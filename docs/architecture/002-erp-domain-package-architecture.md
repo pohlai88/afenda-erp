@@ -23,7 +23,7 @@ finance, HR, sales, inventory, or CRM business logic.
 | List/metadata builders   | `packages/domain/src/modules/list-surfaces.ts`        | Move to `@afenda/feature-*` when threshold met            |
 | Database schema          | Flat `packages/db/src/schema/*.ts` + shared `erp.ts` | `schema/<moduleId>/` for ledger-grade tables              |
 | Vercel project link      | **Deferred** until repo stable (see **ARCH-001**)    | Root-linked monorepo; `vercel.json` already defines build |
-| Feature packages on disk | **None** (`packages/features/*` glob ready)          | One package per extracted module                          |
+| Feature packages on disk | **Nine scaffold packages** (`@afenda/feature-*`)     | Module logic moves in as extraction threshold is met      |
 
 ## Decision
 
@@ -98,7 +98,7 @@ runtime context: [System Architecture](001-system-architecture.md).
 
 ## As-built compatibility layer
 
-Until the first `@afenda/feature-*` package exists:
+Feature packages exist as module-bound metadata wrappers; domain builders and route adapters remain the active wiring path until extraction moves logic into `@afenda/feature-*`:
 
 | Concern                            | Current owner                                                                                                         |
 | ---------------------------------- | --------------------------------------------------------------------------------------------------------------------- |

@@ -1,13 +1,14 @@
 import { requireCapability } from "@afenda/auth/server";
 import {
-  buildWorkItemDetailTabs,
   describeWorkspaceDataSource,
   getErpModuleById,
   getModuleWorkspaceWorkItem,
+  isCoreModuleId,
   isModuleId,
   resolveWorkspaceDataMode,
-  type ModuleId,
+  type CoreModuleId,
 } from "@afenda/domain";
+import { getModuleFeatureMetadata } from "@/lib/module-feature-metadata";
 import { GovernedDetailTabs } from "@afenda/governed-surface/server";
 import { SectionPanel, StatusBadge } from "@afenda/ui";
 import type { Metadata } from "next";
@@ -21,8 +22,8 @@ type WorkItemDetailPageProps = {
   }>;
 };
 
-function resolveModuleId(moduleId: string): ModuleId {
-  if (!isModuleId(moduleId) || moduleId === "dashboard") {
+function resolveModuleId(moduleId: string): CoreModuleId {
+  if (!isModuleId(moduleId) || !isCoreModuleId(moduleId)) {
     notFound();
   }
 
@@ -58,6 +59,7 @@ async function loadWorkItemDetail({ params }: WorkItemDetailPageProps) {
     organization,
     workItem,
     dataMode,
+    moduleId: resolvedModuleId,
   };
 }
 
@@ -75,11 +77,10 @@ export async function generateMetadata(
 export default async function WorkItemDetailPage(
   props: WorkItemDetailPageProps,
 ) {
-  const { moduleDefinition, organization, workItem, dataMode } =
+  const { moduleDefinition, organization, workItem, dataMode, moduleId } =
     await loadWorkItemDetail(props);
 
-  const detailTabsModel = buildWorkItemDetailTabs({
-    moduleId: moduleDefinition.id,
+  const detailTabsModel = getModuleFeatureMetadata(moduleId).buildWorkItemDetailTabs({
     workItem,
   });
 

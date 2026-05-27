@@ -26,7 +26,7 @@ import type {
 } from "@afenda/governed-surface/schemas";
 import { resolveModuleMetrics } from "./shared/module-metrics";
 import type { ModuleId } from "@afenda/config/module-ids";
-import type { ModuleDataMode } from "./shared/workspace-tables";
+import type { ModuleDataMode } from "./shared/workspace-data-mode";
 import {
   toRecordWindowQuery,
   toWorkItemWindowQuery,
@@ -47,6 +47,7 @@ export {
 export {
   buildDashboardAiUsageListSurface,
   buildDashboardAutomationListSurface,
+  buildDashboardHardeningChecklistSurface,
   buildDashboardWorkflowListSurface,
   buildDocumentRegistryListSurface,
   buildModuleRecordListSurface,
@@ -56,16 +57,21 @@ export {
   buildSavedViewsListSurface,
   buildSolutionConsoleAiUsageListSurface,
   buildSolutionConsoleEvidenceListSurface,
+  dashboardHardeningChecklistSurfaceKey,
   getDashboardListSurfaceKeys,
   getModuleListSurfaceKeys,
   getSolutionConsoleListSurfaceKeys,
 } from "./modules/list-surfaces";
 export {
   buildDashboardKpiStatGrid,
+  buildDashboardWorkflowSummaryStatGrid,
+  buildModuleScreenOverviewStatGrid,
   buildModuleWorkspaceCountStatGrid,
   buildModuleWorkspaceStatGrid,
   buildSolutionConsoleStatGrid,
   dashboardStatSurfaceKey,
+  dashboardWorkflowSummaryStatSurfaceKey,
+  getModuleOverviewStatSurfaceKey,
   getModuleStatSurfaceKey,
   solutionConsoleStatSurfaceKey,
   type ResolvedMetric,
@@ -88,6 +94,12 @@ export {
 export {
   buildDocumentExtractionFormMetadata,
 } from "./modules/form-surfaces";
+export {
+  createModuleFeatureMetadata,
+  isCoreModuleId,
+  type CoreModuleId,
+  type ModuleFeatureMetadata,
+} from "./modules/feature-metadata";
 export {
   resolveModuleWorkspaceListQuery,
   type ModuleWorkspaceListQuery,
@@ -113,7 +125,7 @@ export {
   describeWorkspaceDataSource,
   resolveWorkspaceDataMode,
   type ModuleDataMode,
-} from "./shared/workspace-tables";
+} from "./shared/workspace-data-mode";
 export {
   getModuleObservabilityIndicators,
   type ModuleObservabilityIndicator,
@@ -269,7 +281,7 @@ export type ModuleWorkspaceDocument = {
 
 export type ModuleWorkspace = {
   module: ErpModuleDefinition;
-  dataMode: import("./shared/workspace-tables").ModuleDataMode;
+  dataMode: import("./shared/workspace-data-mode").ModuleDataMode;
   fallbackApplied: boolean;
   records: readonly ModuleWorkspaceRecord[];
   recordWindow: ModuleWorkspaceWindow;

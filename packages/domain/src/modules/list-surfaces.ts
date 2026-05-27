@@ -667,12 +667,73 @@ export function buildDashboardAiUsageListSurface(input: {
   });
 }
 
+export function buildDashboardHardeningChecklistSurface(input: {
+  items: readonly {
+    area: string;
+    status: string;
+    detail: string;
+  }[];
+}): ListSurfaceRendererConfigurationResolvedInput {
+  const rows = input.items;
+
+  return buildGovernedListSurface({
+    __schemaVersion: GOVERNED_METADATA_SCHEMA_VERSION,
+    dataNature: "table",
+    presentationProfile: "erp-operational-table",
+    requiresErpPermission: {
+      module: "dashboard",
+      object: "hardening-checklist",
+      function: "read",
+    },
+    pagination: buildPagination(undefined, rows.length),
+    surface: {
+      header: { title: dashboardRouteSections.productionHardening.title },
+      columnsId: "dashboard-hardening-checklist",
+      rowKey: "area",
+      empty: {
+        variant: "muted",
+        title: "No hardening checklist items are configured.",
+      },
+    },
+    columns: [
+      {
+        id: "area",
+        header: "Area",
+        priority: "primary" as const,
+        pin: "start" as const,
+        wrap: true,
+        minWidth: 160,
+      },
+      {
+        id: "status",
+        header: "Status",
+        cellKind: { kind: "badge" as const },
+      },
+      { id: "detail", header: "Detail", wrap: true },
+    ],
+    rows: rows.map((item) => ({
+      id: item.area,
+      cells: {
+        area: item.area,
+        status: item.status,
+        detail: item.detail,
+      },
+      rowTone:
+        item.status === "review" ? ("attention" as const) : ("default" as const),
+    })),
+  });
+}
+
+export const dashboardHardeningChecklistSurfaceKey =
+  "dashboard.hardening-checklist.list";
+
 export function getDashboardListSurfaceKeys() {
   return {
     workflow: "dashboard.workflow.list",
     aiUsage: "dashboard.ai-usage.list",
     automations: "dashboard.automations.list",
     savedViews: "dashboard.saved-views.list",
+    hardeningChecklist: dashboardHardeningChecklistSurfaceKey,
   };
 }
 

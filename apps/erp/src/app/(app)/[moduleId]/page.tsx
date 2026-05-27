@@ -1,10 +1,11 @@
 import { createModuleMetadata, ModuleRoutePage } from "../module-screen";
 import { getCachedModuleMetadata } from "@/lib/cached-module-metadata";
 import {
+  isCoreModuleId,
   isModuleId,
   moduleIds,
   resolveModuleWorkspaceListQuery,
-  type ModuleId,
+  type CoreModuleId,
   type ModuleWorkspaceSearchParams,
 } from "@afenda/domain";
 import type { Metadata } from "next";
@@ -15,8 +16,8 @@ type ModulePageProps = {
   searchParams?: Promise<ModuleWorkspaceSearchParams>;
 };
 
-function resolveModuleId(moduleId: string): ModuleId {
-  if (!isModuleId(moduleId) || moduleId === "dashboard") {
+function resolveModuleId(moduleId: string): CoreModuleId {
+  if (!isModuleId(moduleId) || !isCoreModuleId(moduleId)) {
     notFound();
   }
 

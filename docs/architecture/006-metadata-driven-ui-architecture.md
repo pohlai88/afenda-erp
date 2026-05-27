@@ -20,11 +20,11 @@ Metadata may describe fields, columns, row links, filters, sort choices, present
 
 - `@afenda/governed-surface` is the governed UI kernel and already exposes public doors for root, `client`, `server`, `metadata`, and `schemas`.
 - `@afenda/erp` owns App Router routes, Server Components, session context, and page composition.
-- `@afenda/domain` currently owns module definitions, record type definitions, query normalization, workspace shaping, and surface builders as a shared contract layer. Mature module-specific implementations move to `@afenda/feature-*` packages under `packages/features/*` when created. **No feature packages exist on disk yet.**
+- `@afenda/domain` owns module definitions, record type definitions, query normalization, workspace shaping, and surface builders as a shared contract layer. Module-bound builder wrappers live in `@afenda/feature-*` packages under `packages/features/*`; routes may still call domain builders during the compatibility window.
 - `@afenda/db` owns persisted ERP records, work items, saved views, documents, query windows, Drizzle schema, and RLS context helpers.
-- `@afenda/ui` provides accessible primitives and remains metadata-unaware.
-- Dashboard, module workspace, and solution-console list sections already render through `GovernedPatternCListSection`.
-- Stats still use `MetricCard` and `MetricGrid` in app routes. `buildGovernedStatGrid` exists, but app-level stat adoption is deliberate rather than automatic.
+- `@afenda/ui` provides accessible layout primitives (`SectionPanel`, `StatusBadge`, `ModuleLinkGrid`, …) and remains metadata-unaware. Tabular ERP data renders through governed list/stat/chart sections — not ERP shell grid composites.
+- Dashboard, module workspace, and solution-console surfaces render through `GovernedPatternBStatSection`, `GovernedPatternCListSection`, and related governed sections.
+- Stats, workflow summaries, module overview metadata, and hardening checklists use `buildGovernedStatGrid` / `buildGovernedListSurface` domain builders.
 - `RecordTypeDefinition` is the app-facing contract for record list columns, default profile, default filters, default sort, route templates, toolbar metadata, extension validation, and record permissions.
 - Server windows expose `pageSize`, `totalCount`, `hasNextPage`, and opaque cursor metadata. Route-level list state uses server-normalized URL params.
 

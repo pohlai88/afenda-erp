@@ -1,7 +1,7 @@
 import { getCachedModuleMetadata } from "@/lib/cached-module-metadata";
-import { createModuleMetadata } from "../module-screen";
 import { DashboardRoutePage } from "../dashboard-route";
 import {
+  getErpModuleById,
   resolveModuleWorkspaceListQuery,
   type ModuleWorkspaceSearchParams,
 } from "@afenda/domain";
@@ -9,8 +9,16 @@ import type { Metadata } from "next";
 
 export async function generateMetadata(): Promise<Metadata> {
   const cachedMetadata = await getCachedModuleMetadata("dashboard");
+  if (cachedMetadata) {
+    return cachedMetadata;
+  }
 
-  return cachedMetadata ?? createModuleMetadata("dashboard");
+  const moduleDefinition = getErpModuleById("dashboard");
+
+  return {
+    title: moduleDefinition?.label ?? "Dashboard",
+    description: moduleDefinition?.description,
+  };
 }
 
 export default async function DashboardPage({

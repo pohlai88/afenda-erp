@@ -6,6 +6,10 @@ import {
   buildSolutionConsoleAiUsageListSurface,
   buildSolutionConsoleEvidenceListSurface,
   buildSolutionConsoleStatGrid,
+  getSolutionConsoleListSurfaceKeys,
+  solutionConsoleStatSurfaceKey,
+} from "@afenda/feature-solution-console/metadata";
+import {
   describeWorkspaceDataSource,
   getAccessibleModules,
   getAiUsageRouteSummary,
@@ -15,11 +19,9 @@ import {
   getNavigationExtensionHeroCopy,
   getRecoveryConsoleModuleIds,
   getRecoveryPlaybookDefinitions,
-  getSolutionConsoleListSurfaceKeys,
   getSolutionConsoleSection,
   resolveWorkspaceDataMode,
   solutionConsoleMetrics,
-  solutionConsoleStatSurfaceKey,
 } from "@afenda/domain";
 import {
   GovernedPatternBStatSection,

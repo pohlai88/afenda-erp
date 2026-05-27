@@ -691,7 +691,7 @@ Lists on the **same page** as those islands should still use Pattern B/C where a
 | **3 — Resolver**            | **Done**        | `resolve-governed-presentation.ts` (pure merge, no RBAC)                                                                                   |
 | **4 — Builder helpers**     | **Done**        | `buildGovernedListSurface`, `buildGovernedStatGrid`                                                                                        |
 | **5 — ERP workspace lists** | **Done**        | `packages/domain/src/modules/list-surfaces.ts` builds module record and work-item lists with profile-first helpers                          |
-| **6 — Stat adoption**       | **Partial**     | `buildGovernedStatGrid` exists; dashboard and module routes still use handcrafted `MetricCard` where route-specific composition is clearer |
+| **6 — Stat adoption**       | **Done**        | Module, dashboard, and solution-console routes use `buildGovernedStatGrid` via `GovernedPatternBStatSection` |
 | **7 — Feature extraction**  | **Not started** | Move module builders and services into `@afenda/feature-*` when modules mature — see erp-domain architecture                               |
 
 ### After kernel ship

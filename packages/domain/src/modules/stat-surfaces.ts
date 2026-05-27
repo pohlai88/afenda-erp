@@ -23,8 +23,7 @@ export type ResolvedMetric = {
 };
 
 /**
- * Maps resolved module metrics (from definitions or DB) to a governed KPI stat grid.
- * Used for module workspace headline metrics that previously used MetricGrid.
+ * Maps resolved module metrics to a governed KPI stat grid.
  */
 export function buildModuleWorkspaceStatGrid(input: {
   moduleId: ModuleId;
@@ -52,7 +51,6 @@ export function buildModuleWorkspaceStatGrid(input: {
 
 /**
  * Maps raw workspace counts to a governed operation-summary stat grid.
- * Replaces the three individual MetricCard components in module-screen.tsx.
  */
 export function buildModuleWorkspaceCountStatGrid(input: {
   moduleId: ModuleId;
@@ -89,7 +87,6 @@ export function buildModuleWorkspaceCountStatGrid(input: {
 
 /**
  * Builds the dashboard KPI stat grid from resolved organization-level metrics.
- * Replaces the MetricCard trio and MetricGrid in dashboard-route.tsx.
  */
 export function buildDashboardKpiStatGrid(input: {
   metrics: readonly ResolvedMetric[];
@@ -115,7 +112,6 @@ export function buildDashboardKpiStatGrid(input: {
 
 /**
  * Builds the solution console capability stat grid.
- * Replaces MetricCard usage in solution-console-route.tsx.
  */
 export function buildSolutionConsoleStatGrid(input: {
   metrics: readonly ResolvedMetric[];
@@ -136,5 +132,62 @@ export function getModuleStatSurfaceKey(moduleId: ModuleId) {
   return `${moduleId}-kpi-stats`;
 }
 
+export function getModuleOverviewStatSurfaceKey(moduleId: ModuleId) {
+  return `${moduleId}-overview-stats`;
+}
+
+/**
+ * Snapshot stat grid for module header metadata (route, views, data source, milestones).
+ */
+export function buildModuleScreenOverviewStatGrid(input: {
+  moduleId: ModuleId;
+  stats: readonly { label: string; value: string }[];
+}): StatCardConfigurationResolvedInput {
+  return buildGovernedStatGrid({
+    __schemaVersion: GOVERNED_METADATA_SCHEMA_VERSION,
+    dataNature: "snapshot-summary",
+    presentationProfile: "erp-kpi-grid",
+    stats: input.stats.map((stat) => ({
+      label: stat.label,
+      value: stat.value,
+      tone: "default" as const,
+    })),
+  });
+}
+
+/**
+ * Workflow queue summary counts for the dashboard automation panel.
+ */
+export function buildDashboardWorkflowSummaryStatGrid(input: {
+  queueDepth: number;
+  escalations: number;
+  highPriority: number;
+}): StatCardConfigurationResolvedInput {
+  return buildGovernedStatGrid({
+    __schemaVersion: GOVERNED_METADATA_SCHEMA_VERSION,
+    dataNature: "kpi",
+    presentationProfile: "erp-kpi-grid",
+    stats: [
+      {
+        label: "Queue depth",
+        value: String(input.queueDepth),
+        tone: input.queueDepth > 0 ? "attention" : "default",
+      },
+      {
+        label: "Escalations",
+        value: String(input.escalations),
+        tone: input.escalations > 0 ? "attention" : "positive",
+      },
+      {
+        label: "High priority",
+        value: String(input.highPriority),
+        tone: input.highPriority > 0 ? "attention" : "positive",
+      },
+    ],
+  });
+}
+
 export const dashboardStatSurfaceKey = "dashboard-kpi-stats";
+export const dashboardWorkflowSummaryStatSurfaceKey =
+  "dashboard-workflow-summary-stats";
 export const solutionConsoleStatSurfaceKey = "solution-console-exec-stats";

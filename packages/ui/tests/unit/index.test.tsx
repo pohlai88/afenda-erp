@@ -1,64 +1,44 @@
 import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 import {
-  MetricGrid,
-  OperationalSkillGrid,
-  RecoveryPlaybookGrid,
+  ModuleLinkGrid,
+  ObservabilityIndicatorList,
+  SectionPanel,
   StatusBadge,
-  WorkflowSummaryPanel,
 } from "../../src/index";
 
-describe("@afenda/ui metadata components", () => {
+describe("@afenda/ui shell primitives", () => {
   afterEach(() => {
     cleanup();
   });
 
-  it("renders metric grid from metadata rows", () => {
+  it("renders section panel headings", () => {
     render(
-      <MetricGrid
-        metrics={[
+      <SectionPanel title="Workspace overview" description="Tenant context">
+        <div>Body</div>
+      </SectionPanel>,
+    );
+
+    expect(screen.getByText("Workspace overview")).toBeTruthy();
+    expect(screen.getByText("Body")).toBeTruthy();
+  });
+
+  it("renders observability indicators", () => {
+    render(
+      <ObservabilityIndicatorList
+        indicators={[
           {
-            label: "Open approvals",
-            value: "14",
-            detail: "Pending review",
-            tone: "warning",
+            label: "Queue latency",
+            value: "Healthy",
+            detail: "Within service budget.",
+            tone: "positive",
           },
         ]}
       />,
     );
 
-    expect(screen.getByText("Open approvals")).toBeTruthy();
-    expect(screen.getByText("14")).toBeTruthy();
-  });
-
-  it("renders recovery playbooks from metadata", () => {
-    render(
-      <RecoveryPlaybookGrid
-        playbooks={[
-          {
-            id: "cash-flow",
-            label: "Improve cash flow",
-            problem: "Cash-flow pressure",
-            diagnosis: "Collections delayed",
-            action: "Draft follow-ups",
-            risk: "high",
-          },
-        ]}
-      />,
-    );
-
-    expect(screen.getByText("Improve cash flow")).toBeTruthy();
-    expect(screen.getByText("Draft follow-ups")).toBeTruthy();
-  });
-
-  it("renders workflow summary counts", () => {
-    render(
-      <WorkflowSummaryPanel escalations={2} highPriority={3} queueDepth={7} />,
-    );
-
-    expect(screen.getByText("7")).toBeTruthy();
-    expect(screen.getByText("2")).toBeTruthy();
-    expect(screen.getByText("3")).toBeTruthy();
+    expect(screen.getByText("Queue latency")).toBeTruthy();
+    expect(screen.getByText("Healthy")).toBeTruthy();
   });
 
   it("renders status badge tone labels", () => {
@@ -67,31 +47,23 @@ describe("@afenda/ui metadata components", () => {
     expect(screen.getByText("Healthy")).toBeTruthy();
   });
 
-  it("renders operational skills from metadata", () => {
+  it("renders module link grid entries", () => {
     render(
-      <OperationalSkillGrid
-        skills={[
+      <ModuleLinkGrid
+        modules={[
           {
-            id: "lms-training-designer",
-            moduleId: "lms",
-            label: "LMS training designer",
-            description: "Design and schedule training plans with approval.",
-            problemTypes: ["skill_gap", "compliance_training"],
-            readToolNames: ["analyzeTrainingNeeds", "reviewCertificationGaps"],
-            draftToolNames: [
-              "designTrainingPlan",
-              "draftLearnerAssignments",
-              "draftTrainingSchedule",
-            ],
-            approvalToolNames: ["proposeTrainingApproval"],
-            approvalPolicy: "human-approval-required",
+            id: "finance",
+            href: "/finance",
+            label: "Finance",
+            summary: "Ledger and close controls.",
+            statusLabel: "Operational",
+            statusTone: "positive",
           },
         ]}
       />,
     );
 
-    expect(screen.getByText("LMS training designer")).toBeTruthy();
-    expect(screen.getByText("human approval required")).toBeTruthy();
-    expect(screen.getByText(/skill_gap/)).toBeTruthy();
+    expect(screen.getByText("Finance")).toBeTruthy();
+    expect(screen.getByText("Ledger and close controls.")).toBeTruthy();
   });
 });

@@ -1,14 +1,15 @@
 import { requireCapability } from "@afenda/auth/server";
 import { GovernedDetailTabs } from "@afenda/governed-surface/server";
 import {
-  buildRecordDetailTabs,
   describeWorkspaceDataSource,
   getErpModuleById,
   getModuleWorkspaceRecord,
+  isCoreModuleId,
   isModuleId,
   resolveWorkspaceDataMode,
-  type ModuleId,
+  type CoreModuleId,
 } from "@afenda/domain";
+import { getModuleFeatureMetadata } from "@/lib/module-feature-metadata";
 import { SectionPanel, StatusBadge } from "@afenda/ui";
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -21,8 +22,8 @@ type RecordDetailPageProps = {
   }>;
 };
 
-function resolveModuleId(moduleId: string): ModuleId {
-  if (!isModuleId(moduleId) || moduleId === "dashboard") {
+function resolveModuleId(moduleId: string): CoreModuleId {
+  if (!isModuleId(moduleId) || !isCoreModuleId(moduleId)) {
     notFound();
   }
 
@@ -58,6 +59,7 @@ async function loadRecordDetail({ params }: RecordDetailPageProps) {
     organization,
     record,
     dataMode,
+    moduleId: resolvedModuleId,
   };
 }
 
@@ -73,11 +75,10 @@ export async function generateMetadata(
 }
 
 export default async function RecordDetailPage(props: RecordDetailPageProps) {
-  const { moduleDefinition, organization, record, dataMode } =
+  const { moduleDefinition, organization, record, dataMode, moduleId } =
     await loadRecordDetail(props);
 
-  const detailTabsModel = buildRecordDetailTabs({
-    moduleId: moduleDefinition.id,
+  const detailTabsModel = getModuleFeatureMetadata(moduleId).buildRecordDetailTabs({
     record,
   });
 

@@ -6,7 +6,7 @@ alwaysApply: false
 
 # Afenda feature packages (`@afenda/feature-*`)
 
-**ARCH-002** · **ARCH-004** (naming). No feature packages exist on disk yet — follow this when creating one.
+**ARCH-002** · **ARCH-004** (naming). Nine `@afenda/feature-*` packages exist under `packages/features/*`.
 
 ## Create when
 

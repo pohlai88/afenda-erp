@@ -1,15 +1,5 @@
 import {
-  buildDocumentRegistryListSurface,
-  buildModuleRecordListSurface,
-  buildModuleWorkItemListSurface,
-  buildModuleWorkItemKanbanSurface,
-  buildModuleWorkspaceCountStatGrid,
-  buildModuleWorkspaceStatGrid,
-  buildSavedViewsListSurface,
   describeWorkspaceDataSource,
-  getModuleListSurfaceKeys,
-  getModuleStatSurfaceKey,
-  getModuleWorkItemKanbanSurfaceKey,
   formatModuleObservabilityFooter,
   getAccessibleModules,
   getErpModuleById,
@@ -20,13 +10,13 @@ import {
   moduleScreenDetailListLabels,
   moduleScreenSections,
   resolveWorkspaceDataMode,
-  type ModuleId,
+  type CoreModuleId,
   type ModuleWorkspaceListQuery,
 } from "@afenda/domain";
 import { requireCapability } from "@afenda/auth/server";
+import { getModuleFeatureMetadata } from "@/lib/module-feature-metadata";
 import {
   BulletColumns,
-  DetailList,
   ModuleLinkGrid,
   ObservabilityIndicatorList,
   SectionPanel,
@@ -44,7 +34,7 @@ import { notFound } from "next/navigation";
 import { DocumentExtractionForm } from "./document-extraction-form";
 import { DocumentUploadForm } from "./document-upload-form";
 
-function getModuleOrThrow(moduleId: ModuleId) {
+function getModuleOrThrow(moduleId: CoreModuleId) {
   const moduleDefinition = getErpModuleById(moduleId);
 
   if (!moduleDefinition) {
@@ -54,7 +44,7 @@ function getModuleOrThrow(moduleId: ModuleId) {
   return moduleDefinition;
 }
 
-export function createModuleMetadata(moduleId: ModuleId): Metadata {
+export function createModuleMetadata(moduleId: CoreModuleId): Metadata {
   const moduleDefinition = getModuleOrThrow(moduleId);
 
   return {
@@ -67,10 +57,11 @@ export async function ModuleRoutePage({
   moduleId,
   query,
 }: {
-  moduleId: ModuleId;
+  moduleId: CoreModuleId;
   query?: ModuleWorkspaceListQuery;
 }) {
   const moduleDefinition = getModuleOrThrow(moduleId);
+  const metadata = getModuleFeatureMetadata(moduleId);
   const { session, organization } = await requireCapability(
     moduleDefinition.requiredCapability,
   );
@@ -85,31 +76,26 @@ export async function ModuleRoutePage({
   const neighboringModules = getAccessibleModules(organization.capabilities)
     .filter((module) => module.id !== moduleId)
     .slice(0, 3);
-  const surfaceKeys = getModuleListSurfaceKeys(moduleId);
-  const recordListSurface = buildModuleRecordListSurface({
-    moduleId,
+  const surfaceKeys = metadata.getListSurfaceKeys();
+  const recordListSurface = metadata.buildRecordListSurface({
     records: workspace.records,
     window: workspace.recordWindow,
     query,
   });
-  const workItemListSurface = buildModuleWorkItemListSurface({
-    moduleId,
+  const workItemListSurface = metadata.buildWorkItemListSurface({
     workItems: workspace.workItems,
     window: workspace.workItemWindow,
     query,
   });
-  const savedViewsListSurface = buildSavedViewsListSurface({
+  const savedViewsListSurface = metadata.buildSavedViewsListSurface({
     views: workspace.savedViews,
-    moduleId,
   });
-  const documentListSurface = buildDocumentRegistryListSurface({
+  const documentListSurface = metadata.buildDocumentRegistryListSurface({
     documents: workspace.documents,
-    moduleId,
   });
   const workItemKanbanSurface =
     moduleId === "approvals"
-      ? buildModuleWorkItemKanbanSurface({
-          moduleId,
+      ? metadata.buildWorkItemKanbanSurface({
           workItems: workspace.workItems,
         })
       : null;
@@ -149,34 +135,44 @@ export async function ModuleRoutePage({
           </div>
         }
       >
-        <DetailList
-          items={[
+        <GovernedPatternBStatSection
+          title="Module context"
+          surfaceKey={metadata.getOverviewStatSurfaceKey()}
+          layout="embedded"
+          statGroups={[
             {
-              label: moduleScreenDetailListLabels.primaryRoute,
-              value: moduleDefinition.href,
-            },
-            {
-              label: moduleScreenDetailListLabels.defaultViews,
-              value: moduleDefinition.defaultViews.join(", "),
-            },
-            {
-              label: moduleScreenDetailListLabels.linkedActions,
-              value:
-                moduleDefinition.actions.length > 0
-                  ? moduleScreenDetailListLabels.metadataRoutes(
-                      moduleDefinition.actions.length,
-                    )
-                  : moduleScreenDetailListLabels.noneConfigured,
-            },
-            {
-              label: moduleScreenDetailListLabels.dataSource,
-              value: dataSourceLabel,
-            },
-            {
-              label: moduleScreenDetailListLabels.milestones,
-              value: moduleScreenDetailListLabels.queuedImprovements(
-                moduleDefinition.milestones.length,
-              ),
+              groupKey: "module-overview",
+              configuration: metadata.buildOverviewStatGrid({
+                stats: [
+                  {
+                    label: moduleScreenDetailListLabels.primaryRoute,
+                    value: moduleDefinition.href,
+                  },
+                  {
+                    label: moduleScreenDetailListLabels.defaultViews,
+                    value: moduleDefinition.defaultViews.join(", "),
+                  },
+                  {
+                    label: moduleScreenDetailListLabels.linkedActions,
+                    value:
+                      moduleDefinition.actions.length > 0
+                        ? moduleScreenDetailListLabels.metadataRoutes(
+                            moduleDefinition.actions.length,
+                          )
+                        : moduleScreenDetailListLabels.noneConfigured,
+                  },
+                  {
+                    label: moduleScreenDetailListLabels.dataSource,
+                    value: dataSourceLabel,
+                  },
+                  {
+                    label: moduleScreenDetailListLabels.milestones,
+                    value: moduleScreenDetailListLabels.queuedImprovements(
+                      moduleDefinition.milestones.length,
+                    ),
+                  },
+                ],
+              }),
             },
           ]}
         />
@@ -197,13 +193,12 @@ export async function ModuleRoutePage({
 
       <GovernedPatternBStatSection
         title="Workspace counts"
-        surfaceKey={`${getModuleStatSurfaceKey(moduleId)}-counts`}
+        surfaceKey={`${metadata.getStatSurfaceKey()}-counts`}
         layout="embedded"
         statGroups={[
           {
             groupKey: "workspace-counts",
-            configuration: buildModuleWorkspaceCountStatGrid({
-              moduleId,
+            configuration: metadata.buildCountStatGrid({
               recordCount: workspaceStats.recordCount,
               workItemCount: workspaceStats.workItemCount,
               documentCount: workspaceStats.documentCount,
@@ -215,13 +210,12 @@ export async function ModuleRoutePage({
 
       <GovernedPatternBStatSection
         title="Module KPIs"
-        surfaceKey={getModuleStatSurfaceKey(moduleId)}
+        surfaceKey={metadata.getStatSurfaceKey()}
         layout="embedded"
         statGroups={[
           {
             groupKey: "module-kpis",
-            configuration: buildModuleWorkspaceStatGrid({
-              moduleId,
+            configuration: metadata.buildStatGrid({
               metrics: headlineMetrics,
             }),
           },
@@ -267,14 +261,14 @@ export async function ModuleRoutePage({
 
       {workItemKanbanSurface ? (
         <GovernedKanbanFooterSection
-          surfaceKey={getModuleWorkItemKanbanSurfaceKey(moduleId)}
+          surfaceKey={metadata.getWorkItemKanbanSurfaceKey()}
           title={moduleScreenSections.workflowQueue.title}
           description="Workflow items by current stage."
           layout="titled"
         >
           <GovernedKanbanReadOnlyBoard
             configuration={workItemKanbanSurface}
-            surfaceKey={getModuleWorkItemKanbanSurfaceKey(moduleId)}
+            surfaceKey={metadata.getWorkItemKanbanSurfaceKey()}
           />
         </GovernedKanbanFooterSection>
       ) : null}

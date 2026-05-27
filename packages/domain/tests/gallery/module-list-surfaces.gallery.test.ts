@@ -13,6 +13,7 @@ import { buildDocumentExtractionFormMetadata } from "../../src/modules/form-surf
 import { buildModuleWorkItemKanbanSurface } from "../../src/modules/kanban-surfaces";
 import {
   buildDashboardAutomationListSurface,
+  buildDashboardHardeningChecklistSurface,
   buildDashboardWorkflowListSurface,
   buildDocumentRegistryListSurface,
   buildModuleRecordListSurface,
@@ -22,6 +23,8 @@ import {
   buildSavedViewsListSurface,
 } from "../../src/modules/list-surfaces";
 import {
+  buildDashboardWorkflowSummaryStatGrid,
+  buildModuleScreenOverviewStatGrid,
   buildModuleWorkspaceCountStatGrid,
   buildModuleWorkspaceStatGrid,
 } from "../../src/modules/stat-surfaces";
@@ -343,6 +346,40 @@ describe("form metadata gallery fixtures", () => {
   it("parses document extraction form — valid", () => {
     const result = parseGovernedMultiStepFormConfiguration(
       buildDocumentExtractionFormMetadata({ moduleId: "finance" }),
+    );
+    expect(result.success).toBe(true);
+  });
+});
+
+describe("dashboard auxiliary surface gallery fixtures", () => {
+  it("parses hardening checklist list — ready", () => {
+    const result = parseListSurfaceRendererConfiguration(
+      buildDashboardHardeningChecklistSurface({
+        items: [
+          { area: "RLS", status: "configured", detail: "Tenant isolation enforced." },
+        ],
+      }),
+    );
+    expect(result.success).toBe(true);
+  });
+
+  it("parses workflow summary stat grid", () => {
+    const result = parseStatCardConfiguration(
+      buildDashboardWorkflowSummaryStatGrid({
+        queueDepth: 7,
+        escalations: 2,
+        highPriority: 3,
+      }),
+    );
+    expect(result.success).toBe(true);
+  });
+
+  it("parses module overview stat grid", () => {
+    const result = parseStatCardConfiguration(
+      buildModuleScreenOverviewStatGrid({
+        moduleId: "finance",
+        stats: [{ label: "Primary route", value: "/finance" }],
+      }),
     );
     expect(result.success).toBe(true);
   });

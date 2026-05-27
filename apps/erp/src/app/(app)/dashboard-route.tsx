@@ -1,18 +1,9 @@
 import { requireCapability } from "@afenda/auth/server";
 import {
-  buildDashboardAiUsageListSurface,
-  buildDashboardAutomationListSurface,
-  buildDashboardHardeningChart,
-  buildDashboardKpiStatGrid,
-  buildDashboardWorkflowListSurface,
-  buildSavedViewsListSurface,
-  dashboardHardeningChartSurfaceKey,
-  dashboardStatSurfaceKey,
   dashboardRouteSections,
   describeWorkspaceDataSource,
   getAccessibleModules,
   getAiUsageRouteSummary,
-  getDashboardListSurfaceKeys,
   getDashboardMetrics,
   getDashboardWorkspace,
   getErpModuleById,
@@ -25,6 +16,20 @@ import {
   type ModuleWorkspaceListQuery,
 } from "@afenda/domain";
 import {
+  buildDashboardAiUsageListSurface,
+  buildDashboardAutomationListSurface,
+  buildDashboardHardeningChart,
+  buildDashboardHardeningChecklistSurface,
+  buildDashboardKpiStatGrid,
+  buildDashboardWorkflowListSurface,
+  buildDashboardWorkflowSummaryStatGrid,
+  buildSavedViewsListSurface,
+  dashboardHardeningChartSurfaceKey,
+  dashboardStatSurfaceKey,
+  dashboardWorkflowSummaryStatSurfaceKey,
+  getDashboardListSurfaceKeys,
+} from "@afenda/feature-dashboard/metadata";
+import {
   GovernedPatternBChartSection,
   GovernedPatternBStatSection,
   GovernedPatternCListSection,
@@ -34,19 +39,13 @@ import {
   getWorkspaceObservabilitySummary,
 } from "@afenda/observability";
 import {
-  HardeningChecklistGrid,
   ModuleLinkGrid,
   ObservabilityIndicatorList,
   SectionPanel,
   StatusBadge,
-  WorkflowSummaryPanel,
 } from "@afenda/ui";
 import { ErpAssistantPanel } from "./erp-assistant-panel";
 import Link from "next/link";
-
-function hardeningStatusTone(status: string) {
-  return status === "review" ? ("warning" as const) : ("positive" as const);
-}
 
 export async function DashboardRoutePage({
   query,
@@ -106,6 +105,9 @@ export async function DashboardRoutePage({
   });
   const hardeningChartConfig = buildDashboardHardeningChart({
     checklist: productionHardeningChecklist,
+  });
+  const hardeningChecklistSurface = buildDashboardHardeningChecklistSurface({
+    items: productionHardeningChecklist,
   });
   const dataSourceLabel = describeWorkspaceDataSource(dashboardWorkspace);
   const workflowSummary = {
@@ -206,10 +208,16 @@ export async function DashboardRoutePage({
             <ObservabilityIndicatorList
               indicators={observabilitySummary.indicators}
             />
-            <WorkflowSummaryPanel
-              escalations={workflowSummary.escalations}
-              highPriority={workflowSummary.highPriority}
-              queueDepth={workflowSummary.queueDepth}
+            <GovernedPatternBStatSection
+              title="Workflow summary"
+              surfaceKey={dashboardWorkflowSummaryStatSurfaceKey}
+              layout="embedded"
+              statGroups={[
+                {
+                  groupKey: "workflow-summary",
+                  configuration: buildDashboardWorkflowSummaryStatGrid(workflowSummary),
+                },
+              ]}
             />
             <GovernedPatternCListSection
               title={dashboardRouteSections.automationTelemetry.scheduledAutomationsTitle}
@@ -259,11 +267,12 @@ export async function DashboardRoutePage({
             chartConfiguration={hardeningChartConfig}
             layout="embedded"
           />
-          <HardeningChecklistGrid
-            items={productionHardeningChecklist.map((item) => ({
-              ...item,
-              statusTone: hardeningStatusTone(item.status),
-            }))}
+          <GovernedPatternCListSection
+            title={dashboardRouteSections.productionHardening.title}
+            surfaceKey={surfaceKeys.hardeningChecklist}
+            listConfiguration={hardeningChecklistSurface}
+            parentAccessAllowed
+            layout="embedded"
           />
         </div>
       </SectionPanel>

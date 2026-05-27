@@ -102,6 +102,9 @@ importers:
       '@afenda/feature-crm':
         specifier: workspace:*
         version: link:../../packages/features/crm
+      '@afenda/feature-dashboard':
+        specifier: workspace:*
+        version: link:../../packages/features/dashboard
       '@afenda/feature-finance':
         specifier: workspace:*
         version: link:../../packages/features/finance
@@ -120,6 +123,9 @@ importers:
       '@afenda/feature-sales':
         specifier: workspace:*
         version: link:../../packages/features/sales
+      '@afenda/feature-solution-console':
+        specifier: workspace:*
+        version: link:../../packages/features/solution-console
       '@afenda/governed-surface':
         specifier: workspace:*
         version: link:../../packages/governed-surface
@@ -378,6 +384,19 @@ importers:
         specifier: workspace:*
         version: link:../../config
 
+  packages/features/dashboard:
+    dependencies:
+      '@afenda/domain':
+        specifier: workspace:*
+        version: link:../../domain
+      '@afenda/governed-surface':
+        specifier: workspace:*
+        version: link:../../governed-surface
+    devDependencies:
+      '@afenda/config':
+        specifier: workspace:*
+        version: link:../../config
+
   packages/features/finance:
     dependencies:
       '@afenda/domain':
@@ -444,6 +463,19 @@ importers:
         version: link:../../config
 
   packages/features/sales:
+    dependencies:
+      '@afenda/domain':
+        specifier: workspace:*
+        version: link:../../domain
+      '@afenda/governed-surface':
+        specifier: workspace:*
+        version: link:../../governed-surface
+    devDependencies:
+      '@afenda/config':
+        specifier: workspace:*
+        version: link:../../config
+
+  packages/features/solution-console:
     dependencies:
       '@afenda/domain':
         specifier: workspace:*
