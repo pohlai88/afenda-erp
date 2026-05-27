@@ -20,6 +20,7 @@ import {
   type ModuleWorkspaceListQuery,
 } from "@afenda/domain";
 import { requireCapability } from "@afenda/auth/server";
+import { getBlobEnv } from "@afenda/config/env";
 import { getModuleFeatureMetadata } from "@/lib/module-feature-metadata";
 import {
   BulletColumns,
@@ -72,6 +73,7 @@ export async function ModuleRoutePage({
   const { session, organization } = await requireCapability(
     moduleDefinition.requiredCapability,
   );
+  const blobEnv = getBlobEnv();
   const workspace = await getModuleWorkspace({
     organizationId: organization.id,
     moduleId,
@@ -99,6 +101,8 @@ export async function ModuleRoutePage({
   });
   const documentListSurface = metadata.buildDocumentRegistryListSurface({
     documents: workspace.documents,
+    window: workspace.documentWindow,
+    query,
   });
   const workItemKanbanSurface =
     moduleId === "approvals"
@@ -329,11 +333,15 @@ export async function ModuleRoutePage({
         description={moduleScreenSections.documents.description}
       >
         <div className="mb-4 grid gap-4 xl:grid-cols-2">
-          <DocumentUploadForm moduleId={moduleId} />
+          <DocumentUploadForm
+            blobConfigured={blobEnv.configured}
+            moduleId={moduleId}
+            organizationId={organization.id}
+          />
           <DocumentExtractionForm moduleId={moduleId} />
         </div>
         <GovernedPatternCListSection
-          title={moduleScreenSections.documents.title}
+          title="Document registry"
           surfaceKey={surfaceKeys.documents}
           listConfiguration={documentListSurface}
           parentAccessAllowed

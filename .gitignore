@@ -30,3 +30,4 @@ apps/erp/test-results/
 apps/erp/playwright-report/
 
 .vercel
+.env*.local

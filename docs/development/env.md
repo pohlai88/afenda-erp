@@ -99,4 +99,29 @@ Official references: [GitHub MCP setup](https://docs.github.com/en/copilot/how-t
 
 ## Vercel
 
-Project linking is **deferred** until stabilization — see [vercel-link.md](./vercel-link.md) and ARCH-001.
+Project linking: [vercel-link.md](./vercel-link.md). Blob storage setup is below.
+
+### Vercel Blob (document uploads)
+
+| Item | Value |
+| ---- | ----- |
+| Store name | `afenda-erp-documents` (`store_Xj6sQ439ILZy4w8Y`) |
+| Access | `private` |
+| Upload route | `/api/uploads` (client upload via `@vercel/blob/client`) |
+| Config route | `GET /api/uploads/config?moduleId=<moduleId>` — tenant pathname prefix |
+| Download route | `GET /api/documents/[documentId]/download?moduleId=<moduleId>` |
+| Required env | `BLOB_READ_WRITE_TOKEN` (auto-provisioned when store is linked) |
+| Local callback (optional) | `VERCEL_BLOB_CALLBACK_URL` — tunnel URL ending in `/api/uploads` so `onUploadCompleted` runs locally |
+
+**Provision (linked project):**
+
+```bash
+vercel blob create-store afenda-erp-documents --access private --yes \
+  --environment production --environment preview --environment development
+```
+
+Copy `BLOB_READ_WRITE_TOKEN` into `.env.config` §D, then `pnpm env:sync:all`. On Vercel preview/production the platform injects the token automatically.
+
+**Local `onUploadCompleted`:** Vercel Blob cannot call `localhost`. Use ngrok/cloudflared and set `VERCEL_BLOB_CALLBACK_URL=https://<tunnel>/api/uploads`. Without it, uploads still land in Blob but DB registration may not run until the callback succeeds on a reachable URL.
+
+Canonical policy: [ARCH-001 § Files and Documents](../architecture/001-system-architecture.md).

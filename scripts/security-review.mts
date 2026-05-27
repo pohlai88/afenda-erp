@@ -18,7 +18,9 @@ const checks: readonly Check[] = [
     name: "Uploads validate capability and content policy",
     file: "apps/erp/src/app/api/uploads/route.ts",
     patterns: [
-      "requireUploadCapability",
+      "assertBlobConfigured",
+      "requireBlobModuleAccess",
+      "assertUploadPathnameMatchesTenant",
       "documentUploadContentTypes",
       "registerTenantDocument",
     ],
@@ -53,12 +55,14 @@ const checks: readonly Check[] = [
   {
     name: "Cron routes require CRON_SECRET",
     file: "apps/erp/src/lib/cron.ts",
-    patterns: ["CRON_SECRET", "authorization", "Bearer"],
+    // getCronSecret reads CRON_SECRET; authorizeCronRequest checks Bearer header
+    patterns: ["getCronSecret", "authorization", "Bearer"],
   },
   {
     name: "Drain endpoint verifies Vercel signature",
     file: "apps/erp/src/app/api/observability/drain/route.ts",
-    patterns: ["VERCEL_DRAIN_SECRET", "verifyVercelSignature"],
+    // getVercelDrainSecret reads VERCEL_DRAIN_SECRET; verifyVercelSignature validates
+    patterns: ["getVercelDrainSecret", "verifyVercelSignature"],
   },
   {
     name: "Tenant tables carry organization scope",

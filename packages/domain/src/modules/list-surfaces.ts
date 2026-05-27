@@ -73,7 +73,7 @@ type ModuleListWindow = {
   nextCursor?: string;
 };
 
-type ModulePaginationKind = "records" | "work-items";
+type ModulePaginationKind = "records" | "work-items" | "documents";
 
 const MODULE_WORK_ITEM_COLUMNS = [
   {
@@ -244,7 +244,11 @@ function buildModuleListHref(input: {
   }
 
   const cursorParam =
-    input.kind === "records" ? "recordsCursor" : "workItemsCursor";
+    input.kind === "records"
+      ? "recordsCursor"
+      : input.kind === "documents"
+        ? "documentsCursor"
+        : "workItemsCursor";
   if (input.cursor) {
     params.set(cursorParam, input.cursor);
   }
@@ -278,7 +282,9 @@ function buildPaginationWithHref(input: {
   const cursor =
     input.kind === "records"
       ? input.query?.recordsCursor
-      : input.query?.workItemsCursor;
+      : input.kind === "documents"
+        ? input.query?.documentsCursor
+        : input.query?.workItemsCursor;
   const currentOffset = decodeWindowOffset(cursor);
   const pageSize = input.window?.pageSize ?? input.rowCount;
   const previousOffset = Math.max(0, currentOffset - Math.max(1, pageSize));
@@ -1057,11 +1063,18 @@ const DOCUMENT_REGISTRY_COLUMNS = [
     header: "Access",
     cellKind: { kind: "badge" as const },
   },
+  {
+    id: "download",
+    header: "Download",
+    cellKind: { kind: "link" as const },
+  },
 ];
 
 export function buildDocumentRegistryListSurface(input: {
   documents: readonly DocumentRegistryRow[];
   moduleId: ModuleId;
+  window?: ModuleListWindow;
+  query?: ModuleWorkspaceListQuery;
 }): ListSurfaceRendererConfigurationResolvedInput {
   const rows = input.documents;
 
@@ -1074,9 +1087,15 @@ export function buildDocumentRegistryListSurface(input: {
       object: "documents",
       function: "read",
     },
-    pagination: buildPagination(undefined, rows.length),
+    pagination: buildPaginationWithHref({
+      moduleId: input.moduleId,
+      kind: "documents",
+      window: input.window,
+      rowCount: rows.length,
+      query: input.query,
+    }),
     surface: {
-      header: { title: moduleScreenSections.documents.title },
+      header: { title: "Document registry" },
       columnsId: `${input.moduleId}-documents`,
       rowKey: "id",
       empty: {
@@ -1092,6 +1111,13 @@ export function buildDocumentRegistryListSurface(input: {
         contentType: doc.contentType,
         size: doc.size,
         access: doc.access,
+        download: "Download",
+      },
+      cellKinds: {
+        download: {
+          kind: "link" as const,
+          href: `/api/documents/${doc.id}/download?moduleId=${input.moduleId}`,
+        },
       },
     })),
   });

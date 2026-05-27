@@ -9,6 +9,7 @@ Local CLI link is active for this monorepo. Preview/production promotion still r
 | Intended deploy app | `@afenda/erp` (`apps/erp`) |
 | Build contract | Root [`vercel.json`](../../vercel.json): `pnpm install` → `pnpm turbo build --filter=@afenda/erp` |
 | **Linked Vercel project** | `afenda-erp` (`prj_rEu23fWSlpHD3C7FzPnsxfWQHBfm`) on team `jacks-projects-7b3cfe94` |
+| **Blob store** | `afenda-erp-documents` (private, `iad1`) — linked to project; `BLOB_READ_WRITE_TOKEN` on all envs |
 | Local link metadata | `.vercel/project.json` (gitignored; created by `vercel link`) |
 | Git integration | `https://github.com/pohlai88/afenda-erp` (connected at link time) |
 | Legacy project | `afenda-vercel` — still points at `pohlai88/afenda-vercel`; do not use for this monorepo |
@@ -38,7 +39,7 @@ Also confirm Neon Auth, migrations, AI routes, and governed list surfaces in a p
 
 1. Confirm dashboard project settings match `vercel.json` (`installCommand`, `buildCommand`, crons). CLI may show “No framework detected” at repo root; custom build commands still apply.
 2. `vercel env pull .env.local` — map keys from [`.env.config.example`](../../.env.config.example) (no secrets in docs). Or continue `pnpm env:sync:all` and merge with pulled vars.
-3. Provision Neon, Neon Auth, Blob, AI Gateway, `CRON_SECRET`, `VERCEL_DRAIN_SECRET`, drain URL on the **`afenda-erp`** project.
+3. Provision Neon, Neon Auth, Blob (`afenda-erp-documents`, private), AI Gateway, `CRON_SECRET`, `VERCEL_DRAIN_SECRET`, drain URL on the **`afenda-erp`** project. Blob env: `BLOB_READ_WRITE_TOKEN` (auto when store is linked); optional local `VERCEL_BLOB_CALLBACK_URL` — see [env.md](./env.md#vercel-blob-document-uploads).
 4. First **preview**: `vercel deploy` (or push to GitHub for automatic preview). Fix builder-only issues before `vercel deploy --prod`.
 5. Enable Vercel Remote Cache for Turborepo when builds are stable.
 

@@ -5,7 +5,7 @@ import {
   getTenantWorkItem,
   getTenantErpRecord,
   listAuditLogsForEntity,
-  listTenantDocuments,
+  listTenantDocumentWindow,
   listTenantErpRecordWindow,
   listTenantSavedViews,
   listTenantWorkItemWindow,
@@ -15,6 +15,7 @@ import {
   type AiUsageSummary,
   type TenantAuditLog,
   type TenantErpDocument,
+  type TenantErpDocumentWindow,
   type TenantErpRecord,
   type TenantErpRecordWindow,
   type TenantErpSavedView,
@@ -31,6 +32,7 @@ import type { ModuleId } from "@afenda/config/module-ids";
 import type { ModuleDataMode } from "./shared/workspace-data-mode";
 import {
   toRecordWindowQuery,
+  toDocumentWindowQuery,
   toWorkItemWindowQuery,
   type ModuleWorkspaceListQuery,
 } from "./shared/module-workspace-query";
@@ -108,6 +110,7 @@ export {
 } from "./modules/feature-metadata";
 export {
   resolveModuleWorkspaceListQuery,
+  toDocumentWindowQuery,
   type ModuleWorkspaceListQuery,
   type ModuleWorkspaceSearchParams,
 } from "./shared/module-workspace-query";
@@ -295,6 +298,7 @@ export type ModuleWorkspace = {
   workItems: readonly ModuleWorkspaceItem[];
   workItemWindow: ModuleWorkspaceWindow;
   documents: readonly ModuleWorkspaceDocument[];
+  documentWindow: ModuleWorkspaceWindow;
 };
 
 export type ModuleWorkspaceStats = {
@@ -627,6 +631,11 @@ function createMetadataWorkspace(
       hasNextPage: false,
     },
     documents: [],
+    documentWindow: {
+      pageSize: 0,
+      totalCount: 0,
+      hasNextPage: false,
+    },
   };
 }
 
@@ -652,6 +661,17 @@ function serializeWorkItemWindow(
   };
 }
 
+function serializeDocumentWindow(
+  window: TenantErpDocumentWindow,
+): ModuleWorkspaceWindow {
+  return {
+    pageSize: window.pageSize,
+    totalCount: window.totalCount,
+    hasNextPage: window.hasNextPage,
+    ...(window.nextCursor ? { nextCursor: window.nextCursor } : {}),
+  };
+}
+
 export async function getModuleWorkspace(input: {
   organizationId: string;
   moduleId: ModuleId;
@@ -668,7 +688,7 @@ export async function getModuleWorkspace(input: {
     return createMetadataWorkspace(moduleDefinition);
   }
 
-  const [recordWindow, savedViews, workItemWindow, documents] =
+  const [recordWindow, savedViews, workItemWindow, documentWindow] =
     await Promise.all([
       listTenantErpRecordWindow({
         organizationId: input.organizationId,
@@ -684,9 +704,10 @@ export async function getModuleWorkspace(input: {
         moduleId: input.moduleId,
         query: toWorkItemWindowQuery(input.query),
       }),
-      listTenantDocuments({
+      listTenantDocumentWindow({
         organizationId: input.organizationId,
         moduleId: input.moduleId,
+        query: toDocumentWindowQuery(input.query),
       }),
     ]);
 
@@ -694,7 +715,7 @@ export async function getModuleWorkspace(input: {
     recordWindow.rows.length === 0 &&
     savedViews.length === 0 &&
     workItemWindow.rows.length === 0 &&
-    documents.length === 0
+    documentWindow.rows.length === 0
   ) {
     return createMetadataWorkspace(moduleDefinition, true);
   }
@@ -710,7 +731,8 @@ export async function getModuleWorkspace(input: {
     savedViews: savedViews.map(serializeSavedView),
     workItems: workItemWindow.rows.map(serializeWorkItem),
     workItemWindow: serializeWorkItemWindow(workItemWindow),
-    documents: documents.map(serializeDocument),
+    documents: documentWindow.rows.map(serializeDocument),
+    documentWindow: serializeDocumentWindow(documentWindow),
   };
 }
 
@@ -767,6 +789,11 @@ export async function getDashboardWorkspace(input: {
     workItems: workItemWindow.rows.map(serializeWorkItem),
     workItemWindow: serializeWorkItemWindow(workItemWindow),
     documents: [],
+    documentWindow: {
+      pageSize: 0,
+      totalCount: 0,
+      hasNextPage: false,
+    },
   };
 }
 
@@ -908,7 +935,7 @@ export function getModuleWorkspaceStats(
     highPriorityWorkItemCount: workspace.workItems.filter(
       (item) => item.priority === "high",
     ).length,
-    documentCount: workspace.documents.length,
+    documentCount: workspace.documentWindow.totalCount,
     savedViewCount: workspace.savedViews.length,
   };
 }

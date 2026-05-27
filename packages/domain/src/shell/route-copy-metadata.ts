@@ -297,6 +297,8 @@ export const documentWorkflowCopy = {
     successMessage:
       "Document uploaded. Registry will refresh after completion.",
     failureMessage: "Document upload failed.",
+    blobUnavailableMessage:
+      "Document uploads are unavailable in this environment.",
     titleLabel: "Document title",
     titlePlaceholder: "Invoice, receipt, contract",
     ownerEntityLabel: "Owner entity",

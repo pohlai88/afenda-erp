@@ -6,6 +6,10 @@ import { upload } from "@vercel/blob/client";
 import { useRouter } from "next/navigation";
 import { useRef, useState, type FormEvent } from "react";
 import {
+  buildTenantBlobPathname,
+  shouldUseMultipartUpload,
+} from "@/lib/api/blob-pathnames.shared";
+import {
   documentUploadAccept,
   documentUploadContentTypes,
   documentUploadMaxSizeBytes,
@@ -40,14 +44,37 @@ function isAllowedContentType(contentType: string) {
   return documentUploadContentTypes.some((allowed) => allowed === contentType);
 }
 
-export function DocumentUploadForm({ moduleId }: { moduleId: ModuleId }) {
+export function DocumentUploadForm({
+  moduleId,
+  blobConfigured,
+  organizationId,
+}: {
+  moduleId: ModuleId;
+  blobConfigured: boolean;
+  organizationId: string;
+}) {
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [state, setState] = useState<UploadState>(idleState);
+  const [state, setState] = useState<UploadState>(
+    blobConfigured
+      ? idleState
+      : {
+          message: uploadCopy.blobUnavailableMessage,
+          tone: "warning",
+        },
+  );
   const [isUploading, setIsUploading] = useState(false);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+
+    if (!blobConfigured) {
+      setState({
+        message: uploadCopy.blobUnavailableMessage,
+        tone: "warning",
+      });
+      return;
+    }
 
     const form = new FormData(event.currentTarget);
     const file = fileInputRef.current?.files?.[0] ?? null;
@@ -86,9 +113,16 @@ export function DocumentUploadForm({ moduleId }: { moduleId: ModuleId }) {
     });
 
     try {
-      await upload(file.name, file, {
+      const pathname = buildTenantBlobPathname({
+        organizationId,
+        moduleId,
+        filename: file.name,
+      });
+
+      await upload(pathname, file, {
         access: "private",
         handleUploadUrl: "/api/uploads",
+        multipart: shouldUseMultipartUpload(file.size),
         clientPayload: JSON.stringify({
           moduleId,
           title,
@@ -118,7 +152,6 @@ export function DocumentUploadForm({ moduleId }: { moduleId: ModuleId }) {
 
   return (
     <form
-      action="/api/uploads"
       className="grid gap-4 rounded-lg border border-line bg-surface-strong p-4"
       onSubmit={handleSubmit}
     >
@@ -169,7 +202,7 @@ export function DocumentUploadForm({ moduleId }: { moduleId: ModuleId }) {
         </div>
         <button
           className="rounded-lg bg-slate-950 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-400"
-          disabled={isUploading}
+          disabled={isUploading || !blobConfigured}
           type="submit"
         >
           {isUploading ? uploadCopy.submittingLabel : uploadCopy.submitLabel}

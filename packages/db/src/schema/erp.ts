@@ -9,6 +9,7 @@ import {
 } from "drizzle-orm/pg-core";
 import {
   erpDocumentAccessEnum,
+  erpDocumentRetentionEnum,
   erpModuleIdEnum,
   erpPriorityEnum,
   erpRecordStatusEnum,
@@ -132,6 +133,12 @@ export const erpDocuments = pgTable(
     contentType: text("content_type").notNull(),
     sizeBytes: integer("size_bytes").notNull(),
     access: erpDocumentAccessEnum("access").notNull(),
+    /** ETag returned by Vercel Blob on upload — the store's content integrity identifier. */
+    blobEtag: text("blob_etag"),
+    /** Data-handling retention class (ARCH-001 §Files). */
+    retentionClass: erpDocumentRetentionEnum("retention_class")
+      .notNull()
+      .default("standard"),
     uploadedByAuthUserId: text("uploaded_by_auth_user_id").notNull(),
     metadata: jsonb("metadata").$type<Record<string, unknown>>().notNull(),
     ...timestampColumns,

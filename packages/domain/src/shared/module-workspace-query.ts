@@ -9,6 +9,7 @@ import {
   type TenantErpRecordWindowQuery,
   type TenantErpWorkItemSort,
   type TenantErpWorkItemWindowQuery,
+  type TenantErpDocumentWindowQuery,
 } from "@afenda/db";
 
 const recordSorts = [
@@ -37,6 +38,7 @@ export type ModuleWorkspaceListQuery = {
   workItemsSort?: TenantErpWorkItemSort;
   workItemsStatus?: ErpWorkItemStatus;
   workItemsPriority?: ErpPriority;
+  documentsCursor?: string;
 };
 
 function firstParam(value: string | string[] | undefined) {
@@ -82,6 +84,7 @@ export function resolveModuleWorkspaceListQuery(
       firstParam(searchParams.workItemsPriority),
       erpPriorities,
     ),
+    documentsCursor: firstParam(searchParams.documentsCursor),
   };
 }
 
@@ -97,6 +100,18 @@ export function toRecordWindowQuery(
     sort: query.recordsSort,
     status: query.recordsStatus,
     recordType: query.recordsRecordType,
+  };
+}
+
+export function toDocumentWindowQuery(
+  query: ModuleWorkspaceListQuery | undefined,
+): TenantErpDocumentWindowQuery | undefined {
+  if (!query) {
+    return undefined;
+  }
+
+  return {
+    cursor: query.documentsCursor,
   };
 }
 

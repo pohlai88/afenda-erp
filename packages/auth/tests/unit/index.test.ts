@@ -23,6 +23,7 @@ describe("auth capabilities", () => {
     expect(normalizeCapabilities(["invalid"], "viewer")).toEqual([
       "dashboard.view",
       "reports.view",
+      "reports.documents.read",
     ]);
   });
 

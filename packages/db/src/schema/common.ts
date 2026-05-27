@@ -66,6 +66,18 @@ export const erpDocumentAccessEnum = pgEnum("erp_document_access", [
   "public",
 ]);
 
+/**
+ * Retention classes map to org data-handling policies (ARCH-001 §Files).
+ * - standard   : default; retained until explicitly deleted.
+ * - short-term : retained for 30 days after last access or explicit purge.
+ * - legal-hold : immutable; deletion requires admin approval workflow.
+ */
+export const erpDocumentRetentionEnum = pgEnum("erp_document_retention", [
+  "standard",
+  "short-term",
+  "legal-hold",
+]);
+
 export const aiFeatureEnum = pgEnum("ai_feature", [
   "assistant",
   "document-extraction",

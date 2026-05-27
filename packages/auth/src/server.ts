@@ -62,6 +62,12 @@ function decodeSession(value: string): UserSession | null {
 }
 
 export { isNeonAuthReady, getNeonAuthServer } from "./neon-auth-server";
+export {
+  hasDocumentReadAccess,
+  hasDocumentWriteAccess,
+  documentReadCapability,
+  documentWriteCapability,
+} from "./index";
 
 export function createDevSessionCookie(session: UserSession) {
   return encodeSession(userSessionSchema.parse(session));

@@ -78,6 +78,13 @@
       "when": 1779889927975,
       "tag": "0010_giant_talkback",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1779894586252,
+      "tag": "0011_mean_sleeper",
+      "breakpoints": true
     }
   ]
 }

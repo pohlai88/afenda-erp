@@ -45,7 +45,7 @@ export function assertUploadTokenMatchesSession(
   }
 }
 
-export function getUploadErrorResponse(error: unknown) {
+export function getBlobRouteErrorResponse(error: unknown) {
   if (error instanceof UploadRouteError) {
     return {
       status: error.status,
@@ -61,7 +61,10 @@ export function getUploadErrorResponse(error: unknown) {
   }
 
   return {
-    status: 400,
+    status: 500,
     message: uploadRouteCopy.uploadFailed,
   };
 }
+
+/** @deprecated Use getBlobRouteErrorResponse */
+export const getUploadErrorResponse = getBlobRouteErrorResponse;

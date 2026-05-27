@@ -90,13 +90,30 @@ export type TenantErpWorkItemWindowQuery = {
   priority?: ErpPriority;
 };
 
+export type ErpDocumentRetentionClass = "standard" | "short-term" | "legal-hold";
+
 export type TenantErpDocument = {
   id: string;
   title: string;
   contentType: string;
   sizeBytes: number;
   access: ErpDocumentAccess;
+  /** ETag returned by Vercel Blob — the store's content integrity identifier. */
+  blobEtag: string | null;
+  retentionClass: ErpDocumentRetentionClass;
   createdAt: Date;
+};
+
+export type TenantErpDocumentWindowQuery = {
+  cursor?: string;
+};
+
+export type TenantErpDocumentWindow = {
+  rows: readonly TenantErpDocument[];
+  pageSize: number;
+  totalCount: number;
+  hasNextPage: boolean;
+  nextCursor?: string;
 };
 
 export type TenantErpRecord = {
@@ -656,30 +673,91 @@ export async function listTenantWorkItemWindow(input: {
   });
 }
 
+export async function listTenantDocumentWindow(input: {
+  organizationId: string;
+  moduleId: ErpModuleId;
+  limit?: number;
+  query?: TenantErpDocumentWindowQuery;
+}): Promise<TenantErpDocumentWindow> {
+  const pageSize = input.limit ?? 6;
+  const offset = decodeWindowOffset(input.query?.cursor);
+
+  return runWithOrganizationContext(input.organizationId, async (db) => {
+    const whereClause = and(
+      eq(erpDocuments.organizationId, input.organizationId),
+      eq(erpDocuments.moduleId, input.moduleId),
+    );
+    const [rows, totalRows] = await Promise.all([
+      db
+        .select({
+          id: erpDocuments.id,
+          title: erpDocuments.title,
+          contentType: erpDocuments.contentType,
+          sizeBytes: erpDocuments.sizeBytes,
+          access: erpDocuments.access,
+          blobEtag: erpDocuments.blobEtag,
+          retentionClass: erpDocuments.retentionClass,
+          createdAt: erpDocuments.createdAt,
+        })
+        .from(erpDocuments)
+        .where(whereClause)
+        .orderBy(desc(erpDocuments.createdAt))
+        .limit(pageSize + 1)
+        .offset(offset),
+      db.select({ value: count() }).from(erpDocuments).where(whereClause),
+    ]);
+    const visibleRows = rows.slice(0, pageSize);
+    const hasNextPage = rows.length > pageSize;
+    const nextCursor = hasNextPage
+      ? encodeWindowOffset(offset + pageSize)
+      : undefined;
+
+    return {
+      rows: visibleRows,
+      pageSize,
+      totalCount: Number(totalRows[0]?.value ?? 0),
+      hasNextPage,
+      ...(nextCursor ? { nextCursor } : {}),
+    };
+  });
+}
+
 export async function listTenantDocuments(input: {
   organizationId: string;
   moduleId: ErpModuleId;
   limit?: number;
+  query?: TenantErpDocumentWindowQuery;
+}) {
+  const window = await listTenantDocumentWindow(input);
+  return window.rows;
+}
+
+export async function getTenantDocument(input: {
+  organizationId: string;
+  documentId: string;
+  moduleId: ErpModuleId;
 }) {
   return runWithOrganizationContext(input.organizationId, async (db) => {
-    return db
+    const rows = await db
       .select({
         id: erpDocuments.id,
         title: erpDocuments.title,
+        pathname: erpDocuments.pathname,
         contentType: erpDocuments.contentType,
-        sizeBytes: erpDocuments.sizeBytes,
         access: erpDocuments.access,
-        createdAt: erpDocuments.createdAt,
+        moduleId: erpDocuments.moduleId,
       })
       .from(erpDocuments)
       .where(
         and(
           eq(erpDocuments.organizationId, input.organizationId),
+          eq(erpDocuments.id, input.documentId),
           eq(erpDocuments.moduleId, input.moduleId),
         ),
       )
-      .orderBy(desc(erpDocuments.createdAt))
-      .limit(input.limit ?? 6);
+      .limit(1);
+
+    return rows[0] ?? null;
   });
 }
 
@@ -693,6 +771,10 @@ export async function registerTenantDocument(input: {
   contentType: string;
   sizeBytes: number;
   access: ErpDocumentAccess;
+  /** ETag returned by Vercel Blob on upload. */
+  blobEtag?: string | null;
+  /** Retention class per org data-handling policy (ARCH-001). Defaults to 'standard'. */
+  retentionClass?: ErpDocumentRetentionClass;
   uploadedByAuthUserId: string;
   metadata: Record<string, unknown>;
 }) {
@@ -724,6 +806,8 @@ export async function registerTenantDocument(input: {
       contentType: input.contentType,
       sizeBytes: input.sizeBytes,
       access: input.access,
+      blobEtag: input.blobEtag ?? null,
+      retentionClass: input.retentionClass ?? "standard",
       uploadedByAuthUserId: input.uploadedByAuthUserId,
       metadata: input.metadata,
     });
@@ -741,6 +825,8 @@ export async function registerTenantDocument(input: {
         contentType: input.contentType,
         sizeBytes: input.sizeBytes,
         access: input.access,
+        blobEtag: input.blobEtag ?? null,
+        retentionClass: input.retentionClass ?? "standard",
       },
     });
 

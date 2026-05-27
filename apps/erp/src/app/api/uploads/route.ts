@@ -1,17 +1,23 @@
-import { getActiveOrganization, getSession } from "@afenda/auth/server";
 import { registerTenantDocument } from "@afenda/db";
-import { getErpModuleById, uploadRouteCopy } from "@afenda/domain";
+import { uploadRouteCopy } from "@afenda/domain";
 import { getRequestId, logServerEvent } from "@afenda/observability";
 import { handleUpload, type HandleUploadBody } from "@vercel/blob/client";
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import {
+  assertBlobConfigured,
+  assertUploadPathnameMatchesTenant,
+  resolveBlobCallbackUrl,
+  resolveUploadedDocumentSize,
+} from "@/lib/api/blob-upload";
+import { requireBlobModuleAccess } from "@/lib/api/blob-route-auth";
 import {
   documentUploadContentTypes,
   documentUploadMaxSizeBytes,
 } from "@/lib/document-upload-policy";
 import {
   assertUploadTokenMatchesSession,
-  getUploadErrorResponse,
+  getBlobRouteErrorResponse,
   UploadRouteError,
   uploadPayloadSchema,
   type UploadTokenPayload,
@@ -30,45 +36,6 @@ function parseUploadTokenPayload(tokenPayload: string | null | undefined) {
     .parse(JSON.parse(tokenPayload)) satisfies UploadTokenPayload;
 }
 
-function getUploadModule(moduleId: UploadTokenPayload["moduleId"]) {
-  const moduleDefinition = getErpModuleById(moduleId);
-
-  if (!moduleDefinition) {
-    throw new Error(`Unknown ERP module: ${moduleId}`);
-  }
-
-  return moduleDefinition;
-}
-
-async function requireUploadCapability(
-  moduleId: UploadTokenPayload["moduleId"],
-) {
-  const moduleDefinition = getUploadModule(moduleId);
-  const session = await getSession();
-
-  if (!session) {
-    throw new UploadRouteError(401, uploadRouteCopy.authenticationRequired);
-  }
-
-  const organization = getActiveOrganization(session);
-
-  if (!organization) {
-    throw new UploadRouteError(409, uploadRouteCopy.organizationRequired);
-  }
-
-  if (
-    !organization.capabilities.includes(moduleDefinition.requiredCapability)
-  ) {
-    throw new UploadRouteError(403, uploadRouteCopy.uploadNotAllowed);
-  }
-
-  return {
-    moduleDefinition,
-    organization,
-    session,
-  };
-}
-
 export async function POST(request: Request): Promise<NextResponse> {
   const startedAt = Date.now();
   const requestId = getRequestId(request);
@@ -78,21 +45,45 @@ export async function POST(request: Request): Promise<NextResponse> {
     module: "documents",
     operation: "blob.client_upload",
   };
+  const accessByModule = new Map<
+    UploadTokenPayload["moduleId"],
+    Awaited<ReturnType<typeof requireBlobModuleAccess>>
+  >();
+
+  async function getUploadAccess(moduleId: UploadTokenPayload["moduleId"]) {
+    const cached = accessByModule.get(moduleId);
+    if (cached) {
+      return cached;
+    }
+
+    const access = await requireBlobModuleAccess(moduleId, "upload");
+    accessByModule.set(moduleId, access);
+    return access;
+  }
 
   try {
+    const blobEnv = assertBlobConfigured();
+
     logServerEvent("info", "Upload route started.", context, { route });
 
     const body = (await request.json()) as HandleUploadBody;
     const jsonResponse = await handleUpload({
       body,
       request,
-      onBeforeGenerateToken: async (_pathname, clientPayload) => {
+      token: blobEnv.BLOB_READ_WRITE_TOKEN,
+      onBeforeGenerateToken: async (pathname, clientPayload) => {
         const parsedPayload = uploadPayloadSchema.parse(
           JSON.parse(clientPayload ?? "{}"),
         );
-        const { session, organization } = await requireUploadCapability(
+        const { session, organization } = await getUploadAccess(
           parsedPayload.moduleId,
         );
+
+        assertUploadPathnameMatchesTenant({
+          pathname,
+          organizationId: organization.id,
+          moduleId: parsedPayload.moduleId,
+        });
 
         logServerEvent(
           "info",
@@ -108,6 +99,7 @@ export async function POST(request: Request): Promise<NextResponse> {
             route,
             contentType: parsedPayload.contentType,
             sizeBytes: parsedPayload.sizeBytes,
+            pathname,
           },
         );
 
@@ -115,6 +107,7 @@ export async function POST(request: Request): Promise<NextResponse> {
           addRandomSuffix: true,
           allowedContentTypes: [...documentUploadContentTypes],
           maximumSizeInBytes: documentUploadMaxSizeBytes,
+          callbackUrl: resolveBlobCallbackUrl(request, blobEnv),
           tokenPayload: JSON.stringify({
             ...parsedPayload,
             organizationId: organization.id,
@@ -124,29 +117,43 @@ export async function POST(request: Request): Promise<NextResponse> {
       },
       onUploadCompleted: async ({ blob, tokenPayload }) => {
         const parsedPayload = parseUploadTokenPayload(tokenPayload);
-        const { organization, session } = await requireUploadCapability(
+        const { organization, session } = await getUploadAccess(
           parsedPayload.moduleId,
         );
+
         assertUploadTokenMatchesSession(
           parsedPayload,
           organization,
           session,
         );
+        assertUploadPathnameMatchesTenant({
+          pathname: blob.pathname,
+          organizationId: organization.id,
+          moduleId: parsedPayload.moduleId,
+        });
+
+        const sizeBytes = resolveUploadedDocumentSize({
+          declaredSizeBytes: parsedPayload.sizeBytes,
+          blob,
+        });
 
         await registerTenantDocument({
-          organizationId: parsedPayload.organizationId,
+          organizationId: organization.id,
           moduleId: parsedPayload.moduleId,
           ownerEntityId: parsedPayload.ownerEntityId,
           title: parsedPayload.title,
           blobUrl: blob.url,
           pathname: blob.pathname,
           contentType: blob.contentType ?? parsedPayload.contentType,
-          sizeBytes: parsedPayload.sizeBytes,
+          sizeBytes,
           access: parsedPayload.access,
-          uploadedByAuthUserId: parsedPayload.uploadedByAuthUserId,
+          blobEtag: blob.etag,
+          retentionClass: "standard",
+          uploadedByAuthUserId: session.id,
           metadata: {
             source: "vercel-blob-client-upload",
             declaredContentType: parsedPayload.contentType,
+            declaredSizeBytes: parsedPayload.sizeBytes,
           },
         });
 
@@ -155,8 +162,8 @@ export async function POST(request: Request): Promise<NextResponse> {
           "Upload completed and registered.",
           {
             requestId,
-            organizationId: parsedPayload.organizationId,
-            userId: parsedPayload.uploadedByAuthUserId,
+            organizationId: organization.id,
+            userId: session.id,
             module: parsedPayload.moduleId,
             operation: "blob.register_upload",
           },
@@ -164,7 +171,7 @@ export async function POST(request: Request): Promise<NextResponse> {
             route,
             durationMs: Date.now() - startedAt,
             pathname: blob.pathname,
-            sizeBytes: parsedPayload.sizeBytes,
+            sizeBytes,
           },
         );
       },
@@ -178,7 +185,7 @@ export async function POST(request: Request): Promise<NextResponse> {
 
     return NextResponse.json(jsonResponse);
   } catch (error) {
-    const response = getUploadErrorResponse(error);
+    const response = getBlobRouteErrorResponse(error);
 
     logServerEvent("error", "Upload route failed.", context, {
       route,

@@ -57,7 +57,7 @@ describe("upload route helpers", () => {
     const response = getUploadErrorResponse(new Error("blob unavailable"));
 
     expect(response).toEqual({
-      status: 400,
+      status: 500,
       message: uploadRouteCopy.uploadFailed,
     });
   });

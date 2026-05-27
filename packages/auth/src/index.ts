@@ -13,14 +13,32 @@ export const DEMO_USER_EMAIL = "owner@afenda.local";
 export const appCapabilities = [
   "dashboard.view",
   "finance.view",
+  "finance.documents.read",
+  "finance.documents.write",
   "sales.view",
+  "sales.documents.read",
+  "sales.documents.write",
   "purchasing.view",
+  "purchasing.documents.read",
+  "purchasing.documents.write",
   "inventory.view",
+  "inventory.documents.read",
+  "inventory.documents.write",
   "hr.view",
+  "hr.documents.read",
+  "hr.documents.write",
   "crm.view",
+  "crm.documents.read",
+  "crm.documents.write",
   "approvals.view",
+  "approvals.documents.read",
+  "approvals.documents.write",
   "reports.view",
+  "reports.documents.read",
+  "reports.documents.write",
   "admin.view",
+  "admin.documents.read",
+  "admin.documents.write",
 ] as const;
 
 export const organizationRoles = [
@@ -99,33 +117,114 @@ const roleCapabilities: Record<OrganizationRole, AppCapability[]> = {
   "finance-manager": [
     "dashboard.view",
     "finance.view",
+    "finance.documents.read",
+    "finance.documents.write",
     "sales.view",
+    "sales.documents.read",
     "purchasing.view",
+    "purchasing.documents.read",
     "reports.view",
+    "reports.documents.read",
     "approvals.view",
+    "approvals.documents.read",
   ],
   "operations-manager": [
     "dashboard.view",
     "sales.view",
+    "sales.documents.read",
+    "sales.documents.write",
     "purchasing.view",
+    "purchasing.documents.read",
+    "purchasing.documents.write",
     "inventory.view",
+    "inventory.documents.read",
+    "inventory.documents.write",
     "crm.view",
+    "crm.documents.read",
     "approvals.view",
+    "approvals.documents.read",
     "reports.view",
+    "reports.documents.read",
   ],
   staff: [
     "dashboard.view",
     "sales.view",
+    "sales.documents.read",
+    "sales.documents.write",
     "purchasing.view",
+    "purchasing.documents.read",
+    "purchasing.documents.write",
     "inventory.view",
+    "inventory.documents.read",
+    "inventory.documents.write",
     "crm.view",
+    "crm.documents.read",
     "approvals.view",
+    "approvals.documents.read",
   ],
-  viewer: ["dashboard.view", "reports.view"],
+  viewer: ["dashboard.view", "reports.view", "reports.documents.read"],
 };
 
 export function capabilitiesForRole(role: OrganizationRole) {
   return [...roleCapabilities[role]];
+}
+
+const documentCapabilityModules = new Set([
+  "finance",
+  "sales",
+  "purchasing",
+  "inventory",
+  "hr",
+  "crm",
+  "approvals",
+  "reports",
+  "admin",
+]);
+
+export function documentReadCapability(
+  moduleId: string,
+): AppCapability | null {
+  const cap = `${moduleId}.documents.read`;
+  if (isAppCapability(cap)) {
+    return cap;
+  }
+
+  return null;
+}
+
+export function documentWriteCapability(
+  moduleId: string,
+): AppCapability | null {
+  const cap = `${moduleId}.documents.write`;
+  if (isAppCapability(cap)) {
+    return cap;
+  }
+
+  return null;
+}
+
+export function hasDocumentReadAccess(
+  capabilities: readonly AppCapability[],
+  moduleId: string,
+): boolean {
+  if (!documentCapabilityModules.has(moduleId)) {
+    return capabilities.some((c) => c === `${moduleId}.view`);
+  }
+
+  const readCap = documentReadCapability(moduleId);
+  return readCap !== null && capabilities.includes(readCap);
+}
+
+export function hasDocumentWriteAccess(
+  capabilities: readonly AppCapability[],
+  moduleId: string,
+): boolean {
+  if (!documentCapabilityModules.has(moduleId)) {
+    return capabilities.some((c) => c === `${moduleId}.view`);
+  }
+
+  const writeCap = documentWriteCapability(moduleId);
+  return writeCap !== null && capabilities.includes(writeCap);
 }
 
 const appCapabilitySet = new Set<string>(appCapabilities);
