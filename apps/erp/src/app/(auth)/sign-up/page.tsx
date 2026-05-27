@@ -1,0 +1,64 @@
+import {
+  getPostSignInDestination,
+  getSession,
+  isNeonAuthReady,
+} from "@afenda/auth/server";
+import { getAuthPageShellCopy, signUpEnvironmentCopy } from "@afenda/domain";
+import { Button } from "@afenda/ui/button";
+import type { Metadata } from "next";
+import Link from "next/link";
+import { redirect } from "next/navigation";
+import { Suspense } from "react";
+import { AuthShell, createAuthPageMetadata } from "../_components/auth-shell";
+import { NeonAuthForm } from "../_components/neon-auth-forms";
+
+const shellCopy = getAuthPageShellCopy("signUp");
+
+export const metadata: Metadata = createAuthPageMetadata("signUp");
+
+export default function SignUpPage() {
+  return (
+    <Suspense
+      fallback={
+        <AuthShell
+          description={shellCopy.suspenseDescription}
+          title={shellCopy.title}
+        >
+          <div className="h-56 rounded-lg bg-muted" />
+        </AuthShell>
+      }
+    >
+      <SignUpPageInner />
+    </Suspense>
+  );
+}
+
+async function SignUpPageInner() {
+  const session = await getSession();
+
+  if (session) {
+    redirect(getPostSignInDestination(session));
+  }
+
+  const neonAuthReady = isNeonAuthReady();
+
+  return (
+    <AuthShell description={shellCopy.description} title={shellCopy.title}>
+      {neonAuthReady ? (
+        <NeonAuthForm mode="sign-up" />
+      ) : (
+        <div>
+          <h2 className="text-2xl font-semibold text-foreground">
+            {signUpEnvironmentCopy.title}
+          </h2>
+          <p className="mt-3 text-sm leading-6 text-muted-foreground">
+            {signUpEnvironmentCopy.description}
+          </p>
+          <Button asChild className="mt-8">
+            <Link href="/sign-in">{signUpEnvironmentCopy.actionLabel}</Link>
+          </Button>
+        </div>
+      )}
+    </AuthShell>
+  );
+}

@@ -1,0 +1,180 @@
+"use client";
+
+import { documentWorkflowCopy } from "@afenda/domain";
+import type { ModuleId } from "@afenda/domain";
+import { upload } from "@vercel/blob/client";
+import { useRouter } from "next/navigation";
+import { useRef, useState, type FormEvent } from "react";
+import {
+  documentUploadAccept,
+  documentUploadContentTypes,
+  documentUploadMaxSizeBytes,
+  formatUploadLimit,
+} from "@/lib/document-upload-policy";
+
+type UploadState = {
+  message: string;
+  tone: "neutral" | "positive" | "warning";
+};
+
+const uploadCopy = documentWorkflowCopy.upload;
+
+const idleState: UploadState = {
+  message: uploadCopy.idleMessage,
+  tone: "neutral",
+};
+
+function getStateClassName(tone: UploadState["tone"]) {
+  if (tone === "positive") {
+    return "border-emerald-200 bg-emerald-50 text-emerald-800";
+  }
+
+  if (tone === "warning") {
+    return "border-amber-200 bg-amber-50 text-amber-900";
+  }
+
+  return "border-line bg-surface text-muted";
+}
+
+function isAllowedContentType(contentType: string) {
+  return documentUploadContentTypes.some((allowed) => allowed === contentType);
+}
+
+export function DocumentUploadForm({ moduleId }: { moduleId: ModuleId }) {
+  const router = useRouter();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [state, setState] = useState<UploadState>(idleState);
+  const [isUploading, setIsUploading] = useState(false);
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    const form = new FormData(event.currentTarget);
+    const file = fileInputRef.current?.files?.[0] ?? null;
+
+    if (!file) {
+      setState({
+        message: uploadCopy.selectDocumentWarning,
+        tone: "warning",
+      });
+      return;
+    }
+
+    if (!isAllowedContentType(file.type)) {
+      setState({
+        message: uploadCopy.invalidTypeWarning,
+        tone: "warning",
+      });
+      return;
+    }
+
+    if (file.size > documentUploadMaxSizeBytes) {
+      setState({
+        message: uploadCopy.sizeLimitWarning(formatUploadLimit()),
+        tone: "warning",
+      });
+      return;
+    }
+
+    const title = String(form.get("title") || file.name).trim();
+    const ownerEntityId = String(form.get("ownerEntityId") || "").trim();
+
+    setIsUploading(true);
+    setState({
+      message: uploadCopy.uploadingMessage,
+      tone: "neutral",
+    });
+
+    try {
+      await upload(file.name, file, {
+        access: "private",
+        handleUploadUrl: "/api/uploads",
+        clientPayload: JSON.stringify({
+          moduleId,
+          title,
+          ownerEntityId: ownerEntityId || undefined,
+          contentType: file.type,
+          sizeBytes: file.size,
+          access: "private",
+        }),
+      });
+
+      event.currentTarget.reset();
+      setState({
+        message: uploadCopy.successMessage,
+        tone: "positive",
+      });
+      router.refresh();
+    } catch (error) {
+      setState({
+        message:
+          error instanceof Error ? error.message : uploadCopy.failureMessage,
+        tone: "warning",
+      });
+    } finally {
+      setIsUploading(false);
+    }
+  }
+
+  return (
+    <form
+      action="/api/uploads"
+      className="grid gap-4 rounded-lg border border-line bg-surface-strong p-4"
+      onSubmit={handleSubmit}
+    >
+      <div className="grid gap-3 md:grid-cols-2">
+        <label className="block">
+          <span className="mb-2 block text-sm font-medium text-foreground">
+            {uploadCopy.titleLabel}
+          </span>
+          <input
+            className="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-foreground outline-none transition focus:border-slate-400"
+            maxLength={160}
+            name="title"
+            placeholder={uploadCopy.titlePlaceholder}
+            type="text"
+          />
+        </label>
+        <label className="block">
+          <span className="mb-2 block text-sm font-medium text-foreground">
+            {uploadCopy.ownerEntityLabel}
+          </span>
+          <input
+            className="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-foreground outline-none transition focus:border-slate-400"
+            maxLength={160}
+            name="ownerEntityId"
+            placeholder={uploadCopy.ownerEntityPlaceholder}
+            type="text"
+          />
+        </label>
+      </div>
+      <label className="block">
+        <span className="mb-2 block text-sm font-medium text-foreground">
+          {uploadCopy.fileLabel}
+        </span>
+        <input
+          ref={fileInputRef}
+          accept={documentUploadAccept}
+          className="w-full rounded-lg border border-dashed border-line bg-surface px-3 py-3 text-sm text-muted file:mr-4 file:rounded-md file:border-0 file:bg-slate-950 file:px-3 file:py-2 file:text-sm file:font-medium file:text-white"
+          name="file"
+          type="file"
+        />
+      </label>
+      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+        <div
+          className={`rounded-lg border px-3 py-2 text-sm ${getStateClassName(state.tone)}`}
+          role="status"
+        >
+          {state.message}
+        </div>
+        <button
+          className="rounded-lg bg-slate-950 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-400"
+          disabled={isUploading}
+          type="submit"
+        >
+          {isUploading ? uploadCopy.submittingLabel : uploadCopy.submitLabel}
+        </button>
+      </div>
+    </form>
+  );
+}

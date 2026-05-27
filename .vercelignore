@@ -1,0 +1,11 @@
+.artifacts
+.vitest-reports
+coverage
+**/coverage
+test-results
+**/test-results
+playwright-report
+**/playwright-report
+blob-report
+**/blob-report
+.codex-*

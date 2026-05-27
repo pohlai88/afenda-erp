@@ -1,0 +1,113 @@
+{
+  "$schema": "https://turborepo.com/schema.json",
+  "globalDependencies": [
+    "package.json",
+    "packages/config/tsconfig.base.json",
+    ".env.config"
+  ],
+  "globalEnv": [
+    "NODE_ENV",
+    "DATABASE_URL",
+    "DATABASE_MIGRATION_URL",
+    "AFENDA_DEV_AUTH_BYPASS",
+    "AFENDA_NEON_AUTH_ENABLED",
+    "AFENDA_E2E_DEV_AUTH",
+    "NEON_AUTH_BASE_URL",
+    "NEON_AUTH_COOKIE_SECRET"
+  ],
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "env": [
+        "NEXT_PUBLIC_APP_NAME",
+        "NEXT_PUBLIC_SITE_URL",
+        "NEXT_PUBLIC_STAGE",
+        "NEXT_PUBLIC_AUTH_URL"
+      ]
+    },
+    "@afenda/erp#build": {
+      "dependsOn": ["^build"],
+      "outputs": [".next/**", "!.next/cache/**"],
+      "env": [
+        "NEXT_PUBLIC_APP_NAME",
+        "NEXT_PUBLIC_SITE_URL",
+        "NEXT_PUBLIC_STAGE",
+        "NEXT_PUBLIC_AUTH_URL",
+        "VERCEL_URL"
+      ]
+    },
+    "@afenda/observability#build": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**"]
+    },
+    "@afenda/domain#build": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**"]
+    },
+    "@afenda/ui#build": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**"]
+    },
+    "@afenda/governed-surface#build": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**"]
+    },
+    "@afenda/config#build": {
+      "outputs": ["dist/**"]
+    },
+    "@afenda/db#build": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**"]
+    },
+    "@afenda/auth#build": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**"]
+    },
+    "@afenda/ai#build": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**"]
+    },
+    "@afenda/workflows#build": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**"]
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "lint": {},
+    "typecheck": {},
+    "test": {
+      "dependsOn": ["^build"],
+      "cache": false
+    },
+    "test:e2e": {
+      "dependsOn": ["@afenda/erp#build"],
+      "cache": false,
+      "env": [
+        "PLAYWRIGHT_BASE_URL",
+        "AFENDA_DEV_AUTH_BYPASS",
+        "AFENDA_NEON_AUTH_ENABLED",
+        "AFENDA_E2E_DEV_AUTH",
+        "NEXT_PUBLIC_APP_NAME",
+        "NEXT_PUBLIC_SITE_URL",
+        "NEXT_PUBLIC_STAGE"
+      ]
+    },
+    "db:generate": {
+      "cache": false
+    },
+    "db:migrate": {
+      "cache": false,
+      "env": [
+        "DATABASE_URL",
+        "DATABASE_MIGRATION_URL",
+        "NEON_PREVIEW_DATABASE_URL"
+      ]
+    },
+    "db:seed": {
+      "cache": false,
+      "env": ["DATABASE_URL"]
+    }
+  }
+}

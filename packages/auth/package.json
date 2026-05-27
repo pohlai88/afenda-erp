@@ -1,0 +1,60 @@
+{
+  "name": "@afenda/auth",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "development": "./src/index.ts",
+      "default": "./dist/index.js"
+    },
+    "./client": {
+      "types": "./src/client.ts",
+      "development": "./src/client.ts",
+      "default": "./dist/client.js"
+    },
+    "./neon-auth-server": {
+      "types": "./src/neon-auth-server.ts",
+      "development": "./src/neon-auth-server.ts",
+      "default": "./dist/neon-auth-server.js"
+    },
+    "./neon-cookies": {
+      "types": "./src/neon-cookies.ts",
+      "development": "./src/neon-cookies.ts",
+      "default": "./dist/neon-cookies.js"
+    },
+    "./neon-session": {
+      "types": "./src/neon-session.ts",
+      "development": "./src/neon-session.ts",
+      "default": "./dist/neon-session.js"
+    },
+    "./server": {
+      "types": "./src/server.ts",
+      "development": "./src/server.ts",
+      "default": "./dist/server.js"
+    }
+  },
+  "dependencies": {
+    "@afenda/config": "workspace:*",
+    "@afenda/db": "workspace:*",
+    "@neondatabase/auth": "0.4.1-beta",
+    "@neondatabase/serverless": "^1.1.0",
+    "drizzle-orm": "catalog:",
+    "jose": "^6.1.2",
+    "zod": "catalog:"
+  },
+  "peerDependencies": {
+    "next": "catalog:",
+    "react": "catalog:"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "lint": "tsc -p tsconfig.json --noEmit",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "vitest": "catalog:"
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "name": "@afenda/config",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./env": {
+      "types": "./src/env.ts",
+      "development": "./src/env.ts",
+      "default": "./dist/env.js"
+    },
+    "./next": {
+      "types": "./src/next.ts",
+      "development": "./src/next.ts",
+      "default": "./dist/next.js"
+    },
+    "./eslint/nextjs": "./eslint.nextjs.mjs",
+    "./module-ids": {
+      "types": "./src/module-ids.ts",
+      "development": "./src/module-ids.ts",
+      "default": "./dist/module-ids.js"
+    },
+    "./prettier": "./prettier.config.mjs",
+    "./vitest": {
+      "types": "./src/vitest.ts",
+      "development": "./src/vitest.ts",
+      "default": "./dist/vitest.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "lint": "tsc -p tsconfig.build.json --noEmit",
+    "typecheck": "tsc -p tsconfig.build.json --noEmit"
+  },
+  "dependencies": {
+    "zod": "catalog:"
+  },
+  "peerDependencies": {
+    "eslint": "catalog:",
+    "eslint-config-next": "catalog:",
+    "next": "catalog:",
+    "vitest": "catalog:"
+  },
+  "devDependencies": {
+    "next": "catalog:",
+    "vitest": "catalog:"
+  }
+}

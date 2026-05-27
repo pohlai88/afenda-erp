@@ -1,0 +1,47 @@
+{
+  "name": "afenda-erp",
+  "private": true,
+  "packageManager": "pnpm@10.33.3",
+  "scripts": {
+    "env:sync": "tsx scripts/sync-env.mts",
+    "env:sync:dry-run": "tsx scripts/sync-env.mts --dry-run",
+    "predev": "pnpm env:sync",
+    "dev": "turbo dev --filter=@afenda/erp",
+    "build": "turbo build",
+    "lint": "turbo lint",
+    "typecheck": "turbo typecheck",
+    "architecture:check": "tsx scripts/check-directory-architecture.mts",
+    "artifacts:init": "tsx scripts/ensure-artifacts-layout.mts",
+    "artifacts:check": "tsx scripts/check-artifacts-layout.mts",
+    "artifacts:clean": "tsx scripts/clean-artifacts.mts",
+    "artifacts:reset": "pnpm artifacts:clean && pnpm artifacts:init",
+    "pretest": "pnpm artifacts:init",
+    "pretest:e2e": "pnpm artifacts:init",
+    "test": "turbo test",
+    "test:e2e": "turbo test:e2e --filter=@afenda/erp",
+    "analyze:erp": "pnpm --filter @afenda/erp analyze",
+    "performance:budget": "tsx scripts/check-performance-budget.mts",
+    "security:review": "tsx scripts/security-review.mts",
+    "lint:governed-renderers": "tsx packages/governed-surface/scripts/lint-governed-renderers.mts",
+    "db:generate": "turbo db:generate --filter=@afenda/db",
+    "db:migrate": "turbo db:migrate --filter=@afenda/db",
+    "db:seed": "turbo db:seed --filter=@afenda/db",
+    "db:setup": "pnpm db:migrate && pnpm db:seed",
+    "format": "prettier --check .",
+    "format:write": "prettier --write ."
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "eslint": "catalog:",
+    "eslint-config-next": "catalog:",
+    "prettier": "^3.6.2",
+    "turbo": "^2.8.3",
+    "typescript": "catalog:"
+  },
+  "dependencies": {
+    "dotenv": "^17.4.2",
+    "tsx": "^4.22.3"
+  }
+}

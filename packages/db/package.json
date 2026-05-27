@@ -1,0 +1,32 @@
+{
+  "name": "@afenda/db",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "development": "./src/index.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "lint": "tsc -p tsconfig.json --noEmit",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "tsx ./scripts/evaluate-rls.mts && tsx ./scripts/test-tenant-context.mts && tsx ./scripts/test-workflow-sweeps.mts",
+    "db:generate": "drizzle-kit generate --config=drizzle.config.ts",
+    "db:migrate": "tsx ./scripts/migrate.mts",
+    "db:seed": "tsx ./scripts/seed-permissions.mts && tsx ./scripts/seed-core-erp.mts"
+  },
+  "dependencies": {
+    "@afenda/config": "workspace:*",
+    "@neondatabase/auth": "0.4.1-beta",
+    "@neondatabase/serverless": "^1.1.0",
+    "drizzle-orm": "catalog:"
+  },
+  "devDependencies": {
+    "dotenv": "^17.4.2",
+    "drizzle-kit": "^0.31.10"
+  }
+}

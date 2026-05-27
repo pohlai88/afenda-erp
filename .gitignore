@@ -1,0 +1,28 @@
+node_modules
+.turbo
+.next
+dist
+.vercel
+.codex-runtime
+*.tsbuildinfo
+.env
+.env.*
+.env.config
+!.env.example
+
+# Test & CI outputs (never commit)
+/.artifacts/
+/test-results/
+**/test-results/
+/playwright-report/
+**/playwright-report/
+/blob-report/
+**/blob-report/
+/.vitest-reports/
+coverage/
+**/coverage/
+**/junit.xml
+
+# Playwright when run from apps/erp without redirected outputDir
+apps/erp/test-results/
+apps/erp/playwright-report/

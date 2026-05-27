@@ -1,0 +1,17 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "outDir": "dist",
+    "rootDir": "src",
+    "declaration": true,
+    "declarationMap": true
+  },
+  "include": [
+    "src/env.ts",
+    "src/next.ts",
+    "src/module-ids.ts",
+    "src/vitest.ts"
+  ],
+  "exclude": []
+}

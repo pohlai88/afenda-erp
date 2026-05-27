@@ -1,0 +1,19 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "installCommand": "pnpm install",
+  "buildCommand": "pnpm turbo build --filter=@afenda/erp",
+  "crons": [
+    {
+      "path": "/api/cron/reminders",
+      "schedule": "0 0 * * *"
+    },
+    {
+      "path": "/api/cron/syncs",
+      "schedule": "0 1 * * *"
+    },
+    {
+      "path": "/api/cron/housekeeping",
+      "schedule": "0 2 * * *"
+    }
+  ]
+}
