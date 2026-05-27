@@ -45,6 +45,14 @@ export function GovernedComponentTree({
   const parsed = parseGovernedComponentData(component);
 
   if (!parsed.success) {
+    recordGovernedDispatchSpan({
+      rendererId: "(unknown)",
+      componentType: "(unknown)",
+      serverType: "(unknown)",
+      dataNature: undefined,
+      surfaceKey,
+      validation: "parse_failed",
+    });
     return (
       <GovernedEmpty
         model={{
@@ -66,6 +74,14 @@ export function GovernedComponentTree({
   )[data.type];
 
   if (!rendererId) {
+    recordGovernedDispatchSpan({
+      rendererId: "(unregistered)",
+      componentType: data.type,
+      serverType: data.serverType,
+      dataNature: extractGovernedConfigurationDataNature(data.configuration),
+      surfaceKey,
+      validation: "unregistered",
+    });
     return (
       <GovernedEmpty
         model={{
@@ -86,10 +102,40 @@ export function GovernedComponentTree({
     AFENDA_GOVERNED_RENDERER_CONTRACTS[rendererId];
   if (contract.acceptedNatures.length > 0) {
     const dataNature = extractGovernedConfigurationDataNature(data.configuration);
-    if (
-      dataNature !== undefined &&
-      !(contract.acceptedNatures as readonly string[]).includes(dataNature)
-    ) {
+
+    if (dataNature === undefined) {
+      // Missing dataNature on a renderer that requires one is a contract violation.
+      emitGovernedTelemetry({
+        name: "governed.data_nature_mismatch",
+        type: data.type,
+        rendererId,
+        observed: "(missing)",
+        accepted: contract.acceptedNatures,
+        surfaceKey,
+      });
+      recordGovernedDispatchSpan({
+        rendererId,
+        componentType: data.type,
+        serverType: data.serverType,
+        dataNature: undefined,
+        surfaceKey,
+        validation: "nature_mismatch",
+      });
+      return (
+        <GovernedEmpty
+          model={{
+            variant: "error",
+            title: "Section unavailable",
+            description:
+              diagnostics === "operator"
+                ? `Renderer "${rendererId}" requires dataNature (accepted: ${contract.acceptedNatures.join(", ")}) but none was provided.`
+                : "This section is not available in the current surface.",
+          }}
+        />
+      );
+    }
+
+    if (!(contract.acceptedNatures as readonly string[]).includes(dataNature)) {
       emitGovernedTelemetry({
         name: "governed.data_nature_mismatch",
         type: data.type,
@@ -98,7 +144,14 @@ export function GovernedComponentTree({
         accepted: contract.acceptedNatures,
         surfaceKey,
       });
-
+      recordGovernedDispatchSpan({
+        rendererId,
+        componentType: data.type,
+        serverType: data.serverType,
+        dataNature,
+        surfaceKey,
+        validation: "nature_mismatch",
+      });
       return (
         <GovernedEmpty
           model={{

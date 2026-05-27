@@ -1,8 +1,15 @@
 import {
+  buildDocumentRegistryListSurface,
   buildModuleRecordListSurface,
   buildModuleWorkItemListSurface,
+  buildModuleWorkItemKanbanSurface,
+  buildModuleWorkspaceCountStatGrid,
+  buildModuleWorkspaceStatGrid,
+  buildSavedViewsListSurface,
   describeWorkspaceDataSource,
   getModuleListSurfaceKeys,
+  getModuleStatSurfaceKey,
+  getModuleWorkItemKanbanSurfaceKey,
   formatModuleObservabilityFooter,
   getAccessibleModules,
   getErpModuleById,
@@ -11,7 +18,6 @@ import {
   getModuleWorkspaceStats,
   getResolvedModuleMetrics,
   moduleScreenDetailListLabels,
-  moduleScreenMetrics,
   moduleScreenSections,
   resolveWorkspaceDataMode,
   type ModuleId,
@@ -21,15 +27,17 @@ import { requireCapability } from "@afenda/auth/server";
 import {
   BulletColumns,
   DetailList,
-  MetricCard,
-  MetricGrid,
   ModuleLinkGrid,
   ObservabilityIndicatorList,
-  SavedViewGrid,
   SectionPanel,
   StatusBadge,
 } from "@afenda/ui";
-import { GovernedPatternCListSection } from "@afenda/governed-surface/server";
+import {
+  GovernedKanbanFooterSection,
+  GovernedKanbanReadOnlyBoard,
+  GovernedPatternBStatSection,
+  GovernedPatternCListSection,
+} from "@afenda/governed-surface/server";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -90,6 +98,21 @@ export async function ModuleRoutePage({
     window: workspace.workItemWindow,
     query,
   });
+  const savedViewsListSurface = buildSavedViewsListSurface({
+    views: workspace.savedViews,
+    moduleId,
+  });
+  const documentListSurface = buildDocumentRegistryListSurface({
+    documents: workspace.documents,
+    moduleId,
+  });
+  const workItemKanbanSurface =
+    moduleId === "approvals"
+      ? buildModuleWorkItemKanbanSurface({
+          moduleId,
+          workItems: workspace.workItems,
+        })
+      : null;
   const dataSourceLabel = describeWorkspaceDataSource(workspace);
   const highPriorityCount = workspace.workItems.filter(
     (item) => item.priority === "high",
@@ -172,32 +195,38 @@ export async function ModuleRoutePage({
         ) : null}
       </SectionPanel>
 
-      <section className="grid gap-4 md:grid-cols-3">
-        <MetricCard
-          detail={moduleScreenMetrics[0].detail}
-          label={moduleScreenMetrics[0].label}
-          tone={workspaceStats.recordCount > 0 ? "positive" : "neutral"}
-          value={String(workspaceStats.recordCount)}
-        />
-        <MetricCard
-          detail={moduleScreenMetrics[1].detail}
-          label={moduleScreenMetrics[1].label}
-          tone={
-            workspaceStats.highPriorityWorkItemCount > 0
-              ? "warning"
-              : "positive"
-          }
-          value={String(workspaceStats.workItemCount)}
-        />
-        <MetricCard
-          detail={moduleScreenMetrics[2].detail}
-          label={moduleScreenMetrics[2].label}
-          tone={workspaceStats.documentCount > 0 ? "positive" : "neutral"}
-          value={String(workspaceStats.documentCount)}
-        />
-      </section>
+      <GovernedPatternBStatSection
+        title="Workspace counts"
+        surfaceKey={`${getModuleStatSurfaceKey(moduleId)}-counts`}
+        layout="embedded"
+        statGroups={[
+          {
+            groupKey: "workspace-counts",
+            configuration: buildModuleWorkspaceCountStatGrid({
+              moduleId,
+              recordCount: workspaceStats.recordCount,
+              workItemCount: workspaceStats.workItemCount,
+              documentCount: workspaceStats.documentCount,
+              highPriorityWorkItemCount: workspaceStats.highPriorityWorkItemCount,
+            }),
+          },
+        ]}
+      />
 
-      <MetricGrid metrics={headlineMetrics} persisted={usesPersistedMetrics} />
+      <GovernedPatternBStatSection
+        title="Module KPIs"
+        surfaceKey={getModuleStatSurfaceKey(moduleId)}
+        layout="embedded"
+        statGroups={[
+          {
+            groupKey: "module-kpis",
+            configuration: buildModuleWorkspaceStatGrid({
+              moduleId,
+              metrics: headlineMetrics,
+            }),
+          },
+        ]}
+      />
 
       <SectionPanel
         title={moduleScreenSections.controlDesign.title}
@@ -213,9 +242,12 @@ export async function ModuleRoutePage({
           surfaceKey={surfaceKeys.records}
           listConfiguration={recordListSurface}
           parentAccessAllowed
-          resolveConfiguredPermission={false}
           layout="embedded"
-          trailingColumn={{ header: "Action", cellId: "governed.metadata" }}
+          trailingColumn={{
+            header: "Action",
+            cellId: "governed.metadata",
+            context: { surfaceKey: surfaceKeys.records, moduleId },
+          }}
         />
 
         <GovernedPatternCListSection
@@ -224,11 +256,28 @@ export async function ModuleRoutePage({
           surfaceKey={surfaceKeys.workItems}
           listConfiguration={workItemListSurface}
           parentAccessAllowed
-          resolveConfiguredPermission={false}
           layout="embedded"
-          trailingColumn={{ header: "Action", cellId: "governed.metadata" }}
+          trailingColumn={{
+            header: "Action",
+            cellId: "governed.metadata",
+            context: { surfaceKey: surfaceKeys.workItems, moduleId },
+          }}
         />
       </div>
+
+      {workItemKanbanSurface ? (
+        <GovernedKanbanFooterSection
+          surfaceKey={getModuleWorkItemKanbanSurfaceKey(moduleId)}
+          title={moduleScreenSections.workflowQueue.title}
+          description="Workflow items by current stage."
+          layout="titled"
+        >
+          <GovernedKanbanReadOnlyBoard
+            configuration={workItemKanbanSurface}
+            surfaceKey={getModuleWorkItemKanbanSurfaceKey(moduleId)}
+          />
+        </GovernedKanbanFooterSection>
+      ) : null}
 
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1.35fr)_minmax(340px,0.65fr)]">
         <SectionPanel
@@ -244,12 +293,14 @@ export async function ModuleRoutePage({
           />
         </SectionPanel>
 
-        <SectionPanel
+        <GovernedPatternCListSection
           title={moduleScreenSections.savedViews.title}
           description={moduleScreenSections.savedViews.description}
-        >
-          <SavedViewGrid views={workspace.savedViews} />
-        </SectionPanel>
+          surfaceKey={surfaceKeys.savedViews}
+          listConfiguration={savedViewsListSurface}
+          parentAccessAllowed
+          layout="embedded"
+        />
       </div>
 
       <SectionPanel
@@ -260,30 +311,13 @@ export async function ModuleRoutePage({
           <DocumentUploadForm moduleId={moduleId} />
           <DocumentExtractionForm moduleId={moduleId} />
         </div>
-        <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-          {workspace.documents.length > 0 ? (
-            workspace.documents.map((document) => (
-              <div
-                key={document.id}
-                className="rounded-lg border border-line bg-surface-strong p-4"
-              >
-                <div className="flex items-center justify-between gap-3">
-                  <div className="text-sm font-semibold text-foreground">
-                    {document.title}
-                  </div>
-                  <StatusBadge label={document.access} tone="neutral" />
-                </div>
-                <div className="mt-2 text-sm leading-6 text-muted">
-                  {document.contentType} · {document.size}
-                </div>
-              </div>
-            ))
-          ) : (
-            <div className="rounded-lg border border-dashed border-line bg-surface-strong p-4 text-sm leading-6 text-muted">
-              {moduleScreenSections.documents.emptyState}
-            </div>
-          )}
-        </div>
+        <GovernedPatternCListSection
+          title={moduleScreenSections.documents.title}
+          surfaceKey={surfaceKeys.documents}
+          listConfiguration={documentListSurface}
+          parentAccessAllowed
+          layout="embedded"
+        />
       </SectionPanel>
 
       <SectionPanel

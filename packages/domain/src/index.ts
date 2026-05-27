@@ -46,15 +46,48 @@ export {
 } from "@afenda/config/module-ids";
 export {
   buildDashboardAiUsageListSurface,
+  buildDashboardAutomationListSurface,
   buildDashboardWorkflowListSurface,
+  buildDocumentRegistryListSurface,
   buildModuleRecordListSurface,
   buildModuleWorkItemListSurface,
+  buildOperationalSkillsListSurface,
+  buildRecoveryPlaybookListSurface,
+  buildSavedViewsListSurface,
   buildSolutionConsoleAiUsageListSurface,
   buildSolutionConsoleEvidenceListSurface,
   getDashboardListSurfaceKeys,
   getModuleListSurfaceKeys,
   getSolutionConsoleListSurfaceKeys,
 } from "./modules/list-surfaces";
+export {
+  buildDashboardKpiStatGrid,
+  buildModuleWorkspaceCountStatGrid,
+  buildModuleWorkspaceStatGrid,
+  buildSolutionConsoleStatGrid,
+  dashboardStatSurfaceKey,
+  getModuleStatSurfaceKey,
+  solutionConsoleStatSurfaceKey,
+  type ResolvedMetric,
+} from "./modules/stat-surfaces";
+export {
+  auditRowsFromPanel,
+  buildRecordDetailTabs,
+  buildWorkItemDetailTabs,
+} from "./modules/detail-surfaces";
+export {
+  buildDashboardHardeningChart,
+  buildModuleObservabilityChart,
+  dashboardHardeningChartSurfaceKey,
+  getModuleObservabilityChartSurfaceKey,
+} from "./modules/chart-surfaces";
+export {
+  buildModuleWorkItemKanbanSurface,
+  getModuleWorkItemKanbanSurfaceKey,
+} from "./modules/kanban-surfaces";
+export {
+  buildDocumentExtractionFormMetadata,
+} from "./modules/form-surfaces";
 export {
   resolveModuleWorkspaceListQuery,
   type ModuleWorkspaceListQuery,
@@ -77,17 +110,8 @@ export {
   type RecordTypeSortDefinition,
 } from "./modules/record-types";
 export {
-  aiUsageTableColumns,
-  evidenceCoverageTableColumns,
-  buildDashboardWorkflowRows,
-  buildModuleRecordRows,
-  buildModuleWorkItemRows,
-  dashboardWorkflowTableColumns,
   describeWorkspaceDataSource,
-  moduleRecordTableColumns,
-  moduleWorkItemTableColumns,
   resolveWorkspaceDataMode,
-  type DataTableRow,
   type ModuleDataMode,
 } from "./shared/workspace-tables";
 export {

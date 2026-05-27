@@ -56,6 +56,10 @@ export {
   type GovernedKanbanFooterSectionProps as GovernedKanbanDragSectionProps,
 } from "./components/governed-kanban-footer-section";
 export {
+  GovernedKanbanReadOnlyBoard,
+  type GovernedKanbanReadOnlyBoardProps,
+} from "./components/governed-kanban-read-only-board.client";
+export {
   GovernedEmpty,
   type GovernedEmptyProps,
 } from "./components/governed-empty";

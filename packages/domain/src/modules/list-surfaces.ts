@@ -559,6 +559,8 @@ export function getModuleListSurfaceKeys(moduleId: ModuleId) {
   return {
     records: moduleSurfaceKey(moduleId, "records"),
     workItems: moduleSurfaceKey(moduleId, "work-items"),
+    savedViews: `${moduleId}.saved-views.list`,
+    documents: `${moduleId}.documents.list`,
   };
 }
 
@@ -669,6 +671,8 @@ export function getDashboardListSurfaceKeys() {
   return {
     workflow: "dashboard.workflow.list",
     aiUsage: "dashboard.ai-usage.list",
+    automations: "dashboard.automations.list",
+    savedViews: "dashboard.saved-views.list",
   };
 }
 
@@ -763,5 +767,326 @@ export function getSolutionConsoleListSurfaceKeys() {
   return {
     evidence: "solution-console.evidence.list",
     aiUsage: "solution-console.ai-usage.list",
+    playbooks: "solution-console.playbooks.list",
+    skills: "solution-console.skills.list",
   };
+}
+
+// ─── Saved-views list ────────────────────────────────────────────────────────
+
+type SavedViewRow = {
+  id: string;
+  name: string;
+  description: string;
+  visibility: string;
+};
+
+const SAVED_VIEWS_COLUMNS = [
+  {
+    id: "name",
+    header: "View name",
+    priority: "primary" as const,
+    pin: "start" as const,
+    wrap: true,
+    minWidth: 180,
+  },
+  { id: "description", header: "Description", wrap: true },
+  { id: "visibility", header: "Visibility", cellKind: { kind: "badge" as const } },
+];
+
+export function buildSavedViewsListSurface(input: {
+  views: readonly SavedViewRow[];
+  moduleId: ModuleId | "dashboard";
+}): ListSurfaceRendererConfigurationResolvedInput {
+  const rows = input.views;
+
+  return buildGovernedListSurface({
+    __schemaVersion: GOVERNED_METADATA_SCHEMA_VERSION,
+    dataNature: "table",
+    presentationProfile: "erp-operational-table",
+    requiresErpPermission: {
+      module: input.moduleId === "dashboard" ? "dashboard" : input.moduleId,
+      object: "saved-views",
+      function: "read",
+    },
+    pagination: buildPagination(undefined, rows.length),
+    surface: {
+      header: { title: moduleScreenSections.savedViews.title },
+      columnsId: `${input.moduleId}-saved-views`,
+      rowKey: "id",
+      empty: {
+        variant: "muted",
+        title: "No saved views are configured for this route yet.",
+      },
+    },
+    columns: SAVED_VIEWS_COLUMNS,
+    rows: rows.map((view) => ({
+      id: view.id,
+      cells: {
+        name: view.name,
+        description: view.description,
+        visibility: view.visibility,
+      },
+    })),
+  });
+}
+
+// ─── Automation-run list ──────────────────────────────────────────────────────
+
+type AutomationRunRow = {
+  id: string;
+  name: string;
+  schedule: string;
+  status: string;
+  detail: string;
+};
+
+const AUTOMATION_RUN_COLUMNS = [
+  {
+    id: "name",
+    header: "Automation",
+    priority: "primary" as const,
+    pin: "start" as const,
+    wrap: true,
+    minWidth: 180,
+  },
+  { id: "schedule", header: "Schedule" },
+  { id: "status", header: "Status", cellKind: { kind: "badge" as const } },
+  { id: "detail", header: "Detail", wrap: true },
+];
+
+export function buildDashboardAutomationListSurface(input: {
+  runs: readonly AutomationRunRow[];
+}): ListSurfaceRendererConfigurationResolvedInput {
+  const rows = input.runs;
+
+  return buildGovernedListSurface({
+    __schemaVersion: GOVERNED_METADATA_SCHEMA_VERSION,
+    dataNature: "table",
+    presentationProfile: "erp-operational-table",
+    requiresErpPermission: {
+      module: "dashboard",
+      object: "automations",
+      function: "read",
+    },
+    pagination: buildPagination(undefined, rows.length),
+    surface: {
+      header: { title: dashboardRouteSections.automationTelemetry.scheduledAutomationsTitle },
+      columnsId: "dashboard-automations",
+      rowKey: "id",
+      empty: {
+        variant: "muted",
+        title: "No scheduled automations are active.",
+      },
+    },
+    columns: AUTOMATION_RUN_COLUMNS,
+    rows: rows.map((run) => ({
+      id: run.id,
+      cells: {
+        name: run.name,
+        schedule: run.schedule,
+        status: run.status,
+        detail: run.detail,
+      },
+    })),
+  });
+}
+
+// ─── Recovery-playbook list ───────────────────────────────────────────────────
+
+type RecoveryPlaybookRow = {
+  id: string;
+  label: string;
+  problem: string;
+  diagnosis: string;
+  action: string;
+  risk: string;
+};
+
+const RECOVERY_PLAYBOOK_COLUMNS = [
+  {
+    id: "label",
+    header: "Playbook",
+    priority: "primary" as const,
+    pin: "start" as const,
+    wrap: true,
+    minWidth: 200,
+  },
+  { id: "problem", header: "Problem", wrap: true },
+  {
+    id: "risk",
+    header: "Risk",
+    cellKind: { kind: "badge" as const, tone: "attention" as const },
+  },
+  { id: "diagnosis", header: "Diagnosis", wrap: true },
+  { id: "action", header: "Recommended action", wrap: true },
+];
+
+export function buildRecoveryPlaybookListSurface(input: {
+  playbooks: readonly RecoveryPlaybookRow[];
+}): ListSurfaceRendererConfigurationResolvedInput {
+  const rows = input.playbooks;
+
+  return buildGovernedListSurface({
+    __schemaVersion: GOVERNED_METADATA_SCHEMA_VERSION,
+    dataNature: "table",
+    presentationProfile: "erp-exception-table",
+    requiresErpPermission: {
+      module: "dashboard",
+      object: "recovery-playbooks",
+      function: "read",
+    },
+    pagination: buildPagination(undefined, rows.length),
+    surface: {
+      header: { title: solutionConsoleSections.playbookCatalog.title },
+      columnsId: "solution-console-playbooks",
+      rowKey: "id",
+      empty: {
+        variant: "muted",
+        title: "No recovery playbooks are defined.",
+      },
+    },
+    columns: RECOVERY_PLAYBOOK_COLUMNS,
+    rows: rows.map((playbook) => ({
+      id: playbook.id,
+      cells: {
+        label: playbook.label,
+        problem: playbook.problem,
+        risk: playbook.risk,
+        diagnosis: playbook.diagnosis,
+        action: playbook.action,
+      },
+    })),
+  });
+}
+
+// ─── Document-registry list ───────────────────────────────────────────────────
+
+type DocumentRegistryRow = {
+  id: string;
+  title: string;
+  contentType: string;
+  size: string;
+  access: string;
+};
+
+const DOCUMENT_REGISTRY_COLUMNS = [
+  {
+    id: "title",
+    header: "Document",
+    priority: "primary" as const,
+    pin: "start" as const,
+    wrap: true,
+    minWidth: 180,
+  },
+  { id: "contentType", header: "Type" },
+  { id: "size", header: "Size" },
+  {
+    id: "access",
+    header: "Access",
+    cellKind: { kind: "badge" as const },
+  },
+];
+
+export function buildDocumentRegistryListSurface(input: {
+  documents: readonly DocumentRegistryRow[];
+  moduleId: ModuleId;
+}): ListSurfaceRendererConfigurationResolvedInput {
+  const rows = input.documents;
+
+  return buildGovernedListSurface({
+    __schemaVersion: GOVERNED_METADATA_SCHEMA_VERSION,
+    dataNature: "table",
+    presentationProfile: "erp-operational-table",
+    requiresErpPermission: {
+      module: input.moduleId,
+      object: "documents",
+      function: "read",
+    },
+    pagination: buildPagination(undefined, rows.length),
+    surface: {
+      header: { title: moduleScreenSections.documents.title },
+      columnsId: `${input.moduleId}-documents`,
+      rowKey: "id",
+      empty: {
+        variant: "muted",
+        title: moduleScreenSections.documents.emptyState,
+      },
+    },
+    columns: DOCUMENT_REGISTRY_COLUMNS,
+    rows: rows.map((doc) => ({
+      id: doc.id,
+      cells: {
+        title: doc.title,
+        contentType: doc.contentType,
+        size: doc.size,
+        access: doc.access,
+      },
+    })),
+  });
+}
+
+// ─── Operational-skills list ──────────────────────────────────────────────────
+
+type OperationalSkillRow = {
+  id: string;
+  label: string;
+  moduleId: string;
+  description: string;
+  approvalPolicy: string;
+};
+
+const OPERATIONAL_SKILL_COLUMNS = [
+  {
+    id: "label",
+    header: "Skill",
+    priority: "primary" as const,
+    pin: "start" as const,
+    wrap: true,
+    minWidth: 200,
+  },
+  { id: "moduleId", header: "Module", cellKind: { kind: "badge" as const } },
+  {
+    id: "approvalPolicy",
+    header: "Approval policy",
+    cellKind: { kind: "badge" as const },
+  },
+  { id: "description", header: "Description", wrap: true },
+];
+
+export function buildOperationalSkillsListSurface(input: {
+  skills: readonly OperationalSkillRow[];
+}): ListSurfaceRendererConfigurationResolvedInput {
+  const rows = input.skills;
+
+  return buildGovernedListSurface({
+    __schemaVersion: GOVERNED_METADATA_SCHEMA_VERSION,
+    dataNature: "table",
+    presentationProfile: "erp-operational-table",
+    requiresErpPermission: {
+      module: "dashboard",
+      object: "skills",
+      function: "read",
+    },
+    pagination: buildPagination(undefined, rows.length),
+    surface: {
+      header: { title: solutionConsoleSections.operationalSkills.title },
+      columnsId: "solution-console-skills",
+      rowKey: "id",
+      empty: {
+        variant: "muted",
+        title: "No operational skills are available.",
+      },
+    },
+    columns: OPERATIONAL_SKILL_COLUMNS,
+    rows: rows.map((skill) => ({
+      id: skill.id,
+      cells: {
+        label: skill.label,
+        moduleId: skill.moduleId,
+        approvalPolicy: skill.approvalPolicy,
+        description: skill.description,
+      },
+    })),
+  });
 }

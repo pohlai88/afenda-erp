@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-import { parseGovernedComponentData } from "../client";
+import { GovernedEmpty } from "../components/governed-empty";
 import { toGovernedComponentEnvelopeFromDetailSection } from "../governed-configuration.shared";
 import type { GovernedDetailSection } from "../schemas/detail-tabs.schema";
 
@@ -11,18 +11,27 @@ import { GovernedComponentRenderer } from "./render-governed-component";
  *
  * `rendererKey` is a free-form string on the schema (e.g. "governed:stat-card",
  * "governed:list-surface"). The discriminated component schema does the type
- * narrowing — anything that does not match a known literal returns null and
- * `GovernedComponentTree` shows the standard "section unavailable" fallback.
+ * narrowing — anything that does not match a known renderer type shows the
+ * "section unavailable" fallback via `GovernedComponentTree`.
+ *
+ * Delegates all validation and error rendering to `GovernedComponentRenderer`
+ * (which wraps `GovernedComponentTree`) so diagnostic copy is always consistent.
  */
 export function resolveGovernedDetailSectionContent(
   section: GovernedDetailSection,
 ): ReactNode {
-  const parsed = parseGovernedComponentData(
-    toGovernedComponentEnvelopeFromDetailSection(section),
-  );
-  if (!parsed.success) {
-    return null;
+  try {
+    const envelope = toGovernedComponentEnvelopeFromDetailSection(section);
+    return <GovernedComponentRenderer component={envelope} />;
+  } catch {
+    return (
+      <GovernedEmpty
+        model={{
+          variant: "error",
+          title: "Section unavailable",
+          description: "This section could not be loaded safely.",
+        }}
+      />
+    );
   }
-
-  return <GovernedComponentRenderer component={parsed.data} />;
 }

@@ -1,4 +1,5 @@
 import type {
+  GovernedChartPresentationProfiles,
   GovernedListPresentationProfiles,
   GovernedStatPresentationProfiles,
 } from "./governed-profile-types";
@@ -64,5 +65,23 @@ export const GOVERNED_STAT_PRESENTATION_PROFILES: GovernedStatPresentationProfil
     },
     "erp-executive-summary": {
       density: "comfortable",
+    },
+  };
+
+/**
+ * Canonical ERP chart presentation defaults (v1).
+ * Builders still supply `series`, `heatmap`, `annotations`, and `title`.
+ */
+export const GOVERNED_CHART_PRESENTATION_PROFILES: GovernedChartPresentationProfiles =
+  {
+    /** Time-series area/line charts for KPI trends and operational timelines. */
+    "erp-trend-chart": {
+      chartKind: "area",
+      dataNature: "time-series",
+    },
+    /** Categorical bar charts for status distributions and count comparisons. */
+    "erp-status-chart": {
+      chartKind: "bar",
+      dataNature: "categorical",
     },
   };

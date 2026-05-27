@@ -28,19 +28,7 @@ function sortVisibleSections(
 }
 
 function renderSectionSlot(section: GovernedDetailSection) {
-  const resolved = resolveGovernedDetailSectionContent(section);
-  if (resolved != null) {
-    return resolved;
-  }
-  return (
-    <GovernedEmpty
-      model={{
-        variant: "muted",
-        title: "Renderer not registered",
-        description: `No renderer is registered for "${section.rendererKey}".`,
-      }}
-    />
-  );
+  return resolveGovernedDetailSectionContent(section);
 }
 
 function RevisionsTable({ rows }: { rows: GovernedRevisionEntry[] }) {

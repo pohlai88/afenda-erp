@@ -1,8 +1,13 @@
 import { requireCapability } from "@afenda/auth/server";
 import {
   buildDashboardAiUsageListSurface,
+  buildDashboardAutomationListSurface,
+  buildDashboardHardeningChart,
+  buildDashboardKpiStatGrid,
   buildDashboardWorkflowListSurface,
-  dashboardRouteMetrics,
+  buildSavedViewsListSurface,
+  dashboardHardeningChartSurfaceKey,
+  dashboardStatSurfaceKey,
   dashboardRouteSections,
   describeWorkspaceDataSource,
   getAccessibleModules,
@@ -19,37 +24,25 @@ import {
   roleOperatingPosture,
   type ModuleWorkspaceListQuery,
 } from "@afenda/domain";
-import { GovernedPatternCListSection } from "@afenda/governed-surface/server";
+import {
+  GovernedPatternBChartSection,
+  GovernedPatternBStatSection,
+  GovernedPatternCListSection,
+} from "@afenda/governed-surface/server";
 import {
   getProductionHardeningChecklist,
   getWorkspaceObservabilitySummary,
 } from "@afenda/observability";
 import {
-  AutomationRunList,
   HardeningChecklistGrid,
-  MetricCard,
-  MetricGrid,
   ModuleLinkGrid,
   ObservabilityIndicatorList,
-  SavedViewGrid,
   SectionPanel,
   StatusBadge,
   WorkflowSummaryPanel,
 } from "@afenda/ui";
 import { ErpAssistantPanel } from "./erp-assistant-panel";
 import Link from "next/link";
-
-function automationStatusTone(status: string) {
-  if (status === "healthy") {
-    return "positive" as const;
-  }
-
-  if (status === "watch") {
-    return "warning" as const;
-  }
-
-  return "neutral" as const;
-}
 
 function hardeningStatusTone(status: string) {
   return status === "review" ? ("warning" as const) : ("positive" as const);
@@ -104,6 +97,16 @@ export async function DashboardRoutePage({
   const aiUsageListSurface = buildDashboardAiUsageListSurface({
     events: aiUsageRows,
   });
+  const automationListSurface = buildDashboardAutomationListSurface({
+    runs: automationRuns,
+  });
+  const savedViewsListSurface = buildSavedViewsListSurface({
+    views: dashboardWorkspace.savedViews,
+    moduleId: "dashboard",
+  });
+  const hardeningChartConfig = buildDashboardHardeningChart({
+    checklist: productionHardeningChecklist,
+  });
   const dataSourceLabel = describeWorkspaceDataSource(dashboardWorkspace);
   const workflowSummary = {
     queueDepth: dashboardWorkspace.workItems.length,
@@ -134,36 +137,51 @@ export async function DashboardRoutePage({
           </div>
         }
       >
-        <div className="grid gap-4 md:grid-cols-3">
-          <MetricCard
-            label={dashboardRouteMetrics[0].label}
-            value={String(readiness.accessibleModuleCount)}
-            detail={dashboardRouteMetrics[0].detail}
-            tone="positive"
-          />
-          <MetricCard
-            label={dashboardRouteMetrics[1].label}
-            value={String(dashboardWorkspaceStats.savedViewCount)}
-            detail={dashboardRouteMetrics[1].detail(dataSourceLabel)}
-            tone="positive"
-          />
-          <MetricCard
-            label={dashboardRouteMetrics[2].label}
-            value={String(dashboardWorkspaceStats.workItemCount)}
-            detail={dashboardRouteMetrics[2].detail(
-              readiness.operationalModules,
-              readiness.controlModules,
-            )}
-            tone={
-              dashboardWorkspaceStats.highPriorityWorkItemCount > 0
-                ? "warning"
-                : "positive"
-            }
-          />
-        </div>
+        <GovernedPatternBStatSection
+          title="Workspace overview"
+          surfaceKey={`${dashboardStatSurfaceKey}-overview`}
+          layout="embedded"
+          statGroups={[
+            {
+              groupKey: "workspace-overview",
+              configuration: buildDashboardKpiStatGrid({
+                metrics: [
+                  {
+                    label: "Accessible modules",
+                    value: String(readiness.accessibleModuleCount),
+                    detail: "Routes available under the current role and organization context.",
+                    tone: "positive",
+                  },
+                  {
+                    label: "Workspace views",
+                    value: String(dashboardWorkspaceStats.savedViewCount),
+                    detail: `Saved views resolved from ${dataSourceLabel.toLowerCase()}.`,
+                    tone: "positive",
+                  },
+                  {
+                    label: "Workflow items",
+                    value: String(dashboardWorkspaceStats.workItemCount),
+                    detail: `${readiness.operationalModules} operational modules and ${readiness.controlModules} watchlist modules are in scope.`,
+                    tone: dashboardWorkspaceStats.highPriorityWorkItemCount > 0 ? "warning" : "positive",
+                  },
+                ],
+              }),
+            },
+          ]}
+        />
       </SectionPanel>
 
-      <MetricGrid metrics={dashboardMetrics} persisted={usesPersistedMetrics} />
+      <GovernedPatternBStatSection
+        title="Module KPIs"
+        surfaceKey={dashboardStatSurfaceKey}
+        layout="embedded"
+        statGroups={[
+          {
+            groupKey: "module-kpis",
+            configuration: buildDashboardKpiStatGrid({ metrics: dashboardMetrics }),
+          },
+        ]}
+      />
 
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1.1fr)_minmax(360px,0.9fr)]">
         <GovernedPatternCListSection
@@ -172,9 +190,12 @@ export async function DashboardRoutePage({
           surfaceKey={surfaceKeys.workflow}
           listConfiguration={workflowListSurface}
           parentAccessAllowed
-          resolveConfiguredPermission={false}
           layout="embedded"
-          trailingColumn={{ header: "Action", cellId: "governed.metadata" }}
+          trailingColumn={{
+            header: "Action",
+            cellId: "governed.metadata",
+            context: { surfaceKey: surfaceKeys.workflow, moduleId: "dashboard" },
+          }}
         />
 
         <SectionPanel
@@ -190,22 +211,13 @@ export async function DashboardRoutePage({
               highPriority={workflowSummary.highPriority}
               queueDepth={workflowSummary.queueDepth}
             />
-            <div className="rounded-lg border border-line bg-surface-strong p-4">
-              <div className="text-sm font-semibold text-foreground">
-                {
-                  dashboardRouteSections.automationTelemetry
-                    .scheduledAutomationsTitle
-                }
-              </div>
-              <div className="mt-3">
-                <AutomationRunList
-                  runs={automationRuns.map((automation) => ({
-                    ...automation,
-                    statusTone: automationStatusTone(automation.status),
-                  }))}
-                />
-              </div>
-            </div>
+            <GovernedPatternCListSection
+              title={dashboardRouteSections.automationTelemetry.scheduledAutomationsTitle}
+              surfaceKey={surfaceKeys.automations}
+              listConfiguration={automationListSurface}
+              parentAccessAllowed
+              layout="embedded"
+            />
           </div>
         </SectionPanel>
       </div>
@@ -229,7 +241,6 @@ export async function DashboardRoutePage({
                 surfaceKey={surfaceKeys.aiUsage}
                 listConfiguration={aiUsageListSurface}
                 parentAccessAllowed
-                resolveConfiguredPermission={false}
                 layout="embedded"
               />
             </div>
@@ -241,20 +252,30 @@ export async function DashboardRoutePage({
         title={dashboardRouteSections.productionHardening.title}
         description={dashboardRouteSections.productionHardening.description}
       >
-        <HardeningChecklistGrid
-          items={productionHardeningChecklist.map((item) => ({
-            ...item,
-            statusTone: hardeningStatusTone(item.status),
-          }))}
-        />
+        <div className="grid gap-6 xl:grid-cols-[minmax(360px,0.6fr)_minmax(0,1.4fr)]">
+          <GovernedPatternBChartSection
+            title="Hardening status"
+            surfaceKey={dashboardHardeningChartSurfaceKey}
+            chartConfiguration={hardeningChartConfig}
+            layout="embedded"
+          />
+          <HardeningChecklistGrid
+            items={productionHardeningChecklist.map((item) => ({
+              ...item,
+              statusTone: hardeningStatusTone(item.status),
+            }))}
+          />
+        </div>
       </SectionPanel>
 
-      <SectionPanel
+      <GovernedPatternCListSection
         title={dashboardRouteSections.savedViews.title}
         description={dashboardRouteSections.savedViews.description}
-      >
-        <SavedViewGrid views={dashboardWorkspace.savedViews} />
-      </SectionPanel>
+        surfaceKey={surfaceKeys.savedViews}
+        listConfiguration={savedViewsListSurface}
+        parentAccessAllowed
+        layout="embedded"
+      />
 
       <SectionPanel
         title={dashboardRouteSections.moduleSurfaces.title}

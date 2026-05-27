@@ -15,6 +15,12 @@ export {
 
 export { GovernedMetadataTrailingCell } from "./components/governed-metadata-trailing-cell.client";
 
+export {
+  GOVERNED_LIST_TRAILING_CELL_REGISTRY,
+  resolveGovernedTrailingColumn,
+  type GovernedListTrailingCellId,
+} from "./components/governed-list-trailing-cell-registry.client";
+
 export type {
   GovernedListTrailingCellProps,
   GovernedPatternCTrailingColumnSpec,
@@ -34,6 +40,11 @@ export {
   GovernedKanbanTransitionHint,
   type GovernedKanbanTransitionHintProps,
 } from "./components/governed-kanban-transition-hint.client";
+
+export {
+  GovernedKanbanReadOnlyBoard,
+  type GovernedKanbanReadOnlyBoardProps,
+} from "./components/governed-kanban-read-only-board.client";
 
 export {
   GovernedEmpty,

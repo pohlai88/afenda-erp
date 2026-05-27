@@ -1,6 +1,7 @@
 import { requireCapability } from "@afenda/auth/server";
-import { GovernedAuditPanel } from "@afenda/governed-surface/server";
+import { GovernedDetailTabs } from "@afenda/governed-surface/server";
 import {
+  buildRecordDetailTabs,
   describeWorkspaceDataSource,
   getErpModuleById,
   getModuleWorkspaceRecord,
@@ -8,7 +9,7 @@ import {
   resolveWorkspaceDataMode,
   type ModuleId,
 } from "@afenda/domain";
-import { DetailList, SectionPanel, StatusBadge } from "@afenda/ui";
+import { SectionPanel, StatusBadge } from "@afenda/ui";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -74,7 +75,11 @@ export async function generateMetadata(
 export default async function RecordDetailPage(props: RecordDetailPageProps) {
   const { moduleDefinition, organization, record, dataMode } =
     await loadRecordDetail(props);
-  const metadataEntries = Object.entries(record.metadata);
+
+  const detailTabsModel = buildRecordDetailTabs({
+    moduleId: moduleDefinition.id,
+    record,
+  });
 
   return (
     <div className="space-y-6">
@@ -92,26 +97,14 @@ export default async function RecordDetailPage(props: RecordDetailPageProps) {
           </div>
         }
       >
-        <DetailList
-          items={[
-            { label: "Record type", value: record.recordType },
-            { label: "Owner", value: record.owner },
-            { label: "Amount", value: record.amount },
-            { label: "Due", value: record.due },
-            { label: "Updated", value: record.updatedAt },
-            {
-              label: "Extension schema",
-              value: record.extensionValid ? "Valid" : "Needs review",
-            },
-            {
-              label: "Data source",
-              value: describeWorkspaceDataSource({
-                dataMode,
-                fallbackApplied: false,
-              }),
-            },
-          ]}
-        />
+        {!record.extensionValid && record.extensionIssues.length > 0 ? (
+          <div className="mb-4 rounded-lg border border-warning/40 bg-warning/10 p-4 text-sm leading-6 text-warning-foreground">
+            {record.extensionIssues.join("; ")}
+          </div>
+        ) : null}
+        <p className="text-xs text-muted-foreground">
+          Data source: {describeWorkspaceDataSource({ dataMode, fallbackApplied: false })}
+        </p>
         <div className="mt-4">
           <Link
             className="text-sm font-medium text-foreground underline-offset-4 hover:underline"
@@ -122,44 +115,7 @@ export default async function RecordDetailPage(props: RecordDetailPageProps) {
         </div>
       </SectionPanel>
 
-      <SectionPanel
-        title="Governed metadata"
-        description="Validated extension values and operational descriptors for this record."
-      >
-        {!record.extensionValid && record.extensionIssues.length > 0 ? (
-          <div className="mb-4 rounded-lg border border-warning/40 bg-warning/10 p-4 text-sm leading-6 text-warning-foreground">
-            {record.extensionIssues.join("; ")}
-          </div>
-        ) : null}
-        {metadataEntries.length > 0 ? (
-          <dl className="grid gap-3 md:grid-cols-2">
-            {metadataEntries.map(([key, value]) => (
-              <div
-                className="rounded-lg border border-line bg-surface-strong p-4"
-                key={key}
-              >
-                <dt className="text-xs uppercase tracking-wide text-muted">
-                  {key}
-                </dt>
-                <dd className="mt-2 text-sm font-medium text-foreground">
-                  {String(value)}
-                </dd>
-              </div>
-            ))}
-          </dl>
-        ) : (
-          <div className="rounded-lg border border-dashed border-line bg-surface-strong p-4 text-sm leading-6 text-muted">
-            No extension metadata is attached to this record.
-          </div>
-        )}
-      </SectionPanel>
-
-      <SectionPanel
-        title="Audit trail"
-        description="Read-only governed audit entries for this record."
-      >
-        <GovernedAuditPanel model={record.auditPanel} />
-      </SectionPanel>
+      <GovernedDetailTabs model={detailTabsModel} />
     </div>
   );
 }

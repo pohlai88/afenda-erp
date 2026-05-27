@@ -12,6 +12,8 @@ export const GOVERNED_PRESENTATION_PROFILE_IDS = [
   "erp-audit-ledger",
   "erp-kpi-grid",
   "erp-executive-summary",
+  "erp-trend-chart",
+  "erp-status-chart",
 ] as const;
 
 export const presentationProfileIdSchema = z.enum(
@@ -40,6 +42,15 @@ export type StatPresentationProfileId = z.infer<
   typeof statPresentationProfileIdSchema
 >;
 
+export const chartPresentationProfileIdSchema = z.enum([
+  "erp-trend-chart",
+  "erp-status-chart",
+]);
+
+export type ChartPresentationProfileId = z.infer<
+  typeof chartPresentationProfileIdSchema
+>;
+
 export function isListPresentationProfileId(
   profile: PresentationProfileId,
 ): profile is ListPresentationProfileId {
@@ -50,4 +61,10 @@ export function isStatPresentationProfileId(
   profile: PresentationProfileId,
 ): profile is StatPresentationProfileId {
   return statPresentationProfileIdSchema.safeParse(profile).success;
+}
+
+export function isChartPresentationProfileId(
+  profile: PresentationProfileId,
+): profile is ChartPresentationProfileId {
+  return chartPresentationProfileIdSchema.safeParse(profile).success;
 }

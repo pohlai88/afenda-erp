@@ -1,11 +1,14 @@
 import {
+  GOVERNED_CHART_PRESENTATION_PROFILES,
   GOVERNED_LIST_PRESENTATION_PROFILES,
   GOVERNED_STAT_PRESENTATION_PROFILES,
 } from "../profiles/governed-presentation-profiles";
 import type { ListSurfacePresentation } from "../schemas/list-surface-renderer.schema";
 import type { StatCardDensity } from "../schemas/stat-card.schema";
+import type { ChartDataNature, GovernedChartKind } from "../schemas/chart.schema";
 import type { ListSurfaceToolbar } from "../schemas/list-surface-toolbar.schema";
 import type {
+  ChartPresentationProfileId,
   ListPresentationProfileId,
   StatPresentationProfileId,
 } from "../schemas/presentation-profile.schema";
@@ -82,4 +85,27 @@ export function resolveGovernedStatPresentation({
 }: ResolveGovernedStatPresentationInput): StatCardDensity {
   const defaults = GOVERNED_STAT_PRESENTATION_PROFILES[profile];
   return density ?? defaults.density;
+}
+
+export type ResolveGovernedChartPresentationInput = {
+  profile: ChartPresentationProfileId;
+  chartKind?: GovernedChartKind;
+  dataNature?: ChartDataNature;
+};
+
+export type GovernedChartPresentationResolved = {
+  chartKind: GovernedChartKind;
+  dataNature: ChartDataNature;
+};
+
+export function resolveGovernedChartPresentation({
+  profile,
+  chartKind,
+  dataNature,
+}: ResolveGovernedChartPresentationInput): GovernedChartPresentationResolved {
+  const defaults = GOVERNED_CHART_PRESENTATION_PROFILES[profile];
+  return {
+    chartKind: chartKind ?? defaults.chartKind,
+    dataNature: dataNature ?? defaults.dataNature,
+  };
 }

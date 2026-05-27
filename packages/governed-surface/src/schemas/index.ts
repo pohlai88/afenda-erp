@@ -238,3 +238,24 @@ export {
   type FormRuleEffect,
   type FormRuleFieldCondition,
 } from "./form-rules.schema";
+
+export {
+  GOVERNED_MULTI_STEP_FORM_SCHEMA_ID,
+  GOVERNED_MULTI_STEP_FORM_SCHEMA_STABILITY,
+  governedMultiStepFormConfigurationSchema,
+  parseGovernedMultiStepFormConfiguration,
+  type GovernedFormField,
+  type GovernedFormFieldKind,
+  type GovernedFormFieldOption,
+  type GovernedFormStep,
+  type GovernedMultiStepFormConfiguration,
+  type GovernedMultiStepFormConfigurationInput,
+  type MultiStepFormDataNature,
+} from "./multi-step-form.schema";
+
+export {
+  SCHEMA_STABILITY as LIST_TRAILING_CELL_CONTEXT_SCHEMA_STABILITY,
+  governedListTrailingCellContextSchema,
+  parseGovernedListTrailingCellContext,
+  type GovernedListTrailingCellContext,
+} from "./list-trailing-cell-context.schema";

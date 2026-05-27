@@ -19,7 +19,7 @@ in the same change.
 
 **Status:** Governed-surface kernel (schemas, profiles, resolver, builders,
 renderers) is implemented. Module list builders currently live in
-`packages/domain/src/module-list-surfaces.ts`. No `@afenda/feature-*` packages
+`packages/domain/src/modules/list-surfaces.ts`. Nine `@afenda/feature-*` packages
 exist yet. **Deferred:** `build-governed-chart-surface` until multiple modules
 share chart chrome.
 
@@ -115,7 +115,7 @@ Renderer  — paints only
 | **Profile**  | `packages/governed-surface/src/profiles/`                                       | Reusable ERP presentation defaults (table chrome, KPI grid density, toolbar affordances)              | Row-specific truth, tenant/session                                  |
 | **Resolver** | `packages/governed-surface/src/resolvers/resolve-governed-presentation.ts`      | Merge `presentationProfile` defaults + local `presentation` override (deep-merge `toolbar` only)      | Visual painting, React, ERP RBAC, permission checks                 |
 | **Renderer** | `packages/governed-surface/src/metadata/renderers/`                             | Paint from resolved config; container queries; skeleton parity                                        | Domain queries, IAM, guessing from labels                           |
-| **Builder**  | `packages/domain/src/module-list-surfaces.ts` and related domain metadata files | Columns, rows, `rowTone`, `rowHref`, `cellKind`, stat `href`, `trailingAction`, profile **selection** | Repeated `stickyHeader` / `virtualizeRowThreshold` on every surface |
+| **Builder**  | `packages/domain/src/modules/list-surfaces.ts` and related domain metadata files | Columns, rows, `rowTone`, `rowHref`, `cellKind`, stat `href`, `trailingAction`, profile **selection** | Repeated `stickyHeader` / `virtualizeRowThreshold` on every surface |
 | **Runtime**  | `apps/erp/src/app/**`, Server Actions, route handlers, auth helpers             | Session, org, ERP RBAC, audit, cache tags                                                             | Ad-hoc table markup, viewport breakpoints inside renderers          |
 
 ### 2.4 Upgrade decision rule
@@ -350,13 +350,13 @@ packages/governed-surface/src/builders/
 
 **Public door:** `@afenda/governed-surface` exports `buildGovernedListSurface`, `buildGovernedStatGrid`, `resolveGovernedListPresentation`, `GOVERNED_LIST_PRESENTATION_PROFILES`.
 
-Feature modules keep **domain mapping** in `packages/domain/src/module-list-surfaces.ts` and related domain metadata files; helpers stay generic.
+Feature modules keep **domain mapping** in `packages/domain/src/modules/list-surfaces.ts` and related domain metadata files; helpers stay generic.
 
 ---
 
 ## 5. Builder layer — domain truth only
 
-**Location:** `packages/domain/src/module-list-surfaces.ts` and related `packages/domain/src/*metadata.ts` files (server-owned domain mapping).
+**Location:** `packages/domain/src/modules/list-surfaces.ts` and related `packages/domain/src/*metadata.ts` files (server-owned domain mapping).
 
 ### 5.1 Correct builder style (target)
 
@@ -429,15 +429,15 @@ Current references for profile-first builders:
 
 | Pattern                  | Current reference                                                    |
 | ------------------------ | -------------------------------------------------------------------- |
-| List profile selection   | `packages/domain/src/module-list-surfaces.ts`                        |
-| Record route templates   | `packages/domain/src/record-type-definitions.ts`                     |
+| List profile selection   | `packages/domain/src/modules/list-surfaces.ts`                        |
+| Record route templates   | `packages/domain/src/modules/record-types.ts`                     |
 | App route section wiring | `apps/erp/src/app/(app)/module-screen.tsx`                           |
 | Dashboard wiring         | `apps/erp/src/app/(app)/dashboard-route.tsx`                         |
 | Solution Console wiring  | `apps/erp/src/app/(app)/solution-console/solution-console-route.tsx` |
 
 ### 5.3 Record drill-down (canonical)
 
-**Door:** `packages/domain/src/record-type-definitions.ts` owns route templates and permissions. `packages/domain/src/module-list-surfaces.ts` maps records and work items into governed row metadata.
+**Door:** `packages/domain/src/modules/record-types.ts` owns route templates and permissions. `packages/domain/src/modules/list-surfaces.ts` maps records and work items into governed row metadata.
 
 | Case                        | Builder pattern                                                                     | Renderer behavior                                                                            |
 | --------------------------- | ----------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
@@ -582,7 +582,7 @@ Importing broad @afenda/feature-* barrels from *.client.tsx when index.ts export
 | `resolveGovernedListPresentation` / stat density     | **Shipped**                     | `resolvers/resolve-governed-presentation.ts`                                                                                                              |
 | `presentationProfile` on list/stat parse             | **Shipped**                     | `list-surface-renderer.schema.ts`, `stat-card.schema.ts`                                                                                                  |
 | `buildGovernedListSurface` / `buildGovernedStatGrid` | **Shipped**                     | `builders/`                                                                                                                                               |
-| Builders profile-first                               | **In progress**                 | Core ERP workspace lists in `packages/domain/src/module-list-surfaces.ts` use `buildGovernedListSurface`; feature-package builders move out on extraction |
+| Builders profile-first                               | **In progress**                 | Core ERP workspace lists in `packages/domain/src/modules/list-surfaces.ts` use `buildGovernedListSurface`; feature-package builders move out on extraction |
 
 **Platform maturity:** kernel CI and registry coverage are implemented through package tests and `pnpm architecture:check`.  
 **Enterprise presentation:** renderer capability is strong; remaining gaps are selective builder adoption and route-level visual QA.
@@ -690,7 +690,7 @@ Lists on the **same page** as those islands should still use Pattern B/C where a
 | **2 — Profiles**            | **Done**        | `GOVERNED_LIST_PRESENTATION_PROFILES`, `GOVERNED_STAT_PRESENTATION_PROFILES`                                                               |
 | **3 — Resolver**            | **Done**        | `resolve-governed-presentation.ts` (pure merge, no RBAC)                                                                                   |
 | **4 — Builder helpers**     | **Done**        | `buildGovernedListSurface`, `buildGovernedStatGrid`                                                                                        |
-| **5 — ERP workspace lists** | **Done**        | `packages/domain/src/module-list-surfaces.ts` builds module record and work-item lists with profile-first helpers                          |
+| **5 — ERP workspace lists** | **Done**        | `packages/domain/src/modules/list-surfaces.ts` builds module record and work-item lists with profile-first helpers                          |
 | **6 — Stat adoption**       | **Partial**     | `buildGovernedStatGrid` exists; dashboard and module routes still use handcrafted `MetricCard` where route-specific composition is clearer |
 | **7 — Feature extraction**  | **Not started** | Move module builders and services into `@afenda/feature-*` when modules mature — see erp-domain architecture                               |
 
@@ -740,7 +740,7 @@ Use **two scores** — do not conflate platform CI maturity with operator presen
 | Zod `presentationProfile` transform                  | `list-surface-renderer.schema.ts`, `stat-card.schema.ts` | Parse-time profile merge                                                                         |
 | Parse-time schema migration                          | `prepareGovernedConfigurationForParse`                   | List + stat paths                                                                                |
 | Registry + shipped renderers                         | `registry.ts`, `renderers/**`                            | Production ERP list/stat/chart/kanban renderers                                                  |
-| ERP list builders on profiles                        | `packages/domain/src/module-list-surfaces.ts`            | Six `buildGovernedListSurface` call sites for module workspace lists                             |
+| ERP list builders on profiles                        | `packages/domain/src/modules/list-surfaces.ts`            | Six `buildGovernedListSurface` call sites for module workspace lists                             |
 | Chart builder helper                                 | Not created                                              | **Deferred** until multiple modules share chart chrome                                           |
 | Feature-package builders                             | Not created                                              | **Deferred** until first `@afenda/feature-*` extraction                                          |
 

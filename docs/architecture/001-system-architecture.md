@@ -769,12 +769,12 @@ catalog.
 Current status: module workspaces use dynamic `(app)/[moduleId]/` routes and
 metadata-driven list surfaces via `GovernedPatternCListSection` in
 `module-screen.tsx`, `dashboard-route.tsx`, and `solution-console-route.tsx`
-(domain builders in `packages/domain/src/module-list-surfaces.ts`).
+(domain builders in `packages/domain/src/modules/list-surfaces.ts`).
 `packages/domain` resolves serialized module workspaces from tenant-scoped
 database records, saved views, workflow items, and document registry rows, with
-metadata fallback for local dev mode. That is a compatibility foundation, not
-the target location for mature ERP feature implementation. No
-`packages/features/*` packages exist yet. Future finance, sales, purchasing,
+metadata fallback for local dev mode. That is a compatibility foundation; the
+nine `@afenda/feature-*` packages under `packages/features/` now exist and own
+the module-bound builder wrappers. Future finance, sales, purchasing,
 inventory, HR, CRM, approvals, reports, and admin implementation should move
 into `@afenda/feature-*` packages with module-owned services, components,
 schemas, and tests. `packages/db` includes Phase 3 persistence for `erp_module_records`,

@@ -74,24 +74,31 @@ export {
 } from "./schemas/stat-card.schema";
 
 export {
+  chartPresentationProfileIdSchema,
+  isChartPresentationProfileId,
   isListPresentationProfileId,
   isStatPresentationProfileId,
   listPresentationProfileIdSchema,
   presentationProfileIdSchema,
   statPresentationProfileIdSchema,
+  type ChartPresentationProfileId,
   type ListPresentationProfileId,
   type PresentationProfileId,
   type StatPresentationProfileId,
 } from "./schemas/presentation-profile.schema";
 
 export {
+  GOVERNED_CHART_PRESENTATION_PROFILES,
   GOVERNED_LIST_PRESENTATION_PROFILES,
   GOVERNED_STAT_PRESENTATION_PROFILES,
 } from "./profiles/governed-presentation-profiles";
 
 export {
+  resolveGovernedChartPresentation,
   resolveGovernedListPresentation,
   resolveGovernedStatPresentation,
+  type GovernedChartPresentationResolved,
+  type ResolveGovernedChartPresentationInput,
   type ResolveGovernedListPresentationInput,
   type ResolveGovernedStatPresentationInput,
 } from "./resolvers/resolve-governed-presentation";
@@ -116,6 +123,25 @@ export {
   buildGovernedStatGrid,
   type BuildGovernedStatGridInput,
 } from "./builders/build-governed-stat-grid";
+
+export {
+  buildGovernedChartSurface,
+  type BuildGovernedChartSurfaceInput,
+} from "./builders/build-governed-chart-surface";
+
+export {
+  parseGovernedChartConfiguration,
+  type ChartAction,
+  type ChartAnnotation,
+  type ChartDataNature,
+  type ChartHeatmapCell,
+  type ChartPoint,
+  type ChartReferenceBand,
+  type ChartSeries,
+  type GovernedChartConfiguration,
+  type GovernedChartConfigurationInput,
+  type GovernedChartKind,
+} from "./schemas/chart.schema";
 
 export {
   buildKanbanWorkflowFromColumnTransitions,

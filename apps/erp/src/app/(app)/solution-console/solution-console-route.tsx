@@ -1,8 +1,11 @@
 import { requireCapability } from "@afenda/auth/server";
 import { getOperationalSkills } from "@afenda/ai";
 import {
+  buildOperationalSkillsListSurface,
+  buildRecoveryPlaybookListSurface,
   buildSolutionConsoleAiUsageListSurface,
   buildSolutionConsoleEvidenceListSurface,
+  buildSolutionConsoleStatGrid,
   describeWorkspaceDataSource,
   getAccessibleModules,
   getAiUsageRouteSummary,
@@ -16,13 +19,14 @@ import {
   getSolutionConsoleSection,
   resolveWorkspaceDataMode,
   solutionConsoleMetrics,
+  solutionConsoleStatSurfaceKey,
 } from "@afenda/domain";
-import { GovernedPatternCListSection } from "@afenda/governed-surface/server";
 import {
-  MetricCard,
+  GovernedPatternBStatSection,
+  GovernedPatternCListSection,
+} from "@afenda/governed-surface/server";
+import {
   ModuleLinkGrid,
-  OperationalSkillGrid,
-  RecoveryPlaybookGrid,
   SectionPanel,
   StatusBadge,
 } from "@afenda/ui";
@@ -82,6 +86,12 @@ export async function SolutionConsoleRoutePage() {
   );
   const recoveryPlaybooks = getRecoveryPlaybookDefinitions();
   const operationalSkills = getOperationalSkills();
+  const playbookListSurface = buildRecoveryPlaybookListSurface({
+    playbooks: recoveryPlaybooks,
+  });
+  const skillsListSurface = buildOperationalSkillsListSurface({
+    skills: operationalSkills,
+  });
   const heroSection = getSolutionConsoleSection("hero");
   const playbookSection = getSolutionConsoleSection("playbookCatalog");
   const skillsSection = getSolutionConsoleSection("operationalSkills");
@@ -135,32 +145,43 @@ export async function SolutionConsoleRoutePage() {
           </div>
         }
       >
-        <div className="grid gap-4 md:grid-cols-4">
-          {solutionConsoleMetrics.map((metric, index) => (
-            <MetricCard
-              detail={metric.detail}
-              key={metric.id}
-              label={metric.label}
-              tone={metricTones[index]}
-              value={String(metricValues[index])}
-            />
-          ))}
-        </div>
+        <GovernedPatternBStatSection
+          title="Console overview"
+          surfaceKey={solutionConsoleStatSurfaceKey}
+          layout="embedded"
+          statGroups={[
+            {
+              groupKey: "console-overview",
+              configuration: buildSolutionConsoleStatGrid({
+                metrics: solutionConsoleMetrics.map((metric, index) => ({
+                  label: metric.label,
+                  value: String(metricValues[index] ?? 0),
+                  detail: metric.detail,
+                  tone: metricTones[index] ?? "neutral",
+                })),
+              }),
+            },
+          ]}
+        />
       </SectionPanel>
 
-      <SectionPanel
+      <GovernedPatternCListSection
         title={playbookSection.title}
         description={playbookSection.description}
-      >
-        <RecoveryPlaybookGrid playbooks={recoveryPlaybooks} />
-      </SectionPanel>
+        surfaceKey={surfaceKeys.playbooks}
+        listConfiguration={playbookListSurface}
+        parentAccessAllowed
+        layout="embedded"
+      />
 
-      <SectionPanel
+      <GovernedPatternCListSection
         title={skillsSection.title}
         description={skillsSection.description}
-      >
-        <OperationalSkillGrid skills={operationalSkills} />
-      </SectionPanel>
+        surfaceKey={surfaceKeys.skills}
+        listConfiguration={skillsListSurface}
+        parentAccessAllowed
+        layout="embedded"
+      />
 
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1.25fr)_minmax(360px,0.75fr)]">
         <SectionPanel
@@ -181,7 +202,6 @@ export async function SolutionConsoleRoutePage() {
               surfaceKey={surfaceKeys.evidence}
               listConfiguration={evidenceListSurface}
               parentAccessAllowed
-              resolveConfiguredPermission={false}
               layout="embedded"
             />
             <div className="rounded-lg border border-line bg-surface-strong p-4">
@@ -197,7 +217,6 @@ export async function SolutionConsoleRoutePage() {
                   surfaceKey={surfaceKeys.aiUsage}
                   listConfiguration={aiUsageListSurface}
                   parentAccessAllowed
-                  resolveConfiguredPermission={false}
                   layout="embedded"
                 />
               </div>

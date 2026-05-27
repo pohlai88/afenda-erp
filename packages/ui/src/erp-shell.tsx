@@ -8,10 +8,6 @@ type ShellFrameProps = {
 
 export type Tone = "neutral" | "positive" | "warning";
 
-export type DataTableRow = {
-  id: string;
-  cells: readonly string[];
-};
 
 export function ShellFrame({ sidebar, header, children }: ShellFrameProps) {
   return (
@@ -184,43 +180,6 @@ export function BulletColumns({
   );
 }
 
-export function SimpleDataTable({
-  columns,
-  rows,
-}: {
-  columns: readonly string[];
-  rows: readonly DataTableRow[];
-}) {
-  return (
-    <div className="overflow-x-auto rounded-lg border border-line bg-surface-strong">
-      <table className="min-w-full border-collapse text-sm">
-        <thead className="bg-slate-100 text-left text-xs uppercase tracking-wide text-muted">
-          <tr>
-            {columns.map((column) => (
-              <th key={column} className="px-4 py-3 font-medium">
-                {column}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((row) => (
-            <tr key={row.id} className="border-t border-line">
-              {columns.map((column, cellIndex) => (
-                <td
-                  key={`${row.id}-${column}`}
-                  className="px-4 py-3 text-slate-700"
-                >
-                  {row.cells[cellIndex] ?? "-"}
-                </td>
-              ))}
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
-}
 
 export type MetricItem = {
   label: string;

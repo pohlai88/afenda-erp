@@ -6,7 +6,10 @@ import type {
   GovernedListTrailingCellProps,
   GovernedPatternCTrailingColumnSpec,
 } from "../governed-pattern-c-trailing-column.shared";
-import type { GovernedListTrailingCellContext } from "../schemas/list-trailing-cell-context.schema";
+import {
+  parseGovernedListTrailingCellContext,
+  type GovernedListTrailingCellContext,
+} from "../schemas/list-trailing-cell-context.schema";
 
 import { GovernedMetadataTrailingCell } from "./governed-metadata-trailing-cell.client";
 
@@ -36,9 +39,25 @@ export function resolveGovernedTrailingColumn(
     (spec.cellId
       ? GOVERNED_LIST_TRAILING_CELL_REGISTRY[spec.cellId]
       : GovernedMetadataTrailingCell);
+
+  // Validate context at the Pattern C boundary so callers receive schema errors
+  // in development before invalid context reaches the trailing Cell.
+  let context: GovernedListTrailingCellContext | undefined;
+  if (spec.context !== undefined) {
+    const parsed = parseGovernedListTrailingCellContext(spec.context);
+    if (parsed.success) {
+      context = parsed.data;
+    } else if (process.env.NODE_ENV === "development") {
+      console.warn(
+        "[governed-ui] trailing column context failed validation — context will be omitted.",
+        parsed.error.flatten(),
+      );
+    }
+  }
+
   return {
     header: spec.header,
     Cell,
-    context: spec.context,
+    context,
   };
 }
