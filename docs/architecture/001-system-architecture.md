@@ -1,4 +1,13 @@
-# Afenda ERP Architecture
+# ARCH-001 · Afenda ERP Architecture
+
+**Doc ID:** `ARCH-001` · **File:** `001-system-architecture.md`
+
+| Field | Value |
+| ----- | ----- |
+| Status | Active — aligned with `afenda-erp` repo as-built (May 2026) |
+| Authority | Product-wide runtime, deployment, data, auth, AI, observability |
+| Supersedes | Informal root architecture draft (removed; do not add new copies) |
+| Related | **ARCH-002** (packages) · **ARCH-006** (metadata UI) · **ARCH-005** (database) |
 
 ## Executive Summary
 
@@ -33,39 +42,55 @@ applications.
 
 ## Technology Baseline
 
-Use current stable releases at implementation time, with these architectural
-defaults:
+Pinned workspace versions (see root `package.json`, `pnpm-workspace.yaml`
+catalog). Upgrade only through intentional catalog bumps and CI verification.
 
-| Layer          | Default                                                    |
+| Layer          | Pinned default (repo)                                      |
 | -------------- | ---------------------------------------------------------- |
 | Runtime        | Node.js 22 for local, CI, and Vercel builds                |
-| Web framework  | Next.js App Router on the latest patched stable release    |
-| React          | React 19.2 or newer patched release                        |
-| Language       | TypeScript strict mode                                     |
-| Styling        | Tailwind CSS with shadcn/ui and Geist typography           |
-| Monorepo       | pnpm workspaces with Turborepo v2                          |
+| Web framework  | Next.js **16.2.x** App Router (`catalog:next`)             |
+| React          | React **19.2.x** (`catalog:react`)                         |
+| Language       | TypeScript **5.9** strict mode                             |
+| Package manager| pnpm **10.33.x** workspaces                                |
+| Styling        | Tailwind CSS v4 with shadcn/ui                             |
+| Monorepo       | Turborepo v2 (`tasks` in root `turbo.json`)                |
 | Database       | Neon Postgres with Drizzle ORM                             |
-| Auth           | Neon Auth with branchable auth state                       |
-| AI             | Vercel AI SDK v6 through Vercel AI Gateway                 |
+| Auth           | Neon Auth (`@neondatabase/auth`) with branchable state    |
+| AI             | Vercel AI SDK v6 (`ai@^6`) through Vercel AI Gateway       |
 | Storage        | Vercel Blob for attachments and exports                    |
-| Runtime config | Vercel Edge Config                                         |
-| Observability  | Vercel Analytics, Speed Insights, logs, traces, and drains |
+| Runtime config | Vercel Edge Config (flags and non-secret runtime toggles)  |
+| Observability  | Vercel Analytics, Speed Insights, OTEL, log drains         |
+| Next config    | `cacheComponents: true` via `@afenda/config` `createAfendaNextConfig` |
 
-Framework upgrades must be treated as security work, not cosmetic dependency
-churn. Keep Next.js and React on patched releases because App Router and React
-Server Component security fixes can affect all routes.
+Framework upgrades are security work, not cosmetic churn. App Router and React
+Server Component patches can affect every route.
 
 ## Monorepo Structure
+
+**Current on disk:** one app (`apps/erp`) and platform packages under `packages/*`.
+`packages/features/*` is workspace-ready but empty until the first module is
+extracted. Feature-package authority:
+[ERP Domain Package Architecture](002-erp-domain-package-architecture.md).
 
 ```txt
 apps/
   erp/                  # Next.js App Router ERP application
 packages/
+  features/             # Target: ERP module packages when domains mature
+    finance/
+    sales/
+    purchasing/
+    inventory/
+    hr/                   # moduleId: hr
+    crm/
+    approvals/
+    reports/
+    admin/
   ui/                   # Shared UI primitives and ERP layout components
   governed-surface/     # Metadata-driven ERP UI contracts and renderers
   db/                   # Drizzle schema, migrations, Neon connection helpers
   auth/                 # Neon Auth integration, roles, permission helpers
-  domain/               # ERP domain services and business rules
+  domain/               # Cross-module ERP contracts and compatibility adapters
   ai/                   # Vercel AI SDK agents, tools, prompts, guardrails
   workflows/            # Approval flows, scheduled jobs, event handlers
   observability/        # Analytics, tracing, logging conventions
@@ -73,18 +98,24 @@ packages/
 ```
 
 The package manager is `pnpm`. Turborepo owns task orchestration, dependency
-ordering, local cache, remote cache, and affected-package CI. The root
-`turbo.json` should use the Turborepo v2 `tasks` key and define `build`,
-`lint`, `typecheck`, `test`, `test:e2e`, `db:generate`, `db:migrate`, and
-`dev` tasks. Next.js build outputs must cache `.next/**` while excluding
-`.next/cache/**`.
+ordering, local cache, remote cache, and affected-package CI. Root `turbo.json`
+uses the Turborepo v2 **`tasks`** key (not legacy `pipeline`) and defines
+`build`, `lint`, `typecheck`, `test`, `test:e2e`, `db:generate`, `db:migrate`,
+and `dev`. The `@afenda/erp#build` task must cache `.next/**` and **exclude**
+`.next/cache/**` so Vercel Remote Cache stays bounded (Vercel conformance:
+`NEXTJS_NO_TURBO_CACHE`). Library packages emit `dist/**` via `dependsOn: ["^build"]`.
 
 Package ownership rules:
 
 - `apps/erp` owns routing, route handlers, page composition, layouts, and
   application shell behavior.
-- `packages/domain` owns ERP business operations and cannot import from
-  `apps/erp`.
+- `packages/features/*` owns mature ERP module implementation: module-specific
+  metadata, business commands, query services, page sections, schemas,
+  workflow adapters, and tests. Feature packages cannot import from `apps/erp`.
+- `packages/domain` owns cross-module ERP contracts, module IDs, workspace
+  contracts, permission contract types, and compatibility adapters. It is not
+  the long-term home for module-specific finance, HR, sales, purchasing,
+  inventory, CRM, approval, report, or admin implementation.
 - `packages/governed-surface` owns metadata-driven ERP UI schemas, renderers,
   section shells, list-window contracts, presentation profiles, fixtures, and
   renderer parity automation. It cannot own ERP business rules, tenant queries,
@@ -109,7 +140,7 @@ data grids, command palettes, drawers, upload widgets, charts, and optimistic
 forms.
 
 Repeatable ERP surfaces use the metadata-driven UI architecture defined in
-[Metadata-Driven UI Architecture](metadata-driven-ui-architecture.md).
+[Metadata-Driven UI Architecture](006-metadata-driven-ui-architecture.md).
 The default pattern is server-first: routes resolve tenant/session/permission
 authority, domain packages return bounded query windows, builders emit
 Zod-validated metadata envelopes, and static renderers paint only the current
@@ -122,25 +153,29 @@ apps/erp/src/app/
   (auth)/
     sign-in/
     sign-up/
+    forgot-password/
   (app)/
     layout.tsx
     dashboard/
-    finance/
-    sales/
-    purchasing/
-    inventory/
-    hr/
-    crm/
-    approvals/
-    reports/
-    admin/
+    solution-console/
+    [moduleId]/
+      page.tsx
+      records/[recordId]/page.tsx
+      work-items/[workItemId]/page.tsx
+  onboarding/
   api/
     ai/chat/
     ai/extract/
-    webhooks/
+    ai/solution-provider/
+    auth/[...path]/
     uploads/
     cron/
+    observability/drain/
 ```
+
+Module workspace pages use one dynamic `[moduleId]` segment for all core ERP
+modules (`finance`, `sales`, `hr`, …). Do not create per-module route folders
+unless a module needs a genuinely different route tree.
 
 Use Server Actions for internal form mutations and workflow commands. Use Route
 Handlers for webhooks, file uploads, AI streaming responses, cron endpoints,
@@ -154,31 +189,47 @@ database transactions, or large SDKs.
 
 Afenda ERP v1 targets SME core ERP modules:
 
-| Module     | Primary capabilities                                  | Package ownership         |
-| ---------- | ----------------------------------------------------- | ------------------------- |
-| Dashboard  | KPIs, tasks, approvals, alerts                        | `apps/erp`, `domain`      |
-| Finance    | Chart of accounts, journal entries, AR/AP, tax, close | `domain`, `db`            |
-| Sales      | Quotes, orders, invoices, customer terms              | `domain`, `db`            |
-| Purchasing | Vendors, purchase orders, receipts, bills             | `domain`, `db`            |
-| Inventory  | Items, stock ledger, locations, adjustments           | `domain`, `db`            |
-| HR         | Employees, leave, basic payroll inputs                | `domain`, `db`            |
-| CRM        | Leads, accounts, contacts, activities                 | `domain`, `db`            |
-| Approvals  | Approval rules, tasks, escalations, comments          | `workflows`, `domain`     |
-| Reports    | Operational reports, exports, saved views             | `domain`, `observability` |
-| Admin      | Tenant settings, users, roles, audit log              | `auth`, `domain`, `db`    |
+| Module     | Primary capabilities                                  | Mature package ownership                    |
+| ---------- | ----------------------------------------------------- | ------------------------------------------- |
+| Dashboard  | KPIs, tasks, approvals, alerts                        | `apps/erp`, `features/reports`, `workflows` |
+| Finance    | Chart of accounts, journal entries, AR/AP, tax, close | `features/finance`, `db`                    |
+| Sales      | Quotes, orders, invoices, customer terms              | `features/sales`, `db`                      |
+| Purchasing | Vendors, purchase orders, receipts, bills             | `features/purchasing`, `db`                 |
+| Inventory  | Items, stock ledger, locations, adjustments           | `features/inventory`, `db`                  |
+| HR         | Employees, leave, time, payroll inputs, workforce ops | `features/hr`, `db` (moduleId: `hr`)        |
+| CRM        | Leads, accounts, contacts, activities                 | `features/crm`, `db`                        |
+| Approvals  | Approval rules, tasks, escalations, comments          | `features/approvals`, `workflows`, `db`     |
+| Reports    | Operational reports, exports, saved views             | `features/reports`, `observability`, `db`   |
+| Admin      | Tenant settings, users, roles, audit log              | `features/admin`, `auth`, `db`              |
 
-Business rules live in `packages/domain`, not in React components. The current
-module workspace implementation uses shared persisted ERP records, saved views,
-work items, documents, and domain metadata. Dedicated subledger tables and
-module-specific command services such as journal posting, sales order creation,
-or stock adjustment remain roadmap work and should be added behind domain
-operations before app routes call them.
+Business rules live in feature packages once a module becomes real; they do not
+live in React route components. `packages/domain` remains the cross-module
+contract layer. The current module workspace implementation uses shared
+persisted ERP records, saved views, work items, documents, and domain metadata
+as a compatibility foundation. Dedicated feature packages, subledger tables,
+and module-specific command services such as journal posting, sales order
+creation, or stock adjustment should be introduced before app routes depend on
+those workflows.
+
+The package threshold is defined in
+[ERP Domain Package Architecture](002-erp-domain-package-architecture.md). The
+database scale and promotion path from shared records to module-owned tables is
+defined in [Database Scale Architecture](005-database-scale-architecture.md).
 
 ## Data Architecture
 
 Neon Postgres is the system of record. Drizzle ORM defines the schema and
 migrations in `packages/db`. SQL remains the conceptual model: tables,
 relations, indexes, constraints, and transactions should be explicit.
+
+Afenda should be planned as a large ERP database from the beginning. A mature
+SME ERP can reasonably grow into hundreds of tables once finance, inventory,
+HR, workflow, reporting, documents, AI usage, audit, and integrations are
+fully modeled. The current shared ERP record tables are an early workspace and
+metadata foundation, not the final source of truth for ledger-grade,
+inventory-grade, payroll-sensitive, or statutory records. See
+[Database Scale Architecture](005-database-scale-architecture.md) for table-count
+planning, schema ownership, and promotion rules.
 
 Core data rules:
 
@@ -192,11 +243,15 @@ Core data rules:
 - All list views use indexed filters and stable pagination.
 - Queries select only the columns required by the calling view or service.
 - Large list surfaces use the governed server-window contract described in
-  [Metadata-Driven UI Architecture](metadata-driven-ui-architecture.md).
+  [Metadata-Driven UI Architecture](006-metadata-driven-ui-architecture.md).
   Metadata must not carry the complete dataset; it carries the current server
   window, column/action contract, pagination state, and telemetry only.
 
 Recommended database package shape:
+
+**Current:** flat schema files under `packages/db/src/schema/` (`erp.ts`,
+`identity.ts`, `organizations.ts`, `permissions.ts`, `audit.ts`, `ai.ts`).
+Module subdirectories below are the **target** layout as modules mature.
 
 ```txt
 packages/db/
@@ -217,13 +272,17 @@ packages/db/
       organizations.ts
       permissions.ts
       audit.ts
-      finance.ts
-      sales.ts
-      purchasing.ts
-      inventory.ts
-      hr.ts
-      crm.ts
-      approvals.ts
+      documents.ts
+      workflow.ts
+      ai.ts
+      erp.ts            # Current shared ERP record tables
+      finance/          # Target module-owned tables
+      sales/
+      purchasing/
+      inventory/
+      hr/
+      crm/
+      approvals/
 ```
 
 Database connections must be initialized lazily inside getter functions so
@@ -285,7 +344,8 @@ authorization reviewable in source control instead of scattering business rules
 inside route components.
 
 Authorization must be enforced close to the operation being performed. Route
-protection in Next.js `proxy.ts` can improve navigation and redirects, but it is
+protection in `apps/erp/src/proxy.ts` (Next.js 16 traffic helper; not
+`middleware.ts`) improves navigation and Neon Auth session refresh, but it is
 not a sufficient security boundary. Server Components must check read access,
 and mutations must check write permissions inside the Server Action or Route
 Handler before calling domain services.
@@ -337,9 +397,11 @@ Workflows:
 - Integration sync jobs.
 - Document extraction post-processing.
 
-Vercel Cron Jobs call secured Route Handlers under `app/api/cron/*`. Each cron
-handler must verify `CRON_SECRET` or the platform-provided equivalent before
-running work.
+Vercel Cron Jobs invoke Route Handlers under `app/api/cron/*` (declared in root
+`vercel.json`). Each handler must reject requests unless
+`Authorization: Bearer ${CRON_SECRET}` matches the environment variable (Vercel
+cron contract). Shared helper: `apps/erp/src/lib/cron.ts` (`authorizeCronRequest`,
+`runCronJob`).
 
 ## AI Architecture
 
@@ -347,9 +409,18 @@ AI features are built with Vercel AI SDK v6 and Vercel AI Gateway. The ERP app
 already includes `ai@^6` and `@ai-sdk/react@^3`, and exposes active AI routes
 for assistant chat, document extraction, and the Solution Provider Console. The
 default model access pattern is through provider/model strings routed by AI
-Gateway so usage, failover, and cost tracking are centralized. Production on
-Vercel should use OIDC-backed Gateway authentication where available; local
-development may use `AI_GATEWAY_API_KEY` or a pulled Vercel environment.
+Gateway so usage, failover, and cost tracking are centralized.
+
+**Gateway authentication (Vercel AI Gateway):**
+
+| Environment | Credential |
+| ----------- | ---------- |
+| Vercel deployment | `VERCEL_OIDC_TOKEN` (issued automatically when AI Gateway is enabled) |
+| Local / CI | `AI_GATEWAY_API_KEY` from the Vercel dashboard, or `vercel env pull` |
+
+Application code should resolve credentials in this order:
+`process.env.AI_GATEWAY_API_KEY ?? process.env.VERCEL_OIDC_TOKEN`.
+Never commit either value.
 
 Primary AI capabilities:
 
@@ -427,19 +498,25 @@ Blob when possible rather than proxying through the Next.js server.
 
 ## Caching and Performance
 
+**Cache Components** are enabled in production config (`cacheComponents: true` in
+`packages/config/src/next.ts`). Use them only for shared, non-tenant data.
+
+| Pattern | When to use |
+| ------- | ----------- |
+| `"use cache"` + `cacheLife` / `cacheTag` | Shared reference data inside Server Components |
+| `"use cache: remote"` + `cacheLife` | Route handlers or fetches that should use Vercel Runtime Cache |
+| No cache / `cache: 'no-store'` | Tenant dashboards, org-scoped lists, auth/session-bound reads |
+| `revalidatePath` / `revalidateTag` / `updateTag` | After mutations — prefer narrow invalidation |
+
 Performance defaults:
 
-- Server Components fetch data on the server and stream slow sections behind
-  Suspense boundaries.
-- Shared, non-sensitive reference data can use Cache Components with
-  `"use cache"`, `cacheLife`, `cacheTag`, and tagged revalidation.
+- Server Components fetch on the server; stream slow sections behind Suspense.
 - Personalized and tenant-sensitive data must use tenant-aware cache keys or
-  remain uncached.
-- Mutations invalidate specific paths or tags instead of broad application
-  refreshes.
-- Static assets use Vercel's CDN and immutable hashed filenames.
-- Images use `next/image`; fonts use `next/font`.
-- Client bundle size is monitored with Next.js bundle analysis.
+  stay uncached — never cache another organization's rows.
+- Static assets use the Vercel CDN; images use `next/image`; fonts use
+  `next/font`.
+- Client bundle size is tracked with `pnpm analyze:erp` and
+  `pnpm performance:budget`.
 
 Core Web Vitals targets:
 
@@ -466,33 +543,90 @@ Database performance rules:
 
 ## Vercel Deployment Model
 
-`apps/erp` is deployed as one Vercel project. The Vercel project root points to
-`apps/erp`, while Turborepo resolves and builds required packages from the
-workspace graph.
+Afenda deploys as **one Vercel project linked to this repository root** (not
+one project per package). Root `vercel.json` is the source of truth:
 
-Deployment environments:
+```json
+{
+  "installCommand": "pnpm install",
+  "buildCommand": "pnpm turbo build --filter=@afenda/erp",
+  "crons": [
+    { "path": "/api/cron/reminders", "schedule": "0 0 * * *" },
+    { "path": "/api/cron/syncs", "schedule": "0 1 * * *" },
+    { "path": "/api/cron/housekeeping", "schedule": "0 2 * * *" }
+  ]
+}
+```
+
+Turborepo builds workspace libraries (`dist/**` via `dependsOn: ["^build"]`), then
+`@afenda/erp` (`.next/**`, excluding `.next/cache/**`). Feature packages are
+compile-time dependencies, not separate Vercel projects. See
+[ERP Domain Package Architecture](002-erp-domain-package-architecture.md).
+
+### Platform linkage (verified via Vercel MCP, May 2026)
+
+| Item | As-built |
+| ---- | -------- |
+| Vercel team | `Jack's projects` (`team_Ymg16AtjGxrKyjaZk5Z52IYc`) |
+| Linked project in team | `afenda-vercel` (`prj_f4xLKgSiQsOEXnk24ZKlwlKrwqui`) — **legacy GitHub repo `afenda-vercel`** |
+| This repo (`afenda-erp`) | **Not linked** — no `.vercel/project.json`; **deferred until codebase is stable** |
+| Latest `afenda-vercel` production deploys | **ERROR** (separate codebase; not Afenda ERP health) |
+
+**Vercel link is deferred.** Do not run `vercel link` or wire preview/production deploys until local
+stabilization is complete. Root `vercel.json` documents the intended build for when linking happens.
+
+**Local stabilization gate (before `vercel link`):**
+
+1. `pnpm turbo build --filter=@afenda/erp` succeeds locally and in CI.
+2. `pnpm typecheck`, `pnpm test`, and `pnpm architecture:check` pass.
+3. Neon Auth, database migrations, and AI routes work in local/preview-shaped env (`.env.local` / `pnpm env:sync`).
+4. Governed list surfaces and module workspaces behave correctly end-to-end.
+
+**Platform milestone (after stabilization):**
+
+1. `vercel link` at repo root → create `afenda-erp` or retarget `afenda-vercel` to this repository.
+2. Enable Vercel Remote Cache; confirm `installCommand` / `buildCommand` match `vercel.json`.
+3. `vercel env pull`; provision Neon, Neon Auth, Blob, Edge Config, AI Gateway, Analytics, Speed Insights.
+4. Set `CRON_SECRET`, `VERCEL_DRAIN_SECRET`, database URLs, and gateway credentials.
+5. First preview deployment; fix builder-only issues before production promotion.
+
+### Compute and database on Vercel
+
+- Default route handlers and Server Actions run on the **Node.js** runtime
+  (Fluid Compute enabled at the project level on modern Vercel accounts).
+- Use **Neon pooled** `DATABASE_URL` for serverless query traffic; reserve direct
+  URLs for migrations (`DATABASE_MIGRATION_URL`).
+- When using a server-side `pg` pool, call `attachDatabasePool` from
+  `@vercel/functions` after pool creation so idle clients release before function
+  suspension (Fluid Compute guidance).
+- Reserve **Edge** runtime only for handlers that do not need Drizzle
+  transactions or Node-only SDKs.
+- Configure `maxDuration` in `vercel.json` `functions` globs for long-running AI
+  streams or export kickoffs when defaults are insufficient.
+
+### Deployment environments
 
 | Environment | Purpose                 | Data                                |
 | ----------- | ----------------------- | ----------------------------------- |
-| Local       | Developer iteration     | Local env plus Neon dev branch      |
+| Local       | Developer iteration     | `.env.local` + Neon dev branch      |
 | Preview     | Pull request validation | Neon preview branch where available |
 | Production  | Customer traffic        | Production Neon branch/database     |
 
-Required platform services:
+### Required platform services (per environment)
 
-- Vercel project for `apps/erp`.
+- One Vercel project (root-linked monorepo).
 - Vercel Remote Cache for Turborepo.
-- Neon Postgres integration.
-- Neon Auth configuration.
-- Vercel Blob store.
-- Vercel Edge Config for flags and runtime configuration.
-- Vercel Analytics and Speed Insights.
-- Vercel Observability/log drains where required.
-- Vercel AI Gateway enabled for the project.
+- Neon Postgres (+ branch per preview where possible).
+- Neon Auth (Preview/Production URLs and cookie secret).
+- Vercel Blob store (upload tokens for `/api/uploads`).
+- Vercel Edge Config (feature flags).
+- Vercel Analytics and Speed Insights (wired in `apps/erp` layout).
+- Log drain to `/api/observability/drain` when centralized logging is required.
+- Vercel AI Gateway enabled on the project.
 
-Environment variables are managed through Vercel environments and pulled locally
-with the Vercel CLI. Secrets must not be committed. Shared environment schemas
-belong in `packages/config`.
+Environment variables are managed in Vercel and synced locally via
+`pnpm env:sync` / `vercel env pull`. Secrets never commit. Shared schemas live in
+`packages/config` (see `.env.example` for required keys).
 
 ## Developer Tooling and MCP
 
@@ -597,9 +731,9 @@ tests with mocked model responses.
 
 Current status: the workspace, Turborepo tasks, modular Next.js app shell,
 shared configuration, environment schema, protected application layout, and auth
-routes are implemented locally. Vercel project linking, remote cache, and
-production environment pulls remain platform setup tasks rather than source-code
-changes.
+routes are implemented locally. **Vercel project linking is deferred** until the
+stabilization gate passes (see
+[Platform linkage](#platform-linkage-verified-via-vercel-mcp-may-2026)).
 
 ### Phase 2: Data and Auth
 
@@ -621,16 +755,23 @@ catalog.
 ### Phase 3: Core ERP Modules
 
 - Implement dashboard, CRM, sales, purchasing, inventory, finance, HR, approvals,
-  reports, and admin route groups.
-- Build domain services for each module before adding advanced UI.
+  reports, and admin module workspaces.
+- Build feature-package services for each module before adding advanced UI.
 - Add audit logging for all critical mutations.
 - Add Blob-backed attachment flows for business documents.
 
-Current status: all module route groups exist in `apps/erp` and share a single
-metadata-driven Server Component renderer. `packages/domain` now resolves
-serialized module workspaces from tenant-scoped database records, saved views,
-workflow items, and document registry rows, with metadata fallback for local dev
-mode. `packages/db` includes Phase 3 persistence for `erp_module_records`,
+Current status: module workspaces use dynamic `(app)/[moduleId]/` routes and
+metadata-driven list surfaces via `GovernedPatternCListSection` in
+`module-screen.tsx`, `dashboard-route.tsx`, and `solution-console-route.tsx`
+(domain builders in `packages/domain/src/module-list-surfaces.ts`).
+`packages/domain` resolves serialized module workspaces from tenant-scoped
+database records, saved views, workflow items, and document registry rows, with
+metadata fallback for local dev mode. That is a compatibility foundation, not
+the target location for mature ERP feature implementation. No
+`packages/features/*` packages exist yet. Future finance, sales, purchasing,
+inventory, HR, CRM, approvals, reports, and admin implementation should move
+into `@afenda/feature-*` packages with module-owned services, components,
+schemas, and tests. `packages/db` includes Phase 3 persistence for `erp_module_records`,
 `erp_saved_views`, `erp_work_items`, and `erp_documents`; onboarding and
 `pnpm db:seed` seed initial core ERP records for existing organizations. The
 ERP app also exposes a secured Vercel Blob client-upload Route Handler at
@@ -658,8 +799,10 @@ that requires explicit human approval before recording a proposal.
 `/api/ai/extract` runs schema-constrained document extraction and stores
 reviewable extraction output. `packages/db` persists AI usage events, document
 extractions, and approval proposals so the dashboard can show an AI usage ledger
-by tenant. Local development requires `AI_GATEWAY_API_KEY` or a
-`VERCEL_OIDC_TOKEN` from `vercel env pull` before model calls execute.
+by tenant. Local development requires `AI_GATEWAY_API_KEY` (or
+`VERCEL_OIDC_TOKEN` from `vercel env pull` when testing OIDC flows) before model
+calls execute; Vercel deployments use OIDC automatically when AI Gateway is
+enabled.
 The `/solution-console` route and `/api/ai/solution-provider` handler extend the
 AI layer into a problem-first Solution Provider Console. The first flagship
 workflow is negative P&L recovery: the agent gathers module evidence, diagnoses
@@ -706,6 +849,11 @@ context for policy evaluation.
 
 - The default architecture is one modular Next.js ERP app, not microfrontends.
 - Every major subsystem has an owning app route or package.
+- Mature ERP modules have feature-package ownership under `packages/features/*`;
+  `packages/domain` remains the shared contract layer.
+- Database growth assumes ERP-scale schema expansion and promotes generic
+  records to typed module tables before ledger, inventory, payroll, or
+  compliance workflows depend on them.
 - Tenant context, authorization, audit logging, and validation are mandatory
   patterns, not optional conventions.
 - The data and auth design uses Neon Postgres and Neon Auth as first-class
@@ -715,15 +863,34 @@ context for policy evaluation.
 - Vercel deployment, performance measurement, observability, and remote caching
   are included in the baseline platform design.
 - Metadata-driven ERP surfaces follow
-  [Metadata-Driven UI Architecture](metadata-driven-ui-architecture.md):
+  [Metadata-Driven UI Architecture](006-metadata-driven-ui-architecture.md):
   server-window-first lists, static renderer dispatch, Zod contracts, public
   package doors, and automation gates for renderer/schema/fixture parity.
 
 ## References
 
-- Vercel documentation: https://vercel.com/docs
-- Next.js documentation: https://nextjs.org/docs
-- Turborepo documentation: https://turborepo.com/docs
-- Vercel AI SDK documentation: https://ai-sdk.dev/docs
-- Neon documentation: https://neon.com/docs
-- Drizzle ORM documentation: https://orm.drizzle.team/docs
+### Architecture documents
+
+- [ERP Domain Package Architecture](002-erp-domain-package-architecture.md)
+- [Metadata-Driven UI Architecture](006-metadata-driven-ui-architecture.md)
+- [Governed Metadata Architecture](007-governed-metadata-architecture.md)
+- [Directory Architecture Audit](003-directory-architecture-audit.md)
+- [Database Scale Architecture](005-database-scale-architecture.md)
+- [Naming Conventions](004-naming-conventions.md)
+
+### External (Vercel platform)
+
+- [Vercel docs](https://vercel.com/docs) — deployments, environments, cron, Fluid Compute
+- [Monorepo + Turborepo on Vercel](https://vercel.com/docs/monorepos/turborepo) — `tasks`, cache outputs, filters
+- [Cron Jobs](https://vercel.com/docs/cron-jobs/manage-cron-jobs) — `CRON_SECRET` + `Authorization: Bearer`
+- [Runtime Cache / Cache Components](https://vercel.com/docs/caching/runtime-cache) — `cacheComponents`, `use cache: remote`
+- [AI Gateway authentication](https://vercel.com/docs/ai-gateway/authentication-and-byok) — OIDC vs API key
+- [Next.js on Vercel](https://vercel.com/docs/frameworks/nextjs)
+
+### External (frameworks and data)
+
+- [Next.js documentation](https://nextjs.org/docs)
+- [Turborepo documentation](https://turborepo.com/docs)
+- [Vercel AI SDK documentation](https://ai-sdk.dev/docs)
+- [Neon documentation](https://neon.com/docs)
+- [Drizzle ORM documentation](https://orm.drizzle.team/docs)

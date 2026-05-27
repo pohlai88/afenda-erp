@@ -1,6 +1,12 @@
-# Metadata-Driven UI Architecture
+# ARCH-006 · Metadata-Driven UI Architecture
 
-Status: repaired implementation architecture, May 2026.
+**Doc ID:** `ARCH-006` · **File:** `006-metadata-driven-ui-architecture.md`
+
+| Field | Value |
+| ----- | ----- |
+| Status | Active — as-built implementation architecture (May 2026) |
+| Authority | Metadata vs runtime authority, contracts, query windows, Vercel/Next rules |
+| Related | **ARCH-007** (renderer kernel) · **ARCH-002** (feature packages) · **ARCH-001** (deploy) |
 
 Afenda uses governed metadata to describe ERP UI intent while server runtime code keeps authority over data access, auth, tenancy, rendering, telemetry, and mutations. This is not a tenant-authored low-code runtime and not runtime JSON-to-JSX.
 
@@ -14,7 +20,7 @@ Metadata may describe fields, columns, row links, filters, sort choices, present
 
 - `@afenda/governed-surface` is the governed UI kernel and already exposes public doors for root, `client`, `server`, `metadata`, and `schemas`.
 - `@afenda/erp` owns App Router routes, Server Components, session context, and page composition.
-- `@afenda/domain` owns module definitions, record type definitions, query normalization, workspace shaping, and surface builders.
+- `@afenda/domain` currently owns module definitions, record type definitions, query normalization, workspace shaping, and surface builders as a shared contract layer. Mature module-specific implementations move to `@afenda/feature-*` packages under `packages/features/*` when created. **No feature packages exist on disk yet.**
 - `@afenda/db` owns persisted ERP records, work items, saved views, documents, query windows, Drizzle schema, and RLS context helpers.
 - `@afenda/ui` provides accessible primitives and remains metadata-unaware.
 - Dashboard, module workspace, and solution-console list sections already render through `GovernedPatternCListSection`.
@@ -24,15 +30,16 @@ Metadata may describe fields, columns, row links, filters, sort choices, present
 
 ## Package Boundaries
 
-| Package                    | Responsibility                                                                                                                |
-| -------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| `@afenda/erp`              | App Router routes, Server Components, route-level auth checks, search-param threading, and runtime composition.               |
-| `@afenda/domain`           | ERP definitions, record type definitions, list-query normalization, domain-to-surface builders, labels, and fallback shaping. |
-| `@afenda/governed-surface` | Schemas, builders, profiles, parse boundaries, renderer registry, server/client components, and gallery parse utilities.      |
-| `@afenda/db`               | Tenant-scoped Drizzle queries, persisted records/work items/documents, JSONB fields, query windows, and migrations.           |
-| `@afenda/auth`             | Sessions, organizations, roles, capabilities, and route-level authorization decisions.                                        |
-| `@afenda/observability`    | OTel, render telemetry, invalid metadata events, query-window metrics, and action/audit spans.                                |
-| `@afenda/ui`               | Visual primitives only. No ERP metadata imports.                                                                              |
+| Package                    | Responsibility                                                                                                            |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| `@afenda/erp`              | App Router routes, Server Components, route-level auth checks, search-param threading, and runtime composition.           |
+| `@afenda/domain`           | Cross-module ERP contracts, record type contracts, list-query normalization contracts, labels, and compatibility shaping. |
+| `@afenda/feature-*`        | Target home for mature module metadata, builders, query services, command services, components, schemas, and tests. Not created yet. |
+| `@afenda/governed-surface` | Schemas, builders, profiles, parse boundaries, renderer registry, server/client components, and gallery parse utilities.  |
+| `@afenda/db`               | Tenant-scoped Drizzle queries, persisted records/work items/documents, JSONB fields, query windows, and migrations.       |
+| `@afenda/auth`             | Sessions, organizations, roles, capabilities, and route-level authorization decisions.                                    |
+| `@afenda/observability`    | OTel, render telemetry, invalid metadata events, query-window metrics, and action/audit spans.                            |
+| `@afenda/ui`               | Visual primitives only. No ERP metadata imports.                                                                          |
 
 Import rules:
 
@@ -172,20 +179,48 @@ Dangerous or mutating actions require:
 
 ## Vercel And Next.js Runtime Rules
 
-The ERP app is a Next.js App Router app deployed through Vercel. The current build path remains:
+The ERP app is a Next.js **16** App Router app deployed through Vercel from the
+repository root. Root `vercel.json` runs:
 
 ```bash
 pnpm turbo build --filter=@afenda/erp
 ```
 
+Cron routes (`/api/cron/*`) use `Authorization: Bearer ${CRON_SECRET}` per
+**ARCH-001**. Vercel project linking remains **deferred** until local stabilization.
+
+**Cache Components (validated May 2026):** `createAfendaNextConfig` sets
+`cacheComponents: true`. Use Next.js 16 cache directives on **read models** where
+safe:
+
+- `'use cache: remote'` + `cacheLife` / `cacheTag` for stable list snapshots or
+  reference data ([Runtime Cache](https://vercel.com/docs/caching/runtime-cache)).
+- After mutations, prefer `updateTag` / `revalidateTag` so governed list metadata
+  does not flash stale toolbar state.
+- For tenant-scoped ERP rows, default to **dynamic** server reads inside
+  `runWithOrganizationContext` — do not cache per-tenant list windows in the CDN.
+- Prefer `fetch(..., { cache: 'no-store' })` over `export const dynamic = 'force-dynamic'`
+  when only one subtree must stay fresh (Vercel conformance:
+  `NEXTJS_NO_DYNAMIC_AUTO`).
+
 Runtime rules:
 
-- Keep DB/auth/service clients lazily initialized. Do not create Neon, Drizzle, Redis, or external SDK clients at module scope in new code.
-- `proxy.ts` is a traffic/session helper, not the only auth boundary.
-- Server Components, Route Handlers, and Server Actions must re-check capability before protected data reads or mutations.
-- Preserve `@vercel/otel` instrumentation and avoid logging tenant-sensitive field values.
+- Keep DB/auth/service clients lazily initialized via package helpers (`getDb()`,
+  auth server doors). Do not create Neon pools, Drizzle instances, Redis, or
+  external SDK clients at module scope in new app code.
+- When introducing a dedicated pool in a Function, call `attachDatabasePool` from
+  `@vercel/functions` after pool creation (**ARCH-005**).
+- `apps/erp/src/proxy.ts` is the traffic/session helper (Next.js 16+); it is not
+  the only auth boundary.
+- Server Components, Route Handlers, and Server Actions must re-check capability
+  before protected data reads or mutations.
+- Preserve `@vercel/otel` instrumentation and avoid logging tenant-sensitive field
+  values.
 - Keep Vercel cron paths unchanged unless a real background job is added.
-- Vercel Blob image configuration remains centralized in `createAfendaNextConfig`.
+- Vercel Blob `remotePatterns` for `*.public.blob.vercel-storage.com` stay in
+  `createAfendaNextConfig` (`packages/config/src/next.ts`).
+- RSC pages: batch independent reads with `Promise.all` (see **ARCH-007** §6.2);
+  pass governed **configuration** to client bridges, not raw Drizzle rows.
 
 ## Testing Gates
 
@@ -215,3 +250,13 @@ Invalid metadata must fail parse before rendering. Production fallbacks must be 
 ## Decision Summary
 
 Afenda should continue building an internal governed UI kernel. The architecture is metadata-driven where it improves consistency, testability, and operational safety, while server runtime code remains the source of truth for data, authorization, tenancy, audit, and command execution.
+
+## Related Documents
+
+| Document | Topic |
+| -------- | ----- |
+| [ERP Domain Package Architecture](002-erp-domain-package-architecture.md) | Feature-package boundaries, import doors, and extraction |
+| [Governed Metadata Architecture](007-governed-metadata-architecture.md) | Renderer kernel, profiles, resolver, and builder layering |
+| [Directory Architecture Audit](003-directory-architecture-audit.md) | Monorepo guards and package categories |
+| [System Architecture](001-system-architecture.md) | Product-wide runtime and deployment |
+| [Naming Conventions](004-naming-conventions.md) | File, route, and package naming |

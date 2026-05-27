@@ -11,7 +11,8 @@ type PackageCategory =
   | "runtime-library"
   | "ui-primitives"
   | "config"
-  | "database";
+  | "database"
+  | "feature-package";
 
 type PackageArchitectureRule = {
   category: PackageCategory;
@@ -19,6 +20,14 @@ type PackageArchitectureRule = {
   requiresCompiledDistExports: boolean;
   requiresPackageBuild: boolean;
   turboBuildOutputs: string[];
+};
+
+type WorkspacePackage = {
+  workspaceRoot: WorkspaceRoot;
+  packageDirectory: string;
+  directoryName: string;
+  packageJsonPath: string;
+  packageJson: Record<string, unknown>;
 };
 
 const packageArchitectureRules: Record<string, PackageArchitectureRule> = {
@@ -100,6 +109,7 @@ const ignoredDirectories = new Set([
   ".turbo",
   ".artifacts",
   ".vercel",
+  ".agents",
   "dist",
   ".codex-runtime",
   ".codex-logs",
@@ -173,9 +183,11 @@ function checkDocumentationNaming(filePath: string) {
 
   if (
     !isAllowedUppercaseMarkdown &&
-    !/^[a-z0-9]+(?:-[a-z0-9]+)*\.md$/.test(fileName)
+    !/^(?:\d{3}-)?[a-z0-9]+(?:-[a-z0-9]+)*\.md$/.test(fileName)
   ) {
-    problems.push(`Markdown filename must be lowercase kebab-case: ${rel}`);
+    problems.push(
+      `Markdown filename must be lowercase kebab-case, optionally prefixed with 00N-: ${rel}`,
+    );
   }
 
   if (!rel.includes("/") && lowerFileName.endsWith("-architecture.md")) {
@@ -303,27 +315,48 @@ function checkAppUiBoundary() {
 
 function readWorkspacePackages(workspaceRoot: WorkspaceRoot) {
   const workspaceDir = path.join(root, workspaceRoot);
-  const packages: Array<{
-    directoryName: string;
-    packageJsonPath: string;
-    packageJson: Record<string, unknown>;
-  }> = [];
+  const packages: WorkspacePackage[] = [];
+
+  function pushPackage(packageDirectory: string, directoryName: string) {
+    const packageJsonPath = path.join(root, packageDirectory, "package.json");
+    if (!fs.existsSync(packageJsonPath)) {
+      return;
+    }
+
+    packages.push({
+      workspaceRoot,
+      packageDirectory,
+      directoryName,
+      packageJsonPath,
+      packageJson: readJson(packageJsonPath),
+    });
+  }
 
   for (const entry of fs.readdirSync(workspaceDir, { withFileTypes: true })) {
     if (!entry.isDirectory()) {
       continue;
     }
 
-    const packageJsonPath = path.join(workspaceDir, entry.name, "package.json");
-    if (!fs.existsSync(packageJsonPath)) {
+    const packageDirectory = normalize(path.join(workspaceRoot, entry.name));
+    pushPackage(packageDirectory, entry.name);
+
+    if (workspaceRoot !== "packages" || entry.name !== "features") {
       continue;
     }
 
-    packages.push({
-      directoryName: entry.name,
-      packageJsonPath,
-      packageJson: readJson(packageJsonPath),
-    });
+    const featuresDir = path.join(workspaceDir, entry.name);
+    for (const featureEntry of fs.readdirSync(featuresDir, {
+      withFileTypes: true,
+    })) {
+      if (!featureEntry.isDirectory()) {
+        continue;
+      }
+
+      pushPackage(
+        normalize(path.join(workspaceRoot, entry.name, featureEntry.name)),
+        featureEntry.name,
+      );
+    }
   }
 
   return packages;
@@ -345,58 +378,89 @@ function getExports(packageJson: Record<string, unknown>) {
     : {};
 }
 
-function getPackageName(
-  workspaceRoot: WorkspaceRoot,
-  directoryName: string,
-  packageJson: Record<string, unknown>,
-) {
-  const packageName = packageJson.name;
+function getPackageRule(
+  packageName: string,
+  workspacePackage: WorkspacePackage,
+): PackageArchitectureRule | undefined {
+  const staticRule = packageArchitectureRules[packageName];
+  if (staticRule) {
+    return staticRule;
+  }
+
+  if (
+    workspacePackage.packageDirectory.startsWith("packages/features/") &&
+    packageName.startsWith("@afenda/feature-")
+  ) {
+    return {
+      category: "feature-package",
+      workspaceRoot: "packages",
+      requiresCompiledDistExports: true,
+      requiresPackageBuild: true,
+      turboBuildOutputs: ["dist/**"],
+    };
+  }
+
+  return undefined;
+}
+
+function getPackageName(workspacePackage: WorkspacePackage) {
+  const workspaceRoot = workspacePackage.workspaceRoot;
+  const directoryName = workspacePackage.directoryName;
+  const packageDirectory = workspacePackage.packageDirectory;
+  const packageName = workspacePackage.packageJson.name;
+
   if (typeof packageName !== "string") {
-    problems.push(
-      `${workspaceRoot}/${directoryName} package.json needs a name`,
-    );
+    problems.push(`${packageDirectory} package.json needs a name`);
     return undefined;
   }
 
-  const expectedDirectoryName = packageName.replace(/^@afenda\//, "");
+  const isFeaturePackage = packageDirectory.startsWith("packages/features/");
+  const expectedDirectoryName = isFeaturePackage
+    ? packageName.replace(/^@afenda\/feature-/, "")
+    : packageName.replace(/^@afenda\//, "");
+  const expectedPackageDirectory = isFeaturePackage
+    ? `packages/features/${expectedDirectoryName}`
+    : `${workspaceRoot}/${expectedDirectoryName}`;
+
   if (expectedDirectoryName !== directoryName) {
     problems.push(
-      `${packageName} must live in ${workspaceRoot}/${expectedDirectoryName}, found ${workspaceRoot}/${directoryName}`,
+      `${packageName} must live in ${expectedPackageDirectory}, found ${packageDirectory}`,
     );
   }
 
   return packageName;
 }
 
+function readAllWorkspacePackages() {
+  return [
+    ...readWorkspacePackages("apps"),
+    ...readWorkspacePackages("packages"),
+  ];
+}
+
 function checkWorkspacePackageRegistry() {
   const seenPackages = new Set<string>();
 
-  for (const workspaceRoot of ["apps", "packages"] satisfies WorkspaceRoot[]) {
-    for (const workspacePackage of readWorkspacePackages(workspaceRoot)) {
-      const packageName = getPackageName(
-        workspaceRoot,
-        workspacePackage.directoryName,
-        workspacePackage.packageJson,
+  for (const workspacePackage of readAllWorkspacePackages()) {
+    const packageName = getPackageName(workspacePackage);
+    if (!packageName) {
+      continue;
+    }
+
+    seenPackages.add(packageName);
+
+    const rule = getPackageRule(packageName, workspacePackage);
+    if (!rule) {
+      problems.push(
+        `${packageName} is not classified in packageArchitectureRules and does not match an approved dynamic category`,
       );
-      if (!packageName) {
-        continue;
-      }
+      continue;
+    }
 
-      seenPackages.add(packageName);
-
-      const rule = packageArchitectureRules[packageName];
-      if (!rule) {
-        problems.push(
-          `${packageName} is not classified in packageArchitectureRules; add a category before introducing a new workspace package`,
-        );
-        continue;
-      }
-
-      if (rule.workspaceRoot !== workspaceRoot) {
-        problems.push(
-          `${packageName} is classified for ${rule.workspaceRoot}/ but lives in ${workspaceRoot}/`,
-        );
-      }
+    if (rule.workspaceRoot !== workspacePackage.workspaceRoot) {
+      problems.push(
+        `${packageName} is classified for ${rule.workspaceRoot}/ but lives in ${workspacePackage.workspaceRoot}/`,
+      );
     }
   }
 
@@ -411,16 +475,12 @@ function checkWorkspacePackageRegistry() {
 
 function checkPackageBuildPolicy() {
   for (const workspacePackage of readWorkspacePackages("packages")) {
-    const packageName = getPackageName(
-      "packages",
-      workspacePackage.directoryName,
-      workspacePackage.packageJson,
-    );
+    const packageName = getPackageName(workspacePackage);
     if (!packageName) {
       continue;
     }
 
-    const rule = packageArchitectureRules[packageName];
+    const rule = getPackageRule(packageName, workspacePackage);
     if (!rule?.requiresPackageBuild) {
       continue;
     }
@@ -435,8 +495,7 @@ function checkPackageBuildPolicy() {
 
     const tsconfigBuildPath = path.join(
       root,
-      "packages",
-      workspacePackage.directoryName,
+      workspacePackage.packageDirectory,
       "tsconfig.build.json",
     );
     if (!fs.existsSync(tsconfigBuildPath)) {
@@ -495,7 +554,33 @@ function checkTurboBuildOutputs() {
       ? (turboConfig.tasks as Record<string, unknown>)
       : {};
 
-  for (const [packageName, rule] of Object.entries(packageArchitectureRules)) {
+  const defaultBuildTask = tasks.build;
+  const defaultBuildOutputs =
+    defaultBuildTask &&
+    typeof defaultBuildTask === "object" &&
+    !Array.isArray(defaultBuildTask) &&
+    Array.isArray((defaultBuildTask as Record<string, unknown>).outputs)
+      ? ((defaultBuildTask as Record<string, unknown>).outputs as unknown[])
+      : [];
+
+  const packagesWithRules = readAllWorkspacePackages()
+    .map((workspacePackage) => {
+      const packageName = getPackageName(workspacePackage);
+      if (!packageName) {
+        return null;
+      }
+
+      const rule = getPackageRule(packageName, workspacePackage);
+      return rule ? { packageName, rule } : null;
+    })
+    .filter(
+      (
+        entry,
+      ): entry is { packageName: string; rule: PackageArchitectureRule } =>
+        Boolean(entry),
+    );
+
+  for (const { packageName, rule } of packagesWithRules) {
     if (!rule.requiresPackageBuild && rule.turboBuildOutputs.length === 0) {
       continue;
     }
@@ -503,6 +588,14 @@ function checkTurboBuildOutputs() {
     const taskName = `${packageName}#build`;
     const task = tasks[taskName];
     if (!task || typeof task !== "object" || Array.isArray(task)) {
+      const missingOutputs = rule.turboBuildOutputs.filter(
+        (expectedOutput) => !defaultBuildOutputs.includes(expectedOutput),
+      );
+
+      if (missingOutputs.length === 0) {
+        continue;
+      }
+
       problems.push(`${taskName} must be declared in turbo.json`);
       continue;
     }

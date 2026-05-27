@@ -10,9 +10,8 @@ const targetPaths = [
 ];
 const dryRun = process.argv.includes("--dry-run");
 
-function parseDotenv(content) {
-  /** @type {Record<string, string>} */
-  const env = {};
+function parseDotenv(content: string) {
+  const env: Record<string, string> = {};
 
   for (const rawLine of content.split(/\r?\n/)) {
     const line = rawLine.trim();
@@ -36,7 +35,7 @@ function parseDotenv(content) {
   return env;
 }
 
-function formatEnvValue(value) {
+function formatEnvValue(value: string) {
   if (value === "") return "";
   if (/[\r\n#"'\s\\]/.test(value)) {
     return `"${value.replace(/\\/g, "\\\\").replace(/"/g, '\\"')}"`;
@@ -51,14 +50,14 @@ async function main() {
   const parsedSource = parseDotenv(source);
   const sourceKeys = new Set(Object.keys(parsedSource));
 
-  const outputs = new Map();
+  const outputs = new Map<string, string>();
   const banner = `# Generated from .env.config via pnpm env:sync.
 # Edit .env.config and re-run the sync script.
 
 `;
 
   for (const targetPath of targetPaths) {
-    let preserved = {};
+    let preserved: Record<string, string> = {};
 
     try {
       const existing = await readFile(targetPath, "utf8");
