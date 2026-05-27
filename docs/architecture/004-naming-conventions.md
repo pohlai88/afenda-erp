@@ -2,11 +2,11 @@
 
 **Doc ID:** `ARCH-004` · **File:** `004-naming-conventions.md`
 
-| Field | Value |
-| ----- | ----- |
-| Status | Active — enforced by `pnpm architecture:check` (May 2026) |
-| Authority | Workspace packages, routes, exports, docs, tests, symbols |
-| Related | **ARCH-003** (guards) · **ARCH-002** (feature packages) · **ARCH-001** (deploy) |
+| Field     | Value                                                                           |
+| --------- | ------------------------------------------------------------------------------- |
+| Status    | Active — enforced by `pnpm architecture:check` (May 2026)                       |
+| Authority | Workspace packages, routes, exports, docs, tests, symbols                       |
+| Related   | **ARCH-003** (guards) · **ARCH-002** (feature packages) · **ARCH-001** (deploy) |
 
 Afenda uses predictable names so routes, packages, Turborepo tasks, and
 documentation stay scannable in a **single-app Vercel/Turborepo monorepo**.
@@ -22,25 +22,25 @@ shape, and documentation naming. Package categories:
 
 Validated against Vercel monorepo and conformance guidance (May 2026):
 
-| Concern | Afenda rule |
-| ------- | ----------- |
-| Deploy unit | One Vercel project for `@afenda/erp`; not one project per module |
-| Build filter | `pnpm turbo build --filter=@afenda/erp` — only the app and `^build` deps ship |
-| Workspace installs | `pnpm install` with `pnpm-workspace.yaml`; every workspace dir has `package.json` |
-| Unresolved imports | Declare direct `workspace:*` deps for every import used in source |
-| Turborepo outputs | App: `.next/**` + `!.next/cache/**`; libraries: `dist/**` (**ARCH-003**) |
-| Project link | **Deferred** until local stabilization (**ARCH-001**); naming must not assume multiple Vercel projects |
+| Concern            | Afenda rule                                                                                            |
+| ------------------ | ------------------------------------------------------------------------------------------------------ |
+| Deploy unit        | One Vercel project for `@afenda/erp`; not one project per module                                       |
+| Build filter       | `pnpm turbo build --filter=@afenda/erp` — only the app and `^build` deps ship                          |
+| Workspace installs | `pnpm install` with `pnpm-workspace.yaml`; every workspace dir has `package.json`                      |
+| Unresolved imports | Declare direct `workspace:*` deps for every import used in source                                      |
+| Turborepo outputs  | App: `.next/**` + `!.next/cache/**`; libraries: `dist/**` (**ARCH-003**)                               |
+| Project link       | **Deferred** until local stabilization (**ARCH-001**); naming must not assume multiple Vercel projects |
 
 Do not name packages or folders as if each ERP module were its own Vercel
 deployment unless an ADR explicitly adds a second project.
 
 ## Workspace Packages
 
-| Scope | Pattern | Example folder | Example `name` |
-| ----- | ------- | -------------- | -------------- |
-| App | `@afenda/<app>` | `apps/erp` | `@afenda/erp` |
-| Platform library | `@afenda/<package>` | `packages/domain` | `@afenda/domain` |
-| Feature module | `@afenda/feature-<moduleId>` | `packages/features/hr` | `@afenda/feature-hr` |
+| Scope            | Pattern                      | Example folder         | Example `name`       |
+| ---------------- | ---------------------------- | ---------------------- | -------------------- |
+| App              | `@afenda/<app>`              | `apps/erp`             | `@afenda/erp`        |
+| Platform library | `@afenda/<package>`          | `packages/domain`      | `@afenda/domain`     |
+| Feature module   | `@afenda/feature-<moduleId>` | `packages/features/hr` | `@afenda/feature-hr` |
 
 Rules:
 
@@ -62,18 +62,18 @@ separate Vercel projects unless a future ADR explicitly adds one.
 Runtime module IDs are canonical in `packages/config/src/module-ids.ts`. Routes,
 permissions, and database promotion use the same slug.
 
-| moduleId | Route segment | Feature folder | Package |
-| -------- | ------------- | -------------- | ------- |
-| `dashboard` | `/dashboard` | — (app shell) | `@afenda/erp` |
-| `finance` | `/finance` via `[moduleId]` | `packages/features/finance` | `@afenda/feature-finance` |
-| `sales` | `/sales` | `packages/features/sales` | `@afenda/feature-sales` |
-| `purchasing` | `/purchasing` | `packages/features/purchasing` | `@afenda/feature-purchasing` |
-| `inventory` | `/inventory` | `packages/features/inventory` | `@afenda/feature-inventory` |
-| `hr` | `/hr` | `packages/features/hr` | `@afenda/feature-hr` |
-| `crm` | `/crm` | `packages/features/crm` | `@afenda/feature-crm` |
-| `approvals` | `/approvals` | `packages/features/approvals` | `@afenda/feature-approvals` |
-| `reports` | `/reports` | `packages/features/reports` | `@afenda/feature-reports` |
-| `admin` | `/admin` | `packages/features/admin` | `@afenda/feature-admin` |
+| moduleId     | Route segment               | Feature folder                 | Package                      |
+| ------------ | --------------------------- | ------------------------------ | ---------------------------- |
+| `dashboard`  | `/dashboard`                | — (app shell)                  | `@afenda/erp`                |
+| `finance`    | `/finance` via `[moduleId]` | `packages/features/finance`    | `@afenda/feature-finance`    |
+| `sales`      | `/sales`                    | `packages/features/sales`      | `@afenda/feature-sales`      |
+| `purchasing` | `/purchasing`               | `packages/features/purchasing` | `@afenda/feature-purchasing` |
+| `inventory`  | `/inventory`                | `packages/features/inventory`  | `@afenda/feature-inventory`  |
+| `hr`         | `/hr`                       | `packages/features/hr`         | `@afenda/feature-hr`         |
+| `crm`        | `/crm`                      | `packages/features/crm`        | `@afenda/feature-crm`        |
+| `approvals`  | `/approvals`                | `packages/features/approvals`  | `@afenda/feature-approvals`  |
+| `reports`    | `/reports`                  | `packages/features/reports`    | `@afenda/feature-reports`    |
+| `admin`      | `/admin`                    | `packages/features/admin`      | `@afenda/feature-admin`      |
 
 Core ERP modules share one dynamic route tree:
 `apps/erp/src/app/(app)/[moduleId]/…`. Do not create per-module route folders
@@ -92,13 +92,13 @@ Target database schema folders follow the same moduleId slug:
 Workspace libraries expose **explicit public doors** in `package.json` `exports`.
 Follow the governed-surface and auth patterns:
 
-| Subpath | Use |
-| ------- | --- |
-| `.` | Shared entry; keep server-only graphs out of client bundles |
-| `./client` | Client Components and browser-only modules |
-| `./server` | Server Components, Server Actions helpers, Node-only code |
-| `./metadata` | Governed renderer dispatch and metadata-only imports |
-| `./schemas` | Zod contracts without runtime UI |
+| Subpath      | Use                                                         |
+| ------------ | ----------------------------------------------------------- |
+| `.`          | Shared entry; keep server-only graphs out of client bundles |
+| `./client`   | Client Components and browser-only modules                  |
+| `./server`   | Server Components, Server Actions helpers, Node-only code   |
+| `./metadata` | Governed renderer dispatch and metadata-only imports        |
+| `./schemas`  | Zod contracts without runtime UI                            |
 
 Export shape for compiled libraries:
 
@@ -174,11 +174,11 @@ Feature package template: [ERP Domain Package Architecture](002-erp-domain-packa
 
 Root scripts filter the deployable app unless the task is repo-wide:
 
-| Script | Filter / scope |
-| ------ | -------------- |
-| `pnpm dev` | `turbo dev --filter=@afenda/erp` |
-| `pnpm test:e2e` | `turbo test:e2e --filter=@afenda/erp` |
-| `pnpm build` | `turbo build` (full workspace graph) |
+| Script                | Filter / scope                          |
+| --------------------- | --------------------------------------- |
+| `pnpm dev`            | `turbo dev --filter=@afenda/erp`        |
+| `pnpm test:e2e`       | `turbo test:e2e --filter=@afenda/erp`   |
+| `pnpm build`          | `turbo build` (full workspace graph)    |
 | Vercel `buildCommand` | `pnpm turbo build --filter=@afenda/erp` |
 
 Package `package.json` scripts use standard task names consumed by `turbo.json`:

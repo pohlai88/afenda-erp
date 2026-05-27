@@ -1,18 +1,18 @@
-import type { ReactNode } from "react"
+import type { ReactNode } from "react";
 
-import { GovernedComponentTree } from "./governed-component-tree"
+import { GovernedComponentTree } from "./governed-component-tree";
 import type {
   AfendaGovernedComponentRegistry,
   GovernedComponentRendererDiagnostics,
   GovernedComponentRendererInput,
-} from "./registry"
+} from "./registry";
 
 export type GovernedComponentRendererProps = {
-  component: GovernedComponentRendererInput | unknown
-  registry?: AfendaGovernedComponentRegistry
-  diagnostics?: GovernedComponentRendererDiagnostics
-  surfaceKey?: string
-}
+  component: GovernedComponentRendererInput | unknown;
+  registry?: AfendaGovernedComponentRegistry;
+  diagnostics?: GovernedComponentRendererDiagnostics;
+  surfaceKey?: string;
+};
 
 /**
  * Public boundary for governed metadata rendering.
@@ -34,5 +34,5 @@ export function GovernedComponentRenderer({
       diagnostics={diagnostics}
       surfaceKey={surfaceKey}
     />
-  )
+  );
 }

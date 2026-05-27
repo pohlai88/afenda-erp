@@ -15,10 +15,7 @@ import {
   isAiSensitiveContentError,
 } from "@afenda/ai";
 import { requireCapability } from "@afenda/auth/server";
-import {
-  createAiUsageEvent,
-  registerAiDocumentExtraction,
-} from "@afenda/db";
+import { createAiUsageEvent, registerAiDocumentExtraction } from "@afenda/db";
 import { getErpModuleById } from "@afenda/domain";
 import { getRequestId, logServerEvent } from "@afenda/observability";
 import { generateText, Output } from "ai";
@@ -109,8 +106,7 @@ export async function POST(request: Request) {
     });
 
     const extraction = result.output;
-    const status =
-      extraction.confidence >= 80 ? "completed" : "needs-review";
+    const status = extraction.confidence >= 80 ? "completed" : "needs-review";
     const extractionId = await registerAiDocumentExtraction({
       organizationId: organization.id,
       documentId: parsedRequest.documentId,
@@ -180,9 +176,9 @@ export async function POST(request: Request) {
             ? "Invalid document extraction request."
             : isAiBudgetError(error)
               ? "Document exceeds the configured AI extraction budget."
-            : isAiSensitiveContentError(error)
-              ? "Document contains credential-like sensitive content."
-            : "Document extraction failed.",
+              : isAiSensitiveContentError(error)
+                ? "Document contains credential-like sensitive content."
+                : "Document extraction failed.",
       },
       {
         status: isAiBudgetError(error)

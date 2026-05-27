@@ -222,7 +222,9 @@ export function getActiveOrganization(session: UserSession) {
   return (
     session.organizations.find(
       (organization) => organization.id === session.activeOrganizationId,
-    ) ?? session.organizations[0] ?? null
+    ) ??
+    session.organizations[0] ??
+    null
   );
 }
 
@@ -253,7 +255,9 @@ export async function requireCapability(capability: AppCapability) {
   return context;
 }
 
-export async function bootstrapCurrentUserOrganization(organizationName: string) {
+export async function bootstrapCurrentUserOrganization(
+  organizationName: string,
+) {
   const session = await requireSession();
 
   if (session.source !== "neon") {

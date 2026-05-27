@@ -1,9 +1,9 @@
-import { z } from "zod"
+import { z } from "zod";
 
-import type { SchemaStability } from "./_stability.shared"
-import { actionDescriptorSchema } from "./action.schema"
+import type { SchemaStability } from "./_stability.shared";
+import { actionDescriptorSchema } from "./action.schema";
 
-export const SCHEMA_STABILITY: SchemaStability = "beta"
+export const SCHEMA_STABILITY: SchemaStability = "beta";
 
 /**
  * Serializable trailing-column action metadata (ADR-0026 Pattern C — Wave C3).
@@ -26,7 +26,7 @@ export const listSurfaceRowTrailingActionSchema = z
         message:
           "disabledReason is required when trailing action state is disabled",
         path: ["disabledReason"],
-      })
+      });
     }
     if (value.state === "hidden" && value.disabledReason) {
       ctx.addIssue({
@@ -34,14 +34,14 @@ export const listSurfaceRowTrailingActionSchema = z
         message:
           "disabledReason must not be set when trailing action state is hidden",
         path: ["disabledReason"],
-      })
+      });
     }
-  })
+  });
 
 export type ListSurfaceRowTrailingAction = z.infer<
   typeof listSurfaceRowTrailingActionSchema
->
+>;
 
 export function parseListSurfaceRowTrailingAction(raw: unknown) {
-  return listSurfaceRowTrailingActionSchema.safeParse(raw)
+  return listSurfaceRowTrailingActionSchema.safeParse(raw);
 }

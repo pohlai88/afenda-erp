@@ -1,4 +1,7 @@
-import { getNeonAuthServer, isNeonAuthReady } from "@afenda/auth/neon-auth-server";
+import {
+  getNeonAuthServer,
+  isNeonAuthReady,
+} from "@afenda/auth/neon-auth-server";
 import { getRequestId, logServerEvent } from "@afenda/observability";
 import {
   getAuthRouteFailedResponse,

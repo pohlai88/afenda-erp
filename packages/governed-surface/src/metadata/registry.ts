@@ -1,4 +1,4 @@
-import type { GovernedComponentRegistry } from "../schemas/component-registry.schema"
+import type { GovernedComponentRegistry } from "../schemas/component-registry.schema";
 
 /**
  * Maps governed component `type` to internal renderer id.
@@ -20,10 +20,10 @@ export const AFENDA_GOVERNED_COMPONENT_REGISTRY = {
   "governed:kanban-board": "kanban-board",
   "governed:multi-step-form": "multi-step-form",
   "governed:scorecard-form": "scorecard-form",
-} as const satisfies GovernedComponentRegistry
+} as const satisfies GovernedComponentRegistry;
 
 export type AfendaGovernedComponentRegistry =
-  typeof AFENDA_GOVERNED_COMPONENT_REGISTRY
+  typeof AFENDA_GOVERNED_COMPONENT_REGISTRY;
 
 /**
  * All renderer ids the kernel recognises, including design-reserve renderers
@@ -44,7 +44,7 @@ export type AfendaGovernedRendererId =
   | "multi-step-form"
   | "scorecard-form"
   | "approval-timeline"
-  | "chart"
+  | "chart";
 
 /**
  * Diagnostic posture for renderer error messages.
@@ -54,7 +54,7 @@ export type AfendaGovernedRendererId =
  * - `operator` — dev / preview / admin contexts; messages disclose the
  *                renderer id, dataNature, and reason for failure.
  */
-export type GovernedComponentRendererDiagnostics = "user" | "operator"
+export type GovernedComponentRendererDiagnostics = "user" | "operator";
 
 /**
  * Public input shape for `GovernedComponentRenderer` — allows callers to pass
@@ -62,10 +62,10 @@ export type GovernedComponentRendererDiagnostics = "user" | "operator"
  * tree performs full validation regardless.
  */
 export type GovernedComponentRendererInput = {
-  type: string
-  serverType: string
-  configuration?: unknown
-}
+  type: string;
+  serverType: string;
+  configuration?: unknown;
+};
 
 /**
  * Renderer contract entry (ADR-0025).
@@ -77,17 +77,17 @@ export type GovernedComponentRendererInput = {
  *                        threshold the renderer must be replaced with a
  *                        denser variant or moved to a wider surface.
  */
-export type RendererContractMaturity = "preview" | "production"
+export type RendererContractMaturity = "preview" | "production";
 
 export type RendererContractEntry = {
-  acceptedNatures: readonly string[]
-  minContainerPx: number
+  acceptedNatures: readonly string[];
+  minContainerPx: number;
   /**
    * ERP readiness gate. `preview` renderers must not back production mutations
    * without an explicit maturity bump in the same PR as the workflow contract.
    */
-  maturity?: RendererContractMaturity
-}
+  maturity?: RendererContractMaturity;
+};
 
 /**
  * Single source of truth for renderer-side constraints. Mirrored in:
@@ -154,4 +154,4 @@ export const AFENDA_GOVERNED_RENDERER_CONTRACTS = {
     acceptedNatures: [],
     minContainerPx: 0,
   },
-} as const satisfies Record<AfendaGovernedRendererId, RendererContractEntry>
+} as const satisfies Record<AfendaGovernedRendererId, RendererContractEntry>;

@@ -1,3 +1,9 @@
+import {
+  getAiEnv,
+  getBaseEnv,
+  hasAiGatewayCredentials as configHasAiGatewayCredentials,
+} from "@afenda/config/env";
+
 export const defaultAiGatewayModel = "openai/gpt-5.4";
 export const defaultFastAiGatewayModel = "openai/gpt-5.4";
 export const defaultHighConfidenceAiGatewayModel = "openai/gpt-5.4";
@@ -47,14 +53,15 @@ function toGatewayTagValue(value: string | undefined, fallback: string) {
 export function getAiGatewayEnvironment(
   input: NodeJS.ProcessEnv = process.env,
 ) {
-  return toGatewayTagValue(
-    input.VERCEL_ENV ?? input.NODE_ENV,
-    "development",
-  );
+  const env = getAiEnv(input);
+  const base = getBaseEnv(input);
+
+  return toGatewayTagValue(env.VERCEL_ENV ?? base.NODE_ENV, "development");
 }
 
 export function getAiGatewayModel(input: NodeJS.ProcessEnv = process.env) {
-  return input.AFENDA_AI_MODEL || defaultAiGatewayModel;
+  const env = getAiEnv(input);
+  return env.AFENDA_AI_MODEL || defaultAiGatewayModel;
 }
 
 export function getAiModelForFeature(
@@ -62,8 +69,10 @@ export function getAiModelForFeature(
   riskLevel: AiRiskLevel = "medium",
   input: NodeJS.ProcessEnv = process.env,
 ) {
-  if (input.AFENDA_AI_MODEL) {
-    return input.AFENDA_AI_MODEL;
+  const env = getAiEnv(input);
+
+  if (env.AFENDA_AI_MODEL) {
+    return env.AFENDA_AI_MODEL;
   }
 
   if (
@@ -71,7 +80,9 @@ export function getAiModelForFeature(
     feature === "approval-tools" ||
     feature === "solution-provider"
   ) {
-    return input.AFENDA_AI_HIGH_CONFIDENCE_MODEL || defaultHighConfidenceAiGatewayModel;
+    return (
+      env.AFENDA_AI_HIGH_CONFIDENCE_MODEL || defaultHighConfidenceAiGatewayModel
+    );
   }
 
   if (
@@ -79,7 +90,7 @@ export function getAiModelForFeature(
     feature === "document-lookup" ||
     feature === "task-drafting"
   ) {
-    return input.AFENDA_AI_FAST_MODEL || defaultFastAiGatewayModel;
+    return env.AFENDA_AI_FAST_MODEL || defaultFastAiGatewayModel;
   }
 
   return defaultAiGatewayModel;
@@ -88,7 +99,7 @@ export function getAiModelForFeature(
 export function hasAiGatewayCredentials(
   input: NodeJS.ProcessEnv = process.env,
 ) {
-  return Boolean(input.AI_GATEWAY_API_KEY || input.VERCEL_OIDC_TOKEN);
+  return configHasAiGatewayCredentials(input);
 }
 
 export function createGatewayOptions(input: {

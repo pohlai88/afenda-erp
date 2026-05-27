@@ -25,10 +25,7 @@ Use `ignoreWorkspaces` to exclude specific packages from analysis. This is usefu
 
 ```json
 {
-  "ignoreWorkspaces": [
-    "packages/legacy-fork",
-    "packages/generated-api"
-  ],
+  "ignoreWorkspaces": ["packages/legacy-fork", "packages/generated-api"],
   "workspaces": {
     "packages/*": {
       "entry": ["index.ts"]
@@ -38,6 +35,7 @@ Use `ignoreWorkspaces` to exclude specific packages from analysis. This is usefu
 ```
 
 **When to ignore workspaces:**
+
 - Third-party code forks with different conventions
 - Generated code packages
 - Packages scheduled for removal

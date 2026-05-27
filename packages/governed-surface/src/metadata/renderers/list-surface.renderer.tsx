@@ -1,30 +1,30 @@
-import { GovernedListSurface } from "../../components/governed-list-surface"
+import { GovernedListSurface } from "../../components/governed-list-surface";
 import {
   parseListSurfaceRendererConfiguration,
   type ListSurfaceRendererConfiguration,
-} from "../../schemas/list-surface-renderer.schema"
+} from "../../schemas/list-surface-renderer.schema";
 
-import type { ListSurfaceTableClientProps } from "./list-surface-table.client"
-import { ListSurfaceTable } from "./list-surface-table"
+import type { ListSurfaceTableClientProps } from "./list-surface-table.client";
+import { ListSurfaceTable } from "./list-surface-table";
 
 export type ListSurfaceRendererProps = {
-  configuration: unknown
-  variant?: "full" | "table-only"
-}
+  configuration: unknown;
+  variant?: "full" | "table-only";
+};
 
 export function ListSurfaceRenderer({
   configuration,
   variant,
 }: ListSurfaceRendererProps) {
-  const parsed = parseListSurfaceRendererConfiguration(configuration)
+  const parsed = parseListSurfaceRendererConfiguration(configuration);
   if (!parsed.success) {
-    return null
+    return null;
   }
 
-  const config: ListSurfaceRendererConfiguration = parsed.data
-  const { surface, columns, rows, presentation, pagination } = config
-  const resolvedVariant = variant ?? presentation?.variant ?? "full"
-  const tableDensity = presentation?.tableDensity ?? "compact"
+  const config: ListSurfaceRendererConfiguration = parsed.data;
+  const { surface, columns, rows, presentation, pagination } = config;
+  const resolvedVariant = variant ?? presentation?.variant ?? "full";
+  const tableDensity = presentation?.tableDensity ?? "compact";
 
   const tableProps = {
     columns,
@@ -45,17 +45,17 @@ export function ListSurfaceRenderer({
     summary: presentation?.summary,
     decisionLedger: presentation?.decisionLedger,
     pagination,
-  } satisfies ListSurfaceTableClientProps
+  } satisfies ListSurfaceTableClientProps;
 
-  const table = <ListSurfaceTable {...tableProps} />
+  const table = <ListSurfaceTable {...tableProps} />;
 
   if (resolvedVariant === "table-only") {
-    return <div className="@container min-w-0">{table}</div>
+    return <div className="@container min-w-0">{table}</div>;
   }
 
   return (
     <GovernedListSurface model={surface} rowCount={rows.length}>
       <div className="@container min-w-0">{table}</div>
     </GovernedListSurface>
-  )
+  );
 }

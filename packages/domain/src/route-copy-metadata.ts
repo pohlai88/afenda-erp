@@ -19,8 +19,7 @@ export const solutionConsoleAgentCopy = {
   title: "Solution Provider Agent",
   description:
     "Diagnose business problems, cite ERP evidence, and draft human-approved recovery actions.",
-  inputPlaceholder:
-    "Describe the business problem you need Afenda to solve...",
+  inputPlaceholder: "Describe the business problem you need Afenda to solve...",
   toolRejectReason: "Rejected by Solution Console operator.",
 } as const;
 
@@ -114,7 +113,8 @@ export const solutionConsoleSections = {
   },
   connectedModules: {
     title: "Connected ERP modules",
-    description: "Open the owning workspace before approving a proposed recovery action.",
+    description:
+      "Open the owning workspace before approving a proposed recovery action.",
   },
 } as const;
 
@@ -133,7 +133,8 @@ export const moduleScreenMetrics = [
   {
     id: "workflow-items",
     label: "Workflow items",
-    detail: "Open workflow items resolved from tenant data or metadata fallback.",
+    detail:
+      "Open workflow items resolved from tenant data or metadata fallback.",
   },
   {
     id: "documents",
@@ -288,7 +289,8 @@ export const documentWorkflowCopy = {
     sizeLimitWarning: (limitLabel: string) =>
       `Document size must be ${limitLabel} or less.`,
     uploadingMessage: "Uploading document to Vercel Blob.",
-    successMessage: "Document uploaded. Registry will refresh after completion.",
+    successMessage:
+      "Document uploaded. Registry will refresh after completion.",
     failureMessage: "Document upload failed.",
     titleLabel: "Document title",
     titlePlaceholder: "Invoice, receipt, contract",
@@ -303,7 +305,8 @@ export const documentWorkflowCopy = {
     runningMessage: "Running extraction through AI Gateway.",
     successMessage: "Extraction completed and logged for review.",
     failureMessage: "Document extraction failed.",
-    unexpectedPayloadMessage: "Document extraction returned an unexpected payload.",
+    unexpectedPayloadMessage:
+      "Document extraction returned an unexpected payload.",
     titleLabel: "Document title",
     titlePlaceholder: "Supplier invoice",
     documentIdLabel: "Document ID",

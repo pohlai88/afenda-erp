@@ -5,11 +5,7 @@ export const operationalModuleIds = [...moduleIds, "lms"] as const;
 
 export const operationalModuleIdSchema = z.enum(operationalModuleIds);
 export const operationRiskLevelSchema = z.enum(["low", "medium", "high"]);
-export const operationConfidenceLevelSchema = z.enum([
-  "low",
-  "medium",
-  "high",
-]);
+export const operationConfidenceLevelSchema = z.enum(["low", "medium", "high"]);
 
 export const groundedEvidenceSchema = z.object({
   id: z.string().min(1).max(120),

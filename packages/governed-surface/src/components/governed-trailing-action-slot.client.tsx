@@ -1,20 +1,16 @@
-"use client"
+"use client";
 
-import type { ReactNode } from "react"
+import type { ReactNode } from "react";
 
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@afenda/ui/tooltip"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@afenda/ui/tooltip";
 
-import type { ListSurfaceRowTrailingAction } from "../schemas/list-surface-row-trailing-action.schema"
-import { isListSurfaceTrailingActionRenderable } from "../list-surface-trailing-action.shared"
+import type { ListSurfaceRowTrailingAction } from "../schemas/list-surface-row-trailing-action.schema";
+import { isListSurfaceTrailingActionRenderable } from "../list-surface-trailing-action.shared";
 
 export type GovernedTrailingActionSlotProps = {
-  trailingAction?: ListSurfaceRowTrailingAction
-  children: ReactNode
-}
+  trailingAction?: ListSurfaceRowTrailingAction;
+  children: ReactNode;
+};
 
 /**
  * Wraps Pattern C trailing-column mutation UI with consistent disabled chrome
@@ -25,10 +21,10 @@ export function GovernedTrailingActionSlot({
   children,
 }: GovernedTrailingActionSlotProps) {
   if (!isListSurfaceTrailingActionRenderable(trailingAction)) {
-    return null
+    return null;
   }
 
-  const disabled = trailingAction.state === "disabled"
+  const disabled = trailingAction.state === "disabled";
   const shell = (
     <span
       className={disabled ? "inline-flex opacity-60" : "inline-flex"}
@@ -38,7 +34,7 @@ export function GovernedTrailingActionSlot({
     >
       {children}
     </span>
-  )
+  );
 
   if (disabled && trailingAction.disabledReason) {
     return (
@@ -48,8 +44,8 @@ export function GovernedTrailingActionSlot({
           {trailingAction.disabledReason}
         </TooltipContent>
       </Tooltip>
-    )
+    );
   }
 
-  return shell
+  return shell;
 }

@@ -1,6 +1,6 @@
-import { z } from "zod"
+import { z } from "zod";
 
-import { ERP_FUNCTIONS } from "../adapters/rbac.shared"
+import { ERP_FUNCTIONS } from "../adapters/rbac.shared";
 
 /**
  * Serializable ERP permission gate for governed surface metadata (ADR-0026).
@@ -12,8 +12,8 @@ export const erpPermissionRequirementSchema = z
     object: z.string().trim().min(1),
     function: z.enum(ERP_FUNCTIONS),
   })
-  .strict()
+  .strict();
 
 export type ErpPermissionRequirement = z.infer<
   typeof erpPermissionRequirementSchema
->
+>;

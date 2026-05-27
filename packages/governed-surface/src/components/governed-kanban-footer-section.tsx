@@ -1,33 +1,33 @@
-import "server-only"
+import "server-only";
 
-import type { ReactNode } from "react"
+import type { ReactNode } from "react";
 
-import { cn } from "@afenda/ui/utils"
+import { cn } from "@afenda/ui/utils";
 
-import type { EmptyState } from "../schemas/list-surface.schema"
-import { governedKanbanSectionTestId } from "../kanban-surface-identity.shared"
+import type { EmptyState } from "../schemas/list-surface.schema";
+import { governedKanbanSectionTestId } from "../kanban-surface-identity.shared";
 
-import { GovernedEmpty } from "./governed-empty"
+import { GovernedEmpty } from "./governed-empty";
 
-export type GovernedKanbanFooterSectionLayout = "embedded" | "titled"
+export type GovernedKanbanFooterSectionLayout = "embedded" | "titled";
 
 export type GovernedKanbanFooterSectionProps = {
-  surfaceKey: string
-  title: string
-  description?: string
+  surfaceKey: string;
+  title: string;
+  description?: string;
   /** Defaults to `governedKanbanSectionTestId(surfaceKey)`. */
-  sectionTestId?: string
-  layout?: GovernedKanbanFooterSectionLayout
-  headerSlot?: ReactNode
+  sectionTestId?: string;
+  layout?: GovernedKanbanFooterSectionLayout;
+  headerSlot?: ReactNode;
   /** Query failure — renders error empty state instead of the board bridge. */
-  loadError?: EmptyState
-  children: ReactNode
-  className?: string
-  contentClassName?: string
-}
+  loadError?: EmptyState;
+  children: ReactNode;
+  className?: string;
+  contentClassName?: string;
+};
 
 const TITLED_HEADING_CLASS =
-  "mb-3 text-sm font-semibold tracking-wide text-muted-foreground uppercase"
+  "mb-3 text-sm font-semibold tracking-wide text-muted-foreground uppercase";
 
 /**
  * RSC section shell for Pattern K kanban boards (`footer-actions` or `drag-reorder`).
@@ -46,9 +46,9 @@ export function GovernedKanbanFooterSection({
   className,
   contentClassName,
 }: GovernedKanbanFooterSectionProps) {
-  const testId = sectionTestId ?? governedKanbanSectionTestId(surfaceKey)
-  const headingId = `governed-kanban-section-${surfaceKey.replace(/:/g, "-")}-title`
-  const boardSlot = loadError ? <GovernedEmpty model={loadError} /> : children
+  const testId = sectionTestId ?? governedKanbanSectionTestId(surfaceKey);
+  const headingId = `governed-kanban-section-${surfaceKey.replace(/:/g, "-")}-title`;
+  const boardSlot = loadError ? <GovernedEmpty model={loadError} /> : children;
 
   if (layout === "embedded") {
     return (
@@ -56,7 +56,7 @@ export function GovernedKanbanFooterSection({
         {headerSlot}
         <div className={contentClassName}>{boardSlot}</div>
       </div>
-    )
+    );
   }
 
   return (
@@ -80,5 +80,5 @@ export function GovernedKanbanFooterSection({
         {boardSlot}
       </div>
     </section>
-  )
+  );
 }

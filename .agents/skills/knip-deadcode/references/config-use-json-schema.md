@@ -35,7 +35,7 @@ Add JSON schema to your knip.json for IDE autocompletion and instant validation 
   "$schema": "https://unpkg.com/knip@5/schema-jsonc.json",
   // Entry points for analysis
   "entry": ["src/index.ts"],
-  "project": ["src/**/*.ts"]
+  "project": ["src/**/*.ts"],
 }
 ```
 

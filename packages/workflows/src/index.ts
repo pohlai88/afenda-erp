@@ -4,11 +4,7 @@ import {
   runTenantSyncSweep,
   type TenantWorkflowSweepResult,
 } from "@afenda/db";
-import {
-  getRecoveryPlaybookDefinitions,
-  getWorkflowAutomationDefinitions,
-  getResolvedWorkflowAutomationRuns,
-} from "@afenda/domain";
+import { getWorkflowAutomationDefinitions } from "@afenda/domain";
 
 export const workflowNamespaces = ["approvals", "reminders", "sync"] as const;
 
@@ -33,7 +29,9 @@ export async function runSyncSweep() {
     runTenantSyncSweep(),
     Promise.resolve(getWorkflowAutomationDefinitions()),
   ]);
-  const delayedAutomations = automations.filter((run) => run.status === "watch");
+  const delayedAutomations = automations.filter(
+    (run) => run.status === "watch",
+  );
 
   return {
     ...tenantSweep,

@@ -8,7 +8,7 @@ export const GOVERNED_WORKBENCH_SEARCH_PARAM_KEYS = {
   focus: "focus",
   dept: "dept",
   device: "device",
-} as const
+} as const;
 
 export type GovernedWorkbenchSearchParamKey =
-  (typeof GOVERNED_WORKBENCH_SEARCH_PARAM_KEYS)[keyof typeof GOVERNED_WORKBENCH_SEARCH_PARAM_KEYS]
+  (typeof GOVERNED_WORKBENCH_SEARCH_PARAM_KEYS)[keyof typeof GOVERNED_WORKBENCH_SEARCH_PARAM_KEYS];

@@ -1,71 +1,71 @@
-import "server-only"
+import "server-only";
 
-import type { ReactNode } from "react"
-import { getGovernedSurfaceTranslations } from "../i18n/governed-surface-copy"
+import type { ReactNode } from "react";
+import { getGovernedSurfaceTranslations } from "../i18n/governed-surface-copy";
 
-import { GovernedComponentRenderer } from "../metadata/index"
-import { logUnexpectedServerError } from "../adapters/logger.server"
+import { GovernedComponentRenderer } from "../metadata/index";
+import { logUnexpectedServerError } from "../adapters/logger.server";
 
-import type { EmptyState } from "../schemas/list-surface.schema"
+import type { EmptyState } from "../schemas/list-surface.schema";
 import {
   parseStatCardConfiguration,
   type StatCardConfigurationInput,
-} from "../schemas/stat-card.schema"
-import { GovernedEmpty } from "./governed-empty"
+} from "../schemas/stat-card.schema";
+import { GovernedEmpty } from "./governed-empty";
 import {
   GovernedSurfaceSectionCard,
   type GovernedSurfaceSectionCardBody,
-} from "./governed-surface-section-card"
+} from "./governed-surface-section-card";
 
-export type GovernedPatternBStatSectionLayout = "card" | "embedded"
+export type GovernedPatternBStatSectionLayout = "card" | "embedded";
 
 export type GovernedPatternBStatGroup = {
   /** Stable id for `data-testid` on the group wrapper (e.g. `registry`). */
-  groupKey: string
+  groupKey: string;
   /** Optional subgroup label above the stat-card renderer. */
-  label?: string
-  configuration: StatCardConfigurationInput
-}
+  label?: string;
+  configuration: StatCardConfigurationInput;
+};
 
 export type GovernedPatternBStatSectionProps = {
-  title: string
-  description?: string
-  surfaceKey: string
-  statGroups: ReadonlyArray<GovernedPatternBStatGroup>
-  layout?: GovernedPatternBStatSectionLayout
-  loadError?: EmptyState
-  forbidden?: EmptyState
-  invalid?: EmptyState
-  headerSlot?: ReactNode
-  headerAction?: ReactNode
-  className?: string
-  cardClassName?: string
-  contentClassName?: string
-}
+  title: string;
+  description?: string;
+  surfaceKey: string;
+  statGroups: ReadonlyArray<GovernedPatternBStatGroup>;
+  layout?: GovernedPatternBStatSectionLayout;
+  loadError?: EmptyState;
+  forbidden?: EmptyState;
+  invalid?: EmptyState;
+  headerSlot?: ReactNode;
+  headerAction?: ReactNode;
+  className?: string;
+  cardClassName?: string;
+  contentClassName?: string;
+};
 
 export function governedStatSectionTestId(surfaceKey: string): string {
-  return `governed-stat-section:${surfaceKey}`
+  return `governed-stat-section:${surfaceKey}`;
 }
 
 function renderStatBody(body: GovernedSurfaceSectionCardBody) {
   if (body.state === "forbidden" || body.state === "invalid") {
-    return <GovernedEmpty model={body.model} />
+    return <GovernedEmpty model={body.model} />;
   }
-  return body.children
+  return body.children;
 }
 
 type RenderSectionShellInput = {
-  layout: GovernedPatternBStatSectionLayout
-  className?: string
-  sectionTestId: string
-  headerSlot?: ReactNode
-  title: string
-  description?: string
-  headerAction?: ReactNode
-  body: GovernedSurfaceSectionCardBody
-  cardClassName?: string
-  contentClassName?: string
-}
+  layout: GovernedPatternBStatSectionLayout;
+  className?: string;
+  sectionTestId: string;
+  headerSlot?: ReactNode;
+  title: string;
+  description?: string;
+  headerAction?: ReactNode;
+  body: GovernedSurfaceSectionCardBody;
+  cardClassName?: string;
+  contentClassName?: string;
+};
 
 function renderSectionShell({
   layout,
@@ -79,7 +79,7 @@ function renderSectionShell({
   cardClassName,
   contentClassName,
 }: RenderSectionShellInput) {
-  const statBody = renderStatBody(body)
+  const statBody = renderStatBody(body);
 
   if (layout === "embedded") {
     return (
@@ -87,7 +87,7 @@ function renderSectionShell({
         {headerSlot}
         <div className={contentClassName}>{statBody}</div>
       </div>
-    )
+    );
   }
 
   return (
@@ -102,7 +102,7 @@ function renderSectionShell({
         contentClassName={contentClassName}
       />
     </div>
-  )
+  );
 }
 
 export async function GovernedPatternBStatSection({
@@ -120,8 +120,8 @@ export async function GovernedPatternBStatSection({
   cardClassName,
   contentClassName,
 }: GovernedPatternBStatSectionProps) {
-  const t = await getGovernedSurfaceTranslations("Erp")
-  const sectionTestId = governedStatSectionTestId(surfaceKey)
+  const t = await getGovernedSurfaceTranslations("Erp");
+  const sectionTestId = governedStatSectionTestId(surfaceKey);
 
   const shellInput = {
     layout,
@@ -133,46 +133,46 @@ export async function GovernedPatternBStatSection({
     headerAction,
     cardClassName,
     contentClassName,
-  }
+  };
 
   const invalidModel: EmptyState = invalid ?? {
     variant: "error",
     title: t("GovernedSurface.invalidConfigTitle"),
     description: t("GovernedSurface.invalidConfigDescription"),
-  }
+  };
 
   if (loadError) {
     const body: GovernedSurfaceSectionCardBody = {
       state: "invalid",
       model: loadError,
-    }
-    return renderSectionShell({ ...shellInput, body })
+    };
+    return renderSectionShell({ ...shellInput, body });
   }
 
   if (forbidden) {
     return renderSectionShell({
       ...shellInput,
       body: { state: "forbidden", model: forbidden },
-    })
+    });
   }
 
   const parsedGroups = statGroups.map((group) => ({
     group,
     parsed: parseStatCardConfiguration(group.configuration),
-  }))
+  }));
 
-  const firstInvalid = parsedGroups.find((entry) => !entry.parsed.success)
-  let body: GovernedSurfaceSectionCardBody
+  const firstInvalid = parsedGroups.find((entry) => !entry.parsed.success);
+  let body: GovernedSurfaceSectionCardBody;
 
   if (firstInvalid) {
     logUnexpectedServerError(
       "GovernedPatternBStatSection invalid stat configuration",
       firstInvalid.parsed.error,
-      { surfaceKey, groupKey: firstInvalid.group.groupKey }
-    )
-    body = { state: "invalid", model: invalidModel }
+      { surfaceKey, groupKey: firstInvalid.group.groupKey },
+    );
+    body = { state: "invalid", model: invalidModel };
   } else if (parsedGroups.length === 0) {
-    body = { state: "invalid", model: invalidModel }
+    body = { state: "invalid", model: invalidModel };
   } else {
     body = {
       state: "ready",
@@ -180,7 +180,7 @@ export async function GovernedPatternBStatSection({
         <div className="flex flex-col gap-4">
           {parsedGroups.map(({ group, parsed }) => {
             if (!parsed.success) {
-              return null
+              return null;
             }
             return (
               <section
@@ -202,12 +202,12 @@ export async function GovernedPatternBStatSection({
                   surfaceKey={surfaceKey}
                 />
               </section>
-            )
+            );
           })}
         </div>
       ),
-    }
+    };
   }
 
-  return renderSectionShell({ ...shellInput, body })
+  return renderSectionShell({ ...shellInput, body });
 }

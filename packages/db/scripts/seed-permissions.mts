@@ -33,31 +33,36 @@ const permissionCatalog = [
     key: "finance.view",
     module: "finance",
     label: "View finance",
-    description: "Read finance controls, receivables, payables, and close state.",
+    description:
+      "Read finance controls, receivables, payables, and close state.",
   },
   {
     key: "sales.view",
     module: "sales",
     label: "View sales",
-    description: "Read quotes, orders, revenue blockers, and commercial handoffs.",
+    description:
+      "Read quotes, orders, revenue blockers, and commercial handoffs.",
   },
   {
     key: "purchasing.view",
     module: "purchasing",
     label: "View purchasing",
-    description: "Read supplier, purchase order, receipt, and spend-control state.",
+    description:
+      "Read supplier, purchase order, receipt, and spend-control state.",
   },
   {
     key: "inventory.view",
     module: "inventory",
     label: "View inventory",
-    description: "Read stock health, locations, movement exceptions, and replenishment state.",
+    description:
+      "Read stock health, locations, movement exceptions, and replenishment state.",
   },
   {
     key: "hr.view",
     module: "hr",
     label: "View HR",
-    description: "Read people operations summaries and workforce exception state.",
+    description:
+      "Read people operations summaries and workforce exception state.",
   },
   {
     key: "crm.view",
@@ -75,13 +80,15 @@ const permissionCatalog = [
     key: "reports.view",
     module: "reports",
     label: "View reports",
-    description: "Read saved views, exports, snapshots, and report freshness state.",
+    description:
+      "Read saved views, exports, snapshots, and report freshness state.",
   },
   {
     key: "admin.view",
     module: "admin",
     label: "View admin",
-    description: "Read tenant governance, membership, settings, and audit surfaces.",
+    description:
+      "Read tenant governance, membership, settings, and audit surfaces.",
   },
 ] as const;
 

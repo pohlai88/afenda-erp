@@ -17,7 +17,7 @@ knip
 
 ```typescript
 // packages/api/src/handler.ts
-import lodash from 'lodash'  // Not in packages/api/package.json
+import lodash from "lodash"; // Not in packages/api/package.json
 // Works in development due to hoisting
 ```
 

@@ -7,7 +7,8 @@ const modules = [
     href: "/dashboard",
     label: "Dashboard",
     navigationLabel: "Dashboard",
-    description: "KPIs, approvals, alerts, and cross-functional operating signals.",
+    description:
+      "KPIs, approvals, alerts, and cross-functional operating signals.",
     summary:
       "The executive workspace combines approval pressure, operating health, and module readiness into one route.",
     ownerTeam: "Operations Platform",
@@ -23,7 +24,8 @@ const modules = [
       {
         label: "Exceptions",
         value: "03",
-        detail: "Stock variance, invoice hold, and payroll validation mismatch.",
+        detail:
+          "Stock variance, invoice hold, and payroll validation mismatch.",
         tone: "warning",
       },
       {
@@ -33,7 +35,11 @@ const modules = [
         tone: "positive",
       },
     ],
-    defaultViews: ["Workspace summary", "Approval pressure", "Performance health"],
+    defaultViews: [
+      "Workspace summary",
+      "Approval pressure",
+      "Performance health",
+    ],
     actions: [
       { label: "Review approvals", href: "/approvals" },
       { label: "Inspect reports", href: "/reports" },
@@ -135,7 +141,8 @@ const modules = [
     href: "/sales",
     label: "Sales",
     navigationLabel: "Sales",
-    description: "Quotes, orders, invoicing triggers, and customer commitments.",
+    description:
+      "Quotes, orders, invoicing triggers, and customer commitments.",
     summary:
       "Sales tracks commitment flow from quote acceptance through invoice handoff.",
     ownerTeam: "Commercial Operations",
@@ -243,8 +250,7 @@ const modules = [
       },
       {
         title: "Operational continuity",
-        summary:
-          "Inventory and purchasing need a shared view of inbound risk.",
+        summary: "Inventory and purchasing need a shared view of inbound risk.",
         bullets: [
           "Highlight items that jeopardize open sales orders.",
           "Show receiving exceptions separately from authorization issues.",
@@ -263,7 +269,8 @@ const modules = [
     href: "/inventory",
     label: "Inventory",
     navigationLabel: "Inventory",
-    description: "Stock health, locations, replenishment, and movement exceptions.",
+    description:
+      "Stock health, locations, replenishment, and movement exceptions.",
     summary:
       "Inventory prioritizes stock exposure, replenishment timing, and movement integrity.",
     ownerTeam: "Operations Execution",
@@ -343,7 +350,8 @@ const modules = [
       {
         label: "Profile gaps",
         value: "06",
-        detail: "Employment records missing mandatory payroll or compliance fields.",
+        detail:
+          "Employment records missing mandatory payroll or compliance fields.",
         tone: "warning",
       },
       {
@@ -391,7 +399,8 @@ const modules = [
     href: "/crm",
     label: "CRM",
     navigationLabel: "CRM",
-    description: "Accounts, contacts, leads, pipeline activity, and relationship risk.",
+    description:
+      "Accounts, contacts, leads, pipeline activity, and relationship risk.",
     summary:
       "CRM focuses on account health, stalled opportunities, and relationship continuity.",
     ownerTeam: "Revenue Operations",
@@ -401,7 +410,8 @@ const modules = [
       {
         label: "Stalled leads",
         value: "07",
-        detail: "Accounts without follow-up activity in the last 5 business days.",
+        detail:
+          "Accounts without follow-up activity in the last 5 business days.",
         tone: "warning",
       },
       {
@@ -455,7 +465,8 @@ const modules = [
     href: "/approvals",
     label: "Approvals",
     navigationLabel: "Approvals",
-    description: "Approval queues, escalations, SLA pressure, and decision trails.",
+    description:
+      "Approval queues, escalations, SLA pressure, and decision trails.",
     summary:
       "Approvals is the control route for time-bound decisions across finance, purchasing, HR, and operations.",
     ownerTeam: "Workflow Platform",
@@ -465,7 +476,8 @@ const modules = [
       {
         label: "Queue depth",
         value: "14",
-        detail: "Requests currently open across operational and financial workflows.",
+        detail:
+          "Requests currently open across operational and financial workflows.",
         tone: "warning",
       },
       {
@@ -519,7 +531,8 @@ const modules = [
     href: "/reports",
     label: "Reports",
     navigationLabel: "Reports",
-    description: "Saved views, exports, snapshots, and operational insight delivery.",
+    description:
+      "Saved views, exports, snapshots, and operational insight delivery.",
     summary:
       "Reports provides operational and executive output surfaces built from tenant-safe summaries.",
     ownerTeam: "Data and Insights",
@@ -529,7 +542,8 @@ const modules = [
       {
         label: "Saved views",
         value: "12",
-        detail: "Reusable reporting presets for finance, sales, and operations.",
+        detail:
+          "Reusable reporting presets for finance, sales, and operations.",
         tone: "positive",
       },
       {
@@ -563,8 +577,7 @@ const modules = [
       },
       {
         title: "Performance discipline",
-        summary:
-          "Reporting is where poor query shape becomes visible first.",
+        summary: "Reporting is where poor query shape becomes visible first.",
         bullets: [
           "Use summaries and precomputed views for repeated workloads.",
           "Track latency and freshness together.",
@@ -583,7 +596,8 @@ const modules = [
     href: "/admin",
     label: "Admin",
     navigationLabel: "Admin",
-    description: "Users, roles, settings, audit access, and tenant-level controls.",
+    description:
+      "Users, roles, settings, audit access, and tenant-level controls.",
     summary:
       "Admin is the system control surface for identity, role assignment, and tenant governance.",
     ownerTeam: "Platform Administration",

@@ -1,14 +1,8 @@
 "use client";
 
-import {
-  credentialsSignInSchema,
-  credentialsSignUpSchema,
-} from "@afenda/auth";
+import { credentialsSignInSchema, credentialsSignUpSchema } from "@afenda/auth";
 import { neonAuthClient } from "@afenda/auth/client";
-import {
-  getNeonAuthFormModeCopy,
-  neonAuthFormCopy,
-} from "@afenda/domain";
+import { getNeonAuthFormModeCopy, neonAuthFormCopy } from "@afenda/domain";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import {
@@ -164,7 +158,12 @@ export function NeonAuthForm({
       >
         {mode === "sign-up" ? (
           <AuthField id="auth-name" label={fields.fullName}>
-            <AuthInput autoComplete="name" id="auth-name" name="name" required />
+            <AuthInput
+              autoComplete="name"
+              id="auth-name"
+              name="name"
+              required
+            />
           </AuthField>
         ) : null}
         <AuthField id="auth-email" label={fields.email}>
@@ -201,7 +200,9 @@ export function NeonAuthForm({
           </div>
         ) : null}
 
-        {errorMessage ? <AuthNotice tone="error">{errorMessage}</AuthNotice> : null}
+        {errorMessage ? (
+          <AuthNotice tone="error">{errorMessage}</AuthNotice>
+        ) : null}
         {statusMessage ? (
           <AuthNotice tone="success">{statusMessage}</AuthNotice>
         ) : null}

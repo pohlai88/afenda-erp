@@ -31,7 +31,9 @@ export function AppSidebar({
             }`}
           >
             <div className="flex items-center justify-between gap-3">
-              <div className="text-sm font-semibold">{item.navigationLabel}</div>
+              <div className="text-sm font-semibold">
+                {item.navigationLabel}
+              </div>
               <StatusBadge
                 label={item.status.label}
                 tone={isActive ? "neutral" : item.status.tone}

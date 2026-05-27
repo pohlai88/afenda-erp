@@ -1,13 +1,13 @@
-import { GovernedEmpty } from "../../client"
+import { GovernedEmpty } from "../../client";
 import {
   GOVERNED_ACTION_BAR_CONFIGURATION_SCHEMA_ID,
   parseGovernedActionBarConfiguration,
-} from "../../schemas/action-bar.schema"
-import { densityGapClass } from "../../schemas/surface-chrome.classes"
-import { cn } from "@afenda/ui/utils"
-import { Button } from "@afenda/ui/button"
+} from "../../schemas/action-bar.schema";
+import { densityGapClass } from "../../schemas/surface-chrome.classes";
+import { cn } from "@afenda/ui/utils";
+import { Button } from "@afenda/ui/button";
 
-import type { GovernedComponentRendererDiagnostics } from "../registry"
+import type { GovernedComponentRendererDiagnostics } from "../registry";
 
 /**
  * governed:action-bar — declarative action descriptors (submit wiring via Phase 3 actionId).
@@ -16,10 +16,10 @@ export function ActionBarRenderer({
   configuration,
   diagnostics = "user",
 }: {
-  configuration: unknown
-  diagnostics?: GovernedComponentRendererDiagnostics
+  configuration: unknown;
+  diagnostics?: GovernedComponentRendererDiagnostics;
 }) {
-  const parsed = parseGovernedActionBarConfiguration(configuration)
+  const parsed = parseGovernedActionBarConfiguration(configuration);
 
   if (!parsed.success) {
     return (
@@ -33,10 +33,10 @@ export function ActionBarRenderer({
               : "This action bar could not be loaded safely.",
         }}
       />
-    )
+    );
   }
 
-  const { actions, chrome, ariaLabel } = parsed.data
+  const { actions, chrome, ariaLabel } = parsed.data;
 
   return (
     <div
@@ -44,7 +44,7 @@ export function ActionBarRenderer({
       aria-label={ariaLabel ?? "Actions"}
       className={cn(
         "flex flex-wrap items-center",
-        densityGapClass(chrome?.density)
+        densityGapClass(chrome?.density),
       )}
     >
       {actions.map((action) => (
@@ -61,5 +61,5 @@ export function ActionBarRenderer({
         </Button>
       ))}
     </div>
-  )
+  );
 }

@@ -1,11 +1,11 @@
-import { Alert, AlertDescription, AlertTitle } from "@afenda/ui/alert"
+import { Alert, AlertDescription, AlertTitle } from "@afenda/ui/alert";
 
-import type { ActionResult } from "../schemas/action-result.shared"
+import type { ActionResult } from "../schemas/action-result.shared";
 
 export type ActionFormErrorsProps<T = void> = {
-  result: ActionResult<T> | null | undefined
-  title?: string
-}
+  result: ActionResult<T> | null | undefined;
+  title?: string;
+};
 
 /**
  * RSC helper — renders expected Server Action failures without throwing.
@@ -15,15 +15,15 @@ export function ActionFormErrors<T>({
   title,
 }: ActionFormErrorsProps<T>) {
   if (!result || result.ok) {
-    return null
+    return null;
   }
 
   const entries = result.fieldErrors
     ? Object.entries(result.fieldErrors).filter(
         (entry): entry is [string, string] =>
-          typeof entry[1] === "string" && entry[1].length > 0
+          typeof entry[1] === "string" && entry[1].length > 0,
       )
-    : []
+    : [];
 
   return (
     <Alert variant="destructive" className="w-full max-w-xl">
@@ -46,5 +46,5 @@ export function ActionFormErrors<T>({
         ) : null}
       </AlertDescription>
     </Alert>
-  )
+  );
 }

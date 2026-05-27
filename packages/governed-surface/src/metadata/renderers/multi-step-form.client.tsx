@@ -1,63 +1,64 @@
-"use client"
+"use client";
 
-import { useState } from "react"
+import { useState } from "react";
 
-import { Button } from "@afenda/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@afenda/ui/card"
-import { Checkbox } from "@afenda/ui/checkbox"
-import { Input } from "@afenda/ui/input"
-import { Label } from "@afenda/ui/label"
+import { Button } from "@afenda/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@afenda/ui/card";
+import { Checkbox } from "@afenda/ui/checkbox";
+import { Input } from "@afenda/ui/input";
+import { Label } from "@afenda/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@afenda/ui/select"
-import { Textarea } from "@afenda/ui/textarea"
-import {
-  resolveFormFieldRuleState,
-  type FormRuleValues,
-} from "../../client"
+} from "@afenda/ui/select";
+import { Textarea } from "@afenda/ui/textarea";
+import { resolveFormFieldRuleState, type FormRuleValues } from "../../client";
 import type {
   GovernedFormField,
   GovernedMultiStepFormConfiguration,
   MultiStepFormDataNature,
-} from "../../schemas/multi-step-form.schema"
-import { densityGapClass } from "../../schemas/surface-chrome.classes"
-import { cn } from "@afenda/ui/utils"
+} from "../../schemas/multi-step-form.schema";
+import { densityGapClass } from "../../schemas/surface-chrome.classes";
+import { cn } from "@afenda/ui/utils";
 
 const DATA_NATURE_CLASS: Record<MultiStepFormDataNature, string> = {
   wizard: "@container flex flex-col gap-4",
-}
+};
 
 function buildInitialWizardValues(
-  form: GovernedMultiStepFormConfiguration
+  form: GovernedMultiStepFormConfiguration,
 ): FormRuleValues {
-  const initial: FormRuleValues = {}
+  const initial: FormRuleValues = {};
   for (const step of form.steps) {
     for (const field of step.fields) {
-      initial[field.id] = field.kind === "checkbox" ? false : ""
+      initial[field.id] = field.kind === "checkbox" ? false : "";
     }
   }
-  return initial
+  return initial;
 }
 
 export function MultiStepFormSurface({
   form,
 }: {
-  form: GovernedMultiStepFormConfiguration
+  form: GovernedMultiStepFormConfiguration;
 }) {
-  const [stepIndex, setStepIndex] = useState(0)
+  const [stepIndex, setStepIndex] = useState(0);
   const [values, setValues] = useState<FormRuleValues>(() =>
-    buildInitialWizardValues(form)
-  )
-  const step = form.steps[stepIndex]
-  const isFirst = stepIndex === 0
-  const isLast = stepIndex === form.steps.length - 1
+    buildInitialWizardValues(form),
+  );
+  const step = form.steps[stepIndex];
+  const isFirst = stepIndex === 0;
+  const isLast = stepIndex === form.steps.length - 1;
+
+  if (!step) {
+    return null;
+  }
 
   function setFieldValue(fieldId: string, next: unknown) {
-    setValues((prev) => ({ ...prev, [fieldId]: next }))
+    setValues((prev) => ({ ...prev, [fieldId]: next }));
   }
 
   return (
@@ -97,7 +98,7 @@ export function MultiStepFormSurface({
           <div
             className={cn(
               "flex flex-col",
-              densityGapClass(form.chrome?.density)
+              densityGapClass(form.chrome?.density),
             )}
           >
             {step.fields.map((field) => (
@@ -138,7 +139,7 @@ export function MultiStepFormSurface({
         </CardContent>
       </Card>
     </section>
-  )
+  );
 }
 
 function WizardField({
@@ -146,15 +147,15 @@ function WizardField({
   values,
   onValueChange,
 }: {
-  field: GovernedFormField
-  values: FormRuleValues
-  onValueChange: (fieldId: string, next: unknown) => void
+  field: GovernedFormField;
+  values: FormRuleValues;
+  onValueChange: (fieldId: string, next: unknown) => void;
 }) {
-  const id = `wizard-field-${field.id}`
-  const { visible, enabled } = resolveFormFieldRuleState(field.rules, values)
+  const id = `wizard-field-${field.id}`;
+  const { visible, enabled } = resolveFormFieldRuleState(field.rules, values);
 
   if (!visible) {
-    return null
+    return null;
   }
 
   return (
@@ -228,5 +229,5 @@ function WizardField({
         </>
       )}
     </div>
-  )
+  );
 }

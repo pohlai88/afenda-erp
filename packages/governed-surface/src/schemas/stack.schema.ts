@@ -1,25 +1,25 @@
-import { z } from "zod"
+import { z } from "zod";
 
-import type { SchemaStability } from "./_stability.shared"
+import type { SchemaStability } from "./_stability.shared";
 
-import { governedSurfaceChromeSchema } from "./surface-chrome.schema"
+import { governedSurfaceChromeSchema } from "./surface-chrome.schema";
 
 export const GOVERNED_STACK_CONFIGURATION_SCHEMA_ID =
-  "governed.stack.configuration" as const
+  "governed.stack.configuration" as const;
 
 export const GOVERNED_STACK_CONFIGURATION_SCHEMA_STABILITY: SchemaStability =
-  "beta"
+  "beta";
 
 export const governedStackDirectionSchema = z.enum([
   "vertical",
   "horizontal",
   "bento",
-])
+]);
 
 export const governedStackBentoTemplateSchema = z.enum([
   "kpi-hero-list",
   "chart-sidebar-table",
-])
+]);
 
 export const governedStackConfigurationSchema = z
   .object({
@@ -33,20 +33,20 @@ export const governedStackConfigurationSchema = z
      */
     children: z.array(z.unknown()).min(1),
   })
-  .strict()
+  .strict();
 
 export type GovernedStackDirection = z.infer<
   typeof governedStackDirectionSchema
->
+>;
 
 export type GovernedStackConfiguration = z.infer<
   typeof governedStackConfigurationSchema
->
+>;
 
 export type GovernedStackConfigurationInput = z.input<
   typeof governedStackConfigurationSchema
->
+>;
 
 export function parseGovernedStackConfiguration(raw: unknown) {
-  return governedStackConfigurationSchema.safeParse(raw)
+  return governedStackConfigurationSchema.safeParse(raw);
 }

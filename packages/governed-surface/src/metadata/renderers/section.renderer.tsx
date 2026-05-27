@@ -1,33 +1,33 @@
-import { GovernedSection } from "../../components/governed-section"
-import { GovernedEmpty } from "../../client"
+import { GovernedSection } from "../../components/governed-section";
+import { GovernedEmpty } from "../../client";
 import {
   parseGovernedComponentData,
   type GovernedComponent,
-} from "../../schemas/component.schema"
-import { parseGovernedSectionConfiguration } from "../../schemas/section.schema"
+} from "../../schemas/component.schema";
+import { parseGovernedSectionConfiguration } from "../../schemas/section.schema";
 import {
   densityGapClass,
   elevationClass,
   surfaceMaterialClass,
-} from "../../schemas/surface-chrome.classes"
-import { cn } from "@afenda/ui/utils"
+} from "../../schemas/surface-chrome.classes";
+import { cn } from "@afenda/ui/utils";
 
-import { GovernedComponentTree } from "../governed-component-tree"
-import type { GovernedComponentRendererDiagnostics } from "../registry"
+import { GovernedComponentTree } from "../governed-component-tree";
+import type { GovernedComponentRendererDiagnostics } from "../registry";
 
 export type SectionRendererProps = {
-  configuration: unknown
-  diagnostics?: GovernedComponentRendererDiagnostics
-}
+  configuration: unknown;
+  diagnostics?: GovernedComponentRendererDiagnostics;
+};
 
 function renderChildren(
   children: unknown[],
-  diagnostics: GovernedComponentRendererDiagnostics
+  diagnostics: GovernedComponentRendererDiagnostics,
 ): React.ReactNode {
   return children.map((child, index) => {
-    const parsed = parseGovernedComponentData(child)
+    const parsed = parseGovernedComponentData(child);
     if (!parsed.success) {
-      return null
+      return null;
     }
     return (
       <GovernedComponentTree
@@ -35,8 +35,8 @@ function renderChildren(
         component={parsed.data as GovernedComponent}
         diagnostics={diagnostics}
       />
-    )
-  })
+    );
+  });
 }
 
 /**
@@ -46,7 +46,7 @@ export function SectionRenderer({
   configuration,
   diagnostics = "user",
 }: SectionRendererProps) {
-  const parsed = parseGovernedSectionConfiguration(configuration)
+  const parsed = parseGovernedSectionConfiguration(configuration);
 
   if (!parsed.success) {
     return (
@@ -60,11 +60,11 @@ export function SectionRenderer({
               : "This section could not be loaded safely.",
         }}
       />
-    )
+    );
   }
 
-  const { header, children, chrome } = parsed.data
-  const gapClass = densityGapClass(chrome?.density)
+  const { header, children, chrome } = parsed.data;
+  const gapClass = densityGapClass(chrome?.density);
 
   if (!header?.title) {
     return (
@@ -75,12 +75,12 @@ export function SectionRenderer({
           elevationClass(chrome?.elevation),
           surfaceMaterialClass(chrome?.surface),
           chrome?.elevation !== "flat" &&
-            "rounded-2xl border border-border/60 p-4"
+            "rounded-2xl border border-border/60 p-4",
         )}
       >
         {renderChildren(children, diagnostics)}
       </div>
-    )
+    );
   }
 
   return (
@@ -93,10 +93,10 @@ export function SectionRenderer({
         elevationClass(chrome?.elevation),
         surfaceMaterialClass(chrome?.surface),
         chrome?.elevation !== "flat" &&
-          "rounded-2xl border border-border/60 p-4"
+          "rounded-2xl border border-border/60 p-4",
       )}
     >
       {renderChildren(children, diagnostics)}
     </GovernedSection>
-  )
+  );
 }

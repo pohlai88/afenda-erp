@@ -1,19 +1,19 @@
-import { z } from "zod"
+import { z } from "zod";
 
-import type { SchemaStability } from "./_stability.shared"
+import type { SchemaStability } from "./_stability.shared";
 
-import { erpPermissionRequirementSchema } from "./erp-permission-requirement.schema"
-import { emptyStateSchema } from "./list-surface.schema"
-import { governedSurfaceChromeSchema } from "./surface-chrome.schema"
+import { erpPermissionRequirementSchema } from "./erp-permission-requirement.schema";
+import { emptyStateSchema } from "./list-surface.schema";
+import { governedSurfaceChromeSchema } from "./surface-chrome.schema";
 
 export const GOVERNED_KANBAN_BOARD_SCHEMA_ID =
-  "governed.kanban-board.configuration" as const
+  "governed.kanban-board.configuration" as const;
 
-export const GOVERNED_KANBAN_BOARD_SCHEMA_STABILITY: SchemaStability = "beta"
+export const GOVERNED_KANBAN_BOARD_SCHEMA_STABILITY: SchemaStability = "beta";
 
 /** Kanban board data nature (ADR-0025 §2). */
-export const kanbanBoardDataNatureSchema = z.literal("kanban")
-export type KanbanBoardDataNature = z.infer<typeof kanbanBoardDataNatureSchema>
+export const kanbanBoardDataNatureSchema = z.literal("kanban");
+export type KanbanBoardDataNature = z.infer<typeof kanbanBoardDataNatureSchema>;
 
 /**
  * ERP kanban interaction posture (ADR-0026).
@@ -27,9 +27,9 @@ export const kanbanInteractionModeSchema = z.enum([
   "read-only",
   "footer-actions",
   "drag-reorder",
-])
+]);
 
-export type KanbanInteractionMode = z.infer<typeof kanbanInteractionModeSchema>
+export type KanbanInteractionMode = z.infer<typeof kanbanInteractionModeSchema>;
 
 export const kanbanBoardCopySchema = z
   .object({
@@ -40,16 +40,16 @@ export const kanbanBoardCopySchema = z
     invalidTitle: z.string().trim().min(1).optional(),
     invalidDescription: z.string().trim().min(1).optional(),
   })
-  .strict()
+  .strict();
 
-export type KanbanBoardCopy = z.infer<typeof kanbanBoardCopySchema>
+export type KanbanBoardCopy = z.infer<typeof kanbanBoardCopySchema>;
 
 export const kanbanBadgeToneSchema = z.enum([
   "default",
   "positive",
   "attention",
   "critical",
-])
+]);
 
 export const kanbanColumnSchema = z
   .object({
@@ -57,7 +57,7 @@ export const kanbanColumnSchema = z
     label: z.string().trim().min(1),
     badgeTone: kanbanBadgeToneSchema.optional(),
   })
-  .strict()
+  .strict();
 
 export const kanbanWorkflowTransitionSchema = z
   .object({
@@ -65,17 +65,17 @@ export const kanbanWorkflowTransitionSchema = z
     fromColumnId: z.string().trim().min(1),
     toColumnId: z.string().trim().min(1),
   })
-  .strict()
+  .strict();
 
 export type KanbanWorkflowTransition = z.infer<
   typeof kanbanWorkflowTransitionSchema
->
+>;
 
 export const kanbanWorkflowSchema = z
   .object({
     transitions: z.array(kanbanWorkflowTransitionSchema).min(1),
   })
-  .strict()
+  .strict();
 
 export const kanbanCardTransitionAvailabilitySchema = z
   .object({
@@ -92,7 +92,7 @@ export const kanbanCardTransitionAvailabilitySchema = z
         message:
           "disabledReason is required when transition availability state is disabled",
         path: ["disabledReason"],
-      })
+      });
     }
     if (value.state === "hidden" && value.disabledReason) {
       ctx.addIssue({
@@ -100,13 +100,13 @@ export const kanbanCardTransitionAvailabilitySchema = z
         message:
           "disabledReason must not be set when transition availability state is hidden",
         path: ["disabledReason"],
-      })
+      });
     }
-  })
+  });
 
 export type KanbanCardTransitionAvailability = z.infer<
   typeof kanbanCardTransitionAvailabilitySchema
->
+>;
 
 export const kanbanCardSchema = z
   .object({
@@ -124,7 +124,7 @@ export const kanbanCardSchema = z
             label: z.string().trim().min(1),
             tone: kanbanBadgeToneSchema.optional(),
           })
-          .strict()
+          .strict(),
       )
       .optional(),
     /** Server-resolved transition hints for read-only boards (no kernel buttons). */
@@ -132,7 +132,7 @@ export const kanbanCardSchema = z
       .array(kanbanCardTransitionAvailabilitySchema)
       .optional(),
   })
-  .strict()
+  .strict();
 
 export const governedKanbanBoardConfigurationSchema = z
   .object({
@@ -150,7 +150,7 @@ export const governedKanbanBoardConfigurationSchema = z
   })
   .strict()
   .superRefine((board, ctx) => {
-    const columnIds = new Set<string>()
+    const columnIds = new Set<string>();
 
     for (const [index, col] of board.columns.entries()) {
       if (columnIds.has(col.id)) {
@@ -158,13 +158,13 @@ export const governedKanbanBoardConfigurationSchema = z
           code: z.ZodIssueCode.custom,
           message: "Column ids must be unique.",
           path: ["columns", index, "id"],
-        })
+        });
       }
 
-      columnIds.add(col.id)
+      columnIds.add(col.id);
     }
 
-    const transitionIds = new Set<string>()
+    const transitionIds = new Set<string>();
     if (board.workflow) {
       for (const [index, edge] of board.workflow.transitions.entries()) {
         if (transitionIds.has(edge.id)) {
@@ -172,28 +172,28 @@ export const governedKanbanBoardConfigurationSchema = z
             code: z.ZodIssueCode.custom,
             message: "Workflow transition ids must be unique.",
             path: ["workflow", "transitions", index, "id"],
-          })
+          });
         }
-        transitionIds.add(edge.id)
+        transitionIds.add(edge.id);
 
         if (!columnIds.has(edge.fromColumnId)) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
             message: `Workflow references unknown fromColumnId "${edge.fromColumnId}".`,
             path: ["workflow", "transitions", index, "fromColumnId"],
-          })
+          });
         }
         if (!columnIds.has(edge.toColumnId)) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
             message: `Workflow references unknown toColumnId "${edge.toColumnId}".`,
             path: ["workflow", "transitions", index, "toColumnId"],
-          })
+          });
         }
       }
     }
 
-    const cardIds = new Set<string>()
+    const cardIds = new Set<string>();
 
     for (const [index, card] of board.cards.entries()) {
       if (cardIds.has(card.id)) {
@@ -201,17 +201,17 @@ export const governedKanbanBoardConfigurationSchema = z
           code: z.ZodIssueCode.custom,
           message: "Card ids must be unique.",
           path: ["cards", index, "id"],
-        })
+        });
       }
 
-      cardIds.add(card.id)
+      cardIds.add(card.id);
 
       if (!columnIds.has(card.columnId)) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           message: `Card references unknown column "${card.columnId}".`,
           path: ["cards", index, "columnId"],
-        })
+        });
       }
 
       if (card.availableTransitions?.length) {
@@ -221,15 +221,15 @@ export const governedKanbanBoardConfigurationSchema = z
             message:
               "workflow is required when cards declare availableTransitions.",
             path: ["workflow"],
-          })
+          });
         } else {
           for (const [
             ti,
             availability,
           ] of card.availableTransitions.entries()) {
             const edge = board.workflow.transitions.find(
-              (t) => t.id === availability.transitionId
-            )
+              (t) => t.id === availability.transitionId,
+            );
             if (!edge) {
               ctx.addIssue({
                 code: z.ZodIssueCode.custom,
@@ -241,8 +241,8 @@ export const governedKanbanBoardConfigurationSchema = z
                   ti,
                   "transitionId",
                 ],
-              })
-              continue
+              });
+              continue;
             }
             if (edge.fromColumnId !== card.columnId) {
               ctx.addIssue({
@@ -255,7 +255,7 @@ export const governedKanbanBoardConfigurationSchema = z
                   ti,
                   "transitionId",
                 ],
-              })
+              });
             }
           }
         }
@@ -270,7 +270,7 @@ export const governedKanbanBoardConfigurationSchema = z
           message:
             "footer-actions boards must not declare availableTransitions on cards; use renderCardFooter for mutations.",
           path: ["cards", index, "availableTransitions"],
-        })
+        });
       }
 
       if (board.interactionMode === "drag-reorder") {
@@ -280,7 +280,7 @@ export const governedKanbanBoardConfigurationSchema = z
             message:
               "drag-reorder boards must declare availableTransitions on every card (use [] when no moves apply).",
             path: ["cards", index, "availableTransitions"],
-          })
+          });
         }
       }
     }
@@ -291,14 +291,14 @@ export const governedKanbanBoardConfigurationSchema = z
           code: z.ZodIssueCode.custom,
           message: "drag-reorder boards require workflow.",
           path: ["workflow"],
-        })
+        });
       }
       if (!board.copy.dragHandleAriaLabel) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           message: "drag-reorder boards require copy.dragHandleAriaLabel.",
           path: ["copy", "dragHandleAriaLabel"],
-        })
+        });
       }
     }
 
@@ -309,24 +309,24 @@ export const governedKanbanBoardConfigurationSchema = z
             code: z.ZodIssueCode.custom,
             message: `columnOrder references unknown column "${colId}".`,
             path: ["columnOrder", index],
-          })
+          });
         }
       }
     }
-  })
+  });
 
-export type KanbanBadgeTone = z.infer<typeof kanbanBadgeToneSchema>
-export type KanbanColumn = z.infer<typeof kanbanColumnSchema>
-export type KanbanCard = z.infer<typeof kanbanCardSchema>
+export type KanbanBadgeTone = z.infer<typeof kanbanBadgeToneSchema>;
+export type KanbanColumn = z.infer<typeof kanbanColumnSchema>;
+export type KanbanCard = z.infer<typeof kanbanCardSchema>;
 
 export type GovernedKanbanBoardConfiguration = z.infer<
   typeof governedKanbanBoardConfigurationSchema
->
+>;
 
 export type GovernedKanbanBoardConfigurationInput = z.input<
   typeof governedKanbanBoardConfigurationSchema
->
+>;
 
 export function parseGovernedKanbanBoardConfiguration(raw: unknown) {
-  return governedKanbanBoardConfigurationSchema.safeParse(raw)
+  return governedKanbanBoardConfigurationSchema.safeParse(raw);
 }

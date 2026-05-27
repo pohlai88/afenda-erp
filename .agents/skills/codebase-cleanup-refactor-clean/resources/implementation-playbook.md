@@ -5,7 +5,9 @@ This file contains detailed patterns, checklists, and code samples referenced by
 ## Instructions
 
 ### 1. Code Analysis
+
 First, analyze the current code for:
+
 - **Code Smells**
   - Long methods/functions (>20 lines)
   - Large classes (>200 lines)
@@ -36,6 +38,7 @@ First, analyze the current code for:
 Create a prioritized refactoring plan:
 
 **Immediate Fixes (High Impact, Low Effort)**
+
 - Extract magic numbers to constants
 - Improve variable and function names
 - Remove dead code
@@ -43,6 +46,7 @@ Create a prioritized refactoring plan:
 - Extract duplicate code to functions
 
 **Method Extraction**
+
 ```
 # Before
 def process_order(order):
@@ -58,12 +62,14 @@ def process_order(order):
 ```
 
 **Class Decomposition**
+
 - Extract responsibilities to separate classes
 - Create interfaces for dependencies
 - Implement dependency injection
 - Use composition over inheritance
 
 **Pattern Application**
+
 - Factory pattern for object creation
 - Strategy pattern for algorithm variants
 - Observer pattern for event handling
@@ -75,6 +81,7 @@ def process_order(order):
 Provide concrete examples of applying each SOLID principle:
 
 **Single Responsibility Principle (SRP)**
+
 ```python
 # BEFORE: Multiple responsibilities in one class
 class UserManager:
@@ -115,6 +122,7 @@ class UserService:
 ```
 
 **Open/Closed Principle (OCP)**
+
 ```python
 # BEFORE: Modification required for new discount types
 class DiscountCalculator:
@@ -160,44 +168,62 @@ class DiscountCalculator:
 ```
 
 **Liskov Substitution Principle (LSP)**
+
 ```typescript
 // BEFORE: Violates LSP - Square changes Rectangle behavior
 class Rectangle {
-    constructor(protected width: number, protected height: number) {}
+  constructor(
+    protected width: number,
+    protected height: number,
+  ) {}
 
-    setWidth(width: number) { this.width = width; }
-    setHeight(height: number) { this.height = height; }
-    area(): number { return this.width * this.height; }
+  setWidth(width: number) {
+    this.width = width;
+  }
+  setHeight(height: number) {
+    this.height = height;
+  }
+  area(): number {
+    return this.width * this.height;
+  }
 }
 
 class Square extends Rectangle {
-    setWidth(width: number) {
-        this.width = width;
-        this.height = width; // Breaks LSP
-    }
-    setHeight(height: number) {
-        this.width = height;
-        this.height = height; // Breaks LSP
-    }
+  setWidth(width: number) {
+    this.width = width;
+    this.height = width; // Breaks LSP
+  }
+  setHeight(height: number) {
+    this.width = height;
+    this.height = height; // Breaks LSP
+  }
 }
 
 // AFTER: Proper abstraction respects LSP
 interface Shape {
-    area(): number;
+  area(): number;
 }
 
 class Rectangle implements Shape {
-    constructor(private width: number, private height: number) {}
-    area(): number { return this.width * this.height; }
+  constructor(
+    private width: number,
+    private height: number,
+  ) {}
+  area(): number {
+    return this.width * this.height;
+  }
 }
 
 class Square implements Shape {
-    constructor(private side: number) {}
-    area(): number { return this.side * this.side; }
+  constructor(private side: number) {}
+  area(): number {
+    return this.side * this.side;
+  }
 }
 ```
 
 **Interface Segregation Principle (ISP)**
+
 ```java
 // BEFORE: Fat interface forces unnecessary implementations
 interface Worker {
@@ -237,6 +263,7 @@ class Robot implements Workable {
 ```
 
 **Dependency Inversion Principle (DIP)**
+
 ```go
 // BEFORE: High-level module depends on low-level module
 type MySQLDatabase struct{}
@@ -386,30 +413,30 @@ class OrderService:
 // SMELL: Long Parameter List
 // BEFORE
 function createUser(
-    firstName: string,
-    lastName: string,
-    email: string,
-    phone: string,
-    address: string,
-    city: string,
-    state: string,
-    zipCode: string
+  firstName: string,
+  lastName: string,
+  email: string,
+  phone: string,
+  address: string,
+  city: string,
+  state: string,
+  zipCode: string,
 ) {}
 
 // AFTER: Parameter Object
 interface UserData {
-    firstName: string;
-    lastName: string;
-    email: string;
-    phone: string;
-    address: Address;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  address: Address;
 }
 
 interface Address {
-    street: string;
-    city: string;
-    state: string;
-    zipCode: string;
+  street: string;
+  city: string;
+  state: string;
+  zipCode: string;
 }
 
 function createUser(userData: UserData) {}
@@ -417,56 +444,56 @@ function createUser(userData: UserData) {}
 // SMELL: Feature Envy (method uses another class's data more than its own)
 // BEFORE
 class Order {
-    calculateShipping(customer: Customer): number {
-        if (customer.isPremium) {
-            return customer.address.isInternational ? 0 : 5;
-        }
-        return customer.address.isInternational ? 20 : 10;
+  calculateShipping(customer: Customer): number {
+    if (customer.isPremium) {
+      return customer.address.isInternational ? 0 : 5;
     }
+    return customer.address.isInternational ? 20 : 10;
+  }
 }
 
 // AFTER: Move method to the class it envies
 class Customer {
-    calculateShippingCost(): number {
-        if (this.isPremium) {
-            return this.address.isInternational ? 0 : 5;
-        }
-        return this.address.isInternational ? 20 : 10;
+  calculateShippingCost(): number {
+    if (this.isPremium) {
+      return this.address.isInternational ? 0 : 5;
     }
+    return this.address.isInternational ? 20 : 10;
+  }
 }
 
 class Order {
-    calculateShipping(customer: Customer): number {
-        return customer.calculateShippingCost();
-    }
+  calculateShipping(customer: Customer): number {
+    return customer.calculateShippingCost();
+  }
 }
 
 // SMELL: Primitive Obsession
 // BEFORE
 function validateEmail(email: string): boolean {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
 let userEmail: string = "test@example.com";
 
 // AFTER: Value Object
 class Email {
-    private readonly value: string;
+  private readonly value: string;
 
-    constructor(email: string) {
-        if (!this.isValid(email)) {
-            throw new Error("Invalid email format");
-        }
-        this.value = email;
+  constructor(email: string) {
+    if (!this.isValid(email)) {
+      throw new Error("Invalid email format");
     }
+    this.value = email;
+  }
 
-    private isValid(email: string): boolean {
-        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-    }
+  private isValid(email: string): boolean {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  }
 
-    toString(): string {
-        return this.value;
-    }
+  toString(): string {
+    return this.value;
+  }
 }
 
 let userEmail = new Email("test@example.com"); // Validation automatic
@@ -476,15 +503,15 @@ let userEmail = new Email("test@example.com"); // Validation automatic
 
 **Code Quality Metrics Interpretation Matrix**
 
-| Metric | Good | Warning | Critical | Action |
-|--------|------|---------|----------|--------|
-| Cyclomatic Complexity | <10 | 10-15 | >15 | Split into smaller methods |
-| Method Lines | <20 | 20-50 | >50 | Extract methods, apply SRP |
-| Class Lines | <200 | 200-500 | >500 | Decompose into multiple classes |
-| Test Coverage | >80% | 60-80% | <60% | Add unit tests immediately |
-| Code Duplication | <3% | 3-5% | >5% | Extract common code |
-| Comment Ratio | 10-30% | <10% or >50% | N/A | Improve naming or reduce noise |
-| Dependency Count | <5 | 5-10 | >10 | Apply DIP, use facades |
+| Metric                | Good   | Warning      | Critical | Action                          |
+| --------------------- | ------ | ------------ | -------- | ------------------------------- |
+| Cyclomatic Complexity | <10    | 10-15        | >15      | Split into smaller methods      |
+| Method Lines          | <20    | 20-50        | >50      | Extract methods, apply SRP      |
+| Class Lines           | <200   | 200-500      | >500     | Decompose into multiple classes |
+| Test Coverage         | >80%   | 60-80%       | <60%     | Add unit tests immediately      |
+| Code Duplication      | <3%    | 3-5%         | >5%      | Extract common code             |
+| Comment Ratio         | 10-30% | <10% or >50% | N/A      | Improve naming or reduce noise  |
+| Dependency Count      | <5     | 5-10         | >10      | Apply DIP, use facades          |
 
 **Refactoring ROI Analysis**
 
@@ -548,18 +575,18 @@ jobs:
       # GitHub Copilot Autofix
       - uses: github/copilot-autofix@v1
         with:
-          languages: 'python,typescript,go'
+          languages: "python,typescript,go"
 
       # CodeRabbit AI Review
       - uses: coderabbitai/action@v1
         with:
-          review_type: 'comprehensive'
-          focus: 'security,performance,maintainability'
+          review_type: "comprehensive"
+          focus: "security,performance,maintainability"
 
       # Codium AI PR-Agent
       - uses: codiumai/pr-agent@v1
         with:
-          commands: '/review --pr_reviewer.num_code_suggestions=5'
+          commands: "/review --pr_reviewer.num_code_suggestions=5"
 ```
 
 **Static Analysis Toolchain**
@@ -687,6 +714,7 @@ rules:
 Provide the complete refactored code with:
 
 **Clean Code Principles**
+
 - Meaningful names (searchable, pronounceable, no abbreviations)
 - Functions do one thing well
 - No side effects
@@ -695,6 +723,7 @@ Provide the complete refactored code with:
 - YAGNI (You Aren't Gonna Need It)
 
 **Error Handling**
+
 ```python
 # Use specific exceptions
 class OrderValidationError(Exception):
@@ -714,6 +743,7 @@ def validate_order(order):
 ```
 
 **Documentation**
+
 ```python
 def calculate_discount(order: Order, customer: Customer) -> Decimal:
     """
@@ -736,6 +766,7 @@ def calculate_discount(order: Order, customer: Customer) -> Decimal:
 Generate comprehensive tests for the refactored code:
 
 **Unit Tests**
+
 ```python
 class TestOrderProcessor:
     def test_validate_order_empty_items(self):
@@ -751,6 +782,7 @@ class TestOrderProcessor:
 ```
 
 **Test Coverage**
+
 - All public methods tested
 - Edge cases covered
 - Error conditions verified
@@ -761,12 +793,14 @@ class TestOrderProcessor:
 Provide clear comparisons showing improvements:
 
 **Metrics**
+
 - Cyclomatic complexity reduction
 - Lines of code per method
 - Test coverage increase
 - Performance improvements
 
 **Example**
+
 ```
 Before:
 - processData(): 150 lines, complexity: 25
@@ -786,6 +820,7 @@ After:
 If breaking changes are introduced:
 
 **Step-by-Step Migration**
+
 1. Install new dependencies
 2. Update import statements
 3. Replace deprecated methods
@@ -793,6 +828,7 @@ If breaking changes are introduced:
 5. Execute test suite
 
 **Backward Compatibility**
+
 ```python
 # Temporary adapter for smooth migration
 class LegacyOrderProcessor:
@@ -810,6 +846,7 @@ class LegacyOrderProcessor:
 Include specific optimizations:
 
 **Algorithm Improvements**
+
 ```python
 # Before: O(n²)
 for item in items:
@@ -824,6 +861,7 @@ for item_id, item in item_map.items():
 ```
 
 **Caching Strategy**
+
 ```python
 from functools import lru_cache
 

@@ -1,0 +1,30 @@
+---
+description: ERP feature package extraction and public export doors
+globs: packages/features/**/*
+alwaysApply: false
+---
+
+# Afenda feature packages (`@afenda/feature-*`)
+
+**ARCH-002** · **ARCH-004** (naming). No feature packages exist on disk yet — follow this when creating one.
+
+## Create when
+
+Module has its own command/query service, module-specific components, tables under `packages/db/src/schema/<moduleId>/`, metadata builders, or independent tests.
+
+## Scaffold checklist
+
+1. `packages/features/<moduleId>/` with `name`: `@afenda/feature-<moduleId>` (folder slug = `module-ids.ts`).
+2. Export subpaths: `.`, `./client`, `./server`, `./metadata` — `default` → `./dist/*.js`.
+3. `build`: `tsc -p tsconfig.build.json` → `dist/**`.
+4. Add `workspace:*` dep in `apps/erp/package.json`.
+5. Append to `afendaTranspilePackages` in `packages/config/src/next.ts`.
+6. Thin route imports `./server` or `./metadata` only — never barrels that re-export server code into client bundles.
+
+## Must not
+
+- Import from `apps/erp`.
+- Own Drizzle migration files (change schema in `@afenda/db`).
+- Skip `@afenda/auth` permission checks on tenant reads/writes.
+
+Run `pnpm architecture:check` after adding a package.

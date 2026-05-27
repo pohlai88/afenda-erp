@@ -1,0 +1,32 @@
+---
+description: Drizzle schema, tenancy, migrations, and data promotion
+globs: packages/db/**/*
+alwaysApply: false
+---
+
+# Afenda database (`@afenda/db`)
+
+**ARCH-005** (scale & promotion) · **ARCH-002** (package ownership).
+
+## Ownership
+
+- `packages/db` owns physical schema, migrations, `getDb()`, tenancy GUCs, query primitives.
+- Feature packages own module query/command services — not migration files.
+- Target module tables: `src/schema/<moduleId>/` (flat `erp.ts` today is compatibility only).
+
+## Tenancy
+
+- Tenant scope via Postgres GUCs inside transactions (`afenda.current_organization_id`, `afenda.auth_user_id`) — use `@afenda/db` helpers.
+- Every tenant-owned table includes `organizationId`.
+- Do not promote generic `erp_module_records` for ledger, inventory, payroll, or statutory data.
+
+## Connections
+
+- Runtime: `DATABASE_URL` (pooled). Migrations: `DATABASE_MIGRATION_URL`.
+- Lazy `getDb()` — no module-scope pool creation in new code.
+- On Fluid Compute with a dedicated pool, call `attachDatabasePool` from `@vercel/functions` after pool creation.
+
+## Changes
+
+- PRs touching schema: `pnpm db:generate`, review migration SQL, run `pnpm db:migrate` locally when appropriate.
+- Keep `DATABASE_*` in Turborepo `globalEnv` when adding env vars that affect builds.

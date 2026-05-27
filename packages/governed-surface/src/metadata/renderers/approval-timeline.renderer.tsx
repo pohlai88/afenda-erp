@@ -1,23 +1,23 @@
-import type { Route } from "next"
+import type { Route } from "next";
 
-import Link from "next/link"
+import Link from "next/link";
 
-import { Badge } from "@afenda/ui/badge"
-import { Check, Circle, Clock, X } from "lucide-react"
-import { Card, CardContent, CardHeader, CardTitle } from "@afenda/ui/card"
-import { GovernedEmpty } from "../../client"
+import { Badge } from "@afenda/ui/badge";
+import { Check, Circle, Clock, X } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@afenda/ui/card";
+import { GovernedEmpty } from "../../client";
 import {
   parseGovernedApprovalTimelineConfiguration,
   type ApprovalTimelineDataNature,
   type ApprovalTimelineStepStatus,
-} from "../../schemas/approval-timeline.schema"
-import { cn } from "@afenda/ui/utils"
+} from "../../schemas/approval-timeline.schema";
+import { cn } from "@afenda/ui/utils";
 
-import type { GovernedComponentRendererDiagnostics } from "../registry"
+import type { GovernedComponentRendererDiagnostics } from "../registry";
 
 const DATA_NATURE_CLASS: Record<ApprovalTimelineDataNature, string> = {
   "approval-flow": "@container flex flex-col gap-3",
-}
+};
 
 const STATUS_VARIANT: Record<
   ApprovalTimelineStepStatus,
@@ -28,7 +28,7 @@ const STATUS_VARIANT: Record<
   complete: "secondary",
   rejected: "destructive",
   skipped: "outline",
-}
+};
 
 const STATUS_ICON: Record<ApprovalTimelineStepStatus, typeof Circle> = {
   pending: Clock,
@@ -36,52 +36,52 @@ const STATUS_ICON: Record<ApprovalTimelineStepStatus, typeof Circle> = {
   complete: Check,
   rejected: X,
   skipped: Circle,
-}
+};
 
 const METADATA_CHIP_VARIANT = {
   default: "secondary",
   positive: "success",
   attention: "warning",
   critical: "critical",
-} as const
+} as const;
 
 function formatStepTimestamp(iso: string | undefined): string | null {
-  if (!iso) return null
+  if (!iso) return null;
   try {
     return new Intl.DateTimeFormat(undefined, {
       dateStyle: "medium",
       timeStyle: "short",
-    }).format(new Date(iso))
+    }).format(new Date(iso));
   } catch {
-    return iso
+    return iso;
   }
 }
 
 function stepDurationLabel(
   steps: readonly { occurredAt?: string }[],
-  index: number
+  index: number,
 ): string | null {
-  const current = steps[index]?.occurredAt
-  const next = steps[index + 1]?.occurredAt
-  if (!current || !next) return null
-  const ms = new Date(next).getTime() - new Date(current).getTime()
-  if (!Number.isFinite(ms) || ms <= 0) return null
-  const hours = Math.round(ms / (60 * 60 * 1000))
-  if (hours < 24) return `${hours}h to next step`
-  const days = Math.round(hours / 24)
-  return `${days}d to next step`
+  const current = steps[index]?.occurredAt;
+  const next = steps[index + 1]?.occurredAt;
+  if (!current || !next) return null;
+  const ms = new Date(next).getTime() - new Date(current).getTime();
+  if (!Number.isFinite(ms) || ms <= 0) return null;
+  const hours = Math.round(ms / (60 * 60 * 1000));
+  if (hours < 24) return `${hours}h to next step`;
+  const days = Math.round(hours / 24);
+  return `${days}d to next step`;
 }
 
 export type ApprovalTimelineRendererProps = {
-  configuration: unknown
-  diagnostics?: GovernedComponentRendererDiagnostics
-}
+  configuration: unknown;
+  diagnostics?: GovernedComponentRendererDiagnostics;
+};
 
 export function ApprovalTimelineRenderer({
   configuration,
   diagnostics = "user",
 }: ApprovalTimelineRendererProps) {
-  const parsed = parseGovernedApprovalTimelineConfiguration(configuration)
+  const parsed = parseGovernedApprovalTimelineConfiguration(configuration);
 
   if (!parsed.success) {
     return (
@@ -95,12 +95,12 @@ export function ApprovalTimelineRenderer({
               : "This timeline could not be loaded safely.",
         }}
       />
-    )
+    );
   }
 
-  const { dataNature, density, title, steps } = parsed.data
-  const listGapClass = density === "compact" ? "gap-2" : "gap-3"
-  const itemPaddingClass = density === "compact" ? "pb-2" : "pb-3"
+  const { dataNature, density, title, steps } = parsed.data;
+  const listGapClass = density === "compact" ? "gap-2" : "gap-3";
+  const itemPaddingClass = density === "compact" ? "pb-2" : "pb-3";
 
   return (
     <section
@@ -118,16 +118,16 @@ export function ApprovalTimelineRenderer({
         >
           <ol className={cn("flex flex-col", listGapClass)}>
             {steps.map((step, index) => {
-              const Icon = STATUS_ICON[step.status]
-              const occurred = formatStepTimestamp(step.occurredAt)
+              const Icon = STATUS_ICON[step.status];
+              const occurred = formatStepTimestamp(step.occurredAt);
               const duration =
-                step.durationLabel ?? stepDurationLabel(steps, index)
+                step.durationLabel ?? stepDurationLabel(steps, index);
               return (
                 <li
                   key={step.id}
                   className={cn(
                     "flex items-start gap-3 border-b border-border/60 last:border-0 last:pb-0",
-                    itemPaddingClass
+                    itemPaddingClass,
                   )}
                 >
                   <span
@@ -141,7 +141,7 @@ export function ApprovalTimelineRenderer({
                         "border-primary/40 bg-primary/10 text-primary",
                       (step.status === "pending" ||
                         step.status === "skipped") &&
-                        "border-border bg-muted text-muted-foreground"
+                        "border-border bg-muted text-muted-foreground",
                     )}
                     aria-hidden
                   >
@@ -209,11 +209,11 @@ export function ApprovalTimelineRenderer({
                     ) : null}
                   </div>
                 </li>
-              )
+              );
             })}
           </ol>
         </CardContent>
       </Card>
     </section>
-  )
+  );
 }

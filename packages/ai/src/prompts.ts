@@ -1,5 +1,4 @@
 import { getBusinessProblemTypeLabels } from "@afenda/domain";
-import type { DocumentExtractionRequest } from "./schemas/extraction";
 
 export function getAssistantSystemPrompt(input: {
   organizationName: string;

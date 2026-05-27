@@ -1,9 +1,9 @@
-import { GovernedComponentSkeleton } from "./governed-component-skeleton"
-import type { AfendaGovernedRendererId } from "./registry"
+import { GovernedComponentSkeleton } from "./governed-component-skeleton";
+import type { AfendaGovernedRendererId } from "./registry";
 
 export type GovernedMetadataLoadingProps = {
-  rendererId: AfendaGovernedRendererId
-}
+  rendererId: AfendaGovernedRendererId;
+};
 
 /**
  * Loading boundary helper for governed metadata surfaces.
@@ -15,5 +15,5 @@ export type GovernedMetadataLoadingProps = {
 export function GovernedMetadataLoading({
   rendererId,
 }: GovernedMetadataLoadingProps) {
-  return <GovernedComponentSkeleton rendererId={rendererId} />
+  return <GovernedComponentSkeleton rendererId={rendererId} />;
 }

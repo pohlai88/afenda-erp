@@ -1,21 +1,22 @@
-import { z } from "zod"
+import { z } from "zod";
 
-import type { SchemaStability } from "./_stability.shared"
+import type { SchemaStability } from "./_stability.shared";
 
-import { formRuleSchema } from "./form-rules.schema"
-import { governedMetadataSchemaVersionSchema } from "./schema-version.shared"
-import { governedSurfaceChromeSchema } from "./surface-chrome.schema"
+import { formRuleSchema } from "./form-rules.schema";
+import { governedMetadataSchemaVersionSchema } from "./schema-version.shared";
+import { governedSurfaceChromeSchema } from "./surface-chrome.schema";
 
 export const GOVERNED_MULTI_STEP_FORM_SCHEMA_ID =
-  "governed.multi-step-form.configuration" as const
+  "governed.multi-step-form.configuration" as const;
 
-export const GOVERNED_MULTI_STEP_FORM_SCHEMA_STABILITY: SchemaStability = "beta"
+export const GOVERNED_MULTI_STEP_FORM_SCHEMA_STABILITY: SchemaStability =
+  "beta";
 
 /** Multi-step wizard data nature (ADR-0025 §2). */
-export const multiStepFormDataNatureSchema = z.literal("wizard")
+export const multiStepFormDataNatureSchema = z.literal("wizard");
 export type MultiStepFormDataNature = z.infer<
   typeof multiStepFormDataNatureSchema
->
+>;
 
 export const governedFormFieldKindSchema = z.enum([
   "text",
@@ -23,14 +24,14 @@ export const governedFormFieldKindSchema = z.enum([
   "textarea",
   "select",
   "checkbox",
-])
+]);
 
 export const governedFormFieldOptionSchema = z
   .object({
     value: z.string().trim().min(1),
     label: z.string().trim().min(1),
   })
-  .strict()
+  .strict();
 
 export const governedFormFieldSchema = z
   .object({
@@ -53,7 +54,7 @@ export const governedFormFieldSchema = z
         code: z.ZodIssueCode.custom,
         message: "Select fields require at least one option.",
         path: ["options"],
-      })
+      });
     }
 
     if (field.kind !== "select" && field.options !== undefined) {
@@ -61,9 +62,9 @@ export const governedFormFieldSchema = z
         code: z.ZodIssueCode.custom,
         message: "Only select fields may define options.",
         path: ["options"],
-      })
+      });
     }
-  })
+  });
 
 export const governedFormStepSchema = z
   .object({
@@ -74,7 +75,7 @@ export const governedFormStepSchema = z
   })
   .strict()
   .superRefine((step, ctx) => {
-    const seen = new Set<string>()
+    const seen = new Set<string>();
 
     for (const [index, field] of step.fields.entries()) {
       if (seen.has(field.id)) {
@@ -82,12 +83,12 @@ export const governedFormStepSchema = z
           code: z.ZodIssueCode.custom,
           message: "Field ids must be unique within a step.",
           path: ["fields", index, "id"],
-        })
+        });
       }
 
-      seen.add(field.id)
+      seen.add(field.id);
     }
-  })
+  });
 
 export const governedMultiStepFormConfigurationSchema =
   governedMetadataSchemaVersionSchema
@@ -100,7 +101,7 @@ export const governedMultiStepFormConfigurationSchema =
       chrome: governedSurfaceChromeSchema.optional(),
     })
     .superRefine((form, ctx) => {
-      const seen = new Set<string>()
+      const seen = new Set<string>();
 
       for (const [index, step] of form.steps.entries()) {
         if (seen.has(step.id)) {
@@ -108,28 +109,28 @@ export const governedMultiStepFormConfigurationSchema =
             code: z.ZodIssueCode.custom,
             message: "Step ids must be unique.",
             path: ["steps", index, "id"],
-          })
+          });
         }
 
-        seen.add(step.id)
+        seen.add(step.id);
       }
-    })
+    });
 
-export type GovernedFormFieldKind = z.infer<typeof governedFormFieldKindSchema>
+export type GovernedFormFieldKind = z.infer<typeof governedFormFieldKindSchema>;
 export type GovernedFormFieldOption = z.infer<
   typeof governedFormFieldOptionSchema
->
-export type GovernedFormField = z.infer<typeof governedFormFieldSchema>
-export type GovernedFormStep = z.infer<typeof governedFormStepSchema>
+>;
+export type GovernedFormField = z.infer<typeof governedFormFieldSchema>;
+export type GovernedFormStep = z.infer<typeof governedFormStepSchema>;
 
 export type GovernedMultiStepFormConfiguration = z.infer<
   typeof governedMultiStepFormConfigurationSchema
->
+>;
 
 export type GovernedMultiStepFormConfigurationInput = z.input<
   typeof governedMultiStepFormConfigurationSchema
->
+>;
 
 export function parseGovernedMultiStepFormConfiguration(raw: unknown) {
-  return governedMultiStepFormConfigurationSchema.safeParse(raw)
+  return governedMultiStepFormConfigurationSchema.safeParse(raw);
 }

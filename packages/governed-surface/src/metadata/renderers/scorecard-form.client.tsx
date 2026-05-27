@@ -1,31 +1,31 @@
-"use client"
+"use client";
 
-import { useState } from "react"
+import { useState } from "react";
 
-import { Button } from "@afenda/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@afenda/ui/card"
-import { Label } from "@afenda/ui/label"
-import { Textarea } from "@afenda/ui/textarea"
+import { Button } from "@afenda/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@afenda/ui/card";
+import { Label } from "@afenda/ui/label";
+import { Textarea } from "@afenda/ui/textarea";
 import type {
   GovernedScorecardFormConfiguration,
   ScorecardCriterion,
   ScorecardFormDataNature,
-} from "../../schemas/scorecard-form.schema"
-import { densityGapClass } from "../../schemas/surface-chrome.classes"
-import { cn } from "@afenda/ui/utils"
+} from "../../schemas/scorecard-form.schema";
+import { densityGapClass } from "../../schemas/surface-chrome.classes";
+import { cn } from "@afenda/ui/utils";
 
 const DATA_NATURE_CLASS: Record<ScorecardFormDataNature, string> = {
   scoring: "@container flex flex-col gap-4",
-}
+};
 
 export function ScorecardFormSurface({
   form,
 }: {
-  form: GovernedScorecardFormConfiguration
+  form: GovernedScorecardFormConfiguration;
 }) {
   const [scores, setScores] = useState<Record<string, number>>(() =>
-    Object.fromEntries(form.criteria.map((c) => [c.id, 0]))
-  )
+    Object.fromEntries(form.criteria.map((c) => [c.id, 0])),
+  );
 
   return (
     <section
@@ -74,7 +74,7 @@ export function ScorecardFormSurface({
         </CardContent>
       </Card>
     </section>
-  )
+  );
 }
 
 function CriterionRow({
@@ -82,11 +82,11 @@ function CriterionRow({
   value,
   onSelect,
 }: {
-  criterion: ScorecardCriterion
-  value: number
-  onSelect: (score: number) => void
+  criterion: ScorecardCriterion;
+  value: number;
+  onSelect: (score: number) => void;
 }) {
-  const max = criterion.maxScore
+  const max = criterion.maxScore;
 
   return (
     <div className="flex flex-col gap-2 border-b border-border/60 pb-4 last:border-0 last:pb-0">
@@ -104,7 +104,7 @@ function CriterionRow({
         aria-label={`Score for ${criterion.label}`}
       >
         {Array.from({ length: max }, (_, index) => {
-          const score = index + 1
+          const score = index + 1;
           return (
             <Button
               key={score}
@@ -117,9 +117,9 @@ function CriterionRow({
             >
               {score}
             </Button>
-          )
+          );
         })}
       </div>
     </div>
-  )
+  );
 }

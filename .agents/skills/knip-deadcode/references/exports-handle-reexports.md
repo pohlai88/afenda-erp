@@ -13,9 +13,9 @@ Knip tracks re-exports through barrel files. Unused items in re-export chains ar
 
 ```typescript
 // src/index.ts
-export * from './utils'
-export * from './helpers'
-export * from './constants'
+export * from "./utils";
+export * from "./helpers";
+export * from "./constants";
 ```
 
 All exports appear used because they're re-exported.
@@ -37,6 +37,7 @@ knip --trace-export unusedHelper
 ```
 
 Shows the re-export path:
+
 ```text
 unusedHelper
   ← re-exported from src/helpers.ts

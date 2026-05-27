@@ -1,16 +1,16 @@
-"use client"
+"use client";
 
-import type { ColumnDef } from "@tanstack/react-table"
+import type { ColumnDef } from "@tanstack/react-table";
 
-import type { ListColumn } from "../../schemas/list-surface.schema"
-import type { ListSurfaceRow } from "../../schemas/list-surface-renderer.schema"
+import type { ListColumn } from "../../schemas/list-surface.schema";
+import type { ListSurfaceRow } from "../../schemas/list-surface-renderer.schema";
 
-import { ListSurfaceCell } from "./list-surface-cell.client"
-import type { ListSurfaceTableTrailingColumn } from "./list-surface-table.client"
+import { ListSurfaceCell } from "./list-surface-cell.client";
+import type { ListSurfaceTableTrailingColumn } from "./list-surface-table.client";
 
 export function buildListSurfaceColumnDefs(
   columns: readonly ListColumn[],
-  trailingColumn?: ListSurfaceTableTrailingColumn
+  trailingColumn?: ListSurfaceTableTrailingColumn,
 ): ColumnDef<ListSurfaceRow, unknown>[] {
   const defs: ColumnDef<ListSurfaceRow, unknown>[] = columns.map((column) => ({
     id: column.id,
@@ -18,7 +18,7 @@ export function buildListSurfaceColumnDefs(
     header: column.header,
     enableSorting: column.enableClientSort ?? false,
     cell: ({ row }) => <ListSurfaceCell column={column} row={row.original} />,
-  }))
+  }));
 
   if (trailingColumn) {
     defs.push({
@@ -32,8 +32,8 @@ export function buildListSurfaceColumnDefs(
           context={trailingColumn.context}
         />
       ),
-    })
+    });
   }
 
-  return defs
+  return defs;
 }

@@ -30,6 +30,7 @@ Choose the right reporter for your CI environment. Different reporters optimize 
 ```
 
 **Available reporters:**
+
 - `symbols` (default) - Grouped by issue type with symbols
 - `compact` - One line per issue
 - `github-actions` - GitHub annotations on files

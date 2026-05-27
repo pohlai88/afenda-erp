@@ -2,12 +2,12 @@
 
 **Doc ID:** `ARCH-002` · **File:** `002-erp-domain-package-architecture.md`
 
-| Field | Value |
-| ----- | ----- |
-| Status | Active — target boundaries with as-built compatibility layer (May 2026) |
-| Authority | Feature-package extraction, import rules, Vercel single-app build model |
-| Supersedes | Per-module route folders and microfrontend deployment assumptions |
-| Related | **ARCH-001** (runtime/deploy) · **ARCH-005** (schema promotion) · **ARCH-006** (metadata UI) |
+| Field      | Value                                                                                        |
+| ---------- | -------------------------------------------------------------------------------------------- |
+| Status     | Active — target boundaries with as-built compatibility layer (May 2026)                      |
+| Authority  | Feature-package extraction, import rules, Vercel single-app build model                      |
+| Supersedes | Per-module route folders and microfrontend deployment assumptions                            |
+| Related    | **ARCH-001** (runtime/deploy) · **ARCH-005** (schema promotion) · **ARCH-006** (metadata UI) |
 
 Afenda ERP domains are package-scale product capabilities. The deployable app
 owns routing and composition; feature packages own ERP-specific implementation.
@@ -16,14 +16,14 @@ finance, HR, sales, inventory, or CRM business logic.
 
 ## Current vs target
 
-| Area | Current (as-built) | Target |
-| ---- | ------------------ | ------ |
-| Deployable surface | `apps/erp` only | Same — one Vercel project, no per-module deployables |
-| Module implementation | `packages/domain`, `apps/erp` route adapters | `packages/features/<moduleId>` per mature module |
-| List/metadata builders | `packages/domain/src/module-list-surfaces.ts` | Move to `@afenda/feature-*` when threshold met |
-| Database schema | Flat `packages/db/src/schema/*.ts` + shared `erp.ts` | `schema/<moduleId>/` for ledger-grade tables |
-| Vercel project link | **Deferred** until repo stable (see **ARCH-001**) | Root-linked monorepo; `vercel.json` already defines build |
-| Feature packages on disk | **None** (`packages/features/*` glob ready) | One package per extracted module |
+| Area                     | Current (as-built)                                   | Target                                                    |
+| ------------------------ | ---------------------------------------------------- | --------------------------------------------------------- |
+| Deployable surface       | `apps/erp` only                                      | Same — one Vercel project, no per-module deployables      |
+| Module implementation    | `packages/domain`, `apps/erp` route adapters         | `packages/features/<moduleId>` per mature module          |
+| List/metadata builders   | `packages/domain/src/module-list-surfaces.ts`        | Move to `@afenda/feature-*` when threshold met            |
+| Database schema          | Flat `packages/db/src/schema/*.ts` + shared `erp.ts` | `schema/<moduleId>/` for ledger-grade tables              |
+| Vercel project link      | **Deferred** until repo stable (see **ARCH-001**)    | Root-linked monorepo; `vercel.json` already defines build |
+| Feature packages on disk | **None** (`packages/features/*` glob ready)          | One package per extracted module                          |
 
 ## Decision
 
@@ -50,16 +50,16 @@ remain coherent.
 ERP modules are long-lived bounded contexts with different data integrity rules,
 not generic UI slices. Package boundaries match how ERP systems are operated:
 
-| ERP concern | Package placement |
-| ----------- | ----------------- |
-| Ledger posting, reversals, period close | `features/finance` command services |
-| Stock movements, reservations, valuation | `features/inventory` command services |
-| Order-to-cash and procure-to-pay flows | `features/sales`, `features/purchasing` |
-| Payroll-sensitive and statutory HR data | `features/hr` |
-| Cross-module approval and scheduled jobs | `features/approvals`, `workflows` |
-| Physical tables, migrations, tenancy guards | `packages/db` |
-| Module IDs, permissions, record contracts | `packages/domain` |
-| Metadata renderers and list-window UI | `packages/governed-surface` |
+| ERP concern                                 | Package placement                       |
+| ------------------------------------------- | --------------------------------------- |
+| Ledger posting, reversals, period close     | `features/finance` command services     |
+| Stock movements, reservations, valuation    | `features/inventory` command services   |
+| Order-to-cash and procure-to-pay flows      | `features/sales`, `features/purchasing` |
+| Payroll-sensitive and statutory HR data     | `features/hr`                           |
+| Cross-module approval and scheduled jobs    | `features/approvals`, `workflows`       |
+| Physical tables, migrations, tenancy guards | `packages/db`                           |
+| Module IDs, permissions, record contracts   | `packages/domain`                       |
+| Metadata renderers and list-window UI       | `packages/governed-surface`             |
 
 Feature packages own **business behavior**. `packages/db` owns **physical
 schema**. Cross-module writes that must commit together run in one database
@@ -100,14 +100,14 @@ runtime context: [System Architecture](001-system-architecture.md).
 
 Until the first `@afenda/feature-*` package exists:
 
-| Concern | Current owner |
-| ------- | ------------- |
-| Module workspace routes | `apps/erp/src/app/(app)/[moduleId]/` → `module-screen.tsx` |
-| Dashboard / solution-console lists | `dashboard-route.tsx`, `solution-console-route.tsx` |
-| Governed list configuration | `packages/domain/src/module-list-surfaces.ts` (`buildModule*ListSurface`, `buildDashboard*`, `buildSolutionConsole*`) |
-| Governed rendering | `@afenda/governed-surface/server` (`GovernedPatternCListSection`) |
-| Shared ERP records / work items | `packages/db` (`erp_module_records`, `erp_work_items`, …) via `@afenda/domain` |
-| Module registry and capabilities | `packages/domain`, `@afenda/config/module-ids` |
+| Concern                            | Current owner                                                                                                         |
+| ---------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| Module workspace routes            | `apps/erp/src/app/(app)/[moduleId]/` → `module-screen.tsx`                                                            |
+| Dashboard / solution-console lists | `dashboard-route.tsx`, `solution-console-route.tsx`                                                                   |
+| Governed list configuration        | `packages/domain/src/module-list-surfaces.ts` (`buildModule*ListSurface`, `buildDashboard*`, `buildSolutionConsole*`) |
+| Governed rendering                 | `@afenda/governed-surface/server` (`GovernedPatternCListSection`)                                                     |
+| Shared ERP records / work items    | `packages/db` (`erp_module_records`, `erp_work_items`, …) via `@afenda/domain`                                        |
+| Module registry and capabilities   | `packages/domain`, `@afenda/config/module-ids`                                                                        |
 
 Do not treat the compatibility layer as the final home for posting-grade,
 inventory-grade, or statutory workflows. Promote to feature packages and module
@@ -260,12 +260,12 @@ Promotion rules: [Database Scale Architecture](005-database-scale-architecture.m
 
 ## Import rules
 
-| From | May import |
-| ---- | ---------- |
-| `apps/erp` | `@afenda/feature-*`, `@afenda/domain`, platform packages |
-| `@afenda/feature-*` | `@afenda/domain`, `@afenda/db`, `@afenda/auth`, `@afenda/governed-surface`, `@afenda/ui`, `@afenda/workflows`, `@afenda/observability` |
-| Shared platform packages | Each other per **ARCH-003**; **not** `apps/erp` or `@afenda/feature-*` |
-| `@afenda/ui` | Primitives only — no db, auth server, AI, or governed metadata registries |
+| From                     | May import                                                                                                                             |
+| ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------- |
+| `apps/erp`               | `@afenda/feature-*`, `@afenda/domain`, platform packages                                                                               |
+| `@afenda/feature-*`      | `@afenda/domain`, `@afenda/db`, `@afenda/auth`, `@afenda/governed-surface`, `@afenda/ui`, `@afenda/workflows`, `@afenda/observability` |
+| Shared platform packages | Each other per **ARCH-003**; **not** `apps/erp` or `@afenda/feature-*`                                                                 |
+| `@afenda/ui`             | Primitives only — no db, auth server, AI, or governed metadata registries                                                              |
 
 Client subpaths must not import database helpers, auth server modules, or
 Node-only SDKs.

@@ -1,4 +1,4 @@
-import type { ReactNode } from "react"
+import type { ReactNode } from "react";
 
 import {
   Card,
@@ -7,27 +7,27 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@afenda/ui/card"
-import { cn } from "@afenda/ui/utils"
+} from "@afenda/ui/card";
+import { cn } from "@afenda/ui/utils";
 
-import type { EmptyState } from "../schemas/list-surface.schema"
-import { GovernedEmpty } from "./governed-empty"
+import type { EmptyState } from "../schemas/list-surface.schema";
+import { GovernedEmpty } from "./governed-empty";
 
 /** Section body contract — one Card shell, one state path (ADR-0026 Pattern C recipe). */
 export type GovernedSurfaceSectionCardBody =
   | { state: "forbidden"; model: EmptyState }
   | { state: "invalid"; model: EmptyState }
   | { state: "empty"; children: ReactNode }
-  | { state: "ready"; children: ReactNode }
+  | { state: "ready"; children: ReactNode };
 
 export type GovernedSurfaceSectionCardProps = {
-  title: string
-  description?: string
-  body: GovernedSurfaceSectionCardBody
-  headerAction?: ReactNode
-  className?: string
-  contentClassName?: string
-}
+  title: string;
+  description?: string;
+  body: GovernedSurfaceSectionCardBody;
+  headerAction?: ReactNode;
+  className?: string;
+  contentClassName?: string;
+};
 
 export function GovernedSurfaceSectionCard({
   title,
@@ -57,5 +57,5 @@ export function GovernedSurfaceSectionCard({
         )}
       </CardContent>
     </Card>
-  )
+  );
 }

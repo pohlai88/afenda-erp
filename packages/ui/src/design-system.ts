@@ -1,4 +1,4 @@
-import { z } from "zod"
+import { z } from "zod";
 
 /**
  * Code-enforced UI contract (not docs).
@@ -27,11 +27,11 @@ export const uiPrimitiveKeys = [
   "sheet",
   "toolbar",
   "table",
-] as const
+] as const;
 
-export type UiPrimitive = (typeof uiPrimitiveKeys)[number]
+export type UiPrimitive = (typeof uiPrimitiveKeys)[number];
 
-export const uiPrimitiveSchema = z.enum(uiPrimitiveKeys)
+export const uiPrimitiveSchema = z.enum(uiPrimitiveKeys);
 
 /** Radius roles — single source for keys + Zod (keep in sync with `scripts/check-design-contract.mjs` allowlist). */
 export const uiRadiusKeys = [
@@ -49,9 +49,9 @@ export const uiRadiusKeys = [
   "surfaceMediaTop",
   "surfaceMediaBottom",
   "section",
-] as const
+] as const;
 
-export type UiRadiusKey = (typeof uiRadiusKeys)[number]
+export type UiRadiusKey = (typeof uiRadiusKeys)[number];
 
 export const uiRadius = {
   /** Inputs, buttons, triggers, single-line controls */
@@ -75,9 +75,9 @@ export const uiRadius = {
   surfaceMediaBottom: "*:[img:last-child]:rounded-b-2xl",
   /** Accordions, medium grouped shells */
   section: "rounded-xl",
-} as const satisfies Record<UiRadiusKey, string>
+} as const satisfies Record<UiRadiusKey, string>;
 
-export const uiRadiusKeySchema = z.enum(uiRadiusKeys)
+export const uiRadiusKeySchema = z.enum(uiRadiusKeys);
 
 export const uiRadiusClassSchema = z.enum([
   uiRadius.control,
@@ -94,37 +94,44 @@ export const uiRadiusClassSchema = z.enum([
   uiRadius.surfaceMediaTop,
   uiRadius.surfaceMediaBottom,
   uiRadius.section,
-])
+]);
 
-export type UiRadiusClass = z.infer<typeof uiRadiusClassSchema>
+export type UiRadiusClass = z.infer<typeof uiRadiusClassSchema>;
 
 export const uiTracking = {
   /** Buttons, fields, dense UI */
   control: "tracking-[0.01em]",
-} as const
+} as const;
 
 /**
  * Vertical rhythm between stacked blocks — mirrors `:root` density tokens in
  * `apps/web/app/globals.css` via Tailwind `gap-density-*` utilities from `@theme inline`.
  */
-export const uiDensityKeys = ["compact", "comfortable", "relaxed"] as const
+export const uiDensityKeys = ["compact", "comfortable", "relaxed"] as const;
 
-export type UiDensity = (typeof uiDensityKeys)[number]
+export type UiDensity = (typeof uiDensityKeys)[number];
 
 export const uiDensity = {
   compact: "gap-density-compact",
   comfortable: "gap-density-comfortable",
   relaxed: "gap-density-relaxed",
-} as const satisfies Record<UiDensity, string>
+} as const satisfies Record<UiDensity, string>;
 
-export const uiDensitySchema = z.enum(uiDensityKeys)
+export const uiDensitySchema = z.enum(uiDensityKeys);
 
 /** Keys for `--space-surface-*` in `apps/web/app/globals.css` -> `p-surface-*`, `gap-surface-*`, etc. */
-export const uiSurfaceSpaceKeys = ["xs", "sm", "md", "lg", "xl", "2xl"] as const
+export const uiSurfaceSpaceKeys = [
+  "xs",
+  "sm",
+  "md",
+  "lg",
+  "xl",
+  "2xl",
+] as const;
 
-export type UiSurfaceSpaceKey = (typeof uiSurfaceSpaceKeys)[number]
+export type UiSurfaceSpaceKey = (typeof uiSurfaceSpaceKeys)[number];
 
-export const uiSurfaceSpaceSchema = z.enum(uiSurfaceSpaceKeys)
+export const uiSurfaceSpaceSchema = z.enum(uiSurfaceSpaceKeys);
 
 /** Uniform inset per step — use partial axes (`px-surface-*`, `py-surface-*`) when needed */
 export const uiSurfaceInset = {
@@ -134,7 +141,7 @@ export const uiSurfaceInset = {
   lg: "p-surface-lg",
   xl: "p-surface-xl",
   "2xl": "p-surface-2xl",
-} as const satisfies Record<UiSurfaceSpaceKey, string>
+} as const satisfies Record<UiSurfaceSpaceKey, string>;
 
 export const uiTitle = {
   /**
@@ -142,7 +149,7 @@ export const uiTitle = {
    * Page/editorial headings inherit from `apps/web/app/globals.css` (h1-h4).
    */
   sm: "font-heading text-lg leading-tight font-semibold",
-} as const
+} as const;
 
 export const uiStatusToneKeys = [
   "neutral",
@@ -150,10 +157,10 @@ export const uiStatusToneKeys = [
   "warning",
   "info",
   "critical",
-] as const
+] as const;
 
-export type UiStatusTone = (typeof uiStatusToneKeys)[number]
-export const uiStatusToneSchema = z.enum(uiStatusToneKeys)
+export type UiStatusTone = (typeof uiStatusToneKeys)[number];
+export const uiStatusToneSchema = z.enum(uiStatusToneKeys);
 
 export const uiStatusToneClasses: Record<UiStatusTone, string> = {
   neutral: "bg-muted text-muted-foreground",
@@ -161,26 +168,26 @@ export const uiStatusToneClasses: Record<UiStatusTone, string> = {
   warning: "bg-warning/20 text-warning-foreground",
   info: "bg-info/15 text-info",
   critical: "bg-critical/15 text-critical",
-}
+};
 
 export const uiSurfaceElevation = {
   default: "shadow-elevation-1",
   raised: "shadow-elevation-2",
   floating: "shadow-elevation-3",
-} as const
+} as const;
 
 export const uiSurfaceElevationSchema = z.enum([
   "default",
   "raised",
   "floating",
-])
-export type UiSurfaceElevation = z.infer<typeof uiSurfaceElevationSchema>
+]);
+export type UiSurfaceElevation = z.infer<typeof uiSurfaceElevationSchema>;
 
-export const uiPriorityKeys = ["low", "normal", "high", "critical"] as const
+export const uiPriorityKeys = ["low", "normal", "high", "critical"] as const;
 
-export type UiPriority = (typeof uiPriorityKeys)[number]
+export type UiPriority = (typeof uiPriorityKeys)[number];
 
-export const uiPrioritySchema = z.enum(uiPriorityKeys)
+export const uiPrioritySchema = z.enum(uiPriorityKeys);
 
 export const ui = {
   radius: {
@@ -220,7 +227,7 @@ export const ui = {
     high: "ring-1 ring-border",
     critical: "ring-1 ring-critical/35",
   },
-} as const
+} as const;
 
 /** Button variants - keep in sync with `packages/ui/src/button.tsx`. */
 export const buttonVariantKeys = [
@@ -230,11 +237,11 @@ export const buttonVariantKeys = [
   "ghost",
   "destructive",
   "link",
-] as const
+] as const;
 
-export type ButtonVariant = (typeof buttonVariantKeys)[number]
+export type ButtonVariant = (typeof buttonVariantKeys)[number];
 
-export const buttonVariantSchema = z.enum(buttonVariantKeys)
+export const buttonVariantSchema = z.enum(buttonVariantKeys);
 
 /** Button sizes - keep in sync with `packages/ui/src/button.tsx`. */
 export const buttonSizeKeys = [
@@ -246,11 +253,11 @@ export const buttonSizeKeys = [
   "icon-xs",
   "icon-sm",
   "icon-lg",
-] as const
+] as const;
 
-export type ButtonSize = (typeof buttonSizeKeys)[number]
+export type ButtonSize = (typeof buttonSizeKeys)[number];
 
-export const buttonSizeSchema = z.enum(buttonSizeKeys)
+export const buttonSizeSchema = z.enum(buttonSizeKeys);
 
 /** Badge variants - keep in sync with `packages/ui/src/badge.tsx`. */
 export const badgeVariantKeys = [
@@ -264,69 +271,69 @@ export const badgeVariantKeys = [
   "outline",
   "ghost",
   "link",
-] as const
+] as const;
 
-export type BadgeVariant = (typeof badgeVariantKeys)[number]
+export type BadgeVariant = (typeof badgeVariantKeys)[number];
 
-export const badgeVariantSchema = z.enum(badgeVariantKeys)
+export const badgeVariantSchema = z.enum(badgeVariantKeys);
 
 /** Card size - keep in sync with `packages/ui/src/card.tsx`. */
-export const cardSizeKeys = ["default", "sm"] as const
+export const cardSizeKeys = ["default", "sm"] as const;
 
-export type CardSize = (typeof cardSizeKeys)[number]
+export type CardSize = (typeof cardSizeKeys)[number];
 
-export const cardSizeSchema = z.enum(cardSizeKeys)
+export const cardSizeSchema = z.enum(cardSizeKeys);
 
 /**
  * Parse untrusted props / CMS JSON. Example:
  * `buttonVariantSchema.parse(payload.variant)`
  */
 export function parseButtonVariant(value: unknown): ButtonVariant {
-  return buttonVariantSchema.parse(value)
+  return buttonVariantSchema.parse(value);
 }
 
 export function parseButtonSize(value: unknown): ButtonSize {
-  return buttonSizeSchema.parse(value)
+  return buttonSizeSchema.parse(value);
 }
 
 export function parseBadgeVariant(value: unknown): BadgeVariant {
-  return badgeVariantSchema.parse(value)
+  return badgeVariantSchema.parse(value);
 }
 
 export function parseCardSize(value: unknown): CardSize {
-  return cardSizeSchema.parse(value)
+  return cardSizeSchema.parse(value);
 }
 
 export function parseUiPrimitive(value: unknown): UiPrimitive {
-  return uiPrimitiveSchema.parse(value)
+  return uiPrimitiveSchema.parse(value);
 }
 
 export function parseUiDensity(value: unknown): UiDensity {
-  return uiDensitySchema.parse(value)
+  return uiDensitySchema.parse(value);
 }
 
 export function parseUiStatusTone(value: unknown): UiStatusTone {
-  return uiStatusToneSchema.parse(value)
+  return uiStatusToneSchema.parse(value);
 }
 
 export function parseSurfaceElevation(value: unknown): UiSurfaceElevation {
-  return uiSurfaceElevationSchema.parse(value)
+  return uiSurfaceElevationSchema.parse(value);
 }
 
 export function parseUiRadiusKey(value: unknown): UiRadiusKey {
-  return uiRadiusKeySchema.parse(value)
+  return uiRadiusKeySchema.parse(value);
 }
 
 export function parseUiRadiusClass(value: unknown): UiRadiusClass {
-  return uiRadiusClassSchema.parse(value)
+  return uiRadiusClassSchema.parse(value);
 }
 
 export function parseUiSurfaceSpaceKey(value: unknown): UiSurfaceSpaceKey {
-  return uiSurfaceSpaceSchema.parse(value)
+  return uiSurfaceSpaceSchema.parse(value);
 }
 
 export function parseUiPriority(value: unknown): UiPriority {
-  return uiPrioritySchema.parse(value)
+  return uiPrioritySchema.parse(value);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -351,14 +358,14 @@ export const uiMaterialPhaseKeys = [
   "resolving",
   "execution",
   "settled",
-] as const
+] as const;
 
-export type UiMaterialPhase = (typeof uiMaterialPhaseKeys)[number]
+export type UiMaterialPhase = (typeof uiMaterialPhaseKeys)[number];
 
-export const uiMaterialPhaseSchema = z.enum(uiMaterialPhaseKeys)
+export const uiMaterialPhaseSchema = z.enum(uiMaterialPhaseKeys);
 
 export function parseUiMaterialPhase(value: unknown): UiMaterialPhase {
-  return uiMaterialPhaseSchema.parse(value)
+  return uiMaterialPhaseSchema.parse(value);
 }
 
 /** Lynx material-aware vocabulary — mirrors ADR-0001 §13.3. */
@@ -369,12 +376,12 @@ export const uiLynxStateKeys = [
   "high-confidence",
   "warning",
   "mismatch",
-] as const
+] as const;
 
-export type UiLynxState = (typeof uiLynxStateKeys)[number]
+export type UiLynxState = (typeof uiLynxStateKeys)[number];
 
-export const uiLynxStateSchema = z.enum(uiLynxStateKeys)
+export const uiLynxStateSchema = z.enum(uiLynxStateKeys);
 
 export function parseUiLynxState(value: unknown): UiLynxState {
-  return uiLynxStateSchema.parse(value)
+  return uiLynxStateSchema.parse(value);
 }

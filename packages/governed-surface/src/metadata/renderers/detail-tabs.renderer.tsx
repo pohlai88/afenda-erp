@@ -1,8 +1,8 @@
-import { GovernedDetailTabs } from "../../components/governed-detail-tabs"
-import { GovernedEmpty } from "../../client"
-import { parseGovernedDetailTabsData } from "../../schemas/detail-tabs.schema"
+import { GovernedDetailTabs } from "../../components/governed-detail-tabs";
+import { GovernedEmpty } from "../../client";
+import { parseGovernedDetailTabsData } from "../../schemas/detail-tabs.schema";
 
-import type { GovernedComponentRendererDiagnostics } from "../registry"
+import type { GovernedComponentRendererDiagnostics } from "../registry";
 
 /**
  * governed:detail-tabs — entity detail with overview / audit / revisions.
@@ -11,10 +11,10 @@ export function DetailTabsRenderer({
   configuration,
   diagnostics = "user",
 }: {
-  configuration: unknown
-  diagnostics?: GovernedComponentRendererDiagnostics
+  configuration: unknown;
+  diagnostics?: GovernedComponentRendererDiagnostics;
 }) {
-  const parsed = parseGovernedDetailTabsData(configuration)
+  const parsed = parseGovernedDetailTabsData(configuration);
 
   if (!parsed.success) {
     return (
@@ -28,8 +28,8 @@ export function DetailTabsRenderer({
               : "This section could not be loaded safely.",
         }}
       />
-    )
+    );
   }
 
-  return <GovernedDetailTabs model={parsed.data} />
+  return <GovernedDetailTabs model={parsed.data} />;
 }

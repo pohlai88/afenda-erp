@@ -51,7 +51,9 @@ export async function listPermissionKeysForRole(role: PermissionRole) {
   return rows.map((row) => row.permissionKey);
 }
 
-export async function listPermissionKeysByRole(roles: readonly PermissionRole[]) {
+export async function listPermissionKeysByRole(
+  roles: readonly PermissionRole[],
+) {
   const uniqueRoles = [...new Set(roles)];
 
   if (uniqueRoles.length === 0) {

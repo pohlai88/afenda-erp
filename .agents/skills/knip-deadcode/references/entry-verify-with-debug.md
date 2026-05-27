@@ -24,6 +24,7 @@ knip --debug 2>&1 | grep "entry"
 ```
 
 Output shows discovered entries:
+
 ```text
 [DEBUG] Included entry files: src/index.ts, src/cli.ts
 [DEBUG] Plugin entry files: pages/index.tsx, pages/api/auth.ts
@@ -33,11 +34,7 @@ Output shows discovered entries:
 
 ```json
 {
-  "entry": [
-    "src/index.ts",
-    "src/cli.ts",
-    "src/missing-entry.ts"
-  ]
+  "entry": ["src/index.ts", "src/cli.ts", "src/missing-entry.ts"]
 }
 ```
 

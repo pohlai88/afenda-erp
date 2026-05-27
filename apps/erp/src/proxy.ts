@@ -3,10 +3,7 @@ import { isNeonAuthEnabled } from "@afenda/config/env";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
-const SESSION_REFRESH_ONLY_PREFIXES = [
-  "/sign-up",
-  "/forgot-password",
-] as const;
+const SESSION_REFRESH_ONLY_PREFIXES = ["/sign-up", "/forgot-password"] as const;
 
 function shouldRefreshSessionOnly(pathname: string) {
   return SESSION_REFRESH_ONLY_PREFIXES.some((prefix) =>

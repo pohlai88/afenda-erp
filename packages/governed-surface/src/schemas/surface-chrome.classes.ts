@@ -7,43 +7,43 @@ import type {
   GovernedSurfaceDensity,
   GovernedSurfaceElevation,
   GovernedSurfaceMaterial,
-} from "./surface-chrome.schema"
+} from "./surface-chrome.schema";
 
 export function densityGapClass(
-  density: GovernedSurfaceDensity = "comfortable"
+  density: GovernedSurfaceDensity = "comfortable",
 ): string {
   switch (density) {
     case "compact":
-      return "gap-density-compact"
+      return "gap-density-compact";
     case "relaxed":
-      return "gap-density-relaxed"
+      return "gap-density-relaxed";
     case "comfortable":
-      return "gap-density-comfortable"
+      return "gap-density-comfortable";
   }
 }
 
 export function elevationClass(
-  elevation: GovernedSurfaceElevation = "card"
+  elevation: GovernedSurfaceElevation = "card",
 ): string {
   switch (elevation) {
     case "flat":
-      return "shadow-none"
+      return "shadow-none";
     case "raised":
-      return "shadow-elevation-2"
+      return "shadow-elevation-2";
     case "card":
-      return "shadow-elevation-1"
+      return "shadow-elevation-1";
   }
 }
 
 export function surfaceMaterialClass(
-  surface: GovernedSurfaceMaterial = "solid"
+  surface: GovernedSurfaceMaterial = "solid",
 ): string {
   switch (surface) {
     case "muted":
-      return "bg-muted/30"
+      return "bg-muted/30";
     case "subtle":
-      return "bg-card/60"
+      return "bg-card/60";
     case "solid":
-      return "bg-card"
+      return "bg-card";
   }
 }

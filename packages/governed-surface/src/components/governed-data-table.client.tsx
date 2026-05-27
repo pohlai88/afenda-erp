@@ -1,11 +1,11 @@
-"use client"
+"use client";
 
 import {
   flexRender,
   getCoreRowModel,
   useReactTable,
   type ColumnDef,
-} from "@tanstack/react-table"
+} from "@tanstack/react-table";
 
 import {
   Table,
@@ -14,13 +14,13 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@afenda/ui/table"
+} from "@afenda/ui/table";
 
 export type GovernedDataTableClientProps<TData> = {
-  data: TData[]
-  columns: ColumnDef<TData, unknown>[]
-  getRowId: (originalRow: TData, index: number) => string
-}
+  data: TData[];
+  columns: ColumnDef<TData, unknown>[];
+  getRowId: (originalRow: TData, index: number) => string;
+};
 
 export function GovernedDataTableClient<TData>({
   data,
@@ -34,7 +34,7 @@ export function GovernedDataTableClient<TData>({
     columns,
     getCoreRowModel: getCoreRowModel(),
     getRowId,
-  })
+  });
 
   return (
     <Table>
@@ -47,7 +47,7 @@ export function GovernedDataTableClient<TData>({
                   ? null
                   : flexRender(
                       header.column.columnDef.header,
-                      header.getContext()
+                      header.getContext(),
                     )}
               </TableHead>
             ))}
@@ -66,5 +66,5 @@ export function GovernedDataTableClient<TData>({
         ))}
       </TableBody>
     </Table>
-  )
+  );
 }

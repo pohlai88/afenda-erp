@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import type { Route } from "next"
+import { useState } from "react";
+import type { Route } from "next";
 import {
   Check,
   ChevronDown,
@@ -9,64 +9,64 @@ import {
   Search,
   SlidersHorizontal,
   X,
-} from "lucide-react"
+} from "lucide-react";
 
-import { useRouter } from "next/navigation"
-import { Badge } from "@afenda/ui/badge"
-import { Button } from "@afenda/ui/button"
+import { useRouter } from "next/navigation";
+import { Badge } from "@afenda/ui/badge";
+import { Button } from "@afenda/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@afenda/ui/dropdown-menu"
-import { Input } from "@afenda/ui/input"
-import { NativeSelect, NativeSelectOption } from "@afenda/ui/native-select"
+} from "@afenda/ui/dropdown-menu";
+import { Input } from "@afenda/ui/input";
+import { NativeSelect, NativeSelectOption } from "@afenda/ui/native-select";
 import {
   buildGovernedListToolbarClearHref,
   buildGovernedListToolbarParamHref,
   governedListToolbarOwnedParams,
   governedListToolbarResetParams,
-} from "../../client"
-import type { ListSurfaceToolbar } from "../../schemas/list-surface-toolbar.schema"
-import type { uiDensity } from "@afenda/ui/design-system"
-import { cn } from "@afenda/ui/utils"
+} from "../../client";
+import type { ListSurfaceToolbar } from "../../schemas/list-surface-toolbar.schema";
+import type { uiDensity } from "@afenda/ui/design-system";
+import { cn } from "@afenda/ui/utils";
 
 export type ListSurfaceToolbarClientProps = {
-  toolbar?: ListSurfaceToolbar
-  density: keyof typeof uiDensity
-  onDensityChange?: (density: keyof typeof uiDensity) => void
-  hiddenColumnIds?: ReadonlySet<string>
-  onToggleColumn?: (columnId: string) => void
-  columnIds?: readonly string[]
-  exportFormId?: string
-  exportTriggerElementId?: string
-  selectedCount?: number
-  selectionLabel?: string
-}
+  toolbar?: ListSurfaceToolbar;
+  density: keyof typeof uiDensity;
+  onDensityChange?: (density: keyof typeof uiDensity) => void;
+  hiddenColumnIds?: ReadonlySet<string>;
+  onToggleColumn?: (columnId: string) => void;
+  columnIds?: readonly string[];
+  exportFormId?: string;
+  exportTriggerElementId?: string;
+  selectedCount?: number;
+  selectionLabel?: string;
+};
 
 function currentToolbarHref(): string {
   if (typeof window === "undefined") {
-    return "http://localhost/playground/metadata-renderer-gallery"
+    return "http://localhost/playground/metadata-renderer-gallery";
   }
   return (
     window.location.href ||
     "http://localhost/playground/metadata-renderer-gallery"
-  )
+  );
 }
 
 function toolbarParamHref(
   toolbar: ListSurfaceToolbar,
   param: string,
-  value: string
+  value: string,
 ): Route {
   return buildGovernedListToolbarParamHref({
     currentHref: currentToolbarHref(),
     param,
     value,
     resetParams: governedListToolbarResetParams(toolbar),
-  }) as Route
+  }) as Route;
 }
 
 function toolbarClearHref(toolbar: ListSurfaceToolbar): Route {
@@ -74,7 +74,7 @@ function toolbarClearHref(toolbar: ListSurfaceToolbar): Route {
     currentHref: currentToolbarHref(),
     ownedParams: governedListToolbarOwnedParams(toolbar),
     resetParams: governedListToolbarResetParams(toolbar),
-  }) as Route
+  }) as Route;
 }
 
 export function ListSurfaceToolbarClient({
@@ -89,11 +89,11 @@ export function ListSurfaceToolbarClient({
   selectedCount = 0,
   selectionLabel,
 }: ListSurfaceToolbarClientProps) {
-  const router = useRouter()
-  const [showColumns, setShowColumns] = useState(false)
+  const router = useRouter();
+  const [showColumns, setShowColumns] = useState(false);
 
   if (!toolbar) {
-    return null
+    return null;
   }
 
   const activeFilterChips = [
@@ -109,19 +109,19 @@ export function ListSurfaceToolbarClient({
       .map((filter) => {
         const optionLabel =
           filter.options.find((option) => option.value === filter.value)
-            ?.label ?? filter.value
+            ?.label ?? filter.value;
         return {
           key: `filter:${filter.id}`,
           label: `${filter.label}: ${optionLabel}`,
           clearHref: toolbarParamHref(toolbar, filter.param, ""),
-        }
+        };
       }),
     toolbar.sort?.value
       ? {
           key: "sort",
           label: `${toolbar.sort.label}: ${
             toolbar.sort.options.find(
-              (option) => option.value === toolbar.sort?.value
+              (option) => option.value === toolbar.sort?.value,
             )?.label ?? toolbar.sort.value
           }`,
           clearHref: toolbar.sort
@@ -130,9 +130,9 @@ export function ListSurfaceToolbarClient({
         }
       : null,
   ].filter((chip): chip is { key: string; label: string; clearHref: Route } =>
-    Boolean(chip)
-  )
-  const savedViewItems = toolbar.savedView?.items ?? []
+    Boolean(chip),
+  );
+  const savedViewItems = toolbar.savedView?.items ?? [];
 
   return (
     <div
@@ -175,11 +175,13 @@ export function ListSurfaceToolbarClient({
           className="flex min-w-48 items-center gap-1"
           role="search"
           onSubmit={(event) => {
-            event.preventDefault()
-            const data = new FormData(event.currentTarget)
-            const next = String(data.get(toolbar.search?.param ?? "") ?? "")
+            event.preventDefault();
+            const data = new FormData(event.currentTarget);
+            const next = String(data.get(toolbar.search?.param ?? "") ?? "");
             if (toolbar.search) {
-              router.push(toolbarParamHref(toolbar, toolbar.search.param, next))
+              router.push(
+                toolbarParamHref(toolbar, toolbar.search.param, next),
+              );
             }
           }}
         >
@@ -210,8 +212,8 @@ export function ListSurfaceToolbarClient({
                 toolbarParamHref(
                   toolbar,
                   filter.param,
-                  event.currentTarget.value
-                )
+                  event.currentTarget.value,
+                ),
               )
             }
           >
@@ -238,8 +240,8 @@ export function ListSurfaceToolbarClient({
                     toolbarParamHref(
                       toolbar,
                       toolbar.sort.param,
-                      event.currentTarget.value
-                    )
+                      event.currentTarget.value,
+                    ),
                   )
                 : undefined
             }
@@ -283,7 +285,7 @@ export function ListSurfaceToolbarClient({
           disabled={!toolbar.savedView.href}
           onClick={() => {
             if (toolbar.savedView?.href) {
-              router.push(toolbar.savedView.href as Route)
+              router.push(toolbar.savedView.href as Route);
             }
           }}
         >
@@ -317,7 +319,7 @@ export function ListSurfaceToolbarClient({
           {showColumns ? (
             <div
               className={cn(
-                "absolute end-0 top-full z-10 mt-1 min-w-[10rem] rounded-md border border-border bg-popover p-2 shadow-md"
+                "absolute end-0 top-full z-10 mt-1 min-w-[10rem] rounded-md border border-border bg-popover p-2 shadow-md",
               )}
               role="menu"
             >
@@ -370,5 +372,5 @@ export function ListSurfaceToolbarClient({
         </Button>
       ))}
     </div>
-  )
+  );
 }

@@ -1,3 +1,4 @@
+import { getVercelDrainSecret } from "@afenda/config/env";
 import {
   getRequestId,
   logServerEvent,
@@ -15,7 +16,7 @@ export async function POST(request: Request) {
     module: "observability",
     operation: "drain.ingest",
   };
-  const signatureSecret = process.env.VERCEL_DRAIN_SECRET;
+  const signatureSecret = getVercelDrainSecret();
 
   if (!signatureSecret) {
     logServerEvent("error", "Drain secret is not configured.", context, {

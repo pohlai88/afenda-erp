@@ -40,6 +40,7 @@ jobs:
 ```
 
 **Priority order:**
+
 1. Production mode failures are critical (affects users)
 2. Default mode failures are important (affects developers)
 

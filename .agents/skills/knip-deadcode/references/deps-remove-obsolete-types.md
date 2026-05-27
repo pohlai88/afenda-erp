@@ -41,6 +41,7 @@ Knip reports: `@types/axios` is unused (axios includes types).
 3. Run `knip` - it detects unused @types packages
 
 **When to keep @types packages:**
+
 - Package has no bundled types
 - You need a different version of types than bundled
 

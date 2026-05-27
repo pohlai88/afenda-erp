@@ -1,13 +1,13 @@
-import { Skeleton } from "@afenda/ui/skeleton"
+import { Skeleton } from "@afenda/ui/skeleton";
 
-import type { AfendaGovernedRendererId } from "./registry"
+import type { AfendaGovernedRendererId } from "./registry";
 
 export type GovernedComponentSkeletonProps = {
-  rendererId: AfendaGovernedRendererId
-}
+  rendererId: AfendaGovernedRendererId;
+};
 
 function assertNever(value: never): never {
-  throw new Error(`Unhandled governed renderer skeleton: ${value}`)
+  throw new Error(`Unhandled governed renderer skeleton: ${value}`);
 }
 
 export function GovernedComponentSkeleton({
@@ -27,7 +27,7 @@ export function GovernedComponentSkeleton({
             ))}
           </div>
         </section>
-      )
+      );
 
     case "list-surface":
       return (
@@ -47,7 +47,7 @@ export function GovernedComponentSkeleton({
             ))}
           </div>
         </div>
-      )
+      );
 
     case "section":
       return (
@@ -65,7 +65,7 @@ export function GovernedComponentSkeleton({
             <Skeleton className="h-32 w-full rounded-xl" />
           </div>
         </div>
-      )
+      );
 
     case "stack":
       return (
@@ -77,7 +77,7 @@ export function GovernedComponentSkeleton({
           <Skeleton className="h-28 min-w-0 rounded-xl" />
           <Skeleton className="h-28 min-w-0 rounded-xl" />
         </div>
-      )
+      );
 
     case "action-bar":
       return (
@@ -90,7 +90,7 @@ export function GovernedComponentSkeleton({
           <Skeleton className="h-9 w-28 rounded-md" />
           <Skeleton className="h-9 w-20 rounded-md" />
         </div>
-      )
+      );
 
     case "audit-panel":
     case "detail-tabs":
@@ -103,7 +103,7 @@ export function GovernedComponentSkeleton({
           <Skeleton className="h-8 w-64" />
           <Skeleton className="h-56 w-full rounded-xl" />
         </div>
-      )
+      );
 
     case "approval-timeline":
       return (
@@ -116,7 +116,7 @@ export function GovernedComponentSkeleton({
             <Skeleton key={index} className="h-12 w-full rounded-lg" />
           ))}
         </div>
-      )
+      );
 
     case "chart":
       return (
@@ -135,7 +135,7 @@ export function GovernedComponentSkeleton({
             ))}
           </div>
         </div>
-      )
+      );
 
     case "kanban-board":
       return (
@@ -150,7 +150,7 @@ export function GovernedComponentSkeleton({
             ))}
           </div>
         </section>
-      )
+      );
 
     case "multi-step-form":
     case "scorecard-form":
@@ -163,7 +163,7 @@ export function GovernedComponentSkeleton({
           <Skeleton className="h-8 w-56" />
           <Skeleton className="h-48 w-full rounded-xl" />
         </div>
-      )
+      );
 
     case "empty":
       return (
@@ -172,8 +172,8 @@ export function GovernedComponentSkeleton({
           aria-hidden="true"
           data-testid="governed-skeleton-empty"
         />
-      )
+      );
   }
 
-  return assertNever(rendererId)
+  return assertNever(rendererId);
 }

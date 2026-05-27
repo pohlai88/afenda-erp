@@ -1,16 +1,16 @@
-import type { ReactNode } from "react"
+import type { ReactNode } from "react";
 
 import type {
   GovernedKanbanBoardConfiguration,
   KanbanCard,
   KanbanCardTransitionAvailability,
-} from "../../schemas/kanban-board.schema"
+} from "../../schemas/kanban-board.schema";
 import {
   GovernedKanbanTransitionHint,
   governedKanbanCardTestId,
   isKanbanCardTransitionRenderable,
   resolveKanbanBoardDomProps,
-} from "../../client"
+} from "../../client";
 
 import {
   groupCardsByColumn,
@@ -19,32 +19,32 @@ import {
   KanbanCardTile,
   KanbanColumnPanel,
   resolveKanbanColumns,
-} from "./kanban-board-presentation"
+} from "./kanban-board-presentation";
 
 export {
   groupCardsByColumn,
   KANBAN_DATA_NATURE_CLASS,
   kanbanGridClass,
   resolveKanbanColumns,
-} from "./kanban-board-presentation"
+} from "./kanban-board-presentation";
 
 export type KanbanBoardViewProps = {
-  board: GovernedKanbanBoardConfiguration
+  board: GovernedKanbanBoardConfiguration;
   /** When set, board and cards use stable Playwright ids (`governed-kanban-board:{key}`). */
-  surfaceKey?: string
+  surfaceKey?: string;
   /** Server Actions / forms — required for `footer-actions` interaction mode. */
-  renderCardFooter?: (card: KanbanCard) => ReactNode
-}
+  renderCardFooter?: (card: KanbanCard) => ReactNode;
+};
 
 export function KanbanBoardView({
   board,
   surfaceKey,
   renderCardFooter,
 }: KanbanBoardViewProps) {
-  const columns = resolveKanbanColumns(board)
-  const cardsByColumn = groupCardsByColumn(board.cards)
+  const columns = resolveKanbanColumns(board);
+  const cardsByColumn = groupCardsByColumn(board.cards);
 
-  const boardDom = resolveKanbanBoardDomProps(surfaceKey)
+  const boardDom = resolveKanbanBoardDomProps(surfaceKey);
 
   return (
     <section
@@ -55,8 +55,8 @@ export function KanbanBoardView({
     >
       <div className={kanbanGridClass(columns.length)}>
         {columns.map((column) => {
-          const cards = cardsByColumn.get(column.id) ?? []
-          const headingId = `kanban-column-${column.id}-title`
+          const cards = cardsByColumn.get(column.id) ?? [];
+          const headingId = `kanban-column-${column.id}-title`;
 
           return (
             <KanbanColumnPanel
@@ -96,20 +96,20 @@ export function KanbanBoardView({
                 </li>
               )}
             />
-          )
+          );
         })}
       </div>
     </section>
-  )
+  );
 }
 
 function KanbanTransitionHints({
   transitions,
 }: {
-  transitions: readonly KanbanCardTransitionAvailability[]
+  transitions: readonly KanbanCardTransitionAvailability[];
 }) {
-  const visible = transitions.filter(isKanbanCardTransitionRenderable)
-  if (visible.length === 0) return null
+  const visible = transitions.filter(isKanbanCardTransitionRenderable);
+  if (visible.length === 0) return null;
 
   return (
     <ul
@@ -122,5 +122,5 @@ function KanbanTransitionHints({
         </li>
       ))}
     </ul>
-  )
+  );
 }

@@ -1,15 +1,15 @@
-import { z } from "zod"
+import { z } from "zod";
 
-import type { SchemaStability } from "./_stability.shared"
+import type { SchemaStability } from "./_stability.shared";
 
-import { pageHeaderSchema } from "./page-header.schema"
-import { governedSurfaceChromeSchema } from "./surface-chrome.schema"
+import { pageHeaderSchema } from "./page-header.schema";
+import { governedSurfaceChromeSchema } from "./surface-chrome.schema";
 
 export const GOVERNED_SECTION_CONFIGURATION_SCHEMA_ID =
-  "governed.section.configuration" as const
+  "governed.section.configuration" as const;
 
 export const GOVERNED_SECTION_CONFIGURATION_SCHEMA_STABILITY: SchemaStability =
-  "beta"
+  "beta";
 
 /**
  * Section container configuration.
@@ -23,16 +23,16 @@ export const governedSectionConfigurationSchema = z
     chrome: governedSurfaceChromeSchema.optional(),
     children: z.array(z.unknown()).min(1),
   })
-  .strict()
+  .strict();
 
 export type GovernedSectionConfiguration = z.infer<
   typeof governedSectionConfigurationSchema
->
+>;
 
 export type GovernedSectionConfigurationInput = z.input<
   typeof governedSectionConfigurationSchema
->
+>;
 
 export function parseGovernedSectionConfiguration(raw: unknown) {
-  return governedSectionConfigurationSchema.safeParse(raw)
+  return governedSectionConfigurationSchema.safeParse(raw);
 }

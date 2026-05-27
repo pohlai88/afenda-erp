@@ -39,7 +39,9 @@ function getUploadModule(moduleId: UploadTokenPayload["moduleId"]) {
   return moduleDefinition;
 }
 
-async function requireUploadCapability(moduleId: UploadTokenPayload["moduleId"]) {
+async function requireUploadCapability(
+  moduleId: UploadTokenPayload["moduleId"],
+) {
   const moduleDefinition = getUploadModule(moduleId);
   const session = await getSession();
 
@@ -53,7 +55,9 @@ async function requireUploadCapability(moduleId: UploadTokenPayload["moduleId"])
     throw new UploadRouteError(409, uploadRouteCopy.organizationRequired);
   }
 
-  if (!organization.capabilities.includes(moduleDefinition.requiredCapability)) {
+  if (
+    !organization.capabilities.includes(moduleDefinition.requiredCapability)
+  ) {
     throw new UploadRouteError(403, uploadRouteCopy.uploadNotAllowed);
   }
 

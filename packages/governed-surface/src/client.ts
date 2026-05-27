@@ -6,62 +6,62 @@
 export {
   GovernedDataTableClient,
   type GovernedDataTableClientProps,
-} from "./components/governed-data-table.client"
+} from "./components/governed-data-table.client";
 
 export {
   GovernedTrailingActionSlot,
   type GovernedTrailingActionSlotProps,
-} from "./components/governed-trailing-action-slot.client"
+} from "./components/governed-trailing-action-slot.client";
 
-export { GovernedMetadataTrailingCell } from "./components/governed-metadata-trailing-cell.client"
+export { GovernedMetadataTrailingCell } from "./components/governed-metadata-trailing-cell.client";
 
 export type {
   GovernedListTrailingCellProps,
   GovernedPatternCTrailingColumnSpec,
-} from "./governed-pattern-c-trailing-column.shared"
+} from "./governed-pattern-c-trailing-column.shared";
 
 export {
   GovernedKanbanFooterBoard,
   type GovernedKanbanFooterBoardProps,
-} from "./components/governed-kanban-footer-board.client"
+} from "./components/governed-kanban-footer-board.client";
 
 export {
   GovernedKanbanDragBoard,
   type GovernedKanbanDragBoardProps,
-} from "./components/governed-kanban-drag-board.client"
+} from "./components/governed-kanban-drag-board.client";
 
 export {
   GovernedKanbanTransitionHint,
   type GovernedKanbanTransitionHintProps,
-} from "./components/governed-kanban-transition-hint.client"
+} from "./components/governed-kanban-transition-hint.client";
 
 export {
   GovernedEmpty,
   type GovernedEmptyProps,
-} from "./components/governed-empty"
+} from "./components/governed-empty";
 
 export {
   GovernedSection,
   type GovernedSectionProps,
-} from "./components/governed-section"
+} from "./components/governed-section";
 
 export {
   ActionFormErrors,
   type ActionFormErrorsProps,
-} from "./components/action-form-errors"
+} from "./components/action-form-errors";
 
 export {
   isListSurfaceTrailingActionRenderable,
   listSurfaceRowTrailingActionHidden,
   resolveListSurfaceRowTrailingAction,
   type ResolveListSurfaceRowTrailingActionInput,
-} from "./list-surface-trailing-action.shared"
+} from "./list-surface-trailing-action.shared";
 
 export {
   buildGovernedListSurfaceDataAttributes,
   governedListRowTestId,
   governedListSurfaceTestId,
-} from "./list-surface-identity.shared"
+} from "./list-surface-identity.shared";
 
 export {
   DEFAULT_GOVERNED_LIST_TOOLBAR_RESET_PARAMS,
@@ -73,22 +73,22 @@ export {
   governedListToolbarResetParams,
   type GovernedListSavedViewItem,
   type GovernedListSavedViewSource,
-} from "./list-surface-toolbar-url.shared"
+} from "./list-surface-toolbar-url.shared";
 
 export {
   resolveFormFieldRuleState,
   type FormFieldRuleState,
   type FormRuleValues,
-} from "./form-rules.evaluate.shared"
+} from "./form-rules.evaluate.shared";
 
-export type { ListSurfaceRowTrailingAction } from "./schemas/list-surface-row-trailing-action.schema"
+export type { ListSurfaceRowTrailingAction } from "./schemas/list-surface-row-trailing-action.schema";
 
 export type {
   ListSurfacePresentation,
   ListSurfaceRow,
   ListSurfaceRowDecisionLedger,
   ListSurfaceRowTone,
-} from "./schemas/list-surface-renderer.schema"
+} from "./schemas/list-surface-renderer.schema";
 
 export {
   parseGovernedChartConfiguration,
@@ -102,7 +102,7 @@ export {
   type GovernedChartConfiguration,
   type GovernedChartConfigurationInput,
   type GovernedChartKind,
-} from "./schemas/chart.schema"
+} from "./schemas/chart.schema";
 
 export {
   parseGovernedApprovalTimelineConfiguration,
@@ -111,7 +111,7 @@ export {
   type ApprovalTimelineStepStatus,
   type GovernedApprovalTimelineConfiguration,
   type GovernedApprovalTimelineConfigurationInput,
-} from "./schemas/approval-timeline.schema"
+} from "./schemas/approval-timeline.schema";
 
 export {
   type ListSurfaceToolbar,
@@ -124,7 +124,7 @@ export {
   type ListSurfaceToolbarSearch,
   type ListSurfaceToolbarSort,
   type ListSurfaceToolbarSortOption,
-} from "./schemas/list-surface-toolbar.schema"
+} from "./schemas/list-surface-toolbar.schema";
 
 export {
   parseGovernedKanbanBoardConfiguration,
@@ -137,7 +137,7 @@ export {
   type KanbanColumn,
   type KanbanInteractionMode,
   type KanbanWorkflowTransition,
-} from "./schemas/kanban-board.schema"
+} from "./schemas/kanban-board.schema";
 
 export {
   buildKanbanCardMovePayload,
@@ -145,7 +145,7 @@ export {
   resolveKanbanCardDropState,
   type KanbanCardDropState,
   type KanbanCardMovePayload,
-} from "./kanban-card-drop.shared"
+} from "./kanban-card-drop.shared";
 
 export {
   buildKanbanOutgoingTransitionHints,
@@ -154,14 +154,14 @@ export {
   resolveKanbanCardTransition,
   type KanbanOutgoingTransitionTargetInput,
   type ResolveKanbanCardTransitionInput,
-} from "./kanban-card-transition.shared"
+} from "./kanban-card-transition.shared";
 
 export {
   governedKanbanBoardTestId,
   governedKanbanCardTestId,
   governedKanbanSectionTestId,
   resolveKanbanBoardDomProps,
-} from "./kanban-surface-identity.shared"
+} from "./kanban-surface-identity.shared";
 
 export {
   governedComponentDiscriminatedSchema,
@@ -169,4 +169,4 @@ export {
   parseGovernedComponentData,
   type GovernedComponent,
   type GovernedComponentType,
-} from "./schemas/component.schema"
+} from "./schemas/component.schema";

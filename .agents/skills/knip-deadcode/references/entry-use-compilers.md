@@ -34,22 +34,23 @@ The Vue plugin automatically compiles `.vue` files and extracts imports.
 
 ```typescript
 // knip.config.ts
-import type { KnipConfig } from 'knip'
+import type { KnipConfig } from "knip";
 
 const config: KnipConfig = {
   compilers: {
     mdx: (source) => {
       // Extract imports from MDX
-      const imports = source.match(/import .+ from ['"].+['"]/g)
-      return imports?.join('\n') ?? ''
-    }
-  }
-}
+      const imports = source.match(/import .+ from ['"].+['"]/g);
+      return imports?.join("\n") ?? "";
+    },
+  },
+};
 
-export default config
+export default config;
 ```
 
 **Built-in compiler support:**
+
 - Vue (via plugin)
 - Svelte (via plugin)
 - Astro (via plugin)

@@ -1,0 +1,37 @@
+---
+description: Afenda monorepo boundaries, tenancy, and architecture authority
+alwaysApply: true
+---
+
+# Afenda core architecture
+
+Canonical doctrine: `docs/architecture/` (`ARCH-001`–`ARCH-007`). Index: `docs/architecture/README.md`.
+
+**Authority when docs conflict:** ARCH-002 (feature packages) → ARCH-001 (runtime) → update the other doc in the same PR.
+
+## Layout
+
+- `apps/erp` — only deployable Next.js app (`@afenda/erp`).
+- `packages/*` — workspace libraries; `packages/features/*` is ready but **empty** until first extraction.
+- No `apps/erp/src/components/ui/` — primitives live in `@afenda/ui`.
+- Library packages emit `dist/**`; app emits `.next/**` (exclude `.next/cache/**` from Turborepo cache).
+
+## Imports
+
+| From | May import |
+| ---- | ---------- |
+| `apps/erp` | `@afenda/feature-*`, `@afenda/domain`, platform packages |
+| `@afenda/feature-*` | domain, db, auth, governed-surface, ui, workflows, observability — **not** `apps/erp` |
+| `@afenda/ui` | Primitives only — no db, auth server, AI, or governed metadata |
+
+Use explicit export subpaths (`./server`, `./client`, `./metadata`). Client code must not pull server-only graphs.
+
+## Tenancy and security
+
+- Resolve org from server session; never use client `organizationId` as source of truth.
+- Enforce capabilities at mutation and sensitive read boundaries, not only in navigation/proxy.
+- Validate boundaries with Zod (forms, query params, webhooks, AI structured output).
+
+## Verification
+
+Run `pnpm architecture:check` on layout/export/doc changes. Run `pnpm lint:governed-renderers` when touching governed renderers or registry.

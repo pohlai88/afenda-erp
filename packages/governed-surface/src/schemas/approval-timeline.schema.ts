@@ -1,19 +1,19 @@
-import { z } from "zod"
+import { z } from "zod";
 
-import type { SchemaStability } from "./_stability.shared"
+import type { SchemaStability } from "./_stability.shared";
 
-import { governedSurfaceChromeSchema } from "./surface-chrome.schema"
+import { governedSurfaceChromeSchema } from "./surface-chrome.schema";
 
 export const GOVERNED_APPROVAL_TIMELINE_SCHEMA_ID =
-  "governed.approval-timeline.configuration" as const
+  "governed.approval-timeline.configuration" as const;
 
 export const GOVERNED_APPROVAL_TIMELINE_SCHEMA_STABILITY: SchemaStability =
-  "beta"
+  "beta";
 
-export const approvalTimelineDataNatureSchema = z.enum(["approval-flow"])
+export const approvalTimelineDataNatureSchema = z.enum(["approval-flow"]);
 export type ApprovalTimelineDataNature = z.infer<
   typeof approvalTimelineDataNatureSchema
->
+>;
 
 export const approvalTimelineStepStatusSchema = z.enum([
   "pending",
@@ -21,7 +21,7 @@ export const approvalTimelineStepStatusSchema = z.enum([
   "complete",
   "rejected",
   "skipped",
-])
+]);
 
 export const approvalTimelineStepSchema = z
   .object({
@@ -41,12 +41,12 @@ export const approvalTimelineStepSchema = z
               .enum(["default", "positive", "attention", "critical"])
               .optional(),
           })
-          .strict()
+          .strict(),
       )
       .optional(),
     note: z.string().trim().min(1).optional(),
   })
-  .strict()
+  .strict();
 
 export const governedApprovalTimelineConfigurationSchema = z
   .object({
@@ -58,7 +58,7 @@ export const governedApprovalTimelineConfigurationSchema = z
   })
   .strict()
   .superRefine((config, ctx) => {
-    const seen = new Set<string>()
+    const seen = new Set<string>();
 
     for (const [index, step] of config.steps.entries()) {
       if (seen.has(step.id)) {
@@ -66,27 +66,27 @@ export const governedApprovalTimelineConfigurationSchema = z
           code: z.ZodIssueCode.custom,
           message: "Step ids must be unique.",
           path: ["steps", index, "id"],
-        })
+        });
       }
 
-      seen.add(step.id)
+      seen.add(step.id);
     }
-  })
+  });
 
 export type ApprovalTimelineStepStatus = z.infer<
   typeof approvalTimelineStepStatusSchema
->
+>;
 
-export type ApprovalTimelineStep = z.infer<typeof approvalTimelineStepSchema>
+export type ApprovalTimelineStep = z.infer<typeof approvalTimelineStepSchema>;
 
 export type GovernedApprovalTimelineConfiguration = z.infer<
   typeof governedApprovalTimelineConfigurationSchema
->
+>;
 
 export type GovernedApprovalTimelineConfigurationInput = z.input<
   typeof governedApprovalTimelineConfigurationSchema
->
+>;
 
 export function parseGovernedApprovalTimelineConfiguration(raw: unknown) {
-  return governedApprovalTimelineConfigurationSchema.safeParse(raw)
+  return governedApprovalTimelineConfigurationSchema.safeParse(raw);
 }

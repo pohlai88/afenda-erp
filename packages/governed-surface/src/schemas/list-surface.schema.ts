@@ -1,10 +1,10 @@
-import { z } from "zod"
+import { z } from "zod";
 
-import type { SchemaStability } from "./_stability.shared"
+import type { SchemaStability } from "./_stability.shared";
 
-import { pageHeaderSchema } from "./page-header.schema"
+import { pageHeaderSchema } from "./page-header.schema";
 
-export const SCHEMA_STABILITY: SchemaStability = "beta"
+export const SCHEMA_STABILITY: SchemaStability = "beta";
 
 /**
  * Tone enum shared between stat-card and list-surface badge cells. Mirrors
@@ -17,7 +17,7 @@ export const listCellToneSchema = z.enum([
   "positive",
   "attention",
   "critical",
-])
+]);
 
 /**
  * Cell-kind discriminator (governed:list-surface cells).
@@ -82,7 +82,7 @@ export const listCellKindSchema = z.discriminatedUnion("kind", [
       overflow: z.number().int().nonnegative().optional(),
     })
     .strict(),
-])
+]);
 
 export const listColumnSchema = z
   .object({
@@ -109,7 +109,7 @@ export const listColumnSchema = z
     cellKind: listCellKindSchema.optional(),
     enableClientSort: z.boolean().optional(),
   })
-  .strict()
+  .strict();
 
 export const emptyStateSchema = z
   .object({
@@ -124,7 +124,7 @@ export const emptyStateSchema = z
       .strict()
       .optional(),
   })
-  .strict()
+  .strict();
 
 export const listSurfaceSchema = z
   .object({
@@ -142,18 +142,18 @@ export const listSurfaceSchema = z
       .strict()
       .optional(),
   })
-  .strict()
+  .strict();
 
-export type ListColumn = z.infer<typeof listColumnSchema>
-export type ListCellKind = z.infer<typeof listCellKindSchema>
-export type ListCellTone = z.infer<typeof listCellToneSchema>
-export type EmptyState = z.infer<typeof emptyStateSchema>
-export type ListSurface = z.infer<typeof listSurfaceSchema>
+export type ListColumn = z.infer<typeof listColumnSchema>;
+export type ListCellKind = z.infer<typeof listCellKindSchema>;
+export type ListCellTone = z.infer<typeof listCellToneSchema>;
+export type EmptyState = z.infer<typeof emptyStateSchema>;
+export type ListSurface = z.infer<typeof listSurfaceSchema>;
 
 export function parseEmptyStateData(raw: unknown) {
-  return emptyStateSchema.safeParse(raw)
+  return emptyStateSchema.safeParse(raw);
 }
 
 export function parseListSurfaceData(raw: unknown) {
-  return listSurfaceSchema.safeParse(raw)
+  return listSurfaceSchema.safeParse(raw);
 }

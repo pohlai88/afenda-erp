@@ -1,21 +1,21 @@
-import { GovernedEmpty } from "../../client"
+import { GovernedEmpty } from "../../client";
 import {
   GOVERNED_MULTI_STEP_FORM_SCHEMA_ID,
   parseGovernedMultiStepFormConfiguration,
-} from "../../schemas/multi-step-form.schema"
+} from "../../schemas/multi-step-form.schema";
 
-import type { GovernedComponentRendererDiagnostics } from "../registry"
+import type { GovernedComponentRendererDiagnostics } from "../registry";
 
-import { MultiStepFormSurface } from "./multi-step-form.client"
+import { MultiStepFormSurface } from "./multi-step-form.client";
 
 export function MultiStepFormRenderer({
   configuration,
   diagnostics = "user",
 }: {
-  configuration: unknown
-  diagnostics?: GovernedComponentRendererDiagnostics
+  configuration: unknown;
+  diagnostics?: GovernedComponentRendererDiagnostics;
 }) {
-  const parsed = parseGovernedMultiStepFormConfiguration(configuration)
+  const parsed = parseGovernedMultiStepFormConfiguration(configuration);
 
   if (!parsed.success) {
     return (
@@ -29,8 +29,8 @@ export function MultiStepFormRenderer({
               : "This form could not be loaded safely.",
         }}
       />
-    )
+    );
   }
 
-  return <MultiStepFormSurface form={parsed.data} />
+  return <MultiStepFormSurface form={parsed.data} />;
 }

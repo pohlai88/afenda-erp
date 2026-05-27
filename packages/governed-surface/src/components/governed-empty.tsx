@@ -1,36 +1,36 @@
-import type { Route } from "next"
+import type { Route } from "next";
 
-import Link from "next/link"
+import Link from "next/link";
 
-import { Button } from "@afenda/ui/button"
-import { Empty, EmptyDescription, EmptyTitle } from "@afenda/ui/empty"
-import { ui } from "@afenda/ui/design-system"
-import { cn } from "@afenda/ui/utils"
+import { Button } from "@afenda/ui/button";
+import { Empty, EmptyDescription, EmptyTitle } from "@afenda/ui/empty";
+import { ui } from "@afenda/ui/design-system";
+import { cn } from "@afenda/ui/utils";
 
-import type { EmptyState } from "../schemas/list-surface.schema"
+import type { EmptyState } from "../schemas/list-surface.schema";
 
 export type GovernedEmptyProps = {
-  model: EmptyState
-  className?: string
-}
+  model: EmptyState;
+  className?: string;
+};
 
 const variantClassName: Record<EmptyState["variant"], string> = {
   muted: "border-dashed border-border bg-transparent",
   cta: cn(
     "border-solid border-border bg-card",
     ui.radius.card,
-    ui.elevation.card
+    ui.elevation.card,
   ),
   forbidden: cn(
     "border-solid border-border bg-muted/30",
     ui.radius.card,
-    ui.elevation.card
+    ui.elevation.card,
   ),
   error: cn(
     "border-solid border-destructive/40 bg-destructive/5",
-    ui.radius.card
+    ui.radius.card,
   ),
-}
+};
 
 export function GovernedEmpty({ model, className }: GovernedEmptyProps) {
   return (
@@ -38,7 +38,7 @@ export function GovernedEmpty({ model, className }: GovernedEmptyProps) {
       className={cn(
         "border p-8 text-center sm:p-10",
         variantClassName[model.variant],
-        className
+        className,
       )}
     >
       <EmptyTitle>{model.title}</EmptyTitle>
@@ -53,5 +53,5 @@ export function GovernedEmpty({ model, className }: GovernedEmptyProps) {
         </Button>
       ) : null}
     </Empty>
-  )
+  );
 }

@@ -14,7 +14,7 @@ Use JSDoc tags to mark intentionally public exports. Configure Knip to exclude t
 ```typescript
 // src/index.ts
 /** This is part of the public API */
-export const publicUtil = () => {}
+export const publicUtil = () => {};
 ```
 
 Knip reports: `publicUtil` is unused.
@@ -27,7 +27,7 @@ Knip reports: `publicUtil` is unused.
  * This is part of the public API
  * @public
  */
-export const publicUtil = () => {}
+export const publicUtil = () => {};
 ```
 
 ```json

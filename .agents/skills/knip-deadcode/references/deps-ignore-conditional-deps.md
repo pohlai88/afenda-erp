@@ -13,11 +13,11 @@ Dependencies loaded conditionally at runtime (based on environment, platform, or
 
 ```typescript
 // src/database.ts
-let driver
-if (process.env.DB_TYPE === 'postgres') {
-  driver = require('pg')
+let driver;
+if (process.env.DB_TYPE === "postgres") {
+  driver = require("pg");
 } else {
-  driver = require('mysql2')
+  driver = require("mysql2");
 }
 ```
 

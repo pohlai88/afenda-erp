@@ -1,0 +1,18 @@
+# Keep Cursor index focused on source and canonical docs (see .gitignore for VCS).
+
+node_modules/
+.turbo/
+**/.next/
+**/dist/
+.vercel/
+.codex-runtime/
+*.tsbuildinfo
+
+.artifacts/
+**/coverage/
+**/test-results/
+**/playwright-report/
+**/blob-report/
+**/.vitest-reports/
+
+pnpm-lock.yaml

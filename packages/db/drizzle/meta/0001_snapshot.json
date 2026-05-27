@@ -109,12 +109,8 @@
           "name": "audit_logs_organization_id_organizations_id_fk",
           "tableFrom": "audit_logs",
           "tableTo": "organizations",
-          "columnsFrom": [
-            "organization_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["organization_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -300,12 +296,8 @@
           "name": "organization_memberships_organization_id_organizations_id_fk",
           "tableFrom": "organization_memberships",
           "tableTo": "organizations",
-          "columnsFrom": [
-            "organization_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["organization_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -488,12 +480,8 @@
           "name": "role_permissions_permission_key_permissions_key_fk",
           "tableFrom": "role_permissions",
           "tableTo": "permissions",
-          "columnsFrom": [
-            "permission_key"
-          ],
-          "columnsTo": [
-            "key"
-          ],
+          "columnsFrom": ["permission_key"],
+          "columnsTo": ["key"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -501,10 +489,7 @@
       "compositePrimaryKeys": {
         "role_permissions_pk": {
           "name": "role_permissions_pk",
-          "columns": [
-            "role",
-            "permission_key"
-          ]
+          "columns": ["role", "permission_key"]
         }
       },
       "uniqueConstraints": {},
@@ -517,12 +502,7 @@
     "public.audit_entity_type": {
       "name": "audit_entity_type",
       "schema": "public",
-      "values": [
-        "organization",
-        "membership",
-        "user-profile",
-        "system"
-      ]
+      "values": ["organization", "membership", "user-profile", "system"]
     },
     "public.organization_role": {
       "name": "organization_role",

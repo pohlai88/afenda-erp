@@ -85,6 +85,14 @@ function getPrimaryEvidence(input: {
   ];
 }
 
+function resolveModuleIdFromEvidence(
+  evidence: readonly ReturnType<typeof evidenceRecordSchema.parse>[],
+  fallback: ModuleId,
+): ModuleId {
+  const primary = evidence[0];
+  return primary?.moduleId ?? fallback;
+}
+
 function toGroundedEvidence(input: {
   evidence: readonly ReturnType<typeof evidenceRecordSchema.parse>[];
   confidence?: number;
@@ -112,7 +120,8 @@ function getWorkItemPreview(workItem: unknown, index: number) {
           : typeof record.title === "string"
             ? record.title
             : `Work item ${index + 1}`,
-      priority: typeof record.priority === "string" ? record.priority : undefined,
+      priority:
+        typeof record.priority === "string" ? record.priority : undefined,
       status: typeof record.status === "string" ? record.status : undefined,
     };
   }
@@ -131,7 +140,9 @@ function titleCase(value: string) {
     .join(" ");
 }
 
-export function createSolutionProviderTools<TWorkspace extends ErpAssistantToolWorkspace>(input: {
+export function createSolutionProviderTools<
+  TWorkspace extends ErpAssistantToolWorkspace,
+>(input: {
   organization: ErpAssistantToolOrganization;
   session: ErpAssistantToolSession;
   model: string;
@@ -142,9 +153,7 @@ export function createSolutionProviderTools<TWorkspace extends ErpAssistantToolW
     moduleDefinition: ErpAssistantToolModule;
     workspace: TWorkspace;
   }>;
-  getWorkspaceStats: (
-    workspace: TWorkspace,
-  ) => ErpAssistantToolWorkspaceStats;
+  getWorkspaceStats: (workspace: TWorkspace) => ErpAssistantToolWorkspaceStats;
   registerSolutionActionProposal: (
     proposal: RegisterSolutionActionProposalInput,
   ) => Promise<string>;
@@ -184,37 +193,40 @@ export function createSolutionProviderTools<TWorkspace extends ErpAssistantToolW
           : toolModuleBindings.analyzeProfitAndLoss;
         const inspected = await Promise.all(modules.map(inspectModule));
 
-        return inspected.slice(0, 6).map(({ moduleDefinition, stats, evidence }, index) =>
-          rootCauseAnalysisSchema.parse({
-            id: `${problem.problemType}-${index + 1}`,
-            title: `${moduleDefinition.label} pressure`,
-            moduleId: evidence[0]?.moduleId ?? "finance",
-            severity:
-              stats.highPriorityWorkItemCount > 0 || stats.workItemCount > 4
-                ? "high"
-                : stats.recordCount > 0
-                  ? "medium"
-                  : "low",
-            confidence: stats.recordCount > 0 ? "medium" : "low",
-            evidence,
-            confidenceBreakdown: scoreAiConfidence({
-              evidenceCount: evidence.length,
-              directSourceCount: evidence.length,
-              missingDataCount: stats.recordCount > 0 ? 0 : 1,
-              userGoal: problem.userGoal,
-              taskRiskLevel:
+        return inspected
+          .slice(0, 6)
+          .map(({ moduleDefinition, stats, evidence }, index) =>
+            rootCauseAnalysisSchema.parse({
+              id: `${problem.problemType}-${index + 1}`,
+              title: `${moduleDefinition.label} pressure`,
+              moduleId: resolveModuleIdFromEvidence(evidence, "finance"),
+              severity:
                 stats.highPriorityWorkItemCount > 0 || stats.workItemCount > 4
                   ? "high"
-                  : "medium",
+                  : stats.recordCount > 0
+                    ? "medium"
+                    : "low",
+              confidence: stats.recordCount > 0 ? "medium" : "low",
+              evidence,
+              confidenceBreakdown: scoreAiConfidence({
+                evidenceCount: evidence.length,
+                directSourceCount: evidence.length,
+                missingDataCount: stats.recordCount > 0 ? 0 : 1,
+                userGoal: problem.userGoal,
+                taskRiskLevel:
+                  stats.highPriorityWorkItemCount > 0 || stats.workItemCount > 4
+                    ? "high"
+                    : "medium",
+              }),
+              explanation: `${moduleDefinition.label} has ${stats.recordCount} records, ${stats.workItemCount} workflow items, and ${stats.documentCount} documents available for recovery analysis.`,
+              missingData:
+                stats.recordCount > 0
+                  ? []
+                  : [
+                      `Persist ${moduleDefinition.label.toLowerCase()} transaction records before estimating financial impact.`,
+                    ],
             }),
-            explanation:
-              `${moduleDefinition.label} has ${stats.recordCount} records, ${stats.workItemCount} workflow items, and ${stats.documentCount} documents available for recovery analysis.`,
-            missingData:
-              stats.recordCount > 0
-                ? []
-                : [`Persist ${moduleDefinition.label.toLowerCase()} transaction records before estimating financial impact.`],
-          }),
-        );
+          );
       },
     }),
     findRevenueLeakage: tool({
@@ -228,28 +240,31 @@ export function createSolutionProviderTools<TWorkspace extends ErpAssistantToolW
           toolModuleBindings.findRevenueLeakage.map(inspectModule),
         );
 
-        return inspected.map(({ moduleDefinition, workspace, evidence }, index) =>
-          rootCauseAnalysisSchema.parse({
-            id: `revenue-leakage-${index + 1}`,
-            title: `${moduleDefinition.label} revenue leakage check`,
-            moduleId: evidence[0]?.moduleId ?? "sales",
-            severity: workspace.workItems.length > 0 ? "medium" : "low",
-            confidence: workspace.records.length > 0 ? "medium" : "low",
-            evidence,
-            confidenceBreakdown: scoreAiConfidence({
-              evidenceCount: evidence.length,
-              directSourceCount: evidence.length,
-              missingDataCount: workspace.records.length > 0 ? 0 : 1,
-              userGoal: problem.userGoal,
-              taskRiskLevel: workspace.workItems.length > 0 ? "medium" : "low",
+        return inspected.map(
+          ({ moduleDefinition, workspace, evidence }, index) =>
+            rootCauseAnalysisSchema.parse({
+              id: `revenue-leakage-${index + 1}`,
+              title: `${moduleDefinition.label} revenue leakage check`,
+              moduleId: resolveModuleIdFromEvidence(evidence, "sales"),
+              severity: workspace.workItems.length > 0 ? "medium" : "low",
+              confidence: workspace.records.length > 0 ? "medium" : "low",
+              evidence,
+              confidenceBreakdown: scoreAiConfidence({
+                evidenceCount: evidence.length,
+                directSourceCount: evidence.length,
+                missingDataCount: workspace.records.length > 0 ? 0 : 1,
+                userGoal: problem.userGoal,
+                taskRiskLevel:
+                  workspace.workItems.length > 0 ? "medium" : "low",
+              }),
+              explanation: `${moduleDefinition.label} was checked for blocked orders, stalled accounts, receivables pressure, and stale reporting signals for ${problem.userGoal}.`,
+              missingData:
+                workspace.records.length > 0
+                  ? []
+                  : [
+                      `Add ${moduleDefinition.label.toLowerCase()} records to quantify leakage.`,
+                    ],
             }),
-            explanation:
-              `${moduleDefinition.label} was checked for blocked orders, stalled accounts, receivables pressure, and stale reporting signals for ${problem.userGoal}.`,
-            missingData:
-              workspace.records.length > 0
-                ? []
-                : [`Add ${moduleDefinition.label.toLowerCase()} records to quantify leakage.`],
-          }),
         );
       },
     }),
@@ -268,7 +283,7 @@ export function createSolutionProviderTools<TWorkspace extends ErpAssistantToolW
           rootCauseAnalysisSchema.parse({
             id: `cost-driver-${index + 1}`,
             title: `${moduleDefinition.label} cost driver`,
-            moduleId: evidence[0]?.moduleId ?? "purchasing",
+            moduleId: resolveModuleIdFromEvidence(evidence, "purchasing"),
             severity: stats.highPriorityWorkItemCount > 0 ? "high" : "medium",
             confidence: stats.recordCount > 0 ? "medium" : "low",
             evidence,
@@ -280,12 +295,13 @@ export function createSolutionProviderTools<TWorkspace extends ErpAssistantToolW
               taskRiskLevel:
                 stats.highPriorityWorkItemCount > 0 ? "high" : "medium",
             }),
-            explanation:
-              `${moduleDefinition.label} was reviewed for supplier holds, stock exposure, invoice holds, approval delay, and recoverable cost pressure for ${problem.userGoal}.`,
+            explanation: `${moduleDefinition.label} was reviewed for supplier holds, stock exposure, invoice holds, approval delay, and recoverable cost pressure for ${problem.userGoal}.`,
             missingData:
               stats.documentCount > 0
                 ? []
-                : [`Attach supplier invoices, receipts, or stock documents for stronger cost attribution.`],
+                : [
+                    `Attach supplier invoices, receipts, or stock documents for stronger cost attribution.`,
+                  ],
           }),
         );
       },
@@ -305,7 +321,7 @@ export function createSolutionProviderTools<TWorkspace extends ErpAssistantToolW
           rootCauseAnalysisSchema.parse({
             id: `cash-conversion-${index + 1}`,
             title: `${moduleDefinition.label} cash conversion signal`,
-            moduleId: evidence[0]?.moduleId ?? "finance",
+            moduleId: resolveModuleIdFromEvidence(evidence, "finance"),
             severity: stats.workItemCount > 2 ? "medium" : "low",
             confidence: stats.recordCount > 0 ? "medium" : "low",
             evidence,
@@ -316,8 +332,7 @@ export function createSolutionProviderTools<TWorkspace extends ErpAssistantToolW
               userGoal: "Review cash conversion risk.",
               taskRiskLevel: stats.workItemCount > 2 ? "medium" : "low",
             }),
-            explanation:
-              `${moduleDefinition.label} contributes to cash conversion through receivables, order handoff, supplier timing, or approval throughput.`,
+            explanation: `${moduleDefinition.label} contributes to cash conversion through receivables, order handoff, supplier timing, or approval throughput.`,
             missingData: [],
           }),
         );
@@ -338,7 +353,7 @@ export function createSolutionProviderTools<TWorkspace extends ErpAssistantToolW
           rootCauseAnalysisSchema.parse({
             id: `inventory-risk-${index + 1}`,
             title: `${moduleDefinition.label} inventory risk`,
-            moduleId: evidence[0]?.moduleId ?? "inventory",
+            moduleId: resolveModuleIdFromEvidence(evidence, "inventory"),
             severity: stats.highPriorityWorkItemCount > 0 ? "high" : "medium",
             confidence: stats.recordCount > 0 ? "medium" : "low",
             evidence,
@@ -350,10 +365,13 @@ export function createSolutionProviderTools<TWorkspace extends ErpAssistantToolW
               taskRiskLevel:
                 stats.highPriorityWorkItemCount > 0 ? "high" : "medium",
             }),
-            explanation:
-              `${moduleDefinition.label} was assessed for blocked demand, delayed replenishment, and stock exposure.`,
+            explanation: `${moduleDefinition.label} was assessed for blocked demand, delayed replenishment, and stock exposure.`,
             missingData:
-              stats.recordCount > 0 ? [] : ["Persist SKU, order, and receipt records to quantify inventory exposure."],
+              stats.recordCount > 0
+                ? []
+                : [
+                    "Persist SKU, order, and receipt records to quantify inventory exposure.",
+                  ],
           }),
         );
       },
@@ -373,7 +391,7 @@ export function createSolutionProviderTools<TWorkspace extends ErpAssistantToolW
           rootCauseAnalysisSchema.parse({
             id: `approval-throughput-${index + 1}`,
             title: `${moduleDefinition.label} approval throughput signal`,
-            moduleId: evidence[0]?.moduleId ?? "approvals",
+            moduleId: resolveModuleIdFromEvidence(evidence, "approvals"),
             severity:
               stats.highPriorityWorkItemCount > 0 || stats.workItemCount > 2
                 ? "high"
@@ -388,12 +406,13 @@ export function createSolutionProviderTools<TWorkspace extends ErpAssistantToolW
               taskRiskLevel:
                 stats.highPriorityWorkItemCount > 0 ? "high" : "medium",
             }),
-            explanation:
-              `${moduleDefinition.label} contributes to approval throughput through queue depth, escalations, or missing owner checks.`,
+            explanation: `${moduleDefinition.label} contributes to approval throughput through queue depth, escalations, or missing owner checks.`,
             missingData:
               stats.workItemCount > 0
                 ? []
-                : ["Persist approval queue records to quantify cycle-time drag."],
+                : [
+                    "Persist approval queue records to quantify cycle-time drag.",
+                  ],
           }),
         );
       },
@@ -413,7 +432,7 @@ export function createSolutionProviderTools<TWorkspace extends ErpAssistantToolW
           rootCauseAnalysisSchema.parse({
             id: `audit-readiness-${index + 1}`,
             title: `${moduleDefinition.label} audit readiness signal`,
-            moduleId: evidence[0]?.moduleId ?? "reports",
+            moduleId: resolveModuleIdFromEvidence(evidence, "reports"),
             severity: stats.recordCount === 0 ? "medium" : "low",
             confidence: stats.recordCount > 0 ? "medium" : "low",
             evidence,
@@ -424,12 +443,13 @@ export function createSolutionProviderTools<TWorkspace extends ErpAssistantToolW
               userGoal: "Review audit readiness and control evidence.",
               taskRiskLevel: "medium",
             }),
-            explanation:
-              `${moduleDefinition.label} was reviewed for control evidence, report freshness, unresolved approvals, and admin posture gaps.`,
+            explanation: `${moduleDefinition.label} was reviewed for control evidence, report freshness, unresolved approvals, and admin posture gaps.`,
             missingData:
               stats.recordCount > 0
                 ? []
-                : ["Persist control and report records to quantify audit readiness gaps."],
+                : [
+                    "Persist control and report records to quantify audit readiness gaps.",
+                  ],
           }),
         );
       },
@@ -452,7 +472,7 @@ export function createSolutionProviderTools<TWorkspace extends ErpAssistantToolW
           organizationId: organization.id,
           modules: inspected.map(
             ({ moduleDefinition, workspace, stats, evidence }) => ({
-              moduleId: evidence[0]?.moduleId ?? "finance",
+              moduleId: resolveModuleIdFromEvidence(evidence, "finance"),
               moduleLabel: moduleDefinition.label,
               ownerTeam: moduleDefinition.ownerTeam,
               dataMode: workspace.dataMode,
@@ -467,8 +487,9 @@ export function createSolutionProviderTools<TWorkspace extends ErpAssistantToolW
           maxTokens: 2400,
         });
 
-        const orderedActions = inspected.slice(0, 5).map(
-          ({ moduleDefinition, stats, evidence }, index) => {
+        const orderedActions = inspected
+          .slice(0, 5)
+          .map(({ moduleDefinition, stats, evidence }, index) => {
             const riskLevel =
               stats.highPriorityWorkItemCount > 0 ? "high" : "medium";
             const confidenceBreakdown = scoreAiConfidence({
@@ -481,7 +502,7 @@ export function createSolutionProviderTools<TWorkspace extends ErpAssistantToolW
             const sourceRecordIds = evidence.map((item) => item.recordId);
             const actionSandbox = createActionSandbox({
               organizationId: organization.id,
-              moduleId: evidence[0]?.moduleId ?? "finance",
+              moduleId: resolveModuleIdFromEvidence(evidence, "finance"),
               actionType: "recovery-task-draft",
               title: `Stabilize ${moduleDefinition.label.toLowerCase()} pressure`,
               riskLevel,
@@ -507,7 +528,7 @@ export function createSolutionProviderTools<TWorkspace extends ErpAssistantToolW
             return actionCandidateSchema.parse({
               id: `recovery-action-${index + 1}`,
               title: `Stabilize ${moduleDefinition.label.toLowerCase()} pressure`,
-              moduleId: evidence[0]?.moduleId ?? "finance",
+              moduleId: resolveModuleIdFromEvidence(evidence, "finance"),
               ownerTeam: moduleDefinition.ownerTeam,
               priority: riskLevel === "high" ? "high" : "medium",
               expectedImpact:
@@ -523,8 +544,7 @@ export function createSolutionProviderTools<TWorkspace extends ErpAssistantToolW
               confidenceBreakdown,
               actionSandbox,
             });
-          },
-        );
+          });
 
         return recoveryPlaybookSchema.parse({
           workflowId,

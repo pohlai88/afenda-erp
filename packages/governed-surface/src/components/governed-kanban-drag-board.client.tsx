@@ -1,25 +1,25 @@
-"use client"
+"use client";
 
-import { useTranslations } from "../i18n/governed-surface-copy.client"
+import { useTranslations } from "../i18n/governed-surface-copy.client";
 
-import { KanbanBoardDragView } from "../metadata/renderers/kanban-board-drag-view.client"
+import { KanbanBoardDragView } from "../metadata/renderers/kanban-board-drag-view.client";
 
 import {
   parseGovernedKanbanBoardConfiguration,
   type GovernedKanbanBoardConfigurationInput,
   type KanbanCardMovePayload,
-} from "../client"
+} from "../client";
 
-import { GovernedEmpty } from "./governed-empty"
+import { GovernedEmpty } from "./governed-empty";
 
 export type GovernedKanbanDragBoardProps = {
-  configuration: GovernedKanbanBoardConfigurationInput
-  surfaceKey?: string
-  onCardMove: (payload: KanbanCardMovePayload) => void
-  isMovePending?: boolean
-  pendingCardId?: string | null
-  showOperatorDiagnostics?: boolean
-}
+  configuration: GovernedKanbanBoardConfigurationInput;
+  surfaceKey?: string;
+  onCardMove: (payload: KanbanCardMovePayload) => void;
+  isMovePending?: boolean;
+  pendingCardId?: string | null;
+  showOperatorDiagnostics?: boolean;
+};
 
 /**
  * Client bridge for `interactionMode: "drag-reorder"` kanban boards.
@@ -33,8 +33,8 @@ export function GovernedKanbanDragBoard({
   pendingCardId = null,
   showOperatorDiagnostics = false,
 }: GovernedKanbanDragBoardProps) {
-  const t = useTranslations("Erp.GovernedSurface.kanban")
-  const parsed = parseGovernedKanbanBoardConfiguration(configuration)
+  const t = useTranslations("Erp.GovernedSurface.kanban");
+  const parsed = parseGovernedKanbanBoardConfiguration(configuration);
 
   if (!parsed.success) {
     return (
@@ -47,7 +47,7 @@ export function GovernedKanbanDragBoard({
             : t("invalidConfigDescription"),
         }}
       />
-    )
+    );
   }
 
   if (parsed.data.interactionMode !== "drag-reorder") {
@@ -59,7 +59,7 @@ export function GovernedKanbanDragBoard({
           description: t("invalidInteractionModeDrag"),
         }}
       />
-    )
+    );
   }
 
   return (
@@ -70,5 +70,5 @@ export function GovernedKanbanDragBoard({
       isMovePending={isMovePending}
       pendingCardId={pendingCardId}
     />
-  )
+  );
 }

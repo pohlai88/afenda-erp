@@ -1,11 +1,11 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Accordion as AccordionPrimitive } from "radix-ui"
+import * as React from "react";
+import { Accordion as AccordionPrimitive } from "radix-ui";
 
-import { cn } from "./utils"
-import { ui, uiTracking } from "./design-system"
-import { ChevronDownIcon, ChevronUpIcon } from "lucide-react"
+import { cn } from "./utils";
+import { ui, uiTracking } from "./design-system";
+import { ChevronDownIcon, ChevronUpIcon } from "lucide-react";
 
 function Accordion({
   className,
@@ -17,11 +17,11 @@ function Accordion({
       className={cn(
         "flex w-full flex-col overflow-hidden border",
         ui.radius.panel,
-        className
+        className,
       )}
       {...props}
     />
-  )
+  );
 }
 
 function AccordionItem({
@@ -34,7 +34,7 @@ function AccordionItem({
       className={cn("not-last:border-b data-open:bg-muted/50", className)}
       {...props}
     />
-  )
+  );
 }
 
 function AccordionTrigger({
@@ -49,7 +49,7 @@ function AccordionTrigger({
         className={cn(
           "group/accordion-trigger relative flex flex-1 items-start justify-between gap-6 border border-transparent p-4 text-left text-sm font-medium transition-all outline-none hover:underline disabled:pointer-events-none disabled:opacity-50 **:data-[slot=accordion-trigger-icon]:ml-auto **:data-[slot=accordion-trigger-icon]:size-4 **:data-[slot=accordion-trigger-icon]:text-muted-foreground",
           uiTracking.control,
-          className
+          className,
         )}
         {...props}
       >
@@ -64,7 +64,7 @@ function AccordionTrigger({
         />
       </AccordionPrimitive.Trigger>
     </AccordionPrimitive.Header>
-  )
+  );
 }
 
 function AccordionContent({
@@ -81,13 +81,13 @@ function AccordionContent({
       <div
         className={cn(
           "h-(--radix-accordion-content-height) pt-0 pb-4 [&_a]:underline [&_a]:underline-offset-3 [&_a]:hover:text-foreground [&_p:not(:last-child)]:mb-4",
-          className
+          className,
         )}
       >
         {children}
       </div>
     </AccordionPrimitive.Content>
-  )
+  );
 }
 
-export { Accordion, AccordionItem, AccordionTrigger, AccordionContent }
+export { Accordion, AccordionItem, AccordionTrigger, AccordionContent };

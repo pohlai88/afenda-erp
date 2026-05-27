@@ -13,7 +13,7 @@ Direct imports of transitive dependencies (packages installed as dependencies of
 
 ```typescript
 // src/utils.ts
-import debug from 'debug'  // Not in package.json
+import debug from "debug"; // Not in package.json
 // Works because 'express' depends on 'debug'
 ```
 
@@ -39,6 +39,7 @@ Knip reports: `debug` is unlisted.
 ```
 
 **Why this matters:**
+
 - Express may remove debug as a dependency in future versions
 - Transitive dependencies may have different versions than expected
 - Package managers may not install expected transitive dependencies

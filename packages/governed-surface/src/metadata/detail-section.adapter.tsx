@@ -1,9 +1,9 @@
-import type { ReactNode } from "react"
+import type { ReactNode } from "react";
 
-import { parseGovernedComponentData } from "../client"
-import type { GovernedDetailSection } from "../schemas/detail-tabs.schema"
+import { parseGovernedComponentData } from "../client";
+import type { GovernedDetailSection } from "../schemas/detail-tabs.schema";
 
-import { GovernedComponentRenderer } from "./render-governed-component"
+import { GovernedComponentRenderer } from "./render-governed-component";
 
 /**
  * Resolves `rendererKey` to presentation for a governed detail section.
@@ -14,7 +14,7 @@ import { GovernedComponentRenderer } from "./render-governed-component"
  * `GovernedComponentTree` shows the standard "section unavailable" fallback.
  */
 export function resolveGovernedDetailSectionContent(
-  section: GovernedDetailSection
+  section: GovernedDetailSection,
 ): ReactNode {
   const candidate: Record<string, unknown> = {
     type: section.rendererKey,
@@ -23,12 +23,12 @@ export function resolveGovernedDetailSectionContent(
       section.rendererProps === undefined
         ? undefined
         : (section.rendererProps as Record<string, unknown>),
-  }
+  };
 
-  const parsed = parseGovernedComponentData(candidate)
+  const parsed = parseGovernedComponentData(candidate);
   if (!parsed.success) {
-    return null
+    return null;
   }
 
-  return <GovernedComponentRenderer component={parsed.data} />
+  return <GovernedComponentRenderer component={parsed.data} />;
 }

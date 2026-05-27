@@ -40,6 +40,7 @@ Only hides unused file reports; unused exports and dependencies in generated fil
 ```
 
 **Available targeted ignore options:**
+
 - `ignoreDependencies`: Suppress unused dependency reports
 - `ignoreFiles`: Exclude from unused files detection only
 - `ignoreBinaries`: Exclude missing binaries

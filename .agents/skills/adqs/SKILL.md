@@ -18,23 +18,23 @@ This skill is **embedded in** `.cursor/rules/ask-docs-directory.mdc`. Agents edi
 
 ## Embedded skills (repo-local)
 
-| Skill | Path | Role in ADQS |
-| --- | --- | --- |
-| `documentation-audit` | `.agents/skills/documentation-audit/SKILL.md` | Phase 1 — verify paths, permissions, audit strings against code |
-| `technical-writing` | `.agents/skills/technical-writing/SKILL.md` | Phase 2 — internal-guide prose, headings, operator clarity |
-| `fumadocs-mdx-structure` | user skill (Claude) | MDX frontmatter + section skeleton |
-| `fumadocs-component-docs` | user skill (Claude) | `<Steps>`, `<Callout>`, `<Cards>`, `<Accordions>` |
+| Skill                     | Path                                          | Role in ADQS                                                    |
+| ------------------------- | --------------------------------------------- | --------------------------------------------------------------- |
+| `documentation-audit`     | `.agents/skills/documentation-audit/SKILL.md` | Phase 1 — verify paths, permissions, audit strings against code |
+| `technical-writing`       | `.agents/skills/technical-writing/SKILL.md`   | Phase 2 — internal-guide prose, headings, operator clarity      |
+| `fumadocs-mdx-structure`  | user skill (Claude)                           | MDX frontmatter + section skeleton                              |
+| `fumadocs-component-docs` | user skill (Claude)                           | `<Steps>`, `<Callout>`, `<Cards>`, `<Accordions>`               |
 
 ## Six dimensions (/10 each)
 
-| # | Dimension | 95% requires |
-| --- | --- | --- |
-| 1 | Frontmatter | `title`, `description` (≥8 chars, not duplicate of first paragraph), `audience`, `status`, contextual Lucide `icon`; `lastReviewedAt` when `status: stable` |
-| 2 | Structure | `## Overview` → `## Before you start` → workflow → optional `## Troubleshooting` → `## Related` |
-| 3 | Fumadocs components | Non-placeholder `<Steps>` (≥3 when workflow exists); ≥1 `<Callout>`; `<Cards>` in Related; `<Tabs>` / `<Accordions>` when multi-path or FAQ |
-| 4 | Code-verified accuracy | Paths match App Router; read-only vs mutate correct; step-up and audit match implementation |
-| 5 | Link graph | ≥2 `/ask-docs/…` links; hub + module doc where applicable; passes `lint:ask-docs-links` |
-| 6 | LLM / search | No stub comments; clear `##` headings; no "relevant workspace" on `audience: employee` portal pages |
+| #   | Dimension              | 95% requires                                                                                                                                                |
+| --- | ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | Frontmatter            | `title`, `description` (≥8 chars, not duplicate of first paragraph), `audience`, `status`, contextual Lucide `icon`; `lastReviewedAt` when `status: stable` |
+| 2   | Structure              | `## Overview` → `## Before you start` → workflow → optional `## Troubleshooting` → `## Related`                                                             |
+| 3   | Fumadocs components    | Non-placeholder `<Steps>` (≥3 when workflow exists); ≥1 `<Callout>`; `<Cards>` in Related; `<Tabs>` / `<Accordions>` when multi-path or FAQ                 |
+| 4   | Code-verified accuracy | Paths match App Router; read-only vs mutate correct; step-up and audit match implementation                                                                 |
+| 5   | Link graph             | ≥2 `/ask-docs/…` links; hub + module doc where applicable; passes `lint:ask-docs-links`                                                                     |
+| 6   | LLM / search           | No stub comments; clear `##` headings; no "relevant workspace" on `audience: employee` portal pages                                                         |
 
 **Gold patterns:** `content/ask-docs/getting-started/quick-start.mdx`, `content/ask-docs/hrm/documents.mdx`, `content/ask-docs/portals/employee.mdx`.
 
@@ -67,10 +67,15 @@ Section order (mandatory unless archetype exempts):
 
 ```mdx
 ## Overview
+
 ## Before you start
+
 <!-- workflow: <Steps> with ≥3 <Step> when actions exist -->
-## Troubleshooting   <!-- optional; use <Accordions> for FAQ -->
+
+## Troubleshooting <!-- optional; use <Accordions> for FAQ -->
+
 ## Related
+
 <Cards>...</Cards>
 ```
 

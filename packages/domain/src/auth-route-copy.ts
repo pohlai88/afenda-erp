@@ -20,7 +20,8 @@ export const authPageMetadataCopy = {
   },
   signUp: {
     title: "Create account",
-    description: "Create an operator account and verify your email to continue.",
+    description:
+      "Create an operator account and verify your email to continue.",
   },
   forgotPassword: {
     title: "Reset password",
@@ -136,8 +137,7 @@ export const forgotPasswordCopy = {
   title: "Reset your password",
   requestDescription:
     "We will email a one-time code you can use to choose a new password.",
-  resetDescription:
-    "Enter the code from your email and set a new password.",
+  resetDescription: "Enter the code from your email and set a new password.",
   fields: {
     email: "Email",
     verificationCode: "Verification code",
@@ -214,7 +214,5 @@ export function getAuthPageShellCopy(key: AuthPageMetadataKey) {
 }
 
 export function getNeonAuthFormModeCopy(mode: "sign-in" | "sign-up") {
-  return mode === "sign-in"
-    ? neonAuthFormCopy.signIn
-    : neonAuthFormCopy.signUp;
+  return mode === "sign-in" ? neonAuthFormCopy.signIn : neonAuthFormCopy.signUp;
 }

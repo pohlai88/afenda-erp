@@ -1,19 +1,19 @@
-import type { Route } from "next"
-import type { ReactNode } from "react"
+import type { Route } from "next";
+import type { ReactNode } from "react";
 
-import { Button } from "@afenda/ui/button"
-import { ModulePageHeader } from "./module-page-header"
-import Link from "next/link"
-import { cn } from "@afenda/ui/utils"
+import { Button } from "@afenda/ui/button";
+import { ModulePageHeader } from "./module-page-header";
+import Link from "next/link";
+import { cn } from "@afenda/ui/utils";
 
-import type { PageHeader } from "../schemas/page-header.schema"
+import type { PageHeader } from "../schemas/page-header.schema";
 
 export type GovernedSurfaceProps = {
-  header: PageHeader
-  children: ReactNode
-  actions?: ReactNode
-  className?: string
-}
+  header: PageHeader;
+  children: ReactNode;
+  actions?: ReactNode;
+  className?: string;
+};
 
 /**
  * Thin RSC shell — composes approved primitives only (renderer capability ceiling).
@@ -25,8 +25,8 @@ export function GovernedSurface({
   actions,
   className,
 }: GovernedSurfaceProps) {
-  const backHref = header.backHref
-  const backLabel = header.backLabel
+  const backHref = header.backHref;
+  const backLabel = header.backLabel;
 
   return (
     <div className={cn("space-y-surface-lg", className)}>
@@ -49,5 +49,5 @@ export function GovernedSurface({
       </div>
       {children}
     </div>
-  )
+  );
 }

@@ -15,10 +15,7 @@ import {
   isAiSensitiveContentError,
 } from "@afenda/ai";
 import { getApiAuthContext } from "@afenda/auth/server";
-import {
-  createAiUsageEvent,
-  registerAiApprovalProposal,
-} from "@afenda/db";
+import { createAiUsageEvent, registerAiApprovalProposal } from "@afenda/db";
 import {
   getErpModuleById,
   getModuleWorkspace,
@@ -27,10 +24,7 @@ import {
   resolveWorkspaceDataMode,
 } from "@afenda/domain";
 import { getRequestId, logServerEvent } from "@afenda/observability";
-import {
-  createAgentUIStreamResponse,
-  type UIMessage,
-} from "ai";
+import { createAgentUIStreamResponse, type UIMessage } from "ai";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { solutionProviderRequestSchema } from "@/lib/api/ai-request-schemas";
@@ -130,7 +124,8 @@ export async function POST(request: Request) {
       organization,
       session: activeSession,
       model,
-      getModuleDefinition: (moduleId) => getErpModuleById(moduleId) ?? undefined,
+      getModuleDefinition: (moduleId) =>
+        getErpModuleById(moduleId) ?? undefined,
       getAllowedWorkspace,
       getWorkspaceStats: getModuleWorkspaceStats,
       registerSolutionActionProposal: async (proposal) =>
@@ -233,9 +228,9 @@ export async function POST(request: Request) {
             ? "Invalid Solution Provider request."
             : isAiBudgetError(error)
               ? "Solution Provider request exceeds the configured AI budget."
-            : isAiSensitiveContentError(error)
-              ? "Solution Provider request contains credential-like sensitive content."
-            : "Solution Provider failed.",
+              : isAiSensitiveContentError(error)
+                ? "Solution Provider request contains credential-like sensitive content."
+                : "Solution Provider failed.",
       },
       {
         status: isAiBudgetError(error)

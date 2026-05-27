@@ -44,7 +44,11 @@ const checks: readonly Check[] = [
   {
     name: "Document extraction is schema constrained",
     file: "apps/erp/src/app/api/ai/extract/route.ts",
-    patterns: ["Output.object", "documentExtractionSchema", "requireCapability"],
+    patterns: [
+      "Output.object",
+      "documentExtractionSchema",
+      "requireCapability",
+    ],
   },
   {
     name: "Cron routes require CRON_SECRET",

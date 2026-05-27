@@ -1,17 +1,17 @@
-"use client"
+"use client";
 
-import { useSyncExternalStore } from "react"
+import { useSyncExternalStore } from "react";
 
 function subscribe() {
-  return () => {}
+  return () => {};
 }
 
 function getSnapshot() {
-  return true
+  return true;
 }
 
 function getServerSnapshot() {
-  return false
+  return false;
 }
 
 /**
@@ -19,5 +19,5 @@ function getServerSnapshot() {
  * client pass so server HTML matches before interactive state is applied.
  */
 export function useHydrated() {
-  return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot)
+  return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 }

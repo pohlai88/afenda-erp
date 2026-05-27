@@ -28,6 +28,7 @@ Use `!` prefix in glob patterns to exclude specific files from entry or project 
 ```
 
 **When to use `ignore` vs negation:**
+
 - Negation patterns: Exclude from specific entry/project arrays
 - `ignore`: Suppress all issue types for matching files globally
 

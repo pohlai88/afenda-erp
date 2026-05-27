@@ -1,7 +1,4 @@
-import {
-  approvalToolModuleIds,
-  moduleIds,
-} from "@afenda/config/module-ids";
+import { approvalToolModuleIds, moduleIds } from "@afenda/config/module-ids";
 import { z } from "zod";
 import { actionSandboxSchema } from "../schemas/operations";
 
@@ -148,12 +145,8 @@ export type RecordSearchToolInput = z.infer<typeof recordSearchToolInputSchema>;
 export type DocumentLookupToolInput = z.infer<
   typeof documentLookupToolInputSchema
 >;
-export type TaskDraftingToolInput = z.infer<
-  typeof taskDraftingToolInputSchema
->;
-export type ApprovalProposalToolInput = z.infer<
-  typeof approvalToolInputSchema
->;
+export type TaskDraftingToolInput = z.infer<typeof taskDraftingToolInputSchema>;
+export type ApprovalProposalToolInput = z.infer<typeof approvalToolInputSchema>;
 export type ApprovalProposalToolOutput = z.infer<
   typeof approvalToolOutputSchema
 >;

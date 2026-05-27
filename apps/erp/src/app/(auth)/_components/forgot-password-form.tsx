@@ -46,9 +46,7 @@ export function ForgotPasswordForm() {
         setStatusMessage(copy.messages.codeSent);
       } catch (error) {
         setErrorMessage(
-          error instanceof Error
-            ? error.message
-            : copy.messages.sendCodeFailed,
+          error instanceof Error ? error.message : copy.messages.sendCodeFailed,
         );
       }
     });
@@ -91,9 +89,7 @@ export function ForgotPasswordForm() {
     <div>
       <h2 className="text-2xl font-semibold text-foreground">{copy.title}</h2>
       <p className="mt-3 text-sm leading-6 text-muted-foreground">
-        {step === "request"
-          ? copy.requestDescription
-          : copy.resetDescription}
+        {step === "request" ? copy.requestDescription : copy.resetDescription}
       </p>
 
       {step === "request" ? (
@@ -108,7 +104,9 @@ export function ForgotPasswordForm() {
               type="email"
             />
           </AuthField>
-          {errorMessage ? <AuthNotice tone="error">{errorMessage}</AuthNotice> : null}
+          {errorMessage ? (
+            <AuthNotice tone="error">{errorMessage}</AuthNotice>
+          ) : null}
           {statusMessage ? (
             <AuthNotice tone="success">{statusMessage}</AuthNotice>
           ) : null}
@@ -149,7 +147,9 @@ export function ForgotPasswordForm() {
               type="password"
             />
           </AuthField>
-          {errorMessage ? <AuthNotice tone="error">{errorMessage}</AuthNotice> : null}
+          {errorMessage ? (
+            <AuthNotice tone="error">{errorMessage}</AuthNotice>
+          ) : null}
           {statusMessage ? (
             <AuthNotice tone="success">{statusMessage}</AuthNotice>
           ) : null}

@@ -1,4 +1,4 @@
-import type { GovernedComponentRegistry } from "./component-registry.schema"
+import type { GovernedComponentRegistry } from "./component-registry.schema";
 
 /**
  * Merges module-scoped registry slices into a single lookup table.
@@ -8,19 +8,19 @@ import type { GovernedComponentRegistry } from "./component-registry.schema"
 export function mergeGovernedRegistries(
   ...registries: readonly GovernedComponentRegistry[]
 ): GovernedComponentRegistry {
-  const merged: Record<string, string> = {}
+  const merged: Record<string, string> = {};
 
   for (const registry of registries) {
     for (const [key, value] of Object.entries(registry)) {
       if (Object.prototype.hasOwnProperty.call(merged, key)) {
         throw new Error(
-          `mergeGovernedRegistries: duplicate component type "${key}". Each component type may only be registered once.`
-        )
+          `mergeGovernedRegistries: duplicate component type "${key}". Each component type may only be registered once.`,
+        );
       }
 
-      merged[key] = value
+      merged[key] = value;
     }
   }
 
-  return merged
+  return merged;
 }

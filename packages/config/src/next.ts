@@ -1,5 +1,9 @@
 import type { NextConfig } from "next";
 
+/**
+ * Workspace packages compiled by Next during `apps/erp` build.
+ * When adding `@afenda/feature-<moduleId>`, append it here (ARCH-002).
+ */
 export const afendaTranspilePackages = [
   "@afenda/ai",
   "@afenda/auth",

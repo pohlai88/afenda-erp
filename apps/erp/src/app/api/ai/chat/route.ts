@@ -15,10 +15,7 @@ import {
   isAiSensitiveContentError,
 } from "@afenda/ai";
 import { getApiAuthContext } from "@afenda/auth/server";
-import {
-  createAiUsageEvent,
-  registerAiApprovalProposal,
-} from "@afenda/db";
+import { createAiUsageEvent, registerAiApprovalProposal } from "@afenda/db";
 import {
   getErpModuleById,
   getModuleWorkspace,
@@ -27,10 +24,7 @@ import {
   resolveWorkspaceDataMode,
 } from "@afenda/domain";
 import { getRequestId, logServerEvent } from "@afenda/observability";
-import {
-  createAgentUIStreamResponse,
-  type UIMessage,
-} from "ai";
+import { createAgentUIStreamResponse, type UIMessage } from "ai";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { chatRequestSchema } from "@/lib/api/ai-request-schemas";
@@ -121,7 +115,8 @@ export async function POST(request: Request) {
       organization,
       session: activeSession,
       model,
-      getModuleDefinition: (moduleId) => getErpModuleById(moduleId) ?? undefined,
+      getModuleDefinition: (moduleId) =>
+        getErpModuleById(moduleId) ?? undefined,
       getAllowedWorkspace,
       getWorkspaceStats: getModuleWorkspaceStats,
       registerApprovalProposal: registerAiApprovalProposal,
@@ -201,9 +196,9 @@ export async function POST(request: Request) {
             ? "Invalid assistant request."
             : isAiBudgetError(error)
               ? "Assistant request exceeds the configured AI budget."
-            : isAiSensitiveContentError(error)
-              ? "Assistant request contains credential-like sensitive content."
-            : "AI assistant failed.",
+              : isAiSensitiveContentError(error)
+                ? "Assistant request contains credential-like sensitive content."
+                : "AI assistant failed.",
       },
       {
         status: isAiBudgetError(error)

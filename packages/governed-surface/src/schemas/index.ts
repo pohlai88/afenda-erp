@@ -2,19 +2,19 @@
  * Narrow schema/parser door — import `@afenda/governed-surface/schemas` for builders and tests.
  * without pulling presentation profiles or kanban helpers (ADR-0030 barrel thin).
  */
-export type { SchemaStability } from "./_stability.shared"
+export type { SchemaStability } from "./_stability.shared";
 
 export {
   SCHEMA_STABILITY as PAGE_HEADER_SCHEMA_STABILITY,
   pageHeaderSchema,
   parsePageHeaderData,
   type PageHeader,
-} from "./page-header.schema"
+} from "./page-header.schema";
 
 export {
   erpPermissionRequirementSchema,
   type ErpPermissionRequirement,
-} from "./erp-permission-requirement.schema"
+} from "./erp-permission-requirement.schema";
 
 export {
   SCHEMA_STABILITY as LIST_SURFACE_SCHEMA_STABILITY,
@@ -26,14 +26,14 @@ export {
   type EmptyState,
   type ListColumn,
   type ListSurface,
-} from "./list-surface.schema"
+} from "./list-surface.schema";
 
 export {
   SCHEMA_STABILITY as ACTION_DESCRIPTOR_SCHEMA_STABILITY,
   actionDescriptorSchema,
   parseActionDescriptorData,
   type ActionDescriptor,
-} from "./action.schema"
+} from "./action.schema";
 
 export {
   SCHEMA_STABILITY as AUDIT_PANEL_SCHEMA_STABILITY,
@@ -42,7 +42,7 @@ export {
   parseAuditPanelData,
   type AuditPanelModel,
   type AuditPanelRow,
-} from "./audit-panel.schema"
+} from "./audit-panel.schema";
 
 export {
   SCHEMA_STABILITY as DETAIL_TABS_SCHEMA_STABILITY,
@@ -53,7 +53,7 @@ export {
   type GovernedDetailTabsInput,
   type GovernedDetailTabsModel,
   type GovernedRevisionEntry,
-} from "./detail-tabs.schema"
+} from "./detail-tabs.schema";
 
 export {
   SCHEMA_STABILITY as STAT_CARD_SCHEMA_STABILITY,
@@ -69,7 +69,7 @@ export {
   type StatCardIcon,
   type StatCardItem,
   type StatCardTone,
-} from "./stat-card.schema"
+} from "./stat-card.schema";
 
 export {
   GOVERNED_PRESENTATION_PROFILE_IDS,
@@ -81,7 +81,7 @@ export {
   type ListPresentationProfileId,
   type PresentationProfileId,
   type StatPresentationProfileId,
-} from "./presentation-profile.schema"
+} from "./presentation-profile.schema";
 
 export {
   SCHEMA_STABILITY as LIST_SURFACE_RENDERER_SCHEMA_STABILITY,
@@ -94,7 +94,7 @@ export {
   type ListSurfaceRow,
   type ListSurfaceRowDecisionLedger,
   type ListSurfaceRowTone,
-} from "./list-surface-renderer.schema"
+} from "./list-surface-renderer.schema";
 
 export {
   listSurfaceToolbarSchema,
@@ -108,7 +108,7 @@ export {
   type ListSurfaceToolbarSort,
   type ListSurfaceToolbarSortOption,
   type ListSurfaceToolbar,
-} from "./list-surface-toolbar.schema"
+} from "./list-surface-toolbar.schema";
 
 export {
   GOVERNED_CHART_CONFIGURATION_SCHEMA_ID,
@@ -132,7 +132,7 @@ export {
   type GovernedChartConfiguration,
   type GovernedChartConfigurationInput,
   type GovernedChartKind,
-} from "./chart.schema"
+} from "./chart.schema";
 
 export {
   GOVERNED_APPROVAL_TIMELINE_SCHEMA_ID,
@@ -147,12 +147,12 @@ export {
   type ApprovalTimelineStepStatus,
   type GovernedApprovalTimelineConfiguration,
   type GovernedApprovalTimelineConfigurationInput,
-} from "./approval-timeline.schema"
+} from "./approval-timeline.schema";
 
 export {
   GOVERNED_WORKBENCH_SEARCH_PARAM_KEYS,
   type GovernedWorkbenchSearchParamKey,
-} from "./workbench-search-params.shared"
+} from "./workbench-search-params.shared";
 
 export {
   GOVERNED_KANBAN_BOARD_SCHEMA_ID,
@@ -168,14 +168,14 @@ export {
   type KanbanColumn,
   type KanbanInteractionMode,
   type KanbanWorkflowTransition,
-} from "./kanban-board.schema"
+} from "./kanban-board.schema";
 
 export {
   SCHEMA_STABILITY as LIST_SURFACE_ROW_TRAILING_ACTION_SCHEMA_STABILITY,
   listSurfaceRowTrailingActionSchema,
   parseListSurfaceRowTrailingAction,
   type ListSurfaceRowTrailingAction,
-} from "./list-surface-row-trailing-action.schema"
+} from "./list-surface-row-trailing-action.schema";
 
 export {
   GOVERNED_COMPONENT_SCHEMA_ID,
@@ -185,7 +185,7 @@ export {
   parseGovernedComponentData,
   type GovernedComponent,
   type GovernedComponentType,
-} from "./component.schema"
+} from "./component.schema";
 
 export {
   EMPTY_GOVERNED_COMPONENT_REGISTRY,
@@ -193,7 +193,7 @@ export {
   governedComponentRegistrySchema,
   parseGovernedComponentRegistryData,
   type GovernedComponentRegistry,
-} from "./component-registry.schema"
+} from "./component-registry.schema";
 
 export {
   FORM_EVENTS,
@@ -203,27 +203,27 @@ export {
   parseEventHandlerMetadata,
   type EventHandlerMetadata,
   type FormEventId,
-} from "./events.shared"
+} from "./events.shared";
 
 export {
   type ActionFieldErrors,
   type ActionResult,
   isActionFailure,
   isActionResultSuccess,
-} from "./action-result.shared"
+} from "./action-result.shared";
 
 export {
   assertGovernedSurfaceInput,
   tryGovernedSurfaceInput,
   type GovernedSurfaceInputAssertion,
   type GovernedSurfaceInputAssertionError,
-} from "./dev-assert.shared"
+} from "./dev-assert.shared";
 
 export {
   GOVERNED_METADATA_SCHEMA_VERSION,
   governedMetadataSchemaVersionSchema,
   type GovernedMetadataSchemaVersion,
-} from "./schema-version.shared"
+} from "./schema-version.shared";
 
 export {
   GOVERNED_FORM_RULES_SCHEMA_ID,
@@ -237,4 +237,4 @@ export {
   type FormRuleCondition,
   type FormRuleEffect,
   type FormRuleFieldCondition,
-} from "./form-rules.schema"
+} from "./form-rules.schema";

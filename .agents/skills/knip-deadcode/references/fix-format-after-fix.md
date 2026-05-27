@@ -18,10 +18,10 @@ knip --fix
 
 ```typescript
 // Before fix
-export { used, unused, another } from './utils'
+export { used, unused, another } from "./utils";
 
 // After fix (unformatted)
-export { used,  another } from './utils'
+export { used, another } from "./utils";
 //          ^^ extra space
 ```
 
@@ -41,6 +41,7 @@ npm run format
 ```
 
 **Supported formatters:**
+
 - Prettier (detected automatically)
 - Biome
 - dprint

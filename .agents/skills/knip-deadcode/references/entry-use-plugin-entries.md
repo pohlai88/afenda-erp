@@ -13,10 +13,7 @@ Frameworks like Next.js, Remix, and Astro have non-standard entry patterns. Enab
 
 ```json
 {
-  "entry": [
-    "pages/**/*.tsx",
-    "app/**/*.tsx"
-  ]
+  "entry": ["pages/**/*.tsx", "app/**/*.tsx"]
 }
 ```
 
@@ -29,6 +26,7 @@ Frameworks like Next.js, Remix, and Astro have non-standard entry patterns. Enab
 ```
 
 The Next.js plugin automatically includes:
+
 - `pages/**/*.{js,jsx,ts,tsx}`
 - `app/**/*.{js,jsx,ts,tsx}`
 - `middleware.{js,ts}`

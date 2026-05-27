@@ -2,11 +2,11 @@
 
 **Doc ID:** `ARCH-007` · **File:** `007-governed-metadata-architecture.md`
 
-| Field | Value |
-| ----- | ----- |
-| Status | Active — kernel shipped; builder adoption selective (May 2026) |
-| Authority | Schemas, profiles, resolver, renderers, builder layering |
-| Related | **ARCH-006** (runtime authority) · **ARCH-002** (feature extraction) · **ARCH-001** (deploy) |
+| Field     | Value                                                                                        |
+| --------- | -------------------------------------------------------------------------------------------- |
+| Status    | Active — kernel shipped; builder adoption selective (May 2026)                               |
+| Authority | Schemas, profiles, resolver, renderers, builder layering                                     |
+| Related   | **ARCH-006** (runtime authority) · **ARCH-002** (feature extraction) · **ARCH-001** (deploy) |
 
 **Canonical renderer home:** `packages/governed-surface/src/metadata/`  
 **Import door:** `@afenda/governed-surface/metadata`  
@@ -389,7 +389,13 @@ return buildGovernedListSurface({
 
   presentation: {
     toolbar: canExport
-      ? { export: { actionId: "hr.records.export", label: "...", formats: ["csv"] } }
+      ? {
+          export: {
+            actionId: "hr.records.export",
+            label: "...",
+            formats: ["csv"],
+          },
+        }
       : undefined,
   },
 });
@@ -495,18 +501,18 @@ Renderers, profiles, and the **generic resolver** never call `requireErpPermissi
 
 ### 6.1 Next.js App Router contract (governed ERP pages)
 
-| Concern                | Do                                                                                                                            | Do not                                                                                   |
-| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
-| **Page thickness**     | `page.tsx` ≤ guards + `Promise.all` + section composition                                                                     | Domain queries, Zod, builder maps, or table markup in `app/`                             |
-| **Async request APIs** | `await params`, `await searchParams`, `await cookies()` in pages/layouts/actions                                              | Sync access to dynamic segment props                                                     |
-| **Data fetching**      | Parallelize independent server reads: `Promise.all([listQuery(), resolveCapability()])`                                         | Sequential awaits when queries do not depend on each other                               |
-| **Initial list truth** | Builder runs in RSC section or domain service; pass **configuration** to `GovernedPatternCListSection`                        | `useEffect` + `useState` copying server rows; TanStack Query for first paint             |
-| **Client import door** | `GovernedTrailingActionSlot`, kanban bridges from `@afenda/governed-surface/client`                                           | `@afenda/governed-surface` index from `"use client"` when index re-exports server graphs |
-| **Pattern C boundary** | `trailingColumn.cellId` + registered **Client Component** `Cell`                                                              | `trailingColumn.render` (functions are not serializable across RSC → client)             |
-| **Row links**          | `rowHref` from record-type templates such as `/${moduleId}/records/:recordId`                                                 | Hard-coded module paths that bypass `ModuleId` contracts                                 |
-| **Tenant authority**   | `organizationId` from `@afenda/auth/server` session helpers only                                                              | `organizationId` from `FormData`, query strings, or client props                         |
-| **Mutations**          | Server Actions + `revalidatePath` on affected module routes                                                                   | Route handlers for internal ERP list mutations                                           |
-| **Loading**            | Route `loading.tsx` + section `loadError` / renderer empty states                                                             | Client-only spinners that hide missing server empty handling                             |
+| Concern                | Do                                                                                                     | Do not                                                                                   |
+| ---------------------- | ------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------- |
+| **Page thickness**     | `page.tsx` ≤ guards + `Promise.all` + section composition                                              | Domain queries, Zod, builder maps, or table markup in `app/`                             |
+| **Async request APIs** | `await params`, `await searchParams`, `await cookies()` in pages/layouts/actions                       | Sync access to dynamic segment props                                                     |
+| **Data fetching**      | Parallelize independent server reads: `Promise.all([listQuery(), resolveCapability()])`                | Sequential awaits when queries do not depend on each other                               |
+| **Initial list truth** | Builder runs in RSC section or domain service; pass **configuration** to `GovernedPatternCListSection` | `useEffect` + `useState` copying server rows; TanStack Query for first paint             |
+| **Client import door** | `GovernedTrailingActionSlot`, kanban bridges from `@afenda/governed-surface/client`                    | `@afenda/governed-surface` index from `"use client"` when index re-exports server graphs |
+| **Pattern C boundary** | `trailingColumn.cellId` + registered **Client Component** `Cell`                                       | `trailingColumn.render` (functions are not serializable across RSC → client)             |
+| **Row links**          | `rowHref` from record-type templates such as `/${moduleId}/records/:recordId`                          | Hard-coded module paths that bypass `ModuleId` contracts                                 |
+| **Tenant authority**   | `organizationId` from `@afenda/auth/server` session helpers only                                       | `organizationId` from `FormData`, query strings, or client props                         |
+| **Mutations**          | Server Actions + `revalidatePath` on affected module routes                                            | Route handlers for internal ERP list mutations                                           |
+| **Loading**            | Route `loading.tsx` + section `loadError` / renderer empty states                                      | Client-only spinners that hide missing server empty handling                             |
 
 **Thin page recipe:**
 
@@ -537,14 +543,14 @@ detail routes re-check capability before reading protected rows.
 
 Prioritized rules from [Vercel React Best Practices](https://github.com/vercel-labs/agent-skills/tree/main/skills/react-best-practices) mapped to this stack:
 
-| Priority     | Rule                               | Afenda application                                                                                                                                                                                                  |
-| ------------ | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **CRITICAL** | `async-parallel`                   | Page and RSC section: batch queries + i18n + permission probes in one `Promise.all`                                                                                                                                 |
+| Priority     | Rule                               | Afenda application                                                                                                                                                                                                 |
+| ------------ | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **CRITICAL** | `async-parallel`                   | Page and RSC section: batch queries + i18n + permission probes in one `Promise.all`                                                                                                                                |
 | **CRITICAL** | `bundle-barrel-imports`            | Builders import module-relative `.shared` files or explicit feature subpaths such as `@afenda/feature-hr/metadata` — not broad feature package barrels that pull server-only graphs into accidental client bundles |
-| **HIGH**     | `server-serialization`             | Pass `ListSurfaceRendererConfigurationInput` (or builder output) to client bridges — not raw Drizzle rows + re-map on the client                                                                                    |
-| **MEDIUM**   | `rerender-derived-state-no-effect` | Row selection, filters, and trailing dialog state stay local; do not mirror server `rows` into client state after hydration                                                                                         |
-| **MEDIUM**   | `bundle-dynamic-import`            | Heavy kanban/chart client bridges behind `next/dynamic` when a section is below the fold or tab-gated                                                                                                               |
-| **MEDIUM**   | `rerender-memo`                    | Expensive trailing cells: keep as focused client islands; avoid re-rendering the full table when one dialog opens                                                                                                   |
+| **HIGH**     | `server-serialization`             | Pass `ListSurfaceRendererConfigurationInput` (or builder output) to client bridges — not raw Drizzle rows + re-map on the client                                                                                   |
+| **MEDIUM**   | `rerender-derived-state-no-effect` | Row selection, filters, and trailing dialog state stay local; do not mirror server `rows` into client state after hydration                                                                                        |
+| **MEDIUM**   | `bundle-dynamic-import`            | Heavy kanban/chart client bridges behind `next/dynamic` when a section is below the fold or tab-gated                                                                                                              |
+| **MEDIUM**   | `rerender-memo`                    | Expensive trailing cells: keep as focused client islands; avoid re-rendering the full table when one dialog opens                                                                                                  |
 
 **Cache Components (Next.js 16 + Vercel):** `cacheComponents: true` is enabled in
 `createAfendaNextConfig`. Use `'use cache: remote'` + `cacheLife` / `cacheTag` only
@@ -566,16 +572,16 @@ Importing broad @afenda/feature-* barrels from *.client.tsx when index.ts export
 
 ## 7. Disk truth vs target (2026-05)
 
-| Capability                                           | Status                          | Where                                                                                            |
-| ---------------------------------------------------- | ------------------------------- | ------------------------------------------------------------------------------------------------ |
-| Zod schemas + `dataNature`                           | **Shipped**                     | `packages/governed-surface/src/schemas/`                                                         |
-| TanStack list + virtual rows + toolbar               | **Shipped**                     | `packages/governed-surface/src/metadata/renderers/list-surface-*`                                |
-| Stat href / comparison / sparkline / progress        | **Shipped** (schema + renderer) | Adoption uneven in builders                                                                      |
-| Chart heatmap                                        | **Shipped**                     | `chart-heatmap-body.client.tsx`                                                                  |
-| Presentation profiles (six ids)                      | **Shipped**                     | `profiles/governed-presentation-profiles.ts`                                                     |
-| `resolveGovernedListPresentation` / stat density     | **Shipped**                     | `resolvers/resolve-governed-presentation.ts`                                                     |
-| `presentationProfile` on list/stat parse             | **Shipped**                     | `list-surface-renderer.schema.ts`, `stat-card.schema.ts`                                         |
-| `buildGovernedListSurface` / `buildGovernedStatGrid` | **Shipped**                     | `builders/`                                                                                      |
+| Capability                                           | Status                          | Where                                                                                                                                                     |
+| ---------------------------------------------------- | ------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Zod schemas + `dataNature`                           | **Shipped**                     | `packages/governed-surface/src/schemas/`                                                                                                                  |
+| TanStack list + virtual rows + toolbar               | **Shipped**                     | `packages/governed-surface/src/metadata/renderers/list-surface-*`                                                                                         |
+| Stat href / comparison / sparkline / progress        | **Shipped** (schema + renderer) | Adoption uneven in builders                                                                                                                               |
+| Chart heatmap                                        | **Shipped**                     | `chart-heatmap-body.client.tsx`                                                                                                                           |
+| Presentation profiles (six ids)                      | **Shipped**                     | `profiles/governed-presentation-profiles.ts`                                                                                                              |
+| `resolveGovernedListPresentation` / stat density     | **Shipped**                     | `resolvers/resolve-governed-presentation.ts`                                                                                                              |
+| `presentationProfile` on list/stat parse             | **Shipped**                     | `list-surface-renderer.schema.ts`, `stat-card.schema.ts`                                                                                                  |
+| `buildGovernedListSurface` / `buildGovernedStatGrid` | **Shipped**                     | `builders/`                                                                                                                                               |
 | Builders profile-first                               | **In progress**                 | Core ERP workspace lists in `packages/domain/src/module-list-surfaces.ts` use `buildGovernedListSurface`; feature-package builders move out on extraction |
 
 **Platform maturity:** kernel CI and registry coverage are implemented through package tests and `pnpm architecture:check`.  
@@ -678,24 +684,24 @@ Lists on the **same page** as those islands should still use Pattern B/C where a
 
 ## 12. Implementation roadmap (ordered)
 
-| Phase                    | Status   | Deliverable                                                                                                                                            |
-| ------------------------ | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **1 — Contract**         | **Done** | `presentationProfile?` on list/stat input; parse strips profile after merge                                                                            |
-| **2 — Profiles**         | **Done** | `GOVERNED_LIST_PRESENTATION_PROFILES`, `GOVERNED_STAT_PRESENTATION_PROFILES`                                                                           |
-| **3 — Resolver**         | **Done** | `resolve-governed-presentation.ts` (pure merge, no RBAC)                                                                                               |
-| **4 — Builder helpers**  | **Done** | `buildGovernedListSurface`, `buildGovernedStatGrid`                                                                                                    |
-| **5 — ERP workspace lists** | **Done** | `packages/domain/src/module-list-surfaces.ts` builds module record and work-item lists with profile-first helpers                                      |
-| **6 — Stat adoption**    | **Partial** | `buildGovernedStatGrid` exists; dashboard and module routes still use handcrafted `MetricCard` where route-specific composition is clearer          |
-| **7 — Feature extraction** | **Not started** | Move module builders and services into `@afenda/feature-*` when modules mature — see erp-domain architecture                                          |
+| Phase                       | Status          | Deliverable                                                                                                                                |
+| --------------------------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| **1 — Contract**            | **Done**        | `presentationProfile?` on list/stat input; parse strips profile after merge                                                                |
+| **2 — Profiles**            | **Done**        | `GOVERNED_LIST_PRESENTATION_PROFILES`, `GOVERNED_STAT_PRESENTATION_PROFILES`                                                               |
+| **3 — Resolver**            | **Done**        | `resolve-governed-presentation.ts` (pure merge, no RBAC)                                                                                   |
+| **4 — Builder helpers**     | **Done**        | `buildGovernedListSurface`, `buildGovernedStatGrid`                                                                                        |
+| **5 — ERP workspace lists** | **Done**        | `packages/domain/src/module-list-surfaces.ts` builds module record and work-item lists with profile-first helpers                          |
+| **6 — Stat adoption**       | **Partial**     | `buildGovernedStatGrid` exists; dashboard and module routes still use handcrafted `MetricCard` where route-specific composition is clearer |
+| **7 — Feature extraction**  | **Not started** | Move module builders and services into `@afenda/feature-*` when modules mature — see erp-domain architecture                               |
 
 ### After kernel ship
 
-| Work                  | When                                                                                                                 |
-| --------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| **Renderer** tweaks   | Only if merged presentation exposes a gap (e.g. global `datetime` cell formatting)                                   |
-| **Module builders**   | Extract to feature packages by moduleId; keep generic helpers in governed-surface                                      |
-| **Architecture docs** | Keep this document aligned with metadata-driven UI and erp-domain architecture                                       |
-| **New profile id**    | Only when multiple modules share a pattern not covered by the six shipped profiles                                   |
+| Work                  | When                                                                               |
+| --------------------- | ---------------------------------------------------------------------------------- |
+| **Renderer** tweaks   | Only if merged presentation exposes a gap (e.g. global `datetime` cell formatting) |
+| **Module builders**   | Extract to feature packages by moduleId; keep generic helpers in governed-surface  |
+| **Architecture docs** | Keep this document aligned with metadata-driven UI and erp-domain architecture     |
+| **New profile id**    | Only when multiple modules share a pattern not covered by the six shipped profiles |
 
 ---
 
@@ -722,21 +728,21 @@ Use **two scores** — do not conflate platform CI maturity with operator presen
 | Maturity doc stale enterprise baseline                             | **Closed** — footnote points to enterprise scorecard (~8.3)                                                                                              |
 | `build-governed-chart-surface`                                     | **Deferred** — chart profiles only when ≥3 modules share chart chrome                                                                                    |
 | `migrateGovernedConfiguration` not on parse path                   | **Closed** — `prepareGovernedConfigurationForParse` in list/stat `parse*`                                                                                |
-| Residual inline `presentation: { variant: "table-only" }` builders | **Open** — migrate remaining inline presentation blocks to profile-first helpers as modules are touched |
+| Residual inline `presentation: { variant: "table-only" }` builders | **Open** — migrate remaining inline presentation blocks to profile-first helpers as modules are touched                                                  |
 
 ### Kernel completeness (Afenda ERP)
 
-| Layer                                                     | On disk                                                                                                                 | Notes                                                                                                                     |
-| --------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
-| Four list profiles + two stat profiles                    | `governed-presentation-profiles.ts`                                                                                     | `erp-analytical-table` covers dense comparison lists; export `actionId` stays a builder override                          |
-| `resolveGovernedPresentation`                             | `resolve-governed-presentation.ts` + unit tests                                                                         | Pure merge only                                                                                                           |
-| `buildGovernedListSurface` / `buildGovernedStatGrid`      | `builders/*.ts`                                                                                                         | Used by domain module list builders                                                                                       |
-| Zod `presentationProfile` transform                       | `list-surface-renderer.schema.ts`, `stat-card.schema.ts`                                                                | Parse-time profile merge                                                                                                  |
-| Parse-time schema migration                               | `prepareGovernedConfigurationForParse`                                                                                  | List + stat paths                                                                                                         |
-| Registry + shipped renderers                              | `registry.ts`, `renderers/**`                                                                                           | Production ERP list/stat/chart/kanban renderers                                                                           |
-| ERP list builders on profiles                             | `packages/domain/src/module-list-surfaces.ts`                                                                           | Six `buildGovernedListSurface` call sites for module workspace lists                                                      |
-| Chart builder helper                                      | Not created                                                                                                             | **Deferred** until multiple modules share chart chrome                                                                    |
-| Feature-package builders                                  | Not created                                                                                                             | **Deferred** until first `@afenda/feature-*` extraction                                                                   |
+| Layer                                                | On disk                                                  | Notes                                                                                            |
+| ---------------------------------------------------- | -------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| Four list profiles + two stat profiles               | `governed-presentation-profiles.ts`                      | `erp-analytical-table` covers dense comparison lists; export `actionId` stays a builder override |
+| `resolveGovernedPresentation`                        | `resolve-governed-presentation.ts` + unit tests          | Pure merge only                                                                                  |
+| `buildGovernedListSurface` / `buildGovernedStatGrid` | `builders/*.ts`                                          | Used by domain module list builders                                                              |
+| Zod `presentationProfile` transform                  | `list-surface-renderer.schema.ts`, `stat-card.schema.ts` | Parse-time profile merge                                                                         |
+| Parse-time schema migration                          | `prepareGovernedConfigurationForParse`                   | List + stat paths                                                                                |
+| Registry + shipped renderers                         | `registry.ts`, `renderers/**`                            | Production ERP list/stat/chart/kanban renderers                                                  |
+| ERP list builders on profiles                        | `packages/domain/src/module-list-surfaces.ts`            | Six `buildGovernedListSurface` call sites for module workspace lists                             |
+| Chart builder helper                                 | Not created                                              | **Deferred** until multiple modules share chart chrome                                           |
+| Feature-package builders                             | Not created                                              | **Deferred** until first `@afenda/feature-*` extraction                                          |
 
 **Pattern C trailing column (RSC):** Server sections must pass a **Client Component** as `trailingColumn.Cell` (or `cellId: "governed.metadata"`) — never `trailingColumn.render` (functions are not serializable). See `governed-pattern-c-trailing-column.shared.ts` and `governed-list-trailing-cell-registry.client.ts`. Full runtime rules: **§6.1–6.2**.
 
@@ -757,8 +763,8 @@ Use **two scores** — do not conflate platform CI maturity with operator presen
 
 ## 13. Related documents
 
-| Document                                                              | Topic                                                |
-| --------------------------------------------------------------------- | ---------------------------------------------------- |
+| Document                                                                  | Topic                                                |
+| ------------------------------------------------------------------------- | ---------------------------------------------------- |
 | [ERP Domain Package Architecture](002-erp-domain-package-architecture.md) | Feature-package builder ownership and import doors   |
 | [System Architecture](001-system-architecture.md)                         | Product-wide runtime, deployment, data, and AI       |
 | [Metadata-Driven UI Architecture](006-metadata-driven-ui-architecture.md) | Runtime authority and metadata contracts             |

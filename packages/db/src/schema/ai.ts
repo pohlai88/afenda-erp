@@ -49,7 +49,10 @@ export const aiUsageEvents = pgTable(
       table.feature,
       table.createdAt,
     ),
-    index("ai_usage_events_org_module_idx").on(table.organizationId, table.moduleId),
+    index("ai_usage_events_org_module_idx").on(
+      table.organizationId,
+      table.moduleId,
+    ),
   ],
 );
 

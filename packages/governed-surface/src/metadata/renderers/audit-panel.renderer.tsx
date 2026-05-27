@@ -1,8 +1,8 @@
-import { GovernedAuditPanel } from "../../components/governed-audit-panel"
-import { GovernedEmpty } from "../../client"
-import { parseAuditPanelData } from "../../schemas/audit-panel.schema"
+import { GovernedAuditPanel } from "../../components/governed-audit-panel";
+import { GovernedEmpty } from "../../client";
+import { parseAuditPanelData } from "../../schemas/audit-panel.schema";
 
-import type { GovernedComponentRendererDiagnostics } from "../registry"
+import type { GovernedComponentRendererDiagnostics } from "../registry";
 
 /**
  * governed:audit-panel — IAM / org audit timeline table.
@@ -11,10 +11,10 @@ export function AuditPanelRenderer({
   configuration,
   diagnostics = "user",
 }: {
-  configuration: unknown
-  diagnostics?: GovernedComponentRendererDiagnostics
+  configuration: unknown;
+  diagnostics?: GovernedComponentRendererDiagnostics;
 }) {
-  const parsed = parseAuditPanelData(configuration)
+  const parsed = parseAuditPanelData(configuration);
 
   if (!parsed.success) {
     return (
@@ -28,8 +28,8 @@ export function AuditPanelRenderer({
               : "This audit panel could not be loaded safely.",
         }}
       />
-    )
+    );
   }
 
-  return <GovernedAuditPanel model={parsed.data} />
+  return <GovernedAuditPanel model={parsed.data} />;
 }

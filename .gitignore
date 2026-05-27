@@ -9,6 +9,7 @@ dist
 .env.*
 .env.config
 !.env.example
+!.env.config.example
 
 # Test & CI outputs (never commit)
 /.artifacts/
@@ -26,3 +27,5 @@ coverage/
 # Playwright when run from apps/erp without redirected outputDir
 apps/erp/test-results/
 apps/erp/playwright-report/
+
+.vercel

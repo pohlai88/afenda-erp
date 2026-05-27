@@ -42,7 +42,10 @@ const scopedRows = await runWithOrganizationContext(
   primaryOrganizationId,
   async (db) =>
     db
-      .select({ id: erpWorkItems.id, organizationId: erpWorkItems.organizationId })
+      .select({
+        id: erpWorkItems.id,
+        organizationId: erpWorkItems.organizationId,
+      })
       .from(erpWorkItems)
       .where(eq(erpWorkItems.organizationId, secondaryOrganizationId))
       .limit(5),

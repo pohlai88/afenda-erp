@@ -1,4 +1,5 @@
 import type { ModuleId } from "@afenda/config/module-ids";
+import type { ModuleWorkspaceStats } from "@afenda/domain";
 import { tool } from "ai";
 import { assertCapabilityAllowed } from "../guardrails";
 import {
@@ -52,7 +53,7 @@ export type ErpAssistantToolWorkspace = {
   documents: readonly ErpAssistantToolDocument[];
 };
 
-export type ErpAssistantToolWorkspaceStats = Record<string, number>;
+export type ErpAssistantToolWorkspaceStats = ModuleWorkspaceStats;
 
 export type RegisterApprovalProposalInput = {
   organizationId: string;
@@ -71,7 +72,9 @@ export type RegisterApprovalProposalInput = {
   };
 };
 
-export function createErpAssistantTools<TWorkspace extends ErpAssistantToolWorkspace>(input: {
+export function createErpAssistantTools<
+  TWorkspace extends ErpAssistantToolWorkspace,
+>(input: {
   organization: ErpAssistantToolOrganization;
   session: ErpAssistantToolSession;
   model: string;
@@ -82,9 +85,7 @@ export function createErpAssistantTools<TWorkspace extends ErpAssistantToolWorks
     moduleDefinition: ErpAssistantToolModule;
     workspace: TWorkspace;
   }>;
-  getWorkspaceStats: (
-    workspace: TWorkspace,
-  ) => ErpAssistantToolWorkspaceStats;
+  getWorkspaceStats: (workspace: TWorkspace) => ErpAssistantToolWorkspaceStats;
   registerApprovalProposal: (
     proposal: RegisterApprovalProposalInput,
   ) => Promise<string>;

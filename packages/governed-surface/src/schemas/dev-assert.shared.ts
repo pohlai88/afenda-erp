@@ -26,25 +26,25 @@
  * On failure the assertion message names the builder context and the first
  * Zod issue so preview pages fail loudly during local dev.
  */
-import type { z } from "zod"
+import type { z } from "zod";
 
 export type GovernedSurfaceInputAssertionError = Error & {
-  readonly issuesJson: string
-  readonly builderContext: string
-}
+  readonly issuesJson: string;
+  readonly builderContext: string;
+};
 
 function buildAssertionError(
   builderContext: string,
-  issuesJson: string
+  issuesJson: string,
 ): GovernedSurfaceInputAssertionError {
   const error = new Error(
-    `governed surface assertion failed for "${builderContext}":\n${issuesJson}`
-  )
+    `governed surface assertion failed for "${builderContext}":\n${issuesJson}`,
+  );
   // Attach for runtime inspection in dev panels / preview routes.
   return Object.assign(error, {
     issuesJson,
     builderContext,
-  })
+  });
 }
 
 /**
@@ -61,16 +61,16 @@ function buildAssertionError(
 export function assertGovernedSurfaceInput<Schema extends z.ZodTypeAny>(
   schema: Schema,
   candidate: z.input<Schema>,
-  builderContext: string
+  builderContext: string,
 ): z.output<Schema> {
-  const parsed = schema.safeParse(candidate)
+  const parsed = schema.safeParse(candidate);
   if (parsed.success) {
-    return parsed.data
+    return parsed.data;
   }
   throw buildAssertionError(
     builderContext,
-    JSON.stringify(parsed.error.issues, null, 2)
-  )
+    JSON.stringify(parsed.error.issues, null, 2),
+  );
 }
 
 /**
@@ -81,23 +81,23 @@ export function assertGovernedSurfaceInput<Schema extends z.ZodTypeAny>(
 export type GovernedSurfaceInputAssertion<Schema extends z.ZodTypeAny> =
   | { readonly ok: true; readonly data: z.output<Schema> }
   | {
-      readonly ok: false
-      readonly builderContext: string
-      readonly issues: readonly z.core.$ZodIssue[]
-    }
+      readonly ok: false;
+      readonly builderContext: string;
+      readonly issues: readonly z.core.$ZodIssue[];
+    };
 
 export function tryGovernedSurfaceInput<Schema extends z.ZodTypeAny>(
   schema: Schema,
   candidate: z.input<Schema>,
-  builderContext: string
+  builderContext: string,
 ): GovernedSurfaceInputAssertion<Schema> {
-  const parsed = schema.safeParse(candidate)
+  const parsed = schema.safeParse(candidate);
   if (parsed.success) {
-    return { ok: true, data: parsed.data }
+    return { ok: true, data: parsed.data };
   }
   return {
     ok: false,
     builderContext,
     issues: parsed.error.issues,
-  }
+  };
 }

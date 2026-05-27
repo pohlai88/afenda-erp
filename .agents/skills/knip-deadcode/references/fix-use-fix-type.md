@@ -34,6 +34,7 @@ git diff && npm test && git commit -m "Remove unused types"
 ```
 
 **Available fix types:**
+
 - `exports` - Remove unused exports
 - `types` - Remove unused type exports
 - `dependencies` - Remove from package.json

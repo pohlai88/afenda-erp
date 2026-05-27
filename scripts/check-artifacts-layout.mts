@@ -8,7 +8,6 @@ import {
   PLAYWRIGHT_TEST_RESULTS_DIR,
   VITEST_BLOB_REPORTS_DIR,
   VITEST_BLOB_REPORTS_LINK,
-  VITEST_COVERAGE_DIR,
 } from "./lib/artifacts-paths.mts";
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");

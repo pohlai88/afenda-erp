@@ -4,10 +4,7 @@ import {
   isNeonAuthReady,
 } from "@afenda/auth/server";
 import { isDevCookieAuthEnabled } from "@afenda/config/env";
-import {
-  getAuthPageShellCopy,
-  signInEnvironmentCopy,
-} from "@afenda/domain";
+import { getAuthPageShellCopy, signInEnvironmentCopy } from "@afenda/domain";
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";

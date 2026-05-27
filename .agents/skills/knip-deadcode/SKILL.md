@@ -10,6 +10,7 @@ Comprehensive guide for detecting and removing dead code in JavaScript and TypeS
 ## When to Apply
 
 Reference these guidelines when:
+
 - Configuring Knip for a new project or monorepo
 - Investigating false positives or false negatives
 - Setting up CI pipelines to prevent dead code regressions
@@ -18,16 +19,16 @@ Reference these guidelines when:
 
 ## Rule Categories by Priority
 
-| Priority | Category | Impact | Prefix |
-|----------|----------|--------|--------|
-| 1 | Configuration Foundations | CRITICAL | `config-` |
-| 2 | Entry Point Strategy | CRITICAL | `entry-` |
-| 3 | Workspace & Monorepo | HIGH | `workspace-` |
-| 4 | Dependency Analysis | HIGH | `deps-` |
-| 5 | Export Detection | MEDIUM-HIGH | `exports-` |
-| 6 | CI Integration | MEDIUM | `ci-` |
-| 7 | Auto-Fix Workflow | MEDIUM | `fix-` |
-| 8 | Performance Optimization | LOW-MEDIUM | `perf-` |
+| Priority | Category                  | Impact      | Prefix       |
+| -------- | ------------------------- | ----------- | ------------ |
+| 1        | Configuration Foundations | CRITICAL    | `config-`    |
+| 2        | Entry Point Strategy      | CRITICAL    | `entry-`     |
+| 3        | Workspace & Monorepo      | HIGH        | `workspace-` |
+| 4        | Dependency Analysis       | HIGH        | `deps-`      |
+| 5        | Export Detection          | MEDIUM-HIGH | `exports-`   |
+| 6        | CI Integration            | MEDIUM      | `ci-`        |
+| 7        | Auto-Fix Workflow         | MEDIUM      | `fix-`       |
+| 8        | Performance Optimization  | LOW-MEDIUM  | `perf-`      |
 
 ## Quick Reference
 
@@ -115,8 +116,8 @@ Read individual reference files for detailed explanations and code examples:
 
 ## Reference Files
 
-| File | Description |
-|------|-------------|
-| [references/_sections.md](references/_sections.md) | Category definitions and ordering |
-| [assets/templates/_template.md](assets/templates/_template.md) | Template for new rules |
-| [metadata.json](metadata.json) | Version and reference information |
+| File                                                            | Description                       |
+| --------------------------------------------------------------- | --------------------------------- |
+| [references/\_sections.md](references/_sections.md)             | Category definitions and ordering |
+| [assets/templates/\_template.md](assets/templates/_template.md) | Template for new rules            |
+| [metadata.json](metadata.json)                                  | Version and reference information |

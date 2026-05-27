@@ -1,20 +1,20 @@
-import type { ReactNode } from "react"
+import type { ReactNode } from "react";
 
-import { ModulePageHeader } from "./module-page-header"
-import { Card, CardContent } from "@afenda/ui/card"
-import { cn } from "@afenda/ui/utils"
+import { ModulePageHeader } from "./module-page-header";
+import { Card, CardContent } from "@afenda/ui/card";
+import { cn } from "@afenda/ui/utils";
 
-import type { ListSurface } from "../schemas/list-surface.schema"
+import type { ListSurface } from "../schemas/list-surface.schema";
 
-import { GovernedEmpty } from "./governed-empty"
+import { GovernedEmpty } from "./governed-empty";
 
 export type GovernedListSurfaceProps = {
-  model: ListSurface
-  rowCount: number
+  model: ListSurface;
+  rowCount: number;
   /** Feature-owned table body (often a client island using TanStack Table). */
-  children: ReactNode
-  className?: string
-}
+  children: ReactNode;
+  className?: string;
+};
 
 export function GovernedListSurface({
   model,
@@ -35,5 +35,5 @@ export function GovernedListSurface({
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

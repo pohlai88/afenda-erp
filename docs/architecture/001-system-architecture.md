@@ -2,12 +2,12 @@
 
 **Doc ID:** `ARCH-001` · **File:** `001-system-architecture.md`
 
-| Field | Value |
-| ----- | ----- |
-| Status | Active — aligned with `afenda-erp` repo as-built (May 2026) |
-| Authority | Product-wide runtime, deployment, data, auth, AI, observability |
-| Supersedes | Informal root architecture draft (removed; do not add new copies) |
-| Related | **ARCH-002** (packages) · **ARCH-006** (metadata UI) · **ARCH-005** (database) |
+| Field      | Value                                                                          |
+| ---------- | ------------------------------------------------------------------------------ |
+| Status     | Active — aligned with `afenda-erp` repo as-built (May 2026)                    |
+| Authority  | Product-wide runtime, deployment, data, auth, AI, observability                |
+| Supersedes | Informal root architecture draft (removed; do not add new copies)              |
+| Related    | **ARCH-002** (packages) · **ARCH-006** (metadata UI) · **ARCH-005** (database) |
 
 ## Executive Summary
 
@@ -45,22 +45,22 @@ applications.
 Pinned workspace versions (see root `package.json`, `pnpm-workspace.yaml`
 catalog). Upgrade only through intentional catalog bumps and CI verification.
 
-| Layer          | Pinned default (repo)                                      |
-| -------------- | ---------------------------------------------------------- |
-| Runtime        | Node.js 22 for local, CI, and Vercel builds                |
-| Web framework  | Next.js **16.2.x** App Router (`catalog:next`)             |
-| React          | React **19.2.x** (`catalog:react`)                         |
-| Language       | TypeScript **5.9** strict mode                             |
-| Package manager| pnpm **10.33.x** workspaces                                |
-| Styling        | Tailwind CSS v4 with shadcn/ui                             |
-| Monorepo       | Turborepo v2 (`tasks` in root `turbo.json`)                |
-| Database       | Neon Postgres with Drizzle ORM                             |
-| Auth           | Neon Auth (`@neondatabase/auth`) with branchable state    |
-| AI             | Vercel AI SDK v6 (`ai@^6`) through Vercel AI Gateway       |
-| Storage        | Vercel Blob for attachments and exports                    |
-| Runtime config | Vercel Edge Config (flags and non-secret runtime toggles)  |
-| Observability  | Vercel Analytics, Speed Insights, OTEL, log drains         |
-| Next config    | `cacheComponents: true` via `@afenda/config` `createAfendaNextConfig` |
+| Layer           | Pinned default (repo)                                                 |
+| --------------- | --------------------------------------------------------------------- |
+| Runtime         | Node.js 22 for local, CI, and Vercel builds                           |
+| Web framework   | Next.js **16.2.x** App Router (`catalog:next`)                        |
+| React           | React **19.2.x** (`catalog:react`)                                    |
+| Language        | TypeScript **5.9** strict mode                                        |
+| Package manager | pnpm **10.33.x** workspaces                                           |
+| Styling         | Tailwind CSS v4 with shadcn/ui                                        |
+| Monorepo        | Turborepo v2 (`tasks` in root `turbo.json`)                           |
+| Database        | Neon Postgres with Drizzle ORM                                        |
+| Auth            | Neon Auth (`@neondatabase/auth`) with branchable state                |
+| AI              | Vercel AI SDK v6 (`ai@^6`) through Vercel AI Gateway                  |
+| Storage         | Vercel Blob for attachments and exports                               |
+| Runtime config  | Vercel Edge Config (flags and non-secret runtime toggles)             |
+| Observability   | Vercel Analytics, Speed Insights, OTEL, log drains                    |
+| Next config     | `cacheComponents: true` via `@afenda/config` `createAfendaNextConfig` |
 
 Framework upgrades are security work, not cosmetic churn. App Router and React
 Server Component patches can affect every route.
@@ -413,10 +413,10 @@ Gateway so usage, failover, and cost tracking are centralized.
 
 **Gateway authentication (Vercel AI Gateway):**
 
-| Environment | Credential |
-| ----------- | ---------- |
+| Environment       | Credential                                                            |
+| ----------------- | --------------------------------------------------------------------- |
 | Vercel deployment | `VERCEL_OIDC_TOKEN` (issued automatically when AI Gateway is enabled) |
-| Local / CI | `AI_GATEWAY_API_KEY` from the Vercel dashboard, or `vercel env pull` |
+| Local / CI        | `AI_GATEWAY_API_KEY` from the Vercel dashboard, or `vercel env pull`  |
 
 Application code should resolve credentials in this order:
 `process.env.AI_GATEWAY_API_KEY ?? process.env.VERCEL_OIDC_TOKEN`.
@@ -501,12 +501,12 @@ Blob when possible rather than proxying through the Next.js server.
 **Cache Components** are enabled in production config (`cacheComponents: true` in
 `packages/config/src/next.ts`). Use them only for shared, non-tenant data.
 
-| Pattern | When to use |
-| ------- | ----------- |
-| `"use cache"` + `cacheLife` / `cacheTag` | Shared reference data inside Server Components |
-| `"use cache: remote"` + `cacheLife` | Route handlers or fetches that should use Vercel Runtime Cache |
-| No cache / `cache: 'no-store'` | Tenant dashboards, org-scoped lists, auth/session-bound reads |
-| `revalidatePath` / `revalidateTag` / `updateTag` | After mutations — prefer narrow invalidation |
+| Pattern                                          | When to use                                                    |
+| ------------------------------------------------ | -------------------------------------------------------------- |
+| `"use cache"` + `cacheLife` / `cacheTag`         | Shared reference data inside Server Components                 |
+| `"use cache: remote"` + `cacheLife`              | Route handlers or fetches that should use Vercel Runtime Cache |
+| No cache / `cache: 'no-store'`                   | Tenant dashboards, org-scoped lists, auth/session-bound reads  |
+| `revalidatePath` / `revalidateTag` / `updateTag` | After mutations — prefer narrow invalidation                   |
 
 Performance defaults:
 
@@ -565,22 +565,28 @@ compile-time dependencies, not separate Vercel projects. See
 
 ### Platform linkage (verified via Vercel MCP, May 2026)
 
-| Item | As-built |
-| ---- | -------- |
-| Vercel team | `Jack's projects` (`team_Ymg16AtjGxrKyjaZk5Z52IYc`) |
-| Linked project in team | `afenda-vercel` (`prj_f4xLKgSiQsOEXnk24ZKlwlKrwqui`) — **legacy GitHub repo `afenda-vercel`** |
-| This repo (`afenda-erp`) | **Not linked** — no `.vercel/project.json`; **deferred until codebase is stable** |
-| Latest `afenda-vercel` production deploys | **ERROR** (separate codebase; not Afenda ERP health) |
+| Item                                      | As-built                                                                                      |
+| ----------------------------------------- | --------------------------------------------------------------------------------------------- |
+| Vercel team                               | `Jack's projects` (`team_Ymg16AtjGxrKyjaZk5Z52IYc`)                                           |
+| Linked project in team                    | `afenda-vercel` (`prj_f4xLKgSiQsOEXnk24ZKlwlKrwqui`) — **legacy GitHub repo `afenda-vercel`** |
+| This repo (`afenda-erp`)                  | **Not linked** — no `.vercel/project.json`; **deferred until stabilization gate passes**      |
+| Latest `afenda-vercel` production deploys | **ERROR** (`readyState: ERROR`; repo `pohlai88/afenda-vercel`, not this monorepo)            |
+| Intended build when linked                | Root `vercel.json`: `pnpm install` + `pnpm turbo build --filter=@afenda/erp`                  |
 
-**Vercel link is deferred.** Do not run `vercel link` or wire preview/production deploys until local
-stabilization is complete. Root `vercel.json` documents the intended build for when linking happens.
+**Vercel link is deferred.** Do not run `vercel link` or wire preview/production deploys until the
+local stabilization gate passes. The linked `afenda-vercel` project still uses Vercel default Next.js
+settings until retargeted to this repository.
 
 **Local stabilization gate (before `vercel link`):**
 
-1. `pnpm turbo build --filter=@afenda/erp` succeeds locally and in CI.
-2. `pnpm typecheck`, `pnpm test`, and `pnpm architecture:check` pass.
-3. Neon Auth, database migrations, and AI routes work in local/preview-shaped env (`.env.local` / `pnpm env:sync`).
-4. Governed list surfaces and module workspaces behave correctly end-to-end.
+| Gate | Command / check | Status (May 2026) |
+| ---- | --------------- | ----------------- |
+| Build | `pnpm turbo build --filter=@afenda/erp` | Passed locally (May 2026) |
+| Types | `pnpm typecheck` | Passed; `strict`, `noUncheckedIndexedAccess`, unused checks |
+| Architecture | `pnpm architecture:check` | Fails on untracked `.cursor/` tooling paths (not ERP layout); fix or allowlist before link |
+| Tests | `pnpm test` | Passed locally (May 2026) |
+| Env | `pnpm env:sync` (+ `env:sync:cursor` on Windows) | See `docs/development/env.md` |
+| E2E / governed UI | Manual or `pnpm test:e2e` | Required before production link |
 
 **Platform milestone (after stabilization):**
 

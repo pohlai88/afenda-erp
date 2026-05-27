@@ -1,20 +1,20 @@
-import { z } from "zod"
+import { z } from "zod";
 
-import type { SchemaStability } from "./_stability.shared"
+import type { SchemaStability } from "./_stability.shared";
 
-import { governedMetadataSchemaVersionSchema } from "./schema-version.shared"
-import { governedSurfaceChromeSchema } from "./surface-chrome.schema"
+import { governedMetadataSchemaVersionSchema } from "./schema-version.shared";
+import { governedSurfaceChromeSchema } from "./surface-chrome.schema";
 
 export const GOVERNED_SCORECARD_FORM_SCHEMA_ID =
-  "governed.scorecard-form.configuration" as const
+  "governed.scorecard-form.configuration" as const;
 
-export const GOVERNED_SCORECARD_FORM_SCHEMA_STABILITY: SchemaStability = "beta"
+export const GOVERNED_SCORECARD_FORM_SCHEMA_STABILITY: SchemaStability = "beta";
 
 /** Scorecard / rubric data nature (ADR-0025 §2). */
-export const scorecardFormDataNatureSchema = z.literal("scoring")
+export const scorecardFormDataNatureSchema = z.literal("scoring");
 export type ScorecardFormDataNature = z.infer<
   typeof scorecardFormDataNatureSchema
->
+>;
 
 export const scorecardCriterionSchema = z
   .object({
@@ -23,7 +23,7 @@ export const scorecardCriterionSchema = z
     description: z.string().trim().min(1).optional(),
     maxScore: z.number().int().positive().finite().default(5),
   })
-  .strict()
+  .strict();
 
 export const governedScorecardFormConfigurationSchema =
   governedMetadataSchemaVersionSchema
@@ -38,7 +38,7 @@ export const governedScorecardFormConfigurationSchema =
       chrome: governedSurfaceChromeSchema.optional(),
     })
     .superRefine((form, ctx) => {
-      const seen = new Set<string>()
+      const seen = new Set<string>();
 
       for (const [index, criterion] of form.criteria.entries()) {
         if (seen.has(criterion.id)) {
@@ -46,23 +46,23 @@ export const governedScorecardFormConfigurationSchema =
             code: z.ZodIssueCode.custom,
             message: "Criterion ids must be unique.",
             path: ["criteria", index, "id"],
-          })
+          });
         }
 
-        seen.add(criterion.id)
+        seen.add(criterion.id);
       }
-    })
+    });
 
-export type ScorecardCriterion = z.infer<typeof scorecardCriterionSchema>
+export type ScorecardCriterion = z.infer<typeof scorecardCriterionSchema>;
 
 export type GovernedScorecardFormConfiguration = z.infer<
   typeof governedScorecardFormConfigurationSchema
->
+>;
 
 export type GovernedScorecardFormConfigurationInput = z.input<
   typeof governedScorecardFormConfigurationSchema
->
+>;
 
 export function parseGovernedScorecardFormConfiguration(raw: unknown) {
-  return governedScorecardFormConfigurationSchema.safeParse(raw)
+  return governedScorecardFormConfigurationSchema.safeParse(raw);
 }

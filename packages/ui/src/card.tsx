@@ -1,7 +1,7 @@
-import * as React from "react"
+import * as React from "react";
 
-import { cn } from "./utils"
-import { type CardSize, ui, uiRadius, uiTitle } from "./design-system"
+import { cn } from "./utils";
+import { type CardSize, ui, uiRadius, uiTitle } from "./design-system";
 
 function Card({
   className,
@@ -18,11 +18,11 @@ function Card({
         ui.radius.card,
         uiRadius.surfaceMediaTop,
         uiRadius.surfaceMediaBottom,
-        className
+        className,
       )}
       {...props}
     />
-  )
+  );
 }
 
 function CardHeader({ className, ...props }: React.ComponentProps<"div">) {
@@ -32,11 +32,11 @@ function CardHeader({ className, ...props }: React.ComponentProps<"div">) {
       className={cn(
         "group/card-header @container/card-header grid auto-rows-min items-start gap-1.5 px-6 group-data-[size=sm]/card:px-4 has-data-[slot=card-action]:grid-cols-[1fr_auto] has-data-[slot=card-description]:grid-rows-[auto_auto] [.border-b]:pb-6 group-data-[size=sm]/card:[.border-b]:pb-4",
         uiRadius.surfaceTop,
-        className
+        className,
       )}
       {...props}
     />
-  )
+  );
 }
 
 function CardTitle({ className, ...props }: React.ComponentProps<"div">) {
@@ -46,7 +46,7 @@ function CardTitle({ className, ...props }: React.ComponentProps<"div">) {
       className={cn(uiTitle.sm, className)}
       {...props}
     />
-  )
+  );
 }
 
 function CardDescription({ className, ...props }: React.ComponentProps<"div">) {
@@ -56,7 +56,7 @@ function CardDescription({ className, ...props }: React.ComponentProps<"div">) {
       className={cn("text-sm text-muted-foreground", className)}
       {...props}
     />
-  )
+  );
 }
 
 function CardAction({ className, ...props }: React.ComponentProps<"div">) {
@@ -65,11 +65,11 @@ function CardAction({ className, ...props }: React.ComponentProps<"div">) {
       data-slot="card-action"
       className={cn(
         "col-start-2 row-span-2 row-start-1 self-start justify-self-end",
-        className
+        className,
       )}
       {...props}
     />
-  )
+  );
 }
 
 function CardContent({ className, ...props }: React.ComponentProps<"div">) {
@@ -78,11 +78,11 @@ function CardContent({ className, ...props }: React.ComponentProps<"div">) {
       data-slot="card-content"
       className={cn(
         "px-surface-lg group-data-[size=sm]/card:px-surface-md",
-        className
+        className,
       )}
       {...props}
     />
-  )
+  );
 }
 
 function CardFooter({ className, ...props }: React.ComponentProps<"div">) {
@@ -92,11 +92,11 @@ function CardFooter({ className, ...props }: React.ComponentProps<"div">) {
       className={cn(
         "flex items-center px-surface-lg group-data-[size=sm]/card:px-surface-md [.border-t]:pt-surface-lg group-data-[size=sm]/card:[.border-t]:pt-surface-md",
         uiRadius.surfaceBottom,
-        className
+        className,
       )}
       {...props}
     />
-  )
+  );
 }
 
 export {
@@ -107,4 +107,4 @@ export {
   CardAction,
   CardDescription,
   CardContent,
-}
+};

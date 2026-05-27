@@ -120,7 +120,10 @@ async function main() {
       continue;
     }
 
-    const contents = await readFile(resolve(migrationsDir, migrationFile), "utf8");
+    const contents = await readFile(
+      resolve(migrationsDir, migrationFile),
+      "utf8",
+    );
     await applyMigration(migrationFile, contents, allowExistingObjects);
     process.stdout.write(`Applied ${migrationFile}.\n`);
   }

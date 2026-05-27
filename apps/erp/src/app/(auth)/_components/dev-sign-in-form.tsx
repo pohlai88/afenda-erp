@@ -5,7 +5,9 @@ import { AuthField, AuthInput, AuthPrimaryButton } from "./auth-ui";
 export function DevSignInForm() {
   return (
     <div>
-      <div className="text-sm text-muted-foreground">{devSignInCopy.eyebrow}</div>
+      <div className="text-sm text-muted-foreground">
+        {devSignInCopy.eyebrow}
+      </div>
       <h2 className="mt-2 text-2xl font-semibold text-foreground">
         {devSignInCopy.title}
       </h2>
@@ -32,7 +34,10 @@ export function DevSignInForm() {
             type="email"
           />
         </AuthField>
-        <AuthField id="dev-organization" label={devSignInCopy.fields.organization}>
+        <AuthField
+          id="dev-organization"
+          label={devSignInCopy.fields.organization}
+        >
           <AuthInput
             autoComplete="organization"
             defaultValue={devSignInCopy.defaults.organization}
@@ -41,7 +46,9 @@ export function DevSignInForm() {
             required
           />
         </AuthField>
-        <AuthPrimaryButton type="submit">{devSignInCopy.submitLabel}</AuthPrimaryButton>
+        <AuthPrimaryButton type="submit">
+          {devSignInCopy.submitLabel}
+        </AuthPrimaryButton>
       </form>
     </div>
   );

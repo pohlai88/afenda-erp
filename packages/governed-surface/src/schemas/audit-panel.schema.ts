@@ -1,8 +1,8 @@
-import { z } from "zod"
+import { z } from "zod";
 
-import type { SchemaStability } from "./_stability.shared"
+import type { SchemaStability } from "./_stability.shared";
 
-export const SCHEMA_STABILITY: SchemaStability = "beta"
+export const SCHEMA_STABILITY: SchemaStability = "beta";
 
 export const auditPanelRowSchema = z
   .object({
@@ -25,12 +25,12 @@ export const auditPanelRowSchema = z
               .enum(["default", "positive", "attention", "critical"])
               .optional(),
           })
-          .strict()
+          .strict(),
       )
       .optional(),
     narrative: z.string().optional(),
   })
-  .strict()
+  .strict();
 
 /**
  * Audit-panel data nature (ADR-0025 §2).
@@ -39,8 +39,8 @@ export const auditPanelRowSchema = z
  *                  Single-member enum today; reserved for future
  *                  differentiation (e.g. `change-log` vs `audit-trail`).
  */
-export const auditPanelDataNatureSchema = z.enum(["audit-trail"])
-export type AuditPanelDataNature = z.infer<typeof auditPanelDataNatureSchema>
+export const auditPanelDataNatureSchema = z.enum(["audit-trail"]);
+export type AuditPanelDataNature = z.infer<typeof auditPanelDataNatureSchema>;
 
 export const auditPanelSchema = z
   .object({
@@ -50,12 +50,12 @@ export const auditPanelSchema = z
     density: z.enum(["compact", "comfortable"]).optional(),
     rows: z.array(auditPanelRowSchema),
   })
-  .strict()
+  .strict();
 
-export type AuditPanelRow = z.infer<typeof auditPanelRowSchema>
-export type AuditPanelModel = z.infer<typeof auditPanelSchema>
-export type AuditPanelInput = z.input<typeof auditPanelSchema>
+export type AuditPanelRow = z.infer<typeof auditPanelRowSchema>;
+export type AuditPanelModel = z.infer<typeof auditPanelSchema>;
+export type AuditPanelInput = z.input<typeof auditPanelSchema>;
 
 export function parseAuditPanelData(raw: unknown) {
-  return auditPanelSchema.safeParse(raw)
+  return auditPanelSchema.safeParse(raw);
 }

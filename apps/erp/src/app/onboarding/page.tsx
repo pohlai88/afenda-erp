@@ -3,7 +3,10 @@ import { getAuthPageShellCopy } from "@afenda/domain";
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
-import { AuthShell, createAuthPageMetadata } from "../(auth)/_components/auth-shell";
+import {
+  AuthShell,
+  createAuthPageMetadata,
+} from "../(auth)/_components/auth-shell";
 import { OnboardingForm } from "./onboarding-form";
 
 const shellCopy = getAuthPageShellCopy("onboarding");

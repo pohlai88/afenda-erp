@@ -160,4 +160,3 @@ async function fetchNeonAuthSessionFromUpstream(
     return null;
   }
 }
-

@@ -11,7 +11,11 @@ type RouteStateProps = {
   };
 };
 
-export function RouteStatePanel({ title, description, action }: RouteStateProps) {
+export function RouteStatePanel({
+  title,
+  description,
+  action,
+}: RouteStateProps) {
   return (
     <main className="flex min-h-full items-center justify-center px-6 py-16">
       <div className="w-full max-w-lg rounded-2xl border border-line bg-surface-strong p-8 shadow-sm">

@@ -1,11 +1,11 @@
-"use client"
+"use client";
 
-import { useCallback, useState, type DragEvent } from "react"
+import { useCallback, useState, type DragEvent } from "react";
 
 import type {
   GovernedKanbanBoardConfiguration,
   KanbanCard,
-} from "../../schemas/kanban-board.schema"
+} from "../../schemas/kanban-board.schema";
 import {
   buildKanbanCardMovePayload,
   governedKanbanCardTestId,
@@ -13,7 +13,7 @@ import {
   resolveKanbanBoardDomProps,
   resolveKanbanCardDropState,
   type KanbanCardMovePayload,
-} from "../../client"
+} from "../../client";
 
 import {
   groupCardsByColumn,
@@ -22,20 +22,20 @@ import {
   KanbanCardTile,
   KanbanColumnPanel,
   resolveKanbanColumns,
-} from "./kanban-board-presentation"
+} from "./kanban-board-presentation";
 
 export type KanbanBoardDragViewProps = {
-  board: GovernedKanbanBoardConfiguration
-  surfaceKey?: string
-  onCardMove: (payload: KanbanCardMovePayload) => void
+  board: GovernedKanbanBoardConfiguration;
+  surfaceKey?: string;
+  onCardMove: (payload: KanbanCardMovePayload) => void;
   /** When true, suppresses new drags while a move is in flight. */
-  isMovePending?: boolean
-  pendingCardId?: string | null
-}
+  isMovePending?: boolean;
+  pendingCardId?: string | null;
+};
 
 type DragSession = {
-  card: KanbanCard
-} | null
+  card: KanbanCard;
+} | null;
 
 export function KanbanBoardDragView({
   board,
@@ -44,86 +44,86 @@ export function KanbanBoardDragView({
   isMovePending = false,
   pendingCardId = null,
 }: KanbanBoardDragViewProps) {
-  const [dragSession, setDragSession] = useState<DragSession>(null)
-  const [hoverColumnId, setHoverColumnId] = useState<string | null>(null)
+  const [dragSession, setDragSession] = useState<DragSession>(null);
+  const [hoverColumnId, setHoverColumnId] = useState<string | null>(null);
 
-  const columns = resolveKanbanColumns(board)
-  const cardsByColumn = groupCardsByColumn(board.cards)
-  const dragHandleLabel = board.copy.dragHandleAriaLabel ?? "Move card"
+  const columns = resolveKanbanColumns(board);
+  const cardsByColumn = groupCardsByColumn(board.cards);
+  const dragHandleLabel = board.copy.dragHandleAriaLabel ?? "Move card";
 
   const endDrag = useCallback(() => {
-    setDragSession(null)
-    setHoverColumnId(null)
-  }, [])
+    setDragSession(null);
+    setHoverColumnId(null);
+  }, []);
 
   function resolveColumnDropState(columnId: string) {
-    if (!dragSession) return "none" as const
+    if (!dragSession) return "none" as const;
     return resolveKanbanCardDropState(
       dragSession.card,
       board.workflow,
-      columnId
-    )
+      columnId,
+    );
   }
 
   function handleCardDragStart(
     event: DragEvent<HTMLLIElement>,
-    card: KanbanCard
+    card: KanbanCard,
   ) {
     if (isMovePending) {
-      event.preventDefault()
-      return
+      event.preventDefault();
+      return;
     }
     if (!isKanbanCardDraggable(card, board.workflow)) {
-      event.preventDefault()
-      return
+      event.preventDefault();
+      return;
     }
     if (event.dataTransfer) {
-      event.dataTransfer.effectAllowed = "move"
-      event.dataTransfer.setData("text/plain", card.id)
+      event.dataTransfer.effectAllowed = "move";
+      event.dataTransfer.setData("text/plain", card.id);
     }
-    setDragSession({ card })
+    setDragSession({ card });
   }
 
   function handleColumnDragOver(
     event: DragEvent<HTMLDivElement>,
-    columnId: string
+    columnId: string,
   ) {
-    if (!dragSession) return
+    if (!dragSession) return;
     const dropState = resolveKanbanCardDropState(
       dragSession.card,
       board.workflow,
-      columnId
-    )
-    if (dropState === "forbidden") return
-    event.preventDefault()
+      columnId,
+    );
+    if (dropState === "forbidden") return;
+    event.preventDefault();
     if (event.dataTransfer) {
-      event.dataTransfer.dropEffect = dropState === "allowed" ? "move" : "none"
+      event.dataTransfer.dropEffect = dropState === "allowed" ? "move" : "none";
     }
-    setHoverColumnId(columnId)
+    setHoverColumnId(columnId);
   }
 
   function handleColumnDrop(
     event: DragEvent<HTMLDivElement>,
-    columnId: string
+    columnId: string,
   ) {
-    event.preventDefault()
-    if (!dragSession) return
+    event.preventDefault();
+    if (!dragSession) return;
 
     const dropState = resolveKanbanCardDropState(
       dragSession.card,
       board.workflow,
-      columnId
-    )
+      columnId,
+    );
     if (dropState !== "allowed") {
-      endDrag()
-      return
+      endDrag();
+      return;
     }
 
-    onCardMove(buildKanbanCardMovePayload(dragSession.card, columnId))
-    endDrag()
+    onCardMove(buildKanbanCardMovePayload(dragSession.card, columnId));
+    endDrag();
   }
 
-  const boardDom = resolveKanbanBoardDomProps(surfaceKey)
+  const boardDom = resolveKanbanBoardDomProps(surfaceKey);
 
   return (
     <section
@@ -134,12 +134,12 @@ export function KanbanBoardDragView({
     >
       <div className={kanbanGridClass(columns.length)}>
         {columns.map((column) => {
-          const cards = cardsByColumn.get(column.id) ?? []
-          const headingId = `kanban-column-${column.id}-title`
+          const cards = cardsByColumn.get(column.id) ?? [];
+          const headingId = `kanban-column-${column.id}-title`;
           const dropState =
             hoverColumnId === column.id
               ? resolveColumnDropState(column.id)
-              : "none"
+              : "none";
 
           return (
             <KanbanColumnPanel
@@ -154,15 +154,15 @@ export function KanbanBoardDragView({
                 onDrop: (event) => handleColumnDrop(event, column.id),
                 onDragLeave: () => {
                   if (hoverColumnId === column.id) {
-                    setHoverColumnId(null)
+                    setHoverColumnId(null);
                   }
                 },
               }}
               renderCard={(card) => {
                 const draggable =
-                  !isMovePending && isKanbanCardDraggable(card, board.workflow)
+                  !isMovePending && isKanbanCardDraggable(card, board.workflow);
                 const isDragging =
-                  dragSession?.card.id === card.id || pendingCardId === card.id
+                  dragSession?.card.id === card.id || pendingCardId === card.id;
 
                 return (
                   <li
@@ -190,12 +190,12 @@ export function KanbanBoardDragView({
                       }}
                     />
                   </li>
-                )
+                );
               }}
             />
-          )
+          );
         })}
       </div>
     </section>
-  )
+  );
 }

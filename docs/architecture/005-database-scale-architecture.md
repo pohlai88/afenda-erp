@@ -2,11 +2,11 @@
 
 **Doc ID:** `ARCH-005` · **File:** `005-database-scale-architecture.md`
 
-| Field | Value |
-| ----- | ----- |
-| Status | Active — scale plan with as-built schema inventory (May 2026) |
-| Authority | Schema growth, ownership, promotion, performance on Neon + Vercel |
-| Related | **ARCH-002** (packages) · **ARCH-006** (query windows) · **ARCH-001** (runtime) |
+| Field     | Value                                                                           |
+| --------- | ------------------------------------------------------------------------------- |
+| Status    | Active — scale plan with as-built schema inventory (May 2026)                   |
+| Authority | Schema growth, ownership, promotion, performance on Neon + Vercel               |
+| Related   | **ARCH-002** (packages) · **ARCH-006** (query windows) · **ARCH-001** (runtime) |
 
 Afenda ERP must be designed as a large transactional system before full module
 coding begins. The current shared ERP record tables are a useful foundation for
@@ -26,20 +26,20 @@ snapshots, permissions, and module-specific operational records.
 
 Planning estimate:
 
-| Area                         | Expected table count |
-| ---------------------------- | -------------------- |
-| Identity, tenancy, auth      | 10-20                |
-| Permissions and audit        | 10-25                |
-| Finance and accounting       | 30-70                |
-| Sales and receivables        | 20-45                |
-| Purchasing and payables      | 20-45                |
-| Inventory and warehousing    | 30-70                |
+| Area                        | Expected table count |
+| --------------------------- | -------------------- |
+| Identity, tenancy, auth     | 10-20                |
+| Permissions and audit       | 10-25                |
+| Finance and accounting      | 30-70                |
+| Sales and receivables       | 20-45                |
+| Purchasing and payables     | 20-45                |
+| Inventory and warehousing   | 30-70                |
 | HR and workforce operations | 40-100               |
-| CRM and activities           | 15-35                |
-| Approvals and workflows      | 15-40                |
-| Documents and uploads        | 10-25                |
-| Reporting and snapshots      | 15-50                |
-| AI operations and evals      | 15-40                |
+| CRM and activities          | 15-35                |
+| Approvals and workflows     | 15-40                |
+| Documents and uploads       | 10-25                |
+| Reporting and snapshots     | 15-50                |
+| AI operations and evals     | 15-40                |
 
 The architecture should therefore assume a long-term database in the range of
 230-565 tables as modules mature. v1 does not need all of these tables, but the
@@ -49,15 +49,15 @@ folder, package, migration, and ownership model must not block that growth.
 
 **On disk today** (`packages/db/src/schema/` — flat files, no module subdirs yet):
 
-| File | Primary tables / enums |
-| ---- | ---------------------- |
-| `common.ts` | Shared enums (`erp_module_id`, record/work-item status, AI enums) |
-| `identity.ts` | `user_profiles` |
-| `organizations.ts` | `organizations`, `organization_memberships` |
-| `permissions.ts` | `permissions`, `role_permissions` |
-| `audit.ts` | `audit_logs` |
-| `erp.ts` | `erp_module_records`, `erp_saved_views`, `erp_work_items`, `erp_documents` |
-| `ai.ts` | `ai_usage_events`, `ai_document_extractions`, `ai_approval_proposals` |
+| File               | Primary tables / enums                                                     |
+| ------------------ | -------------------------------------------------------------------------- |
+| `common.ts`        | Shared enums (`erp_module_id`, record/work-item status, AI enums)          |
+| `identity.ts`      | `user_profiles`                                                            |
+| `organizations.ts` | `organizations`, `organization_memberships`                                |
+| `permissions.ts`   | `permissions`, `role_permissions`                                          |
+| `audit.ts`         | `audit_logs`                                                               |
+| `erp.ts`           | `erp_module_records`, `erp_saved_views`, `erp_work_items`, `erp_documents` |
+| `ai.ts`            | `ai_usage_events`, `ai_document_extractions`, `ai_approval_proposals`      |
 
 Connection and tenancy (**as-built** in `packages/db/src/tenant-context.ts`):
 
@@ -71,14 +71,14 @@ payroll, AR/AP, bank reconciliation, procurement matching, or regulatory HR data
 
 ## Vercel and Neon runtime (validated May 2026)
 
-| Topic | Guidance |
-| ----- | -------- |
-| Hosting | Neon Postgres via Vercel Marketplace / env sync; single shared multi-tenant database per **ARCH-001** |
-| Serverless functions | Prefer short transactions; avoid module-scope pool creation in new route code — use `@afenda/db` helpers |
-| Fluid Compute | When wiring pools directly in Functions, call `attachDatabasePool(pool)` from `@vercel/functions` after creating the pool so idle clients release before suspend ([Vercel Functions API](https://vercel.com/docs/functions/functions-api-reference/vercel-functions-package)) |
-| Env vars | `DATABASE_URL`, `DATABASE_MIGRATION_URL` must stay in Turborepo `globalEnv` so Remote Cache hashes stay correct after `vercel link` |
-| Blob / documents | ERP document uploads use Vercel Blob patterns centralized in app/config — not inline schema growth |
-| Observability | Log slow queries and posting paths via `@afenda/observability`; never log tenant field values |
+| Topic                | Guidance                                                                                                                                                                                                                                                                      |
+| -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Hosting              | Neon Postgres via Vercel Marketplace / env sync; single shared multi-tenant database per **ARCH-001**                                                                                                                                                                         |
+| Serverless functions | Prefer short transactions; avoid module-scope pool creation in new route code — use `@afenda/db` helpers                                                                                                                                                                      |
+| Fluid Compute        | When wiring pools directly in Functions, call `attachDatabasePool(pool)` from `@vercel/functions` after creating the pool so idle clients release before suspend ([Vercel Functions API](https://vercel.com/docs/functions/functions-api-reference/vercel-functions-package)) |
+| Env vars             | `DATABASE_URL`, `DATABASE_MIGRATION_URL` must stay in Turborepo `globalEnv` so Remote Cache hashes stay correct after `vercel link`                                                                                                                                           |
+| Blob / documents     | ERP document uploads use Vercel Blob patterns centralized in app/config — not inline schema growth                                                                                                                                                                            |
+| Observability        | Log slow queries and posting paths via `@afenda/observability`; never log tenant field values                                                                                                                                                                                 |
 
 **Target hardening (not blocking v1):** adopt `attachDatabasePool` on the shared Neon pool when the deploy runtime is confirmed on Fluid Compute; until then the lazy singleton + transaction-scoped GUCs match current serverless usage.
 

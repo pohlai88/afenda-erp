@@ -3,19 +3,19 @@ import type {
   FormRuleCondition,
   FormRuleEffect,
   FormRuleFieldCondition,
-} from "./schemas/form-rules.schema"
+} from "./schemas/form-rules.schema";
 
 export type FormFieldRuleState = {
-  visible: boolean
-  enabled: boolean
-}
+  visible: boolean;
+  enabled: boolean;
+};
 
-export type FormRuleValues = Record<string, unknown>
+export type FormRuleValues = Record<string, unknown>;
 
 const DEFAULT_FIELD_STATE: FormFieldRuleState = {
   visible: true,
   enabled: true,
-}
+};
 
 /**
  * Evaluates declarative rules for a single control.
@@ -23,73 +23,73 @@ const DEFAULT_FIELD_STATE: FormFieldRuleState = {
  */
 export function resolveFormFieldRuleState(
   rules: readonly FormRule[] | undefined,
-  values: FormRuleValues
+  values: FormRuleValues,
 ): FormFieldRuleState {
   if (!rules?.length) {
-    return DEFAULT_FIELD_STATE
+    return DEFAULT_FIELD_STATE;
   }
 
-  const hasShowRule = rules.some((rule) => rule.effect === "SHOW")
-  const hasEnableRule = rules.some((rule) => rule.effect === "ENABLE")
-  let visible = hasShowRule ? false : true
-  let enabled = hasEnableRule ? false : true
+  const hasShowRule = rules.some((rule) => rule.effect === "SHOW");
+  const hasEnableRule = rules.some((rule) => rule.effect === "ENABLE");
+  let visible = hasShowRule ? false : true;
+  let enabled = hasEnableRule ? false : true;
 
   for (const rule of rules) {
     if (!evaluateFormRuleCondition(rule.condition, values)) {
-      continue
+      continue;
     }
 
     switch (rule.effect) {
       case "SHOW":
-        visible = true
-        break
+        visible = true;
+        break;
       case "HIDE":
-        visible = false
-        break
+        visible = false;
+        break;
       case "DISABLE":
-        enabled = false
-        break
+        enabled = false;
+        break;
       case "ENABLE":
-        enabled = true
-        break
+        enabled = true;
+        break;
       default: {
-        const _exhaustive: never = rule.effect
-        void _exhaustive
+        const _exhaustive: never = rule.effect;
+        void _exhaustive;
       }
     }
   }
 
-  return { visible, enabled }
+  return { visible, enabled };
 }
 
 export function evaluateFormRuleCondition(
   condition: FormRuleCondition,
-  values: FormRuleValues
+  values: FormRuleValues,
 ): boolean {
   switch (condition.scope) {
     case "field":
-      return evaluateFieldCondition(condition, values)
+      return evaluateFieldCondition(condition, values);
     case "and":
       return condition.conditions.every((child: FormRuleCondition) =>
-        evaluateFormRuleCondition(child, values)
-      )
+        evaluateFormRuleCondition(child, values),
+      );
     case "or":
       return condition.conditions.some((child: FormRuleCondition) =>
-        evaluateFormRuleCondition(child, values)
-      )
+        evaluateFormRuleCondition(child, values),
+      );
     default:
-      return false
+      return false;
   }
 }
 
 function evaluateFieldCondition(
   condition: FormRuleFieldCondition,
-  values: FormRuleValues
+  values: FormRuleValues,
 ): boolean {
-  const observed = values[condition.fieldId]
-  return observed === condition.equals
+  const observed = values[condition.fieldId];
+  return observed === condition.equals;
 }
 
 export function isFormRuleEffectVisible(effect: FormRuleEffect): boolean {
-  return effect === "SHOW" || effect === "HIDE"
+  return effect === "SHOW" || effect === "HIDE";
 }

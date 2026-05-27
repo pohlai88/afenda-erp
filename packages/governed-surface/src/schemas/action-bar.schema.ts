@@ -1,16 +1,16 @@
-import { z } from "zod"
+import { z } from "zod";
 
-import type { SchemaStability } from "./_stability.shared"
+import type { SchemaStability } from "./_stability.shared";
 
-import { erpPermissionRequirementSchema } from "./erp-permission-requirement.schema"
-import { actionDescriptorSchema } from "./action.schema"
-import { governedSurfaceChromeSchema } from "./surface-chrome.schema"
+import { erpPermissionRequirementSchema } from "./erp-permission-requirement.schema";
+import { actionDescriptorSchema } from "./action.schema";
+import { governedSurfaceChromeSchema } from "./surface-chrome.schema";
 
 export const GOVERNED_ACTION_BAR_CONFIGURATION_SCHEMA_ID =
-  "governed.action-bar.configuration" as const
+  "governed.action-bar.configuration" as const;
 
 export const GOVERNED_ACTION_BAR_CONFIGURATION_SCHEMA_STABILITY: SchemaStability =
-  "beta"
+  "beta";
 
 /**
  * Action-bar data nature (ADR-0025 §2).
@@ -20,8 +20,8 @@ export const GOVERNED_ACTION_BAR_CONFIGURATION_SCHEMA_STABILITY: SchemaStability
  *             as a single-member enum so the parity script keeps the
  *             schema / registry / cursor rule in lockstep.
  */
-export const actionBarDataNatureSchema = z.enum(["actions"])
-export type ActionBarDataNature = z.infer<typeof actionBarDataNatureSchema>
+export const actionBarDataNatureSchema = z.enum(["actions"]);
+export type ActionBarDataNature = z.infer<typeof actionBarDataNatureSchema>;
 
 export const governedActionBarConfigurationSchema = z
   .object({
@@ -31,16 +31,16 @@ export const governedActionBarConfigurationSchema = z
     chrome: governedSurfaceChromeSchema.optional(),
     ariaLabel: z.string().trim().min(1).optional(),
   })
-  .strict()
+  .strict();
 
 export type GovernedActionBarConfiguration = z.infer<
   typeof governedActionBarConfigurationSchema
->
+>;
 
 export type GovernedActionBarConfigurationInput = z.input<
   typeof governedActionBarConfigurationSchema
->
+>;
 
 export function parseGovernedActionBarConfiguration(raw: unknown) {
-  return governedActionBarConfigurationSchema.safeParse(raw)
+  return governedActionBarConfigurationSchema.safeParse(raw);
 }

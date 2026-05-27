@@ -29,8 +29,11 @@ async function ProtectedLayoutInner({
 }>) {
   const { session, organization } = await getOrganizationContext();
   const accessibleModules = getAccessibleModules(organization.capabilities);
-  const navigationExtensions = getNavigationExtensions(organization.capabilities);
-  const activeRouteCount = accessibleModules.length + navigationExtensions.length;
+  const navigationExtensions = getNavigationExtensions(
+    organization.capabilities,
+  );
+  const activeRouteCount =
+    accessibleModules.length + navigationExtensions.length;
   const posture = roleOperatingPosture[organization.role];
 
   return (

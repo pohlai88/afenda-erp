@@ -57,7 +57,8 @@ export const recoveryPlaybookDefinitions = [
     id: "cash-flow",
     label: "Improve cash flow",
     problem: "Cash-flow pressure",
-    diagnosis: "Collections, supplier timing, invoice holds, order handoff delay.",
+    diagnosis:
+      "Collections, supplier timing, invoice holds, order handoff delay.",
     action:
       "Draft collection, release, and approval follow-ups for human review.",
     starterPrompt:
@@ -119,9 +120,9 @@ export const recoveryPlaybookDefinitions = [
     id: "approvals",
     label: "Clear approval bottlenecks",
     problem: "Approval bottleneck",
-    diagnosis: "Queue depth, escalations, missing owner checks, cycle-time drag.",
-    action:
-      "Prepare escalation and request-info proposals with audit context.",
+    diagnosis:
+      "Queue depth, escalations, missing owner checks, cycle-time drag.",
+    action: "Prepare escalation and request-info proposals with audit context.",
     starterPrompt:
       "Find approval bottlenecks affecting financial recovery, order release, purchasing, HR, or operations. Recommend accountable next actions and human checks.",
     iconKey: "clipboard-check",

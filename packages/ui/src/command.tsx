@@ -1,17 +1,17 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Command as CommandPrimitive } from "cmdk"
-import { LoaderCircleIcon, SearchIcon } from "lucide-react"
+import * as React from "react";
+import { Command as CommandPrimitive } from "cmdk";
+import { LoaderCircleIcon, SearchIcon } from "lucide-react";
 
-import { cn } from "./utils"
+import { cn } from "./utils";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "./dialog"
+} from "./dialog";
 
 function Command({
   className,
@@ -22,11 +22,11 @@ function Command({
       data-slot="command"
       className={cn(
         "flex size-full flex-col overflow-hidden rounded-xl bg-popover text-popover-foreground",
-        className
+        className,
       )}
       {...props}
     />
-  )
+  );
 }
 
 function CommandDialog({
@@ -37,10 +37,10 @@ function CommandDialog({
   showCloseButton = false,
   ...props
 }: React.ComponentProps<typeof Dialog> & {
-  title?: string
-  description?: string
-  className?: string
-  showCloseButton?: boolean
+  title?: string;
+  description?: string;
+  className?: string;
+  showCloseButton?: boolean;
 }) {
   return (
     <Dialog {...props}>
@@ -55,14 +55,14 @@ function CommandDialog({
           // Container: compact command surface with tokenized elevation.
           "gap-0 overflow-hidden rounded-xl! border border-border p-0",
           "shadow-elevation-3",
-          className
+          className,
         )}
         showCloseButton={showCloseButton}
       >
         {children}
       </DialogContent>
     </Dialog>
-  )
+  );
 }
 
 function CommandInput({
@@ -83,12 +83,12 @@ function CommandInput({
           "flex h-11 w-full bg-transparent py-3 text-sm outline-hidden",
           "placeholder:text-muted-foreground/50",
           "disabled:cursor-not-allowed disabled:opacity-50",
-          className
+          className,
         )}
         {...props}
       />
     </div>
-  )
+  );
 }
 
 function CommandList({
@@ -100,11 +100,11 @@ function CommandList({
       data-slot="command-list"
       className={cn(
         "max-h-72 scroll-py-1 overflow-x-hidden overflow-y-auto overscroll-contain outline-none",
-        className
+        className,
       )}
       {...props}
     />
-  )
+  );
 }
 
 function CommandEmpty({
@@ -116,11 +116,11 @@ function CommandEmpty({
       data-slot="command-empty"
       className={cn(
         "py-8 text-center text-sm text-muted-foreground",
-        className
+        className,
       )}
       {...props}
     />
-  )
+  );
 }
 
 function CommandGroup({
@@ -136,11 +136,11 @@ function CommandGroup({
         "**:[[cmdk-group-heading]]:text-[11px] **:[[cmdk-group-heading]]:font-medium",
         "**:[[cmdk-group-heading]]:tracking-wide **:[[cmdk-group-heading]]:uppercase",
         "**:[[cmdk-group-heading]]:text-muted-foreground/60",
-        className
+        className,
       )}
       {...props}
     />
-  )
+  );
 }
 
 function CommandSeparator({
@@ -153,7 +153,7 @@ function CommandSeparator({
       className={cn("my-1 h-px bg-border/50", className)}
       {...props}
     />
-  )
+  );
 }
 
 function CommandItem({
@@ -173,13 +173,13 @@ function CommandItem({
         "data-selected:border-l-primary data-selected:bg-accent data-selected:text-accent-foreground",
         "transition-[background-color,border-color] duration-100",
         "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
-        className
+        className,
       )}
       {...props}
     >
       {children}
     </CommandPrimitive.Item>
-  )
+  );
 }
 
 function CommandLoading({
@@ -192,7 +192,7 @@ function CommandLoading({
       data-slot="command-loading"
       className={cn(
         "py-8 text-center text-sm text-muted-foreground",
-        className
+        className,
       )}
       {...props}
     >
@@ -206,7 +206,7 @@ function CommandLoading({
         </span>
       )}
     </CommandPrimitive.Loading>
-  )
+  );
 }
 
 function CommandShortcut({
@@ -219,11 +219,11 @@ function CommandShortcut({
       className={cn(
         "ml-auto text-xs tracking-widest text-muted-foreground/60",
         "group-data-selected/command-item:text-accent-foreground/70",
-        className
+        className,
       )}
       {...props}
     />
-  )
+  );
 }
 
 export {
@@ -237,4 +237,4 @@ export {
   CommandItem,
   CommandShortcut,
   CommandSeparator,
-}
+};

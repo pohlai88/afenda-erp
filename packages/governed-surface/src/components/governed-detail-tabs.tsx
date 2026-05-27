@@ -1,4 +1,4 @@
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@afenda/ui/tabs"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@afenda/ui/tabs";
 
 import type {
   GovernedDetailTabsInput,
@@ -6,31 +6,31 @@ import type {
   GovernedDetailTabKind,
   GovernedDetailTabsModel,
   GovernedRevisionEntry,
-} from "../schemas/detail-tabs.schema"
-import { governedDetailTabsSchema } from "../schemas/detail-tabs.schema"
+} from "../schemas/detail-tabs.schema";
+import { governedDetailTabsSchema } from "../schemas/detail-tabs.schema";
 
-import { resolveGovernedDetailSectionContent } from "../metadata/detail-section.adapter"
-import { GovernedAuditPanel } from "./governed-audit-panel"
-import { GovernedEmpty } from "./governed-empty"
+import { resolveGovernedDetailSectionContent } from "../metadata/detail-section.adapter";
+import { GovernedAuditPanel } from "./governed-audit-panel";
+import { GovernedEmpty } from "./governed-empty";
 
 export type GovernedDetailTabsProps = {
-  model: GovernedDetailTabsInput
-}
+  model: GovernedDetailTabsInput;
+};
 
 function sortVisibleSections(
-  sections: GovernedDetailSection[] | undefined
+  sections: GovernedDetailSection[] | undefined,
 ): GovernedDetailSection[] {
-  if (!sections?.length) return []
+  if (!sections?.length) return [];
   return sections
     .filter((s) => !s.hidden)
     .slice()
-    .sort((a, b) => a.orderIndex - b.orderIndex)
+    .sort((a, b) => a.orderIndex - b.orderIndex);
 }
 
 function renderSectionSlot(section: GovernedDetailSection) {
-  const resolved = resolveGovernedDetailSectionContent(section)
+  const resolved = resolveGovernedDetailSectionContent(section);
   if (resolved != null) {
-    return resolved
+    return resolved;
   }
   return (
     <GovernedEmpty
@@ -40,7 +40,7 @@ function renderSectionSlot(section: GovernedDetailSection) {
         description: `No renderer is registered for "${section.rendererKey}".`,
       }}
     />
-  )
+  );
 }
 
 function RevisionsTable({ rows }: { rows: GovernedRevisionEntry[] }) {
@@ -49,7 +49,7 @@ function RevisionsTable({ rows }: { rows: GovernedRevisionEntry[] }) {
       <p className="rounded-md border border-dashed p-8 text-center text-sm text-muted-foreground">
         No revision history.
       </p>
-    )
+    );
   }
 
   return (
@@ -83,40 +83,40 @@ function RevisionsTable({ rows }: { rows: GovernedRevisionEntry[] }) {
         </tbody>
       </table>
     </div>
-  )
+  );
 }
 
 function visibleTabKinds(
-  model: GovernedDetailTabsModel
+  model: GovernedDetailTabsModel,
 ): GovernedDetailTabKind[] {
-  const kinds: GovernedDetailTabKind[] = ["overview"]
+  const kinds: GovernedDetailTabKind[] = ["overview"];
   if (sortVisibleSections(model.relations).length > 0) {
-    kinds.push("relations")
+    kinds.push("relations");
   }
   if (sortVisibleSections(model.referrers).length > 0) {
-    kinds.push("referrers")
+    kinds.push("referrers");
   }
   if ((model.revisions?.length ?? 0) > 0) {
-    kinds.push("revisions")
+    kinds.push("revisions");
   }
   if ((model.audit?.length ?? 0) > 0) {
-    kinds.push("audit")
+    kinds.push("audit");
   }
-  return kinds
+  return kinds;
 }
 
 function effectiveDefaultTab(
-  model: GovernedDetailTabsModel
+  model: GovernedDetailTabsModel,
 ): GovernedDetailTabKind {
-  const kinds = visibleTabKinds(model)
+  const kinds = visibleTabKinds(model);
   if (kinds.includes(model.defaultTab)) {
-    return model.defaultTab
+    return model.defaultTab;
   }
-  return "overview"
+  return "overview";
 }
 
 export function GovernedDetailTabs({ model }: GovernedDetailTabsProps) {
-  const parsedModel = governedDetailTabsSchema.safeParse(model)
+  const parsedModel = governedDetailTabsSchema.safeParse(model);
   if (!parsedModel.success) {
     return (
       <GovernedEmpty
@@ -126,15 +126,15 @@ export function GovernedDetailTabs({ model }: GovernedDetailTabsProps) {
           description: "The detail tab model could not be parsed.",
         }}
       />
-    )
+    );
   }
-  const normalizedModel = parsedModel.data
-  const kinds = visibleTabKinds(normalizedModel)
-  const defaultValue = effectiveDefaultTab(normalizedModel)
-  const relations = sortVisibleSections(normalizedModel.relations)
-  const referrers = sortVisibleSections(normalizedModel.referrers)
-  const revisions = normalizedModel.revisions ?? []
-  const auditRows = normalizedModel.audit ?? []
+  const normalizedModel = parsedModel.data;
+  const kinds = visibleTabKinds(normalizedModel);
+  const defaultValue = effectiveDefaultTab(normalizedModel);
+  const relations = sortVisibleSections(normalizedModel.relations);
+  const referrers = sortVisibleSections(normalizedModel.referrers);
+  const revisions = normalizedModel.revisions ?? [];
+  const auditRows = normalizedModel.audit ?? [];
 
   return (
     <div data-test="governed-detail-tabs">
@@ -267,5 +267,5 @@ export function GovernedDetailTabs({ model }: GovernedDetailTabsProps) {
         ) : null}
       </Tabs>
     </div>
-  )
+  );
 }

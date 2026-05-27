@@ -1,1 +1,1 @@
-export { resolveGovernedErpPermissionAllowed } from "../adapters/rbac.server"
+export { resolveGovernedErpPermissionAllowed } from "../adapters/rbac.server";

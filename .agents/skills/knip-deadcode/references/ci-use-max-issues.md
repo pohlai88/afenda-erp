@@ -12,7 +12,7 @@ Use `--max-issues` to set a threshold for acceptable issues. This enables gradua
 **Incorrect (all-or-nothing blocks adoption):**
 
 ```yaml
-- run: npx knip  # Fails with 500 existing issues
+- run: npx knip # Fails with 500 existing issues
 # Team disables Knip because it blocks all PRs
 ```
 

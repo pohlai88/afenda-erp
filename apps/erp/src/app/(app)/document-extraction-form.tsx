@@ -74,9 +74,7 @@ function ExtractionReview({ payload }: { payload: ExtractionPayload }) {
     <div className="grid gap-4 rounded-lg border border-line bg-surface p-4">
       <div className="grid gap-3 md:grid-cols-4">
         <div>
-          <div className="text-xs uppercase tracking-wide text-muted">
-            Type
-          </div>
+          <div className="text-xs uppercase tracking-wide text-muted">Type</div>
           <div className="mt-1 text-sm font-semibold text-foreground">
             {extraction.documentType}
           </div>

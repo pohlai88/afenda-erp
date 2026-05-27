@@ -1,0 +1,38 @@
+---
+description: Next.js ERP app routes, handlers, and runtime patterns
+globs: apps/erp/**/*
+alwaysApply: false
+---
+
+# Afenda ERP app (`apps/erp`)
+
+Full agent context: `apps/erp/AGENTS.md`. System runtime: **ARCH-001**.
+
+## Route ownership
+
+- Dynamic module workspace: `(app)/[moduleId]/` — do not add `finance/`, `sales/`, etc. as sibling route folders unless the URL tree is genuinely different.
+- Dashboard and solution-console are dedicated routes, not `[moduleId]`.
+- `src/proxy.ts` is the Next.js 16 traffic/session helper — not the sole auth boundary.
+
+## Server vs client
+
+- Default to Server Components; Client Components only for grids, palettes, uploads, charts, optimistic forms.
+- Lazy-init DB/auth via package helpers (`getDb()`, `@afenda/auth/server`). No module-scope pools or SDK clients in new code.
+- Batch independent RSC reads with `Promise.all` where safe.
+
+## Handlers and mutations
+
+- **Server Actions** — internal ERP mutations; check permissions before calling domain/feature services; narrow `revalidatePath` / `revalidateTag` / `updateTag` after writes.
+- **Route Handlers** — AI streams, webhooks, Blob uploads, cron (`CRON_SECRET`), observability drain.
+- **Cron** — use `authorizeCronRequest` / `runCronJob` from `src/lib/cron.ts`.
+
+## Caching (Next 16 Cache Components)
+
+- Tenant-scoped lists and dashboards: dynamic reads inside org context — do not CDN-cache another tenant's rows.
+- `'use cache'` / `'use cache: remote'` only for shared reference data; prefer `cache: 'no-store'` over blanket `force-dynamic` when one subtree must stay fresh.
+
+## Governed lists in this app
+
+- Compose `GovernedPatternCListSection` from `@afenda/governed-surface/server`.
+- Builders today: `@afenda/domain` (`module-list-surfaces.ts`); move to `@afenda/feature-*` when extracting.
+- Pass validated **configuration** to client bridges, not raw Drizzle rows.

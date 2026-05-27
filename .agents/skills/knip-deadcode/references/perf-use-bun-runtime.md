@@ -34,6 +34,7 @@ powershell -c "irm bun.sh/install.ps1 | iex"
 ```
 
 **Performance comparison (typical large project):**
+
 - Node.js: ~30 seconds
 - Bun: ~12 seconds
 

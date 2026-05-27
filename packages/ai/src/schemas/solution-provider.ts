@@ -1,8 +1,5 @@
 import { moduleIds } from "@afenda/config/module-ids";
-import {
-  businessProblemTypes,
-  solutionWorkflowIds,
-} from "@afenda/domain";
+import { businessProblemTypes, solutionWorkflowIds } from "@afenda/domain";
 import { z } from "zod";
 import {
   actionSandboxSchema,
@@ -101,10 +98,6 @@ export type BusinessProblemInput = z.infer<typeof businessProblemInputSchema>;
 export type RootCauseAnalysis = z.infer<typeof rootCauseAnalysisSchema>;
 export type RecoveryPlaybook = z.infer<typeof recoveryPlaybookSchema>;
 export type ActionCandidate = z.infer<typeof actionCandidateSchema>;
-export type ActionApprovalRequest = z.infer<
-  typeof actionApprovalRequestSchema
->;
+export type ActionApprovalRequest = z.infer<typeof actionApprovalRequestSchema>;
 export type SolutionProviderRun = z.infer<typeof solutionProviderRunSchema>;
-export type KpiAnomalyExplanation = z.infer<
-  typeof kpiAnomalyExplanationSchema
->;
+export type KpiAnomalyExplanation = z.infer<typeof kpiAnomalyExplanationSchema>;

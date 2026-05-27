@@ -37,7 +37,8 @@ const moduleObservabilityIndicators: Record<
     {
       label: "Exception capture",
       value: "100%",
-      detail: "Invoice hold routes are mapped into audit and queue instrumentation.",
+      detail:
+        "Invoice hold routes are mapped into audit and queue instrumentation.",
       tone: "positive",
     },
   ],

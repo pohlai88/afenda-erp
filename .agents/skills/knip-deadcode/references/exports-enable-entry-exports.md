@@ -19,8 +19,8 @@ By default, Knip doesn't report unused exports from entry files (they may be con
 
 ```typescript
 // src/index.ts
-export const usedFunction = () => {}
-export const unusedFunction = () => {}  // Not reported
+export const usedFunction = () => {};
+export const unusedFunction = () => {}; // Not reported
 ```
 
 **Correct (entry exports included for private package):**
@@ -50,6 +50,7 @@ Now Knip reports `unusedFunction` as unused.
 ```
 
 **When NOT to enable:**
+
 - Public npm packages (exports are the API)
 - Packages consumed by external projects
 

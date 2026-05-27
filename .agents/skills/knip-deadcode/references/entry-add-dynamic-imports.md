@@ -14,9 +14,9 @@ Knip cannot statically analyze dynamic imports with computed paths. Add dynamica
 ```typescript
 // src/plugins/index.ts
 const loadPlugin = async (name: string) => {
-  const module = await import(`./plugins/${name}`)  // Knip can't resolve
-  return module.default
-}
+  const module = await import(`./plugins/${name}`); // Knip can't resolve
+  return module.default;
+};
 ```
 
 ```json
@@ -29,10 +29,7 @@ const loadPlugin = async (name: string) => {
 
 ```json
 {
-  "entry": [
-    "src/index.ts",
-    "src/plugins/*.ts"
-  ]
+  "entry": ["src/index.ts", "src/plugins/*.ts"]
 }
 ```
 

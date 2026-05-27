@@ -13,11 +13,11 @@ Exports used only within the same file (for testing or organization) can be excl
 
 ```typescript
 // src/math.ts
-export const add = (a: number, b: number) => a + b
-export const multiply = (a: number, b: number) => a * b
+export const add = (a: number, b: number) => a + b;
+export const multiply = (a: number, b: number) => a * b;
 
 // Only used in this file for complex calculations
-export const complexCalc = (x: number) => multiply(add(x, 1), 2)
+export const complexCalc = (x: number) => multiply(add(x, 1), 2);
 ```
 
 Knip reports: `add`, `multiply` unused (only used internally).

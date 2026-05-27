@@ -1,24 +1,24 @@
-"use client"
+"use client";
 
-import type { ReactNode } from "react"
-import { useTranslations } from "../i18n/governed-surface-copy.client"
+import type { ReactNode } from "react";
+import { useTranslations } from "../i18n/governed-surface-copy.client";
 
-import { KanbanBoardView } from "../metadata/renderers/kanban-board-view"
+import { KanbanBoardView } from "../metadata/renderers/kanban-board-view";
 
 import {
   parseGovernedKanbanBoardConfiguration,
   type GovernedKanbanBoardConfigurationInput,
   type KanbanCard,
-} from "../client"
-import { GovernedEmpty } from "./governed-empty"
+} from "../client";
+import { GovernedEmpty } from "./governed-empty";
 
 export type GovernedKanbanFooterBoardProps = {
-  configuration: GovernedKanbanBoardConfigurationInput
-  surfaceKey?: string
-  renderCardFooter?: (card: KanbanCard) => ReactNode
+  configuration: GovernedKanbanBoardConfigurationInput;
+  surfaceKey?: string;
+  renderCardFooter?: (card: KanbanCard) => ReactNode;
   /** When true, invalid-config copy includes schema id (dev / operator). */
-  showOperatorDiagnostics?: boolean
-}
+  showOperatorDiagnostics?: boolean;
+};
 
 /**
  * Client bridge for `interactionMode: "footer-actions"` kanban boards.
@@ -30,8 +30,8 @@ export function GovernedKanbanFooterBoard({
   renderCardFooter,
   showOperatorDiagnostics = false,
 }: GovernedKanbanFooterBoardProps) {
-  const t = useTranslations("Erp.GovernedSurface.kanban")
-  const parsed = parseGovernedKanbanBoardConfiguration(configuration)
+  const t = useTranslations("Erp.GovernedSurface.kanban");
+  const parsed = parseGovernedKanbanBoardConfiguration(configuration);
 
   if (!parsed.success) {
     return (
@@ -44,7 +44,7 @@ export function GovernedKanbanFooterBoard({
             : t("invalidConfigDescription"),
         }}
       />
-    )
+    );
   }
 
   if (parsed.data.interactionMode !== "footer-actions") {
@@ -56,7 +56,7 @@ export function GovernedKanbanFooterBoard({
           description: t("invalidInteractionMode"),
         }}
       />
-    )
+    );
   }
 
   return (
@@ -65,5 +65,5 @@ export function GovernedKanbanFooterBoard({
       surfaceKey={surfaceKey}
       renderCardFooter={renderCardFooter}
     />
-  )
+  );
 }

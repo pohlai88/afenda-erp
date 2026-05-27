@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import { useHydrated } from "@afenda/ui/use-hydrated.client"
+import { useHydrated } from "@afenda/ui/use-hydrated.client";
 import {
   Area,
   AreaChart,
@@ -14,7 +14,7 @@ import {
   ReferenceArea,
   XAxis,
   YAxis,
-} from "recharts"
+} from "recharts";
 
 import {
   ChartContainer,
@@ -23,22 +23,22 @@ import {
   ChartTooltip,
   ChartTooltipContent,
   type ChartConfig,
-} from "@afenda/ui/chart"
-import { GovernedEmpty } from "../../client"
+} from "@afenda/ui/chart";
+import { GovernedEmpty } from "../../client";
 import type {
   ChartAnnotation,
   GovernedChartConfiguration,
-} from "../../schemas/chart.schema"
-import { cn } from "@afenda/ui/utils"
+} from "../../schemas/chart.schema";
+import { cn } from "@afenda/ui/utils";
 
-import { ChartHeatmapBody } from "./chart-heatmap-body.client"
+import { ChartHeatmapBody } from "./chart-heatmap-body.client";
 
 type ChartRendererBodyProps = {
-  configuration: GovernedChartConfiguration
-}
+  configuration: GovernedChartConfiguration;
+};
 
 function buildChartConfig(
-  series: NonNullable<GovernedChartConfiguration["series"]>
+  series: NonNullable<GovernedChartConfiguration["series"]>,
 ): ChartConfig {
   return Object.fromEntries(
     series.map((entry, index) => [
@@ -47,30 +47,30 @@ function buildChartConfig(
         label: entry.label,
         color: entry.color ?? `var(--chart-${(index % 8) + 1})`,
       },
-    ])
-  )
+    ]),
+  );
 }
 
 function flattenSeries(
-  series: NonNullable<GovernedChartConfiguration["series"]>
+  series: NonNullable<GovernedChartConfiguration["series"]>,
 ): Array<Record<string, string | number>> {
-  const byX = new Map<string, Record<string, string | number>>()
+  const byX = new Map<string, Record<string, string | number>>();
 
   for (const entry of series) {
     for (const point of entry.points) {
-      const row = byX.get(point.x) ?? { x: point.x }
-      row[entry.id] = point.y
-      byX.set(point.x, row)
+      const row = byX.get(point.x) ?? { x: point.x };
+      row[entry.id] = point.y;
+      byX.set(point.x, row);
     }
   }
 
-  return [...byX.values()]
+  return [...byX.values()];
 }
 
 function ReferenceBands({
   bands,
 }: {
-  bands: NonNullable<GovernedChartConfiguration["referenceBands"]>
+  bands: NonNullable<GovernedChartConfiguration["referenceBands"]>;
 }) {
   return (
     <>
@@ -85,7 +85,7 @@ function ReferenceBands({
         />
       ))}
     </>
-  )
+  );
 }
 
 const ANNOTATION_TONE_CLASS: Record<
@@ -96,30 +96,30 @@ const ANNOTATION_TONE_CLASS: Record<
   positive: "bg-success/15 text-success",
   attention: "bg-warning/20 text-warning-foreground",
   critical: "bg-critical/15 text-critical",
-}
+};
 
 function ChartAnnotations({
   annotations,
 }: {
-  annotations?: ChartAnnotation[]
+  annotations?: ChartAnnotation[];
 }) {
   if (!annotations?.length) {
-    return null
+    return null;
   }
 
   return (
     <ul className="flex flex-wrap gap-2 text-xs" aria-label="Chart annotations">
       {annotations.map((annotation) => {
-        const tone = annotation.tone ?? "default"
+        const tone = annotation.tone ?? "default";
         const coordinate = [annotation.x, annotation.y]
           .filter((value) => value !== undefined)
-          .join(" / ")
+          .join(" / ");
         return (
           <li
             key={`${annotation.label}-${coordinate}`}
             className={cn(
               "inline-flex items-center gap-1 rounded-md px-2 py-1",
-              ANNOTATION_TONE_CLASS[tone]
+              ANNOTATION_TONE_CLASS[tone],
             )}
           >
             <span aria-hidden>{tone === "default" ? "Note" : tone}</span>
@@ -128,14 +128,14 @@ function ChartAnnotations({
               <span className="text-muted-foreground">({coordinate})</span>
             ) : null}
           </li>
-        )
+        );
       })}
     </ul>
-  )
+  );
 }
 
 export function ChartRendererBody({ configuration }: ChartRendererBodyProps) {
-  const hydrated = useHydrated()
+  const hydrated = useHydrated();
 
   if (!hydrated) {
     return (
@@ -143,7 +143,7 @@ export function ChartRendererBody({ configuration }: ChartRendererBodyProps) {
         className="min-h-[12rem] w-full rounded-md bg-muted/30"
         aria-hidden
       />
-    )
+    );
   }
 
   if (configuration.chartKind === "heatmap") {
@@ -152,10 +152,10 @@ export function ChartRendererBody({ configuration }: ChartRendererBodyProps) {
         <ChartHeatmapBody configuration={configuration} />
         <ChartAnnotations annotations={configuration.annotations} />
       </div>
-    )
+    );
   }
 
-  const series = configuration.series ?? []
+  const series = configuration.series ?? [];
   if (series.length === 0) {
     return (
       <GovernedEmpty
@@ -167,14 +167,14 @@ export function ChartRendererBody({ configuration }: ChartRendererBodyProps) {
         }
         className="border-dashed p-6"
       />
-    )
+    );
   }
 
-  const chartConfig = buildChartConfig(series)
-  const data = flattenSeries(series)
-  const seriesKeys = series.map((entry) => entry.id)
-  const showBrush = configuration.interaction === "brush"
-  const referenceBands = configuration.referenceBands ?? []
+  const chartConfig = buildChartConfig(series);
+  const data = flattenSeries(series);
+  const seriesKeys = series.map((entry) => entry.id);
+  const showBrush = configuration.interaction === "brush";
+  const referenceBands = configuration.referenceBands ?? [];
 
   return (
     <div className="flex flex-col gap-3">
@@ -225,7 +225,7 @@ export function ChartRendererBody({ configuration }: ChartRendererBodyProps) {
                   fill={`var(--color-${entry.id})`}
                   radius={4}
                 />
-              )
+              ),
             )}
             {showBrush ? (
               <Brush dataKey="x" height={24} stroke="var(--chart-1)" />
@@ -299,5 +299,5 @@ export function ChartRendererBody({ configuration }: ChartRendererBodyProps) {
       </ChartContainer>
       <ChartAnnotations annotations={configuration.annotations} />
     </div>
-  )
+  );
 }

@@ -1,8 +1,8 @@
-import type { Route } from "next"
+import type { Route } from "next";
 
-import Link from "next/link"
+import Link from "next/link";
 
-import { Button } from "@afenda/ui/button"
+import { Button } from "@afenda/ui/button";
 import {
   Card,
   CardAction,
@@ -10,31 +10,31 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@afenda/ui/card"
-import { GovernedEmpty } from "../../client"
+} from "@afenda/ui/card";
+import { GovernedEmpty } from "../../client";
 import {
   parseGovernedChartConfiguration,
   type ChartAction,
   type ChartDataNature,
-} from "../../schemas/chart.schema"
+} from "../../schemas/chart.schema";
 
-import type { GovernedComponentRendererDiagnostics } from "../registry"
-import { ChartRendererBody } from "./chart-renderer-body.client"
+import type { GovernedComponentRendererDiagnostics } from "../registry";
+import { ChartRendererBody } from "./chart-renderer-body.client";
 
 const DATA_NATURE_CLASS: Record<ChartDataNature, string> = {
   "time-series": "@container min-h-[14rem]",
   categorical: "@container min-h-[14rem]",
-}
+};
 
 export type ChartRendererProps = {
-  configuration: unknown
-  diagnostics?: GovernedComponentRendererDiagnostics
-}
+  configuration: unknown;
+  diagnostics?: GovernedComponentRendererDiagnostics;
+};
 
 function ChartHeaderAction({
   action,
 }: {
-  action: Pick<ChartAction, "label" | "href" | "actionId">
+  action: Pick<ChartAction, "label" | "href" | "actionId">;
 }) {
   if (action.href) {
     return (
@@ -43,7 +43,7 @@ function ChartHeaderAction({
           {action.label}
         </Link>
       </Button>
-    )
+    );
   }
 
   return (
@@ -56,14 +56,14 @@ function ChartHeaderAction({
     >
       {action.label}
     </Button>
-  )
+  );
 }
 
 export function ChartRenderer({
   configuration,
   diagnostics = "user",
 }: ChartRendererProps) {
-  const parsed = parseGovernedChartConfiguration(configuration)
+  const parsed = parseGovernedChartConfiguration(configuration);
 
   if (!parsed.success) {
     return (
@@ -77,16 +77,17 @@ export function ChartRenderer({
               : "This chart could not be loaded safely.",
         }}
       />
-    )
+    );
   }
 
-  const { actions, dataNature, description, drilldownHref, title } = parsed.data
+  const { actions, dataNature, description, drilldownHref, title } =
+    parsed.data;
   const headerActions: Array<Pick<ChartAction, "label" | "href" | "actionId">> =
     [
       ...(actions ?? []),
       ...(drilldownHref ? [{ href: drilldownHref, label: "View detail" }] : []),
-    ]
-  const hasHeader = Boolean(title || description || headerActions.length)
+    ];
+  const hasHeader = Boolean(title || description || headerActions.length);
 
   return (
     <section
@@ -119,5 +120,5 @@ export function ChartRenderer({
         </CardContent>
       </Card>
     </section>
-  )
+  );
 }

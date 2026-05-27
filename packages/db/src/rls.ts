@@ -17,7 +17,8 @@ export const rlsEvaluation: readonly RlsEvaluationItem[] = [
     table: "organization_memberships",
     tenantColumn: "organization_id",
     recommendation: "candidate",
-    reason: "Membership rows are organization scoped and join to the tenant root.",
+    reason:
+      "Membership rows are organization scoped and join to the tenant root.",
   },
   {
     table: "erp_module_records",
@@ -53,7 +54,8 @@ export const rlsEvaluation: readonly RlsEvaluationItem[] = [
     table: "permissions",
     tenantColumn: "none",
     recommendation: "blocked",
-    reason: "Permission catalog is global reference data and should not use tenant RLS.",
+    reason:
+      "Permission catalog is global reference data and should not use tenant RLS.",
   },
 ];
 

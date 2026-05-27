@@ -2,9 +2,9 @@ import {
   ListSurfaceTable,
   type ListSurfaceTableProps,
   type ListSurfaceTableTrailingColumn,
-} from "./renderers/list-surface-table"
+} from "./renderers/list-surface-table";
 
-export type { ListSurfaceTableTrailingColumn }
+export type { ListSurfaceTableTrailingColumn };
 
 /**
  * Pattern C (ADR-0026): metadata-driven list body plus a trailing column for
@@ -13,7 +13,7 @@ export type { ListSurfaceTableTrailingColumn }
  * Feature modules must import this wrapper — not `list-surface-table` directly.
  */
 export function GovernedListSurfaceWithTrailingColumn(
-  props: ListSurfaceTableProps
+  props: ListSurfaceTableProps,
 ) {
-  return <ListSurfaceTable {...props} />
+  return <ListSurfaceTable {...props} />;
 }

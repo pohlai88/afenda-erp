@@ -22,6 +22,7 @@ knip --performance
 ```
 
 Output shows:
+
 ```text
 Performance:
   findWorkspaces: 50ms
@@ -47,6 +48,7 @@ knip --memory-realtime
 ```
 
 **Common causes of slow analysis:**
+
 - Large node_modules with `--include-libs`
 - Too many entry patterns matching files
 - Missing cache (`--cache` not enabled)

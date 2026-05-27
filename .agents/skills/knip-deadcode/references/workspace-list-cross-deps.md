@@ -13,7 +13,7 @@ List other workspaces as dependencies in each package.json instead of using rela
 
 ```typescript
 // packages/api/src/auth.ts
-import { User } from '@packages/shared/types'  // Path alias
+import { User } from "@packages/shared/types"; // Path alias
 ```
 
 ```json
@@ -37,10 +37,11 @@ import { User } from '@packages/shared/types'  // Path alias
 
 ```typescript
 // packages/api/src/auth.ts
-import { User } from '@myorg/shared/types'  // Package import
+import { User } from "@myorg/shared/types"; // Package import
 ```
 
 **Benefits:**
+
 - Knip tracks the dependency relationship correctly
 - Package manager validates workspace links
 - Clearer dependency graph for developers

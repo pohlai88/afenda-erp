@@ -1,43 +1,43 @@
-"use client"
+"use client";
 
-import { useMemo } from "react"
-import { scaleLinear } from "@visx/scale"
-import { LinePath } from "@visx/shape"
+import { useMemo } from "react";
+import { scaleLinear } from "@visx/scale";
+import { LinePath } from "@visx/shape";
 
 type ListSurfaceSparklineProps = {
-  points: readonly number[]
-  className?: string
-}
+  points: readonly number[];
+  className?: string;
+};
 
 export function ListSurfaceSparkline({
   points,
   className,
 }: ListSurfaceSparklineProps) {
-  const width = 96
-  const height = 32
+  const width = 96;
+  const height = 32;
 
   const pathData = useMemo(() => {
     if (points.length < 2) {
-      return null
+      return null;
     }
-    const min = Math.min(...points)
-    const max = Math.max(...points)
+    const min = Math.min(...points);
+    const max = Math.max(...points);
     const xScale = scaleLinear({
       domain: [0, points.length - 1],
       range: [0, width],
-    })
+    });
     const yScale = scaleLinear({
       domain: [min, max === min ? min + 1 : max],
       range: [height - 2, 2],
-    })
+    });
     return points.map((value, index) => ({
       x: xScale(index) ?? 0,
       y: yScale(value) ?? 0,
-    }))
-  }, [points])
+    }));
+  }, [points]);
 
   if (!pathData) {
-    return null
+    return null;
   }
 
   return (
@@ -57,5 +57,5 @@ export function ListSurfaceSparkline({
         fill="none"
       />
     </svg>
-  )
+  );
 }

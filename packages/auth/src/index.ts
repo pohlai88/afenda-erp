@@ -140,7 +140,9 @@ export function normalizeCapabilities(
 ) {
   const capabilities = values.filter(isAppCapability);
 
-  return capabilities.length > 0 ? capabilities : capabilitiesForRole(fallbackRole);
+  return capabilities.length > 0
+    ? capabilities
+    : capabilitiesForRole(fallbackRole);
 }
 
 export function normalizeOrganizationSlug(name: string) {

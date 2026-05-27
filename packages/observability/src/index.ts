@@ -2,7 +2,7 @@ import {
   getModuleObservabilityIndicators,
   type ModuleObservabilityIndicator,
 } from "@afenda/domain";
-import type { ModuleId, ModuleTone } from "@afenda/domain";
+import type { ModuleId } from "@afenda/domain";
 
 export const telemetry = {
   serviceName: "afenda-erp",
@@ -29,7 +29,10 @@ export type ServerLogEvent = ServerLogContext & {
 };
 
 type ServerLogMetadata = Partial<
-  Omit<ServerLogEvent, keyof ServerLogContext | "level" | "message" | "timestamp">
+  Omit<
+    ServerLogEvent,
+    keyof ServerLogContext | "level" | "message" | "timestamp"
+  >
 > &
   Record<string, unknown>;
 
@@ -41,39 +44,43 @@ export type ProductionHardeningItem = {
   detail: string;
 };
 
-export const productionHardeningChecklist: readonly ProductionHardeningItem[] = [
-  {
-    area: "Analytics",
-    status: "ready",
-    detail: "Vercel Analytics filters auth screens and records app route traffic.",
-  },
-  {
-    area: "Speed Insights",
-    status: "ready",
-    detail: "Core Web Vitals are collected from the root app layout.",
-  },
-  {
-    area: "Structured logs",
-    status: "configured",
-    detail: "API routes emit JSON logs with request IDs, duration, status, and module.",
-  },
-  {
-    area: "Log drains",
-    status: "configured",
-    detail: "Signed drain payloads can be accepted at /api/observability/drain.",
-  },
-  {
-    area: "Cron jobs",
-    status: "configured",
-    detail: "Reminder, sync, and housekeeping routes require CRON_SECRET.",
-  },
-  {
-    area: "RLS",
-    status: "configured",
-    detail:
-      "Tenant tables enforce organization-scoped policies via request-local DB GUC context.",
-  },
-];
+export const productionHardeningChecklist: readonly ProductionHardeningItem[] =
+  [
+    {
+      area: "Analytics",
+      status: "ready",
+      detail:
+        "Vercel Analytics filters auth screens and records app route traffic.",
+    },
+    {
+      area: "Speed Insights",
+      status: "ready",
+      detail: "Core Web Vitals are collected from the root app layout.",
+    },
+    {
+      area: "Structured logs",
+      status: "configured",
+      detail:
+        "API routes emit JSON logs with request IDs, duration, status, and module.",
+    },
+    {
+      area: "Log drains",
+      status: "configured",
+      detail:
+        "Signed drain payloads can be accepted at /api/observability/drain.",
+    },
+    {
+      area: "Cron jobs",
+      status: "configured",
+      detail: "Reminder, sync, and housekeeping routes require CRON_SECRET.",
+    },
+    {
+      area: "RLS",
+      status: "configured",
+      detail:
+        "Tenant tables enforce organization-scoped policies via request-local DB GUC context.",
+    },
+  ];
 
 export type DrainPayloadSummary = {
   eventCount: number;
@@ -91,7 +98,8 @@ export function getWorkspaceObservabilitySummary() {
       {
         label: "Route render budget",
         value: "Sub-250ms",
-        detail: "Current dynamic routes remain inside the initial server budget.",
+        detail:
+          "Current dynamic routes remain inside the initial server budget.",
         tone: "positive" as const,
       },
       {

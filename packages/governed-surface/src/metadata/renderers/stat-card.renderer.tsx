@@ -1,29 +1,29 @@
-import { Card, CardContent } from "@afenda/ui/card"
-import { GovernedEmpty } from "../../client"
+import { Card, CardContent } from "@afenda/ui/card";
+import { GovernedEmpty } from "../../client";
 import {
   parseStatCardConfiguration,
   type StatCardDensity,
   type StatCardItem,
-} from "../../schemas/stat-card.schema"
+} from "../../schemas/stat-card.schema";
 
-import type { GovernedComponentRendererDiagnostics } from "../registry"
-import { StatCardBody } from "./stat-card-body.client"
+import type { GovernedComponentRendererDiagnostics } from "../registry";
+import { StatCardBody } from "./stat-card-body.client";
 
 const GRID_DENSITY_CLASS: Record<StatCardDensity, string> = {
   comfortable: "grid grid-cols-1 gap-3 @sm:grid-cols-2 @2xl:grid-cols-4",
   compact: "grid grid-cols-1 gap-2 @sm:grid-cols-2",
-}
+};
 
 export type StatCardRendererProps = {
-  configuration: unknown
-  diagnostics?: GovernedComponentRendererDiagnostics
-}
+  configuration: unknown;
+  diagnostics?: GovernedComponentRendererDiagnostics;
+};
 
 export function StatCardRenderer({
   configuration,
   diagnostics = "user",
 }: StatCardRendererProps) {
-  const parsed = parseStatCardConfiguration(configuration)
+  const parsed = parseStatCardConfiguration(configuration);
 
   if (!parsed.success) {
     return (
@@ -37,10 +37,10 @@ export function StatCardRenderer({
               : "This card could not be loaded safely.",
         }}
       />
-    )
+    );
   }
 
-  const { stats, density } = parsed.data
+  const { stats, density } = parsed.data;
 
   return (
     <section aria-label="Statistics" className="@container">
@@ -54,15 +54,15 @@ export function StatCardRenderer({
         ))}
       </div>
     </section>
-  )
+  );
 }
 
 function StatTile({
   stat,
   density,
 }: {
-  stat: StatCardItem
-  density: StatCardDensity
+  stat: StatCardItem;
+  density: StatCardDensity;
 }) {
   return (
     <Card className="@container/tile overflow-hidden">
@@ -70,5 +70,5 @@ function StatTile({
         <StatCardBody stat={stat} density={density} />
       </CardContent>
     </Card>
-  )
+  );
 }

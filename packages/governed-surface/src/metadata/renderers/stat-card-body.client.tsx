@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import NumberFlow from "@number-flow/react"
-import type { Route } from "next"
+import NumberFlow from "@number-flow/react";
+import type { Route } from "next";
 import {
   Activity,
   AlertTriangle,
@@ -10,19 +10,19 @@ import {
   Shield,
   Users,
   type LucideIcon,
-} from "lucide-react"
-import { useReducedMotion } from "motion/react"
+} from "lucide-react";
+import { useReducedMotion } from "motion/react";
 
-import Link from "next/link"
-import { Progress } from "@afenda/ui/progress"
+import Link from "next/link";
+import { Progress } from "@afenda/ui/progress";
 import type {
   StatCardIcon,
   StatCardItem,
   StatCardTone,
-} from "../../schemas/stat-card.schema"
-import { cn } from "@afenda/ui/utils"
+} from "../../schemas/stat-card.schema";
+import { cn } from "@afenda/ui/utils";
 
-import { ListSurfaceSparkline } from "./list-surface-sparkline.client"
+import { ListSurfaceSparkline } from "./list-surface-sparkline.client";
 
 const ICON_MAP: Record<StatCardIcon, LucideIcon> = {
   clock: Clock,
@@ -31,45 +31,45 @@ const ICON_MAP: Record<StatCardIcon, LucideIcon> = {
   calendar: Calendar,
   activity: Activity,
   shield: Shield,
-}
+};
 
 const ACCENT_RAIL_CLASS: Record<StatCardTone, string> = {
   positive: "border-l-success",
   attention: "border-l-warning",
   critical: "border-l-destructive",
   default: "border-l-transparent",
-}
+};
 
 const DELTA_TONE_CLASS: Record<StatCardTone, string> = {
   positive: "text-success",
   attention: "text-warning-foreground",
   critical: "text-destructive",
   default: "text-muted-foreground",
-}
+};
 
 const COMPARISON_DIRECTION_CLASS = {
   up: "text-success",
   down: "text-destructive",
   flat: "text-muted-foreground",
-} as const
+} as const;
 
 export type StatCardBodyProps = {
-  stat: StatCardItem
-  density: "compact" | "comfortable"
-}
+  stat: StatCardItem;
+  density: "compact" | "comfortable";
+};
 
 function parseNumericValue(value: string): number | null {
-  const normalized = value.replace(/[^\d.-]/g, "")
-  const parsed = Number(normalized)
-  return Number.isFinite(parsed) ? parsed : null
+  const normalized = value.replace(/[^\d.-]/g, "");
+  const parsed = Number(normalized);
+  return Number.isFinite(parsed) ? parsed : null;
 }
 
 export function StatCardBody({ stat, density }: StatCardBodyProps) {
-  const reduceMotion = useReducedMotion()
-  const Icon = stat.icon ? ICON_MAP[stat.icon] : null
-  const numericValue = parseNumericValue(stat.value)
+  const reduceMotion = useReducedMotion();
+  const Icon = stat.icon ? ICON_MAP[stat.icon] : null;
+  const numericValue = parseNumericValue(stat.value);
   const showAccent =
-    stat.tone === "attention" || stat.tone === "critical" || Boolean(stat.href)
+    stat.tone === "attention" || stat.tone === "critical" || Boolean(stat.href);
 
   const inner = (
     <>
@@ -113,7 +113,7 @@ export function StatCardBody({ stat, density }: StatCardBodyProps) {
         <span
           className={cn(
             "text-label-small font-medium",
-            COMPARISON_DIRECTION_CLASS[stat.comparison.direction]
+            COMPARISON_DIRECTION_CLASS[stat.comparison.direction],
           )}
         >
           {stat.comparison.priorValue} {stat.comparison.label}
@@ -122,40 +122,40 @@ export function StatCardBody({ stat, density }: StatCardBodyProps) {
         <span
           className={cn(
             "text-label-small font-medium",
-            DELTA_TONE_CLASS[stat.tone]
+            DELTA_TONE_CLASS[stat.tone],
           )}
         >
           {stat.delta}
         </span>
       ) : null}
     </>
-  )
+  );
 
   const contentClass = cn(
     "flex flex-col",
     density === "compact" ? "gap-0.5 p-3" : "gap-1 p-4",
     showAccent && "border-l-4",
-    showAccent && ACCENT_RAIL_CLASS[stat.tone]
-  )
+    showAccent && ACCENT_RAIL_CLASS[stat.tone],
+  );
 
   if (stat.href) {
     const linkClass = cn(
       contentClass,
-      "rounded-xl transition-colors hover:bg-muted/40 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
-    )
+      "rounded-xl transition-colors hover:bg-muted/40 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none",
+    );
     if (stat.href.startsWith("?") || stat.href.startsWith("#")) {
       return (
         <a href={stat.href} className={linkClass}>
           {inner}
         </a>
-      )
+      );
     }
     return (
       <Link href={stat.href as Route} prefetch={false} className={linkClass}>
         {inner}
       </Link>
-    )
+    );
   }
 
-  return <div className={contentClass}>{inner}</div>
+  return <div className={contentClass}>{inner}</div>;
 }

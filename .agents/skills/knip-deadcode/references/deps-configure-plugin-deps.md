@@ -36,6 +36,7 @@ Knip reports: `eslint-plugin-react`, `@typescript-eslint/parser` unused.
 Knip reads the ESLint config and detects plugin/parser references.
 
 **Common plugins to configure:**
+
 - `eslint` - ESLint plugins and parsers
 - `jest` - Transform and setup files
 - `webpack` - Loaders and plugins

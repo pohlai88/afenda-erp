@@ -1,7 +1,7 @@
 import type {
   GovernedListPresentationProfiles,
   GovernedStatPresentationProfiles,
-} from "./governed-profile-types"
+} from "./governed-profile-types";
 
 const ERP_TABLE_BASE = {
   variant: "table-only" as const,
@@ -12,7 +12,7 @@ const ERP_TABLE_BASE = {
     columnPicker: true,
     densityToggle: true,
   },
-}
+};
 
 const ERP_ANALYTICAL_TABLE = {
   ...ERP_TABLE_BASE,
@@ -26,7 +26,7 @@ const ERP_ANALYTICAL_TABLE = {
     enabled: true,
     label: "Decision ledger",
   },
-}
+};
 
 /**
  * Canonical ERP list presentation defaults (v1).
@@ -51,7 +51,7 @@ export const GOVERNED_LIST_PRESENTATION_PROFILES: GovernedListPresentationProfil
     "erp-analytical-table": ERP_ANALYTICAL_TABLE,
     /** Audit / history / traceability — pair with `dataNature: "document-lines"` on the builder. */
     "erp-audit-ledger": ERP_TABLE_BASE,
-  }
+  };
 
 /**
  * Canonical ERP stat-card presentation defaults (v1).
@@ -65,4 +65,4 @@ export const GOVERNED_STAT_PRESENTATION_PROFILES: GovernedStatPresentationProfil
     "erp-executive-summary": {
       density: "comfortable",
     },
-  }
+  };

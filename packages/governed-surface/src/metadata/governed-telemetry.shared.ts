@@ -12,38 +12,38 @@
  */
 
 export type GovernedTelemetryBase = {
-  type: string
-  surfaceKey?: string
-}
+  type: string;
+  surfaceKey?: string;
+};
 
 export type GovernedTelemetryEvent =
   | ({
-      name: "governed.render"
-      serverType: string
-      rendererId?: string
+      name: "governed.render";
+      serverType: string;
+      rendererId?: string;
     } & GovernedTelemetryBase)
   | ({
-      name: "governed.validation_error"
-      reason?: string
-      schemaId?: string
+      name: "governed.validation_error";
+      reason?: string;
+      schemaId?: string;
     } & GovernedTelemetryBase)
   | ({
-      name: "governed.renderer_error"
-      rendererId: string
-      message: string
+      name: "governed.renderer_error";
+      rendererId: string;
+      message: string;
     } & GovernedTelemetryBase)
   | ({
-      name: "governed.data_nature_mismatch"
-      rendererId: string
-      observed: string
-      accepted: readonly string[]
-    } & GovernedTelemetryBase)
+      name: "governed.data_nature_mismatch";
+      rendererId: string;
+      observed: string;
+      accepted: readonly string[];
+    } & GovernedTelemetryBase);
 
 export function emitGovernedTelemetry(event: GovernedTelemetryEvent): void {
   if (process.env.NODE_ENV !== "development") {
-    return
+    return;
   }
 
   // Dev-only structured signal — production observability uses iam_audit_event / OTEL.
-  console.debug("[governed-ui]", event)
+  console.debug("[governed-ui]", event);
 }

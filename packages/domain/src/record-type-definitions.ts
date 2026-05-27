@@ -445,14 +445,16 @@ export function resolveModuleRecordListDefinition(
   const recordTypes = new Set(input.records.map((record) => record.recordType));
 
   if (recordTypes.size === 1) {
-    const [recordType] = recordTypes;
-    const definition = getRecordTypeDefinition({
-      moduleId: input.moduleId,
-      recordType,
-    });
+    const recordType = recordTypes.values().next().value;
+    if (recordType !== undefined) {
+      const definition = getRecordTypeDefinition({
+        moduleId: input.moduleId,
+        recordType,
+      });
 
-    if (definition) {
-      return definition.list;
+      if (definition) {
+        return definition.list;
+      }
     }
   }
 

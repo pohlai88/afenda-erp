@@ -26,6 +26,7 @@ knip --watch
 ```
 
 Output updates as you save files:
+
 ```text
 Watching for file changes...
 [12:34:56] Change detected: src/utils.ts
@@ -45,6 +46,7 @@ knip --watch --include exports
 ```
 
 **When to use watch mode:**
+
 - During refactoring sessions
 - When cleaning up dead code
 - When learning codebase structure

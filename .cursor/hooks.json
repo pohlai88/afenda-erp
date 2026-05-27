@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "hooks": {
+    "sessionStart": [
+      {
+        "command": "node .cursor/hooks/session-inject-architecture.mjs"
+      }
+    ],
+    "subagentStart": [
+      {
+        "command": "node .cursor/hooks/session-inject-architecture.mjs"
+      }
+    ],
+    "postToolUse": [
+      {
+        "command": "node .cursor/hooks/post-edit-architecture-hints.mjs",
+        "matcher": "Write|StrReplace"
+      }
+    ]
+  }
+}

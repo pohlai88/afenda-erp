@@ -1,8 +1,8 @@
-import { z } from "zod"
+import { z } from "zod";
 
-import type { SchemaStability } from "./_stability.shared"
+import type { SchemaStability } from "./_stability.shared";
 
-export const SCHEMA_STABILITY: SchemaStability = "beta"
+export const SCHEMA_STABILITY: SchemaStability = "beta";
 
 /**
  * Serializable page chrome — copy is resolved upstream (e.g. `getTranslations`)
@@ -22,10 +22,10 @@ export const pageHeaderSchema = z
     /** Catalog-resolved label; set when `backHref` is present for header back chrome. */
     backLabel: z.string().min(1).optional(),
   })
-  .strict()
+  .strict();
 
-export type PageHeader = z.infer<typeof pageHeaderSchema>
+export type PageHeader = z.infer<typeof pageHeaderSchema>;
 
 export function parsePageHeaderData(raw: unknown) {
-  return pageHeaderSchema.safeParse(raw)
+  return pageHeaderSchema.safeParse(raw);
 }

@@ -1,10 +1,10 @@
-import { z } from "zod"
+import { z } from "zod";
 
-import type { SchemaStability } from "./_stability.shared"
+import type { SchemaStability } from "./_stability.shared";
 
-import { auditPanelRowSchema } from "./audit-panel.schema"
+import { auditPanelRowSchema } from "./audit-panel.schema";
 
-export const SCHEMA_STABILITY: SchemaStability = "experimental"
+export const SCHEMA_STABILITY: SchemaStability = "experimental";
 
 export const governedDetailTabKindSchema = z.enum([
   "overview",
@@ -12,7 +12,7 @@ export const governedDetailTabKindSchema = z.enum([
   "referrers",
   "revisions",
   "audit",
-])
+]);
 
 export const governedDetailSectionSchema = z
   .object({
@@ -25,7 +25,7 @@ export const governedDetailSectionSchema = z
     rendererKey: z.string().min(1),
     rendererProps: z.unknown().optional(),
   })
-  .strict()
+  .strict();
 
 export const governedRevisionEntrySchema = z
   .object({
@@ -42,11 +42,11 @@ export const governedRevisionEntrySchema = z
             from: z.string().optional(),
             to: z.string().optional(),
           })
-          .strict()
+          .strict(),
       )
       .optional(),
   })
-  .strict()
+  .strict();
 
 /**
  * Detail-tabs data nature (ADR-0025 §2).
@@ -56,10 +56,10 @@ export const governedRevisionEntrySchema = z
  *                    Single-member enum reserves the discriminator for
  *                    future variants (e.g. `wizard-detail`, `viewer-only`).
  */
-export const governedDetailTabsDataNatureSchema = z.enum(["tabbed-detail"])
+export const governedDetailTabsDataNatureSchema = z.enum(["tabbed-detail"]);
 export type GovernedDetailTabsDataNature = z.infer<
   typeof governedDetailTabsDataNatureSchema
->
+>;
 
 export const governedDetailTabsSchema = z
   .object({
@@ -74,14 +74,14 @@ export const governedDetailTabsSchema = z
     audit: z.array(auditPanelRowSchema).optional(),
     defaultTab: governedDetailTabKindSchema.default("overview"),
   })
-  .strict()
+  .strict();
 
-export type GovernedDetailTabKind = z.infer<typeof governedDetailTabKindSchema>
-export type GovernedDetailSection = z.infer<typeof governedDetailSectionSchema>
-export type GovernedRevisionEntry = z.infer<typeof governedRevisionEntrySchema>
-export type GovernedDetailTabsModel = z.infer<typeof governedDetailTabsSchema>
-export type GovernedDetailTabsInput = z.input<typeof governedDetailTabsSchema>
+export type GovernedDetailTabKind = z.infer<typeof governedDetailTabKindSchema>;
+export type GovernedDetailSection = z.infer<typeof governedDetailSectionSchema>;
+export type GovernedRevisionEntry = z.infer<typeof governedRevisionEntrySchema>;
+export type GovernedDetailTabsModel = z.infer<typeof governedDetailTabsSchema>;
+export type GovernedDetailTabsInput = z.input<typeof governedDetailTabsSchema>;
 
 export function parseGovernedDetailTabsData(raw: unknown) {
-  return governedDetailTabsSchema.safeParse(raw)
+  return governedDetailTabsSchema.safeParse(raw);
 }

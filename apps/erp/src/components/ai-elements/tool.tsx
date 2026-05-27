@@ -219,7 +219,8 @@ function DiagnosisCards({ value }: { value: unknown }) {
 
   const diagnoses = value.filter(isRecord);
 
-  if (diagnoses.length === 0 || !("evidence" in diagnoses[0])) {
+  const firstDiagnosis = diagnoses[0];
+  if (diagnoses.length === 0 || !firstDiagnosis || !("evidence" in firstDiagnosis)) {
     return null;
   }
 

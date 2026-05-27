@@ -1,0 +1,35 @@
+---
+description: Context7, MCP servers, and when to use external vs repo architecture docs
+alwaysApply: false
+---
+
+# Afenda external context (Context7 & MCP)
+
+Stack versions and Context7 library hints: `.agents/stack-context.md`.
+
+## Priority (framework APIs)
+
+1. **Repo doctrine** — `docs/architecture/` (`ARCH-###`), `.cursor/rules/*`, session hooks routing
+2. **Next.js 16** — `node_modules/next/dist/docs/` before generic Next docs (see root `AGENTS.md`)
+3. **Context7** — add `use context7` for version-matched library APIs (Drizzle, Playwright, Tailwind v4, Vercel AI SDK, etc.)
+4. **Web search** — only if Context7 has no library match
+
+## MCP (global + project)
+
+| Scope | Server | Use for |
+| ----- | ------ | ------- |
+| **Global** (`~/.cursor/mcp.json`) | **context7** | Third-party API docs |
+| **Global** | **Neon**, **github**, **vercel** | DB, repos, deploys (`NEON_API_KEY`, `GITHUB_TOKEN`, OAuth) |
+| **Global** | **playwright** | Browser automation / E2E |
+| **Project** (`.cursor/mcp.json`) | **shadcn** | `apps/erp/components.json` registry only |
+
+Env: `.env.config` → `pnpm env:sync` + `pnpm env:sync:cursor` (Windows; `NEON_API_KEY`, `GITHUB_TOKEN` only). See `docs/development/env.md`. Context7: no API key; skill `context7-mcp`.
+
+TypeScript: `packages/config/tsconfig.base.json` (`strict`, `noUncheckedIndexedAccess`, unused-symbol checks). Vercel link deferred until ARCH-001 stabilization gate passes.
+
+## Do not use Context7 for
+
+- Tenancy, capabilities, org resolution (**ARCH-001**, `@afenda/auth`)
+- Governed list authority, metadata vs runtime (**ARCH-006**, **ARCH-007**)
+- Package boundaries and imports (**ARCH-002**, **ARCH-003**)
+- Afenda-specific shadcn paths — components live in `packages/ui`; use shadcn MCP from ERP `components.json` aliases

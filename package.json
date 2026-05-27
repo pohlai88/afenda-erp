@@ -4,7 +4,9 @@
   "packageManager": "pnpm@10.33.3",
   "scripts": {
     "env:sync": "tsx scripts/sync-env.mts",
+    "env:sync:cursor": "tsx scripts/sync-cursor-env.mts",
     "env:sync:dry-run": "tsx scripts/sync-env.mts --dry-run",
+    "env:sync:all": "pnpm env:sync && pnpm env:sync:cursor",
     "predev": "pnpm env:sync",
     "dev": "turbo dev --filter=@afenda/erp",
     "build": "turbo build",

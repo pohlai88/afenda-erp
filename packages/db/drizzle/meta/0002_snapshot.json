@@ -109,12 +109,8 @@
           "name": "audit_logs_organization_id_organizations_id_fk",
           "tableFrom": "audit_logs",
           "tableTo": "organizations",
-          "columnsFrom": [
-            "organization_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["organization_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -292,12 +288,8 @@
           "name": "erp_module_records_organization_id_organizations_id_fk",
           "tableFrom": "erp_module_records",
           "tableTo": "organizations",
-          "columnsFrom": [
-            "organization_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["organization_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -438,12 +430,8 @@
           "name": "erp_saved_views_organization_id_organizations_id_fk",
           "tableFrom": "erp_saved_views",
           "tableTo": "organizations",
-          "columnsFrom": [
-            "organization_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["organization_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -624,12 +612,8 @@
           "name": "erp_work_items_organization_id_organizations_id_fk",
           "tableFrom": "erp_work_items",
           "tableTo": "organizations",
-          "columnsFrom": [
-            "organization_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["organization_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -637,12 +621,8 @@
           "name": "erp_work_items_source_record_id_erp_module_records_id_fk",
           "tableFrom": "erp_work_items",
           "tableTo": "erp_module_records",
-          "columnsFrom": [
-            "source_record_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["source_record_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         }
@@ -828,12 +808,8 @@
           "name": "organization_memberships_organization_id_organizations_id_fk",
           "tableFrom": "organization_memberships",
           "tableTo": "organizations",
-          "columnsFrom": [
-            "organization_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["organization_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1016,12 +992,8 @@
           "name": "role_permissions_permission_key_permissions_key_fk",
           "tableFrom": "role_permissions",
           "tableTo": "permissions",
-          "columnsFrom": [
-            "permission_key"
-          ],
-          "columnsTo": [
-            "key"
-          ],
+          "columnsFrom": ["permission_key"],
+          "columnsTo": ["key"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1029,10 +1001,7 @@
       "compositePrimaryKeys": {
         "role_permissions_pk": {
           "name": "role_permissions_pk",
-          "columns": [
-            "role",
-            "permission_key"
-          ]
+          "columns": ["role", "permission_key"]
         }
       },
       "uniqueConstraints": {},
@@ -1074,42 +1043,22 @@
     "public.erp_priority": {
       "name": "erp_priority",
       "schema": "public",
-      "values": [
-        "low",
-        "medium",
-        "high"
-      ]
+      "values": ["low", "medium", "high"]
     },
     "public.erp_record_status": {
       "name": "erp_record_status",
       "schema": "public",
-      "values": [
-        "draft",
-        "active",
-        "blocked",
-        "ready",
-        "closed"
-      ]
+      "values": ["draft", "active", "blocked", "ready", "closed"]
     },
     "public.erp_view_visibility": {
       "name": "erp_view_visibility",
       "schema": "public",
-      "values": [
-        "private",
-        "team",
-        "tenant"
-      ]
+      "values": ["private", "team", "tenant"]
     },
     "public.erp_work_item_status": {
       "name": "erp_work_item_status",
       "schema": "public",
-      "values": [
-        "pending",
-        "in-review",
-        "escalated",
-        "scheduled",
-        "completed"
-      ]
+      "values": ["pending", "in-review", "escalated", "scheduled", "completed"]
     },
     "public.organization_role": {
       "name": "organization_role",

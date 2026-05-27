@@ -7,12 +7,7 @@ import {
 } from "@afenda/domain";
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
-import {
-  AlertTriangle,
-  BadgeCheck,
-  Send,
-  ShieldCheck,
-} from "lucide-react";
+import { AlertTriangle, BadgeCheck, Send, ShieldCheck } from "lucide-react";
 import { Conversation } from "@/components/ai-elements/conversation";
 import { Message } from "@/components/ai-elements/message";
 import { PromptInput } from "@/components/ai-elements/prompt-input";
@@ -94,7 +89,10 @@ export function SolutionProviderPanel() {
                 }
                 type="button"
               >
-                <Icon className="mt-0.5 h-4 w-4 shrink-0 text-slate-700" aria-hidden />
+                <Icon
+                  className="mt-0.5 h-4 w-4 shrink-0 text-slate-700"
+                  aria-hidden
+                />
                 <span className="text-sm font-medium leading-5 text-foreground">
                   {playbook.label}
                 </span>

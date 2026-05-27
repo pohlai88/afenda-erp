@@ -1,0 +1,26 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Next.js: dev (ERP)",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "pnpm dev",
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "name": "Next.js: debug client",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:3000",
+      "webRoot": "${workspaceFolder}/apps/erp"
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Next.js: full stack",
+      "configurations": ["Next.js: dev (ERP)", "Next.js: debug client"],
+      "stopAll": true
+    }
+  ]
+}

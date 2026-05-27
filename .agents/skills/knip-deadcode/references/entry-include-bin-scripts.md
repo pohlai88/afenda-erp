@@ -25,11 +25,7 @@ Binary scripts in package.json `bin` field are entry points. Knip reads these au
 
 ```json
 {
-  "entry": [
-    "src/index.ts",
-    "scripts/*.ts",
-    "bin/*.js"
-  ]
+  "entry": ["src/index.ts", "scripts/*.ts", "bin/*.js"]
 }
 ```
 

@@ -32,12 +32,21 @@ export function scoreAiConfidence(
   input: ScoreAiConfidenceInput,
 ): ConfidenceBreakdown {
   const dataQuality = clampScore(
-    45 + input.directSourceCount * 8 + input.evidenceCount * 3 - input.missingDataCount * 12,
+    45 +
+      input.directSourceCount * 8 +
+      input.evidenceCount * 3 -
+      input.missingDataCount * 12,
   );
   const goalLength = input.userGoal?.trim().length ?? 0;
-  const intentClarity = clampScore(goalLength >= 40 ? 85 : goalLength >= 12 ? 65 : 40);
+  const intentClarity = clampScore(
+    goalLength >= 40 ? 85 : goalLength >= 12 ? 65 : 40,
+  );
   const taskComplexity = clampScore(
-    input.taskRiskLevel === "high" ? 52 : input.taskRiskLevel === "medium" ? 70 : 85,
+    input.taskRiskLevel === "high"
+      ? 52
+      : input.taskRiskLevel === "medium"
+        ? 70
+        : 85,
   );
   const historicalAccuracy = clampScore(input.historicalAccuracy ?? 70);
   const groundingStrength = clampScore(

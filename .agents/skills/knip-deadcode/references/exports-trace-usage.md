@@ -26,6 +26,7 @@ knip --trace-export formatDate
 ```
 
 Output shows:
+
 ```text
 Tracing export: formatDate
   - Not found in static imports
@@ -50,6 +51,7 @@ knip --trace-dependency lodash
 Shows where lodash is imported.
 
 **When tracing is essential:**
+
 - Large codebases with dynamic imports
 - Exports used in config files
 - Exports consumed by external packages

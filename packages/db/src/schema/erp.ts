@@ -141,7 +141,10 @@ export const erpDocuments = pgTable(
       table.organizationId,
       table.pathname,
     ),
-    index("erp_documents_org_module_idx").on(table.organizationId, table.moduleId),
+    index("erp_documents_org_module_idx").on(
+      table.organizationId,
+      table.moduleId,
+    ),
     index("erp_documents_owner_entity_idx").on(table.ownerEntityId),
   ],
 );

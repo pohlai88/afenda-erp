@@ -9,8 +9,14 @@ import {
 
 const summary = getRlsEvaluationSummary();
 
-assert.ok(summary.candidateTables >= 7, "expected tenant-scoped RLS candidates");
-assert.ok(summary.blockedTables >= 1, "expected at least one global table exception");
+assert.ok(
+  summary.candidateTables >= 7,
+  "expected tenant-scoped RLS candidates",
+);
+assert.ok(
+  summary.blockedTables >= 1,
+  "expected at least one global table exception",
+);
 assert.match(summary.nextStep, /runWithOrganizationContext/);
 assert.equal(ORGANIZATION_GUC_KEY, "afenda.current_organization_id");
 assert.equal(AUTH_USER_GUC_KEY, "afenda.auth_user_id");

@@ -1,10 +1,11 @@
+import { getCronSecret } from "@afenda/config/env";
 import { getRequestId, logServerEvent } from "@afenda/observability";
 import { NextResponse } from "next/server";
 
 export type CronJobName = "reminders" | "syncs" | "housekeeping";
 
 export function authorizeCronRequest(request: Request) {
-  const cronSecret = process.env.CRON_SECRET;
+  const cronSecret = getCronSecret();
   const authorization = request.headers.get("authorization");
 
   return Boolean(cronSecret && authorization === `Bearer ${cronSecret}`);

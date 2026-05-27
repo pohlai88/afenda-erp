@@ -1,8 +1,8 @@
-import { z } from "zod"
+import { z } from "zod";
 
-import type { SchemaStability } from "./_stability.shared"
+import type { SchemaStability } from "./_stability.shared";
 
-export const SCHEMA_STABILITY: SchemaStability = "beta"
+export const SCHEMA_STABILITY: SchemaStability = "beta";
 
 /**
  * Intent widens ERP semantics; renderers may map non-destructive intents to the
@@ -31,10 +31,10 @@ export const actionDescriptorSchema = z
       .strict()
       .optional(),
   })
-  .strict()
+  .strict();
 
-export type ActionDescriptor = z.infer<typeof actionDescriptorSchema>
+export type ActionDescriptor = z.infer<typeof actionDescriptorSchema>;
 
 export function parseActionDescriptorData(raw: unknown) {
-  return actionDescriptorSchema.safeParse(raw)
+  return actionDescriptorSchema.safeParse(raw);
 }

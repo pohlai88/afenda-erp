@@ -1,29 +1,29 @@
-import type { ListSurfaceRendererDataNature } from "./schemas/list-surface-renderer.schema"
-import type { ListSurfaceRowTrailingAction } from "./schemas/list-surface-row-trailing-action.schema"
+import type { ListSurfaceRendererDataNature } from "./schemas/list-surface-renderer.schema";
+import type { ListSurfaceRowTrailingAction } from "./schemas/list-surface-row-trailing-action.schema";
 
-export type GovernedListSurfaceRenderState = "empty" | "ready"
+export type GovernedListSurfaceRenderState = "empty" | "ready";
 
 export type GovernedListSurfaceTrailingSummary = {
-  total: number
-  hidden: number
-  disabled: number
-  ready: number
-}
+  total: number;
+  hidden: number;
+  disabled: number;
+  ready: number;
+};
 
 export type GovernedListSurfaceRenderLogFields = {
-  surfaceKey: string
-  columnsId: string
-  dataNature: ListSurfaceRendererDataNature
-  presentationVariant: string
-  density: string
-  state: GovernedListSurfaceRenderState
-  rowCount: number
-  trailing: GovernedListSurfaceTrailingSummary
-}
+  surfaceKey: string;
+  columnsId: string;
+  dataNature: ListSurfaceRendererDataNature;
+  presentationVariant: string;
+  density: string;
+  state: GovernedListSurfaceRenderState;
+  rowCount: number;
+  trailing: GovernedListSurfaceTrailingSummary;
+};
 
 /** Stable per-request dedupe key for `logGovernedListSurfaceRender`. */
 export function buildGovernedListSurfaceRenderFingerprint(
-  input: GovernedListSurfaceRenderLogFields
+  input: GovernedListSurfaceRenderLogFields,
 ): string {
   return [
     input.surfaceKey,
@@ -35,68 +35,68 @@ export function buildGovernedListSurfaceRenderFingerprint(
     input.trailing.hidden,
     input.trailing.disabled,
     input.trailing.ready,
-  ].join("|")
+  ].join("|");
 }
 
 export function governedListSectionTestId(surfaceKey: string): string {
-  return `governed-list-section:${surfaceKey}`
+  return `governed-list-section:${surfaceKey}`;
 }
 
 export function governedListSectionDomId(surfaceKey: string): string {
-  return `governed-list-section-${surfaceKey.replace(/[^A-Za-z0-9_-]+/g, "-")}`
+  return `governed-list-section-${surfaceKey.replace(/[^A-Za-z0-9_-]+/g, "-")}`;
 }
 
 export function governedListSectionAnchorHref(surfaceKey: string): string {
-  return `#${governedListSectionDomId(surfaceKey)}`
+  return `#${governedListSectionDomId(surfaceKey)}`;
 }
 
 export function governedListSurfaceTestId(surfaceKey: string): string {
-  return `governed-list-surface:${surfaceKey}`
+  return `governed-list-surface:${surfaceKey}`;
 }
 
 export function governedListRowTestId(
   surfaceKey: string,
-  rowId: string
+  rowId: string,
 ): string {
-  return `governed-list-row:${surfaceKey}:${rowId}`
+  return `governed-list-row:${surfaceKey}:${rowId}`;
 }
 
 export function summarizeListSurfaceTrailingActions(
-  rows: readonly { trailingAction?: ListSurfaceRowTrailingAction }[]
+  rows: readonly { trailingAction?: ListSurfaceRowTrailingAction }[],
 ): GovernedListSurfaceTrailingSummary {
   const summary: GovernedListSurfaceTrailingSummary = {
     total: rows.length,
     hidden: 0,
     disabled: 0,
     ready: 0,
-  }
+  };
 
   for (const row of rows) {
-    const state = row.trailingAction?.state
-    if (state === "hidden") summary.hidden += 1
-    else if (state === "disabled") summary.disabled += 1
-    else if (state === "ready") summary.ready += 1
+    const state = row.trailingAction?.state;
+    if (state === "hidden") summary.hidden += 1;
+    else if (state === "disabled") summary.disabled += 1;
+    else if (state === "ready") summary.ready += 1;
   }
 
-  return summary
+  return summary;
 }
 
 export type GovernedListSurfaceDataAttributes = {
-  "data-governed-surface-key"?: string
-  "data-governed-list-state"?: GovernedListSurfaceRenderState
-  "data-governed-columns-id"?: string
-  "data-governed-table-density"?: string
-  "data-governed-data-nature"?: ListSurfaceRendererDataNature
-  "data-governed-presentation-variant"?: string
-}
+  "data-governed-surface-key"?: string;
+  "data-governed-list-state"?: GovernedListSurfaceRenderState;
+  "data-governed-columns-id"?: string;
+  "data-governed-table-density"?: string;
+  "data-governed-data-nature"?: ListSurfaceRendererDataNature;
+  "data-governed-presentation-variant"?: string;
+};
 
 export function buildGovernedListSurfaceDataAttributes(input: {
-  surfaceKey?: string
-  columnsId?: string
-  dataNature?: ListSurfaceRendererDataNature
-  presentationVariant?: string
-  density?: string
-  state: GovernedListSurfaceRenderState
+  surfaceKey?: string;
+  columnsId?: string;
+  dataNature?: ListSurfaceRendererDataNature;
+  presentationVariant?: string;
+  density?: string;
+  state: GovernedListSurfaceRenderState;
 }): GovernedListSurfaceDataAttributes {
   return {
     ...(input.surfaceKey
@@ -111,5 +111,5 @@ export function buildGovernedListSurfaceDataAttributes(input: {
     ...(input.presentationVariant
       ? { "data-governed-presentation-variant": input.presentationVariant }
       : {}),
-  }
+  };
 }

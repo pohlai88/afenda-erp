@@ -13,7 +13,7 @@ Knip reports unlisted dependencies - packages imported in code but not in packag
 
 ```typescript
 // src/utils.ts
-import dayjs from 'dayjs'  // Not in package.json
+import dayjs from "dayjs"; // Not in package.json
 ```
 
 Knip reports: `dayjs` is unlisted.
@@ -33,6 +33,7 @@ npm install dayjs
 ```
 
 **Why unlisted dependencies are dangerous:**
+
 - May work locally due to hoisting or transitive deps
 - Will fail in production or on other machines
 - Package version is unpredictable

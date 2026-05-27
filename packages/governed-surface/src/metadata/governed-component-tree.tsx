@@ -1,28 +1,28 @@
-import type { ReactNode } from "react"
-import { trace } from "@opentelemetry/api"
+import type { ReactNode } from "react";
+import { trace } from "@opentelemetry/api";
 
 import {
   GovernedEmpty,
   parseGovernedComponentData,
   type GovernedComponent,
-} from "../client"
+} from "../client";
 
-import { emitGovernedTelemetry } from "./governed-telemetry.shared"
-import { renderGovernedRendererById } from "./governed-renderer-dispatch"
+import { emitGovernedTelemetry } from "./governed-telemetry.shared";
+import { renderGovernedRendererById } from "./governed-renderer-dispatch";
 import {
   AFENDA_GOVERNED_COMPONENT_REGISTRY,
   AFENDA_GOVERNED_RENDERER_CONTRACTS,
   type AfendaGovernedComponentRegistry,
   type AfendaGovernedRendererId,
   type GovernedComponentRendererDiagnostics,
-} from "./registry"
+} from "./registry";
 
 export type GovernedComponentTreeProps = {
-  component: unknown
-  registry?: AfendaGovernedComponentRegistry
-  diagnostics?: GovernedComponentRendererDiagnostics
-  surfaceKey?: string
-}
+  component: unknown;
+  registry?: AfendaGovernedComponentRegistry;
+  diagnostics?: GovernedComponentRendererDiagnostics;
+  surfaceKey?: string;
+};
 
 /**
  * Extracts `dataNature` from a raw configuration object without a full parse.
@@ -36,10 +36,10 @@ function extractDataNature(configuration: unknown): string | undefined {
     configuration === null ||
     Array.isArray(configuration)
   ) {
-    return undefined
+    return undefined;
   }
-  const raw = (configuration as Record<string, unknown>).dataNature
-  return typeof raw === "string" ? raw : undefined
+  const raw = (configuration as Record<string, unknown>).dataNature;
+  return typeof raw === "string" ? raw : undefined;
 }
 
 /**
@@ -59,7 +59,7 @@ export function GovernedComponentTree({
   diagnostics = "user",
   surfaceKey,
 }: GovernedComponentTreeProps): ReactNode {
-  const parsed = parseGovernedComponentData(component)
+  const parsed = parseGovernedComponentData(component);
 
   if (!parsed.success) {
     return (
@@ -73,14 +73,14 @@ export function GovernedComponentTree({
               : "This section could not be loaded safely.",
         }}
       />
-    )
+    );
   }
 
-  const data: GovernedComponent = parsed.data
+  const data: GovernedComponent = parsed.data;
   // Registry lookup is safe when a component type has no renderer mapping.
   const rendererId = (
     registry as Readonly<Record<string, AfendaGovernedRendererId | undefined>>
-  )[data.type]
+  )[data.type];
 
   if (!rendererId) {
     return (
@@ -94,15 +94,15 @@ export function GovernedComponentTree({
               : "This section is not available in the current surface.",
         }}
       />
-    )
+    );
   }
 
   // ADR-0025 §3 — validate dataNature against renderer contract before dispatch.
   // Container-only renderers (section, stack, empty) have acceptedNatures: [] and skip this check.
   const contract: (typeof AFENDA_GOVERNED_RENDERER_CONTRACTS)[AfendaGovernedRendererId] =
-    AFENDA_GOVERNED_RENDERER_CONTRACTS[rendererId]
+    AFENDA_GOVERNED_RENDERER_CONTRACTS[rendererId];
   if (contract.acceptedNatures.length > 0) {
-    const dataNature = extractDataNature(data.configuration)
+    const dataNature = extractDataNature(data.configuration);
     if (
       dataNature !== undefined &&
       !(contract.acceptedNatures as readonly string[]).includes(dataNature)
@@ -114,7 +114,7 @@ export function GovernedComponentTree({
         observed: dataNature,
         accepted: contract.acceptedNatures,
         surfaceKey,
-      })
+      });
 
       return (
         <GovernedEmpty
@@ -127,7 +127,7 @@ export function GovernedComponentTree({
                 : "This section is not available in the current surface.",
           }}
         />
-      )
+      );
     }
   }
 
@@ -138,7 +138,7 @@ export function GovernedComponentTree({
     dataNature: extractDataNature(data.configuration),
     surfaceKey,
     validation: "ok",
-  })
+  });
 
   return renderGovernedRendererById({
     rendererId,
@@ -146,31 +146,31 @@ export function GovernedComponentTree({
     configuration: data.configuration,
     diagnostics,
     surfaceKey,
-  })
+  });
 }
 
 function recordGovernedDispatchSpan(input: {
-  rendererId: string
-  componentType: string
-  serverType: string
-  dataNature: string | undefined
-  surfaceKey: string | undefined
-  validation: "ok" | "parse_failed" | "nature_mismatch" | "unregistered"
+  rendererId: string;
+  componentType: string;
+  serverType: string;
+  dataNature: string | undefined;
+  surfaceKey: string | undefined;
+  validation: "ok" | "parse_failed" | "nature_mismatch" | "unregistered";
 }) {
-  if (typeof window !== "undefined") return
-  if (process.env.NEXT_RUNTIME !== "nodejs") return
+  if (typeof window !== "undefined") return;
+  if (process.env.NEXT_RUNTIME !== "nodejs") return;
 
-  const tracer = trace.getTracer("afenda-vercel")
-  const span = tracer.startSpan("governed.component.dispatch")
-  span.setAttribute("governed.renderer_id", input.rendererId)
-  span.setAttribute("governed.component_type", input.componentType)
-  span.setAttribute("governed.server_type", input.serverType)
-  span.setAttribute("governed.validation", input.validation)
+  const tracer = trace.getTracer("afenda-vercel");
+  const span = tracer.startSpan("governed.component.dispatch");
+  span.setAttribute("governed.renderer_id", input.rendererId);
+  span.setAttribute("governed.component_type", input.componentType);
+  span.setAttribute("governed.server_type", input.serverType);
+  span.setAttribute("governed.validation", input.validation);
   if (input.dataNature) {
-    span.setAttribute("governed.data_nature", input.dataNature)
+    span.setAttribute("governed.data_nature", input.dataNature);
   }
   if (input.surfaceKey) {
-    span.setAttribute("governed.surface_key", input.surfaceKey)
+    span.setAttribute("governed.surface_key", input.surfaceKey);
   }
-  span.end()
+  span.end();
 }

@@ -1,18 +1,18 @@
-import { z } from "zod"
+import { z } from "zod";
 
-import type { SchemaStability } from "./_stability.shared"
+import type { SchemaStability } from "./_stability.shared";
 
-import { emptyStateSchema } from "./list-surface.schema"
-import { governedSurfaceChromeSchema } from "./surface-chrome.schema"
+import { emptyStateSchema } from "./list-surface.schema";
+import { governedSurfaceChromeSchema } from "./surface-chrome.schema";
 
 export const GOVERNED_CHART_CONFIGURATION_SCHEMA_ID =
-  "governed.chart.configuration" as const
+  "governed.chart.configuration" as const;
 
 export const GOVERNED_CHART_CONFIGURATION_SCHEMA_STABILITY: SchemaStability =
-  "beta"
+  "beta";
 
-export const chartDataNatureSchema = z.enum(["time-series", "categorical"])
-export type ChartDataNature = z.infer<typeof chartDataNatureSchema>
+export const chartDataNatureSchema = z.enum(["time-series", "categorical"]);
+export type ChartDataNature = z.infer<typeof chartDataNatureSchema>;
 
 export const governedChartKindSchema = z.enum([
   "bar",
@@ -21,14 +21,14 @@ export const governedChartKindSchema = z.enum([
   "heatmap",
   "stacked-bar",
   "combo",
-])
+]);
 
 export const chartPointSchema = z
   .object({
     x: z.string().trim().min(1),
     y: z.number().finite(),
   })
-  .strict()
+  .strict();
 
 export const chartSeriesSchema = z
   .object({
@@ -39,7 +39,7 @@ export const chartSeriesSchema = z
     /** For `combo` charts — bar vs line role per series. */
     role: z.enum(["bar", "line"]).optional(),
   })
-  .strict()
+  .strict();
 
 export const chartHeatmapCellSchema = z
   .object({
@@ -47,14 +47,14 @@ export const chartHeatmapCellSchema = z
     value: z.number().finite(),
     label: z.string().trim().min(1).optional(),
   })
-  .strict()
+  .strict();
 
 export const chartHeatmapSchema = z
   .object({
     cells: z.array(chartHeatmapCellSchema).min(1),
     valueLabel: z.string().trim().min(1).optional(),
   })
-  .strict()
+  .strict();
 
 export const chartReferenceBandSchema = z
   .object({
@@ -62,7 +62,7 @@ export const chartReferenceBandSchema = z
     yMax: z.number().finite(),
     label: z.string().trim().min(1).optional(),
   })
-  .strict()
+  .strict();
 
 export const chartActionSchema = z
   .object({
@@ -71,7 +71,7 @@ export const chartActionSchema = z
     href: z.string().trim().min(1).optional(),
     actionId: z.string().trim().min(1).optional(),
   })
-  .strict()
+  .strict();
 
 export const chartAnnotationSchema = z
   .object({
@@ -80,7 +80,7 @@ export const chartAnnotationSchema = z
     y: z.number().finite().optional(),
     tone: z.enum(["default", "positive", "attention", "critical"]).optional(),
   })
-  .strict()
+  .strict();
 
 const governedChartConfigurationCoreSchema = z
   .object({
@@ -107,9 +107,9 @@ const governedChartConfigurationCoreSchema = z
           code: z.ZodIssueCode.custom,
           path: ["heatmap", "cells"],
           message: 'chartKind "heatmap" requires heatmap.cells.',
-        })
+        });
       }
-      return
+      return;
     }
 
     if (!config.series?.length) {
@@ -117,22 +117,22 @@ const governedChartConfigurationCoreSchema = z
         code: z.ZodIssueCode.custom,
         path: ["series"],
         message: `chartKind "${config.chartKind}" requires at least one series.`,
-      })
-      return
+      });
+      return;
     }
 
-    const seen = new Set<string>()
+    const seen = new Set<string>();
     for (const [index, series] of config.series.entries()) {
       if (seen.has(series.id)) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           message: "Series ids must be unique.",
           path: ["series", index, "id"],
-        })
+        });
       }
-      seen.add(series.id)
+      seen.add(series.id);
     }
-  })
+  });
 
 export const governedChartConfigurationSchema =
   governedChartConfigurationCoreSchema.transform((config) => ({
@@ -140,24 +140,24 @@ export const governedChartConfigurationSchema =
     referenceBands:
       config.referenceBands ??
       (config.referenceBand ? [config.referenceBand] : undefined),
-  }))
+  }));
 
-export type GovernedChartKind = z.infer<typeof governedChartKindSchema>
-export type ChartPoint = z.infer<typeof chartPointSchema>
-export type ChartSeries = z.infer<typeof chartSeriesSchema>
-export type ChartHeatmapCell = z.infer<typeof chartHeatmapCellSchema>
-export type ChartReferenceBand = z.infer<typeof chartReferenceBandSchema>
-export type ChartAction = z.infer<typeof chartActionSchema>
-export type ChartAnnotation = z.infer<typeof chartAnnotationSchema>
+export type GovernedChartKind = z.infer<typeof governedChartKindSchema>;
+export type ChartPoint = z.infer<typeof chartPointSchema>;
+export type ChartSeries = z.infer<typeof chartSeriesSchema>;
+export type ChartHeatmapCell = z.infer<typeof chartHeatmapCellSchema>;
+export type ChartReferenceBand = z.infer<typeof chartReferenceBandSchema>;
+export type ChartAction = z.infer<typeof chartActionSchema>;
+export type ChartAnnotation = z.infer<typeof chartAnnotationSchema>;
 
 export type GovernedChartConfiguration = z.infer<
   typeof governedChartConfigurationSchema
->
+>;
 
 export type GovernedChartConfigurationInput = z.input<
   typeof governedChartConfigurationSchema
->
+>;
 
 export function parseGovernedChartConfiguration(raw: unknown) {
-  return governedChartConfigurationSchema.safeParse(raw)
+  return governedChartConfigurationSchema.safeParse(raw);
 }

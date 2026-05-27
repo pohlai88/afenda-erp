@@ -41,7 +41,9 @@ export async function bootstrapOrganizationForUser(input: {
     name: input.name,
   });
 
-  const existingOrganizations = await listOrganizationsForUser(input.authUserId);
+  const existingOrganizations = await listOrganizationsForUser(
+    input.authUserId,
+  );
 
   if (existingOrganizations.length > 0) {
     const profile = await getUserProfile(input.authUserId);
@@ -55,12 +57,17 @@ export async function bootstrapOrganizationForUser(input: {
       return profile.defaultOrganizationId;
     }
 
+    const firstOrganization = existingOrganizations[0];
+    if (!firstOrganization) {
+      throw new Error("Invariant: expected at least one organization for user");
+    }
+
     await setDefaultOrganizationForUser({
       authUserId: input.authUserId,
-      organizationId: existingOrganizations[0].id,
+      organizationId: firstOrganization.id,
     });
 
-    return existingOrganizations[0].id;
+    return firstOrganization.id;
   }
 
   const organizationId = createEntityId("org");

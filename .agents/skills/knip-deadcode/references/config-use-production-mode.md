@@ -25,14 +25,8 @@ knip --production
 
 ```json
 {
-  "entry": [
-    "src/index.ts!",
-    "src/cli.ts!"
-  ],
-  "project": [
-    "src/**/*.ts!",
-    "!src/**/*.test.ts"
-  ]
+  "entry": ["src/index.ts!", "src/cli.ts!"],
+  "project": ["src/**/*.ts!", "!src/**/*.test.ts"]
 }
 ```
 

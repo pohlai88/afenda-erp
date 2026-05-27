@@ -14,11 +14,17 @@ Knip can detect unused class members (methods, properties). Enable with `--inclu
 ```typescript
 // src/service.ts
 export class UserService {
-  private cache: Map<string, User> = new Map()
+  private cache: Map<string, User> = new Map();
 
-  getUser(id: string) { return this.cache.get(id) }
-  setUser(id: string, user: User) { this.cache.set(id, user) }
-  deleteUser(id: string) { this.cache.delete(id) }  // Never called
+  getUser(id: string) {
+    return this.cache.get(id);
+  }
+  setUser(id: string, user: User) {
+    this.cache.set(id, user);
+  }
+  deleteUser(id: string) {
+    this.cache.delete(id);
+  } // Never called
 }
 ```
 

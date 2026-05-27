@@ -1,24 +1,24 @@
-import { z } from "zod"
+import { z } from "zod";
 
-import type { SchemaStability } from "./_stability.shared"
+import type { SchemaStability } from "./_stability.shared";
 
-import { governedActionBarConfigurationSchema } from "./action-bar.schema"
-import { governedApprovalTimelineConfigurationSchema } from "./approval-timeline.schema"
-import { auditPanelSchema } from "./audit-panel.schema"
-import { governedChartConfigurationSchema } from "./chart.schema"
-import { governedDetailTabsSchema } from "./detail-tabs.schema"
-import { governedKanbanBoardConfigurationSchema } from "./kanban-board.schema"
-import { emptyStateSchema } from "./list-surface.schema"
-import { listSurfaceRendererConfigurationSchema } from "./list-surface-renderer.schema"
-import { governedMultiStepFormConfigurationSchema } from "./multi-step-form.schema"
-import { governedScorecardFormConfigurationSchema } from "./scorecard-form.schema"
-import { governedSectionConfigurationSchema } from "./section.schema"
-import { governedStackConfigurationSchema } from "./stack.schema"
-import { statCardConfigurationSchema } from "./stat-card.schema"
+import { governedActionBarConfigurationSchema } from "./action-bar.schema";
+import { governedApprovalTimelineConfigurationSchema } from "./approval-timeline.schema";
+import { auditPanelSchema } from "./audit-panel.schema";
+import { governedChartConfigurationSchema } from "./chart.schema";
+import { governedDetailTabsSchema } from "./detail-tabs.schema";
+import { governedKanbanBoardConfigurationSchema } from "./kanban-board.schema";
+import { emptyStateSchema } from "./list-surface.schema";
+import { listSurfaceRendererConfigurationSchema } from "./list-surface-renderer.schema";
+import { governedMultiStepFormConfigurationSchema } from "./multi-step-form.schema";
+import { governedScorecardFormConfigurationSchema } from "./scorecard-form.schema";
+import { governedSectionConfigurationSchema } from "./section.schema";
+import { governedStackConfigurationSchema } from "./stack.schema";
+import { statCardConfigurationSchema } from "./stat-card.schema";
 
-export const GOVERNED_COMPONENT_SCHEMA_ID = "governed.component" as const
+export const GOVERNED_COMPONENT_SCHEMA_ID = "governed.component" as const;
 
-export const GOVERNED_COMPONENT_SCHEMA_STABILITY: SchemaStability = "beta"
+export const GOVERNED_COMPONENT_SCHEMA_STABILITY: SchemaStability = "beta";
 
 /**
  * Canonical enumeration of every governed component type literal recognised
@@ -43,9 +43,9 @@ export const governedComponentTypeSchema = z.enum([
   "governed:scorecard-form",
   "governed:approval-timeline",
   "governed:chart",
-])
+]);
 
-export type GovernedComponentType = z.infer<typeof governedComponentTypeSchema>
+export type GovernedComponentType = z.infer<typeof governedComponentTypeSchema>;
 
 /**
  * Discriminated envelope for a single governed component instance.
@@ -155,13 +155,13 @@ export const governedComponentDiscriminatedSchema = z.discriminatedUnion(
         configuration: governedChartConfigurationSchema,
       })
       .strict(),
-  ]
-)
+  ],
+);
 
 export type GovernedComponent = z.infer<
   typeof governedComponentDiscriminatedSchema
->
+>;
 
 export function parseGovernedComponentData(raw: unknown) {
-  return governedComponentDiscriminatedSchema.safeParse(raw)
+  return governedComponentDiscriminatedSchema.safeParse(raw);
 }

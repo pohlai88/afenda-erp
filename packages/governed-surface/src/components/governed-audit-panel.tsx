@@ -1,28 +1,28 @@
-import type { Route } from "next"
+import type { Route } from "next";
 
-import Link from "next/link"
+import Link from "next/link";
 
-import { Badge } from "@afenda/ui/badge"
-import { cn } from "@afenda/ui/utils"
+import { Badge } from "@afenda/ui/badge";
+import { cn } from "@afenda/ui/utils";
 
-import type { AuditPanelModel } from "../schemas/audit-panel.schema"
+import type { AuditPanelModel } from "../schemas/audit-panel.schema";
 
 export type GovernedAuditPanelProps = {
-  model: AuditPanelModel
-}
+  model: AuditPanelModel;
+};
 
 const AUDIT_ROW_TONE_CLASS = {
   default: "",
   attention: "bg-warning/5",
   critical: "bg-critical/5",
-} as const
+} as const;
 
 const AUDIT_CHIP_VARIANT = {
   default: "secondary",
   positive: "success",
   attention: "warning",
   critical: "critical",
-} as const
+} as const;
 
 /**
  * Read-only audit/evidence table — label resolution stays in the owning module.
@@ -33,10 +33,10 @@ export function GovernedAuditPanel({ model }: GovernedAuditPanelProps) {
       <p className="rounded-md border border-dashed p-8 text-center text-sm text-muted-foreground">
         {model.headerDescription ?? "No audit rows."}
       </p>
-    )
+    );
   }
 
-  const cellClass = model.density === "compact" ? "px-2 py-1.5" : "px-3 py-2.5"
+  const cellClass = model.density === "compact" ? "px-2 py-1.5" : "px-3 py-2.5";
 
   return (
     <div className="space-y-3">
@@ -63,19 +63,19 @@ export function GovernedAuditPanel({ model }: GovernedAuditPanelProps) {
           </thead>
           <tbody className="divide-y">
             {model.rows.map((row) => {
-              const tone = row.tone ?? "default"
+              const tone = row.tone ?? "default";
               return (
                 <tr
                   key={row.id}
                   className={cn(
                     "hover:bg-muted/30",
-                    AUDIT_ROW_TONE_CLASS[tone]
+                    AUDIT_ROW_TONE_CLASS[tone],
                   )}
                 >
                   <td
                     className={cn(
                       cellClass,
-                      "font-mono text-[11px] whitespace-nowrap text-muted-foreground"
+                      "font-mono text-[11px] whitespace-nowrap text-muted-foreground",
                     )}
                   >
                     <time dateTime={row.occurredAt}>{row.occurredAt}</time>
@@ -88,7 +88,7 @@ export function GovernedAuditPanel({ model }: GovernedAuditPanelProps) {
                   <td
                     className={cn(
                       cellClass,
-                      "font-mono text-[11px] leading-snug"
+                      "font-mono text-[11px] leading-snug",
                     )}
                   >
                     {row.href ? (
@@ -106,7 +106,7 @@ export function GovernedAuditPanel({ model }: GovernedAuditPanelProps) {
                   <td
                     className={cn(
                       cellClass,
-                      "max-w-[170px] truncate text-xs font-medium"
+                      "max-w-[170px] truncate text-xs font-medium",
                     )}
                   >
                     {row.actorLabel}
@@ -119,7 +119,7 @@ export function GovernedAuditPanel({ model }: GovernedAuditPanelProps) {
                   <td
                     className={cn(
                       cellClass,
-                      "max-w-[180px] truncate text-xs text-muted-foreground"
+                      "max-w-[180px] truncate text-xs text-muted-foreground",
                     )}
                   >
                     {row.resourceLabel ?? "—"}
@@ -155,11 +155,11 @@ export function GovernedAuditPanel({ model }: GovernedAuditPanelProps) {
                     </div>
                   </td>
                 </tr>
-              )
+              );
             })}
           </tbody>
         </table>
       </div>
     </div>
-  )
+  );
 }

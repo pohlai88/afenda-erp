@@ -109,16 +109,7 @@ export function buildModuleRecordRows(
   return [
     {
       id: `${moduleId}-empty-records`,
-      cells: [
-        "No records",
-        "Seed core ERP data",
-        "-",
-        "-",
-        "-",
-        "-",
-        "-",
-        "-",
-      ],
+      cells: ["No records", "Seed core ERP data", "-", "-", "-", "-", "-", "-"],
     },
   ];
 }

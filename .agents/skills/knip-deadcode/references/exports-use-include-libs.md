@@ -14,11 +14,11 @@ External libraries may consume your exports through type definitions. Use `--inc
 ```typescript
 // src/plugin.ts
 export interface PluginConfig {
-  name: string
-  version: string
+  name: string;
+  version: string;
 }
 
-export const definePlugin = (config: PluginConfig) => config
+export const definePlugin = (config: PluginConfig) => config;
 ```
 
 External library uses `PluginConfig` type but Knip reports it unused.

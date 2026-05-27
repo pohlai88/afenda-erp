@@ -1,13 +1,13 @@
-import type { ReactNode } from "react"
+import type { ReactNode } from "react";
 
-import { cn } from "@afenda/ui/utils"
+import { cn } from "@afenda/ui/utils";
 
 export type GovernedSectionProps = {
-  title: string
-  description?: string
-  children: ReactNode
-  className?: string
-}
+  title: string;
+  description?: string;
+  children: ReactNode;
+  className?: string;
+};
 
 export function GovernedSection({
   title,
@@ -25,5 +25,5 @@ export function GovernedSection({
       </div>
       {children}
     </section>
-  )
+  );
 }

@@ -1,8 +1,8 @@
 export type ModulePageHeaderProps = {
-  title: string
-  description?: string
-  eyebrow?: string
-}
+  title: string;
+  description?: string;
+  eyebrow?: string;
+};
 
 export function ModulePageHeader({
   title,
@@ -19,5 +19,5 @@ export function ModulePageHeader({
         <p className="text-body-medium text-muted-foreground">{description}</p>
       ) : null}
     </header>
-  )
+  );
 }

@@ -2,11 +2,11 @@
 
 **Doc ID:** `ARCH-006` · **File:** `006-metadata-driven-ui-architecture.md`
 
-| Field | Value |
-| ----- | ----- |
-| Status | Active — as-built implementation architecture (May 2026) |
-| Authority | Metadata vs runtime authority, contracts, query windows, Vercel/Next rules |
-| Related | **ARCH-007** (renderer kernel) · **ARCH-002** (feature packages) · **ARCH-001** (deploy) |
+| Field     | Value                                                                                    |
+| --------- | ---------------------------------------------------------------------------------------- |
+| Status    | Active — as-built implementation architecture (May 2026)                                 |
+| Authority | Metadata vs runtime authority, contracts, query windows, Vercel/Next rules               |
+| Related   | **ARCH-007** (renderer kernel) · **ARCH-002** (feature packages) · **ARCH-001** (deploy) |
 
 Afenda uses governed metadata to describe ERP UI intent while server runtime code keeps authority over data access, auth, tenancy, rendering, telemetry, and mutations. This is not a tenant-authored low-code runtime and not runtime JSON-to-JSX.
 
@@ -30,16 +30,16 @@ Metadata may describe fields, columns, row links, filters, sort choices, present
 
 ## Package Boundaries
 
-| Package                    | Responsibility                                                                                                            |
-| -------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
-| `@afenda/erp`              | App Router routes, Server Components, route-level auth checks, search-param threading, and runtime composition.           |
-| `@afenda/domain`           | Cross-module ERP contracts, record type contracts, list-query normalization contracts, labels, and compatibility shaping. |
+| Package                    | Responsibility                                                                                                                       |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| `@afenda/erp`              | App Router routes, Server Components, route-level auth checks, search-param threading, and runtime composition.                      |
+| `@afenda/domain`           | Cross-module ERP contracts, record type contracts, list-query normalization contracts, labels, and compatibility shaping.            |
 | `@afenda/feature-*`        | Target home for mature module metadata, builders, query services, command services, components, schemas, and tests. Not created yet. |
-| `@afenda/governed-surface` | Schemas, builders, profiles, parse boundaries, renderer registry, server/client components, and gallery parse utilities.  |
-| `@afenda/db`               | Tenant-scoped Drizzle queries, persisted records/work items/documents, JSONB fields, query windows, and migrations.       |
-| `@afenda/auth`             | Sessions, organizations, roles, capabilities, and route-level authorization decisions.                                    |
-| `@afenda/observability`    | OTel, render telemetry, invalid metadata events, query-window metrics, and action/audit spans.                            |
-| `@afenda/ui`               | Visual primitives only. No ERP metadata imports.                                                                          |
+| `@afenda/governed-surface` | Schemas, builders, profiles, parse boundaries, renderer registry, server/client components, and gallery parse utilities.             |
+| `@afenda/db`               | Tenant-scoped Drizzle queries, persisted records/work items/documents, JSONB fields, query windows, and migrations.                  |
+| `@afenda/auth`             | Sessions, organizations, roles, capabilities, and route-level authorization decisions.                                               |
+| `@afenda/observability`    | OTel, render telemetry, invalid metadata events, query-window metrics, and action/audit spans.                                       |
+| `@afenda/ui`               | Visual primitives only. No ERP metadata imports.                                                                                     |
 
 Import rules:
 
@@ -253,10 +253,10 @@ Afenda should continue building an internal governed UI kernel. The architecture
 
 ## Related Documents
 
-| Document | Topic |
-| -------- | ----- |
-| [ERP Domain Package Architecture](002-erp-domain-package-architecture.md) | Feature-package boundaries, import doors, and extraction |
-| [Governed Metadata Architecture](007-governed-metadata-architecture.md) | Renderer kernel, profiles, resolver, and builder layering |
-| [Directory Architecture Audit](003-directory-architecture-audit.md) | Monorepo guards and package categories |
-| [System Architecture](001-system-architecture.md) | Product-wide runtime and deployment |
-| [Naming Conventions](004-naming-conventions.md) | File, route, and package naming |
+| Document                                                                  | Topic                                                     |
+| ------------------------------------------------------------------------- | --------------------------------------------------------- |
+| [ERP Domain Package Architecture](002-erp-domain-package-architecture.md) | Feature-package boundaries, import doors, and extraction  |
+| [Governed Metadata Architecture](007-governed-metadata-architecture.md)   | Renderer kernel, profiles, resolver, and builder layering |
+| [Directory Architecture Audit](003-directory-architecture-audit.md)       | Monorepo guards and package categories                    |
+| [System Architecture](001-system-architecture.md)                         | Product-wide runtime and deployment                       |
+| [Naming Conventions](004-naming-conventions.md)                           | File, route, and package naming                           |

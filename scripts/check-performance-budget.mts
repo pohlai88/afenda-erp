@@ -27,7 +27,9 @@ function walkFiles(directory: string): string[] {
 
 function getAssets() {
   if (!existsSync(staticDir)) {
-    throw new Error("Missing .next/static. Run `pnpm build` before checking budgets.");
+    throw new Error(
+      "Missing .next/static. Run `pnpm build` before checking budgets.",
+    );
   }
 
   return walkFiles(staticDir).map((path): Asset => {

@@ -2,12 +2,12 @@
 
 **Doc ID:** `ARCH-003` · **File:** `003-directory-architecture-audit.md`
 
-| Field | Value |
-| ----- | ----- |
-| Status | Active — enforced by `pnpm architecture:check` (May 2026) |
-| Authority | Monorepo layout, package categories, output locations, guard scripts |
-| Enforced by | `scripts/check-directory-architecture.mts` |
-| Related | **ARCH-001** (deploy) · **ARCH-002** (feature packages) · **ARCH-004** (naming) |
+| Field       | Value                                                                           |
+| ----------- | ------------------------------------------------------------------------------- |
+| Status      | Active — enforced by `pnpm architecture:check` (May 2026)                       |
+| Authority   | Monorepo layout, package categories, output locations, guard scripts            |
+| Enforced by | `scripts/check-directory-architecture.mts`                                      |
+| Related     | **ARCH-001** (deploy) · **ARCH-002** (feature packages) · **ARCH-004** (naming) |
 
 This document describes **what the repository enforces today**. The guard script is the
 source of truth when this file and code disagree — update both in the same change.
@@ -19,32 +19,32 @@ workspace libraries, generated output outside source trees. Vercel project linki
 **deferred** until stable (**ARCH-001**); root `vercel.json` already defines the
 intended production build.
 
-| Root | Ownership | Contents |
-| ---- | --------- | -------- |
-| `apps/erp/` | Deployable App Router application | routes, layouts, handlers, app-only composition, Playwright/Vitest |
-| `packages/` | Workspace libraries | domain, db, auth, AI, UI, workflows, config, governed-surface |
-| `packages/features/` | Future ERP modules | glob ready; **no packages on disk yet** |
-| `scripts/` | Repo automation | architecture, artifacts, security, performance, env sync |
-| `docs/architecture/` | Stable doctrine | `ARCH-###` + `00N-*.md` (see **ARCH-004**) |
-| `docs/roadmap/` | Tracking / plans | `TRACK-###` + `00N-*.md` |
-| `.github/` | CI | quality, build, e2e, artifact upload on failure |
-| `.artifacts/` | Test outputs (gitignored) | coverage, vitest reports, playwright results |
+| Root                 | Ownership                         | Contents                                                           |
+| -------------------- | --------------------------------- | ------------------------------------------------------------------ |
+| `apps/erp/`          | Deployable App Router application | routes, layouts, handlers, app-only composition, Playwright/Vitest |
+| `packages/`          | Workspace libraries               | domain, db, auth, AI, UI, workflows, config, governed-surface      |
+| `packages/features/` | Future ERP modules                | glob ready; **no packages on disk yet**                            |
+| `scripts/`           | Repo automation                   | architecture, artifacts, security, performance, env sync           |
+| `docs/architecture/` | Stable doctrine                   | `ARCH-###` + `00N-*.md` (see **ARCH-004**)                         |
+| `docs/roadmap/`      | Tracking / plans                  | `TRACK-###` + `00N-*.md`                                           |
+| `.github/`           | CI                                | quality, build, e2e, artifact upload on failure                    |
+| `.artifacts/`        | Test outputs (gitignored)         | coverage, vitest reports, playwright results                       |
 
 ## Registered workspace packages
 
-| Package | Category | Build / outputs |
-| ------- | -------- | ---------------- |
-| `@afenda/erp` | `next-app` | No package `build`; Turborepo `@afenda/erp#build` → `.next/**`, `!.next/cache/**` |
-| `@afenda/ai` | `runtime-library` | `tsc -p tsconfig.build.json` → `dist/**` |
-| `@afenda/auth` | `runtime-library` | compiled `dist`; `client` / `server` subpaths |
-| `@afenda/config` | `config` | compiled `dist`; Next/Vitest/env helpers |
-| `@afenda/db` | `database` | schema, migrations, seeds → `dist/**` |
-| `@afenda/domain` | `runtime-library` | cross-module contracts → `dist/**` |
-| `@afenda/governed-surface` | `runtime-library` | metadata kernel → `dist/**` |
-| `@afenda/observability` | `runtime-library` | logging/tracing helpers → `dist/**` |
-| `@afenda/ui` | `ui-primitives` | shadcn primitives + `erp-shell` → `dist/**` |
-| `@afenda/workflows` | `runtime-library` | workflow helpers → `dist/**` |
-| `@afenda/feature-*` | `feature-package` | **dynamic** when added under `packages/features/*` |
+| Package                    | Category          | Build / outputs                                                                   |
+| -------------------------- | ----------------- | --------------------------------------------------------------------------------- |
+| `@afenda/erp`              | `next-app`        | No package `build`; Turborepo `@afenda/erp#build` → `.next/**`, `!.next/cache/**` |
+| `@afenda/ai`               | `runtime-library` | `tsc -p tsconfig.build.json` → `dist/**`                                          |
+| `@afenda/auth`             | `runtime-library` | compiled `dist`; `client` / `server` subpaths                                     |
+| `@afenda/config`           | `config`          | compiled `dist`; Next/Vitest/env helpers                                          |
+| `@afenda/db`               | `database`        | schema, migrations, seeds → `dist/**`                                             |
+| `@afenda/domain`           | `runtime-library` | cross-module contracts → `dist/**`                                                |
+| `@afenda/governed-surface` | `runtime-library` | metadata kernel → `dist/**`                                                       |
+| `@afenda/observability`    | `runtime-library` | logging/tracing helpers → `dist/**`                                               |
+| `@afenda/ui`               | `ui-primitives`   | shadcn primitives + `erp-shell` → `dist/**`                                       |
+| `@afenda/workflows`        | `runtime-library` | workflow helpers → `dist/**`                                                      |
+| `@afenda/feature-*`        | `feature-package` | **dynamic** when added under `packages/features/*`                                |
 
 ## Package categories (guard rules)
 
@@ -52,14 +52,14 @@ Every workspace package must map to a category in
 `scripts/check-directory-architecture.mts` (`packageArchitectureRules` or dynamic
 `feature-package` detection).
 
-| Category | Applies to | Policy |
-| -------- | ---------- | ------ |
-| `next-app` | `@afenda/erp` | Owns deployable routes; Turborepo caches `.next/**` excluding `.next/cache/**` (Vercel `NEXTJS_NO_TURBO_CACHE`) |
-| `runtime-library` | ai, auth, domain, governed-surface, observability, workflows | `src/` source; `build` = `tsc -p tsconfig.build.json`; runtime `default` exports → `./dist/*.js` |
-| `ui-primitives` | `@afenda/ui` | Sole owner of reusable primitives; **forbidden:** `apps/erp/src/components/ui` |
-| `config` | `@afenda/config` | Shared Next/env/Vitest; compiled subpaths where required |
-| `database` | `@afenda/db` | Migrations and Drizzle source stay in package; emits `dist` |
-| `feature-package` | `@afenda/feature-*` | Under `packages/features/<moduleId>`; compiled `dist`; must not import `apps/erp` |
+| Category          | Applies to                                                   | Policy                                                                                                          |
+| ----------------- | ------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------- |
+| `next-app`        | `@afenda/erp`                                                | Owns deployable routes; Turborepo caches `.next/**` excluding `.next/cache/**` (Vercel `NEXTJS_NO_TURBO_CACHE`) |
+| `runtime-library` | ai, auth, domain, governed-surface, observability, workflows | `src/` source; `build` = `tsc -p tsconfig.build.json`; runtime `default` exports → `./dist/*.js`                |
+| `ui-primitives`   | `@afenda/ui`                                                 | Sole owner of reusable primitives; **forbidden:** `apps/erp/src/components/ui`                                  |
+| `config`          | `@afenda/config`                                             | Shared Next/env/Vitest; compiled subpaths where required                                                        |
+| `database`        | `@afenda/db`                                                 | Migrations and Drizzle source stay in package; emits `dist`                                                     |
+| `feature-package` | `@afenda/feature-*`                                          | Under `packages/features/<moduleId>`; compiled `dist`; must not import `apps/erp`                               |
 
 Adding a category requires updating the guard script in the same PR that introduces
 the package type.
@@ -83,13 +83,13 @@ consumer of its own `.next` output).
 
 Root `turbo.json` uses the v2 **`tasks`** key (not legacy `pipeline`).
 
-| Task | Purpose |
-| ---- | ------- |
-| `build` | Default `dependsOn: ["^build"]`, `outputs: ["dist/**"]` for libraries |
-| `@afenda/erp#build` | `outputs: [".next/**", "!.next/cache/**"]` |
+| Task                 | Purpose                                                                                    |
+| -------------------- | ------------------------------------------------------------------------------------------ |
+| `build`              | Default `dependsOn: ["^build"]`, `outputs: ["dist/**"]` for libraries                      |
+| `@afenda/erp#build`  | `outputs: [".next/**", "!.next/cache/**"]`                                                 |
 | Per-package `#build` | Overrides for domain, ui, governed-surface, db, auth, ai, workflows, observability, config |
-| `test` / `test:e2e` | `cache: false` (artifacts not cached as build outputs) |
-| `globalEnv` | DATABASE_*, NEON_AUTH_*, public NEXT_PUBLIC_* — affects cache hashes |
+| `test` / `test:e2e`  | `cache: false` (artifacts not cached as build outputs)                                     |
+| `globalEnv`          | DATABASE*\*, NEON_AUTH*_, public NEXT*PUBLIC*_ — affects cache hashes                      |
 
 When Vercel Remote Cache is enabled (after link), `globalEnv` and task `env` must stay
 accurate so preview and production caches do not cross-contaminate.
@@ -102,15 +102,15 @@ also lists `VERCEL_URL` in `env` for deployment-scoped cache hashing.
 
 ## Output rules
 
-| Output | Approved location |
-| ------ | ----------------- |
-| Next.js build | `apps/erp/.next/**` (exclude `.next/cache/**` from Turborepo outputs) |
-| Package builds | `packages/*/dist/**` |
-| Turborepo | `.turbo/**`, package `.turbo/**` |
-| Tests / coverage | `.artifacts/**` (see `docs/testing/README.md`) |
-| Vitest blob junction | `.vitest-reports` → `.artifacts/vitest-reports` |
-| TypeScript incremental | `.next/cache/**` or ignored paths — **never** next to app `src/` |
-| Vercel local metadata | `.vercel/**` (gitignored; created after `vercel link`) |
+| Output                 | Approved location                                                     |
+| ---------------------- | --------------------------------------------------------------------- |
+| Next.js build          | `apps/erp/.next/**` (exclude `.next/cache/**` from Turborepo outputs) |
+| Package builds         | `packages/*/dist/**`                                                  |
+| Turborepo              | `.turbo/**`, package `.turbo/**`                                      |
+| Tests / coverage       | `.artifacts/**` (see `docs/testing/README.md`)                        |
+| Vitest blob junction   | `.vitest-reports` → `.artifacts/vitest-reports`                       |
+| TypeScript incremental | `.next/cache/**` or ignored paths — **never** next to app `src/`      |
+| Vercel local metadata  | `.vercel/**` (gitignored; created after `vercel link`)                |
 
 Forbidden in source trees:
 
@@ -144,12 +144,12 @@ walk skips `.agents/` entirely.
 
 ## Prevention commands
 
-| Command | What it guards |
-| ------- | -------------- |
-| `pnpm architecture:check` | Layout, exports, turbo outputs, UI boundary, doc links |
-| `pnpm lint:governed-renderers` | Governed-surface renderer registry parity |
-| `pnpm artifacts:check` | Test artifact directories under `.artifacts/` |
-| `pnpm security:review` | Auth, cron, uploads, tenant scoping (complementary) |
+| Command                        | What it guards                                         |
+| ------------------------------ | ------------------------------------------------------ |
+| `pnpm architecture:check`      | Layout, exports, turbo outputs, UI boundary, doc links |
+| `pnpm lint:governed-renderers` | Governed-surface renderer registry parity              |
+| `pnpm artifacts:check`         | Test artifact directories under `.artifacts/`          |
+| `pnpm security:review`         | Auth, cron, uploads, tenant scoping (complementary)    |
 
 ### CI order (quality job)
 
@@ -168,14 +168,14 @@ stabilization gate passes.
 
 Recorded for audit history — not open work.
 
-| Conflict | Correction |
-| -------- | ---------- |
-| Generated `*.js` / `*.d.ts` in `packages/ui/src` | Removed from source; emit via `packages/ui/dist` |
-| `apps/erp/src/components/ui` duplicated `@afenda/ui` | Removed; imports use `@afenda/ui` |
-| `apps/erp/tsconfig.tsbuildinfo` beside source | Moved to `.next/cache/tsconfig.tsbuildinfo` |
-| `@afenda/governed-surface` source-only runtime defaults | `tsc` build + `default` → `dist` |
-| `@afenda/auth/client`, `@afenda/config/vitest` source defaults | Compiled subpaths → `dist` |
-| Architecture doc filenames without search IDs | Renumbered to `00N-*.md` (**ARCH-004**) |
+| Conflict                                                       | Correction                                       |
+| -------------------------------------------------------------- | ------------------------------------------------ |
+| Generated `*.js` / `*.d.ts` in `packages/ui/src`               | Removed from source; emit via `packages/ui/dist` |
+| `apps/erp/src/components/ui` duplicated `@afenda/ui`           | Removed; imports use `@afenda/ui`                |
+| `apps/erp/tsconfig.tsbuildinfo` beside source                  | Moved to `.next/cache/tsconfig.tsbuildinfo`      |
+| `@afenda/governed-surface` source-only runtime defaults        | `tsc` build + `default` → `dist`                 |
+| `@afenda/auth/client`, `@afenda/config/vitest` source defaults | Compiled subpaths → `dist`                       |
+| Architecture doc filenames without search IDs                  | Renumbered to `00N-*.md` (**ARCH-004**)          |
 
 ## Related documents
 

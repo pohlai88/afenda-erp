@@ -1,6 +1,6 @@
-import { z } from "zod"
+import { z } from "zod";
 
-export const listSurfaceToolbarParamSchema = z.string().trim().min(1)
+export const listSurfaceToolbarParamSchema = z.string().trim().min(1);
 
 export const listSurfaceToolbarExportSchema = z
   .object({
@@ -10,7 +10,7 @@ export const listSurfaceToolbarExportSchema = z
     /** Clicks this element id when export is a client-triggered download. */
     triggerElementId: z.string().trim().min(1).optional(),
   })
-  .strict()
+  .strict();
 
 export const listSurfaceToolbarSearchSchema = z
   .object({
@@ -19,7 +19,7 @@ export const listSurfaceToolbarSearchSchema = z
     placeholder: z.string().trim().min(1).optional(),
     value: z.string().optional(),
   })
-  .strict()
+  .strict();
 
 export const listSurfaceToolbarFilterOptionSchema = z
   .object({
@@ -27,7 +27,7 @@ export const listSurfaceToolbarFilterOptionSchema = z
     value: z.string().trim().min(1),
     count: z.number().int().nonnegative().optional(),
   })
-  .strict()
+  .strict();
 
 export const listSurfaceToolbarFilterSchema = z
   .object({
@@ -37,7 +37,7 @@ export const listSurfaceToolbarFilterSchema = z
     value: z.string().trim().min(1).optional(),
     options: z.array(listSurfaceToolbarFilterOptionSchema).min(1),
   })
-  .strict()
+  .strict();
 
 export const listSurfaceToolbarSortOptionSchema = z
   .object({
@@ -46,7 +46,7 @@ export const listSurfaceToolbarSortOptionSchema = z
     columnId: z.string().trim().min(1),
     direction: z.enum(["asc", "desc"]),
   })
-  .strict()
+  .strict();
 
 export const listSurfaceToolbarSortSchema = z
   .object({
@@ -55,7 +55,7 @@ export const listSurfaceToolbarSortSchema = z
     value: z.string().trim().min(1).optional(),
     options: z.array(listSurfaceToolbarSortOptionSchema).min(1),
   })
-  .strict()
+  .strict();
 
 export const listSurfaceToolbarSavedViewSchema = z
   .object({
@@ -72,11 +72,11 @@ export const listSurfaceToolbarSavedViewSchema = z
             active: z.boolean().optional(),
             icon: z.string().trim().min(1).nullable().optional(),
           })
-          .strict()
+          .strict(),
       )
       .optional(),
   })
-  .strict()
+  .strict();
 
 export const listSurfaceToolbarBulkActionSchema = z
   .object({
@@ -84,7 +84,7 @@ export const listSurfaceToolbarBulkActionSchema = z
     label: z.string().trim().min(1),
     disabledReason: z.string().trim().min(1).optional(),
   })
-  .strict()
+  .strict();
 
 export const listSurfaceToolbarSchema = z
   .object({
@@ -98,33 +98,33 @@ export const listSurfaceToolbarSchema = z
     columnPicker: z.boolean().optional(),
     resetParams: z.array(listSurfaceToolbarParamSchema).optional(),
   })
-  .strict()
+  .strict();
 
 export type ListSurfaceToolbarExport = z.infer<
   typeof listSurfaceToolbarExportSchema
->
+>;
 export type ListSurfaceToolbarSearch = z.infer<
   typeof listSurfaceToolbarSearchSchema
->
+>;
 export type ListSurfaceToolbarFilterOption = z.infer<
   typeof listSurfaceToolbarFilterOptionSchema
->
+>;
 export type ListSurfaceToolbarFilter = z.infer<
   typeof listSurfaceToolbarFilterSchema
->
+>;
 export type ListSurfaceToolbarSortOption = z.infer<
   typeof listSurfaceToolbarSortOptionSchema
->
+>;
 export type ListSurfaceToolbarSort = z.infer<
   typeof listSurfaceToolbarSortSchema
->
+>;
 export type ListSurfaceToolbarSavedView = z.infer<
   typeof listSurfaceToolbarSavedViewSchema
->
+>;
 export type ListSurfaceToolbarSavedViewItem = NonNullable<
   ListSurfaceToolbarSavedView["items"]
->[number]
+>[number];
 export type ListSurfaceToolbarBulkAction = z.infer<
   typeof listSurfaceToolbarBulkActionSchema
->
-export type ListSurfaceToolbar = z.infer<typeof listSurfaceToolbarSchema>
+>;
+export type ListSurfaceToolbar = z.infer<typeof listSurfaceToolbarSchema>;

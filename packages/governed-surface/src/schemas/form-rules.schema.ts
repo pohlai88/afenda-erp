@@ -1,11 +1,11 @@
-import { z } from "zod"
+import { z } from "zod";
 
-import type { SchemaStability } from "./_stability.shared"
+import type { SchemaStability } from "./_stability.shared";
 
 export const GOVERNED_FORM_RULES_SCHEMA_ID =
-  "governed.form-rules.configuration" as const
+  "governed.form-rules.configuration" as const;
 
-export const GOVERNED_FORM_RULES_SCHEMA_STABILITY: SchemaStability = "beta"
+export const GOVERNED_FORM_RULES_SCHEMA_STABILITY: SchemaStability = "beta";
 
 /** JSON Forms–style effects (server-evaluated in builders; client mirrors for wizards). */
 export const formRuleEffectSchema = z.enum([
@@ -13,9 +13,9 @@ export const formRuleEffectSchema = z.enum([
   "HIDE",
   "DISABLE",
   "ENABLE",
-])
+]);
 
-export type FormRuleEffect = z.infer<typeof formRuleEffectSchema>
+export type FormRuleEffect = z.infer<typeof formRuleEffectSchema>;
 
 export const formRuleFieldConditionSchema = z
   .object({
@@ -23,26 +23,26 @@ export const formRuleFieldConditionSchema = z
     fieldId: z.string().trim().min(1),
     equals: z.union([z.string(), z.number(), z.boolean()]),
   })
-  .strict()
+  .strict();
 
 export type FormRuleFieldCondition = z.infer<
   typeof formRuleFieldConditionSchema
->
+>;
 
 export type FormRuleAndCondition = {
-  scope: "and"
-  conditions: FormRuleCondition[]
-}
+  scope: "and";
+  conditions: FormRuleCondition[];
+};
 
 export type FormRuleOrCondition = {
-  scope: "or"
-  conditions: FormRuleCondition[]
-}
+  scope: "or";
+  conditions: FormRuleCondition[];
+};
 
 export type FormRuleCondition =
   | FormRuleFieldCondition
   | FormRuleAndCondition
-  | FormRuleOrCondition
+  | FormRuleOrCondition;
 
 export const formRuleConditionSchema: z.ZodType<FormRuleCondition> = z.lazy(
   () =>
@@ -60,18 +60,18 @@ export const formRuleConditionSchema: z.ZodType<FormRuleCondition> = z.lazy(
           conditions: z.array(formRuleConditionSchema).min(1),
         })
         .strict(),
-    ])
-)
+    ]),
+);
 
 export const formRuleSchema = z
   .object({
     effect: formRuleEffectSchema,
     condition: formRuleConditionSchema,
   })
-  .strict()
+  .strict();
 
-export type FormRule = z.infer<typeof formRuleSchema>
+export type FormRule = z.infer<typeof formRuleSchema>;
 
 export function parseFormRuleData(raw: unknown) {
-  return formRuleSchema.safeParse(raw)
+  return formRuleSchema.safeParse(raw);
 }

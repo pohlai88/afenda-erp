@@ -1,22 +1,22 @@
 import {
   GOVERNED_LIST_PRESENTATION_PROFILES,
   GOVERNED_STAT_PRESENTATION_PROFILES,
-} from "../profiles/governed-presentation-profiles"
-import type { ListSurfacePresentation } from "../schemas/list-surface-renderer.schema"
-import type { StatCardDensity } from "../schemas/stat-card.schema"
-import type { ListSurfaceToolbar } from "../schemas/list-surface-toolbar.schema"
+} from "../profiles/governed-presentation-profiles";
+import type { ListSurfacePresentation } from "../schemas/list-surface-renderer.schema";
+import type { StatCardDensity } from "../schemas/stat-card.schema";
+import type { ListSurfaceToolbar } from "../schemas/list-surface-toolbar.schema";
 import type {
   ListPresentationProfileId,
   StatPresentationProfileId,
-} from "../schemas/presentation-profile.schema"
+} from "../schemas/presentation-profile.schema";
 
 function mergeListSurfaceToolbar(
   base: ListSurfaceToolbar | undefined,
-  override: ListSurfaceToolbar | undefined
+  override: ListSurfaceToolbar | undefined,
 ): ListSurfaceToolbar | undefined {
-  if (!base && !override) return undefined
-  if (!base) return override
-  if (!override) return base
+  if (!base && !override) return undefined;
+  if (!base) return override;
+  if (!override) return base;
   return {
     ...base,
     ...override,
@@ -29,14 +29,14 @@ function mergeListSurfaceToolbar(
     densityToggle: override.densityToggle ?? base.densityToggle,
     columnPicker: override.columnPicker ?? base.columnPicker,
     resetParams: override.resetParams ?? base.resetParams,
-  }
+  };
 }
 
 function mergeListSurfacePresentation(
   base: ListSurfacePresentation,
-  override?: Partial<ListSurfacePresentation>
+  override?: Partial<ListSurfacePresentation>,
 ): ListSurfacePresentation {
-  if (!override) return base
+  if (!override) return base;
   return {
     variant: override.variant ?? base.variant,
     tableDensity: override.tableDensity ?? base.tableDensity,
@@ -51,13 +51,13 @@ function mergeListSurfacePresentation(
     summary: override.summary ?? base.summary,
     columnState: override.columnState ?? base.columnState,
     decisionLedger: override.decisionLedger ?? base.decisionLedger,
-  }
+  };
 }
 
 export type ResolveGovernedListPresentationInput = {
-  profile: ListPresentationProfileId
-  presentation?: Partial<ListSurfacePresentation>
-}
+  profile: ListPresentationProfileId;
+  presentation?: Partial<ListSurfacePresentation>;
+};
 
 /**
  * Pure merge: profile defaults + builder `presentation` override.
@@ -67,19 +67,19 @@ export function resolveGovernedListPresentation({
   profile,
   presentation,
 }: ResolveGovernedListPresentationInput): ListSurfacePresentation {
-  const defaults = GOVERNED_LIST_PRESENTATION_PROFILES[profile]
-  return mergeListSurfacePresentation(defaults, presentation)
+  const defaults = GOVERNED_LIST_PRESENTATION_PROFILES[profile];
+  return mergeListSurfacePresentation(defaults, presentation);
 }
 
 export type ResolveGovernedStatPresentationInput = {
-  profile: StatPresentationProfileId
-  density?: StatCardDensity
-}
+  profile: StatPresentationProfileId;
+  density?: StatCardDensity;
+};
 
 export function resolveGovernedStatPresentation({
   profile,
   density,
 }: ResolveGovernedStatPresentationInput): StatCardDensity {
-  const defaults = GOVERNED_STAT_PRESENTATION_PROFILES[profile]
-  return density ?? defaults.density
+  const defaults = GOVERNED_STAT_PRESENTATION_PROFILES[profile];
+  return density ?? defaults.density;
 }

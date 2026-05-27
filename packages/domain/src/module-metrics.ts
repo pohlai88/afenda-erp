@@ -167,6 +167,8 @@ export function resolveModuleMetrics(
   summary: TenantModuleMetricSummary,
 ): ModuleMetric[] {
   return metrics.map((metric, index) => {
-    return resolveByLabel(metric, summary) ?? resolveBySlot(metric, summary, index);
+    return (
+      resolveByLabel(metric, summary) ?? resolveBySlot(metric, summary, index)
+    );
   });
 }

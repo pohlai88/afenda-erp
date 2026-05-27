@@ -43,6 +43,25 @@ function formatEnvValue(value: string) {
   return value;
 }
 
+/** Dry-run must not echo secrets from `.env.config` to the terminal. */
+function redactEnvFileContent(content: string) {
+  return content
+    .split(/\r?\n/)
+    .map((line) => {
+      const trimmed = line.trim();
+      if (!trimmed || trimmed.startsWith("#")) return line;
+
+      const equalsIndex = line.indexOf("=");
+      if (equalsIndex <= 0) return line;
+
+      const key = line.slice(0, equalsIndex);
+      const value = line.slice(equalsIndex + 1).trim();
+      if (value === "") return `${key}=`;
+      return `${key}=<redacted>`;
+    })
+    .join("\n");
+}
+
 async function main() {
   const sourceRaw = await readFile(sourcePath, "utf8");
   const source = sourceRaw.replace(/^\uFEFF/, "");
@@ -50,7 +69,10 @@ async function main() {
   const parsedSource = parseDotenv(source);
   const sourceKeys = new Set(Object.keys(parsedSource));
 
-  const outputs = new Map<string, string>();
+  const outputs = new Map<
+    string,
+    { content: string; preservedKeys: string[] }
+  >();
   const banner = `# Generated from .env.config via pnpm env:sync.
 # Edit .env.config and re-run the sync script.
 
@@ -78,17 +100,28 @@ async function main() {
         .join("\n")}\n`;
     }
 
-    outputs.set(targetPath, output);
+    outputs.set(targetPath, {
+      content: output,
+      preservedKeys: preservedEntries.map(([key]) => key),
+    });
   }
 
   if (dryRun) {
-    for (const [targetPath, output] of outputs) {
-      process.stdout.write(`--- ${targetPath} ---\n${output}`);
+    for (const [targetPath, { content, preservedKeys }] of outputs) {
+      process.stdout.write(
+        `--- ${targetPath} ---\n` +
+          `Would sync ${sourceKeys.size} key(s) from .env.config` +
+          (preservedKeys.length > 0
+            ? `; preserve ${preservedKeys.length} key(s) not in source: ${preservedKeys.join(", ")}`
+            : "") +
+          ".\n",
+      );
+      process.stdout.write(`${redactEnvFileContent(content)}\n`);
     }
     return;
   }
 
-  for (const [targetPath, output] of outputs) {
+  for (const [targetPath, { content: output }] of outputs) {
     await mkdir(dirname(targetPath), { recursive: true });
 
     try {
@@ -103,6 +136,9 @@ async function main() {
 
   process.stdout.write(
     `Synchronized environment files from ${sourcePath} to ${targetPaths.length} target(s).\n`,
+  );
+  process.stdout.write(
+    "For Cursor MCP on Windows, run: pnpm env:sync:cursor (then restart Cursor).\n",
   );
 }
 

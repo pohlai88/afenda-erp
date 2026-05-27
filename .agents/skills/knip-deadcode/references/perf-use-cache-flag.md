@@ -48,6 +48,7 @@ rm -rf node_modules/.cache/knip
 ```
 
 **When cache helps most:**
+
 - Large monorepos with many packages
 - Repeated local development runs
 - CI with cached node_modules

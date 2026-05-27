@@ -1,20 +1,16 @@
-"use client"
+"use client";
 
-import { Badge } from "@afenda/ui/badge"
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@afenda/ui/tooltip"
-import { cn } from "@afenda/ui/utils"
+import { Badge } from "@afenda/ui/badge";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@afenda/ui/tooltip";
+import { cn } from "@afenda/ui/utils";
 
-import type { KanbanCardTransitionAvailability } from "../schemas/kanban-board.schema"
+import type { KanbanCardTransitionAvailability } from "../schemas/kanban-board.schema";
 
 export type GovernedKanbanTransitionHintProps = {
   transition: KanbanCardTransitionAvailability & {
-    state: "ready" | "disabled"
-  }
-}
+    state: "ready" | "disabled";
+  };
+};
 
 /**
  * Read-only kanban transition hint — mirrors `GovernedTrailingActionSlot` disabled UX.
@@ -22,7 +18,7 @@ export type GovernedKanbanTransitionHintProps = {
 export function GovernedKanbanTransitionHint({
   transition,
 }: GovernedKanbanTransitionHintProps) {
-  const disabled = transition.state === "disabled"
+  const disabled = transition.state === "disabled";
   const badge = (
     <Badge
       variant="outline"
@@ -30,7 +26,7 @@ export function GovernedKanbanTransitionHint({
     >
       {transition.label}
     </Badge>
-  )
+  );
 
   const shell = (
     <span
@@ -41,7 +37,7 @@ export function GovernedKanbanTransitionHint({
     >
       {badge}
     </span>
-  )
+  );
 
   if (disabled && transition.disabledReason) {
     return (
@@ -51,8 +47,8 @@ export function GovernedKanbanTransitionHint({
           {transition.disabledReason}
         </TooltipContent>
       </Tooltip>
-    )
+    );
   }
 
-  return shell
+  return shell;
 }

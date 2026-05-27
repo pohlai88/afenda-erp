@@ -1,0 +1,48 @@
+---
+description: Governed metadata UI — schemas, builders, renderers, list windows
+globs: packages/governed-surface/**/*,packages/domain/**/*surface*,packages/domain/**/*metadata*
+alwaysApply: false
+---
+
+# Governed metadata UI
+
+**ARCH-006** (runtime authority) · **ARCH-007** (kernel layers). Skill: `.agents/skills/metadata-eui-polish/`.
+
+## Prime directive
+
+Metadata declares intent. Runtime owns authority. Renderers paint; they do not fetch, authorize, or guess business rules.
+
+## Import doors
+
+- `@afenda/governed-surface` — shared types/builders/schemas
+- `@afenda/governed-surface/server` — RSC sections
+- `@afenda/governed-surface/client` — client islands
+- `@afenda/governed-surface/metadata` — renderer dispatch only
+- `@afenda/ui` must **not** import governed-surface
+
+## Layer ownership (where to edit)
+
+| Change | Layer |
+| ------ | ----- |
+| Global table chrome / KPI density | Profile + renderer |
+| Module-specific row tone, columns, actions | Builder (+ runtime permission gate) |
+| Contract shape | Schema (Zod) |
+| Paint / cell formatting | Renderer |
+
+Execution order: Runtime → Query → Builder → Resolver → Zod parse → Renderer → UI.
+
+## List windows
+
+- Metadata carries the **current server window** only (cursor, `pageSize`, `totalCount`, `hasNextPage`).
+- Cursors are opaque; `@afenda/db` owns filter/sort/cursor application.
+- Export and bulk work: server jobs or query tokens — never browser-side full-dataset loops.
+
+## Renderer kernel rules
+
+- One shipped renderer per id under `src/metadata/renderers/`.
+- Respect `pnpm lint:governed-renderers` import allowlist on `renderers/**`.
+- Invalid metadata must fail parse before render; safe production fallbacks only.
+
+## Tests
+
+`pnpm --filter @afenda/governed-surface test`, `pnpm lint:governed-renderers`, and `pnpm architecture:check` when changing registry, profiles, or docs links.
