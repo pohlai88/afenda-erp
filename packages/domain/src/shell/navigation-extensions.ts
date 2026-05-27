@@ -1,5 +1,5 @@
 import type { AppCapability } from "@afenda/auth";
-import type { NavigationExtension } from "./module-types";
+import type { NavigationExtension } from "../shared/module-types";
 
 export const navigationExtensions = [
   {

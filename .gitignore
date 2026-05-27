@@ -4,6 +4,7 @@ node_modules
 dist
 .vercel
 .codex-runtime
+.codex-logs
 *.tsbuildinfo
 .env
 .env.*

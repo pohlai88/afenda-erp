@@ -1,4 +1,4 @@
-import type { NavigationExtension } from "./module-types";
+import type { NavigationExtension } from "../shared/module-types";
 
 export const appBrandName = "Afenda ERP";
 

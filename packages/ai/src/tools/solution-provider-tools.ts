@@ -1,4 +1,4 @@
-import type { ModuleId } from "@afenda/config/module-ids";
+import { isModuleId, type ModuleId } from "@afenda/config/module-ids";
 import {
   getRecoveryConsoleModuleIds,
   getSolutionToolModuleBindings,
@@ -90,7 +90,11 @@ function resolveModuleIdFromEvidence(
   fallback: ModuleId,
 ): ModuleId {
   const primary = evidence[0];
-  return primary?.moduleId ?? fallback;
+  const moduleId = primary?.moduleId;
+  if (moduleId && isModuleId(moduleId)) {
+    return moduleId;
+  }
+  return fallback;
 }
 
 function toGroundedEvidence(input: {

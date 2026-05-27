@@ -10,6 +10,7 @@ import {
   documentUploadMaxSizeBytes,
 } from "@/lib/document-upload-policy";
 import {
+  assertUploadTokenMatchesSession,
   getUploadErrorResponse,
   UploadRouteError,
   uploadPayloadSchema,
@@ -123,6 +124,14 @@ export async function POST(request: Request): Promise<NextResponse> {
       },
       onUploadCompleted: async ({ blob, tokenPayload }) => {
         const parsedPayload = parseUploadTokenPayload(tokenPayload);
+        const { organization, session } = await requireUploadCapability(
+          parsedPayload.moduleId,
+        );
+        assertUploadTokenMatchesSession(
+          parsedPayload,
+          organization,
+          session,
+        );
 
         await registerTenantDocument({
           organizationId: parsedPayload.organizationId,

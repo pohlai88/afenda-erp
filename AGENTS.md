@@ -4,6 +4,8 @@
 
 This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
 
+When working with Next.js in `apps/erp`, call the **`init` tool** from the **next-devtools** MCP server at the start of the session (project config: `.cursor/mcp.json`) to load version-matched guidance. Afenda doctrine in `docs/architecture/` still wins over generic MCP defaults.
+
 <!-- END:nextjs-agent-rules -->
 
 # Afenda ERP (`@afenda/erp`) — Agent Guide

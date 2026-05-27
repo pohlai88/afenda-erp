@@ -139,8 +139,9 @@ Enforced by the same guard (walk + link validation):
   The guard maintains an explicit denylist in `check-directory-architecture.mts`.
 - Relative links between architecture docs must resolve (CI fails on broken links).
 
-Agent skill markdown under `.agents/skills/` is outside this policy; the guard
-walk skips `.agents/` entirely.
+Agent skill markdown under `.agents/skills/` and Cursor IDE config under
+`.cursor/` are outside this policy; the guard walk skips `.agents/` and
+`.cursor/` entirely.
 
 ## Prevention commands
 

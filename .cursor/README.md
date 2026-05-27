@@ -4,8 +4,8 @@
 
 | Scope       | File                              | Servers                                           |
 | ----------- | --------------------------------- | ------------------------------------------------- |
-| **Global**  | `%USERPROFILE%\.cursor\mcp.json` | context7, Neon, github, playwright, vercel |
-| **Project** | `.cursor/mcp.json`                | shadcn (`-c apps/erp`, `components.json`)  |
+| **Global**  | `%USERPROFILE%\.cursor\mcp.json` | context7, github, Neon (OAuth), playwright, vercel |
+| **Project** | `.cursor/mcp.json`                | shadcn (`-c apps/erp`), **next-devtools** (`next-devtools-mcp@latest`) |
 
 Canonical global path on Windows: **`%USERPROFILE%\.cursor\mcp.json`** (not `%APPDATA%\Cursor\mcp.json`).
 
@@ -13,16 +13,22 @@ Canonical global path on Windows: **`%USERPROFILE%\.cursor\mcp.json`** (not `%AP
 
 ```bash
 pnpm env:sync          # .env.local + apps/erp/.env.local
-pnpm env:sync:cursor   # Windows User env (NEON_API_KEY, GITHUB_TOKEN)
+pnpm env:sync:cursor   # Windows User env — §L: NEON_API_KEY, GITHUB_TOKEN, CONTEXT7_API_KEY
 pnpm env:sync:dry-run  # preview (values redacted; lists preserved keys)
 ```
 
-Fully **restart Cursor** after `env:sync:cursor`.
+**Context7:** set `CONTEXT7_API_KEY` (`ctx7sk…` from [context7.com/dashboard](https://context7.com/dashboard)) in `.env.config` §L + `env:sync:cursor`, and reference `${env:CONTEXT7_API_KEY}` in global `mcp.json` `context7.env` — avoids monthly quota errors.
+
+**GitHub MCP (remote):** `https://api.githubcopilot.com/mcp/` — **OAuth (preferred):** no `Authorization` header → **Settings → Tools & MCP → github → Connect**. **Or PAT:** `Bearer ${env:GITHUB_TOKEN}` via §L + `env:sync:cursor` (scopes e.g. `repo`, `read:org`). Invalid `GITHUB_TOKEN` breaks both MCP and `gh` CLI.
+
+**Neon MCP (OAuth):** restart Cursor → **Settings → Tools & MCP** → enable **Neon** → **Connect** → authorize in the browser (no API key in `mcp.json`).
+
+Fully **restart Cursor** after changing MCP config or `env:sync:cursor`. Troubleshooting: [`docs/development/env.md`](../docs/development/env.md#cursor-mcp).
 
 **Verify (PowerShell, new window):**
 
 ```powershell
-@('NEON_API_KEY','GITHUB_TOKEN') | ForEach-Object { "$_=$(if ([string]::IsNullOrWhiteSpace([Environment]::GetEnvironmentVariable($_, 'User'))) { 'MISSING' } else { 'SET' })" }
+@('NEON_API_KEY','GITHUB_TOKEN','CONTEXT7_API_KEY') | ForEach-Object { "$_=$(if ([string]::IsNullOrWhiteSpace([Environment]::GetEnvironmentVariable($_, 'User'))) { 'MISSING' } else { 'SET' })" }
 ```
 
 Duplicate MCP files under `AppData\Roaming\Cursor\...` and `AppData\Roaming\.cursor\` were cleared so servers are not registered twice.
@@ -46,3 +52,5 @@ Duplicate MCP files under `AppData\Roaming\Cursor\...` and `AppData\Roaming\.cur
 5. **Indexing & Docs** — add `docs/architecture/`, `docs/testing/`
 
 See rule `afenda-external-context` for Context7 vs ARCH doc priority.
+
+Vercel linking is deferred — [`docs/development/vercel-link.md`](../docs/development/vercel-link.md).

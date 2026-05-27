@@ -1,5 +1,5 @@
 import type { ModuleId } from "@afenda/config/module-ids";
-import type { ErpModuleDefinition } from "./module-types";
+import type { ErpModuleDefinition } from "../shared/module-types";
 
 const modules = [
   {

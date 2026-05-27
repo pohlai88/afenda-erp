@@ -6,6 +6,7 @@ import type {
   GovernedListTrailingCellProps,
   GovernedPatternCTrailingColumnSpec,
 } from "../governed-pattern-c-trailing-column.shared";
+import type { GovernedListTrailingCellContext } from "../schemas/list-trailing-cell-context.schema";
 
 import { GovernedMetadataTrailingCell } from "./governed-metadata-trailing-cell.client";
 
@@ -28,7 +29,7 @@ export function resolveGovernedTrailingColumn(
 ): {
   header: string;
   Cell: ComponentType<GovernedListTrailingCellProps>;
-  context?: Record<string, unknown>;
+  context?: GovernedListTrailingCellContext;
 } {
   const Cell =
     spec.Cell ??

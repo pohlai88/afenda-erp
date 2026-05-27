@@ -6,7 +6,15 @@ alwaysApply: false
 
 # Afenda ERP app (`apps/erp`)
 
-Full agent context: `apps/erp/AGENTS.md`. System runtime: **ARCH-001**.
+Full agent context: `AGENTS.md` (repo root). System runtime: **ARCH-001**.
+
+## Next.js DevTools MCP
+
+When working on `apps/erp` (routes, RSC, handlers, caching, or Next.js APIs), call the **`init` tool** from the **next-devtools** MCP server at the **start of the session** (or when the task clearly shifts to Next.js app work). That loads version-matched Next.js guidance before you write or change code.
+
+- Project MCP: `.cursor/mcp.json` → `next-devtools` (`npx -y next-devtools-mcp@latest`).
+- Still read `node_modules/next/dist/docs/` for breaking changes (see root `AGENTS.md`).
+- Repo doctrine (**ARCH-001**, tenancy, governed UI) overrides generic Next.js defaults from MCP.
 
 ## Route ownership
 
@@ -34,5 +42,5 @@ Full agent context: `apps/erp/AGENTS.md`. System runtime: **ARCH-001**.
 ## Governed lists in this app
 
 - Compose `GovernedPatternCListSection` from `@afenda/governed-surface/server`.
-- Builders today: `@afenda/domain` (`module-list-surfaces.ts`); move to `@afenda/feature-*` when extracting.
+- Builders today: `@afenda/domain` (`src/modules/list-surfaces.ts`); move to `@afenda/feature-*` when extracting.
 - Pass validated **configuration** to client bridges, not raw Drizzle rows.

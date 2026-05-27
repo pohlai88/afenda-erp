@@ -12,7 +12,7 @@ const ROUTES = [
     test: (p) => p.startsWith("apps/erp/"),
     hint: [
       "**apps/erp** — rule `@afenda-erp-app` / `afenda-erp-app`.",
-      "Doctrine: **ARCH-001** + `apps/erp/AGENTS.md`.",
+      "Doctrine: **ARCH-001** + `AGENTS.md` (repo root).",
       "Before done: `pnpm typecheck`; routes/flows → `pnpm test` / `pnpm test:e2e`.",
     ].join(" "),
   },

@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 
 import { parseGovernedComponentData } from "../client";
+import { toGovernedComponentEnvelopeFromDetailSection } from "../governed-configuration.shared";
 import type { GovernedDetailSection } from "../schemas/detail-tabs.schema";
 
 import { GovernedComponentRenderer } from "./render-governed-component";
@@ -16,16 +17,9 @@ import { GovernedComponentRenderer } from "./render-governed-component";
 export function resolveGovernedDetailSectionContent(
   section: GovernedDetailSection,
 ): ReactNode {
-  const candidate: Record<string, unknown> = {
-    type: section.rendererKey,
-    serverType: section.rendererKey,
-    configuration:
-      section.rendererProps === undefined
-        ? undefined
-        : (section.rendererProps as Record<string, unknown>),
-  };
-
-  const parsed = parseGovernedComponentData(candidate);
+  const parsed = parseGovernedComponentData(
+    toGovernedComponentEnvelopeFromDetailSection(section),
+  );
   if (!parsed.success) {
     return null;
   }

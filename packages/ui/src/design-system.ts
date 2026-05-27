@@ -9,10 +9,10 @@ import { z } from "zod";
  * - CI: `pnpm run lint` runs ESLint (import boundaries) + `scripts/check-design-contract.mjs`
  *   (banned radii / shadows / arbitrary rounded / material drift: inline backdrop blur,
  *   arbitrary Tailwind blur utilities with bracket literals, infinite animations,
- *   legacy water tokens — outside `apps/web/app/globals.css`).
+ *   legacy water tokens — outside `apps/erp/src/app/globals.css`).
  * - Preferred API: `ui.*` aliases use familiar primitive names while reusing the
  *   legacy exports below for compatibility.
- * - Spacing: `uiSurfaceSpaceKeys` / `uiSurfaceInset` mirror `apps/web/app/globals.css`
+ * - Spacing: `uiSurfaceSpaceKeys` / `uiSurfaceInset` mirror `apps/erp/src/app/globals.css`
  *   `--space-surface-*` (Tailwind `*-surface-*`).
  */
 
@@ -105,7 +105,7 @@ export const uiTracking = {
 
 /**
  * Vertical rhythm between stacked blocks — mirrors `:root` density tokens in
- * `apps/web/app/globals.css` via Tailwind `gap-density-*` utilities from `@theme inline`.
+ * `apps/erp/src/app/globals.css` via Tailwind `gap-density-*` utilities from `@theme inline`.
  */
 export const uiDensityKeys = ["compact", "comfortable", "relaxed"] as const;
 
@@ -119,7 +119,7 @@ export const uiDensity = {
 
 export const uiDensitySchema = z.enum(uiDensityKeys);
 
-/** Keys for `--space-surface-*` in `apps/web/app/globals.css` -> `p-surface-*`, `gap-surface-*`, etc. */
+/** Keys for `--space-surface-*` in `apps/erp/src/app/globals.css` -> `p-surface-*`, `gap-surface-*`, etc. */
 export const uiSurfaceSpaceKeys = [
   "xs",
   "sm",
@@ -146,7 +146,7 @@ export const uiSurfaceInset = {
 export const uiTitle = {
   /**
    * Card / dialog titles — `text-lg` matches `@layer base` h3 (`1.125rem`).
-   * Page/editorial headings inherit from `apps/web/app/globals.css` (h1-h4).
+   * Page/editorial headings inherit from `apps/erp/src/app/globals.css` (h1-h4).
    */
   sm: "font-heading text-lg leading-tight font-semibold",
 } as const;
@@ -339,7 +339,7 @@ export function parseUiPriority(value: unknown): UiPriority {
 /* -------------------------------------------------------------------------- */
 /* Material semantics — runtime contract                                      */
 /*                                                                            */
-/* Schemas only. The CSS implementation lives in `apps/web/app/globals.css` and the */
+/* Schemas only. The CSS implementation lives in `apps/erp/src/app/globals.css` and the */
 /* adoption contract lives in `.cursor/rules/material-semantics.mdc` +        */
 /* ADR-0001 §13. These exports exist so that components consuming `data-phase`*/
 /* / `data-lynx` from RouteEnvelope, search params, or server payloads can    */

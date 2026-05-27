@@ -203,6 +203,7 @@ export const uploadRouteCopy = {
   invalidRequest: "Invalid document upload request.",
   uploadFailed: "Document upload failed.",
   missingTokenPayload: "Upload token payload is missing.",
+  tokenMismatch: "Upload token does not match the active session.",
 } as const;
 
 export function getAuthPageMetadataCopy(key: AuthPageMetadataKey) {

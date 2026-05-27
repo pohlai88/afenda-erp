@@ -3,10 +3,12 @@ import { uploadRouteCopy } from "@afenda/domain";
 import { describe, expect, it } from "vitest";
 import { z } from "zod";
 import {
+  assertUploadTokenMatchesSession,
   getUploadErrorResponse,
   UploadRouteError,
   uploadAccessSchema,
   uploadPayloadSchema,
+  type UploadTokenPayload,
 } from "@/lib/api/upload-route";
 
 describe("upload route helpers", () => {
@@ -58,5 +60,27 @@ describe("upload route helpers", () => {
       status: 400,
       message: uploadRouteCopy.uploadFailed,
     });
+  });
+
+  it("rejects upload tokens that do not match the active session", () => {
+    const payload = {
+      moduleId: moduleIds[0],
+      title: "Quarterly statement",
+      contentType: "application/pdf" as const,
+      sizeBytes: 1024,
+      access: "private" as const,
+      organizationId: "org-a",
+      uploadedByAuthUserId: "user-a",
+    } satisfies UploadTokenPayload;
+
+    expect(() =>
+      assertUploadTokenMatchesSession(
+        payload,
+        { id: "org-b" },
+        { id: "user-a" },
+      ),
+    ).toThrow(
+      new UploadRouteError(403, uploadRouteCopy.tokenMismatch),
+    );
   });
 });

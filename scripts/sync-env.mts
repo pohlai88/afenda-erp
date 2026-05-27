@@ -10,6 +10,9 @@ const targetPaths = [
 ];
 const dryRun = process.argv.includes("--dry-run");
 
+/** Keys dropped from preserved target sections (removed from `.env.config` / MCP). */
+const STALE_PRESERVED_ENV_KEYS = new Set(["CONTEXT7_API_KEY"]);
+
 function parseDotenv(content: string) {
   const env: Record<string, string> = {};
 
@@ -85,7 +88,10 @@ async function main() {
       const existing = await readFile(targetPath, "utf8");
       const parsedExisting = parseDotenv(existing);
       preserved = Object.fromEntries(
-        Object.entries(parsedExisting).filter(([key]) => !sourceKeys.has(key)),
+        Object.entries(parsedExisting).filter(
+          ([key]) =>
+            !sourceKeys.has(key) && !STALE_PRESERVED_ENV_KEYS.has(key),
+        ),
       );
     } catch {
       preserved = {};

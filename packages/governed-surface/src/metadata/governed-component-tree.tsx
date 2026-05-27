@@ -7,6 +7,7 @@ import {
   type GovernedComponent,
 } from "../client";
 
+import { extractGovernedConfigurationDataNature } from "../governed-configuration.shared";
 import { emitGovernedTelemetry } from "./governed-telemetry.shared";
 import { renderGovernedRendererById } from "./governed-renderer-dispatch";
 import {
@@ -23,24 +24,6 @@ export type GovernedComponentTreeProps = {
   diagnostics?: GovernedComponentRendererDiagnostics;
   surfaceKey?: string;
 };
-
-/**
- * Extracts `dataNature` from a raw configuration object without a full parse.
- * Used for the pre-flight contract check before renderer dispatch.
- * Returns `undefined` when the configuration has no dataNature field
- * (container-only renderers, or schemas that predate ADR-0025).
- */
-function extractDataNature(configuration: unknown): string | undefined {
-  if (
-    typeof configuration !== "object" ||
-    configuration === null ||
-    Array.isArray(configuration)
-  ) {
-    return undefined;
-  }
-  const raw = (configuration as Record<string, unknown>).dataNature;
-  return typeof raw === "string" ? raw : undefined;
-}
 
 /**
  * Core governed metadata tree.
@@ -102,7 +85,7 @@ export function GovernedComponentTree({
   const contract: (typeof AFENDA_GOVERNED_RENDERER_CONTRACTS)[AfendaGovernedRendererId] =
     AFENDA_GOVERNED_RENDERER_CONTRACTS[rendererId];
   if (contract.acceptedNatures.length > 0) {
-    const dataNature = extractDataNature(data.configuration);
+    const dataNature = extractGovernedConfigurationDataNature(data.configuration);
     if (
       dataNature !== undefined &&
       !(contract.acceptedNatures as readonly string[]).includes(dataNature)
@@ -135,7 +118,7 @@ export function GovernedComponentTree({
     rendererId,
     componentType: data.type,
     serverType: data.serverType,
-    dataNature: extractDataNature(data.configuration),
+    dataNature: extractGovernedConfigurationDataNature(data.configuration),
     surfaceKey,
     validation: "ok",
   });

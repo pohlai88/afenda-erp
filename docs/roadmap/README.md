@@ -10,7 +10,7 @@ filename prefixes, matching the architecture numbering scheme.
 
 | ID            | File                                                                               | Topic                                                                              |
 | ------------- | ---------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
-| **TRACK-001** | [001-001-ai-operation-execution-layer.md](001-001-ai-operation-execution-layer.md) | LMS operational execution layer — AI sandbox, training workflows, module promotion |
+| **TRACK-001** | [001-ai-operation-execution-layer.md](001-ai-operation-execution-layer.md) | LMS operational execution layer — AI sandbox, training workflows, module promotion |
 
 ## Placement Rules
 

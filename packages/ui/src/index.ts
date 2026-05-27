@@ -1,4 +1,4 @@
-/** UI primitive barrel - prefer `@afenda/ui`; legacy `#components2/ui` resolves here. */
+/** UI primitive barrel — import from `@afenda/ui`. */
 export * from "./accordion";
 export * from "./alert-dialog";
 export * from "./alert";

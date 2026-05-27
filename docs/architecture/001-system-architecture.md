@@ -575,7 +575,7 @@ compile-time dependencies, not separate Vercel projects. See
 
 **Vercel link is deferred.** Do not run `vercel link` or wire preview/production deploys until the
 local stabilization gate passes. The linked `afenda-vercel` project still uses Vercel default Next.js
-settings until retargeted to this repository.
+settings until retargeted to this repository. Operator guide: [`docs/development/vercel-link.md`](../development/vercel-link.md).
 
 **Local stabilization gate (before `vercel link`):**
 
@@ -583,7 +583,7 @@ settings until retargeted to this repository.
 | ---- | --------------- | ----------------- |
 | Build | `pnpm turbo build --filter=@afenda/erp` | Passed locally (May 2026) |
 | Types | `pnpm typecheck` | Passed; `strict`, `noUncheckedIndexedAccess`, unused checks |
-| Architecture | `pnpm architecture:check` | Fails on untracked `.cursor/` tooling paths (not ERP layout); fix or allowlist before link |
+| Architecture | `pnpm architecture:check` | Pass after `.cursor/` excluded and `components.json` UI paths aligned |
 | Tests | `pnpm test` | Passed locally (May 2026) |
 | Env | `pnpm env:sync` (+ `env:sync:cursor` on Windows) | See `docs/development/env.md` |
 | E2E / governed UI | Manual or `pnpm test:e2e` | Required before production link |

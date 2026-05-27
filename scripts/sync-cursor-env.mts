@@ -7,7 +7,11 @@ const rootDir = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const sourcePath = resolve(rootDir, ".env.config");
 
 /** Keys referenced by ~/.cursor/mcp.json via ${env:…} */
-const CURSOR_USER_ENV_KEYS = ["NEON_API_KEY", "GITHUB_TOKEN"] as const;
+const CURSOR_USER_ENV_KEYS = [
+  "NEON_API_KEY",
+  "GITHUB_TOKEN",
+  "CONTEXT7_API_KEY",
+] as const;
 
 function parseDotenv(content: string) {
   const env: Record<string, string> = {};

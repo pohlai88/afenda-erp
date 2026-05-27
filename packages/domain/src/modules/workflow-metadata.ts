@@ -2,7 +2,7 @@ import type { ModuleId } from "@afenda/config/module-ids";
 import type {
   RecoveryPlaybook,
   WorkflowAutomationDefinition,
-} from "./module-types";
+} from "../shared/module-types";
 
 const recoveryEvidenceModuleIds = [
   "finance",

@@ -20,7 +20,7 @@ finance, HR, sales, inventory, or CRM business logic.
 | ------------------------ | ---------------------------------------------------- | --------------------------------------------------------- |
 | Deployable surface       | `apps/erp` only                                      | Same — one Vercel project, no per-module deployables      |
 | Module implementation    | `packages/domain`, `apps/erp` route adapters         | `packages/features/<moduleId>` per mature module          |
-| List/metadata builders   | `packages/domain/src/module-list-surfaces.ts`        | Move to `@afenda/feature-*` when threshold met            |
+| List/metadata builders   | `packages/domain/src/modules/list-surfaces.ts`        | Move to `@afenda/feature-*` when threshold met            |
 | Database schema          | Flat `packages/db/src/schema/*.ts` + shared `erp.ts` | `schema/<moduleId>/` for ledger-grade tables              |
 | Vercel project link      | **Deferred** until repo stable (see **ARCH-001**)    | Root-linked monorepo; `vercel.json` already defines build |
 | Feature packages on disk | **None** (`packages/features/*` glob ready)          | One package per extracted module                          |
@@ -104,7 +104,7 @@ Until the first `@afenda/feature-*` package exists:
 | ---------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
 | Module workspace routes            | `apps/erp/src/app/(app)/[moduleId]/` → `module-screen.tsx`                                                            |
 | Dashboard / solution-console lists | `dashboard-route.tsx`, `solution-console-route.tsx`                                                                   |
-| Governed list configuration        | `packages/domain/src/module-list-surfaces.ts` (`buildModule*ListSurface`, `buildDashboard*`, `buildSolutionConsole*`) |
+| Governed list configuration        | `packages/domain/src/modules/list-surfaces.ts` (`buildModule*ListSurface`, `buildDashboard*`, `buildSolutionConsole*`) |
 | Governed rendering                 | `@afenda/governed-surface/server` (`GovernedPatternCListSection`)                                                     |
 | Shared ERP records / work items    | `packages/db` (`erp_module_records`, `erp_work_items`, …) via `@afenda/domain`                                        |
 | Module registry and capabilities   | `packages/domain`, `@afenda/config/module-ids`                                                                        |

@@ -4,7 +4,7 @@ import {
   buildDashboardWorkflowListSurface,
   buildModuleRecordListSurface,
   buildModuleWorkItemListSurface,
-} from "../../src/module-list-surfaces";
+} from "../../src/modules/list-surfaces";
 
 const record = {
   id: "record-gallery-1",

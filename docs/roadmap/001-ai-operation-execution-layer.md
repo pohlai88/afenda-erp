@@ -1,6 +1,6 @@
 # TRACK-001 · LMS Operational Execution Layer
 
-**Doc ID:** `TRACK-001` · **File:** `001-001-ai-operation-execution-layer.md`
+**Doc ID:** `TRACK-001` · **File:** `001-ai-operation-execution-layer.md`
 
 ## Afenda AI Next Development Plan
 

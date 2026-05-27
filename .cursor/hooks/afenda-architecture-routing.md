@@ -8,7 +8,7 @@ Canonical index: `docs/architecture/README.md` (`ARCH-001`–`ARCH-007`).
 
 | If you are editing…                                                 | Cursor rule               | Read first                             |
 | ------------------------------------------------------------------- | ------------------------- | -------------------------------------- |
-| `apps/erp/**`                                                       | `afenda-erp-app`          | **ARCH-001**, `apps/erp/AGENTS.md`     |
+| `apps/erp/**`                                                       | `afenda-erp-app`          | **ARCH-001**, `AGENTS.md` (root)       |
 | `packages/db/**`                                                    | `afenda-database`         | **ARCH-005**, **ARCH-002** (ownership) |
 | `packages/governed-surface/**` or domain `*surface*` / `*metadata*` | `afenda-governed-ui`      | **ARCH-006**, **ARCH-007**             |
 | `packages/features/**`                                              | `afenda-feature-packages` | **ARCH-002**, **ARCH-004**             |
@@ -29,7 +29,7 @@ Canonical index: `docs/architecture/README.md` (`ARCH-001`–`ARCH-007`).
 
 - Versions + Context7 library IDs: `.agents/stack-context.md`
 - Prompt with `use context7` for third-party APIs; rule `afenda-external-context`
-- MCP: global `context7` + `Neon`; project `shadcn` (see `.cursor/README.md`)
+- MCP: global `context7` + `Neon`; project `shadcn` + **next-devtools** (`init` at session start for Next.js — see `afenda-erp-app`)
 
 ## Non-negotiables (do not re-litigate)
 

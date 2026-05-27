@@ -1,6 +1,6 @@
 ---
 description: Governed metadata UI — schemas, builders, renderers, list windows
-globs: packages/governed-surface/**/*,packages/domain/**/*surface*,packages/domain/**/*metadata*
+globs: packages/governed-surface/**/*,packages/domain/src/modules/*surface*,packages/domain/src/modules/*metadata*,packages/domain/src/modules/list-surfaces.ts
 alwaysApply: false
 ---
 

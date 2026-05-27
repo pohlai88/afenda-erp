@@ -37,7 +37,7 @@ describe("domain modules", () => {
 
   it("resolves navigation extension metadata by id", async () => {
     const { getNavigationExtensionById } =
-      await import("../../src/navigation-extensions");
+      await import("../../src/shell/navigation-extensions");
     const extension = getNavigationExtensionById("solution-console");
 
     expect(extension?.href).toBe("/solution-console");

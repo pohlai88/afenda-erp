@@ -24,17 +24,17 @@ import type {
   AuditPanelModel,
   AuditPanelRow,
 } from "@afenda/governed-surface/schemas";
-import { resolveModuleMetrics } from "./module-metrics";
+import { resolveModuleMetrics } from "./shared/module-metrics";
 import type { ModuleId } from "@afenda/config/module-ids";
-import type { ModuleDataMode } from "./workspace-tables";
+import type { ModuleDataMode } from "./shared/workspace-tables";
 import {
   toRecordWindowQuery,
   toWorkItemWindowQuery,
   type ModuleWorkspaceListQuery,
-} from "./module-workspace-query";
-import { parseRecordTypeExtension } from "./record-type-definitions";
+} from "./shared/module-workspace-query";
+import { parseRecordTypeExtension } from "./modules/record-types";
 
-export { resolveModuleMetrics } from "./module-metrics";
+export { resolveModuleMetrics } from "./shared/module-metrics";
 
 export {
   approvalToolModuleIds,
@@ -54,12 +54,12 @@ export {
   getDashboardListSurfaceKeys,
   getModuleListSurfaceKeys,
   getSolutionConsoleListSurfaceKeys,
-} from "./module-list-surfaces";
+} from "./modules/list-surfaces";
 export {
   resolveModuleWorkspaceListQuery,
   type ModuleWorkspaceListQuery,
   type ModuleWorkspaceSearchParams,
-} from "./module-workspace-query";
+} from "./shared/module-workspace-query";
 export {
   fallbackModuleRecordColumns,
   getModuleRecordTypeDefinitions,
@@ -75,7 +75,7 @@ export {
   type RecordTypeListDefinition,
   type RecordTypeRouteDefinition,
   type RecordTypeSortDefinition,
-} from "./record-type-definitions";
+} from "./modules/record-types";
 export {
   aiUsageTableColumns,
   evidenceCoverageTableColumns,
@@ -89,16 +89,16 @@ export {
   resolveWorkspaceDataMode,
   type DataTableRow,
   type ModuleDataMode,
-} from "./workspace-tables";
+} from "./shared/workspace-tables";
 export {
   getModuleObservabilityIndicators,
   type ModuleObservabilityIndicator,
-} from "./module-observability";
+} from "./modules/observability";
 export {
   getAssistantEmptyStateHint,
   getAssistantPromptDefinitions,
-} from "./assistant-prompt-metadata";
-export type { AssistantPromptDefinition } from "./assistant-prompt-metadata";
+} from "./modules/assistant-prompts";
+export type { AssistantPromptDefinition } from "./modules/assistant-prompts";
 export {
   appBrandName,
   dashboardRouteMetrics,
@@ -120,7 +120,7 @@ export {
   erpAssistantPanelCopy,
   documentWorkflowCopy,
   routeErrorCopy,
-} from "./route-copy-metadata";
+} from "./shell/route-copy-metadata";
 export {
   appRootMetadataCopy,
   authApiRouteCopy,
@@ -140,7 +140,7 @@ export {
   signUpEnvironmentCopy,
   uploadRouteCopy,
   type AuthPageMetadataKey,
-} from "./auth-route-copy";
+} from "./shell/auth-route-copy";
 export type {
   ErpModuleDefinition,
   BusinessProblemType,
@@ -153,29 +153,29 @@ export type {
   RecoveryPlaybookIconKey,
   SolutionWorkflowId,
   WorkflowAutomationDefinition,
-} from "./module-types";
+} from "./shared/module-types";
 export {
   businessProblemTypes,
   getBusinessProblemTypeLabels,
   getSolutionToolModuleBindings,
   solutionToolModuleBindings,
   solutionWorkflowIds,
-} from "./solution-provider-metadata";
-export { erpModules, moduleByHref, moduleById } from "./module-definitions";
+} from "./modules/solution-playbooks";
+export { erpModules, moduleByHref, moduleById } from "./modules/definitions";
 export {
   getNavigationExtensions,
   getNavigationExtensionById,
   navigationExtensions,
-} from "./navigation-extensions";
+} from "./shell/navigation-extensions";
 export {
   getRecoveryConsoleModuleIds,
   getRecoveryPlaybookByProblemType,
   getRecoveryPlaybookDefinitions,
   getWorkflowAutomationDefinitions,
-} from "./workflow-metadata";
-export { getResolvedWorkflowAutomationRuns } from "./workflow-resolution";
-import type { ErpModuleDefinition, ModuleMetric } from "./module-types";
-import { erpModules, moduleByHref, moduleById } from "./module-definitions";
+} from "./modules/workflow-metadata";
+export { getResolvedWorkflowAutomationRuns } from "./shared/workflow-resolution";
+import type { ErpModuleDefinition, ModuleMetric } from "./shared/module-types";
+import { erpModules, moduleByHref, moduleById } from "./modules/definitions";
 
 export type ModuleWorkspaceRecord = {
   id: string;
@@ -245,7 +245,7 @@ export type ModuleWorkspaceDocument = {
 
 export type ModuleWorkspace = {
   module: ErpModuleDefinition;
-  dataMode: import("./workspace-tables").ModuleDataMode;
+  dataMode: import("./shared/workspace-tables").ModuleDataMode;
   fallbackApplied: boolean;
   records: readonly ModuleWorkspaceRecord[];
   recordWindow: ModuleWorkspaceWindow;
@@ -282,9 +282,6 @@ export function getDashboardMetrics() {
 
   return dashboard.metrics;
 }
-
-/** @deprecated Use getDashboardMetrics() — avoids array-order coupling. */
-export const dashboardMetrics = getDashboardMetrics();
 
 export const roleOperatingPosture = {
   owner: {

@@ -57,10 +57,10 @@ Run `pnpm typecheck` after TS config changes.
 2. Call `resolve-library-id` when the table ID is wrong or version-specific docs are needed.
 3. Call `query-docs` with the resolved ID and a focused question (one API area per query).
 
-Context7 MCP needs **no API key**. Skill: `.agents/skills/context7-mcp`.
+Set **`CONTEXT7_API_KEY`** for reliable MCP (§L in `.env.config`, `pnpm env:sync:cursor`, global `~/.cursor/mcp.json`). Skill: `.agents/skills/context7-mcp` · `docs/development/env.md`.
 
 ## Vercel (pre-link)
 
-- **Do not** `vercel link` until ARCH-001 stabilization gate passes.
+- **Do not** `vercel link` until ARCH-001 stabilization gate passes — see `docs/development/vercel-link.md`.
 - Intended deploy: root `vercel.json` → `pnpm turbo build --filter=@afenda/erp`.
 - Legacy team project `afenda-vercel` is a different GitHub repo; ERROR deploys there are not ERP health signals.

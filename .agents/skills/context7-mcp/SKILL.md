@@ -3,7 +3,9 @@ name: context7-mcp
 description: Use when the user asks about libraries, frameworks, API references, or needs code examples. Activates for setup questions, code generation involving libraries, or mentions of specific frameworks (React, Next.js, Drizzle, Tailwind, etc.).
 ---
 
-When the user asks about libraries, frameworks, or needs code examples, use the **Context7 MCP** tools (`resolve-library-id`, `query-docs`) instead of relying on training data. No API key is required for the MCP server.
+When the user asks about libraries, frameworks, or needs code examples, use the **Context7 MCP** tools (`resolve-library-id`, `query-docs`) instead of relying on training data.
+
+**API key:** Anonymous Context7 usage hits low monthly quotas. Operators should set `CONTEXT7_API_KEY` (`ctx7sk…` from [context7.com/dashboard](https://context7.com/dashboard)) in global `~/.cursor/mcp.json` and/or `.env.config` §L + `pnpm env:sync:cursor` on Windows. See `docs/development/env.md`.
 
 ## When to use
 

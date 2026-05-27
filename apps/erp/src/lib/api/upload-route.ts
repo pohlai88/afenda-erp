@@ -32,6 +32,19 @@ export class UploadRouteError extends Error {
   }
 }
 
+export function assertUploadTokenMatchesSession(
+  payload: UploadTokenPayload,
+  organization: { id: string },
+  session: { id: string },
+) {
+  if (
+    payload.organizationId !== organization.id ||
+    payload.uploadedByAuthUserId !== session.id
+  ) {
+    throw new UploadRouteError(403, uploadRouteCopy.tokenMismatch);
+  }
+}
+
 export function getUploadErrorResponse(error: unknown) {
   if (error instanceof UploadRouteError) {
     return {

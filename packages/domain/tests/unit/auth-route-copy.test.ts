@@ -7,7 +7,7 @@ import {
   getNeonAuthFormModeCopy,
   neonAuthFormCopy,
   uploadRouteCopy,
-} from "../../src/auth-route-copy";
+} from "../../src/shell/auth-route-copy";
 
 describe("auth route copy metadata", () => {
   it("exposes auth shell hero copy", () => {

@@ -5,18 +5,18 @@ import {
   type ListSurfaceToolbar,
   type ListSurfaceRendererConfigurationResolvedInput,
 } from "@afenda/governed-surface";
-import type { ModuleWorkspaceListQuery } from "./module-workspace-query";
+import type { ModuleWorkspaceListQuery } from "../shared/module-workspace-query";
 import {
   getModuleRecordTypeDefinitions,
   resolveModuleRecordListDefinition,
   resolveRecordTypeRowHref,
   resolveRecordTypeTrailingAction,
-} from "./record-type-definitions";
+} from "./record-types";
 import {
   dashboardRouteSections,
   moduleScreenSections,
   solutionConsoleSections,
-} from "./route-copy-metadata";
+} from "../shell/route-copy-metadata";
 type AiUsageListRow = {
   id: string;
   feature: string;

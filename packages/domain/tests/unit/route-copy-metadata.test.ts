@@ -11,7 +11,7 @@ import {
   solutionConsolePageMetadata,
   solutionConsoleSections,
   solutionConsoleUxCards,
-} from "../../src/route-copy-metadata";
+} from "../../src/shell/route-copy-metadata";
 
 describe("route copy metadata", () => {
   it("exposes app shell skeleton nav ids", () => {

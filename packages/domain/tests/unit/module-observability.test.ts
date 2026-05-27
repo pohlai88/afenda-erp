@@ -1,6 +1,6 @@
 import { moduleIds } from "@afenda/config/module-ids";
 import { describe, expect, it } from "vitest";
-import { getModuleObservabilityIndicators } from "../../src/module-observability";
+import { getModuleObservabilityIndicators } from "../../src/modules/observability";
 
 describe("module observability metadata", () => {
   it("defines two indicators for every module id", () => {

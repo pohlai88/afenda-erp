@@ -10,7 +10,7 @@ Stack versions and Context7 library hints: `.agents/stack-context.md`.
 ## Priority (framework APIs)
 
 1. **Repo doctrine** — `docs/architecture/` (`ARCH-###`), `.cursor/rules/*`, session hooks routing
-2. **Next.js 16** — `node_modules/next/dist/docs/` before generic Next docs (see root `AGENTS.md`)
+2. **Next.js 16** — **next-devtools** MCP `init` at session start for `apps/erp` work; then `node_modules/next/dist/docs/` before generic Next docs (see root `AGENTS.md`)
 3. **Context7** — add `use context7` for version-matched library APIs (Drizzle, Playwright, Tailwind v4, Vercel AI SDK, etc.)
 4. **Web search** — only if Context7 has no library match
 
@@ -18,12 +18,15 @@ Stack versions and Context7 library hints: `.agents/stack-context.md`.
 
 | Scope | Server | Use for |
 | ----- | ------ | ------- |
-| **Global** (`~/.cursor/mcp.json`) | **context7** | Third-party API docs |
-| **Global** | **Neon**, **github**, **vercel** | DB, repos, deploys (`NEON_API_KEY`, `GITHUB_TOKEN`, OAuth) |
+| **Global** (`~/.cursor/mcp.json`) | **context7** | Third-party API docs — `CONTEXT7_API_KEY` recommended (§L or `mcp.json` `env`) |
+| **Global** | **Neon** | DB — OAuth via **Connect** in Cursor MCP settings |
+| **Global** | **github** | Remote MCP — **OAuth Connect** (preferred) or PAT via `GITHUB_TOKEN` + `env:sync:cursor` |
+| **Global** | **vercel** | Deploys (OAuth in Cursor) |
 | **Global** | **playwright** | Browser automation / E2E |
 | **Project** (`.cursor/mcp.json`) | **shadcn** | `apps/erp/components.json` registry only |
+| **Project** | **next-devtools** | Next.js 16+ app work — call **`init`** at session start (see `afenda-erp-app`) |
 
-Env: `.env.config` → `pnpm env:sync` + `pnpm env:sync:cursor` (Windows; `NEON_API_KEY`, `GITHUB_TOKEN` only). See `docs/development/env.md`. Context7: no API key; skill `context7-mcp`.
+**Authority:** global MCP is operator-owned (shared across Afenda repos); this repo does not ship a full project MCP manifest. Env: `.env.config` §L → `pnpm env:sync:cursor` (Windows User env for MCP keys). App env: `pnpm env:sync` only. Details and troubleshooting: `docs/development/env.md`. Skill: `context7-mcp`.
 
 TypeScript: `packages/config/tsconfig.base.json` (`strict`, `noUncheckedIndexedAccess`, unused-symbol checks). Vercel link deferred until ARCH-001 stabilization gate passes.
 

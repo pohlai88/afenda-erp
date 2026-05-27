@@ -49,6 +49,7 @@ import type {
   ListSurfaceRowTone,
 } from "../../schemas/list-surface-renderer.schema";
 import type { ListSurfaceToolbar } from "../../schemas/list-surface-toolbar.schema";
+import type { GovernedListTrailingCellContext } from "../../schemas/list-trailing-cell-context.schema";
 import type { uiDensity } from "@afenda/ui/design-system";
 import { cn } from "@afenda/ui/utils";
 
@@ -167,13 +168,13 @@ function DecisionLedgerPanel({
 export type ListSurfaceRowTrailingCellProps = {
   row: ListSurfaceRow;
   rowIndex: number;
-  context?: Record<string, unknown>;
+  context?: GovernedListTrailingCellContext;
 };
 
 export type ListSurfaceTableTrailingColumn = {
   header: string;
   Cell: ComponentType<ListSurfaceRowTrailingCellProps>;
-  context?: Record<string, unknown>;
+  context?: GovernedListTrailingCellContext;
 };
 
 export type ListSurfaceTableClientProps = {

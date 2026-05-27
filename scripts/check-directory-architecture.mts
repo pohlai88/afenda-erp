@@ -110,6 +110,7 @@ const ignoredDirectories = new Set([
   ".artifacts",
   ".vercel",
   ".agents",
+  ".cursor",
   "dist",
   ".codex-runtime",
   ".codex-logs",
