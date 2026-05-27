@@ -161,6 +161,10 @@ export function createSolutionProviderTools<
   registerSolutionActionProposal: (
     proposal: RegisterSolutionActionProposalInput,
   ) => Promise<string>;
+  persistActionSandbox?: (
+    sandbox: ActionSandbox,
+    approvalProposalId: string,
+  ) => Promise<string>;
 }) {
   const {
     organization,
@@ -170,6 +174,7 @@ export function createSolutionProviderTools<
     getAllowedWorkspace,
     getWorkspaceStats,
     registerSolutionActionProposal,
+    persistActionSandbox,
   } = input;
   const toolModuleBindings = solutionToolModuleBindings;
 
@@ -632,8 +637,13 @@ export function createSolutionProviderTools<
           sandbox,
         });
 
+        const sandboxId = persistActionSandbox
+          ? await persistActionSandbox(sandbox, proposalId)
+          : undefined;
+
         return {
           proposalId,
+          sandboxId,
           status: "approved" as const,
           approvalState: "human-approved" as const,
           moduleId: proposal.moduleId,

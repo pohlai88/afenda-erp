@@ -2,6 +2,8 @@ import type { ModuleId } from "@afenda/config/module-ids";
 import type { ModuleWorkspaceStats } from "@afenda/domain";
 import { tool } from "ai";
 import { assertCapabilityAllowed } from "../guardrails";
+import { createActionSandbox, approveActionSandbox } from "../sandbox";
+import type { ActionSandbox } from "../schemas/operations";
 import {
   approvalToolInputSchema,
   approvalToolOutputSchema,
@@ -89,6 +91,10 @@ export function createErpAssistantTools<
   registerApprovalProposal: (
     proposal: RegisterApprovalProposalInput,
   ) => Promise<string>;
+  persistActionSandbox?: (
+    sandbox: ActionSandbox,
+    approvalProposalId: string,
+  ) => Promise<string>;
 }) {
   const {
     organization,
@@ -98,6 +104,7 @@ export function createErpAssistantTools<
     getAllowedWorkspace,
     getWorkspaceStats,
     registerApprovalProposal,
+    persistActionSandbox,
   } = input;
 
   return {
@@ -262,8 +269,26 @@ export function createErpAssistantTools<
           },
         });
 
+        let sandboxId: string | undefined;
+
+        if (persistActionSandbox) {
+          const pending = createActionSandbox({
+            organizationId: organization.id,
+            moduleId: proposal.moduleId,
+            actionType: `approval-${proposal.proposedAction}`,
+            title: `${proposal.proposedAction} — ${proposal.moduleId}`,
+            riskLevel: proposal.riskLevel,
+            summary: proposal.rationale,
+            affectedRecords: proposal.workItemId ? [proposal.workItemId] : [],
+            requiredHumanChecks: proposal.requiredHumanChecks,
+          });
+          const approved = approveActionSandbox({ sandbox: pending });
+          sandboxId = await persistActionSandbox(approved, proposalId);
+        }
+
         return {
           proposalId,
+          sandboxId,
           status: "approved" as const,
           approvalState: "human-approved" as const,
           proposedAction: proposal.proposedAction,

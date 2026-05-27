@@ -15,7 +15,11 @@ import {
   isAiSensitiveContentError,
 } from "@afenda/ai";
 import { getApiAuthContext } from "@afenda/auth/server";
-import { createAiUsageEvent, registerAiApprovalProposal } from "@afenda/db";
+import {
+  createAiActionSandbox,
+  createAiUsageEvent,
+  registerAiApprovalProposal,
+} from "@afenda/db";
 import {
   getErpModuleById,
   getModuleWorkspace,
@@ -150,6 +154,36 @@ export async function POST(request: Request) {
             sandboxStatus: proposal.sandbox?.status ?? "approved",
           },
         }),
+      persistActionSandbox: async (sandbox, approvalProposalId) =>
+        createAiActionSandbox({
+          id: sandbox.id,
+          organizationId: sandbox.organizationId,
+          moduleId: sandbox.moduleId,
+          actionType: sandbox.actionType,
+          title: sandbox.title,
+          proposedBy: sandbox.proposedBy,
+          status: sandbox.status,
+          diff: sandbox.diff as Record<string, unknown>,
+          riskAssessment: sandbox.riskAssessment as Record<string, unknown>,
+          sourceEvidence: (sandbox.sourceEvidence ?? []) as Record<
+            string,
+            unknown
+          >[],
+          rollbackMetadata: sandbox.rollbackMetadata as
+            | Record<string, unknown>
+            | null
+            | undefined,
+          approvalProposalId,
+          rejectionReason: sandbox.rejectionReason,
+          approvedAt: sandbox.approvedAt
+            ? new Date(sandbox.approvedAt)
+            : undefined,
+          rejectedAt: sandbox.rejectedAt
+            ? new Date(sandbox.rejectedAt)
+            : undefined,
+          createdAt: new Date(sandbox.createdAt),
+          updatedAt: new Date(sandbox.updatedAt),
+        }),
     });
 
     const agent = createSolutionProviderAgent({
@@ -166,6 +200,8 @@ export async function POST(request: Request) {
         workflowId,
         riskLevel: "high",
         environment: getAiGatewayEnvironment(),
+        providerOrder: ["anthropic", "openai"],
+        fallbackModels: ["openai/gpt-5.5"],
       }),
       onFinish: async ({ totalUsage, finishReason }) => {
         const usageMetrics = getUsageMetrics(totalUsage);

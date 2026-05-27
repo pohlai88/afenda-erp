@@ -187,6 +187,11 @@ export const moduleScreenSections = {
     description:
       "Use route metadata to move into adjacent workflows without losing organizational context.",
   },
+  aiAssistant: {
+    title: "AI assistant",
+    description:
+      "Gateway-backed chat for workflow review, record queries, document guidance, and human-approved action proposals.",
+  },
 } as const;
 
 export function formatModuleObservabilityFooter(input: {

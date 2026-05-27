@@ -1,6 +1,6 @@
-# Vercel project linking (deferred)
+# Vercel project linking
 
-This monorepo is **not** linked to Vercel yet. Do not run `vercel link`, preview deploys, or production promotion until the stabilization gate in [ARCH-001](../architecture/001-system-architecture.md) is complete.
+Local CLI link is active for this monorepo. Preview/production promotion still requires env provisioning and a successful first preview deploy.
 
 ## Current platform state (May 2026)
 
@@ -8,9 +8,16 @@ This monorepo is **not** linked to Vercel yet. Do not run `vercel link`, preview
 | ---- | ----- |
 | Intended deploy app | `@afenda/erp` (`apps/erp`) |
 | Build contract | Root [`vercel.json`](../../vercel.json): `pnpm install` → `pnpm turbo build --filter=@afenda/erp` |
-| Local link metadata | No `.vercel/project.json` in this repo |
-| Team project today | `afenda-vercel` on GitHub `pohlai88/afenda-vercel` (legacy codebase) |
-| This repo | `pohlai88/afenda-erp` — **not** wired to Vercel |
+| **Linked Vercel project** | `afenda-erp` (`prj_rEu23fWSlpHD3C7FzPnsxfWQHBfm`) on team `jacks-projects-7b3cfe94` |
+| Local link metadata | `.vercel/project.json` (gitignored; created by `vercel link`) |
+| Git integration | `https://github.com/pohlai88/afenda-erp` (connected at link time) |
+| Legacy project | `afenda-vercel` — still points at `pohlai88/afenda-vercel`; do not use for this monorepo |
+
+Link command used (non-interactive):
+
+```bash
+vercel link --yes --project afenda-erp --scope jacks-projects-7b3cfe94
+```
 
 ERROR deployments on `afenda-vercel` reflect the **legacy** repository, not Afenda ERP health.
 
@@ -27,17 +34,16 @@ pnpm test
 
 Also confirm Neon Auth, migrations, AI routes, and governed list surfaces in a preview-shaped `.env.local`.
 
-## When the gate passes
+## Next steps (after link)
 
-1. At repo root: `vercel link` — create **`afenda-erp`** or retarget **`afenda-vercel`** to this GitHub repo.
-2. Align project settings with `vercel.json` (`installCommand`, `buildCommand`, crons).
-3. `vercel env pull` — map keys from [`.env.config.example`](../../.env.config.example) (no secrets in docs).
-4. Provision Neon, Neon Auth, Blob, AI Gateway, `CRON_SECRET`, `VERCEL_DRAIN_SECRET`, drain URL.
-5. First **preview** deploy; fix builder-only issues before production.
+1. Confirm dashboard project settings match `vercel.json` (`installCommand`, `buildCommand`, crons). CLI may show “No framework detected” at repo root; custom build commands still apply.
+2. `vercel env pull .env.local` — map keys from [`.env.config.example`](../../.env.config.example) (no secrets in docs). Or continue `pnpm env:sync:all` and merge with pulled vars.
+3. Provision Neon, Neon Auth, Blob, AI Gateway, `CRON_SECRET`, `VERCEL_DRAIN_SECRET`, drain URL on the **`afenda-erp`** project.
+4. First **preview**: `vercel deploy` (or push to GitHub for automatic preview). Fix builder-only issues before `vercel deploy --prod`.
+5. Enable Vercel Remote Cache for Turborepo when builds are stable.
 
-## Out of scope until linked
+## Still out of scope until preview is green
 
-- Vercel Remote Cache (enable after link)
 - Production domain and promotion
 - Reading production env values into committed files
 

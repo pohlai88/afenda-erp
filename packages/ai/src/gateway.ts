@@ -4,9 +4,13 @@ import {
   hasAiGatewayCredentials as configHasAiGatewayCredentials,
 } from "@afenda/config/env";
 
-export const defaultAiGatewayModel = "openai/gpt-5.4";
-export const defaultFastAiGatewayModel = "openai/gpt-5.4";
-export const defaultHighConfidenceAiGatewayModel = "openai/gpt-5.4";
+// Verify against gateway /v1/models when credentials are available.
+// AFENDA_AI_MODEL / AFENDA_AI_FAST_MODEL / AFENDA_AI_HIGH_CONFIDENCE_MODEL env
+// vars override these at deploy time so no redeploy is needed for model changes.
+export const defaultAiGatewayModel = "openai/gpt-5.5";
+export const defaultFastAiGatewayModel = "openai/gpt-5.5";
+export const defaultHighConfidenceAiGatewayModel =
+  "anthropic/claude-opus-4.7";
 
 export const aiGatewayFeatures = [
   "erp-assistant",
@@ -111,6 +115,9 @@ export function createGatewayOptions(input: {
   riskLevel?: AiRiskLevel;
   environment?: string;
   cacheMode?: AiCacheMode;
+  providerOrder?: readonly string[];
+  fallbackModels?: readonly string[];
+  zeroDataRetention?: boolean;
 }): AiGatewayProviderOptions {
   const riskLevel = input.riskLevel ?? "medium";
   const environment = toGatewayTagValue(input.environment, "development");
@@ -122,7 +129,6 @@ export function createGatewayOptions(input: {
   const gateway: AiJsonObject = {
     user: input.userId,
     tags: [
-      "app:afenda-erp",
       `feature:${input.feature}`,
       `organization:${organizationId}`,
       `module:${moduleId}`,
@@ -135,6 +141,18 @@ export function createGatewayOptions(input: {
 
   if (input.cacheMode === "deterministic") {
     gateway.cacheControl = "max-age=3600";
+  }
+
+  if (input.providerOrder && input.providerOrder.length > 0) {
+    gateway.order = [...input.providerOrder] as AiJsonValue[];
+  }
+
+  if (input.fallbackModels && input.fallbackModels.length > 0) {
+    gateway.models = [...input.fallbackModels] as AiJsonValue[];
+  }
+
+  if (input.zeroDataRetention) {
+    gateway.zeroDataRetention = true;
   }
 
   return { gateway };

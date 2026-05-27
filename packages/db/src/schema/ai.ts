@@ -11,6 +11,7 @@ import {
   aiExtractionStatusEnum,
   aiFeatureEnum,
   aiRequestStatusEnum,
+  aiSandboxStatusEnum,
   erpModuleIdEnum,
   organizationIdColumn,
   timestampColumns,
@@ -107,5 +108,54 @@ export const aiApprovalProposals = pgTable(
       table.status,
     ),
     index("ai_approval_proposals_work_item_idx").on(table.workItemId),
+  ],
+);
+
+export const aiActionSandboxes = pgTable(
+  "ai_action_sandboxes",
+  {
+    id: text("id").primaryKey(),
+    organizationId: organizationReference(),
+    // text rather than enum so operational skills (e.g. lms) can use this
+    // table without requiring an enum migration for each new module.
+    moduleId: text("module_id").notNull(),
+    actionType: text("action_type").notNull(),
+    title: text("title").notNull(),
+    proposedBy: text("proposed_by").notNull().default("ai"),
+    status: aiSandboxStatusEnum("status").notNull().default("pending"),
+    diff: jsonb("diff").$type<Record<string, unknown>>().notNull(),
+    riskAssessment: jsonb("risk_assessment")
+      .$type<Record<string, unknown>>()
+      .notNull(),
+    sourceEvidence: jsonb("source_evidence")
+      .$type<Record<string, unknown>[]>()
+      .notNull()
+      .default([]),
+    rollbackMetadata: jsonb("rollback_metadata").$type<Record<
+      string,
+      unknown
+    > | null>(),
+    approvalProposalId: text("approval_proposal_id").references(
+      () => aiApprovalProposals.id,
+      { onDelete: "set null" },
+    ),
+    rejectionReason: text("rejection_reason"),
+    approvedAt: timestamp("approved_at", { withTimezone: true }),
+    rejectedAt: timestamp("rejected_at", { withTimezone: true }),
+    ...timestampColumns,
+  },
+  (table) => [
+    index("ai_action_sandboxes_org_status_created_idx").on(
+      table.organizationId,
+      table.status,
+      table.createdAt,
+    ),
+    index("ai_action_sandboxes_org_module_idx").on(
+      table.organizationId,
+      table.moduleId,
+    ),
+    index("ai_action_sandboxes_approval_proposal_idx").on(
+      table.approvalProposalId,
+    ),
   ],
 );

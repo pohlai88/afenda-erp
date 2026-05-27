@@ -1,7 +1,13 @@
 import {
+  adminAiApprovalsSurfaceKey,
+  adminAiUsageSurfaceKey,
+  buildAdminAiApprovalsListSurface,
+  buildAdminAiUsageListSurface,
   describeWorkspaceDataSource,
   formatModuleObservabilityFooter,
   getAccessibleModules,
+  getAiApprovalsSummary,
+  getAiUsageRouteSummary,
   getErpModuleById,
   getModuleObservabilityIndicators,
   getModuleWorkspace,
@@ -33,6 +39,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { DocumentExtractionForm } from "./document-extraction-form";
 import { DocumentUploadForm } from "./document-upload-form";
+import { ErpAssistantPanel } from "./erp-assistant-panel";
 
 function getModuleOrThrow(moduleId: CoreModuleId) {
   const moduleDefinition = getErpModuleById(moduleId);
@@ -106,6 +113,26 @@ export async function ModuleRoutePage({
   const escalationCount = workspace.workItems.filter(
     (item) => item.status === "escalated",
   ).length;
+
+  const isAdminModule = moduleId === "admin" && session.source === "neon";
+  const [adminAiUsageRows, adminAiApprovalRows] = isAdminModule
+    ? await Promise.all([
+        getAiUsageRouteSummary({
+          organizationId: organization.id,
+          limit: 20,
+        }),
+        getAiApprovalsSummary({
+          organizationId: organization.id,
+          limit: 20,
+        }),
+      ])
+    : [[], []];
+  const adminAiUsageSurface = isAdminModule
+    ? buildAdminAiUsageListSurface({ events: adminAiUsageRows })
+    : null;
+  const adminAiApprovalsSurface = isAdminModule
+    ? buildAdminAiApprovalsListSurface({ proposals: adminAiApprovalRows })
+    : null;
   const usesPersistedMetrics =
     workspace.dataMode === "persisted" && !workspace.fallbackApplied;
   const headlineMetrics = usesPersistedMetrics
@@ -312,6 +339,37 @@ export async function ModuleRoutePage({
           parentAccessAllowed
           layout="embedded"
         />
+      </SectionPanel>
+
+      {adminAiUsageSurface && adminAiApprovalsSurface ? (
+        <SectionPanel
+          title="AI operation ledger"
+          description="Org-scoped log of AI usage events and human-approved action proposals."
+        >
+          <div className="space-y-4">
+            <GovernedPatternCListSection
+              title="Usage events"
+              surfaceKey={adminAiUsageSurfaceKey}
+              listConfiguration={adminAiUsageSurface}
+              parentAccessAllowed
+              layout="embedded"
+            />
+            <GovernedPatternCListSection
+              title="Approval proposals"
+              surfaceKey={adminAiApprovalsSurfaceKey}
+              listConfiguration={adminAiApprovalsSurface}
+              parentAccessAllowed
+              layout="embedded"
+            />
+          </div>
+        </SectionPanel>
+      ) : null}
+
+      <SectionPanel
+        title={moduleScreenSections.aiAssistant.title}
+        description={moduleScreenSections.aiAssistant.description}
+      >
+        <ErpAssistantPanel contextModuleId={moduleId} />
       </SectionPanel>
 
       <SectionPanel

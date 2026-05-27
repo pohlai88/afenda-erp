@@ -14,11 +14,16 @@ import { useState } from "react";
 
 const assistantPrompts = getAssistantPromptDefinitions();
 
-export function ErpAssistantPanel() {
+export function ErpAssistantPanel({
+  contextModuleId,
+}: {
+  contextModuleId?: string;
+}) {
   const [input, setInput] = useState("");
   const { addToolApprovalResponse, messages, sendMessage, status } = useChat({
     transport: new DefaultChatTransport({
       api: "/api/ai/chat",
+      body: contextModuleId ? { contextModuleId } : undefined,
     }),
   });
   const isBusy = status === "submitted" || status === "streaming";

@@ -15,7 +15,11 @@ import {
   isAiSensitiveContentError,
 } from "@afenda/ai";
 import { getApiAuthContext } from "@afenda/auth/server";
-import { createAiUsageEvent, registerAiApprovalProposal } from "@afenda/db";
+import {
+  createAiActionSandbox,
+  createAiUsageEvent,
+  registerAiApprovalProposal,
+} from "@afenda/db";
 import {
   getErpModuleById,
   getModuleWorkspace,
@@ -61,6 +65,7 @@ export async function POST(request: Request) {
     const { session: activeSession, organization } = auth;
     const parsedRequest = chatRequestSchema.parse(await request.json());
     const messages = parsedRequest.messages as UIMessage[];
+    const contextModuleId = parsedRequest.contextModuleId ?? "dashboard";
     const serializedMessages = JSON.stringify(parsedRequest.messages);
     const estimatedPromptTokens = estimateTokenCount(serializedMessages);
 
@@ -77,7 +82,7 @@ export async function POST(request: Request) {
         requestId,
         organizationId: organization.id,
         userId: activeSession.id,
-        module: "dashboard",
+        module: contextModuleId,
         operation: "ai.assistant.stream",
       },
       {
@@ -120,6 +125,36 @@ export async function POST(request: Request) {
       getAllowedWorkspace,
       getWorkspaceStats: getModuleWorkspaceStats,
       registerApprovalProposal: registerAiApprovalProposal,
+      persistActionSandbox: async (sandbox, approvalProposalId) =>
+        createAiActionSandbox({
+          id: sandbox.id,
+          organizationId: sandbox.organizationId,
+          moduleId: sandbox.moduleId,
+          actionType: sandbox.actionType,
+          title: sandbox.title,
+          proposedBy: sandbox.proposedBy,
+          status: sandbox.status,
+          diff: sandbox.diff as Record<string, unknown>,
+          riskAssessment: sandbox.riskAssessment as Record<string, unknown>,
+          sourceEvidence: (sandbox.sourceEvidence ?? []) as Record<
+            string,
+            unknown
+          >[],
+          rollbackMetadata: sandbox.rollbackMetadata as
+            | Record<string, unknown>
+            | null
+            | undefined,
+          approvalProposalId,
+          rejectionReason: sandbox.rejectionReason,
+          approvedAt: sandbox.approvedAt
+            ? new Date(sandbox.approvedAt)
+            : undefined,
+          rejectedAt: sandbox.rejectedAt
+            ? new Date(sandbox.rejectedAt)
+            : undefined,
+          createdAt: new Date(sandbox.createdAt),
+          updatedAt: new Date(sandbox.updatedAt),
+        }),
     });
 
     const agent = createErpAssistantAgent({
@@ -132,9 +167,11 @@ export async function POST(request: Request) {
         organizationId: organization.id,
         userId: activeSession.id,
         feature: "erp-assistant",
-        moduleId: "dashboard",
+        moduleId: contextModuleId,
         riskLevel: "medium",
         environment: getAiGatewayEnvironment(),
+        providerOrder: ["openai", "anthropic"],
+        fallbackModels: ["anthropic/claude-sonnet-4.6"],
       }),
       onFinish: async ({ totalUsage, finishReason }) => {
         const usageMetrics = getUsageMetrics(totalUsage);
@@ -142,7 +179,7 @@ export async function POST(request: Request) {
         await createAiUsageEvent({
           organizationId: organization.id,
           userAuthId: activeSession.id,
-          moduleId: "dashboard",
+          moduleId: contextModuleId,
           feature: "assistant",
           model,
           status: "completed",

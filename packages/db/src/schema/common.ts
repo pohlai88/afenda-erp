@@ -92,6 +92,13 @@ export const aiApprovalStatusEnum = pgEnum("ai_approval_status", [
   "executed",
 ]);
 
+export const aiSandboxStatusEnum = pgEnum("ai_sandbox_status", [
+  "pending",
+  "approved",
+  "rejected",
+  "discarded",
+]);
+
 export const timestampColumns = {
   createdAt: timestamp("created_at", { withTimezone: true })
     .notNull()

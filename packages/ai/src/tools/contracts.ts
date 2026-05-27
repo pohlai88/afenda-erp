@@ -56,6 +56,7 @@ export const approvalToolInputSchema = z.object({
 
 export const approvalToolOutputSchema = z.object({
   proposalId: z.string().min(1),
+  sandboxId: z.string().optional(),
   status: z.enum(["approved"]),
   approvalState: z.enum(["human-approved"]),
   proposedAction: approvalToolInputSchema.shape.proposedAction,
@@ -80,6 +81,7 @@ export const solutionActionProposalToolInputSchema = z.object({
 
 export const solutionActionProposalToolOutputSchema = z.object({
   proposalId: z.string().min(1),
+  sandboxId: z.string().optional(),
   status: z.enum(["approved"]),
   approvalState: z.enum(["human-approved"]),
   moduleId: z.enum(moduleIds),
