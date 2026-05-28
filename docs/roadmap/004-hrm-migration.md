@@ -2,8 +2,9 @@
 
 **Tracking ID:** `TRACK-004` · **File:** `004-hrm-migration.md` · **Status:** Active workforce migration · **Owner:** Architecture / HR · **Related:** **ARCH-002**, **ARCH-005**, **ARCH-006**, **ARCH-008**
 
-This track migrates the legacy HRM source under `packages/features/hrm` into the
-current Afenda ERP architecture as `@afenda/feature-hr`.
+This track grows `@afenda/feature-hr` into full ERP HR capability using the
+current Afenda architecture (governed UI, ARCH-008 export doors, schema in
+`@afenda/db`).
 
 Audience: engineers and agents implementing HR migration slices.
 
@@ -17,7 +18,8 @@ claiming completion before parity is proven.
 `@afenda/feature-hr` package exists with ARCH-008 export doors only; metadata
 delegates to `createModuleFeatureMetadata("hr")` like other core modules.
 
-- **Legacy input:** `packages/features/hrm` — reference only, not wired to `/hr`;
+- **Legacy input:** `packages/features/hrm` removed (2026-05-28); re-scaffold by
+  slice into `@afenda/feature-hr` when implementing TRACK-004;
 - **Target package:** `packages/features/hr` — see `ARCHITECTURE.md`; no
   `schema/hr` or server queries until Slice 1 is accepted;
 - **Database:** migration `0030_revert_hr_migration_tables` drops tables from the
@@ -26,9 +28,8 @@ delegates to `createModuleFeatureMetadata("hr")` like other core modules.
 - **ERP `/hr`:** generic module workspace via `@afenda/domain` (same as finance
   scaffold phase).
 
-The legacy source under `packages/features/hrm` is migration input and must stay
-available until every legacy capability is either migrated, deliberately retired,
-or documented as out of scope.
+Do not restore the deleted `packages/features/hrm` tree. New HR work lands only in
+`packages/features/hr` with schema in `packages/db` per ARCH-005.
 
 ## Audit Baseline
 

@@ -163,11 +163,27 @@ export async function revokeApiCredentialAction(
     });
   }
 
-  await revokeApiCredential({
-    organizationId: organization.id,
-    credentialId,
-    actorAuthUserId: session.id,
-  });
+  try {
+    await revokeApiCredential({
+      organizationId: organization.id,
+      credentialId,
+      actorAuthUserId: session.id,
+    });
+  } catch (error) {
+    logIntegrationMutation({
+      operation: "integrations.api-credential.revoke",
+      organizationId: organization.id,
+      userId: session.id,
+      result: "failure",
+      metadata: {
+        credentialId,
+        error: error instanceof Error ? error.message : String(error),
+      },
+    });
+    return systemAdminActionFailure(
+      error instanceof Error ? error.message : "API credential revoke failed.",
+    );
+  }
 
   logIntegrationMutation({
     operation: "integrations.api-credential.revoke",

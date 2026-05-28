@@ -4,6 +4,7 @@ import {
   type ListSurfaceRendererConfigurationResolvedInput,
 } from "@afenda/governed-surface";
 import type { TenantAuditLog } from "@afenda/db";
+import { formatSystemAdminDateTime } from "../lib/format";
 
 export const systemAdminAuditLogSurfaceKey = "system-admin.audit-log.list";
 export const systemAdminRetentionSurfaceKey = "system-admin.retention.list";
@@ -133,7 +134,7 @@ export function buildAuditLogListSurface(input: {
         entityType: log.entityType,
         entityId: log.entityId,
         summary: log.summary,
-        createdAt: log.createdAt.toLocaleString(),
+        createdAt: formatSystemAdminDateTime(log.createdAt),
       },
     })),
   });

@@ -2,6 +2,7 @@ import "server-only";
 
 import { readFile } from "node:fs/promises";
 import { listCronRunHistory } from "@afenda/db";
+import { formatSystemAdminDateTime } from "../lib/format";
 import { resolveRepoRootFile } from "../lib/repo-files.server";
 import type { CronHealthSurfaceRow } from "./surfaces";
 
@@ -12,10 +13,6 @@ type VercelCron = {
 
 function jobNameFromPath(path: string) {
   return path.split("/").filter(Boolean).at(-1) ?? path;
-}
-
-function formatDate(value: Date | null | undefined) {
-  return value ? value.toLocaleString() : "Not recorded";
 }
 
 function formatDuration(value: number | null | undefined) {
@@ -48,7 +45,9 @@ export async function getCronHealthSurfaceRows(): Promise<
       path: cron.path,
       schedule: cron.schedule,
       status: latest?.status ?? "configured",
-      lastRun: formatDate(latest?.finishedAt ?? latest?.startedAt),
+      lastRun: formatSystemAdminDateTime(
+        latest?.finishedAt ?? latest?.startedAt,
+      ),
       duration: formatDuration(latest?.durationMs),
       failure: latest?.errorMessage ?? "-",
     };

@@ -208,8 +208,13 @@ export {
 export {
   type ActionFieldErrors,
   type ActionResult,
+  actionFailure,
+  actionSuccess,
+  assertFormActionResult,
   isActionFailure,
   isActionResultSuccess,
+  toVoidFormAction,
+  zodActionFailure,
 } from "./action-result.shared";
 
 export {

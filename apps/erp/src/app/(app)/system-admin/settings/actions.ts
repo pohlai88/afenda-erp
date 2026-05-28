@@ -1,3 +1,6 @@
 "use server";
 
-export { updateTenantSettingsForm } from "@afenda/feature-system-admin/server";
+export {
+  updateTenantSettingsAction,
+  updateTenantSettingsForm,
+} from "@afenda/feature-system-admin/server";

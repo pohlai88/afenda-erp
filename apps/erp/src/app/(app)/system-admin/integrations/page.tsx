@@ -19,12 +19,12 @@ import { Input } from "@afenda/ui/input";
 import { NativeSelect, NativeSelectOption } from "@afenda/ui/native-select";
 import { SectionPanel } from "@afenda/ui";
 import type { Metadata } from "next";
+import { CreateApiCredentialForm } from "@/components/system-admin/create-api-credential-form.client";
+import { CreateWebhookForm } from "@/components/system-admin/create-webhook-form.client";
 import {
   ApiCredentialTrailingCell,
-  CreateApiCredentialForm,
-  CreateWebhookForm,
   WebhookTrailingCell,
-} from "@/components/system-admin/integration-action-panels.client";
+} from "@/components/system-admin/integration-trailing-cells.client";
 import { upsertSsoConnectionForm } from "./actions";
 
 export const metadata: Metadata = {
@@ -41,10 +41,10 @@ export default async function SystemAdminIntegrationsPage() {
   );
 
   const [credentials, webhooks, deliveries, ssoConnections] = await Promise.all([
-    listApiCredentials({ organizationId: organization.id }),
-    listWebhooks({ organizationId: organization.id }),
+    listApiCredentials({ organizationId: organization.id, limit: 100 }),
+    listWebhooks({ organizationId: organization.id, limit: 100 }),
     listWebhookDeliveries({ organizationId: organization.id, limit: 50 }),
-    listSsoConnections({ organizationId: organization.id }),
+    listSsoConnections({ organizationId: organization.id, limit: 50 }),
   ]);
 
   return (

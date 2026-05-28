@@ -7,7 +7,6 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import {
   systemAdminActionSuccess,
-  toSystemAdminVoidFormAction,
   type SystemAdminActionResult,
   zodActionFailure,
 } from "../action-results";
@@ -31,6 +30,7 @@ const retentionSchema = z.object({
 });
 
 export async function upsertRetentionPolicyAction(
+  _previous: SystemAdminActionResult | undefined,
   formData: FormData,
 ): Promise<SystemAdminActionResult> {
   const { session, organization } = await requireCapability(
@@ -83,6 +83,11 @@ export async function upsertRetentionPolicyAction(
   return systemAdminActionSuccess(undefined);
 }
 
-export const upsertRetentionPolicyForm = toSystemAdminVoidFormAction(
-  upsertRetentionPolicyAction,
-);
+export const upsertRetentionPolicyForm = async (
+  formData: FormData,
+): Promise<void> => {
+  const result = await upsertRetentionPolicyAction(undefined, formData);
+  if (!result.ok) {
+    throw new Error(result.error);
+  }
+};

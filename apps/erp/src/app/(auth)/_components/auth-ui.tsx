@@ -24,7 +24,7 @@ export function AuthField({
   const hintId = hint ? `${id}-hint` : undefined;
 
   return (
-    <div className="space-y-2">
+    <div className="flex flex-col gap-2">
       <Label htmlFor={id}>{label}</Label>
       {children}
       {hint ? (

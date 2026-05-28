@@ -43,7 +43,7 @@ export function AuthShell({
           <p className="mt-5 max-w-xl text-sm leading-7 text-white/78">
             {authShellCopy.hero.description}
           </p>
-          <div className="mt-10 space-y-4 border-t border-white/15 pt-8">
+          <div className="mt-10 flex flex-col gap-4 border-t border-white/15 pt-8">
             <div>
               <div className="text-xs uppercase tracking-[0.18em] text-white/55">
                 {authShellCopy.hero.thisStepLabel}
@@ -53,7 +53,7 @@ export function AuthShell({
                 {description}
               </p>
             </div>
-            <ul className="space-y-2 text-sm text-white/72">
+            <ul className="flex flex-col gap-2 text-sm text-white/72">
               {authShellCopy.hero.bullets.map((bullet) => (
                 <li key={bullet}>{bullet}</li>
               ))}

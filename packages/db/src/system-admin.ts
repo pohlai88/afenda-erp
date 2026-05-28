@@ -140,17 +140,21 @@ function decryptWebhookSecret(value: string | null) {
     return null;
   }
 
-  const decipher = createDecipheriv(
-    "aes-256-gcm",
-    key,
-    Buffer.from(iv, "base64url"),
-  );
-  decipher.setAuthTag(Buffer.from(tag, "base64url"));
+  try {
+    const decipher = createDecipheriv(
+      "aes-256-gcm",
+      key,
+      Buffer.from(iv, "base64url"),
+    );
+    decipher.setAuthTag(Buffer.from(tag, "base64url"));
 
-  return Buffer.concat([
-    decipher.update(Buffer.from(encrypted, "base64url")),
-    decipher.final(),
-  ]).toString("utf8");
+    return Buffer.concat([
+      decipher.update(Buffer.from(encrypted, "base64url")),
+      decipher.final(),
+    ]).toString("utf8");
+  } catch {
+    return null;
+  }
 }
 
 function timingSafeHashEqual(left: string, right: string) {
@@ -168,8 +172,17 @@ function isAdminLikeRole(role: PermissionRole) {
   return role === "owner" || role === "admin";
 }
 
+function normalizeSystemAdminListLimit(limit: number | undefined, fallback = 50) {
+  if (!Number.isFinite(limit) || !limit || limit < 1) {
+    return fallback;
+  }
+
+  return Math.min(Math.floor(limit), 200);
+}
+
 export async function listTenantMembers(input: {
   organizationId: string;
+  limit?: number;
 }): Promise<TenantMemberSummary[]> {
   return runWithOrganizationContext(input.organizationId, async (db) => {
     const rows = await db
@@ -186,7 +199,8 @@ export async function listTenantMembers(input: {
         eq(organizationMemberships.authUserId, userProfiles.authUserId),
       )
       .where(eq(organizationMemberships.organizationId, input.organizationId))
-      .orderBy(asc(userProfiles.name));
+      .orderBy(asc(userProfiles.name))
+      .limit(normalizeSystemAdminListLimit(input.limit, 100));
 
     return rows.map((row) => ({
       membershipId: row.membershipId,
@@ -200,9 +214,10 @@ export async function listTenantMembers(input: {
 
 export async function listRoleOverridesForOrganization(input: {
   organizationId: string;
+  limit?: number;
 }): Promise<RoleOverrideRow[]> {
   return runWithOrganizationContext(input.organizationId, async (db) => {
-    const rows = await db
+    const query = db
       .select({
         role: tenantRoleOverrides.role,
         permissionKey: tenantRoleOverrides.permissionKey,
@@ -214,6 +229,11 @@ export async function listRoleOverridesForOrganization(input: {
         asc(tenantRoleOverrides.role),
         asc(tenantRoleOverrides.permissionKey),
       );
+
+    const rows =
+      input.limit === undefined
+        ? await query
+        : await query.limit(normalizeSystemAdminListLimit(input.limit, 100));
 
     return rows;
   });
@@ -355,7 +375,7 @@ export async function listOrganizationInvitations(input: {
     return db.query.organizationInvitations.findMany({
       where: eq(organizationInvitations.organizationId, input.organizationId),
       orderBy: (table, { desc: descOrder }) => [descOrder(table.createdAt)],
-      limit: input.limit ?? 50,
+      limit: normalizeSystemAdminListLimit(input.limit),
     });
   });
 }
@@ -406,15 +426,23 @@ export async function revokeOrganizationInvitation(input: {
   actorAuthUserId: string;
 }) {
   return runWithOrganizationContext(input.organizationId, async (db) => {
-    await db
+    const [updated] = await db
       .update(organizationInvitations)
       .set({ status: "revoked", updatedAt: new Date() })
       .where(
         and(
           eq(organizationInvitations.id, input.invitationId),
           eq(organizationInvitations.organizationId, input.organizationId),
+          eq(organizationInvitations.status, "pending"),
         ),
+      )
+      .returning({ id: organizationInvitations.id });
+
+    if (!updated) {
+      throw new Error(
+        "Pending organization invitation was not found for this tenant.",
       );
+    }
 
     await createAuditLog({
       organizationId: input.organizationId,
@@ -495,7 +523,10 @@ export async function updateMembershipRole(input: {
   });
 }
 
-export async function listApiCredentials(input: { organizationId: string }) {
+export async function listApiCredentials(input: {
+  organizationId: string;
+  limit?: number;
+}) {
   return runWithOrganizationContext(input.organizationId, async (db) =>
     db
       .select({
@@ -510,7 +541,8 @@ export async function listApiCredentials(input: { organizationId: string }) {
       })
       .from(apiCredentials)
       .where(eq(apiCredentials.organizationId, input.organizationId))
-      .orderBy(desc(apiCredentials.createdAt)),
+      .orderBy(desc(apiCredentials.createdAt))
+      .limit(normalizeSystemAdminListLimit(input.limit, 100)),
   );
 }
 
@@ -558,15 +590,21 @@ export async function revokeApiCredential(input: {
   actorAuthUserId: string;
 }) {
   return runWithOrganizationContext(input.organizationId, async (db) => {
-    await db
+    const [updated] = await db
       .update(apiCredentials)
       .set({ status: "revoked", updatedAt: new Date() })
       .where(
         and(
           eq(apiCredentials.id, input.credentialId),
           eq(apiCredentials.organizationId, input.organizationId),
+          eq(apiCredentials.status, "active"),
         ),
-      );
+      )
+      .returning({ id: apiCredentials.id });
+
+    if (!updated) {
+      throw new Error("Active API credential was not found for this tenant.");
+    }
 
     await createAuditLog({
       organizationId: input.organizationId,
@@ -642,11 +680,15 @@ export async function authenticateApiCredential(input: {
   };
 }
 
-export async function listWebhooks(input: { organizationId: string }) {
+export async function listWebhooks(input: {
+  organizationId: string;
+  limit?: number;
+}) {
   return runWithOrganizationContext(input.organizationId, async (db) =>
     db.query.webhooks.findMany({
       where: eq(webhooks.organizationId, input.organizationId),
       orderBy: (table, { desc: descOrder }) => [descOrder(table.createdAt)],
+      limit: normalizeSystemAdminListLimit(input.limit, 100),
     }),
   );
 }
@@ -669,7 +711,7 @@ export async function listWebhookDeliveries(input: {
         ),
       )
       .orderBy(desc(webhookDeliveries.createdAt))
-      .limit(input.limit ?? 50),
+      .limit(normalizeSystemAdminListLimit(input.limit)),
   );
 }
 
@@ -816,11 +858,15 @@ export async function recordWebhookDelivery(input: {
   return id;
 }
 
-export async function listSsoConnections(input: { organizationId: string }) {
+export async function listSsoConnections(input: {
+  organizationId: string;
+  limit?: number;
+}) {
   return runWithOrganizationContext(input.organizationId, async (db) =>
     db.query.ssoConnections.findMany({
       where: eq(ssoConnections.organizationId, input.organizationId),
       orderBy: (table, { asc: ascOrder }) => [ascOrder(table.provider)],
+      limit: normalizeSystemAdminListLimit(input.limit, 50),
     }),
   );
 }
@@ -873,11 +919,13 @@ export async function upsertSsoConnection(input: {
 
 export async function listRetentionPolicies(input: {
   organizationId: string;
+  limit?: number;
 }) {
   return runWithOrganizationContext(input.organizationId, async (db) =>
     db.query.retentionPolicies.findMany({
       where: eq(retentionPolicies.organizationId, input.organizationId),
       orderBy: (table, { asc: ascOrder }) => [ascOrder(table.entityType)],
+      limit: normalizeSystemAdminListLimit(input.limit, 50),
     }),
   );
 }

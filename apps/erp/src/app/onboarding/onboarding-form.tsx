@@ -15,7 +15,7 @@ export function OnboardingForm() {
       <p className="mt-3 text-sm leading-6 text-muted-foreground">
         {onboardingFormCopy.description}
       </p>
-      <form action={completeOnboardingAction} className="mt-8 space-y-5">
+      <form action={completeOnboardingAction} className="mt-8 flex flex-col gap-5">
         <AuthField
           id="onboarding-organization"
           label={onboardingFormCopy.organizationLabel}

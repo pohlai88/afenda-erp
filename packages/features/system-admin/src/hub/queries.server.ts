@@ -18,8 +18,11 @@ export async function getHubGovernanceSnapshot(input: {
   organizationId: string;
 }): Promise<HubGovernanceSnapshot> {
   const [members, invitations, auditLogs, sandboxes] = await Promise.all([
-    listTenantMembers({ organizationId: input.organizationId }),
-    listOrganizationInvitations({ organizationId: input.organizationId }),
+    listTenantMembers({ organizationId: input.organizationId, limit: 100 }),
+    listOrganizationInvitations({
+      organizationId: input.organizationId,
+      limit: 100,
+    }),
     listAuditLogsForOrganization({
       organizationId: input.organizationId,
       limit: 5,

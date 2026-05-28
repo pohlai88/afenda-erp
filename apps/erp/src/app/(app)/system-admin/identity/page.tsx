@@ -13,12 +13,12 @@ import {
 import { GovernedPatternCListSection } from "@afenda/governed-surface/server";
 import { SectionPanel } from "@afenda/ui";
 import type { Metadata } from "next";
+import { InviteMemberForm } from "@/components/system-admin/invite-member-form.client";
 import {
-  InviteMemberForm,
   InvitationTrailingCell,
   MemberRoleTrailingCell,
-  RoleOverrideForm,
-} from "@/components/system-admin/identity-action-panels.client";
+} from "@/components/system-admin/identity-trailing-cells.client";
+import { RoleOverrideForm } from "@/components/system-admin/role-override-form.client";
 
 export const metadata: Metadata = {
   title: "Identity — System admin",
@@ -34,9 +34,12 @@ export default async function SystemAdminIdentityPage() {
   );
 
   const [members, invitations, overrides] = await Promise.all([
-    listTenantMembers({ organizationId: organization.id }),
-    listOrganizationInvitations({ organizationId: organization.id }),
-    listRoleOverridesForOrganization({ organizationId: organization.id }),
+    listTenantMembers({ organizationId: organization.id, limit: 100 }),
+    listOrganizationInvitations({ organizationId: organization.id, limit: 100 }),
+    listRoleOverridesForOrganization({
+      organizationId: organization.id,
+      limit: 200,
+    }),
   ]);
 
   const membersSurface = buildMembersListSurface({ members, canMutate: canWrite });

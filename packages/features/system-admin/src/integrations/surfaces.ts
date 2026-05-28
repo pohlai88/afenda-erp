@@ -4,6 +4,7 @@ import {
   resolveListSurfaceRowTrailingAction,
   type ListSurfaceRendererConfigurationResolvedInput,
 } from "@afenda/governed-surface";
+import { formatSystemAdminDateTime } from "../lib/format";
 
 export const systemAdminApiCredentialsSurfaceKey =
   "system-admin.api-credentials.list";
@@ -155,7 +156,7 @@ export function buildApiCredentialsListSurface(input: {
         keyPrefix: credential.keyPrefix,
         scopes: credential.scopes.join(", "),
         status: credential.status,
-        lastUsedAt: credential.lastUsedAt?.toLocaleString() ?? "Never",
+        lastUsedAt: formatSystemAdminDateTime(credential.lastUsedAt, "Never"),
       },
       trailingAction:
         credential.status === "active"
@@ -320,7 +321,7 @@ export function buildWebhookDeliveriesListSurface(input: {
         retryOutcome: delivery.retryOutcome ?? "-",
         responseCode:
           delivery.responseCode === null ? "-" : String(delivery.responseCode),
-        createdAt: delivery.createdAt.toLocaleString(),
+        createdAt: formatSystemAdminDateTime(delivery.createdAt),
       },
     })),
   });

@@ -15,7 +15,7 @@ export function AppSidebar({
   const pathname = usePathname();
 
   return (
-    <nav className="space-y-2">
+    <nav className="flex flex-col gap-2">
       {modules.map((item) => {
         const isActive =
           pathname === item.href || pathname.startsWith(`${item.href}/`);

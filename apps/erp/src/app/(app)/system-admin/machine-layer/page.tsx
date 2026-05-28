@@ -11,6 +11,7 @@ import {
   buildSystemAdminAiEntitlementsListSurface,
   buildSystemAdminAiSandboxesListSurface,
   buildSystemAdminAiUsageListSurface,
+  formatSystemAdminDateTime,
   getAiApprovalsSummary,
   getAiFeatureEntitlementsSummary,
   getAiSandboxesSummary,
@@ -209,7 +210,7 @@ export default async function SystemAdminMachineLayerPage() {
                 ? "Pass"
                 : "Review",
             failedCases: String(run.failureSamples.length),
-            ranAt: run.ranAt.toLocaleString(),
+            ranAt: formatSystemAdminDateTime(run.ranAt),
           })),
         })}
         parentAccessAllowed

@@ -7,7 +7,6 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import {
   systemAdminActionSuccess,
-  toSystemAdminVoidFormAction,
   type SystemAdminActionResult,
   zodActionFailure,
 } from "../action-results";
@@ -25,6 +24,7 @@ const settingsSchema = z.object({
 });
 
 export async function updateTenantSettingsAction(
+  _previous: SystemAdminActionResult | undefined,
   formData: FormData,
 ): Promise<SystemAdminActionResult> {
   const { session, organization } = await requireCapability(
@@ -78,6 +78,11 @@ export async function updateTenantSettingsAction(
   return systemAdminActionSuccess(undefined);
 }
 
-export const updateTenantSettingsForm = toSystemAdminVoidFormAction(
-  updateTenantSettingsAction,
-);
+export const updateTenantSettingsForm = async (
+  formData: FormData,
+): Promise<void> => {
+  const result = await updateTenantSettingsAction(undefined, formData);
+  if (!result.ok) {
+    throw new Error(result.error);
+  }
+};

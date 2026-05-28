@@ -11,7 +11,7 @@ export async function getBillingPostureSnapshot(input: {
     listAiUsageEvents({ organizationId: input.organizationId, limit: 500 }),
     listLynxEvalRuns(input.organizationId, 500),
     getGatewaySpendReport({ organizationId: input.organizationId }),
-    listTenantMembers({ organizationId: input.organizationId }),
+    listTenantMembers({ organizationId: input.organizationId, limit: 200 }),
   ]);
 
   const gatewayCostUsd = gatewaySpend.entries.reduce(

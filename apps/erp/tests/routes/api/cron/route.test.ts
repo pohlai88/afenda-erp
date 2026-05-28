@@ -1,5 +1,20 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+const cronHistory = vi.hoisted(() => ({
+  createCronRunHistory: vi.fn(async () => "cron_run_route"),
+  finishCronRunHistory: vi.fn(async () => undefined),
+}));
+
+vi.mock("@afenda/db", () => ({
+  createCronRunHistory: cronHistory.createCronRunHistory,
+  finishCronRunHistory: cronHistory.finishCronRunHistory,
+}));
+
+vi.mock("@afenda/observability", () => ({
+  getRequestId: vi.fn(() => "req_cron_route"),
+  logServerEvent: vi.fn(),
+}));
+
 vi.mock("@afenda/workflows", () => ({
   runReminderSweep: vi.fn(async () => ({ processedOrganizations: 1 })),
   runSyncSweep: vi.fn(async () => ({ syncedOrganizations: 1 })),
@@ -26,6 +41,8 @@ import { GET as getLynxOutcomes } from "@/app/api/cron/lynx-outcomes/route";
 describe("cron routes", () => {
   beforeEach(() => {
     process.env.CRON_SECRET = "cron-route-secret";
+    cronHistory.createCronRunHistory.mockClear();
+    cronHistory.finishCronRunHistory.mockClear();
   });
 
   it("rejects unauthenticated reminder sweeps", async () => {
@@ -50,6 +67,12 @@ describe("cron routes", () => {
       success: true,
       job: "reminders",
     });
+    expect(cronHistory.finishCronRunHistory).toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: "cron_run_route",
+        status: "success",
+      }),
+    );
   });
 
   it("runs sync sweeps with bearer auth", async () => {

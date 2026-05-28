@@ -14,7 +14,7 @@ export function DevSignInForm() {
       <p className="mt-3 text-sm leading-6 text-muted-foreground">
         {devSignInCopy.description}
       </p>
-      <form action={signInAction} className="mt-8 space-y-5">
+      <form action={signInAction} className="mt-8 flex flex-col gap-5">
         <AuthField id="dev-name" label={devSignInCopy.fields.name}>
           <AuthInput
             autoComplete="name"

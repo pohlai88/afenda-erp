@@ -11,14 +11,7 @@ import {
   type AiApprovalProposalSummary,
   type AiUsageSummary,
 } from "@afenda/db";
-
-function formatDate(value: Date | null) {
-  if (!value) {
-    return "";
-  }
-
-  return value.toLocaleString();
-}
+import { formatSystemAdminDateTime } from "../lib/format";
 
 export type AiApprovalRouteSummary = {
   id: string;
@@ -79,7 +72,7 @@ function serializeApproval(
     rationale: row.rationale,
     riskLevel: row.riskLevel,
     status: row.status,
-    created: formatDate(row.createdAt),
+    created: formatSystemAdminDateTime(row.createdAt, ""),
   };
 }
 
@@ -92,7 +85,7 @@ function serializeSandbox(row: AiActionSandboxSummary): AiSandboxRouteSummary {
     riskLevel: row.riskLevel,
     status: row.status,
     proposedBy: row.proposedBy,
-    created: formatDate(row.createdAt),
+    created: formatSystemAdminDateTime(row.createdAt, ""),
   };
 }
 
@@ -103,7 +96,7 @@ function serializeEntitlement(
     id: row.feature,
     feature: row.feature,
     enabled: row.enabled ? "enabled" : "disabled",
-    updated: formatDate(row.updatedAt),
+    updated: formatSystemAdminDateTime(row.updatedAt, ""),
     updatedByAuthUserId: row.updatedByAuthUserId ?? "system-default",
   };
 }

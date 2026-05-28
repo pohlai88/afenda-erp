@@ -138,7 +138,7 @@ export function NeonAuthForm({
       </p>
 
       {showGoogleOAuth ? (
-        <div className="mt-8 space-y-5">
+        <div className="mt-8 flex flex-col gap-5">
           <AuthSecondaryButton
             disabled={pending}
             onClick={handleGoogleSignIn}
@@ -154,7 +154,9 @@ export function NeonAuthForm({
       <form
         action={handleSubmit}
         aria-busy={pending}
-        className={showGoogleOAuth ? "space-y-5" : "mt-8 space-y-5"}
+        className={
+          showGoogleOAuth ? "flex flex-col gap-5" : "mt-8 flex flex-col gap-5"
+        }
       >
         {mode === "sign-up" ? (
           <AuthField id="auth-name" label={fields.fullName}>

@@ -1,3 +1,6 @@
 "use server";
 
-export { upsertRetentionPolicyForm } from "@afenda/feature-system-admin/server";
+export {
+  upsertRetentionPolicyAction,
+  upsertRetentionPolicyForm,
+} from "@afenda/feature-system-admin/server";

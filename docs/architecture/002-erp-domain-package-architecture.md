@@ -24,7 +24,7 @@ finance, HR, sales, inventory, or CRM business logic.
 | Database schema          | Flat `packages/db/src/schema/*.ts` + shared `erp.ts` | `schema/<moduleId>/` for ledger-grade tables              |
 | Vercel project link      | **Deferred** until repo stable (see **ARCH-001**)    | Root-linked monorepo; `vercel.json` already defines build |
 | Feature packages on disk | **Nine scaffold packages** (`@afenda/feature-*`)     | Module logic moves in as extraction threshold is met      |
-| HR module                | Scaffold only — `@afenda/feature-hr` exposes public doors and metadata compatibility. Legacy HRM migration source remains under `packages/features/hrm`; accepted HR implementation slices must land through **TRACK-004** with validation gates. | Migrate by slice into `@afenda/feature-hr` |
+| HR module                | Scaffold only — `@afenda/feature-hr` exposes public doors and metadata compatibility. Deferred legacy HRM tree removed (2026-05-28); implement slices through **TRACK-004** with validation gates. | Grow `@afenda/feature-hr` by slice |
 
 ## Decision
 

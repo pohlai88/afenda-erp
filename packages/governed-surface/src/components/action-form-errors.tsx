@@ -28,13 +28,13 @@ export function ActionFormErrors<T>({
   return (
     <Alert variant="destructive" className="w-full max-w-xl">
       <AlertTitle>{title ?? result.error}</AlertTitle>
-      <AlertDescription className="space-y-2">
+      <AlertDescription className="flex flex-col gap-2">
         {title ? <p>{result.error}</p> : null}
         {result.code ? (
           <p className="font-mono text-xs text-destructive/90">{result.code}</p>
         ) : null}
         {entries.length > 0 ? (
-          <ul className="list-inside list-disc space-y-1 text-sm">
+          <ul className="flex list-inside list-disc flex-col gap-1 text-sm">
             {entries.map(([field, message]) => (
               <li key={field}>
                 <span className="font-medium">{field}</span>

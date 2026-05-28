@@ -93,7 +93,7 @@ export function ForgotPasswordForm() {
       </p>
 
       {step === "request" ? (
-        <form action={handleRequestCode} className="mt-8 space-y-5">
+        <form action={handleRequestCode} className="mt-8 flex flex-col gap-5">
           <AuthField id="reset-email" label={copy.fields.email}>
             <AuthInput
               autoComplete="email"
@@ -115,7 +115,7 @@ export function ForgotPasswordForm() {
           </AuthPrimaryButton>
         </form>
       ) : (
-        <form action={handleResetPassword} className="mt-8 space-y-5">
+        <form action={handleResetPassword} className="mt-8 flex flex-col gap-5">
           <AuthField id="reset-email-readonly" label={copy.fields.email}>
             <AuthInput
               id="reset-email-readonly"

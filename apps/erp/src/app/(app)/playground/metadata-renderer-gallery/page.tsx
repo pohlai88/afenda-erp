@@ -207,7 +207,7 @@ export default function MetadataRendererGalleryPage() {
   });
 
   return (
-    <div className="space-y-10 pb-16">
+    <div className="flex flex-col gap-10 pb-16">
       <div className="border-b border-line pb-4">
         <h1 className="text-2xl font-semibold text-foreground">
           Metadata Renderer Gallery
@@ -355,7 +355,7 @@ function GallerySection({
   children: React.ReactNode;
 }) {
   return (
-    <section className="space-y-3">
+    <section className="flex flex-col gap-3">
       <div className="flex items-center gap-3">
         <span className="rounded bg-surface-strong px-2 py-0.5 font-mono text-xs text-muted">
           {label}

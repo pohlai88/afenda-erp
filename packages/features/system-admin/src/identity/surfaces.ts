@@ -5,6 +5,7 @@ import {
   type ListSurfaceRendererConfigurationResolvedInput,
 } from "@afenda/governed-surface";
 import type { TenantMemberSummary } from "@afenda/db";
+import { formatSystemAdminDateTime } from "../lib/format";
 
 export const systemAdminMembersSurfaceKey = "system-admin.members.list";
 export const systemAdminInvitationsSurfaceKey = "system-admin.invitations.list";
@@ -211,7 +212,7 @@ export function buildInvitationsListSurface(input: {
         email: invitation.email,
         role: invitation.role,
         status: invitation.status,
-        expiresAt: invitation.expiresAt.toLocaleString(),
+        expiresAt: formatSystemAdminDateTime(invitation.expiresAt),
       },
       trailingAction:
         invitation.status === "pending"

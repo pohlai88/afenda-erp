@@ -14,8 +14,6 @@ import {
 import {
   buildLynxLatencyAnalyticsListSurface,
   buildLynxObservabilityStatGrid,
-  buildLynxOutcomeMonitorControlListSurface,
-  lynxOutcomeMonitorControlSurfaceKey,
   buildLynxFailedEvalCaseListSurface,
   buildLynxProactiveOutcomeAnalyticsListSurface,
   buildLynxQualityAnalyticsListSurface,
@@ -43,8 +41,7 @@ import {
   buildLynxRunFilterSearchParams,
   parseLynxRunFilters,
 } from "@/lib/api/lynx-run-filters";
-import { LynxOutcomeMonitorSettingForms } from "@/components/system-admin/lynx-outcome-monitor-setting-forms";
-import { LynxOutcomeMonitorTrailingCell } from "@/components/system-admin/lynx-outcome-monitor-trailing-cell.client";
+import { LynxOutcomeMonitorSection } from "@/components/system-admin/lynx-outcome-monitor-section";
 
 type PageProps = {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
@@ -52,10 +49,6 @@ type PageProps = {
 
 function formDefault(value: string | undefined) {
   return value ?? "";
-}
-
-function formatJson(value: Record<string, unknown>) {
-  return Object.keys(value).length > 0 ? JSON.stringify(value) : "{}";
 }
 
 function getRunQualityGate(metadata: Record<string, unknown>) {
@@ -209,18 +202,6 @@ export default async function LynxRunsPage({ searchParams }: PageProps) {
       })),
     },
   );
-  const monitorControlSurface = buildLynxOutcomeMonitorControlListSurface({
-    canMutate: canManageMonitors,
-    rows: monitorSettings.map((setting) => ({
-      id: setting.monitorId,
-      monitorId: setting.monitorId,
-      enabled: setting.enabled ? "enabled" : "disabled",
-      ownerAuthUserId: setting.ownerAuthUserId ?? "-",
-      thresholds: formatJson(setting.thresholds),
-      severityPolicy: formatJson(setting.severityPolicy),
-      updatedAt: setting.updatedAt.toLocaleString(),
-    })),
-  });
   const spendSurface = buildLynxSpendAnalyticsListSurface({
     rows: spendAnalytics.map((row) => ({
       id: `${row.feature}:${row.model}:${row.provider}`,
@@ -572,26 +553,15 @@ export default async function LynxRunsPage({ searchParams }: PageProps) {
         layout="embedded"
       />
 
-      <SectionPanel
-        title="Proactive monitor controls"
+      <LynxOutcomeMonitorSection
+        canWrite={canManageMonitors}
         description="Enable monitors, tune deterministic thresholds, and assign an owner for proactive review sessions."
-      >
-        <div className="flex flex-col gap-4">
-          <GovernedPatternCListSection
-            title="Monitor settings"
-            description="Current tenant monitor configuration. Use Configure to jump to the editor below."
-            surfaceKey={lynxOutcomeMonitorControlSurfaceKey}
-            listConfiguration={monitorControlSurface}
-            parentAccessAllowed
-            layout="embedded"
-            trailingColumn={{ header: "Actions", Cell: LynxOutcomeMonitorTrailingCell }}
-          />
-          <LynxOutcomeMonitorSettingForms
-            canWrite={canManageMonitors}
-            monitorSettings={monitorSettings}
-          />
-        </div>
-      </SectionPanel>
+        listDescription="Current tenant monitor configuration. Use Configure to jump to the editor below."
+        listTitle="Monitor settings"
+        organizationId={organization.id}
+        preloaded={{ monitorSettings }}
+        title="Proactive monitor controls"
+      />
 
       <GovernedPatternCListSection
         title="Quality gate failures"

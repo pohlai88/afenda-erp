@@ -139,11 +139,27 @@ export async function revokeInvitation(
     });
   }
 
-  await revokeOrganizationInvitation({
-    organizationId: organization.id,
-    invitationId,
-    actorAuthUserId: session.id,
-  });
+  try {
+    await revokeOrganizationInvitation({
+      organizationId: organization.id,
+      invitationId,
+      actorAuthUserId: session.id,
+    });
+  } catch (error) {
+    logIdentityMutation({
+      operation: "identity.invitation.revoke",
+      organizationId: organization.id,
+      userId: session.id,
+      result: "failure",
+      metadata: {
+        invitationId,
+        error: error instanceof Error ? error.message : String(error),
+      },
+    });
+    return systemAdminActionFailure(
+      error instanceof Error ? error.message : "Invitation revoke failed.",
+    );
+  }
 
   logIdentityMutation({
     operation: "identity.invitation.revoke",

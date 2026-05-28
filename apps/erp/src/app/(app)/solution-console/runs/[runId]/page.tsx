@@ -12,17 +12,10 @@ import {
   GovernedPatternBStatSection,
   GovernedPatternCListSection,
 } from "@afenda/governed-surface/server";
-import {
-  Button,
-  NativeSelect,
-  NativeSelectOption,
-  SectionPanel,
-  StatusBadge,
-  Textarea,
-} from "@afenda/ui";
+import { SectionPanel, StatusBadge } from "@afenda/ui";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { recordLynxRunFeedbackAction } from "./feedback-actions";
+import { LynxRunFeedbackForm } from "@/components/solution-console/lynx-run-feedback-form.client";
 
 type PageProps = {
   params: Promise<{ runId: string }>;
@@ -213,48 +206,7 @@ export default async function LynxRunDetailPage({ params }: PageProps) {
           title="Record feedback"
           description="Attach operator quality feedback to this replayable Lynx run."
         >
-          <form action={recordLynxRunFeedbackAction} className="flex flex-col gap-4">
-            <input name="runId" type="hidden" value={run.id} />
-            <div className="grid gap-3 sm:grid-cols-2">
-              <label className="grid gap-2 text-sm font-medium text-foreground">
-                Rating
-                <NativeSelect className="w-full" name="rating">
-                  <NativeSelectOption value="positive">
-                    Positive
-                  </NativeSelectOption>
-                  <NativeSelectOption value="negative">
-                    Negative
-                  </NativeSelectOption>
-                </NativeSelect>
-              </label>
-              <label className="grid gap-2 text-sm font-medium text-foreground">
-                Category
-                <NativeSelect className="w-full" name="category">
-                  <NativeSelectOption value="accurate">
-                    Accurate
-                  </NativeSelectOption>
-                  <NativeSelectOption value="unsupported">
-                    Unsupported
-                  </NativeSelectOption>
-                  <NativeSelectOption value="wrong-tool">
-                    Wrong tool
-                  </NativeSelectOption>
-                  <NativeSelectOption value="slow">Slow</NativeSelectOption>
-                  <NativeSelectOption value="unsafe">Unsafe</NativeSelectOption>
-                  <NativeSelectOption value="other">Other</NativeSelectOption>
-                </NativeSelect>
-              </label>
-            </div>
-            <label className="grid gap-2 text-sm font-medium text-foreground">
-              Note
-              <Textarea
-                maxLength={1000}
-                name="note"
-                placeholder="Add review notes for audit and replay."
-              />
-            </label>
-            <Button type="submit">Save feedback</Button>
-          </form>
+          <LynxRunFeedbackForm runId={run.id} />
         </SectionPanel>
       </div>
     </div>

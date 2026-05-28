@@ -17,7 +17,7 @@
 | HR product logic | `packages/features/hr` | Commands, queries, metadata builders, internal categories |
 | Shared contracts | `@afenda/domain` | Module registry, generic list/detail builders until extracted |
 | Physical schema | `@afenda/db` | `schema/hr/` only when a TRACK-004 slice is accepted |
-| Legacy reference | `packages/features/hrm` | Migration **input** — never imported from `@afenda/feature-hr` |
+| Legacy reference | *(removed 2026-05-28)* | Former `packages/features/hrm` deleted; implement in `@afenda/feature-hr` only |
 
 ## Public export doors (ARCH-008)
 
@@ -44,7 +44,7 @@ Add category folders when a slice ships; do not create nested `package.json` wor
 
 ## Migration rules
 
-1. Reimplement behavior on the Afenda stack — do not copy `packages/features/hrm` file trees.
+1. Reimplement behavior on the Afenda stack — do not restore deleted legacy HRM file trees.
 2. Prove parity with tests and TRACK-004 evidence bundles before marking a slice complete.
 3. Resolve tenant scope from server session only; enforce capabilities at mutations and sensitive reads.
 4. Lists use governed Pattern C server windows — never ship full datasets for client pagination.
