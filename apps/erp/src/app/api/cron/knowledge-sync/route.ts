@@ -1,7 +1,7 @@
 import { syncOrgKnowledge } from "@afenda/feature-knowledge/server";
 import { listOrganizationsForCoreErpSeed, runWithOrganizationContext } from "@afenda/db";
 
-import { runCronJob } from "@/lib/cron";
+import { runCronJob } from "@/app-cron/run";
 
 export async function GET(request: Request): Promise<Response> {
   return runCronJob({

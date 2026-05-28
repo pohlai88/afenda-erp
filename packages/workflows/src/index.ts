@@ -4,7 +4,7 @@ import {
   runTenantSyncSweep,
   type TenantWorkflowSweepResult,
 } from "@afenda/db";
-import { getWorkflowAutomationDefinitions } from "@afenda/domain";
+import { getWorkflowAutomationDefinitions } from "@afenda/kernel";
 import { runWorkflowWithRetry } from "./durable-runner";
 
 export const workflowNamespaces = ["approvals", "reminders", "sync"] as const;
@@ -27,7 +27,7 @@ export {
   getRecoveryPlaybookDefinitions,
   getResolvedWorkflowAutomationRuns,
   getWorkflowAutomationDefinitions,
-} from "@afenda/domain";
+} from "@afenda/kernel";
 
 export async function runReminderSweep() {
   const run = await runWorkflowWithRetry({

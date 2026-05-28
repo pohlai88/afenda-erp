@@ -3,7 +3,7 @@ import {
   getErpModuleById,
   getNavigationExtensionById,
   type ModuleId,
-} from "@afenda/domain";
+} from "@afenda/kernel";
 import type { Metadata } from "next";
 
 export async function getCachedModuleMetadata(

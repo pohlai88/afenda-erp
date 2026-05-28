@@ -1,0 +1,2 @@
+CREATE TYPE "public"."organization_membership_status" AS ENUM('active', 'suspended', 'removed');--> statement-breakpoint
+ALTER TABLE "organization_memberships" ADD COLUMN "status" "organization_membership_status" DEFAULT 'active' NOT NULL;

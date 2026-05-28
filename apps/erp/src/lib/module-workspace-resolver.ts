@@ -9,7 +9,7 @@ import {
   type ModuleWorkspaceRecordDetail,
   type ModuleWorkspaceSearchParams,
   type ModuleWorkspaceStats,
-} from "@afenda/domain";
+} from "@afenda/kernel";
 
 export type ResolvedModuleWorkspace = {
   workspace: ModuleWorkspace;

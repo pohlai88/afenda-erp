@@ -9,7 +9,7 @@ export const afendaTranspilePackages = [
   "@afenda/auth",
   "@afenda/config",
   "@afenda/db",
-  "@afenda/domain",
+  "@afenda/kernel",
   "@afenda/feature-system-admin",
   "@afenda/feature-approvals",
   "@afenda/feature-crm",

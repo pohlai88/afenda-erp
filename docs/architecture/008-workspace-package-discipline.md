@@ -2,12 +2,12 @@
 
 **Doc ID:** `ARCH-008` · **File:** `008-workspace-package-discipline.md`
 
-| Field      | Value                                                                                       |
-| ---------- | ------------------------------------------------------------------------------------------- |
-| Status     | Active — implementation discipline for large-module development (May 2026)                  |
-| Authority  | Workspace package classes, export doors, dependency direction, split criteria, guard policy |
-| Defers to  | **ARCH-002** for feature ownership · **ARCH-001** for Vercel deployment topology            |
-| Related    | **ARCH-003** (guards) · **ARCH-004** (naming) · **ARCH-005** (schema ownership)             |
+| Field     | Value                                                                                       |
+| --------- | ------------------------------------------------------------------------------------------- |
+| Status    | Active — implementation discipline for large-module development (May 2026)                  |
+| Authority | Workspace package classes, export doors, dependency direction, split criteria, guard policy |
+| Defers to | **ARCH-002** for feature ownership · **ARCH-001** for Vercel deployment topology            |
+| Related   | **ARCH-003** (guards) · **ARCH-004** (naming) · **ARCH-005** (schema ownership)             |
 
 Afenda ERP uses one deployable Next.js application and many disciplined
 workspace packages. Package boundaries are the maintainability unit; Vercel
@@ -33,12 +33,12 @@ edges. Do not use packages to create deployment fragmentation.
 
 ## Package Classes
 
-| Class              | Location                         | Responsibility                                                                    |
-| ------------------ | -------------------------------- | --------------------------------------------------------------------------------- |
-| Deployable app     | `apps/erp`                       | App Router routes, layouts, handlers, shell composition                           |
-| Feature package    | `packages/features/<moduleId>`   | Module-specific commands, queries, metadata, components, schemas, tests           |
-| Domain contracts   | `packages/domain`                | Module IDs, shared contracts, registry contracts, compatibility adapters          |
-| Platform packages  | `packages/db`, `auth`, `ai`, ... | Database, auth, AI, workflows, observability, config                              |
+| Class              | Location                          | Responsibility                                                                  |
+| ------------------ | --------------------------------- | ------------------------------------------------------------------------------- |
+| Deployable app     | `apps/erp`                        | App Router routes, layouts, handlers, shell composition                         |
+| Feature package    | `packages/features/<moduleId>`    | Module-specific commands, queries, metadata, components, schemas, tests         |
+| Domain contracts   | `packages/kernel`                 | Module IDs, shared contracts, registry contracts, compatibility adapters        |
+| Platform packages  | `packages/db`, `auth`, `ai`, ...  | Database, auth, AI, workflows, observability, config                            |
 | UI/runtime package | `packages/ui`, `governed-surface` | Reusable primitives and governed renderer kernel; no durable ERP business rules |
 
 All package classes are enforced by `pnpm architecture:check`
@@ -57,21 +57,42 @@ packages/features/hr
     client.ts
     server.ts
     metadata.ts
+    actions/
+    components/
+    ...
 ```
+
+Scaffold default: copy [`packages/_template-definition`](../../packages/_template-definition).
+Template-local scaffold and validation scripts live under
+`packages/_template-definition/scripts`; bucket folders live under
+`packages/_template-definition/src`.
 
 Required public export doors:
 
-| Export       | Use                                                        |
-| ------------ | ---------------------------------------------------------- |
+| Export       | Use                                                          |
+| ------------ | ------------------------------------------------------------ |
 | `.`          | Shared package entry; keep server-only graphs out of clients |
-| `./client`   | Client Components and browser-only behavior                |
-| `./server`   | Server Components, command/query services, Node-only code  |
-| `./metadata` | Governed metadata builders and metadata-only module facts  |
+| `./client`   | Client Components and browser-only behavior                  |
+| `./server`   | Server Components, command/query services, Node-only code    |
+| `./metadata` | Governed metadata builders and metadata-only module facts    |
+
+`src/server.ts` is the server-only package marker and imports
+`@afenda/kernel/server`. Deep feature implementation files must not import
+`server-only` or `@afenda/kernel/server` directly; they inherit the boundary by
+being exported through the public `./server` door. This keeps local Vitest
+package tests from depending on Next's `server-only` package resolution while
+preserving an explicit server door.
 
 Feature packages compile to `dist/**` with
 `"build": "tsc -p tsconfig.build.json"`. Their `default` export targets must
 point at compiled `./dist/*.js`; `types` and `development` may point at `./src`
 for local development.
+
+Internal folder grammar comes from
+[`packages/_template-definition/src`](../../packages/_template-definition/src).
+Scaffold with `pnpm scaffold:feature <moduleId>`, then remove starter buckets
+that remain empty after the package audit. Do not use catch-all folder names
+(`_shared`, `common`, `lib`, `utils`, etc.).
 
 ## Flat Workspace, Grouped Internals
 
@@ -99,15 +120,15 @@ a proven dependency-cycle problem that cannot be solved by internal folders.
 
 ## Dependency Direction
 
-| From                | Allowed direction                                                                 |
-| ------------------- | ---------------------------------------------------------------------------------- |
-| `apps/erp`          | Imports public doors from feature/domain/platform/UI packages                      |
-| Feature packages    | Import domain, db, auth, governed-surface, UI, workflows, observability as needed  |
-| Platform packages   | Do not import from `apps/erp` or feature implementations unless explicitly allowed |
-| `@afenda/ui`        | Primitive UI only; no DB, auth server, AI, governed metadata registry, or routes   |
+| From              | Allowed direction                                                                  |
+| ----------------- | ---------------------------------------------------------------------------------- |
+| `apps/erp`        | Imports public doors from feature/kernel/platform/UI packages                      |
+| Feature packages  | Import kernel, db, auth, governed-surface, UI, workflows, observability as needed  |
+| Platform packages | Do not import from `apps/erp` or feature implementations unless explicitly allowed |
+| `@afenda/ui`      | Primitive UI only; no DB, auth server, AI, governed metadata registry, or routes   |
 
 Feature-to-feature imports are discouraged. Prefer shared contracts in
-`@afenda/domain` or cross-module processes in `@afenda/workflows`. If a direct
+`@afenda/kernel` or cross-module processes in `@afenda/workflows`. If a direct
 feature dependency becomes necessary, expose it through `.` / `./server` /
 `./metadata`; never import `src`, `dist`, or `internal` paths.
 
@@ -153,6 +174,8 @@ app. Core ERP modules remain package boundaries inside the single app.
 - feature imports use public package doors;
 - packages do not import from `apps/erp`;
 - feature client exports do not pull server-only modules.
+- feature server-only markers stay centralized at `src/server.ts` through
+  `@afenda/kernel/server`.
 
 The guard is intentionally conservative. If a rule needs an exception, update
 this document and the guard script in the same change.
@@ -165,13 +188,13 @@ folders by category (`employees`, `time-attendance`, `payroll`, `talent`,
 `industry`) before considering more workspace packages.
 
 Package extraction is complete only when app routes are thin adapters, module
-rules live in feature/domain/platform packages, tenant-scoped data access is
+rules live in feature/kernel/platform packages, tenant-scoped data access is
 server-owned, and governed lists use bounded server windows.
 
 ## Related Documents
 
 - **ARCH-001** [System Architecture](001-system-architecture.md)
-- **ARCH-002** [ERP Domain Package Architecture](002-erp-domain-package-architecture.md)
+- **ARCH-002** [ERP Kernel Package Architecture](002-erp-kernel-package-architecture.md)
 - **ARCH-003** [Directory Architecture Audit](003-directory-architecture-audit.md)
 - **ARCH-004** [Naming Conventions](004-naming-conventions.md)
 - **ARCH-005** [Database Scale Architecture](005-database-scale-architecture.md)

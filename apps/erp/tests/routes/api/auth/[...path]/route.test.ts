@@ -10,7 +10,7 @@ vi.mock("@afenda/observability", () => ({
   logServerEvent: vi.fn(),
 }));
 
-import { authApiRouteCopy } from "@afenda/domain";
+import { authApiRouteCopy } from "@afenda/kernel";
 import {
   getNeonAuthServer,
   isNeonAuthReady,

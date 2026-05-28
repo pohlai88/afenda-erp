@@ -1,4 +1,4 @@
-import { authApiRouteCopy } from "@afenda/domain";
+import { authApiRouteCopy } from "@afenda/kernel";
 import { describe, expect, it } from "vitest";
 import {
   getAuthRouteFailedResponse,

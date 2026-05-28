@@ -7,9 +7,9 @@
  *
  * Flipped surfaces (Phase B):
  *   - apps/erp/src/app/(app)/solution-console/**
- *   - packages/domain/src/shell/navigation-extensions.ts
- *   - packages/domain/src/shell/route-copy-metadata.ts
- *   - packages/ai/src/prompts.ts                          (getSolutionProviderSystemPrompt)
+ *   - packages/kernel/src/shell/navigation-extensions.ts
+ *   - packages/kernel/src/shell/route-copy-metadata.ts
+ *   - packages/ai/src/prompts/ai.system-prompt.ts         (getSolutionProviderSystemPrompt)
  *   - packages/features/lynx/**
  *
  * Non-flipped (allowlisted until Phase C):
@@ -26,9 +26,9 @@ const ROOT = join(fileURLToPath(import.meta.url), "../../");
 const FLIPPED_PATHS = [
   "apps/erp/src/app/(app)/solution-console",
   "apps/erp/src/app/(app)/solution-console/lynx-operator-panel.tsx",
-  "packages/domain/src/shell/navigation-extensions.ts",
-  "packages/domain/src/shell/route-copy-metadata.ts",
-  "packages/ai/src/prompts.ts",
+  "packages/kernel/src/shell/navigation-extensions.ts",
+  "packages/kernel/src/shell/route-copy-metadata.ts",
+  "packages/ai/src/prompts/ai.system-prompt.ts",
   "packages/features/lynx",
   "apps/erp/src/app/api/lynx",
 ];
@@ -37,7 +37,7 @@ const BANNED_TERMS = [
   /\bSolution Provider Agent\b/,
   /\bSolution Provider Console\b/,
   /\bSolution Provider calls\b/i,
-  /\bSolution Console\b(?!\s+pageMetadata)/,  // allow the exported const name itself
+  /\bSolution Console\b(?!\s+pageMetadata)/, // allow the exported const name itself
   /\bAI native\b/i,
   /\bYou are Afenda Solution Provider Agent\b/,
   /\bThe agent must\b/i,
@@ -49,9 +49,17 @@ function* walkFiles(dir: string): Generator<string> {
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
     const full = join(dir, entry.name);
     if (entry.isDirectory()) {
-      if (entry.name === "node_modules" || entry.name === ".next" || entry.name === "dist") continue;
+      if (
+        entry.name === "node_modules" ||
+        entry.name === ".next" ||
+        entry.name === "dist"
+      )
+        continue;
       yield* walkFiles(full);
-    } else if (entry.isFile() && /\.(ts|tsx|mts|js|jsx|mjs)$/.test(entry.name)) {
+    } else if (
+      entry.isFile() &&
+      /\.(ts|tsx|mts|js|jsx|mjs)$/.test(entry.name)
+    ) {
       yield full;
     }
   }
@@ -67,7 +75,11 @@ let errorCount = 0;
 for (const path of FLIPPED_PATHS) {
   const abs = join(ROOT, path);
   let stat: ReturnType<typeof statSync> | null = null;
-  try { stat = statSync(abs); } catch { continue; }
+  try {
+    stat = statSync(abs);
+  } catch {
+    continue;
+  }
 
   const files = stat.isDirectory() ? [...walkFiles(abs)] : [abs];
 
@@ -93,9 +105,13 @@ for (const path of FLIPPED_PATHS) {
 }
 
 if (errorCount === 0) {
-  console.log(`✓ lint:lynx-brand — all flipped surfaces use approved machine-layer language.`);
+  console.log(
+    `✓ lint:lynx-brand — all flipped surfaces use approved machine-layer language.`,
+  );
   process.exit(0);
 } else {
-  console.error(`\n✗ lint:lynx-brand — ${errorCount} banned term(s) found in flipped surfaces.`);
+  console.error(
+    `\n✗ lint:lynx-brand — ${errorCount} banned term(s) found in flipped surfaces.`,
+  );
   process.exit(1);
 }

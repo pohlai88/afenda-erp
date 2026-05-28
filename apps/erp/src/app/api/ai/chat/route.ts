@@ -1,9 +1,10 @@
 import {
+  aiGatewayDefaultProviderOrder,
   assertAiBudget,
   assertCapabilityAllowed,
   assertGovernedToolset,
   assertNoSensitiveCredentialContent,
-  createErpAssistantAgent,
+  createErpSpecialistAgent,
   createErpAssistantTools,
   erpAssistantToolMeta,
   createGatewayOptions,
@@ -12,11 +13,11 @@ import {
   getAiModelForFeature,
   getAiRouteError,
   getUsageMetrics,
-  hasAiGatewayCredentials,
+  hasAiGatewayRuntimeCredentials,
   isAiBudgetError,
   isAiPermissionError,
   isAiSensitiveContentError,
-} from "@afenda/ai";
+} from "@afenda/ai/server";
 import { getApiAuthContext } from "@afenda/auth/server";
 import {
   createAiActionSandbox,
@@ -31,12 +32,16 @@ import {
   moduleIds,
   resolveWorkspaceDataMode,
   type ModuleId,
-} from "@afenda/domain";
+} from "@afenda/kernel";
 import { getRequestId, logServerEvent } from "@afenda/observability";
 import { createAgentUIStreamResponse, type UIMessage } from "ai";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { chatRequestSchema } from "@/lib/api/ai-request-schemas";
+import {
+  createRouteAgentStepLogger,
+  createRouteAiTelemetrySettings,
+} from "@/lib/api/ai-agent-observability";
 import { withAiSpan } from "@/lib/ai-tracing";
 
 export const maxDuration = 30;
@@ -58,7 +63,7 @@ export async function POST(request: Request) {
   const model = getAiModelForFeature("erp-assistant");
   let contextModuleId: ModuleId = "dashboard";
 
-  if (!hasAiGatewayCredentials()) {
+  if (!hasAiGatewayRuntimeCredentials()) {
     return getGatewayUnavailableResponse();
   }
 
@@ -195,12 +200,12 @@ export async function POST(request: Request) {
       capabilities: organization.capabilities,
     });
 
-    const agent = createErpAssistantAgent({
+    const agent = createErpSpecialistAgent({
       model,
       organizationName: organization.name,
       role: organization.role,
       tools,
-      stopSteps: 6,
+      maxSteps: 6,
       providerOptions: createGatewayOptions({
         organizationId: organization.id,
         userId: activeSession.id,
@@ -208,8 +213,31 @@ export async function POST(request: Request) {
         moduleId: contextModuleId,
         riskLevel: "medium",
         environment: getAiGatewayEnvironment(),
-        providerOrder: ["openai", "anthropic"],
+        providerOrder: aiGatewayDefaultProviderOrder,
+        providerOnly: aiGatewayDefaultProviderOrder,
         fallbackModels: ["anthropic/claude-sonnet-4.6"],
+      }),
+      onStepFinish: createRouteAgentStepLogger({
+        feature: "erp-assistant",
+        functionId: "ai.chat.agent",
+        model,
+        moduleId: contextModuleId,
+        operation: "ai.assistant.step",
+        organizationId: organization.id,
+        requestId,
+        route,
+        userAuthId: activeSession.id,
+      }),
+      experimental_telemetry: createRouteAiTelemetrySettings({
+        feature: "erp-assistant",
+        functionId: "ai.chat.agent",
+        model,
+        moduleId: contextModuleId,
+        operation: "ai.assistant.stream",
+        organizationId: organization.id,
+        requestId,
+        route,
+        userAuthId: activeSession.id,
       }),
       onFinish: async ({ totalUsage, finishReason }) => {
         const usageMetrics = getUsageMetrics(totalUsage);

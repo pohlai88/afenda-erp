@@ -25,7 +25,7 @@ delegates to `createModuleFeatureMetadata("hr")` like other core modules.
 - **Database:** migration `0030_revert_hr_migration_tables` drops tables from the
   withdrawn `0027` / `0029` attempt; run `pnpm db:migrate` on environments that
   applied those migrations;
-- **ERP `/hr`:** generic module workspace via `@afenda/domain` (same as finance
+- **ERP `/hr`:** generic module workspace via `@afenda/kernel` (same as finance
   scaffold phase).
 
 Do not restore the deleted `packages/features/hrm` tree. New HR work lands only in
@@ -73,7 +73,7 @@ architecture alternative.
 - Nested workspace packages such as `packages/features/hr/payroll/package.json`
   are forbidden unless **ARCH-008** and `pnpm architecture:check` change in the
   same commit.
-- Feature package code may import public doors from `@afenda/domain`,
+- Feature package code may import public doors from `@afenda/kernel`,
   `@afenda/db`, `@afenda/auth`, `@afenda/governed-surface`, `@afenda/ui`,
   `@afenda/workflows`, and `@afenda/observability`.
 - Feature packages must not import from `apps/erp`.
@@ -507,7 +507,7 @@ Every migration slice must follow this sequence. Do not skip steps.
    - Replace legacy package imports with current public doors.
    - Define command/query inputs in `src/<slice>/contracts.ts` or
      `src/contracts`.
-   - Keep shared cross-module types in `@afenda/domain`, not HR internals.
+   - Keep shared cross-module types in `@afenda/kernel`, not HR internals.
 
 3. Promote schema deliberately.
 
@@ -707,7 +707,7 @@ validation output:
 - extra relevant commands:
   - pnpm install --filter @afenda/feature-hr...: passed, refreshed HR
     workspace links for the new @afenda/auth dependency
-  - packages/domain tests normalized to current ARCH-009 Lynx Operator copy so
+  - packages/kernel tests normalized to current ARCH-009 Lynx Operator copy so
     stale Solution Console assertions no longer block the root gate
 
 known gaps:
@@ -839,7 +839,7 @@ validation output:
 - pnpm test:e2e: passed, 24/24 Turbo tasks; 6 smoke tests passed and the
   Neon-only auth smoke was skipped by environment guard
 - extra relevant commands:
-  - pnpm --filter @afenda/domain test: passed, 9 files / 69 tests
+  - pnpm --filter @afenda/kernel test: passed, 9 files / 69 tests
   - pnpm --filter @afenda/governed-surface test: passed, 6 files / 40 tests
   - full-app gate repairs not counted as HR migration progress: removed
     Next 16 cacheComponents-incompatible route segment exports from untracked

@@ -11,7 +11,7 @@
     }
   },
   "dependencies": {
-    "@afenda/domain": "workspace:*"
+    "@afenda/kernel": "workspace:*"
   },
   "scripts": {
     "build": "tsc -p tsconfig.build.json",

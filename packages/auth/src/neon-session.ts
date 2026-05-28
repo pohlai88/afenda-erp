@@ -3,6 +3,7 @@ import "server-only";
 import { getNeonAuthEnv } from "@afenda/config/env";
 import { jwtVerify } from "jose";
 import { cookies } from "next/headers";
+import { z } from "zod";
 import {
   NEON_AUTH_SESSION_DATA_COOKIE,
   NEON_AUTH_SESSION_TOKEN_COOKIE,
@@ -27,64 +28,27 @@ type NeonAuthSessionPayload = {
   } | null;
 };
 
-function parseDate(value: unknown, field: string) {
-  if (value instanceof Date) {
-    return value;
-  }
-
-  if (typeof value === "string" || typeof value === "number") {
-    const parsed = new Date(value);
-
-    if (!Number.isNaN(parsed.getTime())) {
-      return parsed;
-    }
-  }
-
-  throw new Error(`Invalid date for ${field}`);
-}
+const neonAuthSessionPayloadSchema = z.object({
+  session: z.object({
+    id: z.string().min(1),
+    expiresAt: z.coerce.date(),
+    createdAt: z.coerce.date(),
+    updatedAt: z.coerce.date(),
+  }),
+  user: z.object({
+    id: z.string().min(1),
+    name: z.string(),
+    email: z.email(),
+    createdAt: z.coerce.date(),
+    updatedAt: z.coerce.date(),
+  }),
+});
 
 function parseNeonAuthSessionPayload(
   payload: Record<string, unknown>,
 ): NeonAuthSessionPayload | null {
-  const session = payload.session;
-  const user = payload.user;
-
-  if (
-    !session ||
-    typeof session !== "object" ||
-    !user ||
-    typeof user !== "object"
-  ) {
-    return null;
-  }
-
-  const sessionRecord = session as Record<string, unknown>;
-  const userRecord = user as Record<string, unknown>;
-
-  if (
-    typeof sessionRecord.id !== "string" ||
-    typeof userRecord.id !== "string" ||
-    typeof userRecord.name !== "string" ||
-    typeof userRecord.email !== "string"
-  ) {
-    return null;
-  }
-
-  return {
-    session: {
-      id: sessionRecord.id,
-      expiresAt: parseDate(sessionRecord.expiresAt, "session.expiresAt"),
-      createdAt: parseDate(sessionRecord.createdAt, "session.createdAt"),
-      updatedAt: parseDate(sessionRecord.updatedAt, "session.updatedAt"),
-    },
-    user: {
-      id: userRecord.id,
-      name: userRecord.name,
-      email: userRecord.email,
-      createdAt: parseDate(userRecord.createdAt, "user.createdAt"),
-      updatedAt: parseDate(userRecord.updatedAt, "user.updatedAt"),
-    },
-  };
+  const parsed = neonAuthSessionPayloadSchema.safeParse(payload);
+  return parsed.success ? parsed.data : null;
 }
 
 export async function readNeonAuthSessionPayload(): Promise<NeonAuthSessionPayload | null> {

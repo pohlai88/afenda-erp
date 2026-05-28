@@ -3,7 +3,7 @@ name: metadata-eui-polish
 description: >
   Afenda metadata-driven EUI polish workflow. Use automatically when implementing,
   reviewing, or refining governed renderers (packages/governed-surface/src/metadata/renderers),
-  surface builders (packages/domain/src/modules/list-surfaces.ts), Pattern A/B/C ERP pages, or
+  surface builders (packages/kernel/src/modules/list-surfaces.ts), Pattern A/B/C ERP pages, or
   the dev metadata-renderer-gallery. Composes shadcn-metadata, governed-renderer
   contracts, and Vercel web-design/composition skills. Do not invoke sibling
   skills separately for the same task.
@@ -20,7 +20,7 @@ This skill applies when editing:
 
 - `packages/governed-surface/src/metadata/renderers/**`
 - `packages/governed-surface/src/` (`GovernedSurfaceSectionCard`, `GovernedPatternCListSection`)
-- `packages/domain/src/modules/list-surfaces.ts` (list surface builders — pre-feature-package; moves to `packages/features/<id>/` on extraction)
+- `packages/kernel/src/modules/list-surfaces.ts` (list surface builders — pre-feature-package; moves to `packages/features/<id>/` on extraction)
 - ERP pages using `GovernedComponentRenderer` or `GovernedPatternCListSection` (`layout="embedded"` when parent `Card` owns chrome)
 
 **Canonical docs:** **ARCH-006** `docs/architecture/006-metadata-driven-ui-architecture.md`, **ARCH-007** `docs/architecture/007-governed-metadata-architecture.md`. Index: `docs/architecture/README.md`.
@@ -67,7 +67,7 @@ Optional review pass (attach manually): **frontend-design-review**, **wcag-acces
 - Client components → `@afenda/governed-surface/client`
 - Schemas → `@afenda/governed-surface/schemas`
 - UI primitives → `@afenda/ui`
-- List surface builders → `@afenda/domain` (pre-extraction; move to `@afenda/feature-<id>` on extraction per ARCH-002)
+- List surface builders → `@afenda/kernel` (pre-extraction; move to `@afenda/feature-<id>` on extraction per ARCH-002)
 
 ## Pattern map
 
@@ -77,7 +77,7 @@ Optional review pass (attach manually): **frontend-design-review**, **wcag-acces
 | **B**   | Tables, KPI grids, audit lists (no trailing row forms) | `GovernedComponentRenderer` from `@afenda/governed-surface/metadata` + manual `Card` section |
 | **C**   | List metadata + trailing forms/actions                 | `GovernedPatternCListSection` from `@afenda/governed-surface/server`; `GovernedTrailingActionSlot` from `@afenda/governed-surface/client` |
 
-**Builder recipe:** `packages/domain/src/modules/list-surfaces.ts` exports builders that return `ListSurfaceRendererConfigurationInput`. Pattern C sections pass the builder output to `GovernedPatternCListSection` — do not re-parse in the route.
+**Builder recipe:** `packages/kernel/src/modules/list-surfaces.ts` exports builders that return `ListSurfaceRendererConfigurationInput`. Pattern C sections pass the builder output to `GovernedPatternCListSection` — do not re-parse in the route.
 
 **Pattern C polish:** `surfaceKey`, `requiresErpPermission`, row `trailingAction` + `disabledReason`, `data-trailing-action-state` on trailing cells, `data-testid="governed-list-section:{surfaceKey}"`.
 

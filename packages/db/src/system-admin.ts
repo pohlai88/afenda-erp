@@ -5,7 +5,7 @@ import {
   randomBytes,
   timingSafeEqual,
 } from "node:crypto";
-import { and, asc, desc, eq, inArray, sql } from "drizzle-orm";
+import { and, asc, desc, eq, inArray, ne, sql } from "drizzle-orm";
 import { createAuditLog } from "./audit";
 import { getDb, runWithOrganizationContext } from "./client";
 import { createEntityId } from "./ids";
@@ -17,7 +17,11 @@ import {
   organizations,
   retentionPolicies,
   ssoConnections,
+  tenantApprovalSettings,
+  tenantModuleSettings,
+  tenantPolicySettings,
   tenantRoleOverrides,
+  tenantSecuritySettings,
   tenantSettings,
   userProfiles,
   webhookDeliveries,
@@ -31,6 +35,18 @@ export type TenantMemberSummary = {
   name: string;
   email: string;
   role: PermissionRole;
+  status: "active" | "suspended" | "removed";
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+export type TenantMembershipStatus = "active" | "suspended" | "removed";
+
+export type TenantMembershipControlSnapshot = {
+  membershipId: string;
+  authUserId: string;
+  role: PermissionRole;
+  status: TenantMembershipStatus;
 };
 
 export type TenantSettingsSnapshot = {
@@ -42,6 +58,49 @@ export type TenantSettingsSnapshot = {
   branding: Record<string, unknown>;
   zdrEnabled: boolean;
   dataRegion: string;
+  operatingCalendar: Record<string, unknown>;
+  numbering: Record<string, unknown>;
+  documentPrefixes: Record<string, unknown>;
+};
+
+export type SystemAdminReadiness = "preview" | "active" | "blocked" | "deprecated";
+
+export type TenantModuleSettingRow = {
+  organizationId: string;
+  moduleKey: string;
+  enabled: boolean;
+  visible: boolean;
+  readiness: SystemAdminReadiness;
+  configuration: Record<string, unknown>;
+};
+
+export type TenantPolicySettingRow = {
+  id: string;
+  organizationId: string;
+  policyKey: string;
+  label: string;
+  enabled: boolean;
+  readiness: SystemAdminReadiness;
+  configuration: Record<string, unknown>;
+};
+
+export type TenantApprovalSettingRow = {
+  id: string;
+  organizationId: string;
+  approvalKey: string;
+  label: string;
+  enabled: boolean;
+  approverRole: PermissionRole | null;
+  escalationMinutes: number | null;
+  configuration: Record<string, unknown>;
+};
+
+export type TenantSecuritySettingsSnapshot = {
+  organizationId: string;
+  mfaRequired: boolean;
+  trustedDomains: readonly string[];
+  sensitiveActionConfirmation: boolean;
+  sessionPolicy: Record<string, unknown>;
 };
 
 export type RoleOverrideRow = {
@@ -190,6 +249,9 @@ export async function listTenantMembers(input: {
         membershipId: organizationMemberships.id,
         authUserId: organizationMemberships.authUserId,
         role: organizationMemberships.role,
+        status: organizationMemberships.status,
+        createdAt: organizationMemberships.createdAt,
+        updatedAt: organizationMemberships.updatedAt,
         name: userProfiles.name,
         email: userProfiles.email,
       })
@@ -208,7 +270,192 @@ export async function listTenantMembers(input: {
       name: row.name,
       email: row.email,
       role: row.role,
+      status: row.status,
+      createdAt: row.createdAt,
+      updatedAt: row.updatedAt,
     }));
+  });
+}
+
+export async function hasTenantMemberWithEmail(input: {
+  organizationId: string;
+  email: string;
+}) {
+  const normalizedEmail = input.email.toLowerCase();
+
+  return runWithOrganizationContext(input.organizationId, async (db) => {
+    const [membership] = await db
+      .select({ id: organizationMemberships.id })
+      .from(organizationMemberships)
+      .innerJoin(
+        userProfiles,
+        eq(organizationMemberships.authUserId, userProfiles.authUserId),
+      )
+      .where(
+        and(
+          eq(organizationMemberships.organizationId, input.organizationId),
+          sql`lower(${userProfiles.email}) = ${normalizedEmail}`,
+        ),
+      )
+      .limit(1);
+
+    return Boolean(membership);
+  });
+}
+
+export async function getTenantMembershipById(input: {
+  organizationId: string;
+  membershipId: string;
+}): Promise<TenantMembershipControlSnapshot | null> {
+  return runWithOrganizationContext(input.organizationId, async (db) => {
+    const [membership] = await db
+      .select({
+        membershipId: organizationMemberships.id,
+        authUserId: organizationMemberships.authUserId,
+        role: organizationMemberships.role,
+        status: organizationMemberships.status,
+      })
+      .from(organizationMemberships)
+      .where(
+        and(
+          eq(organizationMemberships.organizationId, input.organizationId),
+          eq(organizationMemberships.id, input.membershipId),
+        ),
+      )
+      .limit(1);
+
+    return membership ?? null;
+  });
+}
+
+export async function countRemainingActiveAdminMemberships(input: {
+  organizationId: string;
+  excludingMembershipId?: string;
+}) {
+  return runWithOrganizationContext(input.organizationId, async (db) => {
+    const rows = await db
+      .select({ id: organizationMemberships.id })
+      .from(organizationMemberships)
+      .where(
+        and(
+          eq(organizationMemberships.organizationId, input.organizationId),
+          eq(organizationMemberships.status, "active"),
+          inArray(organizationMemberships.role, ["owner", "admin"]),
+          input.excludingMembershipId
+            ? ne(organizationMemberships.id, input.excludingMembershipId)
+            : sql`true`,
+        ),
+      );
+
+    return rows.length;
+  });
+}
+
+export async function updateTenantMembershipStatus(input: {
+  organizationId: string;
+  actorAuthUserId: string;
+  membershipId: string;
+  status: TenantMembershipStatus;
+}) {
+  const membership = await getTenantMembershipById(input);
+
+  if (!membership) {
+    throw new Error("Organization membership was not found.");
+  }
+
+  if (membership.authUserId === input.actorAuthUserId && input.status !== "active") {
+    throw new Error("You cannot suspend or remove your own active membership.");
+  }
+
+  if (input.status !== "active" && isAdminLikeRole(membership.role)) {
+    const remainingAdmins = await countRemainingActiveAdminMemberships({
+      organizationId: input.organizationId,
+      excludingMembershipId: input.membershipId,
+    });
+
+    if (remainingAdmins === 0) {
+      throw new Error("At least one active owner or admin must remain.");
+    }
+  }
+
+  return runWithOrganizationContext(input.organizationId, async (db) => {
+    const [updated] = await db
+      .update(organizationMemberships)
+      .set({ status: input.status, updatedAt: new Date() })
+      .where(
+        and(
+          eq(organizationMemberships.organizationId, input.organizationId),
+          eq(organizationMemberships.id, input.membershipId),
+        ),
+      )
+      .returning({ id: organizationMemberships.id });
+
+    if (!updated) {
+      throw new Error("Organization membership status was not updated.");
+    }
+  });
+}
+
+export async function assignTenantMembershipRole(input: {
+  organizationId: string;
+  actorAuthUserId: string;
+  membershipId: string;
+  role: PermissionRole;
+}) {
+  const membership = await getTenantMembershipById(input);
+
+  if (!membership) {
+    throw new Error("Organization membership was not found.");
+  }
+
+  if (membership.status !== "active") {
+    throw new Error("Removed or suspended memberships cannot receive roles.");
+  }
+
+  if (membership.role === input.role) {
+    throw new Error("This role is already assigned to the membership.");
+  }
+
+  return updateMembershipRole({
+    organizationId: input.organizationId,
+    authUserId: membership.authUserId,
+    role: input.role,
+    actorAuthUserId: input.actorAuthUserId,
+  });
+}
+
+export async function removeTenantMembershipRole(input: {
+  organizationId: string;
+  actorAuthUserId: string;
+  membershipId: string;
+  role: PermissionRole;
+}) {
+  const membership = await getTenantMembershipById(input);
+
+  if (!membership) {
+    throw new Error("Organization membership was not found.");
+  }
+
+  if (membership.role !== input.role) {
+    throw new Error("This role is not assigned to the membership.");
+  }
+
+  if (isAdminLikeRole(membership.role)) {
+    const remainingAdmins = await countRemainingActiveAdminMemberships({
+      organizationId: input.organizationId,
+      excludingMembershipId: input.membershipId,
+    });
+
+    if (remainingAdmins === 0) {
+      throw new Error("At least one active owner or admin must remain.");
+    }
+  }
+
+  return updateMembershipRole({
+    organizationId: input.organizationId,
+    authUserId: membership.authUserId,
+    role: "viewer",
+    actorAuthUserId: input.actorAuthUserId,
   });
 }
 
@@ -304,6 +551,9 @@ export async function getTenantSettings(input: {
       branding: row.branding,
       zdrEnabled: row.zdrEnabled,
       dataRegion: row.dataRegion,
+      operatingCalendar: row.operatingCalendar,
+      numbering: row.numbering,
+      documentPrefixes: row.documentPrefixes,
     };
   });
 }
@@ -341,6 +591,9 @@ export async function updateTenantSettings(input: {
       | "branding"
       | "zdrEnabled"
       | "dataRegion"
+      | "operatingCalendar"
+      | "numbering"
+      | "documentPrefixes"
     >
   >;
 }) {
@@ -367,6 +620,301 @@ export async function updateTenantSettings(input: {
   });
 }
 
+export async function listTenantModuleSettings(input: {
+  organizationId: string;
+  limit?: number;
+}): Promise<TenantModuleSettingRow[]> {
+  return runWithOrganizationContext(input.organizationId, async (db) =>
+    db
+      .select({
+        organizationId: tenantModuleSettings.organizationId,
+        moduleKey: tenantModuleSettings.moduleKey,
+        enabled: tenantModuleSettings.enabled,
+        visible: tenantModuleSettings.visible,
+        readiness: tenantModuleSettings.readiness,
+        configuration: tenantModuleSettings.configuration,
+      })
+      .from(tenantModuleSettings)
+      .where(eq(tenantModuleSettings.organizationId, input.organizationId))
+      .orderBy(asc(tenantModuleSettings.moduleKey))
+      .limit(normalizeSystemAdminListLimit(input.limit, 100)),
+  );
+}
+
+export async function upsertTenantModuleSettings(input: {
+  organizationId: string;
+  moduleKey: string;
+  enabled: boolean;
+  visible: boolean;
+  readiness: SystemAdminReadiness;
+  configuration?: Record<string, unknown>;
+  actorAuthUserId: string;
+}) {
+  return runWithOrganizationContext(input.organizationId, async (db) => {
+    await db
+      .insert(tenantModuleSettings)
+      .values({
+        organizationId: input.organizationId,
+        moduleKey: input.moduleKey,
+        enabled: input.enabled,
+        visible: input.visible,
+        readiness: input.readiness,
+        configuration: input.configuration ?? {},
+      })
+      .onConflictDoUpdate({
+        target: [
+          tenantModuleSettings.organizationId,
+          tenantModuleSettings.moduleKey,
+        ],
+        set: {
+          enabled: input.enabled,
+          visible: input.visible,
+          readiness: input.readiness,
+          configuration: input.configuration ?? {},
+          updatedAt: new Date(),
+        },
+      });
+
+    await createAuditLog({
+      organizationId: input.organizationId,
+      actorAuthUserId: input.actorAuthUserId,
+      entityType: "organization",
+      entityId: input.organizationId,
+      action: "system-admin.module-settings.updated",
+      summary: `Module settings updated for ${input.moduleKey}.`,
+      metadata: {
+        moduleKey: input.moduleKey,
+        enabled: input.enabled,
+        visible: input.visible,
+        readiness: input.readiness,
+      },
+    });
+  });
+}
+
+export async function listTenantPolicySettings(input: {
+  organizationId: string;
+  limit?: number;
+}): Promise<TenantPolicySettingRow[]> {
+  return runWithOrganizationContext(input.organizationId, async (db) =>
+    db
+      .select({
+        id: tenantPolicySettings.id,
+        organizationId: tenantPolicySettings.organizationId,
+        policyKey: tenantPolicySettings.policyKey,
+        label: tenantPolicySettings.label,
+        enabled: tenantPolicySettings.enabled,
+        readiness: tenantPolicySettings.readiness,
+        configuration: tenantPolicySettings.configuration,
+      })
+      .from(tenantPolicySettings)
+      .where(eq(tenantPolicySettings.organizationId, input.organizationId))
+      .orderBy(asc(tenantPolicySettings.policyKey))
+      .limit(normalizeSystemAdminListLimit(input.limit, 100)),
+  );
+}
+
+export async function upsertTenantPolicySettings(input: {
+  organizationId: string;
+  policyKey: string;
+  label: string;
+  enabled: boolean;
+  readiness: SystemAdminReadiness;
+  configuration?: Record<string, unknown>;
+  actorAuthUserId: string;
+}) {
+  const id = createEntityId("policy");
+
+  return runWithOrganizationContext(input.organizationId, async (db) => {
+    await db
+      .insert(tenantPolicySettings)
+      .values({
+        id,
+        organizationId: input.organizationId,
+        policyKey: input.policyKey,
+        label: input.label,
+        enabled: input.enabled,
+        readiness: input.readiness,
+        configuration: input.configuration ?? {},
+      })
+      .onConflictDoUpdate({
+        target: [
+          tenantPolicySettings.organizationId,
+          tenantPolicySettings.policyKey,
+        ],
+        set: {
+          label: input.label,
+          enabled: input.enabled,
+          readiness: input.readiness,
+          configuration: input.configuration ?? {},
+          updatedAt: new Date(),
+        },
+      });
+
+    await createAuditLog({
+      organizationId: input.organizationId,
+      actorAuthUserId: input.actorAuthUserId,
+      entityType: "organization",
+      entityId: input.organizationId,
+      action: "system-admin.policy.updated",
+      summary: `Policy settings updated for ${input.policyKey}.`,
+      metadata: {
+        policyKey: input.policyKey,
+        enabled: input.enabled,
+        readiness: input.readiness,
+      },
+    });
+  });
+}
+
+export async function listTenantApprovalSettings(input: {
+  organizationId: string;
+  limit?: number;
+}): Promise<TenantApprovalSettingRow[]> {
+  return runWithOrganizationContext(input.organizationId, async (db) =>
+    db
+      .select({
+        id: tenantApprovalSettings.id,
+        organizationId: tenantApprovalSettings.organizationId,
+        approvalKey: tenantApprovalSettings.approvalKey,
+        label: tenantApprovalSettings.label,
+        enabled: tenantApprovalSettings.enabled,
+        approverRole: tenantApprovalSettings.approverRole,
+        escalationMinutes: tenantApprovalSettings.escalationMinutes,
+        configuration: tenantApprovalSettings.configuration,
+      })
+      .from(tenantApprovalSettings)
+      .where(eq(tenantApprovalSettings.organizationId, input.organizationId))
+      .orderBy(asc(tenantApprovalSettings.approvalKey))
+      .limit(normalizeSystemAdminListLimit(input.limit, 100)),
+  );
+}
+
+export async function upsertTenantApprovalSettings(input: {
+  organizationId: string;
+  approvalKey: string;
+  label: string;
+  enabled: boolean;
+  approverRole?: PermissionRole | null;
+  escalationMinutes?: number | null;
+  configuration?: Record<string, unknown>;
+  actorAuthUserId: string;
+}) {
+  const id = createEntityId("approval");
+
+  return runWithOrganizationContext(input.organizationId, async (db) => {
+    await db
+      .insert(tenantApprovalSettings)
+      .values({
+        id,
+        organizationId: input.organizationId,
+        approvalKey: input.approvalKey,
+        label: input.label,
+        enabled: input.enabled,
+        approverRole: input.approverRole ?? null,
+        escalationMinutes: input.escalationMinutes ?? null,
+        configuration: input.configuration ?? {},
+      })
+      .onConflictDoUpdate({
+        target: [
+          tenantApprovalSettings.organizationId,
+          tenantApprovalSettings.approvalKey,
+        ],
+        set: {
+          label: input.label,
+          enabled: input.enabled,
+          approverRole: input.approverRole ?? null,
+          escalationMinutes: input.escalationMinutes ?? null,
+          configuration: input.configuration ?? {},
+          updatedAt: new Date(),
+        },
+      });
+
+    await createAuditLog({
+      organizationId: input.organizationId,
+      actorAuthUserId: input.actorAuthUserId,
+      entityType: "organization",
+      entityId: input.organizationId,
+      action: "system-admin.approval.updated",
+      summary: `Approval settings updated for ${input.approvalKey}.`,
+      metadata: {
+        approvalKey: input.approvalKey,
+        enabled: input.enabled,
+        approverRole: input.approverRole ?? null,
+      },
+    });
+  });
+}
+
+export async function getTenantSecuritySettings(input: {
+  organizationId: string;
+}): Promise<TenantSecuritySettingsSnapshot | null> {
+  return runWithOrganizationContext(input.organizationId, async (db) => {
+    const row = await db.query.tenantSecuritySettings.findFirst({
+      where: eq(tenantSecuritySettings.organizationId, input.organizationId),
+    });
+
+    return row
+      ? {
+          organizationId: row.organizationId,
+          mfaRequired: row.mfaRequired,
+          trustedDomains: row.trustedDomains,
+          sensitiveActionConfirmation: row.sensitiveActionConfirmation,
+          sessionPolicy: row.sessionPolicy,
+        }
+      : null;
+  });
+}
+
+export async function ensureTenantSecuritySettings(input: {
+  organizationId: string;
+}) {
+  return runWithOrganizationContext(input.organizationId, async (db) => {
+    await db
+      .insert(tenantSecuritySettings)
+      .values({ organizationId: input.organizationId })
+      .onConflictDoNothing();
+
+    return input.organizationId;
+  });
+}
+
+export async function updateTenantSecuritySettings(input: {
+  organizationId: string;
+  actorAuthUserId: string;
+  patch: Partial<
+    Pick<
+      TenantSecuritySettingsSnapshot,
+      | "mfaRequired"
+      | "trustedDomains"
+      | "sensitiveActionConfirmation"
+      | "sessionPolicy"
+    >
+  >;
+}) {
+  return runWithOrganizationContext(input.organizationId, async (db) => {
+    await ensureTenantSecuritySettings({ organizationId: input.organizationId });
+
+    await db
+      .update(tenantSecuritySettings)
+      .set({
+        ...input.patch,
+        updatedAt: new Date(),
+      })
+      .where(eq(tenantSecuritySettings.organizationId, input.organizationId));
+
+    await createAuditLog({
+      organizationId: input.organizationId,
+      actorAuthUserId: input.actorAuthUserId,
+      entityType: "organization",
+      entityId: input.organizationId,
+      action: "system-admin.security.updated",
+      summary: "Tenant security settings were updated.",
+      metadata: input.patch,
+    });
+  });
+}
+
 export async function listOrganizationInvitations(input: {
   organizationId: string;
   limit?: number;
@@ -377,6 +925,28 @@ export async function listOrganizationInvitations(input: {
       orderBy: (table, { desc: descOrder }) => [descOrder(table.createdAt)],
       limit: normalizeSystemAdminListLimit(input.limit),
     });
+  });
+}
+
+export async function hasOrganizationInvitationWithEmail(input: {
+  organizationId: string;
+  email: string;
+}) {
+  const normalizedEmail = input.email.toLowerCase();
+
+  return runWithOrganizationContext(input.organizationId, async (db) => {
+    const [invitation] = await db
+      .select({ id: organizationInvitations.id })
+      .from(organizationInvitations)
+      .where(
+        and(
+          eq(organizationInvitations.organizationId, input.organizationId),
+          eq(organizationInvitations.email, normalizedEmail),
+        ),
+      )
+      .limit(1);
+
+    return Boolean(invitation);
   });
 }
 

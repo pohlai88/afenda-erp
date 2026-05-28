@@ -1,6 +1,6 @@
 "use client";
 
-import type { ErpModuleDefinition, NavigationExtension } from "@afenda/domain";
+import type { ErpModuleDefinition, NavigationExtension } from "@afenda/kernel";
 import { StatusBadge } from "@afenda/ui";
 import Link from "next/link";
 import { usePathname } from "next/navigation";

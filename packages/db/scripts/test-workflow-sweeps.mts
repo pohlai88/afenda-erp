@@ -7,6 +7,7 @@ import {
 
 loadEnv({ path: "../../.env.local" });
 loadEnv({ path: "../../.env.config" });
+loadEnv({ path: "../../.secret.config", override: true });
 
 async function main() {
   const [reminders, syncs, housekeeping] = await Promise.all([

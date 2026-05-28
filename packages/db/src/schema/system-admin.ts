@@ -37,6 +37,13 @@ export const webhookDeliveryStatusEnum = pgEnum("webhook_delivery_status", [
   "failed",
 ]);
 
+export const systemAdminReadinessEnum = pgEnum("system_admin_readiness", [
+  "preview",
+  "active",
+  "blocked",
+  "deprecated",
+]);
+
 export const cronRunStatusEnum = pgEnum("cron_run_status", [
   "started",
   "success",
@@ -60,9 +67,118 @@ export const tenantSettings = pgTable(
       .default({}),
     zdrEnabled: boolean("zdr_enabled").notNull().default(false),
     dataRegion: text("data_region").notNull().default("auto"),
+    operatingCalendar: jsonb("operating_calendar")
+      .$type<Record<string, unknown>>()
+      .notNull()
+      .default({}),
+    numbering: jsonb("numbering")
+      .$type<Record<string, unknown>>()
+      .notNull()
+      .default({}),
+    documentPrefixes: jsonb("document_prefixes")
+      .$type<Record<string, unknown>>()
+      .notNull()
+      .default({}),
     ...timestampColumns,
   },
 );
+
+export const tenantModuleSettings = pgTable(
+  "tenant_module_settings",
+  {
+    organizationId: organizationIdColumn()
+      .notNull()
+      .references(() => organizations.id, { onDelete: "cascade" }),
+    moduleKey: text("module_key").notNull(),
+    enabled: boolean("enabled").notNull().default(true),
+    visible: boolean("visible").notNull().default(true),
+    readiness: systemAdminReadinessEnum("readiness").notNull().default("active"),
+    configuration: jsonb("configuration")
+      .$type<Record<string, unknown>>()
+      .notNull()
+      .default({}),
+    ...timestampColumns,
+  },
+  (table) => [
+    primaryKey({
+      columns: [table.organizationId, table.moduleKey],
+      name: "tenant_module_settings_pk",
+    }),
+    index("tenant_module_settings_org_idx").on(table.organizationId),
+  ],
+);
+
+export const tenantPolicySettings = pgTable(
+  "tenant_policy_settings",
+  {
+    id: text("id").primaryKey(),
+    organizationId: organizationIdColumn()
+      .notNull()
+      .references(() => organizations.id, { onDelete: "cascade" }),
+    policyKey: text("policy_key").notNull(),
+    label: text("label").notNull(),
+    enabled: boolean("enabled").notNull().default(true),
+    readiness: systemAdminReadinessEnum("readiness").notNull().default("active"),
+    configuration: jsonb("configuration")
+      .$type<Record<string, unknown>>()
+      .notNull()
+      .default({}),
+    ...timestampColumns,
+  },
+  (table) => [
+    uniqueIndex("tenant_policy_settings_org_key_idx").on(
+      table.organizationId,
+      table.policyKey,
+    ),
+    index("tenant_policy_settings_org_idx").on(table.organizationId),
+  ],
+);
+
+export const tenantApprovalSettings = pgTable(
+  "tenant_approval_settings",
+  {
+    id: text("id").primaryKey(),
+    organizationId: organizationIdColumn()
+      .notNull()
+      .references(() => organizations.id, { onDelete: "cascade" }),
+    approvalKey: text("approval_key").notNull(),
+    label: text("label").notNull(),
+    enabled: boolean("enabled").notNull().default(true),
+    approverRole: organizationRoleEnum("approver_role"),
+    escalationMinutes: integer("escalation_minutes"),
+    configuration: jsonb("configuration")
+      .$type<Record<string, unknown>>()
+      .notNull()
+      .default({}),
+    ...timestampColumns,
+  },
+  (table) => [
+    uniqueIndex("tenant_approval_settings_org_key_idx").on(
+      table.organizationId,
+      table.approvalKey,
+    ),
+    index("tenant_approval_settings_org_idx").on(table.organizationId),
+  ],
+);
+
+export const tenantSecuritySettings = pgTable("tenant_security_settings", {
+  organizationId: organizationIdColumn()
+    .primaryKey()
+    .references(() => organizations.id, { onDelete: "cascade" }),
+  mfaRequired: boolean("mfa_required").notNull().default(false),
+  trustedDomains: jsonb("trusted_domains")
+    .$type<readonly string[]>()
+    .notNull()
+    .default([]),
+  sensitiveActionConfirmation: boolean("sensitive_action_confirmation")
+    .notNull()
+    .default(true),
+  sessionPolicy: jsonb("session_policy")
+    .$type<Record<string, unknown>>()
+    .notNull()
+    .default({}),
+  ...timestampColumns,
+});
 
 export const tenantRoleOverrides = pgTable(
   "tenant_role_overrides",

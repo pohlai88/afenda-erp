@@ -36,6 +36,9 @@ jobs:
       - name: Check directory architecture
         run: pnpm architecture:check
 
+      - name: Verify AI Gateway model registry
+        run: pnpm ai:verify:gateway-models
+
       - name: Lint governed renderers
         run: pnpm lint:governed-renderers
 

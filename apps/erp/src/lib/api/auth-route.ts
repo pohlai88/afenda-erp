@@ -1,4 +1,4 @@
-import { authApiRouteCopy } from "@afenda/domain";
+import { authApiRouteCopy } from "@afenda/kernel";
 
 export function getNeonAuthNotConfiguredResponse() {
   return new Response(authApiRouteCopy.neonNotConfigured, {

@@ -6,11 +6,12 @@ import {
   listRetentionPolicies,
   systemAdminAuditLogSurfaceKey,
   systemAdminRetentionSurfaceKey,
+  upsertRetentionPolicyAction,
 } from "@afenda/feature-system-admin/server";
+import { RetentionPolicyForm } from "@afenda/feature-system-admin/client";
 import { GovernedPatternCListSection } from "@afenda/governed-surface/server";
 import { SectionPanel } from "@afenda/ui";
 import type { Metadata } from "next";
-import { RetentionPolicyForm } from "@/components/system-admin/retention-policy-form.client";
 
 export const metadata: Metadata = {
   title: "Audit — System admin",
@@ -67,7 +68,9 @@ export default async function SystemAdminAuditPage() {
           title="Update retention policy"
           description="Legal hold prevents automated purge for the selected entity type."
         >
-          <RetentionPolicyForm />
+          <RetentionPolicyForm
+            upsertRetentionPolicyAction={upsertRetentionPolicyAction}
+          />
         </SectionPanel>
       ) : null}
     </div>

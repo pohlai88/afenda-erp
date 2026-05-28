@@ -1,5 +1,5 @@
 import { runLynxOutcomeSweep } from "@afenda/feature-lynx/server";
-import { runCronJob } from "@/lib/cron";
+import { runCronJob } from "@/app-cron/run";
 
 export function GET(request: Request) {
   return runCronJob({

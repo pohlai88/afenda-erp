@@ -1,0 +1,36 @@
+# Afenda feature scaffold (`packages/features/**`)
+
+Scaffold default: [`packages/_template-definition`](../../packages/_template-definition).
+
+## Public doors (`src/`)
+
+- `src/index.ts` → export `.`
+- `src/client.ts` → export `./client`
+- `src/server.ts` → export `./server`
+- `src/metadata.ts` → export `./metadata`
+
+## Template buckets
+
+- `src/actions/`
+- `src/components/`
+- `src/contracts/`
+- `src/data/`
+- `src/events/`
+- `src/policies/`
+- `src/schemas/`
+- `src/tests/`
+
+## Non-negotiables
+
+- Do not add catch-all folders: `_shared`, `shared`, `common`, `lib`, `utils`, `helpers`, `misc`, `internal`.
+- Module components live in `src/components/`, not `apps/erp`.
+- TypeScript schemas live in `src/schemas/`; `@afenda/db` owns SQL and migrations.
+- Server Actions in `src/actions/**` (`*.actions.server.ts`).
+- Client components in `src/components/**` (`*.client.tsx`).
+- Feature packages never own Drizzle DDL; schema DDL remains in `@afenda/db`.
+
+## Tools
+
+- `pnpm scaffold:feature <moduleId>` — delegate to `packages/_template-definition/scripts`
+- `pnpm scaffold:vertical <feature> <vertical>` — add template buckets under a vertical folder in `src/`
+- `pnpm architecture:check` — before finishing scaffold changes

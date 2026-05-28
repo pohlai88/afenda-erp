@@ -1,5 +1,5 @@
 import { moduleIds } from "@afenda/config/module-ids";
-import { uploadRouteCopy } from "@afenda/domain";
+import { uploadRouteCopy } from "@afenda/kernel";
 import { z } from "zod";
 import {
   documentUploadContentTypes,

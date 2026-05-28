@@ -1,18 +1,22 @@
 import { NextResponse } from "next/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-vi.mock("@afenda/ai", () => ({
+vi.mock("server-only", () => ({}));
+
+vi.mock("@afenda/ai/server", () => ({
+  aiGatewayHighConfidenceProviderOrder: ["anthropic", "openai"],
   assertAiBudget: vi.fn(),
   assertCapabilityAllowed: vi.fn(),
+  assertGovernedToolset: vi.fn(),
   assertNoSensitiveCredentialContent: vi.fn(),
   createGatewayOptions: vi.fn(),
-  createSolutionProviderAgent: vi.fn(),
+  createSolutionProviderSpecialistAgent: vi.fn(),
   estimateTokenCount: vi.fn(() => 120),
   getAiGatewayEnvironment: vi.fn(() => "development"),
   getAiModelForFeature: vi.fn(() => "openai/gpt-5.4"),
   getAiRouteError: vi.fn(() => null),
   getUsageMetrics: vi.fn(),
-  hasAiGatewayCredentials: vi.fn(),
+  hasAiGatewayRuntimeCredentials: vi.fn(),
   isAiBudgetError: vi.fn(() => false),
   isAiPermissionError: vi.fn(() => false),
   isAiSensitiveContentError: vi.fn(() => false),
@@ -27,8 +31,8 @@ vi.mock("@afenda/db", () => ({
   registerAiApprovalProposal: vi.fn(),
 }));
 
-vi.mock("@afenda/domain", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("@afenda/domain")>();
+vi.mock("@afenda/kernel", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@afenda/kernel")>();
 
   return {
     ...actual,
@@ -69,7 +73,7 @@ vi.mock("@/lib/api/solution-provider-tool-bindings", () => ({
   createErpSolutionProviderTools: vi.fn(() => ({})),
 }));
 
-import { hasAiGatewayCredentials } from "@afenda/ai";
+import { hasAiGatewayRuntimeCredentials } from "@afenda/ai/server";
 import { getApiAuthContext } from "@afenda/auth/server";
 import { POST } from "@/app/api/ai/solution-provider/route";
 
@@ -79,7 +83,7 @@ describe("solution provider route", () => {
   });
 
   it("returns 503 when AI gateway credentials are missing", async () => {
-    vi.mocked(hasAiGatewayCredentials).mockReturnValue(false);
+    vi.mocked(hasAiGatewayRuntimeCredentials).mockReturnValue(false);
 
     const response = await POST(
       new Request("http://localhost/api/ai/solution-provider", {
@@ -97,7 +101,7 @@ describe("solution provider route", () => {
   });
 
   it("returns auth response when session is unavailable", async () => {
-    vi.mocked(hasAiGatewayCredentials).mockReturnValue(true);
+    vi.mocked(hasAiGatewayRuntimeCredentials).mockReturnValue(true);
     vi.mocked(getApiAuthContext).mockResolvedValue(
       NextResponse.json({ error: "Unauthorized" }, { status: 401 }),
     );
@@ -116,7 +120,7 @@ describe("solution provider route", () => {
   });
 
   it("returns 400 for invalid workflow ids", async () => {
-    vi.mocked(hasAiGatewayCredentials).mockReturnValue(true);
+    vi.mocked(hasAiGatewayRuntimeCredentials).mockReturnValue(true);
     vi.mocked(getApiAuthContext).mockResolvedValue({
       session: {
         id: "user_1",
@@ -127,8 +131,10 @@ describe("solution provider route", () => {
         organizations: [
           {
             id: "org_1",
+            membershipId: "member_1",
             name: "Afenda Operations",
             slug: "afenda-ops",
+            locale: "en-MY",
             role: "owner",
             capabilities: ["dashboard.view", "finance.view"],
           },
@@ -136,8 +142,10 @@ describe("solution provider route", () => {
       },
       organization: {
         id: "org_1",
+        membershipId: "member_1",
         name: "Afenda Operations",
         slug: "afenda-ops",
+        locale: "en-MY",
         role: "owner",
         capabilities: ["dashboard.view", "finance.view"],
       },

@@ -15,6 +15,7 @@ const rootDir = resolve(packageDir, "../../..");
 
 config({ path: resolve(rootDir, ".env.local") });
 config({ path: resolve(rootDir, ".env.config"), override: false });
+config({ path: resolve(rootDir, ".secret.config"), override: true });
 
 const databaseUrl =
   process.env.DATABASE_MIGRATION_URL ??

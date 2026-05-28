@@ -1,5 +1,5 @@
 import { getBaseEnv, getBlobEnv, type BlobEnv } from "@afenda/config/env";
-import { uploadRouteCopy } from "@afenda/domain";
+import { uploadRouteCopy } from "@afenda/kernel";
 import {
   assertUploadPathnameMatchesTenant,
   buildTenantBlobPathPrefix,

@@ -3,6 +3,15 @@
   "files.eol": "\n",
   "files.insertFinalNewline": true,
   "files.trimTrailingWhitespace": true,
+  "files.associations": {
+    ".env.config": "dotenv",
+    ".env.config.example": "dotenv",
+    ".env.example": "dotenv",
+    ".secret.config": "dotenv",
+    "**/.env.config": "dotenv",
+    "**/.env.config.example": "dotenv",
+    "**/.secret.config": "dotenv"
+  },
   "editor.tabSize": 2,
   "editor.insertSpaces": true,
   "editor.detectIndentation": false,
@@ -37,6 +46,7 @@
 
   "vitest.ignoreWorkspace": true,
   "vitest.disableWorkspaceWarning": true,
+  "vitest.configSearchPatternInclude": "{packages/*,packages/features/*}/vitest.config.{ts,js,mjs,cjs,cts,mts}",
 
   "search.exclude": {
     "**/node_modules": true,

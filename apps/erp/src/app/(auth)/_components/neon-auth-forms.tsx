@@ -2,7 +2,7 @@
 
 import { credentialsSignInSchema, credentialsSignUpSchema } from "@afenda/auth";
 import { neonAuthClient } from "@afenda/auth/client";
-import { getNeonAuthFormModeCopy, neonAuthFormCopy } from "@afenda/domain";
+import { getNeonAuthFormModeCopy, neonAuthFormCopy } from "@afenda/kernel";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import {

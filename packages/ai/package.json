@@ -8,19 +8,36 @@
       "types": "./src/index.ts",
       "development": "./src/index.ts",
       "default": "./dist/index.js"
+    },
+    "./client": {
+      "types": "./src/client.ts",
+      "development": "./src/client.ts",
+      "default": "./dist/client.js"
+    },
+    "./server": {
+      "types": "./src/server.ts",
+      "development": "./src/server.ts",
+      "default": "./dist/server.js"
+    },
+    "./metadata": {
+      "types": "./src/metadata.ts",
+      "development": "./src/metadata.ts",
+      "default": "./dist/metadata.js"
     }
   },
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
     "lint": "tsc -p tsconfig.json --noEmit",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "vitest run && tsx --conditions development ./scripts/evaluate.mts"
+    "test": "vitest run && tsx --conditions react-server --conditions development ./scripts/evaluate.mts",
+    "verify:gateway-models": "tsx --conditions react-server --conditions development ./scripts/verify-gateway-models.mts"
   },
   "dependencies": {
     "@afenda/config": "workspace:*",
     "@afenda/db": "workspace:*",
-    "@afenda/domain": "workspace:*",
+    "@afenda/kernel": "workspace:*",
     "ai": "^6.0.191",
+    "server-only": "^0.0.1",
     "zod": "catalog:"
   },
   "devDependencies": {

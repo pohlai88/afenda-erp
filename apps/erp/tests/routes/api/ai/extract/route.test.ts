@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-vi.mock("@afenda/ai", () => ({
+vi.mock("@afenda/ai/server", () => ({
+  aiGatewayDefaultProviderOrder: ["openai", "anthropic"],
   assertAiBudget: vi.fn(),
   assertCapabilityAllowed: vi.fn(),
   assertNoSensitiveCredentialContent: vi.fn(),
@@ -17,7 +18,7 @@ vi.mock("@afenda/ai", () => ({
   getAiRouteError: vi.fn(() => null),
   getDocumentExtractionPrompt: vi.fn(() => "Extract invoice fields."),
   getUsageMetrics: vi.fn(),
-  hasAiGatewayCredentials: vi.fn(),
+  hasAiGatewayRuntimeCredentials: vi.fn(),
   isAiBudgetError: vi.fn(() => false),
   isAiPermissionError: vi.fn(() => false),
   isAiSensitiveContentError: vi.fn(() => false),
@@ -32,7 +33,7 @@ vi.mock("@afenda/db", () => ({
   registerAiDocumentExtraction: vi.fn(),
 }));
 
-vi.mock("@afenda/domain", () => ({
+vi.mock("@afenda/kernel", () => ({
   getErpModuleById: vi.fn(),
 }));
 
@@ -52,9 +53,9 @@ vi.mock("@/lib/ai-tracing", () => ({
   withAiSpan: vi.fn((_name, _attrs, fn: () => unknown) => fn()),
 }));
 
-import { hasAiGatewayCredentials } from "@afenda/ai";
+import { hasAiGatewayRuntimeCredentials } from "@afenda/ai/server";
 import { getApiAuthContext, type ApiAuthContext } from "@afenda/auth/server";
-import { getErpModuleById } from "@afenda/domain";
+import { getErpModuleById } from "@afenda/kernel";
 import { POST } from "@/app/api/ai/extract/route";
 
 const authContext: ApiAuthContext = {
@@ -68,8 +69,10 @@ const authContext: ApiAuthContext = {
   },
   organization: {
     id: "org_test",
+    membershipId: "member_test",
     name: "Test Org",
     slug: "test-org",
+    locale: "en-MY",
     role: "owner",
     capabilities: ["finance.view"],
   },
@@ -82,7 +85,7 @@ describe("extract route", () => {
   });
 
   it("returns 503 when AI gateway credentials are missing", async () => {
-    vi.mocked(hasAiGatewayCredentials).mockReturnValue(false);
+    vi.mocked(hasAiGatewayRuntimeCredentials).mockReturnValue(false);
 
     const response = await POST(
       new Request("http://localhost/api/ai/extract", {
@@ -99,7 +102,7 @@ describe("extract route", () => {
   });
 
   it("returns 400 for unknown modules", async () => {
-    vi.mocked(hasAiGatewayCredentials).mockReturnValue(true);
+    vi.mocked(hasAiGatewayRuntimeCredentials).mockReturnValue(true);
     vi.mocked(getErpModuleById).mockReturnValue(null);
 
     const response = await POST(

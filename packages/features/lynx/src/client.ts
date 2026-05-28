@@ -10,6 +10,14 @@ export {
   LYNX_TRUTH_RESPONSE_SECTIONS,
   LYNX_OPERATOR_MAX_STEPS,
   LYNX_GATEWAY_FEATURES,
-} from "./lynx.contract";
-export type { LynxLayer, LynxAuditAction, LynxErpHttpRoute } from "./lynx.contract";
-export * from "./readiness-contract";
+} from "./contracts/lynx.core.contract";
+export type {
+  LynxLayer,
+  LynxAuditAction,
+  LynxErpHttpRoute,
+} from "./contracts/lynx.core.contract";
+export * from "./contracts/lynx.evidence-trust.contract";
+export * from "./contracts/lynx.readiness.contract";
+export * from "./contracts/lynx.run-feedback.contract";
+export * from "./contracts/lynx.truth.contract";
+export * from "./components";

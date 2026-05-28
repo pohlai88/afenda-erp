@@ -36,7 +36,7 @@ const checks: readonly Check[] = [
   },
   {
     name: "AI approval tools require human approval",
-    file: "packages/ai/src/tools/erp-tools.ts",
+    file: "packages/ai/src/tools/ai.erp-tools.tool.server.ts",
     patterns: [
       "needsApproval: true",
       "registerApprovalProposal",

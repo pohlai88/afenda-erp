@@ -41,16 +41,37 @@ export const appCapabilities = [
   "system-admin.documents.write",
   "system-admin.identity.read",
   "system-admin.identity.write",
+  "system-admin.users.read",
+  "system-admin.users.manage",
+  "system-admin.memberships.read",
+  "system-admin.memberships.manage",
+  "system-admin.roles.read",
+  "system-admin.roles.manage",
+  "system-admin.permissions.read",
+  "system-admin.permissions.manage",
+  "system-admin.modules.read",
+  "system-admin.modules.manage",
+  "system-admin.capabilities.read",
+  "system-admin.capabilities.manage",
+  "system-admin.policies.read",
+  "system-admin.policies.manage",
+  "system-admin.approvals.read",
+  "system-admin.approvals.manage",
   "system-admin.settings.read",
   "system-admin.settings.write",
   "system-admin.audit.read",
   "system-admin.audit.export",
+  "system-admin.security.read",
+  "system-admin.security.manage",
+  "system-admin.organization.read",
+  "system-admin.organization.manage",
   "system-admin.integrations.read",
   "system-admin.integrations.write",
   "system-admin.machine-layer.read",
   "system-admin.machine-layer.approve",
   "system-admin.reliability.read",
   "system-admin.billing.read",
+  "system-admin.diagnostics.read",
 ] as const;
 
 export const organizationRoles = [
@@ -66,9 +87,11 @@ export type AppCapability = (typeof appCapabilities)[number];
 export type OrganizationRole = (typeof organizationRoles)[number];
 
 export type OrganizationSummary = {
+  membershipId: string;
   id: string;
   name: string;
   slug: string;
+  locale: string;
   role: OrganizationRole;
   capabilities: AppCapability[];
 };
@@ -86,9 +109,11 @@ const organizationRoleSchema = z.enum(organizationRoles);
 const capabilitySchema = z.enum(appCapabilities);
 
 export const organizationSummarySchema = z.object({
+  membershipId: z.string().min(1).default("member_demo_owner"),
   id: z.string().min(1),
   name: z.string().min(1),
   slug: z.string().min(1),
+  locale: z.string().min(2).default("en-MY"),
   role: organizationRoleSchema,
   capabilities: z.array(capabilitySchema),
 });

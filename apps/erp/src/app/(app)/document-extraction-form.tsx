@@ -1,7 +1,7 @@
 "use client";
 
-import { documentWorkflowCopy } from "@afenda/domain";
-import type { ModuleId } from "@afenda/domain";
+import { documentWorkflowCopy } from "@afenda/kernel";
+import type { ModuleId } from "@afenda/kernel";
 import { useState, type FormEvent } from "react";
 
 const extractionCopy = documentWorkflowCopy.extraction;

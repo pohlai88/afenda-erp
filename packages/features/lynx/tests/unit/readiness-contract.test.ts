@@ -4,7 +4,7 @@ import {
   getAggregateLynxReadinessStatus,
   getWorstLynxReadinessStatus,
   lynxReadinessSnapshotSchema,
-} from "../../src/readiness-contract";
+} from "../../src/contracts/lynx.readiness.contract";
 
 describe("Lynx readiness contract", () => {
   it("marks missing evals unavailable", () => {
@@ -67,9 +67,9 @@ describe("Lynx readiness contract", () => {
   });
 
   it("aggregates mixed readiness as partial for enterprise rollout", () => {
-    expect(
-      getAggregateLynxReadinessStatus(["available", "unavailable"]),
-    ).toBe("partial");
+    expect(getAggregateLynxReadinessStatus(["available", "unavailable"])).toBe(
+      "partial",
+    );
     expect(getAggregateLynxReadinessStatus(["unavailable"])).toBe(
       "unavailable",
     );

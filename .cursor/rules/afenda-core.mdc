@@ -21,7 +21,7 @@ Canonical doctrine: `docs/architecture/` (`ARCH-001`–`ARCH-008`). Index: `docs
 
 | From | May import |
 | ---- | ---------- |
-| `apps/erp` | Public doors only: `@afenda/feature-*` (`.`, `./client`, `./server`, `./metadata`), `@afenda/domain`, platform packages — never `/src`, `/dist`, or `/internal` |
+| `apps/erp` | Public doors only: `@afenda/feature-*` (`.`, `./client`, `./server`, `./metadata`), `@afenda/kernel`, platform packages — never `/src`, `/dist`, or `/internal` |
 | `@afenda/feature-*` | domain, db, auth, governed-surface, ui, workflows, observability — **not** `apps/erp` |
 | `@afenda/ui` | Primitives only — no db, auth server, AI, or governed metadata |
 

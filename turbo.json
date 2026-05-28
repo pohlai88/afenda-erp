@@ -3,7 +3,8 @@
   "globalDependencies": [
     "package.json",
     "packages/config/tsconfig.base.json",
-    ".env.config"
+    ".env.config",
+    ".secret.config"
   ],
   "globalEnv": [
     "NODE_ENV",
@@ -61,7 +62,7 @@
       "dependsOn": ["^build"],
       "outputs": ["dist/**"]
     },
-    "@afenda/domain#build": {
+    "@afenda/kernel#build": {
       "dependsOn": ["^build"],
       "outputs": ["dist/**"]
     },

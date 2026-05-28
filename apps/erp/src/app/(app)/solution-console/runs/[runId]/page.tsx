@@ -8,6 +8,7 @@ import {
   buildLynxRunFeedbackListSurface,
   getLynxReadinessSurfaceKeys,
 } from "@afenda/feature-lynx/metadata";
+import { LynxRunFeedbackForm } from "@afenda/feature-lynx/client";
 import {
   GovernedPatternBStatSection,
   GovernedPatternCListSection,
@@ -15,7 +16,7 @@ import {
 import { SectionPanel, StatusBadge } from "@afenda/ui";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { LynxRunFeedbackForm } from "@/components/solution-console/lynx-run-feedback-form.client";
+import { recordLynxRunFeedbackAction } from "./feedback-actions";
 
 type PageProps = {
   params: Promise<{ runId: string }>;
@@ -206,7 +207,10 @@ export default async function LynxRunDetailPage({ params }: PageProps) {
           title="Record feedback"
           description="Attach operator quality feedback to this replayable Lynx run."
         >
-          <LynxRunFeedbackForm runId={run.id} />
+          <LynxRunFeedbackForm
+            recordFeedbackAction={recordLynxRunFeedbackAction}
+            runId={run.id}
+          />
         </SectionPanel>
       </div>
     </div>

@@ -14,7 +14,7 @@ import {
   resolveWorkspaceDataMode,
   roleOperatingPosture,
   type ModuleWorkspaceListQuery,
-} from "@afenda/domain";
+} from "@afenda/kernel";
 import {
   buildDashboardAiUsageListSurface,
   buildDashboardAutomationListSurface,

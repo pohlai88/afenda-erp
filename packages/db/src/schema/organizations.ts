@@ -1,5 +1,5 @@
 import { relations } from "drizzle-orm";
-import { index, pgTable, text, uniqueIndex } from "drizzle-orm/pg-core";
+import { index, pgEnum, pgTable, text, uniqueIndex } from "drizzle-orm/pg-core";
 import { organizationRoleEnum, timestampColumns } from "./common";
 import { userProfiles } from "./identity";
 
@@ -15,6 +15,11 @@ export const organizations = pgTable(
   (table) => [uniqueIndex("organizations_slug_idx").on(table.slug)],
 );
 
+export const organizationMembershipStatusEnum = pgEnum(
+  "organization_membership_status",
+  ["active", "suspended", "removed"],
+);
+
 export const organizationMemberships = pgTable(
   "organization_memberships",
   {
@@ -24,6 +29,7 @@ export const organizationMemberships = pgTable(
       .references(() => organizations.id, { onDelete: "cascade" }),
     authUserId: text("auth_user_id").notNull(),
     role: organizationRoleEnum("role").notNull(),
+    status: organizationMembershipStatusEnum("status").notNull().default("active"),
     ...timestampColumns,
   },
   (table) => [

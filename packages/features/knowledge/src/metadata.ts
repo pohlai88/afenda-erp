@@ -124,12 +124,18 @@ const KNOWLEDGE_SETTING_COLUMNS = [
   { id: "value", header: "Value" },
 ];
 
+type KnowledgeAdminListColumn = Readonly<{
+  id: string;
+  header: string;
+  priority?: "primary";
+  wrap?: boolean;
+}>;
+
 function buildKnowledgeAdminListSurface(input: {
-  surfaceKey: string;
   columnsId: string;
   title: string;
   emptyTitle: string;
-  columns: typeof KNOWLEDGE_SOURCE_COLUMNS;
+  columns: readonly KnowledgeAdminListColumn[];
   rows: ReadonlyArray<{ id: string; cells: Record<string, string> }>;
 }): ListSurfaceRendererConfigurationResolvedInput {
   const rows = input.rows;
@@ -163,7 +169,6 @@ export function buildKnowledgeSourcesListSurface(input: {
   rows: readonly KnowledgeSourceListRow[];
 }) {
   return buildKnowledgeAdminListSurface({
-    surfaceKey: "knowledge.sources.list",
     columnsId: "knowledge-sources",
     title: "Knowledge sources",
     emptyTitle: "No knowledge sources configured",
@@ -184,7 +189,6 @@ export function buildKnowledgeChunksListSurface(input: {
   rows: readonly KnowledgeChunkListRow[];
 }) {
   return buildKnowledgeAdminListSurface({
-    surfaceKey: "knowledge.chunks.list",
     columnsId: "knowledge-chunks",
     title: "Recent chunks",
     emptyTitle: "No chunks indexed yet",
@@ -204,7 +208,6 @@ export function buildKnowledgeSettingsListSurface(input: {
   rows: readonly KnowledgeSettingListRow[];
 }) {
   return buildKnowledgeAdminListSurface({
-    surfaceKey: "knowledge.settings.list",
     columnsId: "knowledge-settings",
     title: "Retrieval settings",
     emptyTitle: "No retrieval settings",

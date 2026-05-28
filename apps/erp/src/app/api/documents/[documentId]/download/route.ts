@@ -1,6 +1,6 @@
 import { moduleIds } from "@afenda/config/module-ids";
 import { getTenantDocument } from "@afenda/db";
-import { uploadRouteCopy } from "@afenda/domain";
+import { uploadRouteCopy } from "@afenda/kernel";
 import { getRequestId, logServerEvent } from "@afenda/observability";
 import { issueSignedToken, presignUrl } from "@vercel/blob";
 import { NextResponse } from "next/server";

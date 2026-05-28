@@ -48,5 +48,5 @@ When working on `apps/erp` (routes, RSC, handlers, caching, or Next.js APIs), ca
 ## Governed lists in this app
 
 - Compose `GovernedPatternCListSection` from `@afenda/governed-surface/server`.
-- Builders today: `@afenda/domain` (`src/modules/list-surfaces.ts`); move to `@afenda/feature-*` when extracting.
+- Builders today: `@afenda/kernel` (`src/modules/list-surfaces.ts`); move to `@afenda/feature-*` when extracting.
 - Pass validated **configuration** to client bridges, not raw Drizzle rows.

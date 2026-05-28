@@ -35,7 +35,7 @@ const ROUTES = [
   {
     test: (p) =>
       p.startsWith("packages/governed-surface/") ||
-      (p.startsWith("packages/domain/") &&
+      (p.startsWith("packages/kernel/") &&
         (p.includes("surface") || p.includes("metadata"))),
     hint: [
       "**governed UI** — rule `afenda-governed-ui`.",

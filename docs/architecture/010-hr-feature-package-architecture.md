@@ -15,7 +15,7 @@
 | ----- | ----- | ----- |
 | ERP `/hr` routes | `apps/erp` | Thin adapters only; no HR business rules in the app |
 | HR product logic | `packages/features/hr` | Commands, queries, metadata builders, internal categories |
-| Shared contracts | `@afenda/domain` | Module registry, generic list/detail builders until extracted |
+| Shared contracts | `@afenda/kernel` | Module registry, generic list/detail builders until extracted |
 | Physical schema | `@afenda/db` | `schema/hr/` only when a TRACK-004 slice is accepted |
 | Legacy reference | *(removed 2026-05-28)* | Former `packages/features/hrm` deleted; implement in `@afenda/feature-hr` only |
 
@@ -51,4 +51,4 @@ Add category folders when a slice ships; do not create nested `package.json` wor
 
 ## Current state
 
-Scaffold only: metadata delegates to `@afenda/domain` generic module workspace (`erp_module_records`). No `packages/db/src/schema/hr` until the first accepted schema slice. Migration `0030_revert_hr_migration_tables` removes tables from the withdrawn `0027` / `0029` attempt.
+Scaffold only: metadata delegates to `@afenda/kernel` generic module workspace (`erp_module_records`). No `packages/db/src/schema/hr` until the first accepted schema slice. Migration `0030_revert_hr_migration_tables` removes tables from the withdrawn `0027` / `0029` attempt.

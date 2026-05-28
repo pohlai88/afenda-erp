@@ -1,5 +1,5 @@
-import type { ModuleId } from "@afenda/domain";
-import { uploadRouteCopy } from "@afenda/domain";
+import type { ModuleId } from "@afenda/kernel";
+import { uploadRouteCopy } from "@afenda/kernel";
 import { UploadRouteError } from "@/lib/api/upload-route";
 
 export const TENANT_BLOB_ROOT = "tenants";

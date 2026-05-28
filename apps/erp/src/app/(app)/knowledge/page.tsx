@@ -18,7 +18,7 @@ import { requireCapability } from "@afenda/auth/server";
 import { GovernedPatternCListSection } from "@afenda/governed-surface/server";
 import { SectionPanel, StatusBadge } from "@afenda/ui";
 import type { Metadata } from "next";
-import { LynxTruthPanel } from "./lynx-truth-panel";
+import { LynxTruthPanel } from "@afenda/feature-lynx/client";
 
 export const metadata: Metadata = {
   title: "Knowledge — Admin",
@@ -32,15 +32,21 @@ function formatEnabled(enabled: boolean) {
 export default async function KnowledgeAdminPage() {
   const { organization } = await requireCapability("system-admin.view");
 
-  const [sources, recentChunks, chunkCount, documentCount, orgSetting, evalRuns] =
-    await Promise.all([
-      listKnowledgeSources(organization.id),
-      listRecentKnowledgeChunks(organization.id, 10),
-      countKnowledgeChunks(organization.id),
-      countKnowledgeDocuments(organization.id),
-      getKnowledgeOrgSetting(organization.id),
-      listLynxEvalRuns(organization.id, 20),
-    ]);
+  const [
+    sources,
+    recentChunks,
+    chunkCount,
+    documentCount,
+    orgSetting,
+    evalRuns,
+  ] = await Promise.all([
+    listKnowledgeSources(organization.id),
+    listRecentKnowledgeChunks(organization.id, 10),
+    countKnowledgeChunks(organization.id),
+    countKnowledgeDocuments(organization.id),
+    getKnowledgeOrgSetting(organization.id),
+    listLynxEvalRuns(organization.id, 20),
+  ]);
 
   const surfaceKeys = getKnowledgeAdminSurfaceKeys();
 

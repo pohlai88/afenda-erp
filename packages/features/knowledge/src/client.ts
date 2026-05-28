@@ -3,9 +3,5 @@
  * Serializable DTOs, client-safe constants, and Zod schemas only.
  * No server-only, no next/headers, no @afenda/db, no @afenda/ai.
  */
-export * from "./constants";
-export type {
-  RawKnowledgeDocument,
-  SimilarChunkRow,
-  HybridRetrievalRow,
-} from "./types";
+export * from "./contracts";
+export * from "./schemas";

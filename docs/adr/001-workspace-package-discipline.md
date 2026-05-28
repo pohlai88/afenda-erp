@@ -29,7 +29,7 @@ The current source of truth is
 | -------------------------------------------- | ------------------------------------------------------------------------------- |
 | One Vercel project per ERP module            | Fragments tenancy, auth, audit, routing, workflow state, and release operation  |
 | Nested workspaces for every HRM subdomain    | Adds package graph overhead before independent ownership or reuse is proven     |
-| Keep all module logic in `packages/domain`   | Makes the shared contract package a dumping ground for durable module behavior  |
+| Keep all module logic in `packages/kernel`   | Makes the shared contract package a dumping ground for durable module behavior  |
 | Microfrontends for core ERP modules          | Adds routing and deployment complexity without a current independent app need   |
 
 ## Consequences

@@ -1,4 +1,4 @@
-import { createModuleFeatureMetadata } from "@afenda/domain";
+import { createModuleFeatureMetadata } from "@afenda/kernel";
 
 export const {
   moduleId,

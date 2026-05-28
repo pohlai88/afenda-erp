@@ -4,7 +4,7 @@ import {
   hasDocumentReadAccess,
   hasDocumentWriteAccess,
 } from "@afenda/auth/server";
-import { getErpModuleById, uploadRouteCopy, type ModuleId } from "@afenda/domain";
+import { getErpModuleById, uploadRouteCopy, type ModuleId } from "@afenda/kernel";
 import { UploadRouteError } from "@/lib/api/upload-route";
 
 export async function requireBlobModuleAccess(

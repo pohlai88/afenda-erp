@@ -1,15 +1,16 @@
-import { requireCapability } from "@afenda/auth/server";
 import {
   buildTenantSettingsListSurface,
   ensureTenantSettings,
   getOrganizationProfile,
   getTenantSettings,
+  requireSystemAdminOrganizationRead,
   systemAdminSettingsSurfaceKey,
+  updateTenantSettingsAction,
 } from "@afenda/feature-system-admin/server";
+import { TenantSettingsForm } from "@afenda/feature-system-admin/client";
 import { GovernedPatternCListSection } from "@afenda/governed-surface/server";
 import { SectionPanel } from "@afenda/ui";
 import type { Metadata } from "next";
-import { TenantSettingsForm } from "@/components/system-admin/tenant-settings-form.client";
 
 export const metadata: Metadata = {
   title: "Settings — System admin",
@@ -17,12 +18,10 @@ export const metadata: Metadata = {
 };
 
 export default async function SystemAdminSettingsPage() {
-  const { organization } = await requireCapability(
-    "system-admin.settings.read",
-  );
+  const { organization } = await requireSystemAdminOrganizationRead();
   const canWrite = organization.capabilities.includes(
     "system-admin.settings.write",
-  );
+  ) || organization.capabilities.includes("system-admin.organization.manage");
 
   await ensureTenantSettings({ organizationId: organization.id });
 
@@ -33,7 +32,7 @@ export default async function SystemAdminSettingsPage() {
 
   const settingsSurface = buildTenantSettingsListSurface({
     settings,
-    organizationName: profile?.name ?? organization.name,
+    organizationName: profile?.name ?? organization.slug,
   });
 
   return (
@@ -66,6 +65,7 @@ export default async function SystemAdminSettingsPage() {
               dataRegion: settings?.dataRegion ?? "us-east-1",
               zdrEnabled: settings?.zdrEnabled ?? false,
             }}
+            updateTenantSettingsAction={updateTenantSettingsAction}
           />
         </SectionPanel>
       ) : null}

@@ -4,7 +4,7 @@ import {
   erpAssistantPanelCopy,
   getAssistantEmptyStateHint,
   getAssistantPromptDefinitions,
-} from "@afenda/domain";
+} from "@afenda/kernel";
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
 import { Conversation } from "@/components/ai-elements/conversation";

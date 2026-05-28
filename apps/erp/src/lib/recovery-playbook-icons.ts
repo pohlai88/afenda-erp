@@ -1,4 +1,4 @@
-import type { RecoveryPlaybookIconKey } from "@afenda/domain";
+import type { RecoveryPlaybookIconKey } from "@afenda/kernel";
 import type { LucideIcon } from "lucide-react";
 import {
   Banknote,

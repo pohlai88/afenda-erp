@@ -1,4 +1,5 @@
 import {
+  aiGatewayDefaultProviderOrder,
   assertAiBudget,
   assertCapabilityAllowed,
   assertNoSensitiveCredentialContent,
@@ -10,19 +11,19 @@ import {
   getAiModelForFeature,
   getAiRouteError,
   getUsageMetrics,
-  hasAiGatewayCredentials,
+  hasAiGatewayRuntimeCredentials,
   getDocumentExtractionPrompt,
   isAiBudgetError,
   isAiPermissionError,
   isAiSensitiveContentError,
-} from "@afenda/ai";
+} from "@afenda/ai/server";
 import { getApiAuthContext, requireCapability } from "@afenda/auth/server";
 import {
   createAiUsageEvent,
   isAiFeatureEnabledForOrganization,
   registerAiDocumentExtraction,
 } from "@afenda/db";
-import { getErpModuleById } from "@afenda/domain";
+import { getErpModuleById } from "@afenda/kernel";
 import { getRequestId, logServerEvent } from "@afenda/observability";
 import { generateText, Output } from "ai";
 import { NextResponse } from "next/server";
@@ -47,7 +48,7 @@ export async function POST(request: Request) {
   const route = "/api/ai/extract";
   let model = getAiModelForFeature("document-extraction");
 
-  if (!hasAiGatewayCredentials()) {
+  if (!hasAiGatewayRuntimeCredentials()) {
     return getGatewayUnavailableResponse();
   }
 
@@ -139,6 +140,8 @@ export async function POST(request: Request) {
             moduleId: parsedRequest.moduleId,
             riskLevel,
             environment: getAiGatewayEnvironment(),
+            providerOrder: aiGatewayDefaultProviderOrder,
+            providerOnly: aiGatewayDefaultProviderOrder,
             zeroDataRetention: true,
           }),
         }),

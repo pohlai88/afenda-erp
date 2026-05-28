@@ -21,7 +21,7 @@ import {
   buildRecoveryPlaybookListSurface,
   buildSavedViewsListSurface,
   dashboardHardeningChartSurfaceKey,
-} from "@afenda/domain";
+} from "@afenda/kernel";
 import {
   GovernedKanbanFooterSection,
   GovernedKanbanReadOnlyBoard,

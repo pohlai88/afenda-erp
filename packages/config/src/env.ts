@@ -39,17 +39,24 @@ const blobEnvSchema = z.object({
   VERCEL_BLOB_CALLBACK_URL: z.url().optional(),
 });
 
+const optionalNonEmptyEnvString = z.preprocess(
+  (value) =>
+    typeof value === "string" && value.trim().length === 0 ? undefined : value,
+  z.string().min(1).optional(),
+);
+
 const aiEnvSchema = z.object({
-  AFENDA_AI_MODEL: z.string().min(1).optional(),
-  AFENDA_AI_FAST_MODEL: z.string().min(1).optional(),
-  AFENDA_AI_HIGH_CONFIDENCE_MODEL: z.string().min(1).optional(),
-  AI_GATEWAY_API_KEY: z.string().min(1).optional(),
-  /** Vercel account API token (Gateway billing report, REST). */
-  VERCEL_API_TOKEN: z.string().min(1).optional(),
-  /** CLI / tooling token; used for Gateway reporting when VERCEL_API_TOKEN is unset. */
-  VERCEL_TOKEN: z.string().min(1).optional(),
-  VERCEL_OIDC_TOKEN: z.string().min(1).optional(),
-  VERCEL_ENV: z.string().optional(),
+  AFENDA_AI_MODEL: optionalNonEmptyEnvString,
+  AFENDA_AI_FAST_MODEL: optionalNonEmptyEnvString,
+  AFENDA_AI_HIGH_CONFIDENCE_MODEL: optionalNonEmptyEnvString,
+  RERANK_MODEL: optionalNonEmptyEnvString,
+  AI_GATEWAY_API_KEY: optionalNonEmptyEnvString,
+  /** Vercel account API token for management APIs; not a Gateway runtime credential. */
+  VERCEL_API_TOKEN: optionalNonEmptyEnvString,
+  /** CLI / tooling token for Vercel management APIs; not a Gateway runtime credential. */
+  VERCEL_TOKEN: optionalNonEmptyEnvString,
+  VERCEL_OIDC_TOKEN: optionalNonEmptyEnvString,
+  VERCEL_ENV: optionalNonEmptyEnvString,
 });
 
 export type BaseEnv = z.infer<typeof baseEnvSchema>;
@@ -156,57 +163,91 @@ export function getAiEnv(input: NodeJS.ProcessEnv = process.env): AiEnv {
   return aiEnvSchema.parse(input);
 }
 
-export function hasAiGatewayCredentials(
+export type AiGatewayRuntimeCredentialSource =
+  | "AI_GATEWAY_API_KEY"
+  | "VERCEL_OIDC_TOKEN"
+  | "none";
+
+export type VercelManagementCredentialSource =
+  | "VERCEL_API_TOKEN"
+  | "VERCEL_TOKEN"
+  | "none";
+
+function getAiGatewayRuntimeCredentialSource(
+  env: AiEnv,
+): AiGatewayRuntimeCredentialSource {
+  if (env.AI_GATEWAY_API_KEY) {
+    return "AI_GATEWAY_API_KEY";
+  }
+
+  if (env.VERCEL_OIDC_TOKEN) {
+    return "VERCEL_OIDC_TOKEN";
+  }
+
+  return "none";
+}
+
+function getVercelManagementCredentialSource(
+  env: AiEnv,
+): VercelManagementCredentialSource {
+  if (env.VERCEL_API_TOKEN) {
+    return "VERCEL_API_TOKEN";
+  }
+
+  if (env.VERCEL_TOKEN) {
+    return "VERCEL_TOKEN";
+  }
+
+  return "none";
+}
+
+export function hasAiGatewayRuntimeCredentials(
   input: NodeJS.ProcessEnv = process.env,
 ) {
   const env = getAiEnv(input);
-  return Boolean(
-    env.AI_GATEWAY_API_KEY ||
-      env.VERCEL_API_TOKEN ||
-      env.VERCEL_TOKEN ||
-      env.VERCEL_OIDC_TOKEN,
-  );
+  return getAiGatewayRuntimeCredentialSource(env) !== "none";
+}
+
+/**
+ * @deprecated Use hasAiGatewayRuntimeCredentials. VERCEL_API_TOKEN and
+ * VERCEL_TOKEN are management credentials and do not authorize model calls.
+ */
+export function hasAiGatewayCredentials(
+  input: NodeJS.ProcessEnv = process.env,
+) {
+  return hasAiGatewayRuntimeCredentials(input);
 }
 
 export function resolveAiGatewayReportApiKey(
   input: NodeJS.ProcessEnv = process.env,
 ): string | undefined {
   const env = getAiEnv(input);
-  return (
-    env.AI_GATEWAY_API_KEY ??
-    env.VERCEL_API_TOKEN ??
-    env.VERCEL_TOKEN ??
-    env.VERCEL_OIDC_TOKEN
-  );
+  return env.AI_GATEWAY_API_KEY ?? env.VERCEL_OIDC_TOKEN;
 }
 
 export function describeAiGatewayCredentialSources(
   input: NodeJS.ProcessEnv = process.env,
 ): {
   hasAiGatewayCredentials: boolean;
+  hasAiGatewayRuntimeCredentials: boolean;
+  runtimeCredentialSource: AiGatewayRuntimeCredentialSource;
   reportApiKeyConfigured: boolean;
-  reportApiKeySource:
-    | "AI_GATEWAY_API_KEY"
-    | "VERCEL_API_TOKEN"
-    | "VERCEL_TOKEN"
-    | "VERCEL_OIDC_TOKEN"
-    | "none";
+  reportApiKeySource: AiGatewayRuntimeCredentialSource;
+  vercelManagementTokenConfigured: boolean;
+  vercelManagementTokenSource: VercelManagementCredentialSource;
 } {
   const env = getAiEnv(input);
-  const reportApiKeySource = env.AI_GATEWAY_API_KEY
-    ? "AI_GATEWAY_API_KEY"
-    : env.VERCEL_API_TOKEN
-      ? "VERCEL_API_TOKEN"
-      : env.VERCEL_TOKEN
-        ? "VERCEL_TOKEN"
-        : env.VERCEL_OIDC_TOKEN
-          ? "VERCEL_OIDC_TOKEN"
-          : "none";
+  const runtimeCredentialSource = getAiGatewayRuntimeCredentialSource(env);
+  const vercelManagementTokenSource = getVercelManagementCredentialSource(env);
 
   return {
     hasAiGatewayCredentials: hasAiGatewayCredentials(input),
-    reportApiKeyConfigured: reportApiKeySource !== "none",
-    reportApiKeySource,
+    hasAiGatewayRuntimeCredentials: hasAiGatewayRuntimeCredentials(input),
+    runtimeCredentialSource,
+    reportApiKeyConfigured: runtimeCredentialSource !== "none",
+    reportApiKeySource: runtimeCredentialSource,
+    vercelManagementTokenConfigured: vercelManagementTokenSource !== "none",
+    vercelManagementTokenSource,
   };
 }
 
@@ -221,14 +262,10 @@ export function isDevAuthBypassEnabled(input: NodeJS.ProcessEnv = process.env) {
 }
 
 export function isDevCookieAuthEnabled(input: NodeJS.ProcessEnv = process.env) {
-  if (isNeonAuthEnabled(input)) {
-    return false;
-  }
-
   const env = getBaseEnv(input);
 
   if (env.NODE_ENV === "production") {
-    return env.AFENDA_E2E_DEV_AUTH === "1";
+    return env.AFENDA_E2E_DEV_AUTH === "1" && !isNeonAuthEnabled(input);
   }
 
   return true;

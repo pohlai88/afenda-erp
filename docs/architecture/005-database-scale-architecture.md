@@ -14,7 +14,7 @@ early metadata-driven workspaces, but they are not the final data model for a
 mature ERP.
 
 Schema ownership and feature-package boundaries are defined in
-[ERP Domain Package Architecture](002-erp-domain-package-architecture.md).
+[ERP Kernel Package Architecture](002-erp-kernel-package-architecture.md).
 Product-wide runtime context is in [System Architecture](001-system-architecture.md).
 
 ## Expected Size
@@ -164,7 +164,7 @@ Start each mature module with explicit tables in
 `packages/db/src/schema/<moduleId>` and module-owned services in
 `packages/features/<moduleId>`. Feature packages are scaffolded on disk today;
 shared ERP tables remain the compatibility layer until extraction per
-[ERP Domain Package Architecture](002-erp-domain-package-architecture.md) and
+[ERP Kernel Package Architecture](002-erp-kernel-package-architecture.md) and
 [Workspace Package Discipline](008-workspace-package-discipline.md).
 
 Use the current shared ERP tables for:
@@ -200,7 +200,7 @@ and telemetry.
 
 ## Related Documents
 
-- **ARCH-002** [ERP Domain Package Architecture](002-erp-domain-package-architecture.md)
+- **ARCH-002** [ERP Kernel Package Architecture](002-erp-kernel-package-architecture.md)
 - **ARCH-006** [Metadata-Driven UI Architecture](006-metadata-driven-ui-architecture.md)
 - **ARCH-001** [System Architecture](001-system-architecture.md)
 - **ARCH-003** [Directory Architecture Audit](003-directory-architecture-audit.md)

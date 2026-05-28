@@ -1,7 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-vi.mock("server-only", () => ({}));
-
 // Mock @afenda/db
 vi.mock("@afenda/db", () => {
   const mockDb = {
@@ -32,7 +30,7 @@ vi.mock("@afenda/db", () => {
 });
 
 // Mock embeddings
-vi.mock("../../src/server/embeddings", () => ({
+vi.mock("../../src/data/knowledge.embeddings.server", () => ({
   embedKnowledgeBatch: vi.fn().mockResolvedValue({
     embeddingModelVersion: "openai/text-embedding-3-small",
     vectors: [],
@@ -45,12 +43,12 @@ describe("commitKnowledgeDocument", () => {
   });
 
   it("is importable without throwing", async () => {
-    const mod = await import("../../src/server/pipeline-commit");
+    const mod = await import("../../src/data/knowledge.pipeline-commit.server");
     expect(typeof mod.commitKnowledgeDocument).toBe("function");
   }, 15_000);
 
   it("exports CommitDocumentResult type shape", async () => {
-    const mod = await import("../../src/server/pipeline-commit");
+    const mod = await import("../../src/data/knowledge.pipeline-commit.server");
     expect(mod.commitKnowledgeDocument).toBeDefined();
   });
 });

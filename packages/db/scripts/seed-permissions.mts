@@ -8,6 +8,7 @@ const rootDir = resolve(packageDir, "../../..");
 
 config({ path: resolve(rootDir, ".env.local") });
 config({ path: resolve(rootDir, ".env.config"), override: false });
+config({ path: resolve(rootDir, ".secret.config"), override: true });
 
 const seedDatabaseUrl =
   process.env.DATABASE_MIGRATION_URL ??
@@ -114,6 +115,102 @@ const permissionCatalog = [
     description: "Invite members, change roles, and edit role overrides.",
   },
   {
+    key: "system-admin.users.read",
+    module: "system-admin",
+    label: "Read users",
+    description: "View user access state and invitation coverage.",
+  },
+  {
+    key: "system-admin.users.manage",
+    module: "system-admin",
+    label: "Manage users",
+    description: "Invite, deactivate, and review organization users.",
+  },
+  {
+    key: "system-admin.memberships.read",
+    module: "system-admin",
+    label: "Read memberships",
+    description: "View organization membership and team assignment state.",
+  },
+  {
+    key: "system-admin.memberships.manage",
+    module: "system-admin",
+    label: "Manage memberships",
+    description: "Update organization membership and access assignments.",
+  },
+  {
+    key: "system-admin.roles.read",
+    module: "system-admin",
+    label: "Read roles",
+    description: "View role catalog, assignments, and role override state.",
+  },
+  {
+    key: "system-admin.roles.manage",
+    module: "system-admin",
+    label: "Manage roles",
+    description: "Assign roles and update tenant role overrides.",
+  },
+  {
+    key: "system-admin.permissions.read",
+    module: "system-admin",
+    label: "Read permissions",
+    description: "View the permission catalog and role coverage matrix.",
+  },
+  {
+    key: "system-admin.permissions.manage",
+    module: "system-admin",
+    label: "Manage permissions",
+    description: "Configure tenant permission overrides and bundles.",
+  },
+  {
+    key: "system-admin.modules.read",
+    module: "system-admin",
+    label: "Read modules",
+    description: "View module availability, readiness, and visibility settings.",
+  },
+  {
+    key: "system-admin.modules.manage",
+    module: "system-admin",
+    label: "Manage modules",
+    description: "Update tenant module visibility and readiness settings.",
+  },
+  {
+    key: "system-admin.capabilities.read",
+    module: "system-admin",
+    label: "Read capabilities",
+    description: "Inspect execution capability metadata and route coverage.",
+  },
+  {
+    key: "system-admin.capabilities.manage",
+    module: "system-admin",
+    label: "Manage capabilities",
+    description: "Configure tenant capability visibility and availability.",
+  },
+  {
+    key: "system-admin.policies.read",
+    module: "system-admin",
+    label: "Read policies",
+    description: "View tenant policy rules and enforcement posture.",
+  },
+  {
+    key: "system-admin.policies.manage",
+    module: "system-admin",
+    label: "Manage policies",
+    description: "Update tenant policy rules evaluated by the execution kernel.",
+  },
+  {
+    key: "system-admin.approvals.read",
+    module: "system-admin",
+    label: "Read approvals",
+    description: "View approval configuration and escalation posture.",
+  },
+  {
+    key: "system-admin.approvals.manage",
+    module: "system-admin",
+    label: "Manage approvals",
+    description: "Update tenant approval chains and escalation settings.",
+  },
+  {
     key: "system-admin.settings.read",
     module: "system-admin",
     label: "Read tenant settings",
@@ -136,6 +233,30 @@ const permissionCatalog = [
     module: "system-admin",
     label: "Export audit log",
     description: "Export audit evidence for compliance review.",
+  },
+  {
+    key: "system-admin.security.read",
+    module: "system-admin",
+    label: "Read security",
+    description: "View tenant security posture and sensitive action policy.",
+  },
+  {
+    key: "system-admin.security.manage",
+    module: "system-admin",
+    label: "Manage security",
+    description: "Update tenant MFA, session, and trusted domain policy.",
+  },
+  {
+    key: "system-admin.organization.read",
+    module: "system-admin",
+    label: "Read organization settings",
+    description: "View organization profile, locale, calendar, and numbering defaults.",
+  },
+  {
+    key: "system-admin.organization.manage",
+    module: "system-admin",
+    label: "Manage organization settings",
+    description: "Update organization operating defaults and document prefixes.",
   },
   {
     key: "system-admin.integrations.read",
@@ -172,6 +293,12 @@ const permissionCatalog = [
     module: "system-admin",
     label: "Read billing",
     description: "View marketplace usage and billing posture.",
+  },
+  {
+    key: "system-admin.diagnostics.read",
+    module: "system-admin",
+    label: "Read diagnostics",
+    description: "View configuration drift, coverage, reliability, and spend posture.",
   },
 ] as const;
 

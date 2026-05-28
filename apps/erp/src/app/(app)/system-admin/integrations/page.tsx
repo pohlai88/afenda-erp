@@ -4,6 +4,8 @@ import {
   buildSsoConnectionsListSurface,
   buildWebhookDeliveriesListSurface,
   buildWebhooksListSurface,
+  createApiCredentialFormAction,
+  createWebhookFormAction,
   listApiCredentials,
   listSsoConnections,
   listWebhookDeliveries,
@@ -12,20 +14,20 @@ import {
   systemAdminSsoSurfaceKey,
   systemAdminWebhookDeliveriesSurfaceKey,
   systemAdminWebhooksSurfaceKey,
+  upsertSsoConnectionForm,
 } from "@afenda/feature-system-admin/server";
+import {
+  ApiCredentialTrailingCell,
+  CreateApiCredentialForm,
+  CreateWebhookForm,
+  WebhookTrailingCell,
+} from "@afenda/feature-system-admin/client";
 import { GovernedPatternCListSection } from "@afenda/governed-surface/server";
 import { Button } from "@afenda/ui/button";
 import { Input } from "@afenda/ui/input";
 import { NativeSelect, NativeSelectOption } from "@afenda/ui/native-select";
 import { SectionPanel } from "@afenda/ui";
 import type { Metadata } from "next";
-import { CreateApiCredentialForm } from "@/components/system-admin/create-api-credential-form.client";
-import { CreateWebhookForm } from "@/components/system-admin/create-webhook-form.client";
-import {
-  ApiCredentialTrailingCell,
-  WebhookTrailingCell,
-} from "@/components/system-admin/integration-trailing-cells.client";
-import { upsertSsoConnectionForm } from "./actions";
 
 export const metadata: Metadata = {
   title: "Integrations — System admin",
@@ -40,12 +42,14 @@ export default async function SystemAdminIntegrationsPage() {
     "system-admin.integrations.write",
   );
 
-  const [credentials, webhooks, deliveries, ssoConnections] = await Promise.all([
-    listApiCredentials({ organizationId: organization.id, limit: 100 }),
-    listWebhooks({ organizationId: organization.id, limit: 100 }),
-    listWebhookDeliveries({ organizationId: organization.id, limit: 50 }),
-    listSsoConnections({ organizationId: organization.id, limit: 50 }),
-  ]);
+  const [credentials, webhooks, deliveries, ssoConnections] = await Promise.all(
+    [
+      listApiCredentials({ organizationId: organization.id, limit: 100 }),
+      listWebhooks({ organizationId: organization.id, limit: 100 }),
+      listWebhookDeliveries({ organizationId: organization.id, limit: 50 }),
+      listSsoConnections({ organizationId: organization.id, limit: 50 }),
+    ],
+  );
 
   return (
     <div className="flex flex-col gap-6">
@@ -57,7 +61,9 @@ export default async function SystemAdminIntegrationsPage() {
 
       {canWrite ? (
         <SectionPanel title="Create API credential">
-          <CreateApiCredentialForm />
+          <CreateApiCredentialForm
+            createApiCredentialFormAction={createApiCredentialFormAction}
+          />
         </SectionPanel>
       ) : null}
 
@@ -70,12 +76,17 @@ export default async function SystemAdminIntegrationsPage() {
         })}
         parentAccessAllowed
         layout="embedded"
-        trailingColumn={{ header: "Actions", Cell: ApiCredentialTrailingCell }}
+        trailingColumn={{
+          header: "Actions",
+          Cell: ApiCredentialTrailingCell,
+        }}
       />
 
       {canWrite ? (
         <SectionPanel title="Register webhook">
-          <CreateWebhookForm />
+          <CreateWebhookForm
+            createWebhookFormAction={createWebhookFormAction}
+          />
         </SectionPanel>
       ) : null}
 
@@ -94,7 +105,10 @@ export default async function SystemAdminIntegrationsPage() {
         })}
         parentAccessAllowed
         layout="embedded"
-        trailingColumn={{ header: "Actions", Cell: WebhookTrailingCell }}
+        trailingColumn={{
+          header: "Actions",
+          Cell: WebhookTrailingCell,
+        }}
       />
 
       <GovernedPatternCListSection
@@ -138,7 +152,11 @@ export default async function SystemAdminIntegrationsPage() {
             </label>
             <label className="flex flex-col gap-1 text-sm">
               <span className="text-muted-foreground">Staged status</span>
-              <NativeSelect className="w-full" name="enabled" defaultValue="false">
+              <NativeSelect
+                className="w-full"
+                name="enabled"
+                defaultValue="false"
+              >
                 <NativeSelectOption value="false">Disabled</NativeSelectOption>
                 <NativeSelectOption value="true">Staged</NativeSelectOption>
               </NativeSelect>

@@ -2,19 +2,19 @@
 
 **Doc ID:** `ARCH-001` · **File:** `001-system-architecture.md`
 
-| Field      | Value                                                                          |
-| ---------- | ------------------------------------------------------------------------------ |
-| Status     | Active — aligned with `afenda-erp` repo as-built (May 2026)                    |
-| Authority  | Product-wide runtime, deployment, data, auth, AI, observability                |
-| Supersedes | Informal root architecture draft (removed; do not add new copies)              |
-| Related    | **ARCH-002** (packages) · **ARCH-006** (metadata UI) · **ARCH-005** (database) · **ARCH-008** (package discipline) |
+| Field      | Value                                                                                                              |
+| ---------- | ------------------------------------------------------------------------------------------------------------------ |
+| Status     | Active — aligned with `afenda-erp` repo as-built (May 2026)                                                        |
+| Authority  | Product-wide runtime, deployment, data, auth, AI, observability                                                    |
+| Supersedes | Informal root architecture draft (removed; do not add new copies)                                                  |
+| Related    | **ARCH-002** (packages) · **ARCH-005** (database) · **ARCH-006** (metadata UI) · **ARCH-008** (package discipline) · **ARCH-012** (execution authority) |
 
 ## Executive Summary
 
 Afenda ERP is a greenfield, Vercel-first SME ERP platform built as a modular
 single application inside a TypeScript monorepo. The system uses one primary
 Next.js App Router application for the ERP surface, shared internal packages for
-domain logic and platform concerns, Neon Postgres as the operational database,
+kernel contracts and platform concerns, Neon Postgres as the operational database,
 Neon Auth for identity, Drizzle ORM for schema-as-code, and Vercel AI SDK with
 AI Gateway for assistant and automation workflows.
 
@@ -70,7 +70,7 @@ Server Component patches can affect every route.
 **Current on disk:** one app (`apps/erp`) and platform packages under `packages/*`.
 `packages/features/*` is workspace-ready but empty until the first module is
 extracted. Feature-package authority:
-[ERP Domain Package Architecture](002-erp-domain-package-architecture.md).
+[ERP Kernel Package Architecture](002-erp-kernel-package-architecture.md).
 
 ```txt
 apps/
@@ -90,7 +90,7 @@ packages/
   governed-surface/     # Metadata-driven ERP UI contracts and renderers
   db/                   # Drizzle schema, migrations, Neon connection helpers
   auth/                 # Neon Auth integration, roles, permission helpers
-  domain/               # Cross-module ERP contracts and compatibility adapters
+  kernel/               # Cross-module ERP contracts and compatibility adapters
   ai/                   # Vercel AI SDK agents, tools, prompts, guardrails
   workflows/            # Approval flows, scheduled jobs, event handlers
   observability/        # Analytics, tracing, logging conventions
@@ -112,10 +112,11 @@ Package ownership rules:
 - `packages/features/*` owns mature ERP module implementation: module-specific
   metadata, business commands, query services, page sections, schemas,
   workflow adapters, and tests. Feature packages cannot import from `apps/erp`.
-- `packages/domain` owns cross-module ERP contracts, module IDs, workspace
-  contracts, permission contract types, and compatibility adapters. It is not
-  the long-term home for module-specific finance, HR, sales, purchasing,
-  inventory, CRM, approval, report, or admin implementation.
+- `packages/kernel` owns cross-module ERP contracts, execution-kernel
+  authority, module IDs, workspace contracts, permission contract types, and
+  compatibility adapters. It is not the long-term home for module-specific
+  finance, HR, sales, purchasing, inventory, CRM, approval, report, or admin
+  implementation.
 - `packages/governed-surface` owns metadata-driven ERP UI schemas, renderers,
   section shells, list-window contracts, presentation profiles, fixtures, and
   renderer parity automation. It cannot own ERP business rules, tenant queries,
@@ -195,30 +196,30 @@ database transactions, or large SDKs.
 
 Afenda ERP v1 targets SME core ERP modules:
 
-| Module     | Primary capabilities                                  | Mature package ownership                    |
-| ---------- | ----------------------------------------------------- | ------------------------------------------- |
-| Dashboard  | KPIs, tasks, approvals, alerts                        | `apps/erp`, `features/reports`, `workflows` |
-| Finance    | Chart of accounts, journal entries, AR/AP, tax, close | `features/finance`, `db`                    |
-| Sales      | Quotes, orders, invoices, customer terms              | `features/sales`, `db`                      |
-| Purchasing | Vendors, purchase orders, receipts, bills             | `features/purchasing`, `db`                 |
-| Inventory  | Items, stock ledger, locations, adjustments           | `features/inventory`, `db`                  |
-| HR         | Employees, leave, time, payroll inputs, workforce ops | `features/hr`, `db` (moduleId: `hr`)        |
-| CRM        | Leads, accounts, contacts, activities                 | `features/crm`, `db`                        |
-| Approvals  | Approval rules, tasks, escalations, comments          | `features/approvals`, `workflows`, `db`     |
-| Reports    | Operational reports, exports, saved views             | `features/reports`, `observability`, `db`   |
-| System admin | Tenant settings, users, roles, audit log            | `features/system-admin`, `auth`, `db`       |
+| Module       | Primary capabilities                                  | Mature package ownership                    |
+| ------------ | ----------------------------------------------------- | ------------------------------------------- |
+| Dashboard    | KPIs, tasks, approvals, alerts                        | `apps/erp`, `features/reports`, `workflows` |
+| Finance      | Chart of accounts, journal entries, AR/AP, tax, close | `features/finance`, `db`                    |
+| Sales        | Quotes, orders, invoices, customer terms              | `features/sales`, `db`                      |
+| Purchasing   | Vendors, purchase orders, receipts, bills             | `features/purchasing`, `db`                 |
+| Inventory    | Items, stock ledger, locations, adjustments           | `features/inventory`, `db`                  |
+| HR           | Employees, leave, time, payroll inputs, workforce ops | `features/hr`, `db` (moduleId: `hr`)        |
+| CRM          | Leads, accounts, contacts, activities                 | `features/crm`, `db`                        |
+| Approvals    | Approval rules, tasks, escalations, comments          | `features/approvals`, `workflows`, `db`     |
+| Reports      | Operational reports, exports, saved views             | `features/reports`, `observability`, `db`   |
+| System admin | Tenant settings, users, roles, audit log              | `features/system-admin`, `auth`, `db`       |
 
 Business rules live in feature packages once a module becomes real; they do not
-live in React route components. `packages/domain` remains the cross-module
+live in React route components. `packages/kernel` remains the cross-module
 contract layer. The current module workspace implementation uses shared
-persisted ERP records, saved views, work items, documents, and domain metadata
+persisted ERP records, saved views, work items, documents, and kernel metadata
 as a compatibility foundation. Dedicated feature packages, subledger tables,
 and module-specific command services such as journal posting, sales order
 creation, or stock adjustment should be introduced before app routes depend on
 those workflows.
 
 The package threshold is defined in
-[ERP Domain Package Architecture](002-erp-domain-package-architecture.md). The
+[ERP Kernel Package Architecture](002-erp-kernel-package-architecture.md). The
 database scale and promotion path from shared records to module-owned tables is
 defined in [Database Scale Architecture](005-database-scale-architecture.md).
 
@@ -444,20 +445,25 @@ Primary AI capabilities:
 
 ```txt
 packages/ai/src/
-  gateway.ts            # Model policy, Gateway tags, user attribution, cache rules
+  index.ts              # Backward-compatible package root
+  client.ts             # Browser-safe schemas and serializable output contracts
+  server.ts             # Server-only tools, gateway, sandbox, and provider code
+  metadata.ts           # Static AI capability metadata
+  actions/              # Sandbox lifecycle and approved executor dispatch
   agents/
-    erp-assistant.ts
-    solution-provider-agent.ts
+    ai.erp-specialist.agent.server.ts
+    ai.solution-provider-specialist.agent.server.ts
+  components/           # Headless serializable component output contracts
+  contracts/            # TypeScript tool and governance contracts
+  data/                 # Context assembly, gateway model policy, spend reports
+  events/               # Audit, usage, sandbox, and confidence event contracts
+  policies/             # Guardrails, budget checks, confidence scoring
+  schemas/              # Zod schemas for structured output and tool I/O
   tools/
-    contracts.ts        # Zod input/output contracts for AI tools
-    erp-tools.ts        # Tenant-scoped assistant tools with injected domain hooks
-    solution-provider-tools.ts
-  schemas/
-    extraction.ts
-    recommendations.ts
-    solution-provider.ts
-  guardrails.ts
-  prompts.ts
+    ai.erp-tools.tool.server.ts
+    ai.solution-provider-tools.tool.server.ts
+  prompts/
+    ai.system-prompt.ts
 ```
 
 AI tools must use the same authorization helpers as normal application code.
@@ -473,10 +479,11 @@ streams are reserved for CLI or server-to-server consumers. AI outputs intended
 for structured writes must use Zod-backed structured output validation before
 persistence.
 
-Embeddings are not routed through AI Gateway. If semantic search or vector
-features are added, use a direct provider package such as `@ai-sdk/openai` for
-embedding calls and track that usage separately from Gateway chat/generation
-usage.
+Embeddings should use Vercel AI Gateway when the selected embedding model is
+available through Gateway. If a provider-specific embedding feature is not
+exposed through Gateway, isolate the direct provider package inside the owning
+substrate package and track that usage separately from Gateway chat/generation
+usage. Knowledge vectors remain stored in Neon pgvector.
 
 AI logging must capture model, feature, tenant, user, token usage, latency,
 tool calls, approval decisions, and error class. Logs must not store secrets,
@@ -567,7 +574,7 @@ one project per package). Root `vercel.json` is the source of truth:
 Turborepo builds workspace libraries (`dist/**` via `dependsOn: ["^build"]`), then
 `@afenda/erp` (`.next/**`, excluding `.next/cache/**`). Feature packages are
 compile-time dependencies, not separate Vercel projects. See
-[ERP Domain Package Architecture](002-erp-domain-package-architecture.md).
+[ERP Kernel Package Architecture](002-erp-kernel-package-architecture.md).
 
 ### Platform linkage (verified via Vercel MCP, May 2026)
 
@@ -576,7 +583,7 @@ compile-time dependencies, not separate Vercel projects. See
 | Vercel team                               | `Jack's projects` (`team_Ymg16AtjGxrKyjaZk5Z52IYc`)                                           |
 | Linked project in team                    | `afenda-vercel` (`prj_f4xLKgSiQsOEXnk24ZKlwlKrwqui`) — **legacy GitHub repo `afenda-vercel`** |
 | This repo (`afenda-erp`)                  | **Not linked** — no `.vercel/project.json`; **deferred until stabilization gate passes**      |
-| Latest `afenda-vercel` production deploys | **ERROR** (`readyState: ERROR`; repo `pohlai88/afenda-vercel`, not this monorepo)            |
+| Latest `afenda-vercel` production deploys | **ERROR** (`readyState: ERROR`; repo `pohlai88/afenda-vercel`, not this monorepo)             |
 | Intended build when linked                | Root `vercel.json`: `pnpm install` + `pnpm turbo build --filter=@afenda/erp`                  |
 
 **Vercel link is deferred.** Do not run `vercel link` or wire preview/production deploys until the
@@ -585,14 +592,14 @@ settings until retargeted to this repository. Operator guide: [`docs/development
 
 **Local stabilization gate (before `vercel link`):**
 
-| Gate | Command / check | Status (May 2026) |
-| ---- | --------------- | ----------------- |
-| Build | `pnpm turbo build --filter=@afenda/erp` | Passed locally (May 2026) |
-| Types | `pnpm typecheck` | Passed; `strict`, `noUncheckedIndexedAccess`, unused checks |
-| Architecture | `pnpm architecture:check` | Pass after `.cursor/` excluded and `components.json` UI paths aligned |
-| Tests | `pnpm test` | Passed locally (May 2026) |
-| Env | `pnpm env:sync` (+ `env:sync:cursor` on Windows) | See `docs/development/env.md` |
-| E2E / governed UI | Manual or `pnpm test:e2e` | Required before production link |
+| Gate              | Command / check                                  | Status (May 2026)                                                     |
+| ----------------- | ------------------------------------------------ | --------------------------------------------------------------------- |
+| Build             | `pnpm turbo build --filter=@afenda/erp`          | Passed locally (May 2026)                                             |
+| Types             | `pnpm typecheck`                                 | Passed; `strict`, `noUncheckedIndexedAccess`, unused checks           |
+| Architecture      | `pnpm architecture:check`                        | Pass after `.cursor/` excluded and `components.json` UI paths aligned |
+| Tests             | `pnpm test`                                      | Passed locally (May 2026)                                             |
+| Env               | `pnpm env:sync` (+ `env:sync:cursor` on Windows) | See `docs/development/env.md`                                         |
+| E2E / governed UI | Manual or `pnpm test:e2e`                        | Required before production link                                       |
 
 **Platform milestone (after stabilization):**
 
@@ -775,8 +782,8 @@ catalog.
 Current status: module workspaces use dynamic `(app)/[moduleId]/` routes and
 metadata-driven list surfaces via `GovernedPatternCListSection` in
 `module-screen.tsx`, `dashboard-route.tsx`, and `solution-console-route.tsx`
-(domain builders in `packages/domain/src/modules/list-surfaces.ts`).
-`packages/domain` resolves serialized module workspaces from tenant-scoped
+(kernel builders in `packages/kernel/src/modules/list-surfaces.ts`).
+`packages/kernel` resolves serialized module workspaces from tenant-scoped
 database records, saved views, workflow items, and document registry rows, with
 metadata fallback for local dev mode. That is a compatibility foundation; the
 nine `@afenda/feature-*` packages under `packages/features/` now exist and own
@@ -829,7 +836,7 @@ module skill can gather evidence, produce confidence-scored cards, preview
 before/after action diffs, and require human approval before execution. The
 catalog includes current recovery skills and an LMS training-designer blueprint.
 LMS is staged only: `packages/ai` contains the blueprint skill, but
-`@afenda/config`, `@afenda/domain`, and `@afenda/db` do not yet register `lms`
+`@afenda/config`, `@afenda/kernel`, and `@afenda/db` do not yet register `lms`
 as a first-class ERP module or database enum. The Solution Console renders the
 active operational skill layer as metadata-driven cards and structured AI tool
 output cards for diagnosis, evidence, confidence, sandbox diffs, recovery
@@ -865,7 +872,7 @@ LMS module) are **cancelled** for the AI uplift scope — see **TRACK-003**.
 - The default architecture is one modular Next.js ERP app, not microfrontends.
 - Every major subsystem has an owning app route or package.
 - Mature ERP modules have feature-package ownership under `packages/features/*`;
-  `packages/domain` remains the shared contract layer.
+  `packages/kernel` remains the shared contract layer.
 - Database growth assumes ERP-scale schema expansion and promotes generic
   records to typed module tables before ledger, inventory, payroll, or
   compliance workflows depend on them.
@@ -886,7 +893,7 @@ LMS module) are **cancelled** for the AI uplift scope — see **TRACK-003**.
 
 ### Architecture documents
 
-- [ERP Domain Package Architecture](002-erp-domain-package-architecture.md)
+- [ERP Kernel Package Architecture](002-erp-kernel-package-architecture.md)
 - [Metadata-Driven UI Architecture](006-metadata-driven-ui-architecture.md)
 - [Governed Metadata Architecture](007-governed-metadata-architecture.md)
 - [Directory Architecture Audit](003-directory-architecture-audit.md)

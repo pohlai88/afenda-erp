@@ -1,0 +1,23 @@
+{
+  "$schema": "https://unpkg.com/knip@latest/schema.json",
+  "workspaces": {
+    "packages/features/*": {
+      "entry": [
+        "src/index.ts",
+        "src/client.ts",
+        "src/server.ts",
+        "src/metadata.ts"
+      ],
+      "project": ["src/**/*.{ts,tsx}"],
+      "ignore": ["src/**/index.ts"]
+    },
+    "apps/erp": {
+      "entry": [
+        "src/app/**/{page,layout,route,loading,error,template,default,not-found,forbidden,unauthorized}.{ts,tsx}",
+        "src/proxy.ts",
+        "src/instrumentation.ts"
+      ],
+      "project": ["src/**/*.{ts,tsx}"]
+    }
+  }
+}

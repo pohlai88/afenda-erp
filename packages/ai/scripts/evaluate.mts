@@ -18,11 +18,15 @@ import {
   estimateTokenCount,
   getAiGatewayEnvironment,
   getAiModelForFeature,
+  getAssistantSystemPrompt,
   reportNarrativeSchema,
+  hasAiGatewayRuntimeCredentials,
+  redactGovernedToolAuditValue,
   scoreAiConfidence,
   solutionProviderRunSchema,
   businessProblemInputSchema,
   recoveryPlaybookSchema,
+  verifyAiGatewayModels,
   workspaceSummarySchema,
   AiSensitiveContentError,
   getOperationalSkillById,
@@ -98,6 +102,18 @@ assert.equal(
   "openai/gpt-5.4-pro",
 );
 assert.equal(getAiGatewayEnvironment({ VERCEL_ENV: "Preview" }), "preview");
+assert.equal(
+  hasAiGatewayRuntimeCredentials({ AI_GATEWAY_API_KEY: "gateway-key" }),
+  true,
+);
+assert.equal(
+  hasAiGatewayRuntimeCredentials({ VERCEL_OIDC_TOKEN: "oidc-token" }),
+  true,
+);
+assert.equal(
+  hasAiGatewayRuntimeCredentials({ VERCEL_API_TOKEN: "management-token" }),
+  false,
+);
 
 const gatewayOptions = createGatewayOptions({
   organizationId: "Org 123!",
@@ -114,6 +130,65 @@ assert.ok(
     gatewayOptions.gateway.tags.includes("organization:org-123") &&
     gatewayOptions.gateway.tags.includes("module:finance-ops") &&
     gatewayOptions.gateway.tags.includes("risk:medium"),
+);
+const governedGatewayOptions = createGatewayOptions({
+  organizationId: "Org 123!",
+  userId: "user_123",
+  feature: "solution-provider",
+  providerOrder: ["anthropic", "openai"],
+  providerOnly: ["anthropic"],
+  fallbackModels: ["google/gemini-3.1-pro-preview"],
+  automaticCaching: true,
+  zeroDataRetention: true,
+});
+assert.deepEqual(governedGatewayOptions.gateway.order, [
+  "anthropic",
+  "openai",
+]);
+assert.deepEqual(governedGatewayOptions.gateway.only, ["anthropic"]);
+assert.deepEqual(governedGatewayOptions.gateway.models, [
+  "google/gemini-3.1-pro-preview",
+]);
+assert.equal(governedGatewayOptions.gateway.caching, "auto");
+assert.equal(governedGatewayOptions.gateway.zeroDataRetention, true);
+
+const modelVerification = await verifyAiGatewayModels({
+  fallbackModels: ["google/gemini-3.1-pro-preview"],
+  fetch: async () =>
+    new Response(
+      JSON.stringify({
+        data: [
+          { id: "openai/gpt-5.5" },
+          { id: "anthropic/claude-opus-4.7" },
+          { id: "google/gemini-3.1-pro-preview" },
+        ],
+      }),
+    ),
+});
+assert.equal(modelVerification.available, true);
+
+const injectionGuardPrompt = getAssistantSystemPrompt({
+  organizationName: "Afenda",
+  role: "owner",
+});
+assert.ok(injectionGuardPrompt.includes("untrusted data"));
+assert.ok(injectionGuardPrompt.includes("override this system policy"));
+
+const circularAuditPayload: Record<string, unknown> = { value: "ok" };
+circularAuditPayload.self = circularAuditPayload;
+const redactedAuditPayload = redactGovernedToolAuditValue(
+  {
+    apiKey: "secret",
+    circularAuditPayload,
+    longText: "x".repeat(10),
+  },
+  { maxStringLength: 4 },
+) as Record<string, unknown>;
+assert.equal(redactedAuditPayload.apiKey, "[redacted]");
+assert.equal(redactedAuditPayload.longText, "xxxx...[truncated]");
+assert.deepEqual(
+  redactedAuditPayload.circularAuditPayload,
+  { value: "ok", self: "[circular]" },
 );
 
 assert.throws(

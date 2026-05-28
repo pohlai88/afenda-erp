@@ -3,13 +3,14 @@ import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { dirname } from "node:path";
 import { describeAiGatewayCredentialSources } from "../packages/config/src/env.ts";
-import { getGatewaySpendReport } from "../packages/ai/src/gateway.ts";
+import { getGatewaySpendReport } from "../packages/ai/src/data/ai.gateway.data.server.ts";
 
 const rootDir = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 
 for (const file of [".env.config", ".env.local", "apps/erp/.env.local"]) {
   config({ path: resolve(rootDir, file), override: false });
 }
+config({ path: resolve(rootDir, ".secret.config"), override: true });
 
 const credentials = describeAiGatewayCredentialSources();
 const report = await getGatewaySpendReport({
@@ -26,7 +27,12 @@ const keyPresence = {
 console.log(
   JSON.stringify(
     {
-      filesLoaded: [".env.config", ".env.local", "apps/erp/.env.local"],
+      filesLoaded: [
+        ".env.config",
+        ".env.local",
+        "apps/erp/.env.local",
+        ".secret.config",
+      ],
       keyPresence,
       credentials,
       spendReport: {
@@ -35,13 +41,13 @@ console.log(
         entryCount: report.entries.length,
       },
       hints:
-        !keyPresence.AI_GATEWAY_API_KEY && !keyPresence.VERCEL_API_TOKEN
+        !credentials.hasAiGatewayRuntimeCredentials
           ? [
-              "Set AI_GATEWAY_API_KEY in `.env.config`, then run `pnpm env:sync`.",
+              "Set AI_GATEWAY_API_KEY in `.secret.config` and run `pnpm env:sync`, or run `vercel env pull` to refresh VERCEL_OIDC_TOKEN.",
             ]
           : report.authenticationFailed
             ? [
-                "Gateway rejected the API key (401). Create or refresh a key in Vercel → AI Gateway → API keys.",
+                "Gateway rejected the runtime credential (401). Create or refresh an AI Gateway API key, or refresh VERCEL_OIDC_TOKEN with `vercel env pull`.",
                 "https://vercel.com/docs/ai-gateway/capabilities/custom-reporting",
               ]
             : !report.available
@@ -55,6 +61,6 @@ console.log(
   ),
 );
 
-if (!credentials.reportApiKeyConfigured) {
+if (!credentials.hasAiGatewayRuntimeCredentials) {
   process.exitCode = 1;
 }

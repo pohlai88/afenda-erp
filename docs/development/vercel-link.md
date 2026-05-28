@@ -4,15 +4,15 @@ Local CLI link is active for this monorepo. Preview/production promotion still r
 
 ## Current platform state (May 2026)
 
-| Item | Value |
-| ---- | ----- |
-| Intended deploy app | `@afenda/erp` (`apps/erp`) |
-| Build contract | Root [`vercel.json`](../../vercel.json): `pnpm install` → `pnpm turbo build --filter=@afenda/erp` |
-| **Linked Vercel project** | `afenda-erp` (`prj_rEu23fWSlpHD3C7FzPnsxfWQHBfm`) on team `jacks-projects-7b3cfe94` |
-| **Blob store** | `afenda-erp-documents` (private, `iad1`) — linked to project; `BLOB_READ_WRITE_TOKEN` on all envs |
-| Local link metadata | `.vercel/project.json` (gitignored; created by `vercel link`) |
-| Git integration | `https://github.com/pohlai88/afenda-erp` (connected at link time) |
-| Legacy project | `afenda-vercel` — still points at `pohlai88/afenda-vercel`; do not use for this monorepo |
+| Item                      | Value                                                                                             |
+| ------------------------- | ------------------------------------------------------------------------------------------------- |
+| Intended deploy app       | `@afenda/erp` (`apps/erp`)                                                                        |
+| Build contract            | Root [`vercel.json`](../../vercel.json): `pnpm install` → `pnpm turbo build --filter=@afenda/erp` |
+| **Linked Vercel project** | `afenda-erp` (`prj_rEu23fWSlpHD3C7FzPnsxfWQHBfm`) on team `jacks-projects-7b3cfe94`               |
+| **Blob store**            | `afenda-erp-documents` (private, `iad1`) — linked to project; `BLOB_READ_WRITE_TOKEN` on all envs |
+| Local link metadata       | `.vercel/project.json` (gitignored; created by `vercel link`)                                     |
+| Git integration           | `https://github.com/pohlai88/afenda-erp` (connected at link time)                                 |
+| Legacy project            | `afenda-vercel` — still points at `pohlai88/afenda-vercel`; do not use for this monorepo          |
 
 Link command used (non-interactive):
 
@@ -84,11 +84,12 @@ Expected: each route returns HTTP 200 (or 503 if Gateway credentials are absent 
 
 ### New env vars for AI enterprise features
 
-| Variable | Purpose | Required |
-| -------- | ------- | -------- |
-| `VERCEL_API_TOKEN` | Gateway spend API reads | No (graceful fallback; `pnpm env:sync` aliases from `AI_GATEWAY_API_KEY` when unset) |
-| `VERCEL_TEAM_ID` | Gateway spend API | No (graceful fallback) |
-| `VERCEL_AI_GATEWAY_NAME` | Gateway name for spend API | No (graceful fallback) |
+| Variable             | Purpose                                                   | Required                                 |
+| -------------------- | --------------------------------------------------------- | ---------------------------------------- |
+| `AI_GATEWAY_API_KEY` | AI Gateway runtime calls and spend report reads           | Local / CI only when OIDC is unavailable |
+| `VERCEL_OIDC_TOKEN`  | AI Gateway runtime calls and spend report reads on Vercel | Auto-managed by Vercel                   |
+| `RERANK_MODEL`       | Optional Gateway reranking model for Knowledge retrieval  | No                                       |
+| `VERCEL_API_TOKEN`   | Vercel management APIs only; not a model-call credential  | No                                       |
 
 Add these to the Vercel project via `vercel env add` or the dashboard.
 

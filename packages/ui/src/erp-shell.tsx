@@ -1,4 +1,6 @@
 import { Fragment, type ReactNode } from "react";
+import { ui, uiRadius, uiStatusToneClasses, type UiStatusTone } from "./design-system";
+import { cn } from "./utils";
 
 type ShellFrameProps = {
   sidebar: ReactNode;
@@ -7,6 +9,12 @@ type ShellFrameProps = {
 };
 
 export type Tone = "neutral" | "positive" | "warning";
+
+const statusToneMap: Record<Tone, UiStatusTone> = {
+  neutral: "neutral",
+  positive: "success",
+  warning: "warning",
+};
 
 export function ShellFrame({ sidebar, header, children }: ShellFrameProps) {
   return (
@@ -27,16 +35,13 @@ export function ShellFrame({ sidebar, header, children }: ShellFrameProps) {
 }
 
 export function StatusBadge({ label, tone }: { label: string; tone: Tone }) {
-  const className =
-    tone === "positive"
-      ? "border-emerald-200 bg-emerald-50 text-emerald-700"
-      : tone === "warning"
-        ? "border-amber-200 bg-amber-50 text-amber-700"
-        : "border-slate-200 bg-slate-100 text-slate-700";
-
   return (
     <span
-      className={`inline-flex rounded-md border px-2 py-1 text-xs font-medium ${className}`}
+      className={cn(
+        "inline-flex border border-transparent px-2 py-1 text-xs font-medium",
+        ui.radius.chip,
+        uiStatusToneClasses[statusToneMap[tone]],
+      )}
     >
       {label}
     </span>
@@ -98,16 +103,16 @@ export function BulletColumns({
       {items.map((item) => (
         <article
           key={item.title}
-          className="rounded-lg border border-line bg-surface-strong p-5"
+          className={cn(ui.radius.panel, "border border-line bg-card p-5")}
         >
           <h3 className="text-base font-semibold text-foreground">
             {item.title}
           </h3>
           <p className="mt-2 text-sm leading-7 text-muted">{item.summary}</p>
-          <ul className="mt-4 space-y-2 text-sm leading-6 text-slate-700">
+          <ul className="mt-4 flex flex-col gap-2 text-sm leading-6 text-muted-foreground">
             {item.bullets.map((bullet) => (
               <li key={bullet} className="flex gap-2">
-                <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-sm bg-slate-400" />
+                <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-sm bg-muted-foreground/60" />
                 <span>{bullet}</span>
               </li>
             ))}
@@ -127,7 +132,7 @@ export type IndicatorItem = {
 
 function IndicatorCard({ indicator }: { indicator: IndicatorItem }) {
   return (
-    <div className="rounded-lg border border-line bg-surface-strong p-4">
+    <div className={cn(uiRadius.panel, "border border-line bg-card p-4")}>
       <div className="flex items-center justify-between gap-3">
         <div className="text-sm font-semibold text-foreground">
           {indicator.label}
@@ -149,12 +154,17 @@ export function ObservabilityIndicatorList({
   footer?: ReactNode;
 }) {
   return (
-    <div className="space-y-3">
+    <div className="flex flex-col gap-3">
       {indicators.map((indicator) => (
         <IndicatorCard key={indicator.label} indicator={indicator} />
       ))}
       {footer ? (
-        <div className="rounded-lg border border-dashed border-line bg-surface-strong px-4 py-3 text-sm text-muted">
+        <div
+          className={cn(
+            ui.radius.panel,
+            "border border-dashed border-line bg-card px-4 py-3 text-sm text-muted",
+          )}
+        >
           {footer}
         </div>
       ) : null}
@@ -186,7 +196,12 @@ export function ModuleLinkGrid({
 }) {
   if (modules.length === 0) {
     return (
-      <div className="rounded-lg border border-dashed border-line bg-surface-strong p-4 text-sm leading-6 text-muted">
+      <div
+        className={cn(
+          ui.radius.panel,
+          "border border-dashed border-line bg-card p-4 text-sm leading-6 text-muted",
+        )}
+      >
         {emptyMessage}
       </div>
     );
@@ -196,11 +211,11 @@ export function ModuleLinkGrid({
     <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
       {modules.map((module) => {
         const className =
-          "rounded-lg border border-line bg-surface-strong p-4 transition hover:border-slate-300 hover:bg-slate-50";
+          "rounded-xl border border-line bg-card p-4 transition hover:border-border hover:bg-muted/50";
         const children = (
           <>
             <div className="flex items-center justify-between gap-3">
-              <div className="text-sm font-semibold text-slate-950">
+              <div className="text-sm font-semibold text-foreground">
                 {module.label}
               </div>
               <StatusBadge

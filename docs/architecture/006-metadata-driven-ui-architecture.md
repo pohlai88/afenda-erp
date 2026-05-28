@@ -20,11 +20,11 @@ Metadata may describe fields, columns, row links, filters, sort choices, present
 
 - `@afenda/governed-surface` is the governed UI kernel and already exposes public doors for root, `client`, `server`, `metadata`, and `schemas`.
 - `@afenda/erp` owns App Router routes, Server Components, session context, and page composition.
-- `@afenda/domain` owns module definitions, record type definitions, query normalization, workspace shaping, and surface builders as a shared contract layer. Module-bound builder wrappers live in `@afenda/feature-*` packages under `packages/features/*`; routes may still call domain builders during the compatibility window.
+- `@afenda/kernel` owns module definitions, record type definitions, query normalization, workspace shaping, and surface builders as a shared contract layer. Module-bound builder wrappers live in `@afenda/feature-*` packages under `packages/features/*`; routes may still call kernel builders during the compatibility window.
 - `@afenda/db` owns persisted ERP records, work items, saved views, documents, query windows, Drizzle schema, and RLS context helpers.
 - `@afenda/ui` provides accessible layout primitives (`SectionPanel`, `StatusBadge`, `ModuleLinkGrid`, …) and remains metadata-unaware. Tabular ERP data renders through governed list/stat/chart sections — not ERP shell grid composites.
 - Dashboard, module workspace, and solution-console surfaces render through `GovernedPatternBStatSection`, `GovernedPatternCListSection`, and related governed sections.
-- Stats, workflow summaries, module overview metadata, and hardening checklists use `buildGovernedStatGrid` / `buildGovernedListSurface` domain builders.
+- Stats, workflow summaries, module overview metadata, and hardening checklists use `buildGovernedStatGrid` / `buildGovernedListSurface` kernel builders.
 - `RecordTypeDefinition` is the app-facing contract for record list columns, default profile, default filters, default sort, route templates, toolbar metadata, extension validation, and record permissions.
 - Server windows expose `pageSize`, `totalCount`, `hasNextPage`, and opaque cursor metadata. Route-level list state uses server-normalized URL params.
 
@@ -33,7 +33,7 @@ Metadata may describe fields, columns, row links, filters, sort choices, present
 | Package                    | Responsibility                                                                                                                       |
 | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
 | `@afenda/erp`              | App Router routes, Server Components, route-level auth checks, search-param threading, and runtime composition.                      |
-| `@afenda/domain`           | Cross-module ERP contracts, record type contracts, list-query normalization contracts, labels, and compatibility shaping.            |
+| `@afenda/kernel`           | Cross-module ERP contracts, record type contracts, list-query normalization contracts, labels, and compatibility shaping.            |
 | `@afenda/feature-*`        | Target home for mature module metadata, builders, query services, command services, components, schemas, and tests. Not created yet. |
 | `@afenda/governed-surface` | Schemas, builders, profiles, parse boundaries, renderer registry, server/client components, and gallery parse utilities.             |
 | `@afenda/db`               | Tenant-scoped Drizzle queries, persisted records/work items/documents, JSONB fields, query windows, and migrations.                  |
@@ -123,7 +123,7 @@ Rules:
 
 ## Extension Metadata Validation
 
-Persisted record metadata remains JSONB at the database boundary, but it is not treated as render-ready metadata. `@afenda/domain` parses it against the owning `RecordTypeDefinition.extensionSchema` during workspace serialization.
+Persisted record metadata remains JSONB at the database boundary, but it is not treated as render-ready metadata. `@afenda/kernel` parses it against the owning `RecordTypeDefinition.extensionSchema` during workspace serialization.
 
 Validation output is carried as:
 
@@ -149,7 +149,7 @@ Supported route-level list params:
 
 Rules:
 
-- App routes accept search params, but `@afenda/domain` normalizes them.
+- App routes accept search params, but `@afenda/kernel` normalizes them.
 - `@afenda/db` owns accepted query shape and applies filters, sort, and cursor offsets.
 - Cursors are opaque strings. Current implementation uses `offset:<number>` and should be treated as an internal format.
 - Toolbar metadata reflects server-normalized state, not arbitrary client input.
@@ -227,7 +227,7 @@ Runtime rules:
 Minimum gates for metadata UI work:
 
 - `pnpm --filter @afenda/governed-surface test`
-- `pnpm --filter @afenda/domain test`
+- `pnpm --filter @afenda/kernel test`
 - `pnpm --filter @afenda/erp typecheck`
 - `pnpm build`
 - `pnpm test:e2e` when route behavior changes
@@ -255,7 +255,7 @@ Afenda should continue building an internal governed UI kernel. The architecture
 
 | Document                                                                  | Topic                                                     |
 | ------------------------------------------------------------------------- | --------------------------------------------------------- |
-| [ERP Domain Package Architecture](002-erp-domain-package-architecture.md) | Feature-package boundaries, import doors, and extraction  |
+| [ERP Kernel Package Architecture](002-erp-kernel-package-architecture.md) | Feature-package boundaries, import doors, and extraction  |
 | [Governed Metadata Architecture](007-governed-metadata-architecture.md)   | Renderer kernel, profiles, resolver, and builder layering |
 | [Directory Architecture Audit](003-directory-architecture-audit.md)       | Monorepo guards and package categories                    |
 | [System Architecture](001-system-architecture.md)                         | Product-wide runtime and deployment                       |

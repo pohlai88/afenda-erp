@@ -1,7 +1,7 @@
 "use client";
 
-import { routeErrorCopy } from "@afenda/domain";
-import { RouteStatePanel } from "@/components/route-states";
+import { routeErrorCopy } from "@afenda/kernel";
+import { RouteStatePanel } from "@/app-route-state/route-states";
 import { useEffect } from "react";
 
 export default function RootError({

@@ -3,8 +3,8 @@ import {
   LYNX_ERP_READ_TOOL_IDS,
   lynxErpReadToolInputSchema,
   lynxErpReadToolOutputSchema,
-} from "../../src/erp-read-tools-contract";
-import { lynxToolMeta } from "../../src/server/tool-meta";
+} from "../../src/contracts/lynx.erp-read-tools.contract";
+import { lynxToolMeta } from "../../src/tools/lynx.tool-meta";
 
 describe("Lynx ERP read tools contract", () => {
   it("keeps tool inputs tenant-safe", () => {
@@ -12,8 +12,7 @@ describe("Lynx ERP read tools contract", () => {
 
     expect(parsed).toEqual({ limit: 5, includeEvidence: true });
     expect(
-      lynxErpReadToolInputSchema.safeParse({ organizationId: "org_1" })
-        .success,
+      lynxErpReadToolInputSchema.safeParse({ organizationId: "org_1" }).success,
     ).toBe(false);
     expect(Object.keys(parsed)).not.toContain("organizationId");
   });

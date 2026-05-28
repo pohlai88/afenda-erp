@@ -18,7 +18,10 @@ import {
   getAiGatewayEnvironment,
   getAiModelForFeature,
   getGatewaySpendReport,
-} from "../../src/gateway";
+  hasAiGatewayCredentials,
+  hasAiGatewayRuntimeCredentials,
+  verifyAiGatewayModels,
+} from "../../src/data/ai.gateway.data.server";
 
 describe("aiGatewayFeatures", () => {
   it("includes all expected feature identifiers", () => {
@@ -27,6 +30,8 @@ describe("aiGatewayFeatures", () => {
       "document-extraction",
       "approval-tools",
       "solution-provider",
+      "knowledge-retrieval",
+      "knowledge-ingest",
     ] as const;
     for (const f of expected) {
       expect(aiGatewayFeatures).toContain(f);
@@ -50,6 +55,15 @@ describe("getAiModelForFeature", () => {
       AFENDA_AI_MODEL: "openai/custom-model",
     });
     expect(model).toBe("openai/custom-model");
+  });
+
+  it("ignores blank optional env overrides", () => {
+    const model = getAiModelForFeature("record-search", "low", {
+      AFENDA_AI_FAST_MODEL: "",
+      RERANK_MODEL: "",
+    });
+
+    expect(model).toMatch(/gpt|claude/i);
   });
 });
 
@@ -96,6 +110,88 @@ describe("createGatewayOptions", () => {
       providerOrder: ["anthropic", "openai"],
     });
     expect(opts.gateway.order).toEqual(["anthropic", "openai"]);
+  });
+
+  it("sets provider restriction, fallback models, and automatic caching when requested", () => {
+    const opts = createGatewayOptions({
+      organizationId: "org_x",
+      userId: "user_x",
+      feature: "solution-provider",
+      providerOnly: ["anthropic"],
+      fallbackModels: ["openai/gpt-5.5"],
+      automaticCaching: true,
+      zeroDataRetention: true,
+    });
+
+    expect(opts.gateway.only).toEqual(["anthropic"]);
+    expect(opts.gateway.models).toEqual(["openai/gpt-5.5"]);
+    expect(opts.gateway.caching).toBe("auto");
+    expect(opts.gateway.zeroDataRetention).toBe(true);
+  });
+});
+
+describe("AI Gateway runtime credentials", () => {
+  it("accepts API key or OIDC credentials", () => {
+    expect(
+      hasAiGatewayRuntimeCredentials({ AI_GATEWAY_API_KEY: "gateway-key" }),
+    ).toBe(true);
+    expect(
+      hasAiGatewayRuntimeCredentials({ VERCEL_OIDC_TOKEN: "oidc-token" }),
+    ).toBe(true);
+  });
+
+  it("does not treat Vercel management tokens as runtime credentials", () => {
+    expect(hasAiGatewayRuntimeCredentials({ VERCEL_API_TOKEN: "token" })).toBe(
+      false,
+    );
+    expect(hasAiGatewayCredentials({ VERCEL_TOKEN: "token" })).toBe(false);
+  });
+});
+
+describe("verifyAiGatewayModels", () => {
+  function createModelsFetch(modelIds: readonly string[]) {
+    return vi.fn(async () =>
+      Promise.resolve(
+        new Response(JSON.stringify({ data: modelIds.map((id) => ({ id })) }), {
+          status: 200,
+        }),
+      ),
+    ) as unknown as typeof fetch;
+  }
+
+  it("checks default models, env overrides, and fallback models", async () => {
+    const result = await verifyAiGatewayModels({
+      env: {
+        AFENDA_AI_MODEL: "openai/custom-model",
+        RERANK_MODEL: "cohere/rerank-v3.5",
+      },
+      fallbackModels: ["google/gemini-3.1-pro-preview"],
+      fetch: createModelsFetch([
+        "openai/gpt-5.5",
+        "anthropic/claude-opus-4.7",
+        "openai/custom-model",
+        "cohere/rerank-v3.5",
+        "google/gemini-3.1-pro-preview",
+      ]),
+    });
+
+    expect(result.available).toBe(true);
+    expect(result.checkedModelIds).toContain("openai/custom-model");
+    expect(result.checkedModelIds).toContain("cohere/rerank-v3.5");
+    expect(result.checkedModelIds).toContain("google/gemini-3.1-pro-preview");
+    expect(result.missingModelIds).toEqual([]);
+  });
+
+  it("reports invalid env overrides without mutating state", async () => {
+    const result = await verifyAiGatewayModels({
+      env: {
+        AFENDA_AI_HIGH_CONFIDENCE_MODEL: "anthropic/missing-model",
+      },
+      fetch: createModelsFetch(["openai/gpt-5.5", "anthropic/claude-opus-4.7"]),
+    });
+
+    expect(result.available).toBe(false);
+    expect(result.missingModelIds).toEqual(["anthropic/missing-model"]);
   });
 });
 

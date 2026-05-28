@@ -1,5 +1,5 @@
-import type { CoreModuleId, ModuleFeatureMetadata, ModuleId } from "@afenda/domain";
-import { isCoreModuleId } from "@afenda/domain";
+import type { CoreModuleId, ModuleFeatureMetadata, ModuleId } from "@afenda/kernel";
+import { isCoreModuleId } from "@afenda/kernel";
 import * as systemAdmin from "@afenda/feature-system-admin/metadata";
 import * as approvals from "@afenda/feature-approvals/metadata";
 import * as crm from "@afenda/feature-crm/metadata";

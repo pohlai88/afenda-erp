@@ -1,14 +1,24 @@
 import { describe, expect, it } from "vitest";
 import { parseListSurfaceRendererConfiguration } from "@afenda/governed-surface/schemas";
-import { buildMembersListSurface } from "../../src/identity/surfaces";
+import { buildMembersListSurface } from "../../src/surfaces/system-admin.identity.surface";
 import {
   buildApiCredentialsListSurface,
   buildWebhooksListSurface,
-} from "../../src/integrations/surfaces";
+} from "../../src/surfaces/system-admin.integrations.surface";
+import {
+  buildApprovalsListSurface,
+  buildCapabilitiesListSurface,
+  buildDiagnosticsListSurface,
+  buildModulesListSurface,
+  buildOrganizationDefaultsListSurface,
+  buildPermissionsListSurface,
+  buildPoliciesListSurface,
+  buildSecuritySettingsListSurface,
+} from "../../src/surfaces/system-admin.control.surface";
 import {
   buildSystemAdminAiSandboxesListSurface,
   buildSystemAdminAiUsageListSurface,
-} from "../../src/machine-layer/surfaces";
+} from "../../src/surfaces/system-admin.machine-layer.surface";
 
 describe("system admin governed surfaces", () => {
   it("normalizes empty pagination to schema-safe server windows", () => {
@@ -19,9 +29,7 @@ describe("system admin governed surfaces", () => {
     expect(parsed.success).toBe(true);
     if (parsed.success) {
       expect(parsed.data.pagination?.pageSize).toBe(1);
-      expect(parsed.data.presentation?.toolbar?.search?.param).toBe(
-        "membersQ",
-      );
+      expect(parsed.data.presentation?.toolbar?.search?.param).toBe("membersQ");
     }
   });
 
@@ -91,7 +99,29 @@ describe("system admin governed surfaces", () => {
     expect(sandboxes.success).toBe(true);
     if (usage.success && sandboxes.success) {
       expect(usage.data.surface.header?.title).toBe("Machine usage ledger");
-      expect(sandboxes.data.surface.header?.title).toBe("Lynx action sandboxes");
+      expect(sandboxes.data.surface.header?.title).toBe(
+        "Lynx action sandboxes",
+      );
+    }
+  });
+
+  it("parses granular domain control surfaces", () => {
+    const surfaces = [
+      buildPermissionsListSurface({ permissions: [] }),
+      buildModulesListSurface({ modules: [], settings: [] }),
+      buildCapabilitiesListSurface({ capabilities: [] }),
+      buildPoliciesListSurface({ policies: [] }),
+      buildApprovalsListSurface({ approvals: [] }),
+      buildSecuritySettingsListSurface({ security: null }),
+      buildOrganizationDefaultsListSurface({
+        settings: null,
+        organizationName: "Afenda",
+      }),
+      buildDiagnosticsListSurface({ rows: [] }),
+    ];
+
+    for (const surface of surfaces) {
+      expect(parseListSurfaceRendererConfiguration(surface).success).toBe(true);
     }
   });
 });

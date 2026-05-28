@@ -1,15 +1,15 @@
 import { z } from "zod";
 
 /**
- * Code-enforced UI contract (not docs).
+ * Enterprise UI contract (not docs).
  *
+ * - CSS token source of truth: `apps/erp/src/app/globals.css` via Tailwind v4
+ *   `@theme inline` namespaces.
  * - Tailwind still sees literal class strings here → utilities stay generated.
  * - Import these in components instead of inventing new radii in class strings.
  * - Use Zod when variant names come from JSON/CMS/API so invalid values fail at runtime.
- * - CI: `pnpm run lint` runs ESLint (import boundaries) + `scripts/check-design-contract.mjs`
- *   (banned radii / shadows / arbitrary rounded / material drift: inline backdrop blur,
- *   arbitrary Tailwind blur utilities with bracket literals, infinite animations,
- *   legacy water tokens — outside `apps/erp/src/app/globals.css`).
+ * - Contract lint should reject new hardcoded status colors, arbitrary surface
+ *   radii, and non-contract shadows in ERP surfaces.
  * - Preferred API: `ui.*` aliases use familiar primitive names while reusing the
  *   legacy exports below for compatibility.
  * - Spacing: `uiSurfaceSpaceKeys` / `uiSurfaceInset` mirror `apps/erp/src/app/globals.css`
@@ -27,13 +27,60 @@ export const uiPrimitiveKeys = [
   "sheet",
   "toolbar",
   "table",
+  "surface",
+  "section",
+  "empty",
 ] as const;
 
 export type UiPrimitive = (typeof uiPrimitiveKeys)[number];
 
 export const uiPrimitiveSchema = z.enum(uiPrimitiveKeys);
 
-/** Radius roles — single source for keys + Zod (keep in sync with `scripts/check-design-contract.mjs` allowlist). */
+/**
+ * ERP surface purpose is visual intent only. Runtime and governed builders still
+ * own permissions, tenancy, data access, and action authority.
+ */
+export const uiSurfacePurposeKeys = [
+  "directory",
+  "workspace",
+  "review",
+  "audit",
+  "execution",
+] as const;
+
+export type UiSurfacePurpose = (typeof uiSurfacePurposeKeys)[number];
+
+export const uiSurfacePurposeSchema = z.enum(uiSurfacePurposeKeys);
+
+export const uiSurfacePurposeClasses = {
+  directory: "bg-card",
+  workspace: "bg-card",
+  review: "bg-warning/5 ring-1 ring-warning/25",
+  audit: "bg-info/5 ring-1 ring-info/20",
+  execution: "bg-primary/5 ring-1 ring-primary/15",
+} as const satisfies Record<UiSurfacePurpose, string>;
+
+export const uiOperationalStateKeys = [
+  "active",
+  "blocked",
+  "review",
+  "archived",
+  "maintenance",
+] as const;
+
+export type UiOperationalState = (typeof uiOperationalStateKeys)[number];
+
+export const uiOperationalStateSchema = z.enum(uiOperationalStateKeys);
+
+export const uiOperationalStateClasses = {
+  active: "",
+  blocked: "ring-1 ring-critical/35",
+  review: "ring-1 ring-warning/35",
+  archived: "opacity-75",
+  maintenance: "ring-1 ring-info/35",
+} as const satisfies Record<UiOperationalState, string>;
+
+/** Radius roles — single source for keys + Zod. */
 export const uiRadiusKeys = [
   "control",
   "chip",
@@ -55,26 +102,26 @@ export type UiRadiusKey = (typeof uiRadiusKeys)[number];
 
 export const uiRadius = {
   /** Inputs, buttons, triggers, single-line controls */
-  control: "rounded-lg",
+  control: "rounded-control",
   /** Badges, kbd, compact chips */
-  chip: "rounded-md",
+  chip: "rounded-chip",
   /** Preferred aliases for familiar UI primitives */
-  card: "rounded-2xl",
-  panel: "rounded-xl",
-  dialog: "rounded-2xl",
-  popover: "rounded-xl",
-  sheet: "rounded-2xl",
-  table: "rounded-xl",
+  card: "rounded-card",
+  panel: "rounded-panel",
+  dialog: "rounded-dialog",
+  popover: "rounded-popover",
+  sheet: "rounded-sheet",
+  table: "rounded-table",
   /** Cards, dialogs, popovers, command surfaces */
-  surface: "rounded-2xl",
+  surface: "rounded-surface",
   /** Top / bottom caps for media-in-card patterns */
-  surfaceTop: "rounded-t-2xl",
-  surfaceBottom: "rounded-b-2xl",
+  surfaceTop: "rounded-t-surface",
+  surfaceBottom: "rounded-b-surface",
   /** Full selector utilities for card image caps (Tailwind must see literals) */
-  surfaceMediaTop: "*:[img:first-child]:rounded-t-2xl",
-  surfaceMediaBottom: "*:[img:last-child]:rounded-b-2xl",
+  surfaceMediaTop: "*:[img:first-child]:rounded-t-surface",
+  surfaceMediaBottom: "*:[img:last-child]:rounded-b-surface",
   /** Accordions, medium grouped shells */
-  section: "rounded-xl",
+  section: "rounded-section",
 } as const satisfies Record<UiRadiusKey, string>;
 
 export const uiRadiusKeySchema = z.enum(uiRadiusKeys);
@@ -101,20 +148,29 @@ export type UiRadiusClass = z.infer<typeof uiRadiusClassSchema>;
 export const uiTracking = {
   /** Buttons, fields, dense UI */
   control: "tracking-[0.01em]",
+  label: "tracking-[0.08em]",
 } as const;
 
 /**
  * Vertical rhythm between stacked blocks — mirrors `:root` density tokens in
  * `apps/erp/src/app/globals.css` via Tailwind `gap-density-*` utilities from `@theme inline`.
  */
-export const uiDensityKeys = ["compact", "comfortable", "relaxed"] as const;
+export const uiDensityKeys = [
+  "tight",
+  "compact",
+  "comfortable",
+  "relaxed",
+  "loose",
+] as const;
 
 export type UiDensity = (typeof uiDensityKeys)[number];
 
 export const uiDensity = {
+  tight: "gap-density-tight",
   compact: "gap-density-compact",
   comfortable: "gap-density-comfortable",
   relaxed: "gap-density-relaxed",
+  loose: "gap-density-loose",
 } as const satisfies Record<UiDensity, string>;
 
 export const uiDensitySchema = z.enum(uiDensityKeys);
@@ -127,6 +183,7 @@ export const uiSurfaceSpaceKeys = [
   "lg",
   "xl",
   "2xl",
+  "3xl",
 ] as const;
 
 export type UiSurfaceSpaceKey = (typeof uiSurfaceSpaceKeys)[number];
@@ -141,6 +198,17 @@ export const uiSurfaceInset = {
   lg: "p-surface-lg",
   xl: "p-surface-xl",
   "2xl": "p-surface-2xl",
+  "3xl": "p-surface-3xl",
+} as const satisfies Record<UiSurfaceSpaceKey, string>;
+
+export const uiSurfaceGap = {
+  xs: "gap-surface-xs",
+  sm: "gap-surface-sm",
+  md: "gap-surface-md",
+  lg: "gap-surface-lg",
+  xl: "gap-surface-xl",
+  "2xl": "gap-surface-2xl",
+  "3xl": "gap-surface-3xl",
 } as const satisfies Record<UiSurfaceSpaceKey, string>;
 
 export const uiTitle = {
@@ -149,6 +217,56 @@ export const uiTitle = {
    * Page/editorial headings inherit from `apps/erp/src/app/globals.css` (h1-h4).
    */
   sm: "font-heading text-lg leading-tight font-semibold",
+  md: "font-heading text-xl leading-tight font-semibold tracking-tight",
+  lg: "font-heading text-2xl leading-tight font-semibold tracking-tight",
+} as const;
+
+export const uiText = {
+  label:
+    "text-label-small font-medium tracking-[0.08em] text-muted-foreground uppercase",
+  body: "text-sm leading-6 text-foreground",
+  description: "text-sm leading-6 text-muted-foreground",
+  code: "font-mono text-xs leading-5",
+} as const;
+
+/**
+ * ERP semantic typography utilities generated by `apps/erp/src/app/globals.css`.
+ * These are the preferred contract names for page/list/detail builders.
+ */
+export const uiTypography = {
+  display: "type-display",
+  hero: "type-hero",
+  pageTitle: "type-page-title",
+  sectionTitle: "type-section-title",
+  cardTitle: "type-card-title",
+  body: "type-body",
+  muted: "type-muted",
+  caption: "type-caption",
+  label: "type-label",
+  control: "type-control",
+  monoCell: "type-mono-cell",
+} as const;
+
+/** Composite surface utilities. Use these before composing raw border/radius/shadow classes. */
+export const uiSurface = {
+  page: "surface-page",
+  card: "surface-card",
+  panel: "surface-panel",
+  dialog: "surface-dialog",
+  inset: "surface-inset",
+  toolbar: "surface-toolbar",
+  command: "surface-command",
+  focus: "surface-focus",
+} as const;
+
+/** Dense ERP table primitives for metadata-driven list renderers. */
+export const uiTable = {
+  shell: "table-shell",
+  headerRow: "table-header-row",
+  headerCell: "table-header-cell",
+  cell: "table-cell",
+  rowInteractive: "table-row-interactive",
+  rowSelected: "table-row-selected",
 } as const;
 
 export const uiStatusToneKeys = [
@@ -170,18 +288,120 @@ export const uiStatusToneClasses: Record<UiStatusTone, string> = {
   critical: "bg-critical/15 text-critical",
 };
 
-export const uiSurfaceElevation = {
-  default: "shadow-elevation-1",
-  raised: "shadow-elevation-2",
-  floating: "shadow-elevation-3",
-} as const;
+export const uiStatus = {
+  neutral: "state-neutral",
+  success: "state-success",
+  warning: "state-warning",
+  info: "state-info",
+  critical: "state-critical",
+} as const satisfies Record<UiStatusTone, string>;
 
-export const uiSurfaceElevationSchema = z.enum([
+/** Governed metadata risk tones use product semantics, then map to UI tokens. */
+export const uiRiskToneKeys = [
   "default",
+  "positive",
+  "attention",
+  "critical",
+] as const;
+
+export type UiRiskTone = (typeof uiRiskToneKeys)[number];
+
+export const uiRiskToneSchema = z.enum(uiRiskToneKeys);
+
+export const uiRiskToneClasses = {
+  default: "",
+  positive: "bg-success/10 text-success",
+  attention: "bg-warning/10 text-warning-foreground",
+  critical: "bg-critical/10 text-critical",
+} as const satisfies Record<UiRiskTone, string>;
+
+export const uiSurfaceMaterialKeys = ["solid", "muted", "subtle"] as const;
+
+export type UiSurfaceMaterial = (typeof uiSurfaceMaterialKeys)[number];
+
+export const uiSurfaceMaterialSchema = z.enum(uiSurfaceMaterialKeys);
+
+export const uiSurfaceMaterial = {
+  solid: "bg-card",
+  muted: "bg-muted/30",
+  subtle: "bg-card/60",
+} as const satisfies Record<UiSurfaceMaterial, string>;
+
+export const uiSurfaceElevationKeys = [
+  "flat",
+  "card",
   "raised",
   "floating",
-]);
-export type UiSurfaceElevation = z.infer<typeof uiSurfaceElevationSchema>;
+] as const;
+
+export type UiSurfaceElevation = (typeof uiSurfaceElevationKeys)[number];
+
+const uiSurfaceElevationInputKeys = [
+  ...uiSurfaceElevationKeys,
+  "default",
+] as const;
+
+const uiSurfaceElevationInputSchema = z.enum(uiSurfaceElevationInputKeys);
+
+export const uiSurfaceElevationSchema = uiSurfaceElevationInputSchema.transform(
+  (value): UiSurfaceElevation => (value === "default" ? "card" : value),
+);
+
+export const uiSurfaceElevation = {
+  flat: "shadow-none",
+  card: "shadow-elevation-1",
+  raised: "shadow-elevation-2",
+  floating: "shadow-elevation-3",
+  /** Back-compat alias for older primitive code. Prefer `card`. */
+  default: "shadow-elevation-1",
+} as const;
+
+export const uiFocusRing = {
+  default:
+    "focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-focus-ring",
+  strong:
+    "focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-focus-ring-strong",
+  inset:
+    "focus-visible:outline-none focus-visible:shadow-focus-ring focus-visible:ring-0",
+  invalid:
+    "aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40",
+} as const;
+
+export const uiMotion = {
+  interactive:
+    "transition-[background-color,border-color,box-shadow,transform] duration-150 ease-enterprise-standard",
+  surfaceIn: "animate-surface-in",
+  surfaceOut: "animate-surface-out",
+  resolving: "animate-material-resolving",
+} as const;
+
+export const uiOverlay = {
+  scrim: "bg-scrim supports-backdrop-filter:backdrop-blur-material",
+  panel: "bg-overlay supports-backdrop-filter:backdrop-blur-material",
+} as const;
+
+export const uiLayout = {
+  shell: "mx-auto w-full max-w-shell",
+  readable: "mx-auto w-full max-w-readable",
+  panel: "mx-auto w-full max-w-panel",
+  enterpriseGrid: "af-enterprise-grid",
+  pageShell: "page-shell",
+  pageStack: "page-stack",
+  sectionStack: "section-stack",
+  controlRow: "control-row",
+  toolbarRow: "toolbar-row",
+  splitGrid: "split-grid",
+} as const;
+
+export const uiControl = {
+  field: "min-h-field px-[var(--af-field-px)] py-[var(--af-field-py)] text-sm",
+  fieldSm: "h-field-sm px-[var(--af-field-px)] text-sm",
+  menuItem:
+    "px-[var(--af-menu-item-px)] py-[var(--af-menu-item-py)] text-sm font-medium",
+  tableHead: "h-[var(--af-table-head-height)] px-[var(--af-table-cell-px)]",
+  tableCell:
+    "px-[var(--af-table-cell-px)] py-[var(--af-table-cell-py)] align-middle",
+} as const;
 
 export const uiPriorityKeys = ["low", "normal", "high", "critical"] as const;
 
@@ -209,25 +429,75 @@ export const ui = {
     roomy: uiSurfaceInset.xl,
     spacious: uiSurfaceInset["2xl"],
   },
+  surfaceGap: uiSurfaceGap,
+  typography: uiTypography,
+  surface: uiSurface,
+  table: uiTable,
   gap: {
+    tight: uiDensity.tight,
     compact: uiDensity.compact,
     comfortable: uiDensity.comfortable,
     relaxed: uiDensity.relaxed,
+    loose: uiDensity.loose,
   },
   elevation: {
-    flat: "shadow-none",
-    card: uiSurfaceElevation.default,
+    flat: uiSurfaceElevation.flat,
+    card: uiSurfaceElevation.card,
     raised: uiSurfaceElevation.raised,
     floating: uiSurfaceElevation.floating,
   },
+  material: uiSurfaceMaterial,
+  purpose: uiSurfacePurposeClasses,
   tone: uiStatusToneClasses,
+  status: uiStatus,
+  risk: uiRiskToneClasses,
+  text: uiText,
+  title: uiTitle,
+  focus: uiFocusRing,
+  motion: uiMotion,
+  overlay: uiOverlay,
+  layout: uiLayout,
+  control: uiControl,
   priority: {
-    low: "opacity-70",
-    normal: "",
-    high: "ring-1 ring-border",
-    critical: "ring-1 ring-critical/35",
+    low: "priority-low",
+    normal: "priority-normal",
+    high: "priority-high",
+    critical: "priority-critical",
   },
+  state: uiOperationalStateClasses,
 } as const;
+
+export const uiSurfaceContractSchema = z
+  .object({
+    purpose: uiSurfacePurposeSchema.default("workspace"),
+    material: uiSurfaceMaterialSchema.default("solid"),
+    elevation: uiSurfaceElevationSchema.default("card"),
+    density: uiDensitySchema.default("comfortable"),
+    state: uiOperationalStateSchema.default("active"),
+  })
+  .strict();
+
+export type UiSurfaceContract = z.infer<typeof uiSurfaceContractSchema>;
+export type UiSurfaceContractInput = z.input<typeof uiSurfaceContractSchema>;
+
+export function parseUiSurfaceContract(
+  value: UiSurfaceContractInput,
+): UiSurfaceContract {
+  return uiSurfaceContractSchema.parse(value);
+}
+
+export function uiSurfaceClass(value: UiSurfaceContractInput = {}): string {
+  const contract = parseUiSurfaceContract(value);
+  return [
+    ui.material[contract.material],
+    ui.elevation[contract.elevation],
+    ui.purpose[contract.purpose],
+    ui.gap[contract.density],
+    ui.state[contract.state],
+  ]
+    .filter(Boolean)
+    .join(" ");
+}
 
 /** Button variants - keep in sync with `packages/ui/src/button.tsx`. */
 export const buttonVariantKeys = [
@@ -316,8 +586,24 @@ export function parseUiStatusTone(value: unknown): UiStatusTone {
   return uiStatusToneSchema.parse(value);
 }
 
+export function parseUiRiskTone(value: unknown): UiRiskTone {
+  return uiRiskToneSchema.parse(value);
+}
+
 export function parseSurfaceElevation(value: unknown): UiSurfaceElevation {
   return uiSurfaceElevationSchema.parse(value);
+}
+
+export function parseUiSurfaceMaterial(value: unknown): UiSurfaceMaterial {
+  return uiSurfaceMaterialSchema.parse(value);
+}
+
+export function parseUiSurfacePurpose(value: unknown): UiSurfacePurpose {
+  return uiSurfacePurposeSchema.parse(value);
+}
+
+export function parseUiOperationalState(value: unknown): UiOperationalState {
+  return uiOperationalStateSchema.parse(value);
 }
 
 export function parseUiRadiusKey(value: unknown): UiRadiusKey {

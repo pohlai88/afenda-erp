@@ -2,13 +2,17 @@ import "server-only";
 
 import {
   bootstrapOrganizationForUser,
+  getTenantSettings,
   getUserProfile,
   listPermissionKeysByRole,
   listRoleOverridesForOrganization,
   listOrganizationsForUser,
   upsertUserProfile,
 } from "@afenda/db";
-import { isDevAuthBypassEnabled } from "@afenda/config/env";
+import {
+  isDevAuthBypassEnabled,
+  isDevCookieAuthEnabled,
+} from "@afenda/config/env";
 import { cookies } from "next/headers";
 import { notFound, redirect } from "next/navigation";
 import { NextResponse } from "next/server";
@@ -33,9 +37,11 @@ import { getNeonAuthServer, isNeonAuthReady } from "./neon-auth-server";
 import { readNeonAuthSessionPayload } from "./neon-session";
 
 const defaultOrganization: OrganizationSummary = {
+  membershipId: "member_demo_owner",
   id: DEMO_ORG_ID,
   name: DEMO_ORG_NAME,
   slug: "afenda-operations",
+  locale: "en-MY",
   role: "owner",
   capabilities: [...appCapabilities],
 };
@@ -105,33 +111,15 @@ async function getSessionFromNeonAuth() {
     );
 
     const sessionOrganizations: OrganizationSummary[] = await Promise.all(
-      organizations.map(async (organization) => {
-        const baseKeys =
-          permissionsByRole.get(organization.role) ??
-          capabilitiesForRole(organization.role);
-        const overrides = await listRoleOverridesForOrganization({
-          organizationId: organization.id,
-        });
-        const permissionKeys = applyRoleOverrides(
-          baseKeys,
-          overrides,
-          organization.role,
-        );
-
-        return {
-          ...organization,
-          capabilities: normalizeCapabilities(permissionKeys, organization.role),
-        };
-      }),
+      organizations.map((organization) =>
+        hydrateOrganizationSummary(organization, permissionsByRole),
+      ),
     );
 
-    const activeOrganizationId =
-      profile?.defaultOrganizationId &&
-      sessionOrganizations.some(
-        (organization) => organization.id === profile.defaultOrganizationId,
-      )
-        ? profile.defaultOrganizationId
-        : (sessionOrganizations[0]?.id ?? "");
+    const activeOrganizationId = resolveActiveOrganizationId({
+      defaultOrganizationId: profile?.defaultOrganizationId,
+      organizations: sessionOrganizations,
+    });
 
     return userSessionSchema.parse({
       source: "neon",
@@ -156,6 +144,55 @@ async function getSessionFromNeonAuth() {
       organizations: [],
     });
   }
+}
+
+function resolveActiveOrganizationId(input: {
+  defaultOrganizationId?: string | null;
+  organizations: readonly OrganizationSummary[];
+}) {
+  if (!input.defaultOrganizationId) {
+    return input.organizations[0]?.id ?? "";
+  }
+
+  return input.organizations.some(
+    (organization) => organization.id === input.defaultOrganizationId,
+  )
+    ? input.defaultOrganizationId
+    : (input.organizations[0]?.id ?? "");
+}
+
+type RolePermissionMap = Map<OrganizationRole, readonly string[]>;
+
+async function hydrateOrganizationSummary(
+  organization: {
+    membershipId: string;
+    id: string;
+    name: string;
+    slug: string;
+    role: OrganizationRole;
+  },
+  permissionsByRole: RolePermissionMap,
+): Promise<OrganizationSummary> {
+  const baseKeys =
+    permissionsByRole.get(organization.role) ??
+    capabilitiesForRole(organization.role);
+  const overrides = await listRoleOverridesForOrganization({
+    organizationId: organization.id,
+  });
+  const settings = await getTenantSettings({
+    organizationId: organization.id,
+  });
+  const permissionKeys = applyRoleOverrides(
+    baseKeys,
+    overrides,
+    organization.role,
+  );
+
+  return {
+    ...organization,
+    locale: settings?.locale ?? "en-MY",
+    capabilities: normalizeCapabilities(permissionKeys, organization.role),
+  };
 }
 
 export type ApiAuthContext = {
@@ -218,14 +255,19 @@ export async function getSession() {
     return defaultSession;
   }
 
+  const cookieStore = await cookies();
+  const value = cookieStore.get(AFENDA_SESSION_COOKIE)?.value;
+  const devSession = value ? decodeSession(value) : null;
+
+  if (isDevCookieAuthEnabled() && devSession) {
+    return devSession;
+  }
+
   if (isNeonAuthReady()) {
     return getSessionFromNeonAuth();
   }
 
-  const cookieStore = await cookies();
-  const value = cookieStore.get(AFENDA_SESSION_COOKIE)?.value;
-
-  return value ? decodeSession(value) : null;
+  return devSession;
 }
 
 export function getPostSignInDestination(session: UserSession) {
@@ -243,16 +285,17 @@ export async function requireSession() {
 }
 
 export async function signOut() {
-  if (isNeonAuthReady()) {
-    await getNeonAuthServer().signOut();
-    return;
-  }
-
   const cookieStore = await cookies();
+
   cookieStore.delete({
     name: AFENDA_SESSION_COOKIE,
     path: "/",
   });
+
+  if (isNeonAuthReady()) {
+    await getNeonAuthServer().signOut();
+    return;
+  }
 }
 
 export function getActiveOrganization(session: UserSession) {

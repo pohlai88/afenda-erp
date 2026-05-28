@@ -12,8 +12,9 @@ import {
 } from "@afenda/auth";
 import { createDevSessionCookie, signOut } from "@afenda/auth/server";
 import { isDevCookieAuthEnabled } from "@afenda/config/env";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { resolveDevSignInRedirectPath } from "./dev-sign-in-redirect";
 
 function createSession(formData: FormData): UserSession {
   const parsed = devSignInSchema.parse({
@@ -33,8 +34,10 @@ function createSession(formData: FormData): UserSession {
     organizations: [
       {
         id: DEMO_ORG_ID,
+        membershipId: "member_demo_owner",
         name: parsed.organizationName,
         slug: normalizeOrganizationSlug(parsed.organizationName),
+        locale: "en-MY",
         role: "owner",
         capabilities: [...appCapabilities],
       },
@@ -49,6 +52,12 @@ export async function signInAction(formData: FormData) {
 
   const session = createSession(formData);
   const cookieStore = await cookies();
+  const requestHeaders = await headers();
+  const redirectTo = resolveDevSignInRedirectPath({
+    formValue: formData.get("redirectTo"),
+    origin: requestHeaders.get("origin"),
+    referer: requestHeaders.get("referer"),
+  });
 
   cookieStore.set(AFENDA_SESSION_COOKIE, createDevSessionCookie(session), {
     httpOnly: true,
@@ -58,7 +67,7 @@ export async function signInAction(formData: FormData) {
     maxAge: DEV_SESSION_MAX_AGE_SECONDS,
   });
 
-  redirect("/dashboard");
+  redirect(redirectTo);
 }
 
 export async function signOutAction() {

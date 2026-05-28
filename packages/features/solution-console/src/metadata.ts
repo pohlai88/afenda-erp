@@ -9,4 +9,4 @@ export {
   buildSolutionConsoleStatGrid,
   getSolutionConsoleListSurfaceKeys,
   solutionConsoleStatSurfaceKey,
-} from "@afenda/domain";
+} from "@afenda/kernel";

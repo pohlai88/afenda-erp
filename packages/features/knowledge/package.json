@@ -29,6 +29,7 @@
     "@afenda/ai": "workspace:*",
     "@afenda/config": "workspace:*",
     "@afenda/db": "workspace:*",
+    "@afenda/kernel": "workspace:*",
     "@afenda/governed-surface": "workspace:*",
     "ai": "^6.0.191",
     "drizzle-orm": "catalog:",

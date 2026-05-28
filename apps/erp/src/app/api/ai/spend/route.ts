@@ -1,9 +1,9 @@
 import {
   assertCapabilityAllowed,
   getGatewaySpendReport,
-  hasAiGatewayCredentials,
+  hasAiGatewayRuntimeCredentials,
   isAiPermissionError,
-} from "@afenda/ai";
+} from "@afenda/ai/server";
 import { getApiAuthContext } from "@afenda/auth/server";
 import { getRequestId, logServerEvent } from "@afenda/observability";
 import { NextResponse } from "next/server";
@@ -13,8 +13,11 @@ export async function GET(request: Request): Promise<NextResponse> {
   const requestId = getRequestId(request);
   const route = "/api/ai/spend";
 
-  if (!hasAiGatewayCredentials()) {
-    return NextResponse.json({ available: false, entries: [] }, { status: 200 });
+  if (!hasAiGatewayRuntimeCredentials()) {
+    return NextResponse.json(
+      { available: false, entries: [] },
+      { status: 200 },
+    );
   }
 
   try {

@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
-import { createErpAssistantTools } from "../../src/tools/erp-tools";
-import { createSolutionProviderTools } from "../../src/tools/solution-provider-tools";
+import { createErpAssistantTools } from "../../src/tools/ai.erp-tools.tool.server";
+import { createSolutionProviderTools } from "../../src/tools/ai.solution-provider-tools.tool.server";
 import type { ModuleId } from "@afenda/config/module-ids";
 
 function createWorkspace() {
@@ -123,7 +123,8 @@ describe("approval-tool entitlement guards", () => {
         rationale:
           "Finance owner validated the diagnostics and requested a tracked remediation action.",
         riskLevel: "medium",
-        expectedImpact: "Reduce unresolved variance and improve close confidence.",
+        expectedImpact:
+          "Reduce unresolved variance and improve close confidence.",
         sourceRecordIds: ["fin_001"],
         requiredHumanChecks: ["Controller confirmation"],
       }),

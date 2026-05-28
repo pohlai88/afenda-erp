@@ -12,18 +12,18 @@ Runtime stays on Vercel AI SDK v6 + AI Gateway. No Cloudflare runtime, no embedd
 
 ## Scope (KISS / YAGNI)
 
-| In scope | Out of scope |
-| -------- | ------------ |
-| One generic `ai_action_sandboxes` table | Module-specific sandbox variants |
-| One state machine matching existing Zod schema | New status values without a real consumer |
-| Persistence + repo helpers in `@afenda/db` | Vercel Workflow DevKit orchestration |
-| Wiring `proposeHumanApprovedAction` and `proposeApprovalDecision` to persist | New AI tools or skills |
-| Admin/audit list of sandboxes | New module domain (LMS, etc.) |
-| Domain executor contract (one proof skill) | Full domain executors for every module |
+| In scope                                                                     | Out of scope                              |
+| ---------------------------------------------------------------------------- | ----------------------------------------- |
+| One generic `ai_action_sandboxes` table                                      | Module-specific sandbox variants          |
+| One state machine matching existing Zod schema                               | New status values without a real consumer |
+| Persistence + repo helpers in `@afenda/db`                                   | Vercel Workflow DevKit orchestration      |
+| Wiring `proposeHumanApprovedAction` and `proposeApprovalDecision` to persist | New AI tools or skills                    |
+| Admin/audit list of sandboxes                                                | New module domain (LMS, etc.)             |
+| Domain executor contract (one proof skill)                                   | Full domain executors for every module    |
 
 ## State machine
 
-Aligns with [`packages/ai/src/schemas/operations.ts`](../../packages/ai/src/schemas/operations.ts) `sandboxStatusSchema` and current [`sandbox.ts`](../../packages/ai/src/sandbox.ts) helpers.
+Aligns with [`packages/ai/src/schemas/ai.operations.schema.ts`](../../packages/ai/src/schemas/ai.operations.schema.ts) `sandboxStatusSchema` and current [`ai.sandbox.actions.server.ts`](../../packages/ai/src/actions/ai.sandbox.actions.server.ts) helpers.
 
 ```
 pending  --human_approve--> approved
@@ -61,7 +61,7 @@ Tenant-scoped, generic.
 
 Indexes: `(organization_id, status, created_at)`, `(organization_id, module_id)`, `(approval_proposal_id)`.
 
-No new schema is invented for sandbox content — Zod schemas already exist in [`packages/ai/src/schemas/operations.ts`](../../packages/ai/src/schemas/operations.ts).
+No new schema is invented for sandbox content — Zod schemas already exist in [`packages/ai/src/schemas/ai.operations.schema.ts`](../../packages/ai/src/schemas/ai.operations.schema.ts).
 
 ### Repo helpers (in `@afenda/db`)
 
@@ -77,10 +77,10 @@ All helpers are tenant-scoped via `organizationId` and use existing GUC-based te
 
 Fix the existing tools — do not add new ones (YAGNI).
 
-| Tool | Today | Change |
-| ---- | ----- | ------ |
-| `proposeHumanApprovedAction` in [`solution-provider-tools.ts`](../../packages/ai/src/tools/solution-provider-tools.ts) | Builds `createActionSandbox(...)` in memory, never persists, never returns id | Persist via `createAiActionSandbox`, link to existing `ai_approval_proposals` row, return `sandboxId` in tool output |
-| `proposeApprovalDecision` in [`erp-tools.ts`](../../packages/ai/src/tools/erp-tools.ts) | Persists approval proposal only | Also create a `pending` sandbox and link it; status transitions follow the human decision |
+| Tool                                                                                                                                                 | Today                                                                         | Change                                                                                                               |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| `proposeHumanApprovedAction` in [`ai.solution-provider-tools.tool.server.ts`](../../packages/ai/src/tools/ai.solution-provider-tools.tool.server.ts) | Builds `createActionSandbox(...)` in memory, never persists, never returns id | Persist via `createAiActionSandbox`, link to existing `ai_approval_proposals` row, return `sandboxId` in tool output |
+| `proposeApprovalDecision` in [`ai.erp-tools.tool.server.ts`](../../packages/ai/src/tools/ai.erp-tools.tool.server.ts)                                | Persists approval proposal only                                               | Also create a `pending` sandbox and link it; status transitions follow the human decision                            |
 
 `needsApproval: true` stays where it is. Domain writes never happen inside `execute`; they happen in a **separate domain executor** invoked after approval.
 
@@ -97,7 +97,7 @@ type SandboxExecutor<TInput, TOutput> = (input: {
 }) => Promise<{ result: TOutput; createdRowIds: readonly string[] }>;
 ```
 
-- Executors live in feature/domain packages, not in `@afenda/ai`.
+- Executors live in feature/kernel packages, not in `@afenda/ai`.
 - Executors only run for `status === 'approved'`.
 - Executors write the domain row with a `sandbox_id` column referencing the source sandbox.
 
@@ -107,9 +107,9 @@ type SandboxExecutor<TInput, TOutput> = (input: {
 
 Reuse existing components — no new renderer infrastructure required.
 
-- **Solution Console** ([`(app)/solution-console`](../../apps/erp/src/app/(app)/solution-console)) — show sandbox id and link to the admin list on each approval-required card.
+- **Solution Console** ([`(app)/solution-console`](<../../apps/erp/src/app/(app)/solution-console>)) — show sandbox id and link to the admin list on each approval-required card.
 - **Admin/reports** — governed list of `ai_action_sandboxes` per tenant with status filter. Reuse `GovernedPatternCListSection` ([ARCH-006](../architecture/006-metadata-driven-ui-architecture.md)).
-- **Module workspace** ([`module-screen.tsx`](../../apps/erp/src/app/(app)/module-screen.tsx)) — small "AI actions" affordance linking to sandboxes for the current `moduleId`.
+- **Module workspace** ([`module-screen.tsx`](<../../apps/erp/src/app/(app)/module-screen.tsx>)) — small "AI actions" affordance linking to sandboxes for the current `moduleId`.
 
 ## Test plan
 
@@ -134,7 +134,7 @@ Reuse existing components — no new renderer infrastructure required.
 ## Assumptions
 
 - Sandboxes are infrastructure. They must work end-to-end **before** any new ERP module is added.
-- The Zod schemas already in [`packages/ai/src/schemas/operations.ts`](../../packages/ai/src/schemas/operations.ts) are canonical; the DB shape mirrors them.
+- The Zod schemas already in [`packages/ai/src/schemas/ai.operations.schema.ts`](../../packages/ai/src/schemas/ai.operations.schema.ts) are canonical; the DB shape mirrors them.
 - Approval persistence (`ai_approval_proposals`) is not duplicated by sandboxes; sandboxes **link** to approval rows via `approval_proposal_id`.
 - Vercel AI SDK / Gateway remains the runtime layer.
 - Durable workflows (Vercel WDK) are out of scope for this track.
@@ -167,8 +167,8 @@ Anything beyond this minimum is a separate roadmap item.
 
 This document supersedes the earlier draft that mixed LMS provisioning with execution-layer infrastructure and proposed a five-state machine (`pending|approved|rejected|executed|rolled_back`). The earlier shape conflicted with shipping code:
 
-- Code state machine was `pending|approved|rejected|discarded` ([`schemas/operations.ts`](../../packages/ai/src/schemas/operations.ts)).
-- In-memory sandboxes were created by `proposeHumanApprovedAction` and discarded with no persistence ([`solution-provider-tools.ts`](../../packages/ai/src/tools/solution-provider-tools.ts)).
+- Code state machine was `pending|approved|rejected|discarded` ([`schemas/ai.operations.schema.ts`](../../packages/ai/src/schemas/ai.operations.schema.ts)).
+- In-memory sandboxes were created by `proposeHumanApprovedAction` and discarded with no persistence ([`ai.solution-provider-tools.tool.server.ts`](../../packages/ai/src/tools/ai.solution-provider-tools.tool.server.ts)).
 
 Decisions:
 

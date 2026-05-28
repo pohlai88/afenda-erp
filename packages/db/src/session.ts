@@ -3,6 +3,7 @@ import { runWithAuthUserContext } from "./client";
 import { organizationMemberships, organizations, userProfiles } from "./schema";
 
 export type UserOrganizationRecord = {
+  membershipId: string;
   id: string;
   name: string;
   slug: string;
@@ -78,6 +79,7 @@ export async function listOrganizationsForUser(authUserId: string) {
   return runWithAuthUserContext(authUserId, async (db) => {
     const records = await db
       .select({
+        membershipId: organizationMemberships.id,
         id: organizations.id,
         name: organizations.name,
         slug: organizations.slug,
@@ -88,7 +90,12 @@ export async function listOrganizationsForUser(authUserId: string) {
         organizations,
         eq(organizationMemberships.organizationId, organizations.id),
       )
-      .where(eq(organizationMemberships.authUserId, authUserId))
+      .where(
+        and(
+          eq(organizationMemberships.authUserId, authUserId),
+          eq(organizationMemberships.status, "active"),
+        ),
+      )
       .orderBy(asc(organizations.name));
 
     return records satisfies UserOrganizationRecord[];
@@ -119,6 +126,7 @@ export async function userHasOrganizationMembership(input: {
       where: and(
         eq(organizationMemberships.authUserId, input.authUserId),
         eq(organizationMemberships.organizationId, input.organizationId),
+        eq(organizationMemberships.status, "active"),
       ),
     });
 

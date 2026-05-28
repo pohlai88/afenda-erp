@@ -1,18 +1,19 @@
 import {
+  aiGatewayHighConfidenceProviderOrder,
   assertAiBudget,
   assertCapabilityAllowed,
   createGovernedToolRegistry,
   assertGovernedToolset,
   assertNoSensitiveCredentialContent,
   createGatewayOptions,
-  createSolutionProviderAgent,
+  createSolutionProviderSpecialistAgent,
   estimateTokenCount,
   getAiGatewayEnvironment,
   getAiModelForFeature,
   getUsageMetrics,
-  hasAiGatewayCredentials,
+  hasAiGatewayRuntimeCredentials,
   solutionProviderToolMeta,
-} from "@afenda/ai";
+} from "@afenda/ai/server";
 import { getApiAuthContext } from "@afenda/auth/server";
 import {
   completeLynxRun,
@@ -27,6 +28,7 @@ import {
 } from "@afenda/db";
 import {
   createLynxKnowledgeTools,
+  createLynxOperatorCheckpoint,
   createLynxErpReadTools,
   createLynxReadinessTools,
   combineLynxQualityGates,
@@ -36,16 +38,22 @@ import {
   LYNX_GATEWAY_FEATURES,
   LYNX_MODULE_ID,
   LYNX_OPERATOR_MAX_STEPS,
+  type LynxRunContextData,
+  type LynxRunContextMetadata,
   summarizeLynxQualityGate,
   validateLynxClaims,
   type LynxQualityGateResult,
 } from "@afenda/feature-lynx/server";
 import { getRequestId, logServerEvent } from "@afenda/observability";
-import { solutionWorkflowIds, type SolutionWorkflowId } from "@afenda/domain";
+import { solutionWorkflowIds, type SolutionWorkflowId } from "@afenda/kernel";
 import { createAgentUIStreamResponse, type UIMessage } from "ai";
 import { NextResponse } from "next/server";
 
 import { lynxOperatorRequestSchema } from "@/lib/api/ai-request-schemas";
+import {
+  createRouteAgentStepLogger,
+  createRouteAiTelemetrySettings,
+} from "@/lib/api/ai-agent-observability";
 import { createErpSolutionProviderTools } from "@/lib/api/solution-provider-tool-bindings";
 import { withAiSpan } from "@/lib/ai-tracing";
 
@@ -154,7 +162,7 @@ export async function POST(request: Request): Promise<Response> {
   let activeWorkflowSession: { id: string; organizationId: string } | undefined;
   let toolQualityGates: LynxQualityGateResult[] = [];
 
-  if (!hasAiGatewayCredentials()) {
+  if (!hasAiGatewayRuntimeCredentials()) {
     return getGatewayUnavailableResponse();
   }
 
@@ -297,6 +305,12 @@ export async function POST(request: Request): Promise<Response> {
       workflowId: workflow,
       workflowSessionId: workflowSession.id,
     };
+    const runContext = {
+      runId,
+      route,
+      workflowId: workflow,
+      workflowSessionId: workflowSession.id,
+    } satisfies LynxRunContextData;
     await recordLynxRunEvent({
       organizationId: organization.id,
       runId,
@@ -430,28 +444,72 @@ export async function POST(request: Request): Promise<Response> {
       ...erpReadTools,
     };
     const toolMeta = { ...solutionProviderToolMeta, ...lynxToolMeta };
+    const toolMetaByName = toolMeta as Record<
+      string,
+      (typeof toolMeta)[keyof typeof toolMeta]
+    >;
 
     assertGovernedToolset({
       tools: rawTools,
-      meta: toolMeta,
+      meta: toolMetaByName,
       capabilities: organization.capabilities,
+    });
+    const operatorCheckpoint = createLynxOperatorCheckpoint({
+      runId,
+      workflowId: workflow,
+      workflowSessionId: workflowSession.id,
+      tools: Object.keys(rawTools).map((toolName) => {
+        const tool = rawTools[toolName as keyof typeof rawTools] as {
+          needsApproval?: boolean;
+        };
+        const meta = toolMetaByName[toolName]!;
+        return {
+          id: toolName,
+          access: meta.access,
+          risk: meta.risk,
+          requiresApproval: Boolean(tool.needsApproval),
+        };
+      }),
     });
     const { tools } = createGovernedToolRegistry({
       tools: rawTools,
-      meta: toolMeta,
+      meta: toolMetaByName,
       capabilities: organization.capabilities,
       organizationId: organization.id,
       userAuthId: session.id,
       logger: recordToolAudit,
     });
+    await recordLynxRunEvent({
+      organizationId: organization.id,
+      runId,
+      eventType: "operator.checkpoint",
+      summary: "Lynx operator checkpoint persisted before tool loop.",
+      metadata: {
+        workflowId: workflow,
+        workflowSessionId: workflowSession.id,
+        checkpoint: operatorCheckpoint,
+      },
+    });
+    await updateLynxWorkflowSession({
+      organizationId: organization.id,
+      id: workflowSession.id,
+      status: "active",
+      currentStage: "operator.checkpointed",
+      latestRunId: runId,
+      metadata: {
+        requestId,
+        workflowId: workflow,
+        checkpoint: operatorCheckpoint,
+      },
+    });
 
-    const agent = createSolutionProviderAgent({
+    const agent = createSolutionProviderSpecialistAgent({
       model,
       organizationName: organization.name,
       role: organization.role,
       workflowId: workflow,
       tools,
-      stopSteps: LYNX_OPERATOR_MAX_STEPS,
+      maxSteps: LYNX_OPERATOR_MAX_STEPS,
       providerOptions: createGatewayOptions({
         organizationId: organization.id,
         userId: session.id,
@@ -462,6 +520,35 @@ export async function POST(request: Request): Promise<Response> {
         qualityGate: "claim-validation",
         riskLevel: "high",
         environment: getAiGatewayEnvironment(),
+        providerOrder: aiGatewayHighConfidenceProviderOrder,
+        providerOnly: aiGatewayHighConfidenceProviderOrder,
+        fallbackModels: ["openai/gpt-5.5"],
+      }),
+      onStepFinish: createRouteAgentStepLogger({
+        feature: "lynx-operator",
+        functionId: LYNX_AUDIT_ACTIONS.operatorRecommend,
+        model,
+        moduleId: LYNX_MODULE_ID,
+        operation: "lynx.operator.step",
+        organizationId: organization.id,
+        requestId,
+        route,
+        userAuthId: session.id,
+        workflowId: workflow,
+        workflowSessionId: workflowSession.id,
+      }),
+      experimental_telemetry: createRouteAiTelemetrySettings({
+        feature: "lynx-operator",
+        functionId: LYNX_AUDIT_ACTIONS.operatorRecommend,
+        model,
+        moduleId: LYNX_MODULE_ID,
+        operation: LYNX_AUDIT_ACTIONS.operatorRecommend,
+        organizationId: organization.id,
+        requestId,
+        route,
+        userAuthId: session.id,
+        workflowId: workflow,
+        workflowSessionId: workflowSession.id,
       }),
       onFinish: async ({ totalUsage, finishReason }) => {
         const usageMetrics = getUsageMetrics(totalUsage);
@@ -565,6 +652,10 @@ export async function POST(request: Request): Promise<Response> {
           createAgentUIStreamResponse({
             agent,
             uiMessages,
+            messageMetadata: () =>
+              ({
+                lynxRun: runContext,
+              }) satisfies LynxRunContextMetadata,
           }),
         ),
     );

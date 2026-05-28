@@ -1,6 +1,7 @@
 import { requireCapability } from "@afenda/auth/server";
-import { getOperationalSkills } from "@afenda/ai";
+import { getOperationalSkills } from "@afenda/ai/server";
 import { listLynxRunLedger, type LynxRunLedgerSummary } from "@afenda/db";
+import { LynxOperatorPanel } from "@afenda/feature-lynx/client";
 import { getLynxReadinessSnapshot } from "@afenda/feature-lynx/server";
 import {
   buildLynxActivityLedgerListSurface,
@@ -32,14 +33,13 @@ import {
   getSolutionConsoleSection,
   resolveWorkspaceDataMode,
   solutionConsoleMetrics,
-} from "@afenda/domain";
+} from "@afenda/kernel";
 import {
   GovernedPatternBStatSection,
   GovernedPatternCListSection,
 } from "@afenda/governed-surface/server";
 import { Button, ModuleLinkGrid, SectionPanel, StatusBadge } from "@afenda/ui";
 import Link from "next/link";
-import { LynxOperatorPanel } from "./lynx-operator-panel";
 
 const recoveryModuleIds = getRecoveryConsoleModuleIds();
 

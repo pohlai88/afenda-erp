@@ -1,0 +1,35 @@
+---
+description: Feature package server-only marker and Vitest-safe boundary pattern
+globs: "packages/features/**/src/**/*.server.ts,packages/features/**/src/**/*.server.tsx,packages/features/**/src/server.ts,packages/features/**/vitest.config.ts"
+alwaysApply: false
+---
+
+# Afenda feature server boundary
+
+Feature packages centralize the server-only marker at their public `./server`
+door:
+
+```ts
+import "@afenda/kernel/server";
+```
+
+Use that import only from `packages/features/<moduleId>/src/server.ts`.
+Deep implementation files such as `data/*.server.ts`, `tools/*.server.ts`,
+`workflows/*.server.ts`, `policies/*.server.ts`, and server components inherit
+the boundary by being exported through the package server door.
+
+Do not import `server-only` directly from `@afenda/feature-*` packages. The
+`server-only` dependency belongs to `@afenda/kernel`; feature packages depend on
+the public `@afenda/kernel/server` door instead.
+
+Vitest package configs should use the shared config:
+
+```ts
+import { createVitestConfig } from "@afenda/config/vitest";
+
+export default createVitestConfig("@afenda/feature-<moduleId>");
+```
+
+Avoid feature-local `server-only` stubs or aliases. If a test needs a deep
+server implementation, import the implementation directly and mock its real
+runtime dependencies instead of mocking `server-only`.

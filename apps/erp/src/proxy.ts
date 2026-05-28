@@ -1,5 +1,6 @@
+import { AFENDA_SESSION_COOKIE } from "@afenda/auth";
 import { hasNeonAuthSessionToken } from "@afenda/auth/neon-cookies";
-import { isNeonAuthEnabled } from "@afenda/config/env";
+import { isDevCookieAuthEnabled, isNeonAuthEnabled } from "@afenda/config/env";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
@@ -15,6 +16,10 @@ function isApiRoute(pathname: string) {
   return pathname.startsWith("/api/");
 }
 
+function hasDevSessionCookie(request: NextRequest) {
+  return request.cookies.has(AFENDA_SESSION_COOKIE);
+}
+
 export async function proxy(request: NextRequest) {
   if (!isNeonAuthEnabled()) {
     return NextResponse.next();
@@ -23,6 +28,10 @@ export async function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
   if (isApiRoute(pathname)) {
+    return NextResponse.next();
+  }
+
+  if (isDevCookieAuthEnabled() && hasDevSessionCookie(request)) {
     return NextResponse.next();
   }
 

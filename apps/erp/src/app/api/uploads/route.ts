@@ -1,5 +1,5 @@
 import { registerTenantDocument } from "@afenda/db";
-import { uploadRouteCopy } from "@afenda/domain";
+import { uploadRouteCopy } from "@afenda/kernel";
 import { getRequestId, logServerEvent } from "@afenda/observability";
 import { handleUpload, type HandleUploadBody } from "@vercel/blob/client";
 import { NextResponse } from "next/server";

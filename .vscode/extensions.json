@@ -1,6 +1,7 @@
 {
   "recommendations": [
     "editorconfig.editorconfig",
+    "mikestead.dotenv",
     "esbenp.prettier-vscode",
     "dbaeumer.vscode-eslint",
     "bradlc.vscode-tailwindcss",

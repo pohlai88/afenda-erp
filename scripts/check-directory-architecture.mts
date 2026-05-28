@@ -1,6 +1,12 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import {
+  appRouteAllowedTsxNames,
+  bannedBucketNames,
+  featurePublicDoorFiles,
+  readTemplateBuckets,
+} from "../packages/_template-definition/scripts/lib/feature-bucket-grammar.mts";
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 const problems: string[] = [];
@@ -71,7 +77,7 @@ const packageArchitectureRules: Record<string, PackageArchitectureRule> = {
     requiresPackageBuild: true,
     turboBuildOutputs: ["dist/**"],
   },
-  "@afenda/domain": {
+  "@afenda/kernel": {
     category: "runtime-library",
     workspaceRoot: "packages",
     requiresCompiledDistExports: true,
@@ -169,6 +175,42 @@ function isSourceFile(filePath: string) {
     filePath.endsWith(".mts") ||
     filePath.endsWith(".cts")
   );
+}
+
+function parseFeaturePath(relativePath: string) {
+  const rootMatch = relativePath.match(
+    /^packages\/features\/([^/]+)\/(?!src\/)(.+)$/,
+  );
+  if (rootMatch && !relativePath.includes("/src/")) {
+    return {
+      featureName: rootMatch[1] ?? "",
+      afterBase: rootMatch[2] ?? "",
+      legacy: false,
+    };
+  }
+
+  const srcMatch = relativePath.match(
+    /^packages\/features\/([^/]+)\/src(?:\/(.*))?$/,
+  );
+  if (!srcMatch) {
+    return null;
+  }
+  return {
+    featureName: srcMatch[1] ?? "",
+    afterBase: srcMatch[2] ?? "",
+    legacy: true,
+  };
+}
+
+function resolveFeatureBaseDir(featureDir: string) {
+  if (fs.existsSync(path.join(featureDir, "index.ts"))) {
+    return { baseDir: featureDir, legacy: false };
+  }
+  const srcDir = path.join(featureDir, "src");
+  if (fs.existsSync(path.join(srcDir, "index.ts"))) {
+    return { baseDir: srcDir, legacy: true };
+  }
+  return { baseDir: featureDir, legacy: false };
 }
 
 function isExternalMarkdownTarget(target: string) {
@@ -468,9 +510,8 @@ function readClassifiedWorkspacePackages() {
 
       return { ...workspacePackage, packageName, rule };
     })
-    .filter(
-      (workspacePackage): workspacePackage is WorkspacePackageWithName =>
-        Boolean(workspacePackage),
+    .filter((workspacePackage): workspacePackage is WorkspacePackageWithName =>
+      Boolean(workspacePackage),
     );
 }
 
@@ -570,6 +611,168 @@ function checkFeatureWorkspaceDiscipline() {
   }
 
   walkFeatureDir(featuresRoot, 0);
+}
+
+function checkFeatureBucketGrammar() {
+  const featuresRoot = path.join(root, "packages/features");
+  if (!fs.existsSync(featuresRoot)) {
+    return;
+  }
+
+  const templateBuckets = readTemplateBuckets(root);
+  const templateBucketSet = new Set<string>(templateBuckets);
+
+  for (const featureEntry of fs.readdirSync(featuresRoot, {
+    withFileTypes: true,
+  })) {
+    if (!featureEntry.isDirectory()) {
+      continue;
+    }
+
+    const featureDir = path.join(featuresRoot, featureEntry.name);
+    const { baseDir, legacy } = resolveFeatureBaseDir(featureDir);
+    if (!fs.existsSync(baseDir)) {
+      continue;
+    }
+
+    const topEntries = fs.readdirSync(baseDir, { withFileTypes: true });
+    const topNames = new Set(topEntries.map((entry) => entry.name));
+
+    if (!legacy) {
+      for (const door of featurePublicDoorFiles) {
+        if (!topNames.has(door)) {
+          problems.push(
+            `Feature ${featureEntry.name} must include public door ${door} (see packages/_template-definition)`,
+          );
+        }
+      }
+
+      const presentTemplateBuckets = templateBuckets.filter((bucket) =>
+        topNames.has(bucket),
+      );
+      if (presentTemplateBuckets.length === 0) {
+        problems.push(
+          `Feature ${featureEntry.name} must include at least one template bucket (see packages/_template-definition)`,
+        );
+      }
+    }
+
+    for (const topEntry of topEntries) {
+      const rel = relativePath(path.join(baseDir, topEntry.name));
+
+      if (bannedBucketNames.has(topEntry.name)) {
+        if (
+          !(featureEntry.name === "system-admin" && topEntry.name === "lib")
+        ) {
+          problems.push(
+            `Feature uses banned folder name "${topEntry.name}": ${rel}`,
+          );
+        }
+      }
+
+      if (topEntry.isFile() || !topEntry.isDirectory()) {
+        continue;
+      }
+
+      if (templateBucketSet.has(topEntry.name)) {
+        continue;
+      }
+
+      if (legacy) {
+        continue;
+      }
+
+      const verticalDir = path.join(baseDir, topEntry.name);
+      const verticalEntries = fs
+        .readdirSync(verticalDir, { withFileTypes: true })
+        .filter((entry) => entry.isDirectory())
+        .map((entry) => entry.name);
+
+      const hasAnyTemplateBucket = templateBuckets.some((bucket) =>
+        verticalEntries.includes(bucket),
+      );
+      if (!hasAnyTemplateBucket) {
+        continue;
+      }
+
+      for (const bucket of templateBuckets) {
+        if (!verticalEntries.includes(bucket)) {
+          problems.push(
+            `Vertical ${featureEntry.name}/${topEntry.name} must contain template bucket "${bucket}"`,
+          );
+        }
+      }
+
+      for (const verticalEntry of verticalEntries) {
+        if (bannedBucketNames.has(verticalEntry)) {
+          problems.push(
+            `Vertical ${featureEntry.name}/${topEntry.name} uses banned folder "${verticalEntry}"`,
+          );
+        }
+      }
+    }
+  }
+
+  walkSourceFiles(featuresRoot, (filePath) => {
+    const rel = relativePath(filePath);
+    const parsed = parseFeaturePath(rel);
+    if (!parsed || !parsed.afterBase) {
+      return;
+    }
+
+    const fileName = path.basename(rel);
+    if (fileName.endsWith(".client.ts") || fileName.endsWith(".client.tsx")) {
+      if (!rel.includes("/components/")) {
+        problems.push(`Client-suffix file must live in components/: ${rel}`);
+      }
+    }
+
+    if (fileName.endsWith(".actions.server.ts") && !rel.includes("/actions/")) {
+      problems.push(`Action server file must live in actions/: ${rel}`);
+    }
+  });
+}
+
+function checkAppRouteFileWhitelist() {
+  const appRoot = path.join(root, "apps/erp/src");
+  if (!fs.existsSync(appRoot)) {
+    return;
+  }
+
+  const transitionAllowList = new Set([
+    "apps/erp/src/app/(app)/app-sidebar.tsx",
+    "apps/erp/src/app/(app)/dashboard-route.tsx",
+    "apps/erp/src/app/(app)/document-extraction-form.tsx",
+    "apps/erp/src/app/(app)/document-upload-form.tsx",
+    "apps/erp/src/app/(app)/erp-assistant-panel.tsx",
+    "apps/erp/src/app/(app)/module-screen.tsx",
+    "apps/erp/src/app/(app)/solution-console/lynx-operator-panel.tsx",
+    "apps/erp/src/app/(app)/solution-console/solution-console-route.tsx",
+    "apps/erp/src/app/(app)/knowledge/lynx-truth-panel.tsx",
+    "apps/erp/src/app/app-analytics.tsx",
+    "apps/erp/src/app/onboarding/onboarding-form.tsx",
+  ]);
+
+  walkSourceFiles(appRoot, (filePath) => {
+    const rel = relativePath(filePath);
+
+    if (!rel.startsWith("apps/erp/src/app/")) {
+      return;
+    }
+
+    if (rel.endsWith(".tsx")) {
+      const fileName = path.basename(rel);
+      const inPrivateComponents = rel.includes("/_components/");
+      if (
+        !appRouteAllowedTsxNames.has(fileName) &&
+        fileName !== "global-error.tsx" &&
+        !inPrivateComponents &&
+        !transitionAllowList.has(rel)
+      ) {
+        problems.push(`Non-route TSX file found in app tree: ${rel}`);
+      }
+    }
+  });
 }
 
 function readTranspilePackages() {
@@ -735,7 +938,7 @@ function checkImportBoundaries() {
       if (
         specifier.startsWith("@afenda/feature-") &&
         !isFeaturePackageFile &&
-        !rel.startsWith("packages/domain/")
+        !rel.startsWith("packages/kernel/")
       ) {
         const packageRoot = specifier.split("/").slice(0, 2).join("/");
         if (
@@ -770,6 +973,78 @@ function checkImportBoundaries() {
       ) {
         problems.push(
           `${rel} is a client export path and must not import server-only module ${specifier}`,
+        );
+      }
+    }
+  });
+}
+
+function checkFeatureServerBoundaryMarkers() {
+  const featuresRoot = path.join(root, "packages/features");
+  if (!fs.existsSync(featuresRoot)) {
+    return;
+  }
+
+  walkSourceFiles(featuresRoot, (filePath) => {
+    const rel = relativePath(filePath);
+    const content = fs.readFileSync(filePath, "utf8");
+    const importSpecifiers = getImportSpecifiers(content);
+    const isFeatureServerDoor =
+      /^packages\/features\/[^/]+\/src\/server\.tsx?$/.test(rel);
+
+    for (const specifier of importSpecifiers) {
+      if (specifier === "server-only" || specifier === "server-only/index.js") {
+        problems.push(
+          `${rel} must not import server-only directly; mark the feature package server boundary through @afenda/kernel/server in src/server.ts`,
+        );
+      }
+
+      if (specifier === "@afenda/kernel/server" && !isFeatureServerDoor) {
+        problems.push(
+          `${rel} must not import @afenda/kernel/server directly; feature internals inherit the server boundary from src/server.ts`,
+        );
+      }
+    }
+
+    if (
+      isFeatureServerDoor &&
+      !importSpecifiers.includes("@afenda/kernel/server")
+    ) {
+      problems.push(
+        `${rel} must import @afenda/kernel/server as the feature package server boundary marker`,
+      );
+    }
+  });
+}
+
+function checkFeatureSchemaOwnership() {
+  const featuresRoot = path.join(root, "packages/features");
+  if (!fs.existsSync(featuresRoot)) {
+    return;
+  }
+
+  walkSourceFiles(featuresRoot, (filePath) => {
+    const rel = relativePath(filePath);
+    const content = fs.readFileSync(filePath, "utf8");
+
+    if (
+      content.includes("drizzle-orm/pg-core") ||
+      content.includes("pgTable(") ||
+      content.includes("pgEnum(")
+    ) {
+      problems.push(
+        `Feature package must not own Drizzle DDL; move schema to @afenda/db: ${rel}`,
+      );
+    }
+
+    if (content.includes('"use server"') || content.includes("'use server'")) {
+      const isActionPath =
+        rel.includes("/actions/") ||
+        rel.includes("/actions.server.") ||
+        rel.includes("actions.server.ts");
+      if (!isActionPath) {
+        problems.push(
+          `'use server' is only allowed in action-oriented files: ${rel}`,
         );
       }
     }
@@ -924,10 +1199,14 @@ walk(root);
 checkAppUiBoundary();
 checkWorkspacePackageRegistry();
 checkFeatureWorkspaceDiscipline();
+checkFeatureBucketGrammar();
 checkPackageBuildPolicy();
 checkTurboBuildOutputs();
 checkAppWorkspaceDependencySync();
 checkImportBoundaries();
+checkFeatureServerBoundaryMarkers();
+checkFeatureSchemaOwnership();
+checkAppRouteFileWhitelist();
 
 if (problems.length > 0) {
   console.error("[architecture:check] Directory architecture violations:");

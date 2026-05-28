@@ -1,29 +1,37 @@
 import {
+  aiGatewayHighConfidenceProviderOrder,
   assertAiBudget,
   assertCapabilityAllowed,
   assertGovernedToolset,
   assertNoSensitiveCredentialContent,
   createGatewayOptions,
-  createSolutionProviderAgent,
+  createSolutionProviderSpecialistAgent,
   estimateTokenCount,
   getAiGatewayEnvironment,
   getAiModelForFeature,
   getAiRouteError,
   getUsageMetrics,
-  hasAiGatewayCredentials,
+  hasAiGatewayRuntimeCredentials,
   isAiBudgetError,
   isAiPermissionError,
   isAiSensitiveContentError,
   solutionProviderToolMeta,
-} from "@afenda/ai";
+} from "@afenda/ai/server";
 import { getApiAuthContext } from "@afenda/auth/server";
-import { createAiUsageEvent, isAiFeatureEnabledForOrganization } from "@afenda/db";
+import {
+  createAiUsageEvent,
+  isAiFeatureEnabledForOrganization,
+} from "@afenda/db";
 import { getRequestId, logServerEvent } from "@afenda/observability";
 import { createAgentUIStreamResponse, type UIMessage } from "ai";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
 import { solutionProviderRequestSchema } from "@/lib/api/ai-request-schemas";
+import {
+  createRouteAgentStepLogger,
+  createRouteAiTelemetrySettings,
+} from "@/lib/api/ai-agent-observability";
 import { createErpSolutionProviderTools } from "@/lib/api/solution-provider-tool-bindings";
 import { withAiSpan } from "@/lib/ai-tracing";
 
@@ -64,7 +72,7 @@ async function handlePost(request: Request): Promise<NextResponse | Response> {
   const route = "/api/ai/solution-provider";
   const model = getAiModelForFeature("solution-provider", "high");
 
-  if (!hasAiGatewayCredentials()) {
+  if (!hasAiGatewayRuntimeCredentials()) {
     return getGatewayUnavailableResponse();
   }
 
@@ -138,13 +146,13 @@ async function handlePost(request: Request): Promise<NextResponse | Response> {
       capabilities: organization.capabilities,
     });
 
-    const agent = createSolutionProviderAgent({
+    const agent = createSolutionProviderSpecialistAgent({
       model,
       organizationName: organization.name,
       role: organization.role,
       workflowId,
       tools,
-      stopSteps: 8,
+      maxSteps: 8,
       providerOptions: createGatewayOptions({
         organizationId: organization.id,
         userId: session.id,
@@ -153,8 +161,33 @@ async function handlePost(request: Request): Promise<NextResponse | Response> {
         workflowId,
         riskLevel: "high",
         environment: getAiGatewayEnvironment(),
-        providerOrder: ["anthropic", "openai"],
+        providerOrder: aiGatewayHighConfidenceProviderOrder,
+        providerOnly: aiGatewayHighConfidenceProviderOrder,
         fallbackModels: ["openai/gpt-5.5"],
+      }),
+      onStepFinish: createRouteAgentStepLogger({
+        feature: "solution-provider",
+        functionId: "ai.solution-provider.agent",
+        model,
+        moduleId: "dashboard",
+        operation: "ai.solution-provider.step",
+        organizationId: organization.id,
+        requestId,
+        route,
+        userAuthId: session.id,
+        ...(workflowId ? { workflowId } : {}),
+      }),
+      experimental_telemetry: createRouteAiTelemetrySettings({
+        feature: "solution-provider",
+        functionId: "ai.solution-provider.agent",
+        model,
+        moduleId: "dashboard",
+        operation: "ai.solution-provider.stream",
+        organizationId: organization.id,
+        requestId,
+        route,
+        userAuthId: session.id,
+        ...(workflowId ? { workflowId } : {}),
       }),
       onFinish: async ({ totalUsage, finishReason }) => {
         const usageMetrics = getUsageMetrics(totalUsage);

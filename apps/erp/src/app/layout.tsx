@@ -1,4 +1,4 @@
-import { appRootMetadataCopy } from "@afenda/domain";
+import { appRootMetadataCopy } from "@afenda/kernel";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { AppAnalytics } from "./app-analytics";

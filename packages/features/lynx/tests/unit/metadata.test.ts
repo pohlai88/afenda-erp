@@ -24,7 +24,7 @@ import {
   buildLynxReadinessStatGrid,
   buildLynxToolAvailabilityListSurface,
 } from "../../src/metadata";
-import type { LynxReadinessSnapshot } from "../../src/readiness-contract";
+import type { LynxReadinessSnapshot } from "../../src/contracts/lynx.readiness.contract";
 
 const snapshot: LynxReadinessSnapshot = {
   organizationId: "org_1",
@@ -162,6 +162,17 @@ describe("Lynx metadata builders", () => {
           sandboxId: "-",
           createdAt: "2026-05-28 10:01",
         },
+        {
+          id: "event_2",
+          eventType: "output-denied",
+          summary: "Tool output was denied.",
+          toolName: "requestApproval",
+          evidenceCount: "0",
+          validation: "-",
+          approvalProposalId: "approval_1",
+          sandboxId: "-",
+          createdAt: "2026-05-28 10:02",
+        },
       ],
     });
     const feedback = buildLynxRunFeedbackListSurface({
@@ -178,6 +189,7 @@ describe("Lynx metadata builders", () => {
 
     expect(stats.stats[0]?.value).toBe("completed");
     expect(timeline.rows[0]?.cells.toolName).toBe("inspectLynxReadiness");
+    expect(timeline.rows[1]?.rowTone).toBe("critical");
     expect(feedback.rows[0]?.cells.category).toBe("accurate");
   });
 

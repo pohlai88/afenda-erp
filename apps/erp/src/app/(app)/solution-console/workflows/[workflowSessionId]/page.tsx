@@ -4,6 +4,7 @@ import {
   getLynxWorkflowSession,
   listLynxRunLedger,
 } from "@afenda/db";
+import { LynxOperatorPanel } from "@afenda/feature-lynx/client";
 import {
   buildLynxWorkflowLinkedRunListSurface,
   buildLynxWorkflowSessionDetailStatGrid,
@@ -16,7 +17,6 @@ import {
 import { Button, SectionPanel, StatusBadge } from "@afenda/ui";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { LynxOperatorPanel } from "../../lynx-operator-panel";
 
 type PageProps = {
   params: Promise<{ workflowSessionId: string }>;
@@ -126,7 +126,10 @@ export default async function LynxWorkflowSessionDetailPage({
   const origin = getMetadataString(session.metadata, "origin");
   const monitorStatus = getMetadataString(session.metadata, "monitorStatus");
   const severity = getMetadataString(session.metadata, "severity");
-  const ownerAuthUserId = getMetadataString(session.metadata, "ownerAuthUserId");
+  const ownerAuthUserId = getMetadataString(
+    session.metadata,
+    "ownerAuthUserId",
+  );
   const detailStats = buildLynxWorkflowSessionDetailStatGrid({
     status: session.status,
     ...(origin ? { origin } : {}),

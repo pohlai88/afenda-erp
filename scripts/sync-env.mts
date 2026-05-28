@@ -3,7 +3,8 @@ import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const rootDir = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const sourcePath = resolve(rootDir, ".env.config");
+const configSourcePath = resolve(rootDir, ".env.config");
+const secretSourcePath = resolve(rootDir, ".secret.config");
 const targetPaths = [
   resolve(rootDir, ".env.local"),
   resolve(rootDir, "apps/erp/.env.local"),
@@ -36,6 +37,28 @@ function parseDotenv(content: string) {
   }
 
   return env;
+}
+
+function hasDotenvAssignment(line: string) {
+  const trimmed = line.trim();
+  if (!trimmed || trimmed.startsWith("#")) return null;
+
+  const equalsIndex = line.indexOf("=");
+  if (equalsIndex <= 0) return null;
+
+  return line.slice(0, equalsIndex).trim();
+}
+
+function stripAssignments(content: string, keys: ReadonlySet<string>) {
+  if (keys.size === 0) return content;
+
+  return content
+    .split(/\r?\n/)
+    .filter((line) => {
+      const key = hasDotenvAssignment(line);
+      return !key || !keys.has(key);
+    })
+    .join("\n");
 }
 
 function formatEnvValue(value: string) {
@@ -82,18 +105,40 @@ function redactEnvFileContent(content: string) {
 }
 
 async function main() {
-  const sourceRaw = await readFile(sourcePath, "utf8");
-  const source = sourceRaw.replace(/^\uFEFF/, "");
-  const normalizedSource = source.endsWith("\n") ? source : `${source}\n`;
-  const parsedSource = parseDotenv(source);
+  const configRaw = await readFile(configSourcePath, "utf8");
+  let secretRaw = "";
+  try {
+    secretRaw = await readFile(secretSourcePath, "utf8");
+  } catch {
+    secretRaw = "";
+  }
+
+  const configSource = configRaw.replace(/^\uFEFF/, "");
+  const secretSource = secretRaw.replace(/^\uFEFF/, "");
+  const parsedConfig = parseDotenv(configSource);
+  const parsedSecret = parseDotenv(secretSource);
+  const secretKeys = new Set(Object.keys(parsedSecret));
+  const configWithoutSecretKeys = stripAssignments(configSource, secretKeys);
+  const mergedSource = [configWithoutSecretKeys, secretSource]
+    .map((source) => source.trimEnd())
+    .filter(Boolean)
+    .join("\n\n");
+  const normalizedSource = mergedSource.endsWith("\n")
+    ? mergedSource
+    : `${mergedSource}\n`;
+  const parsedSource = { ...parsedConfig, ...parsedSecret };
+  const aiGatewayAliasBlock = buildAiGatewayAliasBlock(parsedSource);
   const sourceKeys = new Set(Object.keys(parsedSource));
+  if (aiGatewayAliasBlock) {
+    sourceKeys.add("VERCEL_API_TOKEN");
+  }
 
   const outputs = new Map<
     string,
     { content: string; preservedKeys: string[] }
   >();
-  const banner = `# Generated from .env.config via pnpm env:sync.
-# Edit .env.config and re-run the sync script.
+  const banner = `# Generated from .env.config + .secret.config via pnpm env:sync.
+# Edit .env.config for non-secret values and .secret.config for secrets, then re-run the sync script.
 
 `;
 
@@ -113,10 +158,10 @@ async function main() {
       preserved = {};
     }
 
-    let output = `${banner}${normalizedSource}${buildAiGatewayAliasBlock(parsedSource)}`;
+    let output = `${banner}${normalizedSource}${aiGatewayAliasBlock}`;
     const preservedEntries = Object.entries(preserved);
     if (preservedEntries.length > 0) {
-      output += `\n# --- Not in .env.config (kept from previous ${targetPath.endsWith(".env.local") ? ".env.local" : "env file"}) ---\n`;
+      output += `\n# --- Not in .env.config or .secret.config (kept from previous ${targetPath.endsWith(".env.local") ? ".env.local" : "env file"}) ---\n`;
       output += `${preservedEntries
         .map(([key, value]) => `${key}=${formatEnvValue(value)}`)
         .join("\n")}\n`;
@@ -132,7 +177,7 @@ async function main() {
     for (const [targetPath, { content, preservedKeys }] of outputs) {
       process.stdout.write(
         `--- ${targetPath} ---\n` +
-          `Would sync ${sourceKeys.size} key(s) from .env.config` +
+          `Would sync ${sourceKeys.size} key(s) from .env.config + .secret.config` +
           (preservedKeys.length > 0
             ? `; preserve ${preservedKeys.length} key(s) not in source: ${preservedKeys.join(", ")}`
             : "") +
@@ -157,7 +202,7 @@ async function main() {
   }
 
   process.stdout.write(
-    `Synchronized environment files from ${sourcePath} to ${targetPaths.length} target(s).\n`,
+    `Synchronized environment files from ${configSourcePath} and ${secretSourcePath} to ${targetPaths.length} target(s).\n`,
   );
   process.stdout.write(
     "For Cursor MCP on Windows, run: pnpm env:sync:cursor (then restart Cursor).\n",

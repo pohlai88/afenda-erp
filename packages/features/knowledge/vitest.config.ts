@@ -1,8 +1,3 @@
-import { defineConfig } from "vitest/config";
+import { createVitestConfig } from "@afenda/config/vitest";
 
-export default defineConfig({
-  test: {
-    environment: "node",
-    include: ["tests/**/*.test.ts"],
-  },
-});
+export default createVitestConfig("@afenda/feature-knowledge");

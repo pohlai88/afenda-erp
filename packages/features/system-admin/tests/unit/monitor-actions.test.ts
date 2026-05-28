@@ -6,12 +6,36 @@ const mocks = vi.hoisted(() => ({
     session: { id: "auth_1" },
     organization: { id: "org_1" },
   })),
+  requireExecutionContext: vi.fn(async () => ({
+    organizationId: "org_1",
+    organizationSlug: "org-1",
+    userId: "auth_1",
+    membershipId: "member_1",
+    locale: "en-MY",
+    actorType: "user",
+    capabilities: ["system-admin.machine-layer.approve"],
+    role: "admin",
+    sessionSource: "dev",
+  })),
+  hasExecutionPermission: vi.fn(
+    (
+      context: { capabilities: readonly string[] },
+      permission: string,
+    ) => context.capabilities.includes(permission),
+  ),
+  requireExecutionPermission: vi.fn(),
   revalidatePath: vi.fn(),
   updateLynxOutcomeMonitorSetting: vi.fn(async () => undefined),
 }));
 
 vi.mock("@afenda/auth/server", () => ({
   requireCapability: mocks.requireCapability,
+}));
+
+vi.mock("@afenda/kernel/execution", () => ({
+  hasExecutionPermission: mocks.hasExecutionPermission,
+  requireExecutionContext: mocks.requireExecutionContext,
+  requireExecutionPermission: mocks.requireExecutionPermission,
 }));
 
 vi.mock("@afenda/db", () => ({
@@ -26,7 +50,7 @@ vi.mock("next/cache", () => ({
   revalidatePath: mocks.revalidatePath,
 }));
 
-import { updateLynxOutcomeMonitorSettingAction } from "../../src/machine-layer/monitor-actions.server";
+import { updateLynxOutcomeMonitorSettingAction } from "../../src/actions/system-admin.lynx-outcome-monitor.actions.server";
 
 function monitorForm(overrides: Record<string, string> = {}) {
   const formData = new FormData();
@@ -43,6 +67,9 @@ describe("Lynx outcome monitor setting actions", () => {
   beforeEach(() => {
     mocks.logServerEvent.mockClear();
     mocks.requireCapability.mockClear();
+    mocks.requireExecutionContext.mockClear();
+    mocks.hasExecutionPermission.mockClear();
+    mocks.requireExecutionPermission.mockClear();
     mocks.revalidatePath.mockClear();
     mocks.updateLynxOutcomeMonitorSetting.mockClear();
   });

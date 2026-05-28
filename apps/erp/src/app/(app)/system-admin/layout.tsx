@@ -1,5 +1,5 @@
-import { requireCapability } from "@afenda/auth/server";
-import { SystemAdminNav } from "@/components/system-admin/system-admin-nav.client";
+import { SystemAdminNav } from "@afenda/feature-system-admin/client";
+import { requireSystemAdminRead } from "@afenda/feature-system-admin/server";
 import type { ReactNode } from "react";
 
 export default async function SystemAdminLayout({
@@ -7,7 +7,7 @@ export default async function SystemAdminLayout({
 }: {
   children: ReactNode;
 }) {
-  await requireCapability("system-admin.view");
+  await requireSystemAdminRead();
 
   return (
     <div className="flex flex-col gap-6">

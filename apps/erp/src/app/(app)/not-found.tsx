@@ -1,5 +1,5 @@
-import { routeErrorCopy } from "@afenda/domain";
-import { RouteStatePanel } from "@/components/route-states";
+import { routeErrorCopy } from "@afenda/kernel";
+import { RouteStatePanel } from "@/app-route-state/route-states";
 
 export default function AppNotFound() {
   return (

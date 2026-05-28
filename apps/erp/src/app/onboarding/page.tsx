@@ -1,5 +1,5 @@
 import { getPostSignInDestination, getSession } from "@afenda/auth/server";
-import { getAuthPageShellCopy } from "@afenda/domain";
+import { getAuthPageShellCopy } from "@afenda/kernel";
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";

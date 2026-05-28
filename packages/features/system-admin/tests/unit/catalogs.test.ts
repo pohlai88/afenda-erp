@@ -9,7 +9,7 @@ import {
   systemAdminPermissionCatalog,
   systemAdminDefaultWebhookEventPresets,
   systemAdminWebhookEvents,
-} from "../../src/catalogs";
+} from "../../src/contracts";
 
 describe("system admin catalogs", () => {
   it("backs RBAC override selection with the app capability catalog", () => {
@@ -17,6 +17,10 @@ describe("system admin catalogs", () => {
       appCapabilities,
     );
     expect(isSystemAdminPermissionKey("system-admin.audit.read")).toBe(true);
+    expect(isSystemAdminPermissionKey("system-admin.roles.manage")).toBe(true);
+    expect(isSystemAdminPermissionKey("system-admin.diagnostics.read")).toBe(
+      true,
+    );
     expect(isSystemAdminPermissionKey("free.form.permission")).toBe(false);
   });
 
@@ -30,16 +34,19 @@ describe("system admin catalogs", () => {
     expect(isSystemAdminWebhookEvent("tenant.*")).toBe(false);
     expect(isSystemAdminWebhookEvent("tenant.webhook.enabled")).toBe(true);
     expect(isSystemAdminWebhookEvent("tenant.webhook.disabled")).toBe(true);
+    expect(isSystemAdminWebhookEvent("system-admin.policy.updated")).toBe(true);
+    expect(isSystemAdminWebhookEvent("system-admin.security.updated")).toBe(
+      true,
+    );
     for (const event of systemAdminDefaultWebhookEventPresets) {
       expect(isSystemAdminWebhookEvent(event)).toBe(true);
     }
   });
 
   it("exposes structured Lynx outcome monitor threshold catalogs", () => {
-    const financeCatalog =
-      getSystemAdminLynxOutcomeMonitorThresholdCatalog(
-        "finance-control-watch",
-      );
+    const financeCatalog = getSystemAdminLynxOutcomeMonitorThresholdCatalog(
+      "finance-control-watch",
+    );
 
     expect(financeCatalog?.fields.map((field) => field.key)).toContain(
       "blockedRecordsWatchAbove",

@@ -6,7 +6,7 @@ alwaysApply: false
 
 # Afenda feature packages (`@afenda/feature-*`)
 
-**ARCH-002** (ownership) · **ARCH-004** (naming) · **ARCH-008** (discipline, guards). Nine `@afenda/feature-*` packages exist under `packages/features/*`.
+**ARCH-002** (ownership) · **ARCH-004** (naming) · **ARCH-008** (discipline, guards). Scaffold default: `packages/_template-definition`.
 
 ## Create when
 
@@ -15,16 +15,26 @@ Module has its own command/query service, module-specific components, tables und
 ## Scaffold checklist
 
 1. `packages/features/<moduleId>/` with `name`: `@afenda/feature-<moduleId>` (folder slug = `module-ids.ts`).
-2. Required export doors: `.`, `./client`, `./server`, `./metadata` — `default` → `./dist/*.js`; `types`/`development` may point at `./src`.
+2. Required export doors: `.`, `./client`, `./server`, `./metadata` — `default` → `./dist/*.js`; `types`/`development` may point at `./src/*.ts` files.
 3. `build`: `tsc -p tsconfig.build.json` → `dist/**`.
 4. Add `workspace:*` dep in `apps/erp/package.json` **and** append the same name to `afendaTranspilePackages` in `packages/config/src/next.ts` (guard enforces sync).
-5. Organize categories as nested `src/` folders (`employees/`, `payroll/`, …) — not nested workspace `package.json` files.
-6. App and other packages import only public doors — never `@afenda/feature-*/src`, `/dist`, or `/internal`.
-7. Thin routes import `./server` or `./metadata`; client bundles use `./client` only — never barrels that re-export server graphs.
+5. Scaffold from template: `pnpm scaffold:feature <moduleId>` (delegates to `packages/_template-definition/scripts`).
+6. Template buckets live under `src/`: `actions`, `components`, `contracts`, `data`, `events`, `policies`, `schemas`, `tests`.
+7. Do not add catch-all folders (`_shared`, `shared`, `common`, `lib`, `utils`, `helpers`, `misc`, `internal`).
+8. Server Actions in `src/actions/` (`*.actions.server.ts`); client components in `src/components/` (`*.client.tsx`).
+9. App and other packages import only public doors — never deep paths into bucket folders.
+10. Thin routes import `./server` or `./metadata`; client bundles use `./client` only.
 
 ## `./client` must not import
 
 `@afenda/db`, `@afenda/ai`, `@afenda/workflows`, `@afenda/auth/server`, or `node:*` (enforced by `pnpm architecture:check`).
+
+## Server boundary marker
+
+Feature package `src/server.ts` imports `@afenda/kernel/server` as the only
+server-only marker. Deep implementation files must not import `server-only` or
+`@afenda/kernel/server` directly; they inherit the boundary from the public
+`./server` door. See rule `afenda-server-boundary`.
 
 ## Must not
 

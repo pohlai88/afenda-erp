@@ -1,10 +1,11 @@
 import {
+  aiGatewayDefaultProviderOrder,
   assertCapabilityAllowed,
   createGatewayOptions,
   getAiModelForFeature,
-  hasAiGatewayCredentials,
+  hasAiGatewayRuntimeCredentials,
   resolveLanguageModel,
-} from "@afenda/ai";
+} from "@afenda/ai/server";
 import { getApiAuthContext } from "@afenda/auth/server";
 import {
   completeLynxRun,
@@ -15,18 +16,20 @@ import {
 } from "@afenda/db";
 import {
   getKnowledgeOrgSetting,
-  retrieveKnowledgeChunks,
+  retrieveKnowledgeChunksWithDiagnostics,
 } from "@afenda/feature-knowledge/server";
 import {
   buildLynxTruthSystemPrompt,
   LYNX_AUDIT_ACTIONS,
   LYNX_GATEWAY_FEATURES,
   LYNX_MODULE_ID,
+  type LynxRunContextData,
+  type LynxRunContextMetadata,
   summarizeLynxQualityGate,
   validateLynxClaims,
-  type LynxClaimValidationResult,
-  type LynxQualityGateResult,
   type LynxTruthEvidenceData,
+  type LynxTruthQualityGateData,
+  type LynxTruthRetrievalStateData,
   validateLynxTruthResponse,
 } from "@afenda/feature-lynx";
 import { getRequestId, logServerEvent } from "@afenda/observability";
@@ -52,14 +55,13 @@ const truthSearchUiRequestSchema = z.object({
 });
 
 type LynxTruthDataParts = {
+  "lynx-run-context": LynxRunContextData;
   "lynx-truth-evidence": LynxTruthEvidenceData;
-  "lynx-quality-gate": {
-    claims: LynxClaimValidationResult[];
-    gate: LynxQualityGateResult;
-  };
+  "lynx-retrieval-state": LynxTruthRetrievalStateData;
+  "lynx-quality-gate": LynxTruthQualityGateData;
 };
 
-type LynxTruthUiMessage = UIMessage<unknown, LynxTruthDataParts>;
+type LynxTruthUiMessage = UIMessage<LynxRunContextMetadata, LynxTruthDataParts>;
 
 function getTextFromPart(part: unknown): string {
   if (
@@ -110,9 +112,11 @@ export async function POST(request: Request): Promise<Response> {
   const requestId = getRequestId(request);
   const route = "/api/lynx/truth-search";
   const modelId = getAiModelForFeature("lynx-truth");
-  let activeRun: { id: string; organizationId: string; query: string } | undefined;
+  let activeRun:
+    | { id: string; organizationId: string; query: string }
+    | undefined;
 
-  if (!hasAiGatewayCredentials()) {
+  if (!hasAiGatewayRuntimeCredentials()) {
     return getGatewayUnavailableResponse();
   }
 
@@ -170,14 +174,37 @@ export async function POST(request: Request): Promise<Response> {
       chunkCount: 0,
       passages: [],
     };
+    let retrievalState: LynxTruthRetrievalStateData = {
+      status: "no_evidence",
+      chunkCount: 0,
+    };
     let systemPrompt: string;
 
     try {
-      const chunks = await retrieveKnowledgeChunks(organization.id, query, {
-        topK: 8,
-        hybrid: orgSetting?.retrievalHybridEnabled ?? false,
-        rerank: orgSetting?.retrievalRerankEnabled ?? false,
-      });
+      const retrievalResult = await retrieveKnowledgeChunksWithDiagnostics(
+        organization.id,
+        query,
+        {
+          topK: 8,
+          hybrid: orgSetting?.retrievalHybridEnabled ?? false,
+          rerank: orgSetting?.retrievalRerankEnabled ?? false,
+          telemetry: {
+            organizationId: organization.id,
+            userId: session.id,
+            feature: "knowledge-retrieval",
+            moduleId: LYNX_MODULE_ID,
+            requestId,
+          },
+        },
+      );
+      const chunks = retrievalResult.rows;
+      retrievalState = {
+        status: retrievalResult.diagnostics.status,
+        chunkCount: chunks.length,
+        ...(retrievalResult.diagnostics.degradedReason
+          ? { degradedReason: retrievalResult.diagnostics.degradedReason }
+          : {}),
+      };
       evidence = {
         query,
         chunkCount: chunks.length,
@@ -194,6 +221,7 @@ export async function POST(request: Request): Promise<Response> {
       systemPrompt = buildLynxTruthSystemPrompt({
         organizationId: organization.id,
         query,
+        retrievalState,
         chunks: chunks.map((chunk, index) => ({
           id: chunk.id,
           title: chunk.title,
@@ -202,6 +230,11 @@ export async function POST(request: Request): Promise<Response> {
         })),
       });
     } catch (retrievalError) {
+      retrievalState = {
+        status: "degraded",
+        chunkCount: 0,
+        degradedReason: "retrieval-failed",
+      };
       logServerEvent(
         "warn",
         "Lynx truth retrieval degraded — streaming without passages.",
@@ -222,6 +255,7 @@ export async function POST(request: Request): Promise<Response> {
       systemPrompt = buildLynxTruthSystemPrompt({
         organizationId: organization.id,
         query,
+        retrievalState,
         chunks: [],
       });
     }
@@ -236,7 +270,12 @@ export async function POST(request: Request): Promise<Response> {
         module: LYNX_MODULE_ID,
         operation: LYNX_AUDIT_ACTIONS.truthQuery,
       },
-      { route, model: modelId, chunkCount: evidence.chunkCount },
+      {
+        route,
+        model: modelId,
+        chunkCount: evidence.chunkCount,
+        retrievalState,
+      },
     );
 
     await createAiUsageEvent({
@@ -249,6 +288,7 @@ export async function POST(request: Request): Promise<Response> {
       metadata: {
         query,
         chunkCount: evidence.chunkCount,
+        retrievalState,
       },
     });
 
@@ -262,9 +302,14 @@ export async function POST(request: Request): Promise<Response> {
         requestId,
         query,
         chunkCount: evidence.chunkCount,
+        retrievalState,
       },
     });
     activeRun = { id: runId, organizationId: organization.id, query };
+    const runContext = {
+      runId,
+      route,
+    } satisfies LynxRunContextData;
     await recordLynxRunEvent({
       organizationId: organization.id,
       runId,
@@ -278,6 +323,21 @@ export async function POST(request: Request): Promise<Response> {
       metadata: {
         query,
         chunkCount: evidence.chunkCount,
+      },
+    });
+    await recordLynxRunEvent({
+      organizationId: organization.id,
+      runId,
+      eventType: "truth.retrieval_state",
+      summary:
+        retrievalState.status === "degraded"
+          ? "Truth Retrieval evidence retrieval degraded."
+          : retrievalState.status === "no_evidence"
+            ? "Truth Retrieval found no evidence passages."
+            : "Truth Retrieval evidence retrieval completed.",
+      metadata: {
+        query,
+        retrievalState,
       },
     });
 
@@ -301,21 +361,41 @@ export async function POST(request: Request): Promise<Response> {
             feature: LYNX_GATEWAY_FEATURES.truth,
             moduleId: LYNX_MODULE_ID,
             qualityGate: "claim-validation",
+            providerOrder: aiGatewayDefaultProviderOrder,
+            providerOnly: aiGatewayDefaultProviderOrder,
+            fallbackModels: ["anthropic/claude-sonnet-4.6"],
             zeroDataRetention: orgSetting?.enforceZdr ?? false,
           }),
           experimental_telemetry: {
             isEnabled: true,
             functionId: LYNX_AUDIT_ACTIONS.truthQuery,
+            recordInputs: false,
+            recordOutputs: false,
             metadata: {
               organizationId: organization.id,
               ...(requestId ? { requestId } : {}),
               chunkCount: String(evidence.chunkCount),
-              hybridEnabled: String(orgSetting?.retrievalHybridEnabled ?? false),
+              retrievalStatus: retrievalState.status,
+              hybridEnabled: String(
+                orgSetting?.retrievalHybridEnabled ?? false,
+              ),
             },
           },
         });
         const stream = createUIMessageStream<LynxTruthUiMessage>({
           execute: ({ writer }) => {
+            writer.write({
+              type: "data-lynx-run-context",
+              id: "lynx-run-context",
+              data: runContext,
+            });
+
+            writer.write({
+              type: "data-lynx-retrieval-state",
+              id: "lynx-retrieval-state",
+              data: retrievalState,
+            });
+
             writer.write({
               type: "data-lynx-truth-evidence",
               id: "lynx-truth-evidence",
@@ -324,6 +404,9 @@ export async function POST(request: Request): Promise<Response> {
 
             writer.merge(
               result.toUIMessageStream<LynxTruthUiMessage>({
+                messageMetadata: () => ({
+                  lynxRun: runContext,
+                }),
                 onFinish: async ({ responseMessage, finishReason }) => {
                   const text = responseMessage.parts
                     .map(getTextFromPart)
@@ -331,6 +414,7 @@ export async function POST(request: Request): Promise<Response> {
                   const validation = validateLynxTruthResponse({
                     text,
                     evidenceCount: evidence.chunkCount,
+                    retrievalStatus: retrievalState.status,
                   });
                   const claims = validateLynxClaims({
                     answer: text,
@@ -367,6 +451,7 @@ export async function POST(request: Request): Promise<Response> {
                       validation,
                       qualityGate,
                       chunkCount: evidence.chunkCount,
+                      retrievalState,
                     },
                   });
                   await recordLynxRunEvent({
@@ -381,6 +466,7 @@ export async function POST(request: Request): Promise<Response> {
                     metadata: {
                       query,
                       finishReason,
+                      retrievalState,
                       claims,
                     },
                   });
@@ -395,6 +481,7 @@ export async function POST(request: Request): Promise<Response> {
                       validation,
                       qualityGate,
                       chunkCount: evidence.chunkCount,
+                      retrievalState,
                     },
                   });
 

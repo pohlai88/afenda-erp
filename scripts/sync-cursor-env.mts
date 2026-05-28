@@ -4,7 +4,8 @@ import { fileURLToPath } from "node:url";
 import { execFileSync } from "node:child_process";
 
 const rootDir = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const sourcePath = resolve(rootDir, ".env.config");
+const configSourcePath = resolve(rootDir, ".env.config");
+const secretSourcePath = resolve(rootDir, ".secret.config");
 
 /** Keys referenced by ~/.cursor/mcp.json via ${env:…} */
 const CURSOR_USER_ENV_KEYS = [
@@ -38,6 +39,14 @@ function parseDotenv(content: string) {
   return env;
 }
 
+async function readOptionalDotenv(path: string) {
+  try {
+    return await readFile(path, "utf8");
+  } catch {
+    return "";
+  }
+}
+
 function setWindowsUserEnv(key: string, value: string) {
   const script = [
     `$value = @'
@@ -61,8 +70,12 @@ async function main() {
     return;
   }
 
-  const sourceRaw = await readFile(sourcePath, "utf8");
-  const parsed = parseDotenv(sourceRaw.replace(/^\uFEFF/, ""));
+  const configRaw = await readFile(configSourcePath, "utf8");
+  const secretRaw = await readOptionalDotenv(secretSourcePath);
+  const parsed = {
+    ...parseDotenv(configRaw.replace(/^\uFEFF/, "")),
+    ...parseDotenv(secretRaw.replace(/^\uFEFF/, "")),
+  };
 
   const updated: string[] = [];
   const skipped: string[] = [];
@@ -83,7 +96,7 @@ async function main() {
   }
   if (skipped.length > 0) {
     process.stdout.write(
-      `Skipped (empty in .env.config): ${skipped.join(", ")}\n`,
+      `Skipped (empty in .env.config + .secret.config): ${skipped.join(", ")}\n`,
     );
   }
 
@@ -94,7 +107,7 @@ async function main() {
 
 main().catch((error) => {
   process.stderr.write(
-    `Unable to sync Cursor MCP env from .env.config. ${String(error)}\n`,
+    `Unable to sync Cursor MCP env from .env.config + .secret.config. ${String(error)}\n`,
   );
   process.exitCode = 1;
 });

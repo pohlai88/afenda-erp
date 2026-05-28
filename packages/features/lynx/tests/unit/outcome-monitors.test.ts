@@ -1,10 +1,10 @@
 import { describe, expect, it, vi } from "vitest";
 
-vi.mock("server-only", () => ({}));
+import type { LynxReadinessSnapshot } from "../../src/contracts/lynx.readiness.contract";
+import type { ModuleWorkspace } from "@afenda/kernel";
 
-import { evaluateLynxOutcomeMonitors } from "../../src/server/outcome-monitors";
-import type { LynxReadinessSnapshot } from "../../src/readiness-contract";
-import type { ModuleWorkspace } from "@afenda/domain";
+const { evaluateLynxOutcomeMonitors } =
+  await import("../../src/workflows/lynx.outcome-monitor.workflow.server");
 
 function workspace(input: {
   moduleId: "finance" | "approvals" | "reports" | "system-admin";

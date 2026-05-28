@@ -1,27 +1,34 @@
-export const aiFeatureFlags = [
-  "assistant",
-  "extraction",
-  "approvals",
-  "solution-provider",
-] as const;
+/**
+ * @afenda/ai — provider-agnostic agent, tool, and governance layer.
+ *
+ * Explicit buckets follow packages/_template-definition:
+ * actions · components · contracts · data · events · policies · schemas.
+ * Additional buckets are on demand: agents · catalogs · errors · prompts · tools.
+ *
+ * ARCH-009: substrate-blind — never imports @afenda/feature-knowledge.
+ * Lynx and Knowledge products compose this package; it does not compose them.
+ */
+import "server-only";
 
-export * from "./agents/erp-assistant";
-export * from "./agents/solution-provider-agent";
-export * from "./confidence";
-export * from "./context";
+// ---------------------------------------------------------------------------
+// Explicit bucket entrypoints
+// ---------------------------------------------------------------------------
+
+export * from "./actions";
+export * from "./components";
+export * from "./contracts";
+export * from "./data";
+export * from "./events";
+export * from "./metadata";
+export * from "./policies";
+export * from "./schemas";
+
+// ---------------------------------------------------------------------------
+// On-demand platform buckets
+// ---------------------------------------------------------------------------
+
+export * from "./agents";
+export * from "./catalogs";
 export * from "./errors";
-export * from "./gateway";
-export * from "./guardrails";
-export * from "./operational-skills";
 export * from "./prompts";
-export * from "./schemas/extraction";
-export * from "./schemas/operations";
-export * from "./schemas/recommendations";
-export * from "./schemas/solution-provider";
-export * from "./sandbox";
-export * from "./sandbox-executors";
-export * from "./tools/contracts";
-export * from "./tools/erp-tools";
-export * from "./tools/governance";
-export * from "./tools/meta";
-export * from "./tools/solution-provider-tools";
+export * from "./tools";

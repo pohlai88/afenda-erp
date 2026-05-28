@@ -39,7 +39,7 @@ deployment unless an ADR explicitly adds a second project.
 | Scope            | Pattern                      | Example folder         | Example `name`       |
 | ---------------- | ---------------------------- | ---------------------- | -------------------- |
 | App              | `@afenda/<app>`              | `apps/erp`             | `@afenda/erp`        |
-| Platform library | `@afenda/<package>`          | `packages/domain`      | `@afenda/domain`     |
+| Platform library | `@afenda/<package>`          | `packages/kernel`      | `@afenda/kernel`     |
 | Feature module   | `@afenda/feature-<moduleId>` | `packages/features/hr` | `@afenda/feature-hr` |
 
 Rules:
@@ -62,18 +62,18 @@ separate Vercel projects unless a future ADR explicitly adds one.
 Runtime module IDs are canonical in `packages/config/src/module-ids.ts`. Routes,
 permissions, and database promotion use the same slug.
 
-| moduleId     | Route segment               | Feature folder                 | Package                      |
-| ------------ | --------------------------- | ------------------------------ | ---------------------------- |
-| `dashboard`  | `/dashboard`                | — (app shell)                  | `@afenda/erp`                |
-| `finance`    | `/finance` via `[moduleId]` | `packages/features/finance`    | `@afenda/feature-finance`    |
-| `sales`      | `/sales`                    | `packages/features/sales`      | `@afenda/feature-sales`      |
-| `purchasing` | `/purchasing`               | `packages/features/purchasing` | `@afenda/feature-purchasing` |
-| `inventory`  | `/inventory`                | `packages/features/inventory`  | `@afenda/feature-inventory`  |
-| `hr`         | `/hr`                       | `packages/features/hr`         | `@afenda/feature-hr`         |
-| `crm`        | `/crm`                      | `packages/features/crm`        | `@afenda/feature-crm`        |
-| `approvals`  | `/approvals`                | `packages/features/approvals`  | `@afenda/feature-approvals`  |
-| `reports`    | `/reports`                  | `packages/features/reports`    | `@afenda/feature-reports`    |
-| `system-admin` | `/system-admin`           | `packages/features/system-admin` | `@afenda/feature-system-admin` |
+| moduleId       | Route segment               | Feature folder                   | Package                        |
+| -------------- | --------------------------- | -------------------------------- | ------------------------------ |
+| `dashboard`    | `/dashboard`                | — (app shell)                    | `@afenda/erp`                  |
+| `finance`      | `/finance` via `[moduleId]` | `packages/features/finance`      | `@afenda/feature-finance`      |
+| `sales`        | `/sales`                    | `packages/features/sales`        | `@afenda/feature-sales`        |
+| `purchasing`   | `/purchasing`               | `packages/features/purchasing`   | `@afenda/feature-purchasing`   |
+| `inventory`    | `/inventory`                | `packages/features/inventory`    | `@afenda/feature-inventory`    |
+| `hr`           | `/hr`                       | `packages/features/hr`           | `@afenda/feature-hr`           |
+| `crm`          | `/crm`                      | `packages/features/crm`          | `@afenda/feature-crm`          |
+| `approvals`    | `/approvals`                | `packages/features/approvals`    | `@afenda/feature-approvals`    |
+| `reports`      | `/reports`                  | `packages/features/reports`      | `@afenda/feature-reports`      |
+| `system-admin` | `/system-admin`             | `packages/features/system-admin` | `@afenda/feature-system-admin` |
 
 Core ERP modules share one dynamic route tree:
 `apps/erp/src/app/(app)/[moduleId]/…`. Do not create per-module route folders
@@ -82,7 +82,7 @@ unless a module needs a genuinely different URL tree.
 Do not invent alternate slugs (`hrm`, `human-resources`) unless the module ID
 changes in `@afenda/config`. Feature packages are scaffolded on disk; mature
 logic moves into those packages per
-[ERP Domain Package Architecture](002-erp-domain-package-architecture.md).
+[ERP Kernel Package Architecture](002-erp-kernel-package-architecture.md).
 
 Target database schema folders follow the same moduleId slug:
 `packages/db/src/schema/<moduleId>/`.
@@ -121,12 +121,12 @@ Export shape for compiled libraries:
 
 Import rules (Vercel/Next.js server-client separation):
 
-- App routes and Server Components: `@afenda/<pkg>/server`, `@afenda/domain`, feature `./server` or `./metadata`.
+- App routes and Server Components: `@afenda/<pkg>/server`, `@afenda/kernel`, feature `./server` or `./metadata`.
 - Client Components: `@afenda/<pkg>/client`, `@afenda/ui/*`, feature `./client` only.
 - Prefer explicit subpaths over package root barrels when the root re-exports server code.
-- `@afenda/ui` may use `./*` deep imports for primitives; do not copy that pattern into feature or domain packages without an ADR.
+- `@afenda/ui` may use `./*` deep imports for primitives; do not copy that pattern into feature or kernel packages without an ADR.
 
-Feature package template: [ERP Domain Package Architecture](002-erp-domain-package-architecture.md).
+Feature package template: [ERP Kernel Package Architecture](002-erp-kernel-package-architecture.md).
 Workspace split discipline: [Workspace Package Discipline](008-workspace-package-discipline.md).
 
 ## Directories
@@ -202,7 +202,7 @@ Package `package.json` scripts use standard task names consumed by `turbo.json`:
 
 ## Related Documents
 
-- **ARCH-002** [ERP Domain Package Architecture](002-erp-domain-package-architecture.md) — feature-package naming and export doors
+- **ARCH-002** [ERP Kernel Package Architecture](002-erp-kernel-package-architecture.md) — feature-package naming and export doors
 - **ARCH-003** [Directory Architecture Audit](003-directory-architecture-audit.md) — enforced package categories
 - **ARCH-006** [Metadata-Driven UI Architecture](006-metadata-driven-ui-architecture.md) — import doors for governed UI
 - **ARCH-001** [System Architecture](001-system-architecture.md) — route shape and deployment model

@@ -1,5 +1,5 @@
-import { authLoadingCopy } from "@afenda/domain";
-import { RouteStatePanel } from "@/components/route-states";
+import { authLoadingCopy } from "@afenda/kernel";
+import { RouteStatePanel } from "@/app-route-state/route-states";
 
 export default function AuthLoading() {
   return (

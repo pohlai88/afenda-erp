@@ -8,6 +8,5 @@
  *
  * Doctrine: docs/architecture/009-machine-layer-doctrine.md (ARCH-009)
  */
-export * from "./constants";
-export * from "./eval-dataset-contract";
-export * from "./types";
+export * from "./contracts";
+export * from "./schemas/knowledge.eval-dataset.schema";

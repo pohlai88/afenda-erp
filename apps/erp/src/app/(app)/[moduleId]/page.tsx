@@ -6,7 +6,7 @@ import {
   moduleIds,
   type CoreModuleId,
   type ModuleWorkspaceSearchParams,
-} from "@afenda/domain";
+} from "@afenda/kernel";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 

@@ -1,5 +1,5 @@
 import { moduleIds } from "@afenda/config/module-ids";
-import { solutionWorkflowIds } from "@afenda/domain";
+import { solutionWorkflowIds } from "@afenda/kernel";
 import { z } from "zod";
 
 export const chatRequestSchema = z.object({

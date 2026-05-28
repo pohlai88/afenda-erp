@@ -1,7 +1,7 @@
 import {
   assertCapabilityAllowed,
   createSolutionProviderTools,
-} from "@afenda/ai";
+} from "@afenda/ai/server";
 import type { ApiAuthContext } from "@afenda/auth/server";
 import { createAiActionSandbox, registerAiApprovalProposal } from "@afenda/db";
 import {
@@ -10,7 +10,7 @@ import {
   getModuleWorkspaceStats,
   moduleIds,
   resolveWorkspaceDataMode,
-} from "@afenda/domain";
+} from "@afenda/kernel";
 
 /**
  * Shared Solution Provider / Lynx Operator tool wiring for ERP route handlers.

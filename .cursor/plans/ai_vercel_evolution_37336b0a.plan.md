@@ -94,7 +94,7 @@ KISS: three buckets, not five phases. Each item is independently shippable.
    - Repo helpers in `@afenda/db`: `createAiActionSandbox`, `listAiActionSandboxes`, `transitionAiActionSandbox`.
    - Wire `proposeHumanApprovedAction` ([`solution-provider-tools.ts`](packages/ai/src/tools/solution-provider-tools.ts)) and `proposeApprovalDecision` ([`erp-tools.ts`](packages/ai/src/tools/erp-tools.ts)) to persist + return id.
 3. **ERP surfacing** — put the existing assistant on `[moduleId]` workspaces (today only dashboard); link Solution Console skill cards to module records/work items.
-4. **Admin AI ledger** — use existing `listAiUsageEvents`/`AiUsageSummary` in [`packages/domain/src/index.ts`](packages/domain/src/index.ts) to render a governed list under reports/admin. No new tables.
+4. **Admin AI ledger** — use existing `listAiUsageEvents`/`AiUsageSummary` in [`packages/kernel/src/index.ts`](packages/kernel/src/index.ts) to render a governed list under reports/admin. No new tables.
 5. **Model id audit** — replace `openai/gpt-5.4` defaults with current `gateway.getAvailableModels()` ground truth in [`gateway.ts`](packages/ai/src/gateway.ts).
 6. **Tag cleanup** — remove `app:afenda-erp`; keep `feature/organization/module/risk/env`.
 
@@ -113,7 +113,7 @@ These do **not** block Now; do them when stabilization gate passes per [`vercel-
 1. **Domain executor** for an approved sandbox — single proof skill first (recommend: `revenue-leakage-recovery` against existing sales workspace).
 2. **Vercel Workflow DevKit** for multi-day approval reminders and "re-run recovery in 7 days" via `defineHook` + `sleep`.
 3. **LMS proof module** — only when sandbox execute path is boring. Initial cut = `lms_courses` + `lms_enrollments`. Drop `lms_assessments` and `lms_certifications` from TRACK-001 first scope (YAGNI).
-4. **Module tools migration** to `@afenda/feature-*` packages ([ARCH-002](docs/architecture/002-erp-domain-package-architecture.md)).
+4. **Module tools migration** to `@afenda/feature-*` packages ([ARCH-002](docs/architecture/002-erp-kernel-package-architecture.md)).
 5. **Embeddings / semantic search** — direct provider, not Gateway, per ARCH-001. Only with a concrete operator query that requires it.
 
 ---

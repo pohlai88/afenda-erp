@@ -13,11 +13,11 @@ alwaysApply: false
 
 ## Boundary split
 
-| Module | Role | Public door |
-|---|---|---|
+| Module                          | Role                                                                          | Public door                                                                                                                               |
+| ------------------------------- | ----------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
 | **`@afenda/feature-knowledge`** | Substrate — pgvector, `knowledge_chunk`, embeddings, chunk CRUD, eval harness | `@afenda/feature-knowledge`, `@afenda/feature-knowledge/server`, `@afenda/feature-knowledge/client`, `@afenda/feature-knowledge/metadata` |
-| **`@afenda/feature-lynx`** | Product — Truth Retrieval UI, streaming truth, Operator Assist | `@afenda/feature-lynx`, `@afenda/feature-lynx/server`, `@afenda/feature-lynx/client`, `@afenda/feature-lynx/metadata` |
-| **`@afenda/ai`** | Provider-agnostic agent + tool layer | Stays substrate-blind — no import of `@afenda/feature-knowledge` |
+| **`@afenda/feature-lynx`**      | Product — Truth Retrieval UI, streaming truth, Operator Assist                | `@afenda/feature-lynx`, `@afenda/feature-lynx/server`, `@afenda/feature-lynx/client`, `@afenda/feature-lynx/metadata`                     |
+| **`@afenda/ai`**                | Provider-agnostic agent + tool layer                                          | Stays substrate-blind — no import of `@afenda/feature-knowledge`                                                                          |
 
 `@afenda/feature-lynx` composes `@afenda/feature-knowledge` via barrel only — no deep imports.
 
@@ -35,7 +35,7 @@ Lynx is Afenda's machine layer for resolving truth, preparing work, and recommen
 
 ### Canonical contract file
 
-`packages/features/lynx/src/lynx.contract.ts` — `LYNX_MODULE_ID`, `LYNX_LAYERS`, `LYNX_AUDIT_ACTIONS`, `LYNX_ERP_HTTP_ROUTES`. Derive audits, tests, and guards from here.
+`packages/features/lynx/src/contracts/lynx.core.contract.ts` — `LYNX_MODULE_ID`, `LYNX_LAYERS`, `LYNX_AUDIT_ACTIONS`, `LYNX_ERP_HTTP_ROUTES`. Derive audits, tests, and guards from here.
 
 ### Truth response format (mandatory)
 
@@ -69,6 +69,8 @@ Only `pipeline-commit.ts` may write `knowledge_document` or `knowledge_chunk`.
 
 Retrieval and reranking must not branch on `knowledge_source.kind`. Do not join source metadata for ranking heuristics. Allowed inputs: tenant id, query, optional explicit document allowlists.
 
+New retrieval callers use `retrieveKnowledgeChunksWithDiagnostics` and preserve the diagnostic envelope through Lynx where operator trust depends on it. The envelope reports `ok`, `no_evidence`, or `degraded`, plus mode, hybrid/rerank flags, and degraded reason. Keep `retrieveKnowledgeChunks` as the row-only compatibility wrapper.
+
 ### Invariant C — Embedding runs outside Route Handlers
 
 Never call `embedKnowledgeBatch` inline in a Route Handler. Embedding runs in background jobs (cron + queue). Embedding in Route Handlers for single queries (truth search, operator tool) is acceptable only when the query is user-initiated and the latency budget is known.
@@ -77,17 +79,27 @@ Never call `embedKnowledgeBatch` inline in a Route Handler. Embedding runs in ba
 
 All queries include `WHERE organization_id = $orgId`. RLS policies are defense-in-depth — app-level filters are still mandatory.
 
+### Invariant E — Structured substrate audit
+
+Knowledge sync, commit, embedding, retrieval degradation, rerank fallback, and eval paths emit structured audit/observability events through package helpers. Rerank audit must distinguish skipped, unavailable, and failed states, and streamed degradation reasons must stay stable and non-secret. Do not add route-local or adapter-local audit `console.log` payloads.
+
 ---
 
 ## Import boundary
 
-| Consumer | Import |
-|---|---|
-| `apps/erp/app/**` RSC, Route Handlers, Server Actions | `@afenda/feature-knowledge`, `@afenda/feature-lynx` |
-| Any `"use client"` file, client islands | `@afenda/feature-knowledge/client`, `@afenda/feature-lynx/client` only |
-| `@afenda/ai` | No import of `@afenda/feature-knowledge` — substrate-blind |
+| Consumer                                              | Import                                                                 |
+| ----------------------------------------------------- | ---------------------------------------------------------------------- |
+| `apps/erp/app/**` RSC, Route Handlers, Server Actions | `@afenda/feature-knowledge`, `@afenda/feature-lynx`                    |
+| Any `"use client"` file, client islands               | `@afenda/feature-knowledge/client`, `@afenda/feature-lynx/client` only |
+| `@afenda/ai`                                          | No import of `@afenda/feature-knowledge` — substrate-blind             |
 
 `./client` exports: serializable DTOs, client-safe constants, Zod schemas. No `server-only`, no `next/headers`, no `@afenda/db`, no `@afenda/ai`.
+
+`@afenda/feature-knowledge` and `@afenda/feature-lynx` mark server-only package
+boundaries only in `src/server.ts` via `import "@afenda/kernel/server"`. Deep
+`data/*.server.ts`, `tools/*.server.ts`, and `workflows/*.server.ts` files do
+not import `server-only` or `@afenda/kernel/server` directly; local Vitest
+tests can import those files without feature-local `server-only` stubs.
 
 ---
 
@@ -98,7 +110,13 @@ Every tool exported from `@afenda/ai` must carry:
 ```ts
 type GovernedToolMeta = {
   risk: "low" | "medium" | "high";
-  category: "contacts" | "knowledge" | "operations" | "approvals" | "records" | "documents";
+  category:
+    | "contacts"
+    | "knowledge"
+    | "operations"
+    | "approvals"
+    | "records"
+    | "documents";
   access: "read" | "write";
   dataSensitivity: "none" | "low" | "medium" | "high";
   audit: "silent" | "record";

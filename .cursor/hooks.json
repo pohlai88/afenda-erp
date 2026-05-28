@@ -11,7 +11,17 @@
         "command": "node .cursor/hooks/session-inject-architecture.mjs"
       }
     ],
+    "beforeFileEdit": [
+      {
+        "command": "tsx scripts/validate-feature-shape.mts --path \"${file}\" --action edit",
+        "matcher": "packages/features/**|apps/erp/src/**"
+      }
+    ],
     "preToolUse": [
+      {
+        "command": "node .cursor/hooks/guard-server-boundary-imports.mjs",
+        "matcher": "Write|StrReplace"
+      },
       {
         "command": "node .cursor/hooks/guard-database-ddl.mjs",
         "matcher": "Write|StrReplace"
@@ -33,6 +43,10 @@
       {
         "command": "node .cursor/hooks/post-edit-architecture-hints.mjs",
         "matcher": "Write|StrReplace"
+      },
+      {
+        "command": "tsx scripts/validate-feature-shape.mts --path \"${file}\" --action write",
+        "matcher": "packages/features/**|apps/erp/src/**"
       }
     ]
   }

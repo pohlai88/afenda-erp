@@ -1,17 +1,18 @@
 import { describe, expect, it } from "vitest";
-import { createErpAssistantTools } from "../../src/tools/erp-tools";
+import { createErpAssistantTools } from "../../src/tools/ai.erp-tools.tool.server";
 import {
   assertGovernedToolPolicy,
   assertGovernedToolset,
   createGovernedToolRegistry,
-} from "../../src/tools/governance";
-import { createSolutionProviderTools } from "../../src/tools/solution-provider-tools";
+  redactGovernedToolAuditValue,
+} from "../../src/tools/ai.governance.tool.server";
+import { createSolutionProviderTools } from "../../src/tools/ai.solution-provider-tools.tool.server";
 import {
   ERP_ASSISTANT_TOOL_IDS,
   SOLUTION_PROVIDER_TOOL_IDS,
   erpAssistantToolMeta,
   solutionProviderToolMeta,
-} from "../../src/tools/meta";
+} from "../../src/tools/ai.tool-meta";
 
 const baseOrg = {
   id: "org_test",
@@ -292,6 +293,63 @@ describe("Runtime governed tool registry", () => {
       toolName: "safeTool",
       input: { token: "[redacted]", value: "ok" },
       output: { apiKey: "[redacted]" },
+    });
+  });
+});
+
+describe("Governed audit redaction", () => {
+  it("bounds nested objects, circular references, and long strings", () => {
+    const circular: Record<string, unknown> = { value: "ok" };
+    circular.self = circular;
+    circular.deep = { next: { final: "too deep" } };
+
+    const redacted = redactGovernedToolAuditValue(
+      {
+        authorization: "Bearer secret",
+        longText: "x".repeat(20),
+        circular,
+      },
+      {
+        maxDepth: 2,
+        maxStringLength: 5,
+      },
+    );
+
+    expect(redacted).toMatchObject({
+      authorization: "[redacted]",
+      longText: "xxxxx...[truncated]",
+      circular: {
+        value: "ok",
+        self: "[circular]",
+        deep: "[truncated-depth]",
+      },
+    });
+  });
+
+  it("limits large arrays and object key counts", () => {
+    const input = Object.fromEntries(
+      Array.from({ length: 5 }, (_, index) => [`key${index}`, index]),
+    );
+
+    const redacted = redactGovernedToolAuditValue(
+      {
+        list: [1, 2, 3, 4],
+        object: input,
+      },
+      {
+        maxArrayItems: 2,
+        maxObjectKeys: 3,
+      },
+    );
+
+    expect(redacted).toMatchObject({
+      list: [1, 2, "[truncated-array:2]"],
+      object: {
+        key0: 0,
+        key1: 1,
+        key2: 2,
+        __truncatedKeys: 2,
+      },
     });
   });
 });

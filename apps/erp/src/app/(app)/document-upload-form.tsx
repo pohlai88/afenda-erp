@@ -1,7 +1,7 @@
 "use client";
 
-import { documentWorkflowCopy } from "@afenda/domain";
-import type { ModuleId } from "@afenda/domain";
+import { documentWorkflowCopy } from "@afenda/kernel";
+import type { ModuleId } from "@afenda/kernel";
 import { upload } from "@vercel/blob/client";
 import { useRouter } from "next/navigation";
 import { useRef, useState, type FormEvent } from "react";
@@ -14,7 +14,7 @@ import {
   documentUploadContentTypes,
   documentUploadMaxSizeBytes,
   formatUploadLimit,
-} from "@/lib/document-upload-policy";
+} from "@/app-env/upload-policy";
 
 type UploadState = {
   message: string;

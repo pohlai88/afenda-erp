@@ -1,4 +1,4 @@
-import { solutionConsolePageMetadata } from "@afenda/domain";
+import { solutionConsolePageMetadata } from "@afenda/kernel";
 import { getCachedNavigationExtensionMetadata } from "@/lib/cached-module-metadata";
 import { SolutionConsoleRoutePage } from "./solution-console-route";
 import type { Metadata } from "next";

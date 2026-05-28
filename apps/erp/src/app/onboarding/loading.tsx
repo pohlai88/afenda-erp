@@ -1,5 +1,5 @@
-import { onboardingLoadingCopy } from "@afenda/domain";
-import { RouteStatePanel } from "@/components/route-states";
+import { onboardingLoadingCopy } from "@afenda/kernel";
+import { RouteStatePanel } from "@/app-route-state/route-states";
 
 export default function OnboardingLoading() {
   return (

@@ -11,7 +11,7 @@ import {
   isAiPermissionError,
   isAiSensitiveContentError,
   estimateTokenCount,
-} from "../../src/guardrails";
+} from "../../src/policies/ai.guardrails.policy";
 
 describe("estimateTokenCount", () => {
   it("approximates token count at ~4 chars per token", () => {

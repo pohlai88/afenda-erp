@@ -5,7 +5,7 @@
 Unit and integration tests live in dedicated workspace test folders:
 
 - `packages/*/tests/unit/**/*.test.ts` (and `packages/ui/tests/unit/**/*.test.tsx`)
-- `packages/domain/tests/gallery/**/*.test.ts`
+- `packages/kernel/tests/gallery/**/*.test.ts`
 - `apps/erp/tests/unit/**/*.test.ts`
 - `apps/erp/tests/routes/**/*.test.ts`
 - `apps/erp/tests/e2e/**/*.spec.ts`

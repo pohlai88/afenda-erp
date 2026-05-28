@@ -3,7 +3,7 @@ import {
   getSession,
   isNeonAuthReady,
 } from "@afenda/auth/server";
-import { getAuthPageShellCopy, signUpEnvironmentCopy } from "@afenda/domain";
+import { getAuthPageShellCopy, signUpEnvironmentCopy } from "@afenda/kernel";
 import { Button } from "@afenda/ui/button";
 import type { Metadata } from "next";
 import Link from "next/link";

@@ -4,6 +4,9 @@
     "allowImportingTsExtensions": true,
     "types": ["node"]
   },
-  "include": ["scripts/**/*.mts"],
+  "include": [
+    "scripts/**/*.mts",
+    "packages/_template-definition/scripts/**/*.mts"
+  ],
   "exclude": ["node_modules"]
 }

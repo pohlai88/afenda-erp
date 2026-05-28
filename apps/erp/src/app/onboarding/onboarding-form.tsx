@@ -1,4 +1,4 @@
-import { onboardingFormCopy } from "@afenda/domain";
+import { onboardingFormCopy } from "@afenda/kernel";
 import { completeOnboardingAction } from "./actions";
 import {
   AuthField,

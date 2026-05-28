@@ -2,11 +2,11 @@
 
 **Doc ID:** `ARCH-009` · **File:** `009-machine-layer-doctrine.md`
 
-| Field      | Value                                                                               |
-| ---------- | ----------------------------------------------------------------------------------- |
-| Status     | Active — governs `@afenda/feature-lynx` and `@afenda/feature-knowledge`             |
-| Authority  | Machine-layer product framing, four-layer model, brand contract, retrieval substrate |
-| Supersedes | TRACK-003 disposition row "Embeddings / RAG" (Cancelled → Superseded by TRACK-004) |
+| Field      | Value                                                                                                                 |
+| ---------- | --------------------------------------------------------------------------------------------------------------------- |
+| Status     | Active — governs `@afenda/feature-lynx` and `@afenda/feature-knowledge`                                               |
+| Authority  | Machine-layer product framing, four-layer model, brand contract, retrieval substrate                                  |
+| Supersedes | TRACK-003 disposition row "Embeddings / RAG" (Cancelled → Superseded by TRACK-004)                                    |
 | Related    | **ARCH-001** (AI gateway, runtime), **ARCH-002** (feature packages), **ARCH-008** (package discipline), **TRACK-004** |
 
 ---
@@ -23,12 +23,12 @@ Lynx is an **ERP module**, not an "AI feature". It owns every machine-assisted m
 
 ## Four product layers
 
-| # | Name                 | Code slug    | Route                        | Audit action                     |
-|---|----------------------|--------------|------------------------------|----------------------------------|
-| 1 | Truth Retrieval      | `truth`      | `api/lynx/truth-search`      | `erp.lynx.truth.query`           |
-| 2 | Operating Briefs     | `briefs`     | (deferred until product validates) | `erp.lynx.brief.generate`   |
-| 3 | Canonical Intake     | `structured` | (deferred)                   | `erp.lynx.intake.commit`         |
-| 4 | Decision Operator    | `operator`   | `api/lynx/operator`          | `erp.lynx.operator.recommend`    |
+| #   | Name              | Code slug    | Route                              | Audit action                  |
+| --- | ----------------- | ------------ | ---------------------------------- | ----------------------------- |
+| 1   | Truth Retrieval   | `truth`      | `api/lynx/truth-search`            | `erp.lynx.truth.query`        |
+| 2   | Operating Briefs  | `briefs`     | (deferred until product validates) | `erp.lynx.brief.generate`     |
+| 3   | Canonical Intake  | `structured` | (deferred)                         | `erp.lynx.intake.commit`      |
+| 4   | Decision Operator | `operator`   | `api/lynx/operator`                | `erp.lynx.operator.recommend` |
 
 Phase 1 ships layers 1 and 4. Layers 2 and 3 are deferred until product validates demand.
 
@@ -58,10 +58,10 @@ A `ToolLoopAgent` with a governed tool registry. Tenant id is captured in the cl
 
 ## Module split: Knowledge substrate vs Lynx product
 
-| Module                      | Role                                                              | Public door                   |
-|-----------------------------|-------------------------------------------------------------------|-------------------------------|
-| `@afenda/feature-knowledge` | Substrate — pgvector, `knowledge_chunk`, embeddings, chunk CRUD  | `./`, `./client`, `./server`, `./metadata` |
-| `@afenda/feature-lynx`      | Product — Truth Retrieval UI, streaming truth, Operator Assist   | `./`, `./client`, `./server`, `./metadata` |
+| Module                      | Role                                                            | Public door                                |
+| --------------------------- | --------------------------------------------------------------- | ------------------------------------------ |
+| `@afenda/feature-knowledge` | Substrate — pgvector, `knowledge_chunk`, embeddings, chunk CRUD | `./`, `./client`, `./server`, `./metadata` |
+| `@afenda/feature-lynx`      | Product — Truth Retrieval UI, streaming truth, Operator Assist  | `./`, `./client`, `./server`, `./metadata` |
 
 `@afenda/feature-lynx` composes `@afenda/feature-knowledge` via barrel only — no deep imports.
 
@@ -79,6 +79,8 @@ A `ToolLoopAgent` with a governed tool registry. Tenant id is captured in the cl
 
 Retrieval and reranking must not branch on `knowledge_source.kind`. Do not join source metadata for ranking heuristics. Allowed inputs: tenant id, query, optional explicit document allowlists.
 
+Retrieval APIs expose a diagnostic envelope for new callers. `retrieveKnowledgeChunksWithDiagnostics` returns rows plus status (`ok`, `no_evidence`, `degraded`), retrieval mode, hybrid/rerank flags, and an optional degraded reason. The legacy row-only `retrieveKnowledgeChunks` remains a compatibility wrapper.
+
 ### Invariant C — Embedding runs outside Route Handlers
 
 Embedding and chunking loops run in background jobs (cron + queue). Never call `embedKnowledgeBatch` inline in a Route Handler that must respond within the Vercel function timeout.
@@ -86,6 +88,10 @@ Embedding and chunking loops run in background jobs (cron + queue). Never call `
 ### Invariant D — Tenant isolation is non-negotiable
 
 All queries against `knowledge_chunk`, `knowledge_document`, `knowledge_source` must include `WHERE organization_id = $orgId`. RLS policies in `packages/db/drizzle/0014_knowledge_substrate.sql` provide defense-in-depth; app-level filters are still mandatory.
+
+### Invariant E — Audit and degradation telemetry
+
+Knowledge ingest, retrieval degradation, and rerank fallback paths emit structured package audit events with stable action ids, tenant id, source/document ids when available, result, duration, and sanitized metadata. Rerank events distinguish skipped, unavailable, and failed states without exposing provider or database error detail to the client. Do not add ad hoc `console.log` audit payloads in source adapters, sync, commit, embedding, or retrieval code.
 
 ---
 
@@ -96,7 +102,13 @@ Every tool in `@afenda/ai` must declare this metadata envelope:
 ```ts
 type GovernedToolMeta = {
   risk: "low" | "medium" | "high";
-  category: "contacts" | "knowledge" | "operations" | "approvals" | "records" | "documents";
+  category:
+    | "contacts"
+    | "knowledge"
+    | "operations"
+    | "approvals"
+    | "records"
+    | "documents";
   access: "read" | "write";
   dataSensitivity: "none" | "low" | "medium" | "high";
   audit: "silent" | "record";
@@ -114,17 +126,17 @@ type GovernedToolMeta = {
 
 Do **not** use in product copy, navigation labels, UI eyebrow text, or i18n message files:
 
-| Banned                | Use instead                              |
-|-----------------------|------------------------------------------|
-| AI assistant          | Lynx / The Machine                       |
-| Chatbot               | Lynx                                     |
-| Copilot               | Lynx                                     |
-| AI mode               | (omit)                                   |
-| AI active             | "Lynx is resolving"                      |
-| Thinking              | "resolving"                              |
-| Processing            | "listening"                              |
-| Generating            | (omit or use "resolving")                |
-| AI answers            | "Lynx responds" / "high confidence"      |
+| Banned       | Use instead                         |
+| ------------ | ----------------------------------- |
+| AI assistant | Lynx / The Machine                  |
+| Chatbot      | Lynx                                |
+| Copilot      | Lynx                                |
+| AI mode      | (omit)                              |
+| AI active    | "Lynx is resolving"                 |
+| Thinking     | "resolving"                         |
+| Processing   | "listening"                         |
+| Generating   | (omit or use "resolving")           |
+| AI answers   | "Lynx responds" / "high confidence" |
 
 The lint gate `pnpm lint:lynx-brand` enforces banned vocabulary on surfaces that have flipped to the Lynx brand. Surfaces that have not yet flipped are allowlisted.
 
@@ -134,12 +146,12 @@ The lint gate `pnpm lint:lynx-brand` enforces banned vocabulary on surfaces that
 
 Branding rolls out in four phases to avoid "big-bang rename" instability:
 
-| Phase | State                | Trigger                                           |
-|-------|----------------------|---------------------------------------------------|
-| A     | Code-only Lynx       | TRACK-004 P0+P1 complete. Internal ids/audits are Lynx; UI copy unchanged. |
-| B     | First surface flip   | First surface ships Lynx UI (Solution Console → Lynx Operator). |
-| C     | All surfaces under Lynx | Post-TRACK-004. ERP Assistant → Lynx Truth, AI Ledger → Lynx Ledger. |
-| D     | Lint enforced        | `pnpm lint:lynx-brand` passes with full allowlist removed. |
+| Phase | State                   | Trigger                                                                    |
+| ----- | ----------------------- | -------------------------------------------------------------------------- |
+| A     | Code-only Lynx          | TRACK-004 P0+P1 complete. Internal ids/audits are Lynx; UI copy unchanged. |
+| B     | First surface flip      | First surface ships Lynx UI (Solution Console → Lynx Operator).            |
+| C     | All surfaces under Lynx | Post-TRACK-004. ERP Assistant → Lynx Truth, AI Ledger → Lynx Ledger.       |
+| D     | Lint enforced           | `pnpm lint:lynx-brand` passes with full allowlist removed.                 |
 
 ---
 
@@ -153,14 +165,14 @@ Use **Vercel AI SDK UI streams** (`streamText` returning `result.toDataStreamRes
 
 Neon Postgres with the `pgvector` extension is the vector store. Key parameters:
 
-| Parameter                | Value                              | Rationale                                               |
-|--------------------------|------------------------------------|---------------------------------------------------------|
-| Embedding model          | `openai/text-embedding-3-small`    | 1536 dims; efficient, Vercel AI Gateway routed          |
-| Dimensions               | 1536                               | Must match `vector(1536)` column definition             |
-| Index                    | HNSW `vector_cosine_ops`           | Sub-100 ms similarity at 100k+ chunks per tenant        |
-| Hybrid retrieval default | off (per-org setting)              | Enable via `knowledge_org_setting.retrievalHybridEnabled` |
-| Rerank default           | off (per-org setting)              | Enable via `knowledge_org_setting.retrievalRerankEnabled` + `RERANK_MODEL` |
-| ZDR default              | off (per-org setting)              | Enable via `knowledge_org_setting.enforceZdr`           |
+| Parameter                | Value                           | Rationale                                                                  |
+| ------------------------ | ------------------------------- | -------------------------------------------------------------------------- |
+| Embedding model          | `openai/text-embedding-3-small` | 1536 dims; efficient, Vercel AI Gateway routed                             |
+| Dimensions               | 1536                            | Must match `vector(1536)` column definition                                |
+| Index                    | HNSW `vector_cosine_ops`        | Sub-100 ms similarity at 100k+ chunks per tenant                           |
+| Hybrid retrieval default | off (per-org setting)           | Enable via `knowledge_org_setting.retrievalHybridEnabled`                  |
+| Rerank default           | off (per-org setting)           | Enable via `knowledge_org_setting.retrievalRerankEnabled` + `RERANK_MODEL` |
+| ZDR default              | off (per-org setting)           | Enable via `knowledge_org_setting.enforceZdr`                              |
 
 External vector databases (Pinecone, Weaviate, Qdrant) are **rejected** — they break the one-Neon doctrine in **ARCH-001** and require a second tenant boundary.
 
@@ -168,23 +180,29 @@ External vector databases (Pinecone, Weaviate, Qdrant) are **rejected** — they
 
 ## Import rules
 
-| Consumer                                           | Import                                      |
-|----------------------------------------------------|---------------------------------------------|
-| `apps/erp/app/**` RSC, Route Handlers, Server Actions | `@afenda/feature-knowledge`, `@afenda/feature-lynx` |
-| Any `"use client"` file, client islands            | `@afenda/feature-knowledge/client`, `@afenda/feature-lynx/client` only |
-| `@afenda/ai`                                       | No import of `@afenda/feature-knowledge` — stays substrate-blind |
+| Consumer                                              | Import                                                                 |
+| ----------------------------------------------------- | ---------------------------------------------------------------------- |
+| `apps/erp/app/**` RSC, Route Handlers, Server Actions | `@afenda/feature-knowledge`, `@afenda/feature-lynx`                    |
+| Any `"use client"` file, client islands               | `@afenda/feature-knowledge/client`, `@afenda/feature-lynx/client` only |
+| `@afenda/ai`                                          | No import of `@afenda/feature-knowledge` — stays substrate-blind       |
 
 `./client` exports: serializable DTOs, client-safe constants, Zod schemas. No `server-only`, no `next/headers`, no `@afenda/db`, no `@afenda/ai`.
+
+For `@afenda/feature-knowledge` and `@afenda/feature-lynx`, `src/server.ts` is
+the only server-boundary marker and imports `@afenda/kernel/server`. Deep
+`data/*.server.ts`, `tools/*.server.ts`, and `workflows/*.server.ts` files do
+not import `server-only` directly; package tests may import those files without
+feature-local `server-only` aliases.
 
 ---
 
 ## Verification
 
-| Area                                    | Command                                           |
-|-----------------------------------------|---------------------------------------------------|
-| Architecture layout + exports           | `pnpm architecture:check`                         |
-| Knowledge schema migration              | `pnpm db:generate`                                |
-| Knowledge RLS coverage                  | `pnpm --filter @afenda/db test`                   |
-| Governed-renderer changes               | `pnpm lint:governed-renderers`                    |
-| Lynx brand compliance (flipped surfaces)| `pnpm lint:lynx-brand`                            |
-| Full type safety                        | `pnpm typecheck`                                  |
+| Area                                     | Command                         |
+| ---------------------------------------- | ------------------------------- |
+| Architecture layout + exports            | `pnpm architecture:check`       |
+| Knowledge schema migration               | `pnpm db:generate`              |
+| Knowledge RLS coverage                   | `pnpm --filter @afenda/db test` |
+| Governed-renderer changes                | `pnpm lint:governed-renderers`  |
+| Lynx brand compliance (flipped surfaces) | `pnpm lint:lynx-brand`          |
+| Full type safety                         | `pnpm typecheck`                |

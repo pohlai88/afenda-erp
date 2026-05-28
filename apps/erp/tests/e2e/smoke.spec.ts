@@ -25,6 +25,24 @@ test.describe("Afenda ERP smoke", () => {
     ).toBeVisible();
   });
 
+  test("shows floating dev sign-in on pre-sign-in shell pages", async ({
+    page,
+  }) => {
+    await page.goto("/sign-up");
+
+    const devPanel = page.locator('aside[aria-label="Developer sign-in"]');
+
+    if (!(await devPanel.isVisible())) {
+      test.skip(true, "Dev sign-in is unavailable while Neon Auth is active.");
+    }
+
+    await expect(devPanel.getByText("Developer sign-in")).toBeVisible();
+    await devPanel.getByText("Developer sign-in").click();
+    await expect(
+      devPanel.getByRole("button", { name: "Continue here" }),
+    ).toBeVisible();
+  });
+
   test("loads dashboard after dev sign-in", async ({ page }) => {
     await page.goto("/sign-in");
     const devSignInButton = page.getByRole("button", {
@@ -92,6 +110,43 @@ test.describe("Afenda ERP smoke", () => {
     ).toBeVisible();
     await expect(page.getByText("Governed metadata")).toBeVisible();
     await expect(page.getByText("Audit trail")).toBeVisible();
+  });
+
+  test("keeps the current protected route after floating dev sign-in", async ({
+    page,
+  }) => {
+    test.setTimeout(75_000);
+
+    await page.goto("/sign-in");
+    const initialDevPanel = page.locator(
+      'aside[aria-label="Developer sign-in"]',
+    );
+
+    if (!(await initialDevPanel.isVisible())) {
+      test.skip(true, "Dev sign-in is unavailable while Neon Auth is active.");
+    }
+
+    await initialDevPanel.getByText("Developer sign-in").click();
+    await initialDevPanel
+      .getByRole("button", { name: "Continue here" })
+      .evaluate((button: HTMLButtonElement) => button.click());
+    await expect(page).toHaveURL(/\/dashboard/, { timeout: 15_000 });
+    await page.goto("/finance");
+    await expect(
+      page.getByRole("heading", { level: 1, name: "Finance" }),
+    ).toBeVisible();
+
+    const devPanel = page.locator('aside[aria-label="Developer sign-in"]');
+    await expect(devPanel).toBeVisible();
+    await devPanel.getByText("Developer sign-in").click();
+    await devPanel
+      .getByRole("button", { name: "Continue here" })
+      .evaluate((button: HTMLButtonElement) => button.click());
+
+    await expect(page).toHaveURL(/\/finance$/, { timeout: 15_000 });
+    await expect(
+      page.getByRole("heading", { level: 1, name: "Finance" }),
+    ).toBeVisible();
   });
 
   test("opens a governed module work item detail after dev sign-in", async ({

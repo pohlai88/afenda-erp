@@ -1,7 +1,7 @@
 "use client";
 
 import { neonAuthClient } from "@afenda/auth/client";
-import { forgotPasswordCopy } from "@afenda/domain";
+import { forgotPasswordCopy } from "@afenda/kernel";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import {

@@ -1,11 +1,15 @@
 import { NextResponse } from "next/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-vi.mock("@afenda/ai", () => ({
+vi.mock("server-only", () => ({}));
+
+vi.mock("@afenda/ai/server", () => ({
+  aiGatewayDefaultProviderOrder: ["openai", "anthropic"],
   assertAiBudget: vi.fn(),
   assertCapabilityAllowed: vi.fn(),
+  assertGovernedToolset: vi.fn(),
   assertNoSensitiveCredentialContent: vi.fn(),
-  createErpAssistantAgent: vi.fn(),
+  createErpSpecialistAgent: vi.fn(),
   createErpAssistantTools: vi.fn(),
   createGatewayOptions: vi.fn(),
   estimateTokenCount: vi.fn(() => 80),
@@ -13,8 +17,9 @@ vi.mock("@afenda/ai", () => ({
   getAiModelForFeature: vi.fn(() => "openai/gpt-5.4"),
   getAiRouteError: vi.fn(() => null),
   getUsageMetrics: vi.fn(),
-  hasAiGatewayCredentials: vi.fn(),
+  hasAiGatewayRuntimeCredentials: vi.fn(),
   isAiBudgetError: vi.fn(() => false),
+  isAiPermissionError: vi.fn(() => false),
   isAiSensitiveContentError: vi.fn(() => false),
 }));
 
@@ -27,8 +32,8 @@ vi.mock("@afenda/db", () => ({
   registerAiApprovalProposal: vi.fn(),
 }));
 
-vi.mock("@afenda/domain", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("@afenda/domain")>();
+vi.mock("@afenda/kernel", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@afenda/kernel")>();
 
   return {
     ...actual,
@@ -55,7 +60,7 @@ vi.mock("ai", () => ({
   ),
 }));
 
-import { hasAiGatewayCredentials } from "@afenda/ai";
+import { hasAiGatewayRuntimeCredentials } from "@afenda/ai/server";
 import { getApiAuthContext } from "@afenda/auth/server";
 import { POST } from "@/app/api/ai/chat/route";
 
@@ -65,7 +70,7 @@ describe("chat route", () => {
   });
 
   it("returns 503 when AI gateway credentials are missing", async () => {
-    vi.mocked(hasAiGatewayCredentials).mockReturnValue(false);
+    vi.mocked(hasAiGatewayRuntimeCredentials).mockReturnValue(false);
 
     const response = await POST(
       new Request("http://localhost/api/ai/chat", {
@@ -81,7 +86,7 @@ describe("chat route", () => {
   });
 
   it("returns auth response when session is unavailable", async () => {
-    vi.mocked(hasAiGatewayCredentials).mockReturnValue(true);
+    vi.mocked(hasAiGatewayRuntimeCredentials).mockReturnValue(true);
     vi.mocked(getApiAuthContext).mockResolvedValue(
       NextResponse.json({ error: "Unauthorized" }, { status: 401 }),
     );

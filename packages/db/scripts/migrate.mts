@@ -11,6 +11,7 @@ const migrationsDir = resolve(packageDir, "../drizzle");
 
 config({ path: resolve(rootDir, ".env.local") });
 config({ path: resolve(rootDir, ".env.config"), override: false });
+config({ path: resolve(rootDir, ".secret.config"), override: true });
 
 const migrationUrl =
   process.env.DATABASE_MIGRATION_URL ??

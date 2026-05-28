@@ -3,9 +3,44 @@ import {
   combineLynxQualityGates,
   summarizeLynxQualityGate,
   validateLynxClaims,
-} from "../../src/evidence-trust-contract";
+} from "../../src/contracts/lynx.evidence-trust.contract";
 
 describe("Lynx evidence trust contract", () => {
+  it("validates claims from canonical markdown truth responses", () => {
+    const results = validateLynxClaims({
+      answer: [
+        "### Answer",
+        "Operators must review evidence before action [1].",
+        "",
+        "### Evidence used",
+        "[1] Policy",
+        "",
+        "### Limitations",
+        "Only indexed passages were checked.",
+        "",
+        "### Next safe action",
+        "Ask a human owner to validate the exception.",
+      ].join("\n"),
+      evidence: [
+        {
+          id: "chunk_1",
+          passage: 1,
+          title: "Policy",
+          excerpt: "Operators must review evidence before action.",
+        },
+      ],
+      mode: "truth",
+    });
+    const gate = summarizeLynxQualityGate(results);
+
+    expect(results).toHaveLength(1);
+    expect(results[0]?.status).toBe("supported");
+    expect(results[0]?.claim.text).toBe(
+      "Operators must review evidence before action [1].",
+    );
+    expect(gate.status).toBe("passed");
+  });
+
   it("passes supported claims only when citations resolve to trusted evidence", () => {
     const results = validateLynxClaims({
       answer: "Answer: Operators must review evidence before action [1].",

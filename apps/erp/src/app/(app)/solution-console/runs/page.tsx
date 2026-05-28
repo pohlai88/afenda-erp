@@ -1,5 +1,9 @@
 import { requireCapability } from "@afenda/auth/server";
 import {
+  LynxOutcomeMonitorSection,
+  updateLynxOutcomeMonitorSettingAction,
+} from "@afenda/feature-system-admin/server";
+import {
   getLynxLatencyAnalytics,
   getLynxObservabilityOverview,
   getLynxOutcomeMonitorSettings,
@@ -41,7 +45,6 @@ import {
   buildLynxRunFilterSearchParams,
   parseLynxRunFilters,
 } from "@/lib/api/lynx-run-filters";
-import { LynxOutcomeMonitorSection } from "@/components/system-admin/lynx-outcome-monitor-section";
 
 type PageProps = {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
@@ -561,6 +564,7 @@ export default async function LynxRunsPage({ searchParams }: PageProps) {
         organizationId={organization.id}
         preloaded={{ monitorSettings }}
         title="Proactive monitor controls"
+        updateLynxOutcomeMonitorSettingAction={updateLynxOutcomeMonitorSettingAction}
       />
 
       <GovernedPatternCListSection

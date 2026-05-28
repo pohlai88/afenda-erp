@@ -2,11 +2,11 @@
 
 **Doc ID:** `ARCH-003` · **File:** `003-directory-architecture-audit.md`
 
-| Field       | Value                                                                           |
-| ----------- | ------------------------------------------------------------------------------- |
-| Status      | Active — enforced by `pnpm architecture:check` (May 2026)                       |
-| Authority   | Monorepo layout, package categories, output locations, guard scripts            |
-| Enforced by | `scripts/check-directory-architecture.mts`                                      |
+| Field       | Value                                                                                                               |
+| ----------- | ------------------------------------------------------------------------------------------------------------------- |
+| Status      | Active — enforced by `pnpm architecture:check` (May 2026)                                                           |
+| Authority   | Monorepo layout, package categories, output locations, guard scripts                                                |
+| Enforced by | `scripts/check-directory-architecture.mts`                                                                          |
 | Related     | **ARCH-001** (deploy) · **ARCH-002** (feature packages) · **ARCH-004** (naming) · **ARCH-008** (package discipline) |
 
 This document describes **what the repository enforces today**. The guard script is the
@@ -22,7 +22,7 @@ intended production build.
 | Root                 | Ownership                         | Contents                                                           |
 | -------------------- | --------------------------------- | ------------------------------------------------------------------ |
 | `apps/erp/`          | Deployable App Router application | routes, layouts, handlers, app-only composition, Playwright/Vitest |
-| `packages/`          | Workspace libraries               | domain, db, auth, AI, UI, workflows, config, governed-surface      |
+| `packages/`          | Workspace libraries               | kernel, db, auth, AI, UI, workflows, config, governed-surface      |
 | `packages/features/` | ERP module packages               | scaffolded `@afenda/feature-*`; one workspace per canonical module |
 | `scripts/`           | Repo automation                   | architecture, artifacts, security, performance, env sync           |
 | `docs/architecture/` | Stable doctrine                   | `ARCH-###` + `00N-*.md` (see **ARCH-004**)                         |
@@ -39,7 +39,7 @@ intended production build.
 | `@afenda/auth`             | `runtime-library` | compiled `dist`; `client` / `server` subpaths                                     |
 | `@afenda/config`           | `config`          | compiled `dist`; Next/Vitest/env helpers                                          |
 | `@afenda/db`               | `database`        | schema, migrations, seeds → `dist/**`                                             |
-| `@afenda/domain`           | `runtime-library` | cross-module contracts → `dist/**`                                                |
+| `@afenda/kernel`           | `runtime-library` | cross-module contracts → `dist/**`                                                |
 | `@afenda/governed-surface` | `runtime-library` | metadata kernel → `dist/**`                                                       |
 | `@afenda/observability`    | `runtime-library` | logging/tracing helpers → `dist/**`                                               |
 | `@afenda/ui`               | `ui-primitives`   | shadcn primitives + `erp-shell` → `dist/**`                                       |
@@ -55,7 +55,7 @@ Every workspace package must map to a category in
 | Category          | Applies to                                                   | Policy                                                                                                          |
 | ----------------- | ------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------- |
 | `next-app`        | `@afenda/erp`                                                | Owns deployable routes; Turborepo caches `.next/**` excluding `.next/cache/**` (Vercel `NEXTJS_NO_TURBO_CACHE`) |
-| `runtime-library` | ai, auth, domain, governed-surface, observability, workflows | `src/` source; `build` = `tsc -p tsconfig.build.json`; runtime `default` exports → `./dist/*.js`                |
+| `runtime-library` | ai, auth, kernel, governed-surface, observability, workflows | `src/` source; `build` = `tsc -p tsconfig.build.json`; runtime `default` exports → `./dist/*.js`                |
 | `ui-primitives`   | `@afenda/ui`                                                 | Sole owner of reusable primitives; **forbidden:** `apps/erp/src/components/ui`                                  |
 | `config`          | `@afenda/config`                                             | Shared Next/env/Vitest; compiled subpaths where required                                                        |
 | `database`        | `@afenda/db`                                                 | Migrations and Drizzle source stay in package; emits `dist`                                                     |
@@ -152,12 +152,12 @@ Agent skill markdown under `.agents/skills/` and Cursor IDE config under
 
 ## Prevention commands
 
-| Command                        | What it guards                                         |
-| ------------------------------ | ------------------------------------------------------ |
+| Command                        | What it guards                                                  |
+| ------------------------------ | --------------------------------------------------------------- |
 | `pnpm architecture:check`      | Layout, exports, imports, turbo outputs, UI boundary, doc links |
-| `pnpm lint:governed-renderers` | Governed-surface renderer registry parity              |
-| `pnpm artifacts:check`         | Test artifact directories under `.artifacts/`          |
-| `pnpm security:review`         | Auth, cron, uploads, tenant scoping (complementary)    |
+| `pnpm lint:governed-renderers` | Governed-surface renderer registry parity                       |
+| `pnpm artifacts:check`         | Test artifact directories under `.artifacts/`                   |
+| `pnpm security:review`         | Auth, cron, uploads, tenant scoping (complementary)             |
 
 ### CI order (quality job)
 
@@ -188,7 +188,7 @@ Recorded for audit history — not open work.
 ## Related documents
 
 - **ARCH-001** [System Architecture](001-system-architecture.md) — runtime, Vercel deferral, observability
-- **ARCH-002** [ERP Domain Package Architecture](002-erp-domain-package-architecture.md) — feature extraction and imports
+- **ARCH-002** [ERP Kernel Package Architecture](002-erp-kernel-package-architecture.md) — feature extraction and imports
 - **ARCH-004** [Naming Conventions](004-naming-conventions.md) — files, docs, packages
 - **ARCH-005** [Database Scale Architecture](005-database-scale-architecture.md) — schema ownership
 - **ARCH-008** [Workspace Package Discipline](008-workspace-package-discipline.md) — package classes and export doors

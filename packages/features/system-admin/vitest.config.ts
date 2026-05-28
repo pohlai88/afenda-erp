@@ -1,14 +1,3 @@
-import { defineConfig } from "vitest/config";
+import { createVitestConfig } from "@afenda/config/vitest";
 
-export default defineConfig({
-  resolve: {
-    alias: {
-      "server-only": new URL("./tests/stubs/server-only.ts", import.meta.url)
-        .pathname,
-    },
-  },
-  test: {
-    environment: "node",
-    include: ["tests/**/*.test.ts"],
-  },
-});
+export default createVitestConfig("@afenda/feature-system-admin");

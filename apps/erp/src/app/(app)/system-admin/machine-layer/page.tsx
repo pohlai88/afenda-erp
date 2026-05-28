@@ -1,35 +1,41 @@
 import { requireCapability } from "@afenda/auth/server";
-import { getGatewaySpendReport } from "@afenda/ai";
-import { evaluateKnowledgeEvalGate, listLynxEvalRuns } from "@afenda/feature-knowledge/server";
+import { getGatewaySpendReport } from "@afenda/ai/server";
+import { formatErpDateTime } from "@afenda/kernel";
+import {
+  evaluateKnowledgeEvalGate,
+  listLynxEvalRuns,
+} from "@afenda/feature-knowledge/server";
 import {
   buildLynxEvalRunListSurface,
   getKnowledgeAdminSurfaceKeys,
 } from "@afenda/feature-knowledge/metadata";
+import {
+  AiFeatureEntitlementTrailingCell,
+  SandboxTrailingCell,
+} from "@afenda/feature-system-admin/client";
 import {
   buildGatewaySpendListSurface,
   buildSystemAdminAiApprovalsListSurface,
   buildSystemAdminAiEntitlementsListSurface,
   buildSystemAdminAiSandboxesListSurface,
   buildSystemAdminAiUsageListSurface,
-  formatSystemAdminDateTime,
   getAiApprovalsSummary,
   getAiFeatureEntitlementsSummary,
   getAiSandboxesSummary,
   getAiUsageRouteSummary,
   getTenantAiSpendEntries,
+  LynxOutcomeMonitorSection,
   systemAdminAiApprovalsSurfaceKey,
   systemAdminAiEntitlementsSurfaceKey,
   systemAdminAiSandboxesSurfaceKey,
   systemAdminAiUsageSurfaceKey,
   systemAdminGatewaySpendSurfaceKey,
+  updateLynxOutcomeMonitorSettingAction,
 } from "@afenda/feature-system-admin/server";
 import { GovernedPatternCListSection } from "@afenda/governed-surface/server";
 import { SectionPanel } from "@afenda/ui";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { LynxOutcomeMonitorSection } from "@/components/system-admin/lynx-outcome-monitor-section";
-import { AiFeatureEntitlementTrailingCell } from "@/components/ai-elements/ai-feature-entitlement-trailing-cell.client";
-import { SandboxTrailingCell } from "@/components/ai-elements/sandbox-trailing-cell.client";
 
 export const metadata: Metadata = {
   title: "Machine layer — System admin",
@@ -99,7 +105,9 @@ export default async function SystemAdminMachineLayerPage() {
         title="Machine usage ledger"
         description="Recent model calls, token totals, and latency for this tenant."
         surfaceKey={systemAdminAiUsageSurfaceKey}
-        listConfiguration={buildSystemAdminAiUsageListSurface({ events: usageRows })}
+        listConfiguration={buildSystemAdminAiUsageListSurface({
+          events: usageRows,
+        })}
         parentAccessAllowed
         layout="embedded"
       />
@@ -210,7 +218,7 @@ export default async function SystemAdminMachineLayerPage() {
                 ? "Pass"
                 : "Review",
             failedCases: String(run.failureSamples.length),
-            ranAt: formatSystemAdminDateTime(run.ranAt),
+            ranAt: formatErpDateTime(run.ranAt),
           })),
         })}
         parentAccessAllowed
@@ -220,6 +228,9 @@ export default async function SystemAdminMachineLayerPage() {
       <LynxOutcomeMonitorSection
         organizationId={organization.id}
         canWrite={canApprove}
+        updateLynxOutcomeMonitorSettingAction={
+          updateLynxOutcomeMonitorSettingAction
+        }
       />
 
       <SectionPanel

@@ -10,9 +10,9 @@ import {
   resolveWorkspaceDataMode,
   type CoreModuleId,
   type ModuleWorkspaceSearchParams,
-} from "@afenda/domain";
+} from "@afenda/kernel";
 import { requireCapability } from "@afenda/auth/server";
-import { getBlobEnv } from "@afenda/config/env";
+import { getBlobEnv } from "@/app-env/blob";
 import { getModuleFeatureMetadata } from "@/lib/module-feature-metadata";
 import {
   getResolvedModuleWorkspaceStats,

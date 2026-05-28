@@ -13,9 +13,9 @@ export {
   dashboardStatSurfaceKey,
   dashboardWorkflowSummaryStatSurfaceKey,
   getDashboardListSurfaceKeys,
-} from "@afenda/domain";
+} from "@afenda/kernel";
 
 export {
   buildDashboardHardeningChart,
   dashboardHardeningChartSurfaceKey,
-} from "@afenda/domain";
+} from "@afenda/kernel";

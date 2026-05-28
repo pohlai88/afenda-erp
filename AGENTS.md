@@ -14,17 +14,19 @@ You are working in the **deployable Next.js 16 App Router application** for Afen
 
 ## Canonical references
 
-| ID           | File                                                       | Use when                                           |
-| ------------ | ---------------------------------------------------------- | -------------------------------------------------- |
-| **ARCH-001** | `docs/architecture/001-system-architecture.md`             | Runtime, auth, AI, Vercel deploy, tenancy, caching |
-| **ARCH-002** | `docs/architecture/002-erp-domain-package-architecture.md` | Feature packages, imports, extraction              |
-| **ARCH-003** | `docs/architecture/003-directory-architecture-audit.md`    | Monorepo guards, outputs, UI boundary              |
-| **ARCH-004** | `docs/architecture/004-naming-conventions.md`              | Routes, packages, exports, module IDs              |
-| **ARCH-005** | `docs/architecture/005-database-scale-architecture.md`     | Schema ownership, promotion                        |
-| **ARCH-006** | `docs/architecture/006-metadata-driven-ui-architecture.md` | Metadata vs runtime authority, list windows        |
-| **ARCH-007** | `docs/architecture/007-governed-metadata-architecture.md`  | Renderer kernel, profiles, builders                |
-| **ARCH-008** | `docs/architecture/008-workspace-package-discipline.md`    | Package classes, export doors, split discipline    |
+| ID           | File                                                       | Use when                                                |
+| ------------ | ---------------------------------------------------------- | ------------------------------------------------------- |
+| **ARCH-001** | `docs/architecture/001-system-architecture.md`             | Runtime, auth, AI, Vercel deploy, tenancy, caching      |
+| **ARCH-002** | `docs/architecture/002-erp-kernel-package-architecture.md` | Feature packages, imports, extraction                   |
+| **ARCH-003** | `docs/architecture/003-directory-architecture-audit.md`    | Monorepo guards, outputs, UI boundary                   |
+| **ARCH-004** | `docs/architecture/004-naming-conventions.md`              | Routes, packages, exports, module IDs                   |
+| **ARCH-005** | `docs/architecture/005-database-scale-architecture.md`     | Schema ownership, promotion                             |
+| **ARCH-006** | `docs/architecture/006-metadata-driven-ui-architecture.md` | Metadata vs runtime authority, list windows             |
+| **ARCH-007** | `docs/architecture/007-governed-metadata-architecture.md`  | Renderer kernel, profiles, builders                     |
+| **ARCH-008** | `docs/architecture/008-workspace-package-discipline.md`    | Package classes, export doors, split discipline         |
 | **ARCH-009** | `docs/architecture/009-machine-layer-doctrine.md`          | Lynx machine layer, Knowledge substrate, brand contract |
+
+Feature scaffold default: `packages/_template-definition`.
 
 Index: `docs/architecture/README.md`.
 
@@ -41,7 +43,7 @@ Lynx is the ERP machine layer — every machine-assisted modality routes through
 
 - App Router routes, layouts, `loading.tsx` / `error.tsx`, Route Handlers under `src/app/api/`.
 - Server-side session and organization resolution at page entry.
-- Thin adapters: call `@afenda/domain`, `@afenda/feature-*` (when they exist), platform packages; compose governed sections.
+- Thin adapters: call `@afenda/kernel`, `@afenda/feature-*` (when they exist), platform packages; compose governed sections.
 
 **Do not put here:** durable ERP business rules, Drizzle schema, cross-module workflow state, governed renderer implementations, or reusable UI primitives (`@afenda/ui`).
 
@@ -52,6 +54,8 @@ Lynx is the ERP machine layer — every machine-assisted modality routes through
 3. **One app, one deploy** — Single Vercel project from repo root (`vercel.json` → `pnpm turbo build --filter=@afenda/erp`). No per-module Vercel projects. Linking is **deferred** until ARCH-001 stabilization gate passes.
 4. **Module routes** — Core modules use `(app)/[moduleId]/…` only. Do not add per-module route folders unless the URL tree genuinely differs.
 5. **Package discipline** — Feature packages stay flat at workspace level (`packages/features/<moduleId>`). Use nested internal folders for categories; do not create nested feature workspaces without updating ARCH-008 and the guard script.
+   - Feature scaffold follows `packages/_template-definition`. Run `pnpm scaffold:feature <moduleId>`. Avoid catch-all folders (`_shared`, `common`, `lib`, `utils`, `helpers`, `misc`).
+   - Feature server-only markers live at `src/server.ts` via `import "@afenda/kernel/server";`. Do not import `server-only` or `@afenda/kernel/server` from deep feature implementation files; local Vitest package tests import deep files without needing server-only stubs.
 6. **Governed UI** — Metadata declares intent; runtime owns authority. Lists use server windows and `GovernedPatternCListSection`; never ship full datasets to the client for pagination.
 7. **Lazy clients** — Use `getDb()` and package auth doors; do not create Neon pools or SDK clients at module scope in new app code.
 8. **Caching** — `cacheComponents: true` via `@afenda/config`. Cache only shared/non-tenant data. Tenant dashboards and org-scoped lists stay dynamic.
@@ -62,8 +66,8 @@ Lynx is the ERP machine layer — every machine-assisted modality routes through
 
 | Area          | Today                                         | Target                                                   |
 | ------------- | --------------------------------------------- | -------------------------------------------------------- |
-| Module logic  | `@afenda/domain`, route adapters              | `@afenda/feature-<moduleId>` under `packages/features/*` |
-| List builders | `packages/domain/src/module-list-surfaces.ts` | Move to feature packages when threshold met (ARCH-002)   |
+| Module logic  | `@afenda/kernel`, route adapters              | `@afenda/feature-<moduleId>` under `packages/features/*` |
+| List builders | `packages/kernel/src/module-list-surfaces.ts` | Move to feature packages when threshold met (ARCH-002)   |
 | Schema        | Flat `packages/db/src/schema/*.ts`            | `schema/<moduleId>/` for ledger-grade tables             |
 
 Do not extend generic `erp_module_records` for posting-grade, inventory-grade, or statutory workflows.

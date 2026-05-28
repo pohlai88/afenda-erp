@@ -1,4 +1,4 @@
-import { RouteStatePanel } from "@/components/route-states";
+import { RouteStatePanel } from "@/app-route-state/route-states";
 
 export default function RootNotFound() {
   return (

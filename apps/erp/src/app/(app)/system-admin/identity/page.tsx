@@ -1,24 +1,26 @@
-import { requireCapability } from "@afenda/auth/server";
 import {
   buildInvitationsListSurface,
   buildMembersListSurface,
   buildRoleOverridesListSurface,
+  inviteMemberAction,
   listOrganizationInvitations,
   listRoleOverridesForOrganization,
   listTenantMembers,
+  requireSystemAdminUsersRead,
+  setRoleOverrideAction,
   systemAdminInvitationsSurfaceKey,
   systemAdminMembersSurfaceKey,
   systemAdminRoleOverridesSurfaceKey,
 } from "@afenda/feature-system-admin/server";
+import {
+  InvitationTrailingCell,
+  InviteMemberForm,
+  MemberRoleTrailingCell,
+  RoleOverrideForm,
+} from "@afenda/feature-system-admin/client";
 import { GovernedPatternCListSection } from "@afenda/governed-surface/server";
 import { SectionPanel } from "@afenda/ui";
 import type { Metadata } from "next";
-import { InviteMemberForm } from "@/components/system-admin/invite-member-form.client";
-import {
-  InvitationTrailingCell,
-  MemberRoleTrailingCell,
-} from "@/components/system-admin/identity-trailing-cells.client";
-import { RoleOverrideForm } from "@/components/system-admin/role-override-form.client";
 
 export const metadata: Metadata = {
   title: "Identity — System admin",
@@ -26,23 +28,28 @@ export const metadata: Metadata = {
 };
 
 export default async function SystemAdminIdentityPage() {
-  const { organization } = await requireCapability(
-    "system-admin.identity.read",
-  );
-  const canWrite = organization.capabilities.includes(
-    "system-admin.identity.write",
-  );
+  const { organization } = await requireSystemAdminUsersRead();
+  const canWrite =
+    organization.capabilities.includes("system-admin.identity.write") ||
+    organization.capabilities.includes("system-admin.users.manage") ||
+    organization.capabilities.includes("system-admin.roles.manage");
 
   const [members, invitations, overrides] = await Promise.all([
     listTenantMembers({ organizationId: organization.id, limit: 100 }),
-    listOrganizationInvitations({ organizationId: organization.id, limit: 100 }),
+    listOrganizationInvitations({
+      organizationId: organization.id,
+      limit: 100,
+    }),
     listRoleOverridesForOrganization({
       organizationId: organization.id,
       limit: 200,
     }),
   ]);
 
-  const membersSurface = buildMembersListSurface({ members, canMutate: canWrite });
+  const membersSurface = buildMembersListSurface({
+    members,
+    canMutate: canWrite,
+  });
   const invitationsSurface = buildInvitationsListSurface({
     invitations,
     canMutate: canWrite,
@@ -62,7 +69,7 @@ export default async function SystemAdminIdentityPage() {
           title="Invite member"
           description="Invitations expire after seven days. The token is displayed once for manual delivery until outbound delivery is activated."
         >
-          <InviteMemberForm />
+          <InviteMemberForm inviteMemberAction={inviteMemberAction} />
         </SectionPanel>
       ) : null}
 
@@ -72,7 +79,10 @@ export default async function SystemAdminIdentityPage() {
         listConfiguration={membersSurface}
         parentAccessAllowed
         layout="embedded"
-        trailingColumn={{ header: "Actions", Cell: MemberRoleTrailingCell }}
+        trailingColumn={{
+          header: "Actions",
+          Cell: MemberRoleTrailingCell,
+        }}
       />
 
       <GovernedPatternCListSection
@@ -81,7 +91,10 @@ export default async function SystemAdminIdentityPage() {
         listConfiguration={invitationsSurface}
         parentAccessAllowed
         layout="embedded"
-        trailingColumn={{ header: "Actions", Cell: InvitationTrailingCell }}
+        trailingColumn={{
+          header: "Actions",
+          Cell: InvitationTrailingCell,
+        }}
       />
 
       <GovernedPatternCListSection
@@ -95,7 +108,7 @@ export default async function SystemAdminIdentityPage() {
 
       {canWrite ? (
         <SectionPanel title="Set role override">
-          <RoleOverrideForm />
+          <RoleOverrideForm setRoleOverrideAction={setRoleOverrideAction} />
         </SectionPanel>
       ) : null}
     </div>

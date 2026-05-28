@@ -7,7 +7,7 @@ import {
   isModuleId,
   resolveWorkspaceDataMode,
   type CoreModuleId,
-} from "@afenda/domain";
+} from "@afenda/kernel";
 import { getModuleFeatureMetadata } from "@/lib/module-feature-metadata";
 import { resolveModuleRecordDetail } from "@/lib/module-workspace-resolver";
 import { SectionPanel, StatusBadge } from "@afenda/ui";
