@@ -85,14 +85,14 @@ export default async function WorkItemDetailPage(
   });
 
   return (
-    <div className="space-y-6">
+    <div className="flex flex-col gap-6">
       <SectionPanel
         eyebrow={moduleDefinition.label}
         headingLevel={1}
         title={workItem.subject}
         description={`${workItem.priority} priority · ${workItem.status}`}
         aside={
-          <div className="space-y-3 text-right">
+          <div className="flex flex-col gap-3 text-right">
             <StatusBadge label={workItem.status} tone="neutral" />
             <div className="text-xs uppercase tracking-wide text-muted">
               {organization.slug}

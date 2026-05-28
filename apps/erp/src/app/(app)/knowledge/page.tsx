@@ -86,14 +86,14 @@ export default async function KnowledgeAdminPage() {
   });
 
   return (
-    <div className="space-y-6">
+    <div className="flex flex-col gap-6">
       <SectionPanel
         eyebrow="Machine layer substrate"
         headingLevel={1}
         title="Knowledge"
         description="Sources, indexed chunks, retrieval settings, and Lynx eval runs for the active organization."
         aside={
-          <div className="space-y-3 text-right">
+          <div className="flex flex-col gap-3 text-right">
             <StatusBadge label="Admin" tone="neutral" />
             <div className="text-xs uppercase tracking-wide text-muted">
               {organization.slug}

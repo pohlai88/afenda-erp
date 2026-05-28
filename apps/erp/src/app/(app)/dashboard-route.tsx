@@ -121,14 +121,14 @@ export async function DashboardRoutePage({
   };
 
   return (
-    <div className="space-y-6">
+    <div className="flex flex-col gap-6">
       <SectionPanel
         eyebrow={moduleDefinition.ownerTeam}
         headingLevel={1}
         title={`${organization.name} workspace`}
         description={posture.description}
         aside={
-          <div className="space-y-3 text-right">
+          <div className="flex flex-col gap-3 text-right">
             <StatusBadge
               label={moduleDefinition.status.label}
               tone={moduleDefinition.status.tone}
@@ -204,7 +204,7 @@ export async function DashboardRoutePage({
           title={dashboardRouteSections.automationTelemetry.title}
           description={dashboardRouteSections.automationTelemetry.description}
         >
-          <div className="space-y-3">
+          <div className="flex flex-col gap-3">
             <ObservabilityIndicatorList
               indicators={observabilitySummary.indicators}
             />

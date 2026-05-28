@@ -127,14 +127,14 @@ export async function ModuleRoutePage({
     : moduleDefinition.metrics;
 
   return (
-    <div className="space-y-6">
+    <div className="flex flex-col gap-6">
       <SectionPanel
         eyebrow={moduleDefinition.ownerTeam}
         headingLevel={1}
         title={moduleDefinition.label}
         description={moduleDefinition.summary}
         aside={
-          <div className="space-y-3 text-right">
+          <div className="flex flex-col gap-3 text-right">
             <StatusBadge
               label={moduleDefinition.status.label}
               tone={moduleDefinition.status.tone}

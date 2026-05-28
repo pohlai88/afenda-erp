@@ -84,14 +84,14 @@ export default async function RecordDetailPage(props: RecordDetailPageProps) {
   });
 
   return (
-    <div className="space-y-6">
+    <div className="flex flex-col gap-6">
       <SectionPanel
         eyebrow={moduleDefinition.label}
         headingLevel={1}
         title={record.reference}
         description={record.title}
         aside={
-          <div className="space-y-3 text-right">
+          <div className="flex flex-col gap-3 text-right">
             <StatusBadge label={record.status} tone="neutral" />
             <div className="text-xs uppercase tracking-wide text-muted">
               {organization.slug}
