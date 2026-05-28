@@ -3,6 +3,7 @@
 import { useMemo } from "react";
 
 import { Tooltip, TooltipContent, TooltipTrigger } from "@afenda/ui/tooltip";
+import { GovernedEmpty } from "../../client";
 import type { GovernedChartConfiguration } from "../../schemas/chart.schema";
 import { cn } from "@afenda/ui/utils";
 
@@ -29,9 +30,9 @@ export function ChartHeatmapBody({ configuration }: ChartHeatmapBodyProps) {
 
   if (cells.length === 0) {
     return (
-      <p className="text-sm text-muted-foreground" role="status">
-        No heatmap data.
-      </p>
+      <GovernedEmpty
+        model={{ variant: "muted", title: "No heatmap data." }}
+      />
     );
   }
 
@@ -39,7 +40,7 @@ export function ChartHeatmapBody({ configuration }: ChartHeatmapBodyProps) {
 
   return (
     <div
-      className="@container grid w-full gap-1.5 rounded-lg border border-border/50 bg-muted/20 p-3"
+      className="@container grid w-full gap-1.5 rounded-section border border-border/50 bg-muted/20 p-3"
       style={{
         gridTemplateColumns: "repeat(auto-fill, minmax(2.75rem, 1fr))",
       }}
@@ -53,8 +54,8 @@ export function ChartHeatmapBody({ configuration }: ChartHeatmapBodyProps) {
             <TooltipTrigger asChild>
               <div
                 className={cn(
-                  "aspect-square min-h-9 rounded-md border border-border/50 shadow-sm transition-[transform,box-shadow]",
-                  "hover:scale-105 hover:shadow-md",
+                  "aspect-square min-h-9 rounded-control border border-border/50 shadow-elevation-1 transition-[transform,box-shadow]",
+                  "hover:scale-105 hover:shadow-elevation-2",
                   "focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none",
                   "motion-reduce:transition-none motion-reduce:hover:scale-100",
                 )}
@@ -64,9 +65,11 @@ export function ChartHeatmapBody({ configuration }: ChartHeatmapBodyProps) {
                 aria-label={title}
               />
             </TooltipTrigger>
-            <TooltipContent side="top" className="text-xs">
-              <p className="font-medium">{cell.date}</p>
-              <p className="text-muted-foreground">
+            <TooltipContent side="top" className="flex flex-col gap-0.5">
+              <p className="type-caption font-medium text-foreground">
+                {cell.date}
+              </p>
+              <p className="type-caption">
                 {configuration.heatmap?.valueLabel ?? "Value"}: {cell.value}
               </p>
             </TooltipContent>

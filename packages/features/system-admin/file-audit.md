@@ -1,46 +1,47 @@
 # System Admin File Audit
 
-## Current Status
+## Export doors (ARCH-008)
 
-- Package root remains `packages/features/system-admin`.
-- Root export door exposes metadata and route contracts only.
-- `./client` remains browser-safe and exports client components, DTOs, and serializable catalogs.
-- `./server` owns server-only actions, data access, governed surfaces, policies, and domain facades.
+| Door | Owns |
+| ---- | ---- |
+| `./metadata` | List surface builders, `surfaceKey` constants, `getSystemAdminSurfaceKeys`, module metadata helpers |
+| `./server` | Page models, policies, actions, queries, server components, Lynx monitor surface builder |
+| `./client` | Client forms, trailing cells, nav, serializable catalogs |
 
-## Domain Buckets
+Pattern C ERP routes import list configuration from **`/metadata`** and authority from **`/server`**.
 
-- `overview/`: Phase 1 overview vertical with server snapshot and page component.
-- `users/`: user invitation and user access review facade.
-- `memberships/`: membership list and role assignment facade.
-- `roles/`: role override facade.
-- `permissions/`: permission catalog facade.
-- `modules/`: tenant module settings facade.
-- `capabilities/`: execution capability metadata facade.
-- `policies/`: tenant policy settings facade.
-- `approvals/`: tenant approval settings facade.
-- `audit-viewer/`: audit and retention facade.
-- `security/`: tenant security settings facade.
-- `organization/`: organization defaults facade.
-- `diagnostics/`: drift, cron, coverage, and spend evidence facade.
+## Domain verticals
 
-## Compatibility Buckets Retained
+- `overview/`, `users/`, `memberships/`, `roles/`, `permissions/`, `modules/`, `capabilities/`
+- `policies/` (policy-rules vertical + root capability gates in `system-admin.capability.policy.server.ts`)
+- `approvals/`, `audit-viewer/`, `security/`, `organization/`, `diagnostics/`, `execution/`
 
-- `actions/`, `data/`, `schemas/`, `surfaces/`, `components/`, `contracts/`, `events/`, and `policies/` remain because existing routes and tests import them.
-- `/system-admin/identity` and `/system-admin/settings` remain compatibility pages.
-- Broad permissions such as `system-admin.identity.write` and `system-admin.settings.write` remain compatibility gates while granular keys roll out.
+Vertical `index.ts` files export page models, actions, and policies — not list builders (those live on `/metadata`).
 
-## Moved Or Normalized In This Pass
+## Data access
 
-- Added granular System Admin route constants.
-- Added execution-kernel backed System Admin policy helpers.
-- Added durable tenant stores for module, policy, approval, security, and organization default settings.
-- Added governed Pattern C surfaces for permissions, modules, capabilities, policies, approvals, security, organization, and diagnostics.
-- Added domain pages under the existing `/system-admin/*` route family.
-- Added Phase 1 vertical bucket sets for `overview`, `users`, `memberships`, and `roles`.
-- Phase 1 role assignment uses the existing single-role `organization_memberships.role` model because durable `roles` and `role_assignments` tables do not exist yet.
-- Added durable membership status on `organization_memberships` so suspend/reactivate/remove can be represented without introducing a new role-assignment schema.
+Domain repositories under `data/repositories/`:
 
-## Stale Or Empty Buckets
+- `tenant-settings`, `tenant-security`, `identity`, `integrations`, `execution-settings`, `audit`, `machine-layer`
 
-- No stale source bucket was removed in this pass because the compatibility routes still consume the existing broad buckets.
-- Future cleanup can move implementation files from broad technical buckets into domain buckets once all imports use the domain facades.
+`data/system-admin.data-access.repository.server.ts` remains a compat re-export barrel for `data/index.ts` only.
+
+## Compatibility buckets
+
+- `actions/`, `data/`, `schemas/`, `surfaces/`, `components/`, `contracts/`, `events/` — implementation homes; routes use export doors.
+- `/system-admin/identity` and `/system-admin/settings` — compatibility routes.
+- Hub route: `apps/erp/.../system-admin/(index)/page.tsx` with route-level `loading.tsx`.
+
+## Removed shims (cleanup pass)
+
+- `surfaces/system-admin.audit.surface.ts` — retention/audit keys import from `audit-viewer/data/` directly.
+- `systemAdminAuditLogSurfaceKey` / `getSystemAdminSurfaceKeys().auditLog`.
+- Duplicate list-builder exports on `/server` and vertical indexes.
+- `SystemAdminAuditExportButton` on `audit-viewer` server index (client door only).
+- `buildDiagnosticsListSurface` alias on control surface.
+
+## Follow-up
+
+- Point remaining callers at domain repos; delete compat data-access barrel.
+- Full `integrations/` and `audit-viewer/` policy/event vertical parity.
+- Collapse root `actions/` shims into vertical action modules.

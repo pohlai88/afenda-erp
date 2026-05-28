@@ -110,7 +110,7 @@ export function ApprovalTimelineRenderer({
       <Card>
         {title ? (
           <CardHeader className="pb-2">
-            <CardTitle className="text-base">{title}</CardTitle>
+            <CardTitle>{title}</CardTitle>
           </CardHeader>
         ) : null}
         <CardContent
@@ -132,11 +132,11 @@ export function ApprovalTimelineRenderer({
                 >
                   <span
                     className={cn(
-                      "mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-full border text-xs font-medium",
+                      "mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-full border type-label", // audit-ds: ignore no-raw-typography — step status badge; type-label uppercase is acceptable here
                       step.status === "complete" &&
                         "border-success/40 bg-success/10 text-success",
                       step.status === "rejected" &&
-                        "border-destructive/40 bg-destructive/10 text-destructive",
+                        "border-critical/40 bg-critical/10 text-critical",
                       step.status === "active" &&
                         "border-primary/40 bg-primary/10 text-primary",
                       (step.status === "pending" ||
@@ -153,12 +153,12 @@ export function ApprovalTimelineRenderer({
                         <Link
                           href={step.href as Route}
                           prefetch={false}
-                          className="text-sm font-medium text-primary hover:underline"
+                          className="type-body font-medium text-primary hover:underline"
                         >
                           {step.label}
                         </Link>
                       ) : (
-                        <span className="text-sm font-medium">
+                        <span className="type-body font-medium">
                           {step.label}
                         </span>
                       )}
@@ -167,7 +167,7 @@ export function ApprovalTimelineRenderer({
                       </Badge>
                       {occurred ? (
                         <time
-                          className="text-xs text-muted-foreground"
+                          className="type-caption"
                           dateTime={step.occurredAt}
                         >
                           {occurred}
@@ -175,16 +175,16 @@ export function ApprovalTimelineRenderer({
                       ) : null}
                     </div>
                     {step.actorLabel ? (
-                      <p className="text-xs font-medium text-foreground/80">
+                      <p className="type-caption font-medium text-foreground/80"> {/* audit-ds: ignore no-raw-typography — actor attribution; type-caption sets muted but foreground/80 overrides */}
                         {step.actorLabel}
                       </p>
                     ) : null}
                     {duration ? (
-                      <p className="text-xs text-muted-foreground">
-                        {duration}
-                      </p>
-                    ) : null}
-                    {step.metadataChips?.length ? (
+                      <p className="type-caption">
+                          {duration}
+                        </p>
+                      ) : null}
+                      {step.metadataChips?.length ? (
                       <ul
                         className="flex flex-wrap gap-1"
                         aria-label="Step metadata"
@@ -203,9 +203,9 @@ export function ApprovalTimelineRenderer({
                       </ul>
                     ) : null}
                     {step.note ? (
-                      <p className="text-xs text-muted-foreground">
-                        {step.note}
-                      </p>
+                      <p className="type-caption">
+                          {step.note}
+                        </p>
                     ) : null}
                   </div>
                 </li>

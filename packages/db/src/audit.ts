@@ -1,4 +1,4 @@
-import { and, desc, eq } from "drizzle-orm";
+import { and, count, desc, eq, gte, ilike, lte, or } from "drizzle-orm";
 import {
   getDb,
   runWithOrganizationContext,
@@ -92,17 +92,130 @@ export async function createAuditLogUnscoped(input: {
   });
 }
 
+export type TenantAuditLogSearchFilters = {
+  actorAuthUserId?: string;
+  action?: string;
+  moduleKey?: string;
+  entityType?: AuditEntityType;
+  query?: string;
+  createdAfter?: Date;
+  createdBefore?: Date;
+};
+
+function buildAuditLogSearchWhere(
+  organizationId: string,
+  filters: TenantAuditLogSearchFilters | undefined,
+) {
+  const clauses = [eq(auditLogs.organizationId, organizationId)];
+
+  if (filters?.actorAuthUserId) {
+    clauses.push(eq(auditLogs.actorAuthUserId, filters.actorAuthUserId));
+  }
+
+  if (filters?.action) {
+    clauses.push(ilike(auditLogs.action, `%${filters.action}%`));
+  }
+
+  if (filters?.moduleKey) {
+    clauses.push(ilike(auditLogs.action, `${filters.moduleKey}.%`));
+  }
+
+  if (filters?.entityType) {
+    clauses.push(eq(auditLogs.entityType, filters.entityType));
+  }
+
+  if (filters?.createdAfter) {
+    clauses.push(gte(auditLogs.createdAt, filters.createdAfter));
+  }
+
+  if (filters?.createdBefore) {
+    clauses.push(lte(auditLogs.createdAt, filters.createdBefore));
+  }
+
+  if (filters?.query) {
+    const pattern = `%${filters.query}%`;
+    clauses.push(
+      or(
+        ilike(auditLogs.action, pattern),
+        ilike(auditLogs.summary, pattern),
+        ilike(auditLogs.entityId, pattern),
+        ilike(auditLogs.actorAuthUserId, pattern),
+      )!,
+    );
+  }
+
+  return and(...clauses);
+}
+
+export async function getTenantAuditLogById(input: {
+  organizationId: string;
+  auditLogId: string;
+}): Promise<TenantAuditLog | null> {
+  return runWithOrganizationContext(input.organizationId, async (db) => {
+    const row = await db.query.auditLogs.findFirst({
+      where: and(
+        eq(auditLogs.organizationId, input.organizationId),
+        eq(auditLogs.id, input.auditLogId),
+      ),
+    });
+
+    return row ?? null;
+  });
+}
+
+export async function searchTenantAuditLogs(input: {
+  organizationId: string;
+  limit: number;
+  offset: number;
+  filters?: TenantAuditLogSearchFilters;
+}): Promise<{ rows: TenantAuditLog[]; totalCount: number }> {
+  return runWithOrganizationContext(input.organizationId, async (db) => {
+    const where = buildAuditLogSearchWhere(
+      input.organizationId,
+      input.filters,
+    );
+
+    const [rows, total] = await Promise.all([
+      db
+        .select({
+          id: auditLogs.id,
+          organizationId: auditLogs.organizationId,
+          actorAuthUserId: auditLogs.actorAuthUserId,
+          entityType: auditLogs.entityType,
+          entityId: auditLogs.entityId,
+          action: auditLogs.action,
+          summary: auditLogs.summary,
+          metadata: auditLogs.metadata,
+          createdAt: auditLogs.createdAt,
+          updatedAt: auditLogs.updatedAt,
+        })
+        .from(auditLogs)
+        .where(where)
+        .orderBy(desc(auditLogs.createdAt))
+        .limit(input.limit)
+        .offset(input.offset),
+      db
+        .select({ total: count() })
+        .from(auditLogs)
+        .where(where)
+        .then((result) => Number(result[0]?.total ?? 0)),
+    ]);
+
+    return { rows, totalCount: total };
+  });
+}
+
 export async function listAuditLogsForOrganization(input: {
   organizationId: string;
   limit?: number;
 }): Promise<TenantAuditLog[]> {
-  return runWithOrganizationContext(input.organizationId, async (db) =>
-    db.query.auditLogs.findMany({
-      where: eq(auditLogs.organizationId, input.organizationId),
-      limit: input.limit ?? 20,
-      orderBy: (table, { desc }) => [desc(table.createdAt)],
-    }),
-  );
+  const result = await searchTenantAuditLogs({
+    organizationId: input.organizationId,
+    limit: input.limit ?? 20,
+    offset: 0,
+  });
+
+  return result.rows;
 }
 
 export async function listAuditLogsForEntity(input: {

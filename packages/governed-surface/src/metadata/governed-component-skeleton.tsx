@@ -23,7 +23,7 @@ export function GovernedComponentSkeleton({
         >
           <div className="grid grid-cols-1 gap-3 @sm:grid-cols-2 @2xl:grid-cols-4">
             {Array.from({ length: 4 }).map((_, index) => (
-              <Skeleton key={index} className="h-24 rounded-xl" />
+              <Skeleton key={index} className="h-24 rounded-card" />
             ))}
           </div>
         </section>
@@ -37,13 +37,13 @@ export function GovernedComponentSkeleton({
           data-testid="governed-skeleton-list-surface"
         >
           <div className="flex justify-end gap-2">
-            <Skeleton className="h-8 w-20 rounded-md" />
-            <Skeleton className="h-8 w-24 rounded-md" />
+            <Skeleton className="h-8 w-20 rounded-control" />
+            <Skeleton className="h-8 w-24 rounded-control" />
           </div>
-          <Skeleton className="h-9 w-full rounded-md" />
+          <Skeleton className="h-9 w-full rounded-control" />
           <div className="flex flex-col gap-1.5">
             {Array.from({ length: 6 }).map((_, index) => (
-              <Skeleton key={index} className="h-10 w-full rounded-md" />
+              <Skeleton key={index} className="h-10 w-full rounded-control" />
             ))}
           </div>
         </div>
@@ -52,7 +52,7 @@ export function GovernedComponentSkeleton({
     case "section":
       return (
         <div
-          className="flex flex-col gap-4"
+          className="flex flex-col gap-surface-lg"
           aria-hidden="true"
           data-testid="governed-skeleton-section"
         >
@@ -61,8 +61,8 @@ export function GovernedComponentSkeleton({
             <Skeleton className="h-3 w-72 max-w-full" />
           </div>
           <div className="flex flex-col gap-3">
-            <Skeleton className="h-24 w-full rounded-xl" />
-            <Skeleton className="h-32 w-full rounded-xl" />
+            <Skeleton className="h-24 w-full rounded-card" />
+            <Skeleton className="h-32 w-full rounded-card" />
           </div>
         </div>
       );
@@ -74,8 +74,8 @@ export function GovernedComponentSkeleton({
           aria-hidden="true"
           data-testid="governed-skeleton-stack"
         >
-          <Skeleton className="h-28 min-w-0 rounded-xl" />
-          <Skeleton className="h-28 min-w-0 rounded-xl" />
+          <Skeleton className="h-28 min-w-0 rounded-card" />
+          <Skeleton className="h-28 min-w-0 rounded-card" />
         </div>
       );
 
@@ -86,9 +86,9 @@ export function GovernedComponentSkeleton({
           aria-hidden="true"
           data-testid="governed-skeleton-action-bar"
         >
-          <Skeleton className="h-9 w-24 rounded-md" />
-          <Skeleton className="h-9 w-28 rounded-md" />
-          <Skeleton className="h-9 w-20 rounded-md" />
+          <Skeleton className="h-9 w-24 rounded-control" />
+          <Skeleton className="h-9 w-28 rounded-control" />
+          <Skeleton className="h-9 w-20 rounded-control" />
         </div>
       );
 
@@ -101,7 +101,7 @@ export function GovernedComponentSkeleton({
           data-testid={`governed-skeleton-${rendererId}`}
         >
           <Skeleton className="h-8 w-64" />
-          <Skeleton className="h-56 w-full rounded-xl" />
+          <Skeleton className="h-56 w-full rounded-card" />
         </div>
       );
 
@@ -113,7 +113,7 @@ export function GovernedComponentSkeleton({
           data-testid="governed-skeleton-approval-timeline"
         >
           {Array.from({ length: 4 }).map((_, index) => (
-            <Skeleton key={index} className="h-12 w-full rounded-lg" />
+            <Skeleton key={index} className="h-12 w-full rounded-section" />
           ))}
         </div>
       );
@@ -126,11 +126,11 @@ export function GovernedComponentSkeleton({
           data-testid="governed-skeleton-chart"
         >
           <Skeleton className="h-6 w-48" />
-          <div className="grid grid-cols-7 gap-1.5 rounded-lg border border-border/40 p-3">
+          <div className="grid grid-cols-7 gap-1.5 rounded-section border border-border/40 p-3">
             {Array.from({ length: 14 }).map((_, index) => (
               <Skeleton
                 key={index}
-                className="aspect-square min-h-8 rounded-md"
+                className="aspect-square min-h-8 rounded-control"
               />
             ))}
           </div>
@@ -146,7 +146,7 @@ export function GovernedComponentSkeleton({
         >
           <div className="grid grid-cols-1 gap-3 @sm:grid-cols-2 @3xl:grid-cols-4">
             {Array.from({ length: 4 }).map((_, index) => (
-              <Skeleton key={index} className="h-48 rounded-xl" />
+              <Skeleton key={index} className="h-48 rounded-card" />
             ))}
           </div>
         </section>
@@ -161,14 +161,14 @@ export function GovernedComponentSkeleton({
           data-testid={`governed-skeleton-${rendererId}`}
         >
           <Skeleton className="h-8 w-56" />
-          <Skeleton className="h-48 w-full rounded-xl" />
+          <Skeleton className="h-48 w-full rounded-card" />
         </div>
       );
 
     case "empty":
       return (
         <Skeleton
-          className="h-16 w-full rounded-xl"
+          className="h-16 w-full rounded-card"
           aria-hidden="true"
           data-testid="governed-skeleton-empty"
         />

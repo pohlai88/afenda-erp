@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { ERP_FUNCTIONS } from "../adapters/rbac.shared";
+import { ERP_FUNCTIONS } from "./erp-permission.shared";
 
 /**
  * Serializable ERP permission gate for governed surface metadata (ADR-0026).

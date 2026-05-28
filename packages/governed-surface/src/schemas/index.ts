@@ -12,6 +12,12 @@ export {
 } from "./page-header.schema";
 
 export {
+  ERP_FUNCTIONS,
+  type ErpFunction,
+  type ErpPermissionTuple,
+} from "./erp-permission.shared";
+
+export {
   erpPermissionRequirementSchema,
   type ErpPermissionRequirement,
 } from "./erp-permission-requirement.schema";
@@ -61,6 +67,7 @@ export {
   statCardConfigurationSchema,
   statCardDataNatureSchema,
   statCardDensitySchema,
+  type StatCardComparison,
   type StatCardConfiguration,
   type StatCardConfigurationInput,
   type StatCardConfigurationResolvedInput,
@@ -68,6 +75,8 @@ export {
   type StatCardDensity,
   type StatCardIcon,
   type StatCardItem,
+  type StatCardProgress,
+  type StatCardSparkPoint,
   type StatCardTone,
 } from "./stat-card.schema";
 

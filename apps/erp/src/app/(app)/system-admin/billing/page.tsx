@@ -1,8 +1,10 @@
-import { requireCapability } from "@afenda/auth/server";
 import {
   buildBillingPostureListSurface,
-  getBillingPostureSnapshot,
   systemAdminBillingSurfaceKey,
+} from "@afenda/feature-system-admin/metadata";
+import {
+  getBillingPostureSnapshot,
+  requireSystemAdminBillingRead,
 } from "@afenda/feature-system-admin/server";
 import { GovernedPatternCListSection } from "@afenda/governed-surface/server";
 import { SectionPanel } from "@afenda/ui";
@@ -14,7 +16,7 @@ export const metadata: Metadata = {
 };
 
 export default async function SystemAdminBillingPage() {
-  const { organization } = await requireCapability("system-admin.billing.read");
+  const { organization } = await requireSystemAdminBillingRead();
 
   const snapshot = await getBillingPostureSnapshot({
     organizationId: organization.id,

@@ -60,7 +60,7 @@ import { ListSurfaceToolbarClient } from "./list-surface-toolbar.client";
 const ROW_TONE_CLASS: Record<ListSurfaceRowTone, string> = {
   default: "",
   attention: "bg-warning/10",
-  critical: "bg-destructive/10",
+  critical: "bg-critical/10",
 };
 
 const LEDGER_TONE_VARIANT: Record<
@@ -88,9 +88,9 @@ function columnVisualClass(column: ListColumn | undefined): string {
   return cn(
     alignClass(column?.align),
     column?.wrap && "whitespace-normal",
-    column?.clip && "max-w-[16rem] truncate",
-    column?.pin === "start" && "sticky left-0 z-[1] bg-card",
-    column?.pin === "end" && "sticky right-0 z-[1] bg-card",
+    column?.clip && "max-w-[16rem] truncate", // audit-ds: ignore no-arbitrary-value — clip column max-width contract
+    column?.pin === "start" && "sticky left-0 z-raised bg-card",
+    column?.pin === "end" && "sticky right-0 z-raised bg-card",
   );
 }
 
@@ -110,19 +110,17 @@ function DecisionLedgerPanel({
 }) {
   const riskTone = ledger.riskTone ?? "default";
   return (
-    <div className="rounded-md border border-border bg-muted/30 p-3 text-sm">
+    <div className="surface-inset flex flex-col gap-2 rounded-section type-body">
       <div className="flex flex-wrap items-center gap-2">
         <ClipboardList className="size-4 text-muted-foreground" aria-hidden />
-        <span className="font-medium">{label}</span>
+        <span className="type-body font-medium">{label}</span>
         <Badge variant={LEDGER_TONE_VARIANT[riskTone]}>{riskTone}</Badge>
       </div>
-      {ledger.reason ? (
-        <p className="mt-2 text-foreground">{ledger.reason}</p>
-      ) : null}
-      <dl className="mt-2 grid gap-2 text-xs text-muted-foreground @sm:grid-cols-2">
+      {ledger.reason ? <p className="type-body">{ledger.reason}</p> : null}
+      <dl className="grid gap-2 type-caption @sm:grid-cols-2">
         {ledger.policyLabel ? (
           <div>
-            <dt className="font-medium text-foreground">Policy</dt>
+            <dt className="type-caption font-medium text-foreground">Policy</dt>
             <dd>
               {ledger.policyHref ? (
                 <Link href={ledger.policyHref as Route}>
@@ -136,19 +134,23 @@ function DecisionLedgerPanel({
         ) : null}
         {ledger.actorLabel ? (
           <div>
-            <dt className="font-medium text-foreground">Actor</dt>
+            <dt className="type-caption font-medium text-foreground">Actor</dt>
             <dd>{ledger.actorLabel}</dd>
           </div>
         ) : null}
         {ledger.occurredAt ? (
           <div>
-            <dt className="font-medium text-foreground">Timestamp</dt>
+            <dt className="type-caption font-medium text-foreground">
+              Timestamp
+            </dt>
             <dd>{ledger.occurredAt}</dd>
           </div>
         ) : null}
         {ledger.nextActionLabel ? (
           <div>
-            <dt className="font-medium text-foreground">Next step</dt>
+            <dt className="type-caption font-medium text-foreground">
+              Next step
+            </dt>
             <dd>{ledger.nextActionLabel}</dd>
           </div>
         ) : null}
@@ -156,7 +158,7 @@ function DecisionLedgerPanel({
       {ledger.evidenceHref ? (
         <Link
           href={ledger.evidenceHref as Route}
-          className="mt-2 inline-flex text-xs font-medium text-primary underline-offset-4 hover:underline"
+          className="inline-flex type-caption font-medium text-primary underline-offset-4 hover:underline"
         >
           Open evidence
         </Link>
@@ -423,7 +425,7 @@ export function ListSurfaceTableClient({
   };
 
   const shell = (
-    <>
+    <div className="flex flex-col gap-2">
       <ListSurfaceToolbarClient
         toolbar={toolbar}
         density={density}
@@ -473,7 +475,7 @@ export function ListSurfaceTableClient({
                   >
                     <CardContent className="flex flex-col gap-2 p-3">
                       {primaryColumn ? (
-                        <div className="text-sm font-medium">
+                        <div className="type-body font-medium">
                           <ListSurfaceCell
                             column={primaryColumn}
                             row={source}
@@ -483,10 +485,10 @@ export function ListSurfaceTableClient({
                       <dl className="grid grid-cols-1 gap-2 @sm:grid-cols-2">
                         {detailColumns.map((column) => (
                           <div key={column.id} className="min-w-0">
-                            <dt className="text-label-small text-muted-foreground">
+                            <dt className="type-caption">
                               {column.header}
                             </dt>
-                            <dd className="text-sm">
+                            <dd className="type-body">
                               <ListSurfaceCell column={column} row={source} />
                             </dd>
                           </div>
@@ -518,14 +520,14 @@ export function ListSurfaceTableClient({
               ref={scrollRef}
               className={cn(
                 tableVisibilityClass,
-                useVirtual && "max-h-[32rem] overflow-auto",
+                useVirtual && "max-h-[32rem] overflow-auto", // audit-ds: ignore no-arbitrary-value — virtual scroll viewport height contract
                 stickyHeader && "relative",
               )}
             >
               <Table density={density}>
                 <TableHeader
                   className={cn(
-                    stickyHeader && "sticky top-0 z-10 bg-card shadow-sm",
+                    stickyHeader && "sticky top-0 z-raised bg-card shadow-elevation-1",
                   )}
                 >
                   {table.getHeaderGroups().map((headerGroup) => (
@@ -566,7 +568,7 @@ export function ListSurfaceTableClient({
                               <div className="inline-flex items-center gap-1">
                                 <button
                                   type="button"
-                                  className="inline-flex items-center gap-1 font-medium hover:text-foreground"
+                                  className="type-label inline-flex items-center gap-1 font-medium hover:text-foreground"
                                   onClick={header.column.getToggleSortingHandler()}
                                 >
                                   {flexRender(
@@ -672,7 +674,7 @@ export function ListSurfaceTableClient({
                         <TableRow key={key} className="bg-muted/40">
                           <TableCell
                             colSpan={tableColumnCount}
-                            className="text-xs font-medium text-muted-foreground"
+                            className="type-label"
                           >
                             {renderItem.label} · {renderItem.rowCount} rows
                           </TableCell>
@@ -809,7 +811,7 @@ export function ListSurfaceTableClient({
                               style={columnVisualStyle(column)}
                             >
                               {column.id === visibleColumns[0]?.id ? (
-                                <span className="font-medium">
+                                <span className="type-body font-medium">
                                   {summaryRow.label}
                                 </span>
                               ) : summaryRow.cells[column.id] !== undefined ? (
@@ -830,7 +832,7 @@ export function ListSurfaceTableClient({
         </>
       )}
       {pagination ? (
-        <div className="mt-2 flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground">
+        <div className="flex flex-wrap items-center justify-between gap-2 type-caption">
           <p role="status">
             {pagination.totalCount != null
               ? `${pagination.totalCount} rows`
@@ -846,7 +848,7 @@ export function ListSurfaceTableClient({
             {pagination.prevHref ? (
               <Link
                 href={pagination.prevHref as Route}
-                className="font-medium text-foreground underline-offset-4 hover:underline"
+                className="type-label font-medium text-foreground underline-offset-4 hover:underline"
               >
                 Previous
               </Link>
@@ -854,7 +856,7 @@ export function ListSurfaceTableClient({
             {pagination.nextHref ? (
               <Link
                 href={pagination.nextHref as Route}
-                className="font-medium text-foreground underline-offset-4 hover:underline"
+                className="type-label font-medium text-foreground underline-offset-4 hover:underline"
               >
                 Next
               </Link>
@@ -862,12 +864,12 @@ export function ListSurfaceTableClient({
           </div>
         </div>
       ) : null}
-    </>
+    </div>
   );
 
   return (
     <div
-      className={cn("af-material-opaque @container min-w-0 rounded-lg")}
+      className={cn("af-material-opaque @container min-w-0 rounded-section")}
       data-testid={listTestId}
       {...governedDataAttrs}
     >

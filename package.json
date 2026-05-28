@@ -33,6 +33,8 @@
     "security:review": "tsx scripts/security-review.mts",
     "lint:governed-renderers": "tsx packages/governed-surface/scripts/lint-governed-renderers.mts",
     "lint:governed-trailing-cells": "tsx packages/governed-surface/scripts/lint-governed-trailing-cells.mts",
+    "lint:governed-renderer-contracts": "tsx packages/governed-surface/scripts/check-renderer-contracts.mts",
+    "audit:governed-design-tokens": "tsx packages/governed-surface/scripts/audit-design-system-tokens.mts",
     "lint:lynx-brand": "tsx scripts/lint-lynx-brand.mts",
     "scaffold:feature": "tsx packages/_template-definition/scripts/scaffold-feature.mts",
     "scaffold:vertical": "tsx packages/_template-definition/scripts/scaffold-vertical.mts",

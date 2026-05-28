@@ -18,6 +18,7 @@ import {
   retentionPolicies,
   ssoConnections,
   tenantApprovalSettings,
+  tenantCapabilitySettings,
   tenantModuleSettings,
   tenantPolicySettings,
   tenantRoleOverrides,
@@ -64,6 +65,14 @@ export type TenantSettingsSnapshot = {
 };
 
 export type SystemAdminReadiness = "preview" | "active" | "blocked" | "deprecated";
+
+export type SystemAdminAvailability = "enabled" | "disabled" | "preview";
+
+export type TenantCapabilitySettingRow = {
+  organizationId: string;
+  capabilityKey: string;
+  availability: SystemAdminAvailability;
+};
 
 export type TenantModuleSettingRow = {
   organizationId: string;
@@ -692,6 +701,64 @@ export async function upsertTenantModuleSettings(input: {
   });
 }
 
+export async function listTenantCapabilitySettings(input: {
+  organizationId: string;
+  limit?: number;
+}): Promise<TenantCapabilitySettingRow[]> {
+  return runWithOrganizationContext(input.organizationId, async (db) =>
+    db
+      .select({
+        organizationId: tenantCapabilitySettings.organizationId,
+        capabilityKey: tenantCapabilitySettings.capabilityKey,
+        availability: tenantCapabilitySettings.availability,
+      })
+      .from(tenantCapabilitySettings)
+      .where(eq(tenantCapabilitySettings.organizationId, input.organizationId))
+      .orderBy(asc(tenantCapabilitySettings.capabilityKey))
+      .limit(normalizeSystemAdminListLimit(input.limit, 500)),
+  );
+}
+
+export async function upsertTenantCapabilitySettings(input: {
+  organizationId: string;
+  capabilityKey: string;
+  availability: SystemAdminAvailability;
+  actorAuthUserId: string;
+}) {
+  return runWithOrganizationContext(input.organizationId, async (db) => {
+    await db
+      .insert(tenantCapabilitySettings)
+      .values({
+        organizationId: input.organizationId,
+        capabilityKey: input.capabilityKey,
+        availability: input.availability,
+      })
+      .onConflictDoUpdate({
+        target: [
+          tenantCapabilitySettings.organizationId,
+          tenantCapabilitySettings.capabilityKey,
+        ],
+        set: {
+          availability: input.availability,
+          updatedAt: new Date(),
+        },
+      });
+
+    await createAuditLog({
+      organizationId: input.organizationId,
+      actorAuthUserId: input.actorAuthUserId,
+      entityType: "organization",
+      entityId: input.organizationId,
+      action: "system-admin.capability-settings.updated",
+      summary: `Capability settings updated for ${input.capabilityKey}.`,
+      metadata: {
+        capabilityKey: input.capabilityKey,
+        availability: input.availability,
+      },
+    });
+  });
+}
+
 export async function listTenantPolicySettings(input: {
   organizationId: string;
   limit?: number;
@@ -891,6 +958,7 @@ export async function updateTenantSecuritySettings(input: {
       | "sessionPolicy"
     >
   >;
+  recordAuditLog?: boolean;
 }) {
   return runWithOrganizationContext(input.organizationId, async (db) => {
     await ensureTenantSecuritySettings({ organizationId: input.organizationId });
@@ -903,15 +971,17 @@ export async function updateTenantSecuritySettings(input: {
       })
       .where(eq(tenantSecuritySettings.organizationId, input.organizationId));
 
-    await createAuditLog({
-      organizationId: input.organizationId,
-      actorAuthUserId: input.actorAuthUserId,
-      entityType: "organization",
-      entityId: input.organizationId,
-      action: "system-admin.security.updated",
-      summary: "Tenant security settings were updated.",
-      metadata: input.patch,
-    });
+    if (input.recordAuditLog !== false) {
+      await createAuditLog({
+        organizationId: input.organizationId,
+        actorAuthUserId: input.actorAuthUserId,
+        entityType: "organization",
+        entityId: input.organizationId,
+        action: "system-admin.security.updated",
+        summary: "Tenant security settings were updated.",
+        metadata: input.patch,
+      });
+    }
   });
 }
 

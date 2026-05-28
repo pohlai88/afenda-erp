@@ -22,7 +22,7 @@ export function GovernedKanbanTransitionHint({
   const badge = (
     <Badge
       variant="outline"
-      className={cn("text-xs font-normal", disabled && "opacity-60")}
+      className={cn("type-caption font-normal", disabled && "opacity-60")}
     >
       {transition.label}
     </Badge>

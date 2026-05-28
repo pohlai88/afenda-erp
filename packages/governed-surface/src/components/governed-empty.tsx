@@ -27,7 +27,7 @@ const variantClassName: Record<EmptyState["variant"], string> = {
     ui.elevation.card,
   ),
   error: cn(
-    "border-solid border-destructive/40 bg-destructive/5",
+    "border-solid border-critical/40 bg-critical/5",
     ui.radius.card,
   ),
 };
@@ -36,7 +36,7 @@ export function GovernedEmpty({ model, className }: GovernedEmptyProps) {
   return (
     <Empty
       className={cn(
-        "border p-8 text-center sm:p-10",
+        "border p-8 text-center @sm:p-10",
         variantClassName[model.variant],
         className,
       )}

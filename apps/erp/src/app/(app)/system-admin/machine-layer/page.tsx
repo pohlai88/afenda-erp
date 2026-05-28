@@ -1,4 +1,3 @@
-import { requireCapability } from "@afenda/auth/server";
 import { getGatewaySpendReport } from "@afenda/ai/server";
 import { formatErpDateTime } from "@afenda/kernel";
 import {
@@ -19,17 +18,20 @@ import {
   buildSystemAdminAiEntitlementsListSurface,
   buildSystemAdminAiSandboxesListSurface,
   buildSystemAdminAiUsageListSurface,
+  systemAdminAiApprovalsSurfaceKey,
+  systemAdminAiEntitlementsSurfaceKey,
+  systemAdminAiSandboxesSurfaceKey,
+  systemAdminAiUsageSurfaceKey,
+  systemAdminGatewaySpendSurfaceKey,
+} from "@afenda/feature-system-admin/metadata";
+import {
   getAiApprovalsSummary,
   getAiFeatureEntitlementsSummary,
   getAiSandboxesSummary,
   getAiUsageRouteSummary,
   getTenantAiSpendEntries,
   LynxOutcomeMonitorSection,
-  systemAdminAiApprovalsSurfaceKey,
-  systemAdminAiEntitlementsSurfaceKey,
-  systemAdminAiSandboxesSurfaceKey,
-  systemAdminAiUsageSurfaceKey,
-  systemAdminGatewaySpendSurfaceKey,
+  requireSystemAdminMachineLayerRead,
   updateLynxOutcomeMonitorSettingAction,
 } from "@afenda/feature-system-admin/server";
 import { GovernedPatternCListSection } from "@afenda/governed-surface/server";
@@ -44,9 +46,7 @@ export const metadata: Metadata = {
 };
 
 export default async function SystemAdminMachineLayerPage() {
-  const { organization } = await requireCapability(
-    "system-admin.machine-layer.read",
-  );
+  const { organization } = await requireSystemAdminMachineLayerRead();
   const canApprove = organization.capabilities.includes(
     "system-admin.machine-layer.approve",
   );

@@ -4,14 +4,11 @@ import {
   type ListSurfaceRendererConfigurationResolvedInput,
 } from "@afenda/governed-surface";
 import type {
-  TenantApprovalSettingRow,
-  TenantModuleSettingRow,
-  TenantPolicySettingRow,
-  TenantSecuritySettingsSnapshot,
-  TenantSettingsSnapshot,
-} from "@afenda/db";
-import type { AppCapability } from "@afenda/auth";
-import type { ExecutionCapability } from "@afenda/kernel/execution";
+  ListColumn,
+  ListSurfaceRow,
+} from "@afenda/governed-surface/schemas";
+import type { TenantSettingsSnapshot } from "@afenda/db";
+import { systemAdminControlLinks } from "../contracts/system-admin.control-links.contract";
 import {
   buildSystemAdminListToolbar,
   buildSystemAdminStaticPagination,
@@ -22,7 +19,12 @@ type BasicRow = {
   [key: string]: string;
 };
 
-function buildControlListSurface(input: {
+type LinkedControlRow = Pick<
+  ListSurfaceRow,
+  "id" | "cells" | "rowHref" | "linkColumnId" | "cellKinds"
+>;
+
+export function buildControlListSurface(input: {
   key: string;
   title: string;
   object: string;
@@ -34,6 +36,26 @@ function buildControlListSurface(input: {
   }>;
   rows: readonly BasicRow[];
   emptyTitle: string;
+  searchValue?: string;
+}): ListSurfaceRendererConfigurationResolvedInput {
+  return buildLinkedControlListSurface({
+    ...input,
+    columns: [...input.columns],
+    rows: input.rows.map((row) => {
+      const { id, ...cells } = row;
+      return { id, cells };
+    }),
+  });
+}
+
+export function buildLinkedControlListSurface(input: {
+  key: string;
+  title: string;
+  object: string;
+  columns: ReadonlyArray<ListColumn>;
+  rows: readonly LinkedControlRow[];
+  emptyTitle: string;
+  searchValue?: string;
 }): ListSurfaceRendererConfigurationResolvedInput {
   return buildGovernedListSurface({
     __schemaVersion: GOVERNED_METADATA_SCHEMA_VERSION,
@@ -44,6 +66,7 @@ function buildControlListSurface(input: {
         scope: input.object,
         searchPlaceholder: `Search ${input.object}`,
         sortColumn: input.columns[0]?.id ?? "id",
+        searchValue: input.searchValue,
       }),
     },
     requiresErpPermission: {
@@ -59,11 +82,59 @@ function buildControlListSurface(input: {
       empty: { variant: "muted", title: input.emptyTitle },
     },
     columns: [...input.columns],
-    rows: input.rows.map((row) => ({
-      id: row.id,
-      cells: row,
-    })),
+    rows: [...input.rows],
   });
+}
+
+export function linkCell(href: string): NonNullable<ListSurfaceRow["cellKinds"]>[string] {
+  return { kind: "link", href };
+}
+
+export function catalogStatusBadge(
+  status: string,
+): NonNullable<ListSurfaceRow["cellKinds"]>[string] {
+  if (status === "orphan" || status === "disabled" || status === "deprecated") {
+    return { kind: "badge", tone: "critical" };
+  }
+
+  if (status === "unused" || status === "preview") {
+    return { kind: "badge", tone: "attention" };
+  }
+
+  return { kind: "badge", tone: "positive" };
+}
+
+function riskLevelBadge(
+  riskLevel: string,
+): NonNullable<ListSurfaceRow["cellKinds"]>[string] {
+  if (riskLevel === "elevated") {
+    return { kind: "badge", tone: "critical" };
+  }
+
+  if (riskLevel === "standard") {
+    return { kind: "badge", tone: "attention" };
+  }
+
+  return { kind: "badge", tone: "default" };
+}
+
+function coverageVerdictBadge(
+  verdict: string,
+): NonNullable<ListSurfaceRow["cellKinds"]>[string] {
+  if (
+    verdict === "missing_permission" ||
+    verdict === "missing_route" ||
+    verdict === "missing_audit" ||
+    verdict === "disabled"
+  ) {
+    return { kind: "badge", tone: "critical" };
+  }
+
+  if (verdict === "missing_docs") {
+    return { kind: "badge", tone: "attention" };
+  }
+
+  return { kind: "badge", tone: "positive" };
 }
 
 export const systemAdminPermissionsSurfaceKey =
@@ -71,9 +142,6 @@ export const systemAdminPermissionsSurfaceKey =
 export const systemAdminModulesSurfaceKey = "system-admin.modules.list";
 export const systemAdminCapabilitiesSurfaceKey =
   "system-admin.capabilities.list";
-export const systemAdminPoliciesSurfaceKey = "system-admin.policies.list";
-export const systemAdminApprovalsSurfaceKey = "system-admin.approvals.list";
-export const systemAdminSecuritySurfaceKey = "system-admin.security.list";
 export const systemAdminOrganizationSurfaceKey =
   "system-admin.organization.list";
 export const systemAdminDiagnosticsSurfaceKey =
@@ -81,181 +149,208 @@ export const systemAdminDiagnosticsSurfaceKey =
 
 export function buildPermissionsListSurface(input: {
   permissions: ReadonlyArray<{
-    value: AppCapability;
+    id: string;
+    permission: string;
+    module: string;
     label: string;
-    description: string;
+    capabilityCount: string;
+    roleCount: string;
+    status: string;
+    riskLevel: string;
   }>;
+  searchValue?: string;
 }): ListSurfaceRendererConfigurationResolvedInput {
-  return buildControlListSurface({
+  return buildLinkedControlListSurface({
     key: systemAdminPermissionsSurfaceKey,
     title: "Permission catalog",
     object: "permissions",
     columns: [
-      { id: "permission", header: "Permission", priority: "primary", pin: "start" },
+      {
+        id: "permission",
+        header: "Permission",
+        priority: "primary",
+        pin: "start",
+        cellKind: { kind: "link" },
+      },
+      { id: "module", header: "Module", cellKind: { kind: "link" } },
+      { id: "capabilityCount", header: "Capabilities", cellKind: { kind: "link" } },
+      { id: "roleCount", header: "Roles", cellKind: { kind: "link" } },
+      { id: "status", header: "Status", cellKind: { kind: "badge" } },
+      { id: "riskLevel", header: "Risk", cellKind: { kind: "badge" } },
       { id: "label", header: "Label" },
-      { id: "description", header: "Description" },
     ],
     rows: input.permissions.map((permission) => ({
-      id: permission.value,
-      permission: permission.value,
-      label: permission.label,
-      description: permission.description,
+      id: permission.id,
+      cells: {
+        permission: permission.permission,
+        module: permission.module,
+        capabilityCount: permission.capabilityCount,
+        roleCount: permission.roleCount,
+        status: permission.status,
+        riskLevel: permission.riskLevel,
+        label: permission.label,
+      },
+      rowHref: systemAdminControlLinks.capabilities(permission.permission),
+      linkColumnId: "permission",
+      cellKinds: {
+        permission: linkCell(
+          systemAdminControlLinks.capabilities(permission.permission),
+        ),
+        module: linkCell(systemAdminControlLinks.modules(permission.module)),
+        capabilityCount: linkCell(
+          systemAdminControlLinks.capabilities(permission.permission),
+        ),
+        roleCount: linkCell(systemAdminControlLinks.roles()),
+        status: catalogStatusBadge(permission.status),
+        riskLevel: riskLevelBadge(permission.riskLevel),
+      },
     })),
     emptyTitle: "No permissions are registered.",
+    searchValue: input.searchValue,
   });
 }
 
 export function buildModulesListSurface(input: {
   modules: ReadonlyArray<{
     id: string;
-    label: string;
-    href: string;
-    requiredCapability: string;
+    module: string;
+    status: string;
+    capabilities: string;
+    enabledRoles: string;
+    readiness: string;
+    permission: string;
+    lastChanged: string;
+    href?: string;
   }>;
-  settings: readonly TenantModuleSettingRow[];
+  searchValue?: string;
 }): ListSurfaceRendererConfigurationResolvedInput {
-  const settingsByModule = new Map(
-    input.settings.map((setting) => [setting.moduleKey, setting]),
-  );
-
-  return buildControlListSurface({
+  return buildLinkedControlListSurface({
     key: systemAdminModulesSurfaceKey,
     title: "Module readiness",
     object: "modules",
     columns: [
-      { id: "module", header: "Module", priority: "primary", pin: "start" },
-      { id: "enabled", header: "Enabled" },
-      { id: "visible", header: "Visible" },
+      {
+        id: "module",
+        header: "Module",
+        priority: "primary",
+        pin: "start",
+        cellKind: { kind: "link" },
+      },
+      { id: "status", header: "Status", cellKind: { kind: "badge" } },
+      { id: "capabilities", header: "Capabilities", cellKind: { kind: "link" } },
+      { id: "enabledRoles", header: "Enabled roles", cellKind: { kind: "link" } },
       { id: "readiness", header: "Readiness" },
-      { id: "permission", header: "Permission" },
+      { id: "permission", header: "Permission", cellKind: { kind: "link" } },
+      { id: "lastChanged", header: "Last changed" },
     ],
-    rows: input.modules.map((module) => {
-      const setting = settingsByModule.get(module.id);
-
-      return {
-        id: module.id,
-        module: module.label,
-        enabled: setting?.enabled === false ? "No" : "Yes",
-        visible: setting?.visible === false ? "No" : "Yes",
-        readiness: setting?.readiness ?? "active",
-        permission: module.requiredCapability,
-      };
-    }),
+    rows: input.modules.map((module) => ({
+      id: module.id,
+      cells: {
+        module: module.module,
+        status: module.status,
+        capabilities: module.capabilities,
+        enabledRoles: module.enabledRoles,
+        readiness: module.readiness,
+        permission: module.permission,
+        lastChanged: module.lastChanged,
+      },
+      rowHref: systemAdminControlLinks.capabilities(module.id),
+      linkColumnId: "module",
+      cellKinds: {
+        module: linkCell(
+          module.href ?? systemAdminControlLinks.capabilities(module.id),
+        ),
+        capabilities: linkCell(systemAdminControlLinks.capabilities(module.id)),
+        enabledRoles: linkCell(systemAdminControlLinks.roles()),
+        permission: linkCell(
+          systemAdminControlLinks.permissions(module.permission),
+        ),
+        status: catalogStatusBadge(module.status),
+      },
+    })),
     emptyTitle: "No modules are registered.",
+    searchValue: input.searchValue,
   });
 }
 
 export function buildCapabilitiesListSurface(input: {
-  capabilities: readonly ExecutionCapability[];
+  capabilities: ReadonlyArray<{
+    id: string;
+    capability: string;
+    module: string;
+    route: string;
+    requiredPermission: string;
+    status: string;
+    accessCoverage: string;
+    auditCoverage: string;
+    docsCoverage: string;
+    verdict: string;
+    issues: string;
+    routeHref?: string;
+  }>;
+  searchValue?: string;
 }): ListSurfaceRendererConfigurationResolvedInput {
-  return buildControlListSurface({
+  return buildLinkedControlListSurface({
     key: systemAdminCapabilitiesSurfaceKey,
     title: "Execution capabilities",
     object: "capabilities",
     columns: [
-      { id: "capability", header: "Capability", priority: "primary", pin: "start" },
-      { id: "module", header: "Module" },
-      { id: "route", header: "Route" },
-      { id: "status", header: "Status" },
+      {
+        id: "capability",
+        header: "Capability",
+        priority: "primary",
+        pin: "start",
+        cellKind: { kind: "link" },
+      },
+      { id: "module", header: "Module", cellKind: { kind: "link" } },
+      { id: "route", header: "Route", cellKind: { kind: "link" } },
+      { id: "requiredPermission", header: "Permission", cellKind: { kind: "link" } },
+      { id: "status", header: "Status", cellKind: { kind: "badge" } },
+      { id: "verdict", header: "Coverage", cellKind: { kind: "badge" } },
+      { id: "accessCoverage", header: "Access" },
+      { id: "auditCoverage", header: "Audit" },
+      { id: "docsCoverage", header: "Docs" },
+      { id: "issues", header: "Issues" },
     ],
-    rows: input.capabilities.map((capability) => ({
-      id: capability.key,
-      capability: capability.key,
-      module: capability.moduleKey,
-      route: capability.route ?? "Not routed",
-      status: capability.status,
-    })),
+    rows: input.capabilities.map((capability) => {
+      const routeHref =
+        capability.routeHref ??
+        (capability.route.startsWith("/") ? capability.route : undefined);
+
+      return {
+        id: capability.id,
+        cells: {
+          capability: capability.capability,
+          module: capability.module,
+          route: capability.route,
+          requiredPermission: capability.requiredPermission,
+          status: capability.status,
+          accessCoverage: capability.accessCoverage,
+          auditCoverage: capability.auditCoverage,
+          docsCoverage: capability.docsCoverage,
+          verdict: capability.verdict,
+          issues: capability.issues,
+        },
+        rowHref: routeHref,
+        linkColumnId: "capability",
+        cellKinds: {
+          capability: linkCell(
+            routeHref ?? systemAdminControlLinks.capabilities(capability.capability),
+          ),
+          module: linkCell(systemAdminControlLinks.modules(capability.module)),
+          route: routeHref
+            ? linkCell(routeHref)
+            : { kind: "text" as const },
+          requiredPermission: linkCell(
+            systemAdminControlLinks.permissions(capability.requiredPermission),
+          ),
+          status: catalogStatusBadge(capability.status),
+          verdict: coverageVerdictBadge(capability.verdict),
+        },
+      };
+    }),
     emptyTitle: "No execution capabilities are registered.",
-  });
-}
-
-export function buildPoliciesListSurface(input: {
-  policies: readonly TenantPolicySettingRow[];
-}): ListSurfaceRendererConfigurationResolvedInput {
-  return buildControlListSurface({
-    key: systemAdminPoliciesSurfaceKey,
-    title: "Policy settings",
-    object: "policies",
-    columns: [
-      { id: "policy", header: "Policy", priority: "primary", pin: "start" },
-      { id: "enabled", header: "Enabled" },
-      { id: "readiness", header: "Readiness" },
-    ],
-    rows: input.policies.map((policy) => ({
-      id: policy.id,
-      policy: policy.label,
-      enabled: policy.enabled ? "Yes" : "No",
-      readiness: policy.readiness,
-    })),
-    emptyTitle: "No tenant policies have been configured.",
-  });
-}
-
-export function buildApprovalsListSurface(input: {
-  approvals: readonly TenantApprovalSettingRow[];
-}): ListSurfaceRendererConfigurationResolvedInput {
-  return buildControlListSurface({
-    key: systemAdminApprovalsSurfaceKey,
-    title: "Approval settings",
-    object: "approvals",
-    columns: [
-      { id: "approval", header: "Approval", priority: "primary", pin: "start" },
-      { id: "enabled", header: "Enabled" },
-      { id: "approverRole", header: "Approver role" },
-      { id: "escalation", header: "Escalation" },
-    ],
-    rows: input.approvals.map((approval) => ({
-      id: approval.id,
-      approval: approval.label,
-      enabled: approval.enabled ? "Yes" : "No",
-      approverRole: approval.approverRole ?? "Not assigned",
-      escalation: approval.escalationMinutes
-        ? `${approval.escalationMinutes} minutes`
-        : "Not configured",
-    })),
-    emptyTitle: "No tenant approvals have been configured.",
-  });
-}
-
-export function buildSecuritySettingsListSurface(input: {
-  security: TenantSecuritySettingsSnapshot | null;
-}): ListSurfaceRendererConfigurationResolvedInput {
-  const security = input.security;
-
-  return buildControlListSurface({
-    key: systemAdminSecuritySurfaceKey,
-    title: "Security posture",
-    object: "security",
-    columns: [
-      { id: "setting", header: "Setting", priority: "primary", pin: "start" },
-      { id: "value", header: "Value" },
-    ],
-    rows: [
-      {
-        id: "mfa",
-        setting: "MFA required",
-        value: security?.mfaRequired ? "Enabled" : "Disabled",
-      },
-      {
-        id: "trusted-domains",
-        setting: "Trusted domains",
-        value: security?.trustedDomains.join(", ") || "Not restricted",
-      },
-      {
-        id: "sensitive-confirmation",
-        setting: "Sensitive action confirmation",
-        value: security?.sensitiveActionConfirmation === false ? "Disabled" : "Enabled",
-      },
-      {
-        id: "session-timeout",
-        setting: "Session timeout",
-        value:
-          typeof security?.sessionPolicy.sessionTimeoutMinutes === "number"
-            ? `${security.sessionPolicy.sessionTimeoutMinutes} minutes`
-            : "Default",
-      },
-    ],
-    emptyTitle: "Security settings are not initialized.",
+    searchValue: input.searchValue,
   });
 }
 
@@ -298,19 +393,3 @@ export function buildOrganizationDefaultsListSurface(input: {
   });
 }
 
-export function buildDiagnosticsListSurface(input: {
-  rows: ReadonlyArray<{ id: string; check: string; status: string; detail: string }>;
-}): ListSurfaceRendererConfigurationResolvedInput {
-  return buildControlListSurface({
-    key: systemAdminDiagnosticsSurfaceKey,
-    title: "Diagnostics checklist",
-    object: "diagnostics",
-    columns: [
-      { id: "check", header: "Check", priority: "primary", pin: "start" },
-      { id: "status", header: "Status" },
-      { id: "detail", header: "Detail" },
-    ],
-    rows: input.rows,
-    emptyTitle: "No diagnostics are available.",
-  });
-}

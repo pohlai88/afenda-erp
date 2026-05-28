@@ -1,22 +1,27 @@
 import type { ExecutionContext } from "../context/execution-context";
-import { ExecutionPolicyDeniedError } from "../errors/execution-errors";
+import {
+  ExecutionPolicyApprovalRequiredError,
+  ExecutionPolicyDeniedError,
+} from "../errors/execution-errors";
+import type {
+  ExecutionPolicyCheck,
+  ExecutionPolicyVerdict,
+} from "./execution-policy-types";
 
 type MaybePromise<T> = T | Promise<T>;
 
-export type ExecutionPolicyCheck = {
-  action: string;
-  targetType: string;
-  targetId?: string;
-  metadata?: Record<string, unknown>;
-};
-
-export type ExecutionPolicyVerdict = {
-  allowed: boolean;
-  action: string;
-  targetType: string;
-  targetId?: string;
-  reason?: string;
-};
+export type { ExecutionPolicyCheck, ExecutionPolicyVerdict } from "./execution-policy-types";
+export type { ExecutionPolicyEffect } from "./tenant-execution-rules";
+export {
+  executionPolicyEffects,
+  findMatchingTenantApprovalRule,
+  findMatchingTenantPolicyRule,
+  isTenantApprovalRuleActive,
+  isTenantPolicyRuleActive,
+  resolveTenantExecutionPolicyVerdict,
+  type TenantApprovalRuleRecord,
+  type TenantPolicyRuleRecord,
+} from "./tenant-execution-rules";
 
 export type ExecutionPolicyEvaluator = (input: {
   context: ExecutionContext;
@@ -24,6 +29,17 @@ export type ExecutionPolicyEvaluator = (input: {
 }) => MaybePromise<ExecutionPolicyVerdict | null | undefined>;
 
 const executionPolicyRegistry = new Map<string, ExecutionPolicyEvaluator[]>();
+const tenantExecutionPolicyEvaluators: ExecutionPolicyEvaluator[] = [];
+
+export function registerTenantExecutionPolicyEvaluator(
+  evaluator: ExecutionPolicyEvaluator,
+) {
+  tenantExecutionPolicyEvaluators.push(evaluator);
+}
+
+export function resetTenantExecutionPolicyEvaluatorsForTest() {
+  tenantExecutionPolicyEvaluators.length = 0;
+}
 
 export function defineExecutionPolicy(
   action: string | readonly string[],
@@ -40,13 +56,17 @@ export function defineExecutionPolicy(
 
 export function resetExecutionPolicyRegistryForTest() {
   executionPolicyRegistry.clear();
+  resetTenantExecutionPolicyEvaluatorsForTest();
 }
 
 export async function resolveExecutionPolicyVerdict(
   context: ExecutionContext,
   policy: ExecutionPolicyCheck,
 ) {
-  const evaluators = executionPolicyRegistry.get(policy.action) ?? [];
+  const evaluators = [
+    ...(executionPolicyRegistry.get(policy.action) ?? []),
+    ...tenantExecutionPolicyEvaluators,
+  ];
 
   for (const evaluator of evaluators) {
     const verdict = await evaluator({ context, policy });
@@ -61,6 +81,22 @@ export async function resolveExecutionPolicyVerdict(
         targetType: verdict.targetType,
         targetId: verdict.targetId,
         reason: verdict.reason,
+        effect: verdict.effect,
+        policyRuleId: verdict.policyRuleId,
+        approvalRuleId: verdict.approvalRuleId,
+      } satisfies ExecutionPolicyVerdict;
+    }
+
+    if (verdict.effect === "warn") {
+      return {
+        allowed: true,
+        action: verdict.action,
+        targetType: verdict.targetType,
+        targetId: verdict.targetId,
+        reason: verdict.reason,
+        effect: verdict.effect,
+        policyRuleId: verdict.policyRuleId,
+        approvalRuleId: verdict.approvalRuleId,
       } satisfies ExecutionPolicyVerdict;
     }
   }
@@ -70,6 +106,7 @@ export async function resolveExecutionPolicyVerdict(
     action: policy.action,
     targetType: policy.targetType,
     targetId: policy.targetId,
+    effect: "allow",
   } satisfies ExecutionPolicyVerdict;
 }
 
@@ -80,11 +117,25 @@ export async function assertExecutionPolicy(
   const verdict = await resolveExecutionPolicyVerdict(context, policy);
 
   if (!verdict.allowed) {
+    if (verdict.effect === "require_approval") {
+      throw new ExecutionPolicyApprovalRequiredError(
+        verdict.action,
+        verdict.targetType,
+        verdict.targetId,
+        verdict.reason,
+        verdict.policyRuleId,
+        verdict.approvalRuleId,
+      );
+    }
+
     throw new ExecutionPolicyDeniedError(
       verdict.action,
       verdict.targetType,
       verdict.targetId,
       verdict.reason,
+      verdict.effect === "lock" ? "lock" : "deny",
+      verdict.policyRuleId,
+      verdict.approvalRuleId,
     );
   }
 

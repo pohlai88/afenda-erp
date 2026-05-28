@@ -27,18 +27,23 @@ export function GovernedSurface({
 }: GovernedSurfaceProps) {
   const backHref = header.backHref;
   const backLabel = header.backLabel;
+  const headerRowClass = "flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between"; // audit-ds: ignore no-viewport-breakpoint — page-level layout; viewport breakpoints are correct here
 
   return (
-    <div className={cn("space-y-surface-lg", className)}>
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-        <div className="min-w-0 flex-1 space-y-2">
+    <div className={cn("flex flex-col gap-surface-lg", className)}>
+      <div className={headerRowClass}>
+        <div className="flex min-w-0 flex-1 flex-col gap-2">
           <ModulePageHeader
             eyebrow={header.eyebrow}
             title={header.title}
             description={header.description}
           />
           {backHref && backLabel ? (
-            <Button variant="link" className="h-auto p-0 text-sm" asChild>
+            <Button
+              variant="link"
+              className="h-auto p-0 type-control"
+              asChild
+            >
               <Link href={backHref as Route} prefetch={false}>
                 {backLabel}
               </Link>

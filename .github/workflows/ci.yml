@@ -42,6 +42,13 @@ jobs:
       - name: Lint governed renderers
         run: pnpm lint:governed-renderers
 
+      - name: Audit governed design-system tokens
+        run: pnpm audit:governed-design-tokens --strict
+
+      - name: Audit consumer design tokens (advisory)
+        run: pnpm audit:governed-design-tokens --scope=all
+        continue-on-error: true
+
       - name: Unit tests
         run: pnpm test
 

@@ -11,13 +11,9 @@ export function ModulePageHeader({
 }: ModulePageHeaderProps) {
   return (
     <header className="flex flex-col gap-surface-xs">
-      <p className="text-label-small font-medium tracking-wide text-muted-foreground uppercase">
-        {eyebrow}
-      </p>
-      <h2 className="text-title-large font-semibold tracking-tight">{title}</h2>
-      {description ? (
-        <p className="text-body-medium text-muted-foreground">{description}</p>
-      ) : null}
+      <p className="type-label">{eyebrow}</p>
+      <h2 className="type-page-title">{title}</h2>
+      {description ? <p className="type-muted">{description}</p> : null}
     </header>
   );
 }

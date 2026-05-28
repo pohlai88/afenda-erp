@@ -211,6 +211,15 @@ export {
 } from "./modules/solution-playbooks";
 export { erpModules, moduleByHref, moduleById } from "./modules/definitions";
 export {
+  applyTenantModuleAvailability,
+  type TenantModuleAvailabilitySetting,
+} from "./modules/tenant-module-availability";
+export {
+  applyTenantCapabilityAvailability,
+  applyTenantNavigationAvailability,
+  type TenantCapabilityAvailabilitySetting,
+} from "./modules/tenant-availability";
+export {
   getNavigationExtensions,
   getNavigationExtensionById,
   navigationExtensions,

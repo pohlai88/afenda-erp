@@ -96,8 +96,9 @@ export type RendererContractEntry = {
  * - `.cursor/rules/governed-renderer-contract.mdc` ("Accepted data natures
  *    per renderer" table).
  *
- * Parity is enforced by `scripts/check-renderer-contracts.mjs`. Mutate this
- * map by editing all three artifacts in the same PR.
+ * Parity is enforced by `scripts/check-renderer-contracts.mts`
+ * (`pnpm lint:governed-renderer-contracts`). Mutate this map by editing all
+ * three artifacts in the same PR.
  */
 export const AFENDA_GOVERNED_RENDERER_CONTRACTS = {
   "stat-card": {

@@ -23,14 +23,14 @@ export function GovernedListSurface({
   className,
 }: GovernedListSurfaceProps) {
   return (
-    <div className={cn("flex w-full min-w-0 flex-col gap-6", className)}>
+    <div className={cn("flex w-full min-w-0 flex-col gap-surface-2xl", className)}>
       <ModulePageHeader
         eyebrow={model.header.eyebrow}
         title={model.header.title}
         description={model.header.description}
       />
       <Card size="default">
-        <CardContent className="pt-6">
+        <CardContent className="pt-surface-2xl">
           {rowCount === 0 ? <GovernedEmpty model={model.empty} /> : children}
         </CardContent>
       </Card>

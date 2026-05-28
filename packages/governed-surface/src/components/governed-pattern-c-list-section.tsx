@@ -3,7 +3,7 @@ import "server-only";
 import type { ReactNode } from "react";
 import type { GovernedPatternCTrailingColumnSpec } from "../governed-pattern-c-trailing-column.shared";
 import { GovernedPatternCListTableHost } from "./governed-pattern-c-list-table-host.client";
-import { logUnexpectedServerError } from "../adapters/logger.server";
+import { logUnexpectedServerError } from "../data/governed-logging.server";
 import { getGovernedSurfaceTranslations } from "../i18n/governed-surface-copy";
 
 import type { EmptyState } from "../schemas/list-surface.schema";
@@ -19,13 +19,13 @@ import {
   governedListSectionTestId as buildGovernedListSectionTestId,
   summarizeListSurfaceTrailingActions,
 } from "../list-surface-identity.shared";
-import { GovernedEmpty } from "./governed-empty";
+import { type GovernedSurfaceSectionCardBody } from "./governed-surface-section-card";
 import {
-  GovernedSurfaceSectionCard,
-  type GovernedSurfaceSectionCardBody,
-} from "./governed-surface-section-card";
+  renderGovernedPatternSectionShell,
+  type GovernedPatternSectionLayout,
+} from "./governed-pattern-section-shell.shared";
 
-export type GovernedPatternCListSectionLayout = "card" | "embedded";
+export type GovernedPatternCListSectionLayout = GovernedPatternSectionLayout;
 
 export type GovernedPatternCListSectionProps = {
   title: string;
@@ -48,6 +48,8 @@ export type GovernedPatternCListSectionProps = {
   forbidden?: EmptyState;
   invalid?: EmptyState;
   headerSlot?: ReactNode;
+  /** Action element rendered in the card header (Pattern C parity with Pattern B `headerAction`). Ignored when `layout="embedded"`. */
+  cardHeaderAction?: ReactNode;
   contentBeforeList?: ReactNode;
   contentAfterList?: ReactNode;
   /** Client Component cell reference or registry `cellId` — never pass `render` from Server Components. */
@@ -56,63 +58,6 @@ export type GovernedPatternCListSectionProps = {
   cardClassName?: string;
   contentClassName?: string;
 };
-
-function renderListBody(body: GovernedSurfaceSectionCardBody) {
-  if (body.state === "forbidden" || body.state === "invalid") {
-    return <GovernedEmpty model={body.model} />;
-  }
-  return body.children;
-}
-
-type RenderSectionShellInput = {
-  layout: GovernedPatternCListSectionLayout;
-  className?: string;
-  sectionTestId: string;
-  sectionDomId: string;
-  headerSlot?: ReactNode;
-  title: string;
-  description?: string;
-  body: GovernedSurfaceSectionCardBody;
-  cardClassName?: string;
-  contentClassName?: string;
-};
-
-function renderSectionShell({
-  layout,
-  className,
-  sectionTestId,
-  sectionDomId,
-  headerSlot,
-  title,
-  description,
-  body,
-  cardClassName,
-  contentClassName,
-}: RenderSectionShellInput) {
-  const listBody = renderListBody(body);
-
-  if (layout === "embedded") {
-    return (
-      <div id={sectionDomId} className={className} data-testid={sectionTestId}>
-        {headerSlot}
-        <div className={contentClassName}>{listBody}</div>
-      </div>
-    );
-  }
-
-  return (
-    <div id={sectionDomId} className={className} data-testid={sectionTestId}>
-      {headerSlot}
-      <GovernedSurfaceSectionCard
-        title={title}
-        description={description}
-        body={body}
-        className={cardClassName}
-        contentClassName={contentClassName}
-      />
-    </div>
-  );
-}
 
 export async function GovernedPatternCListSection({
   title,
@@ -126,6 +71,7 @@ export async function GovernedPatternCListSection({
   forbidden,
   invalid,
   headerSlot,
+  cardHeaderAction,
   contentBeforeList,
   contentAfterList,
   trailingColumn,
@@ -143,6 +89,7 @@ export async function GovernedPatternCListSection({
     sectionTestId,
     sectionDomId,
     headerSlot,
+    headerAction: cardHeaderAction,
     title,
     description,
     cardClassName,
@@ -154,7 +101,7 @@ export async function GovernedPatternCListSection({
       state: "invalid",
       model: loadError,
     };
-    return renderSectionShell({ ...shellInput, body });
+    return renderGovernedPatternSectionShell({ ...shellInput, body });
   }
 
   const [allowedFromConfig, parsed] = await Promise.all([
@@ -222,5 +169,5 @@ export async function GovernedPatternCListSection({
     };
   }
 
-  return renderSectionShell({ ...shellInput, body });
+  return renderGovernedPatternSectionShell({ ...shellInput, body });
 }

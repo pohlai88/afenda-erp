@@ -4,20 +4,22 @@ import type { ReactNode } from "react";
 import { getGovernedSurfaceTranslations } from "../i18n/governed-surface-copy";
 
 import { GovernedComponentRenderer } from "../metadata/index";
-import { logUnexpectedServerError } from "../adapters/logger.server";
+import { logUnexpectedServerError } from "../data/governed-logging.server";
 
 import type { EmptyState } from "../schemas/list-surface.schema";
 import {
   parseStatCardConfiguration,
   type StatCardConfigurationInput,
 } from "../schemas/stat-card.schema";
-import { GovernedEmpty } from "./governed-empty";
 import {
-  GovernedSurfaceSectionCard,
   type GovernedSurfaceSectionCardBody,
 } from "./governed-surface-section-card";
+import {
+  renderGovernedPatternSectionShell,
+  type GovernedPatternSectionLayout,
+} from "./governed-pattern-section-shell.shared";
 
-export type GovernedPatternBStatSectionLayout = "card" | "embedded";
+export type GovernedPatternBStatSectionLayout = GovernedPatternSectionLayout;
 
 export type GovernedPatternBStatGroup = {
   /** Stable id for `data-testid` on the group wrapper (e.g. `registry`). */
@@ -45,64 +47,6 @@ export type GovernedPatternBStatSectionProps = {
 
 export function governedStatSectionTestId(surfaceKey: string): string {
   return `governed-stat-section:${surfaceKey}`;
-}
-
-function renderStatBody(body: GovernedSurfaceSectionCardBody) {
-  if (body.state === "forbidden" || body.state === "invalid") {
-    return <GovernedEmpty model={body.model} />;
-  }
-  return body.children;
-}
-
-type RenderSectionShellInput = {
-  layout: GovernedPatternBStatSectionLayout;
-  className?: string;
-  sectionTestId: string;
-  headerSlot?: ReactNode;
-  title: string;
-  description?: string;
-  headerAction?: ReactNode;
-  body: GovernedSurfaceSectionCardBody;
-  cardClassName?: string;
-  contentClassName?: string;
-};
-
-function renderSectionShell({
-  layout,
-  className,
-  sectionTestId,
-  headerSlot,
-  title,
-  description,
-  headerAction,
-  body,
-  cardClassName,
-  contentClassName,
-}: RenderSectionShellInput) {
-  const statBody = renderStatBody(body);
-
-  if (layout === "embedded") {
-    return (
-      <div className={className} data-testid={sectionTestId}>
-        {headerSlot}
-        <div className={contentClassName}>{statBody}</div>
-      </div>
-    );
-  }
-
-  return (
-    <div className={className} data-testid={sectionTestId}>
-      {headerSlot}
-      <GovernedSurfaceSectionCard
-        title={title}
-        description={description}
-        body={body}
-        headerAction={headerAction}
-        className={cardClassName}
-        contentClassName={contentClassName}
-      />
-    </div>
-  );
 }
 
 export async function GovernedPatternBStatSection({
@@ -146,11 +90,11 @@ export async function GovernedPatternBStatSection({
       state: "invalid",
       model: loadError,
     };
-    return renderSectionShell({ ...shellInput, body });
+    return renderGovernedPatternSectionShell({ ...shellInput, body });
   }
 
   if (forbidden) {
-    return renderSectionShell({
+    return renderGovernedPatternSectionShell({
       ...shellInput,
       body: { state: "forbidden", model: forbidden },
     });
@@ -177,7 +121,7 @@ export async function GovernedPatternBStatSection({
     body = {
       state: "ready",
       children: (
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-surface-lg">
           {parsedGroups.map(({ group, parsed }) => {
             if (!parsed.success) {
               return null;
@@ -189,7 +133,7 @@ export async function GovernedPatternBStatSection({
                 data-testid={`governed-stat-group:${surfaceKey}:${group.groupKey}`}
               >
                 {group.label ? (
-                  <p className="text-sm font-medium text-muted-foreground">
+                  <p className="type-muted font-medium">
                     {group.label}
                   </p>
                 ) : null}
@@ -209,5 +153,5 @@ export async function GovernedPatternBStatSection({
     };
   }
 
-  return renderSectionShell({ ...shellInput, body });
+  return renderGovernedPatternSectionShell({ ...shellInput, body });
 }

@@ -22,8 +22,8 @@ import type { GovernedComponentRendererDiagnostics } from "../registry";
 import { ChartRendererBody } from "./chart-renderer-body.client";
 
 const DATA_NATURE_CLASS: Record<ChartDataNature, string> = {
-  "time-series": "@container min-h-[14rem]",
-  categorical: "@container min-h-[14rem]",
+  "time-series": "@container min-h-[14rem]", // audit-ds: ignore no-arbitrary-value — chart minimum height contract
+  categorical: "@container min-h-[14rem]", // audit-ds: ignore no-arbitrary-value — chart minimum height contract
 };
 
 export type ChartRendererProps = {
@@ -98,7 +98,7 @@ export function ChartRenderer({
         {hasHeader ? (
           <CardHeader className="pb-2">
             {title ? (
-              <CardTitle className="text-base">{title}</CardTitle>
+              <CardTitle>{title}</CardTitle>
             ) : null}
             {description ? (
               <CardDescription>{description}</CardDescription>

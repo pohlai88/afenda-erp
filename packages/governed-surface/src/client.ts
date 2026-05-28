@@ -87,6 +87,8 @@ export {
 } from "./list-surface-toolbar-url.shared";
 
 export {
+  evaluateFormRuleCondition,
+  isFormRuleEffectVisible,
   resolveFormFieldRuleState,
   type FormFieldRuleState,
   type FormRuleValues,

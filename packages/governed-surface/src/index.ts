@@ -5,9 +5,17 @@ export {
 } from "./schemas/schema-version.shared";
 
 export {
+  ERP_FUNCTIONS,
+  type ErpFunction,
+  type ErpPermissionTuple,
+} from "./schemas/erp-permission.shared";
+
+export {
   erpPermissionRequirementSchema,
   type ErpPermissionRequirement,
 } from "./schemas/erp-permission-requirement.schema";
+
+export { resolveErpCapabilityForPermission } from "./erp-permission-capability.shared";
 
 export {
   actionDescriptorSchema,
@@ -63,6 +71,7 @@ export {
 export {
   parseStatCardConfiguration,
   statCardConfigurationSchema,
+  type StatCardComparison,
   type StatCardConfiguration,
   type StatCardConfigurationInput,
   type StatCardConfigurationResolvedInput,
@@ -70,6 +79,8 @@ export {
   type StatCardDensity,
   type StatCardIcon,
   type StatCardItem,
+  type StatCardProgress,
+  type StatCardSparkPoint,
   type StatCardTone,
 } from "./schemas/stat-card.schema";
 

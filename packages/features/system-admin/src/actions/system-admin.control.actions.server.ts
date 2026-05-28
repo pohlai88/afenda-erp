@@ -1,36 +1,36 @@
 "use server";
 
 import {
-  ensureTenantSecuritySettings,
   ensureTenantSettings,
-  updateTenantSecuritySettings,
+  listTenantCapabilitySettings,
+  listTenantModuleSettings,
+  upsertTenantCapabilitySettings,
   updateTenantSettings,
-  upsertTenantApprovalSettings,
   upsertTenantModuleSettings,
-  upsertTenantPolicySettings,
 } from "@afenda/db";
-import { writeExecutionAuditEvent } from "@afenda/kernel/execution";
+import {
+  getExecutionCapability,
+  writeExecutionAuditEvent,
+} from "@afenda/kernel/execution";
 import { logServerEvent } from "@afenda/observability";
 import { revalidatePath } from "next/cache";
 import {
+  systemAdminActionFailure,
   systemAdminActionSuccess,
   type SystemAdminActionResult,
   zodActionFailure,
 } from "../contracts";
 import { systemAdminRoutePaths } from "../contracts/system-admin.route-paths.contract";
 import {
-  requireSystemAdminApprovalsManage,
+  requireSystemAdminCapabilitiesManage,
   requireSystemAdminModulesManage,
   requireSystemAdminOrganizationManage,
-  requireSystemAdminPoliciesManage,
-  requireSystemAdminSecurityManage,
 } from "../policies";
+import { SYSTEM_ADMIN_PROTECTED_MODULE_KEY } from "../modules/contracts";
 import {
-  systemAdminApprovalSettingsActionSchema,
+  systemAdminCapabilitySettingsActionSchema,
   systemAdminModuleSettingsActionSchema,
   systemAdminOrganizationDefaultsActionSchema,
-  systemAdminPolicySettingsActionSchema,
-  systemAdminSecuritySettingsActionSchema,
 } from "../schemas";
 import { dispatchSystemAdminWebhook } from "../events";
 
@@ -78,18 +78,48 @@ export async function updateSystemAdminModuleSettingsAction(
     return zodActionFailure(parsed.error);
   }
 
+  if (
+    parsed.data.moduleKey === SYSTEM_ADMIN_PROTECTED_MODULE_KEY &&
+    (!parsed.data.enabled ||
+      parsed.data.readiness === "blocked" ||
+      parsed.data.readiness === "deprecated")
+  ) {
+    return systemAdminActionFailure(
+      "System Admin cannot be disabled or blocked for this organization.",
+    );
+  }
+
+  const existingSettings = await listTenantModuleSettings({
+    organizationId: organization.id,
+    limit: 100,
+  });
+  const previous = existingSettings.find(
+    (setting) => setting.moduleKey === parsed.data.moduleKey,
+  );
+
   await upsertTenantModuleSettings({
     organizationId: organization.id,
     actorAuthUserId: session.id,
     ...parsed.data,
+    configuration: previous?.configuration ?? {},
   });
   await writeControlAudit({
     organizationId: organization.id,
     actorId: context.userId,
     actorType: context.actorType,
-    action: "system-admin.module-settings.update",
-    targetType: "organization",
-    metadata: parsed.data,
+    action: "system-admin.module_setting.update",
+    targetType: "module",
+    targetId: parsed.data.moduleKey,
+    metadata: {
+      previous: previous
+        ? {
+            enabled: previous.enabled,
+            visible: previous.visible,
+            readiness: previous.readiness,
+          }
+        : null,
+      next: parsed.data,
+    },
   });
   await dispatchSystemAdminWebhook({
     organizationId: organization.id,
@@ -105,139 +135,81 @@ export async function updateSystemAdminModuleSettingsAction(
   });
 
   revalidateSystemAdminPaths(systemAdminRoutePaths.modules);
+  revalidatePath("/");
   return systemAdminActionSuccess(undefined);
 }
 
-export async function updateSystemAdminPolicyAction(
+export async function updateSystemAdminCapabilitySettingsAction(
   _previous: SystemAdminActionResult | undefined,
   formData: FormData,
 ): Promise<SystemAdminActionResult> {
   const { context, organization, session } =
-    await requireSystemAdminPoliciesManage();
-  const parsed = systemAdminPolicySettingsActionSchema.safeParse({
-    policyKey: formData.get("policyKey"),
-    label: formData.get("label"),
-    enabled: formData.get("enabled"),
-    readiness: formData.get("readiness"),
+    await requireSystemAdminCapabilitiesManage();
+  const parsed = systemAdminCapabilitySettingsActionSchema.safeParse({
+    capabilityKey: formData.get("capabilityKey"),
+    availability: formData.get("availability"),
   });
 
   if (!parsed.success) {
     return zodActionFailure(parsed.error);
   }
 
-  await upsertTenantPolicySettings({
-    organizationId: organization.id,
-    actorAuthUserId: session.id,
-    ...parsed.data,
-  });
-  await writeControlAudit({
-    organizationId: organization.id,
-    actorId: context.userId,
-    actorType: context.actorType,
-    action: "system-admin.policy.update",
-    targetType: "organization",
-    metadata: parsed.data,
-  });
-  await dispatchSystemAdminWebhook({
-    organizationId: organization.id,
-    userId: session.id,
-    eventType: "system-admin.policy.updated",
-    payload: parsed.data,
-  });
+  const capability = getExecutionCapability(parsed.data.capabilityKey);
 
-  revalidateSystemAdminPaths(systemAdminRoutePaths.policies);
-  return systemAdminActionSuccess(undefined);
-}
-
-export async function updateSystemAdminApprovalAction(
-  _previous: SystemAdminActionResult | undefined,
-  formData: FormData,
-): Promise<SystemAdminActionResult> {
-  const { context, organization, session } =
-    await requireSystemAdminApprovalsManage();
-  const parsed = systemAdminApprovalSettingsActionSchema.safeParse({
-    approvalKey: formData.get("approvalKey"),
-    label: formData.get("label"),
-    enabled: formData.get("enabled"),
-    approverRole: formData.get("approverRole") || undefined,
-    escalationMinutes: formData.get("escalationMinutes") || undefined,
-  });
-
-  if (!parsed.success) {
-    return zodActionFailure(parsed.error);
+  if (!capability) {
+    return systemAdminActionFailure(
+      "Capability is not registered in the execution kernel.",
+    );
   }
 
-  await upsertTenantApprovalSettings({
+  const existingSettings = await listTenantCapabilitySettings({
+    organizationId: organization.id,
+    limit: 500,
+  });
+  const previous = existingSettings.find(
+    (setting) => setting.capabilityKey === parsed.data.capabilityKey,
+  );
+
+  await upsertTenantCapabilitySettings({
     organizationId: organization.id,
     actorAuthUserId: session.id,
-    ...parsed.data,
+    capabilityKey: parsed.data.capabilityKey,
+    availability: parsed.data.availability,
   });
   await writeControlAudit({
     organizationId: organization.id,
     actorId: context.userId,
     actorType: context.actorType,
-    action: "system-admin.approval.update",
-    targetType: "organization",
-    metadata: parsed.data,
+    action: "system-admin.capability_setting.update",
+    targetType: "capability",
+    targetId: parsed.data.capabilityKey,
+    metadata: {
+      previous: previous?.availability ?? null,
+      next: parsed.data.availability,
+      moduleKey: capability.moduleKey,
+    },
   });
   await dispatchSystemAdminWebhook({
     organizationId: organization.id,
     userId: session.id,
-    eventType: "system-admin.approval.updated",
+    eventType: "system-admin.capability-settings.updated",
     payload: parsed.data,
   });
 
-  revalidateSystemAdminPaths(systemAdminRoutePaths.approvals);
+  revalidateSystemAdminPaths(systemAdminRoutePaths.capabilities);
+  revalidatePath("/");
   return systemAdminActionSuccess(undefined);
 }
 
 export async function updateSystemAdminSecurityAction(
-  _previous: SystemAdminActionResult | undefined,
+  previous: SystemAdminActionResult | undefined,
   formData: FormData,
 ): Promise<SystemAdminActionResult> {
-  const { context, organization, session } =
-    await requireSystemAdminSecurityManage();
-  const parsed = systemAdminSecuritySettingsActionSchema.safeParse({
-    mfaRequired: formData.get("mfaRequired"),
-    trustedDomains: formData.get("trustedDomains"),
-    sensitiveActionConfirmation: formData.get("sensitiveActionConfirmation"),
-    sessionTimeoutMinutes: formData.get("sessionTimeoutMinutes"),
-  });
+  const { updateSystemAdminSecuritySettingsAction } = await import(
+    "../security/actions/system-admin.security.actions.server"
+  );
 
-  if (!parsed.success) {
-    return zodActionFailure(parsed.error);
-  }
-
-  await ensureTenantSecuritySettings({ organizationId: organization.id });
-  await updateTenantSecuritySettings({
-    organizationId: organization.id,
-    actorAuthUserId: session.id,
-    patch: {
-      mfaRequired: parsed.data.mfaRequired,
-      trustedDomains: parsed.data.trustedDomains,
-      sensitiveActionConfirmation: parsed.data.sensitiveActionConfirmation,
-      sessionPolicy: {
-        sessionTimeoutMinutes: parsed.data.sessionTimeoutMinutes,
-      },
-    },
-  });
-  await writeControlAudit({
-    organizationId: organization.id,
-    actorId: context.userId,
-    actorType: context.actorType,
-    action: "system-admin.security.update",
-    targetType: "organization",
-    metadata: parsed.data,
-  });
-  await dispatchSystemAdminWebhook({
-    organizationId: organization.id,
-    userId: session.id,
-    eventType: "system-admin.security.updated",
-    payload: parsed.data,
-  });
-
-  revalidateSystemAdminPaths(systemAdminRoutePaths.security);
-  return systemAdminActionSuccess(undefined);
+  return updateSystemAdminSecuritySettingsAction(previous, formData);
 }
 
 export async function updateSystemAdminOrganizationDefaultsAction(

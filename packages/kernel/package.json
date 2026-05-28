@@ -24,6 +24,18 @@
       "development": "./src/execution.ts",
       "import": "./src/execution.ts",
       "default": "./dist/execution.js"
+    },
+    "./execution-capabilities": {
+      "types": "./src/execution-kernel/capabilities/execution-capabilities.ts",
+      "development": "./src/execution-kernel/capabilities/execution-capabilities.ts",
+      "import": "./src/execution-kernel/capabilities/execution-capabilities.ts",
+      "default": "./dist/execution-kernel/capabilities/execution-capabilities.js"
+    },
+    "./execution-tenant-policy": {
+      "types": "./src/execution-kernel/policy/tenant-execution-rules.ts",
+      "development": "./src/execution-kernel/policy/tenant-execution-rules.ts",
+      "import": "./src/execution-kernel/policy/tenant-execution-rules.ts",
+      "default": "./dist/execution-kernel/policy/tenant-execution-rules.js"
     }
   },
   "dependencies": {

@@ -1,86 +1,105 @@
 import {
-  buildDiagnosticsListSurface,
-  getBillingPostureSnapshot,
-  getCronHealthSurfaceRows,
-  listTenantModuleSettings,
-  requireSystemAdminDiagnosticsRead,
+  buildSystemAdminDiagnosticsBlockedIssuesListSurface,
+  buildSystemAdminDiagnosticsInfoIssuesListSurface,
+  buildSystemAdminDiagnosticsModuleCoverageListSurface,
+  buildSystemAdminDiagnosticsRecentChangesListSurface,
+  buildSystemAdminDiagnosticsWarningIssuesListSurface,
+  systemAdminDiagnosticsModuleCoverageSurfaceKey,
+  systemAdminDiagnosticsRecentChangesSurfaceKey,
   systemAdminDiagnosticsSurfaceKey,
+} from "@afenda/feature-system-admin/metadata";
+import {
+  getSystemAdminDiagnosticsPageModel,
+  requireSystemAdminDiagnosticsRead,
+  SystemAdminDiagnosticsSummaryPanel,
 } from "@afenda/feature-system-admin/server";
 import { GovernedPatternCListSection } from "@afenda/governed-surface/server";
-import { listExecutionCapabilities } from "@afenda/kernel/server";
 import { SectionPanel } from "@afenda/ui";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Diagnostics — System admin",
-  description: "Configuration drift, permission coverage, reliability, and spend posture.",
+  description:
+    "Organization-scoped configuration health for permissions, capabilities, policies, approvals, audit coverage, and security posture.",
 };
 
 export default async function SystemAdminDiagnosticsPage() {
   const { organization } = await requireSystemAdminDiagnosticsRead();
-  const [moduleSettings, cronRows, billing] = await Promise.all([
-    listTenantModuleSettings({ organizationId: organization.id, limit: 100 }),
-    getCronHealthSurfaceRows(),
-    getBillingPostureSnapshot({ organizationId: organization.id }),
-  ]);
-  const capabilities = listExecutionCapabilities();
-  const inactiveModules = moduleSettings.filter(
-    (setting) => !setting.enabled || !setting.visible,
-  );
-  const blockedPolicies = moduleSettings.filter(
-    (setting) => setting.readiness === "blocked",
-  );
-
-  const diagnostics = [
-    {
-      id: "inactive-modules",
-      check: "Inactive modules",
-      status: inactiveModules.length > 0 ? "watch" : "clear",
-      detail: `${inactiveModules.length} module settings are disabled or hidden.`,
-    },
-    {
-      id: "capability-coverage",
-      check: "Capability coverage",
-      status: capabilities.length > 0 ? "clear" : "blocked",
-      detail: `${capabilities.length} execution capabilities are declared.`,
-    },
-    {
-      id: "policy-drift",
-      check: "Policy drift",
-      status: blockedPolicies.length > 0 ? "watch" : "clear",
-      detail: `${blockedPolicies.length} module settings are blocked.`,
-    },
-    {
-      id: "cron-state",
-      check: "Cron state",
-      status: cronRows.some((row) => row.status === "failed") ? "watch" : "clear",
-      detail: `${cronRows.length} cron routes are configured.`,
-    },
-    {
-      id: "gateway-spend",
-      check: "Gateway spend posture",
-      status: billing.gatewaySpendAvailable ? "clear" : "watch",
-      detail: billing.gatewaySpendAvailable
-        ? `${billing.gatewaySpendEntryCount} spend entries available.`
-        : "Gateway spend report is not available.",
-    },
-  ];
+  const {
+    summary,
+    issuesBySeverity,
+    moduleCoverage,
+    recentChanges,
+  } = await getSystemAdminDiagnosticsPageModel({
+    organizationId: organization.id,
+  });
 
   return (
     <div className="flex flex-col gap-6">
       <SectionPanel
         headingLevel={1}
         title="Diagnostics"
-        description="Operational evidence for inactive modules, audit coverage, permission coverage, policy drift, cron state, and spend posture."
+        description="Read-only configuration health. Diagnostics observes drift and coverage gaps; System Admin surfaces are where operators remediate settings."
       />
 
+      <SystemAdminDiagnosticsSummaryPanel summary={summary} />
+
       <GovernedPatternCListSection
-        title="Diagnostics checklist"
-        surfaceKey={systemAdminDiagnosticsSurfaceKey}
-        listConfiguration={buildDiagnosticsListSurface({ rows: diagnostics })}
+        title="Coverage by module"
+        surfaceKey={systemAdminDiagnosticsModuleCoverageSurfaceKey}
+        listConfiguration={buildSystemAdminDiagnosticsModuleCoverageListSurface({
+          rows: moduleCoverage,
+        })}
         parentAccessAllowed
         layout="embedded"
       />
+
+      <GovernedPatternCListSection
+        title="Recent configuration changes"
+        description="Latest administrative audit evidence for module, capability, policy, approval, security, and role configuration. Open the audit viewer for full search and export."
+        surfaceKey={systemAdminDiagnosticsRecentChangesSurfaceKey}
+        listConfiguration={buildSystemAdminDiagnosticsRecentChangesListSurface({
+          rows: recentChanges,
+        })}
+        parentAccessAllowed
+        layout="embedded"
+      />
+
+      {issuesBySeverity.blocked.length > 0 ? (
+        <GovernedPatternCListSection
+          title="Blocked issues"
+          surfaceKey={`${systemAdminDiagnosticsSurfaceKey}:blocked`}
+          listConfiguration={buildSystemAdminDiagnosticsBlockedIssuesListSurface({
+            issues: issuesBySeverity.blocked,
+          })}
+          parentAccessAllowed
+          layout="embedded"
+        />
+      ) : null}
+
+      {issuesBySeverity.warning.length > 0 ? (
+        <GovernedPatternCListSection
+          title="Warnings"
+          surfaceKey={`${systemAdminDiagnosticsSurfaceKey}:warning`}
+          listConfiguration={buildSystemAdminDiagnosticsWarningIssuesListSurface({
+            issues: issuesBySeverity.warning,
+          })}
+          parentAccessAllowed
+          layout="embedded"
+        />
+      ) : null}
+
+      {issuesBySeverity.info.length > 0 ? (
+        <GovernedPatternCListSection
+          title="Informational notices"
+          surfaceKey={`${systemAdminDiagnosticsSurfaceKey}:info`}
+          listConfiguration={buildSystemAdminDiagnosticsInfoIssuesListSurface({
+            issues: issuesBySeverity.info,
+          })}
+          parentAccessAllowed
+          layout="embedded"
+        />
+      ) : null}
     </div>
   );
 }

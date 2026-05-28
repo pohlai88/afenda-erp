@@ -40,10 +40,10 @@ export function GovernedSurfaceSectionCard({
   return (
     <Card
       size="sm"
-      className={cn("mt-6 border-solid border-border", className)}
+      className={cn("mt-surface-2xl border-solid border-border", className)}
     >
       <CardHeader>
-        <CardTitle className="text-base font-semibold tracking-tight">
+        <CardTitle className="type-subtitle">
           {title}
         </CardTitle>
         {description ? <CardDescription>{description}</CardDescription> : null}

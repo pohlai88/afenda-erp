@@ -1,3 +1,7 @@
+/**
+ * Serializable ERP permission vocabulary for governed metadata (ADR-0026).
+ * Evaluated in RSC sections — never on the client.
+ */
 export const ERP_FUNCTIONS = [
   "create",
   "read",

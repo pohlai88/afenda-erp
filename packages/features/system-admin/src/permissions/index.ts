@@ -1,5 +1,14 @@
+export type {
+  SystemAdminPermissionCatalogRow,
+  SystemAdminPermissionCatalogStatus,
+  SystemAdminPermissionRiskLevel,
+} from "./contracts";
 export {
-  isSystemAdminPermissionKey,
-  systemAdminPermissionCatalog as listSystemAdminPermissions,
-} from "../contracts/system-admin.catalog.contract";
-export { buildPermissionsListSurface as buildSystemAdminPermissionsListSurface } from "../surfaces/system-admin.control.surface";
+  buildSystemAdminPermissionCatalogRows,
+  listSystemAdminPermissionCatalog,
+} from "./data";
+export { buildSystemAdminPermissionsPageModel } from "./data/system-admin.permissions.page-model.server";
+export {
+  requireSystemAdminPermissionsManage,
+  requireSystemAdminPermissionsRead,
+} from "./policies/system-admin.permissions.policy.server";

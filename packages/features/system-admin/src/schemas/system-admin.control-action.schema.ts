@@ -1,4 +1,3 @@
-import { organizationRoles } from "@afenda/auth";
 import { z } from "zod";
 
 export const systemAdminReadinessSchema = z.enum([
@@ -19,19 +18,15 @@ export const systemAdminModuleSettingsActionSchema = z.object({
   readiness: systemAdminReadinessSchema,
 });
 
-export const systemAdminPolicySettingsActionSchema = z.object({
-  policyKey: z.string().trim().min(1).max(120),
-  label: z.string().trim().min(1).max(160),
-  enabled: booleanFormSchema,
-  readiness: systemAdminReadinessSchema,
-});
+export const systemAdminCapabilityAvailabilitySchema = z.enum([
+  "enabled",
+  "disabled",
+  "preview",
+]);
 
-export const systemAdminApprovalSettingsActionSchema = z.object({
-  approvalKey: z.string().trim().min(1).max(120),
-  label: z.string().trim().min(1).max(160),
-  enabled: booleanFormSchema,
-  approverRole: z.enum(organizationRoles).optional(),
-  escalationMinutes: z.coerce.number().int().min(0).max(10080).optional(),
+export const systemAdminCapabilitySettingsActionSchema = z.object({
+  capabilityKey: z.string().trim().min(1).max(160),
+  availability: systemAdminCapabilityAvailabilitySchema,
 });
 
 export const systemAdminSecuritySettingsActionSchema = z.object({

@@ -1,5 +1,8 @@
 import { SystemAdminNav } from "@afenda/feature-system-admin/client";
-import { requireSystemAdminRead } from "@afenda/feature-system-admin/server";
+import {
+  requireSystemAdminRead,
+  resolveSystemAdminNavItems,
+} from "@afenda/feature-system-admin/server";
 import type { ReactNode } from "react";
 
 export default async function SystemAdminLayout({
@@ -7,11 +10,18 @@ export default async function SystemAdminLayout({
 }: {
   children: ReactNode;
 }) {
-  await requireSystemAdminRead();
+  const { organization } = await requireSystemAdminRead();
+  const navItems = resolveSystemAdminNavItems(organization.capabilities).map(
+    (item) => ({
+      href: item.href,
+      label: item.label,
+      exact: "exact" in item ? item.exact : undefined,
+    }),
+  );
 
   return (
     <div className="flex flex-col gap-6">
-      <SystemAdminNav />
+      <SystemAdminNav items={navItems} />
       {children}
     </div>
   );

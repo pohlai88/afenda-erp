@@ -24,6 +24,7 @@ import {
   ChartTooltipContent,
   type ChartConfig,
 } from "@afenda/ui/chart";
+import { Skeleton } from "@afenda/ui/skeleton";
 import { GovernedEmpty } from "../../client";
 import type {
   ChartAnnotation,
@@ -108,7 +109,7 @@ function ChartAnnotations({
   }
 
   return (
-    <ul className="flex flex-wrap gap-2 text-xs" aria-label="Chart annotations">
+    <ul className="flex flex-wrap gap-2 type-caption" aria-label="Chart annotations">
       {annotations.map((annotation) => {
         const tone = annotation.tone ?? "default";
         const coordinate = [annotation.x, annotation.y]
@@ -118,14 +119,16 @@ function ChartAnnotations({
           <li
             key={`${annotation.label}-${coordinate}`}
             className={cn(
-              "inline-flex items-center gap-1 rounded-md px-2 py-1",
+              "inline-flex items-center gap-1 rounded-control px-2 py-1",
               ANNOTATION_TONE_CLASS[tone],
             )}
           >
             <span aria-hidden>{tone === "default" ? "Note" : tone}</span>
-            <span className="font-medium">{annotation.label}</span>
+            <span className="type-caption font-medium text-foreground">
+              {annotation.label}
+            </span>
             {coordinate ? (
-              <span className="text-muted-foreground">({coordinate})</span>
+              <span className="type-caption">({coordinate})</span>
             ) : null}
           </li>
         );
@@ -139,9 +142,9 @@ export function ChartRendererBody({ configuration }: ChartRendererBodyProps) {
 
   if (!hydrated) {
     return (
-      <div
-        className="min-h-[12rem] w-full rounded-md bg-muted/30"
+      <Skeleton
         aria-hidden
+        className="min-h-[12rem] w-full rounded-control" // audit-ds: ignore no-arbitrary-value — chart skeleton minimum height contract
       />
     );
   }
@@ -178,6 +181,7 @@ export function ChartRendererBody({ configuration }: ChartRendererBodyProps) {
 
   return (
     <div className="flex flex-col gap-3">
+      {/* audit-ds: ignore no-arbitrary-value — chart container minimum height contract */}
       <ChartContainer config={chartConfig} className="min-h-[12rem] w-full">
         {configuration.chartKind === "stacked-bar" ? (
           <BarChart data={data} accessibilityLayer>

@@ -9,4 +9,3 @@ export {
   setRoleOverride as updateSystemAdminRoleOverride,
   setRoleOverrideAction as updateSystemAdminRoleOverrideAction,
 } from "../actions/system-admin.identity.actions.server";
-export { buildRoleOverridesListSurface as buildSystemAdminRolesListSurface } from "../surfaces/system-admin.identity.surface";

@@ -1,4 +1,7 @@
 import { appBrandName, getAppShellSkeletonNavItemIds } from "@afenda/kernel";
+import { Skeleton } from "@afenda/ui/skeleton";
+import { ui } from "@afenda/ui/design-system";
+import { cn } from "@afenda/ui/utils";
 import Link from "next/link";
 
 type RouteStateProps = {
@@ -44,6 +47,115 @@ export function RouteStatePanel({
         ) : null}
       </div>
     </main>
+  );
+}
+
+function SystemAdminListSectionPlaceholder() {
+  return (
+    <div
+      className={cn(
+        ui.radius.panel,
+        "border border-line bg-card p-4",
+      )}
+    >
+      <Skeleton className="h-5 w-40" />
+      <Skeleton className="mt-4 h-48 w-full" />
+    </div>
+  );
+}
+
+export function SystemAdminSectionSkeleton() {
+  return (
+    <div
+      className="flex flex-col gap-6"
+      aria-busy="true"
+      aria-label="Loading system admin"
+    >
+      <div className="flex flex-wrap gap-2">
+        {Array.from({ length: 8 }, (_, index) => (
+          <Skeleton
+            className="h-9 w-24 rounded-control"
+            key={`system-admin-nav-${index}`}
+          />
+        ))}
+      </div>
+      <SystemAdminListSectionPlaceholder />
+    </div>
+  );
+}
+
+export function SystemAdminHubSkeleton() {
+  return (
+    <div
+      className="flex flex-col gap-6"
+      aria-busy="true"
+      aria-label="Loading system admin hub"
+    >
+      <Skeleton className="h-28 w-full rounded-panel" />
+      <div className="grid gap-3 md:grid-cols-3 lg:grid-cols-4">
+        {Array.from({ length: 7 }, (_, index) => (
+          <div
+            className={cn(ui.radius.panel, "border border-line bg-card p-4")}
+            key={`system-admin-stat-${index}`}
+          >
+            <Skeleton className="h-3 w-20" />
+            <Skeleton className="mt-3 h-8 w-12" />
+          </div>
+        ))}
+      </div>
+      <div className="grid gap-4 md:grid-cols-3">
+        {Array.from({ length: 6 }, (_, index) => (
+          <div
+            className={cn(ui.radius.panel, "border border-line bg-card p-4")}
+            key={`system-admin-link-${index}`}
+          >
+            <Skeleton className="h-5 w-32" />
+            <Skeleton className="mt-3 h-12 w-full" />
+          </div>
+        ))}
+      </div>
+      <SystemAdminListSectionPlaceholder />
+    </div>
+  );
+}
+
+export function SystemAdminAuditPageSkeleton() {
+  return (
+    <div
+      className="flex flex-col gap-6"
+      aria-busy="true"
+      aria-label="Loading audit viewer"
+    >
+      <Skeleton className="h-24 w-full rounded-panel" />
+      <div className="flex flex-wrap gap-2">
+        {Array.from({ length: 5 }, (_, index) => (
+          <Skeleton
+            className="h-9 w-28 rounded-control"
+            key={`system-admin-audit-filter-${index}`}
+          />
+        ))}
+      </div>
+      <SystemAdminListSectionPlaceholder />
+      <SystemAdminListSectionPlaceholder />
+    </div>
+  );
+}
+
+export function SystemAdminMachineLayerPageSkeleton() {
+  return (
+    <div
+      className="flex flex-col gap-6"
+      aria-busy="true"
+      aria-label="Loading machine layer"
+    >
+      <Skeleton className="h-24 w-full rounded-panel" />
+      {Array.from({ length: 5 }, (_, index) => (
+        <SystemAdminListSectionPlaceholder
+          key={`system-admin-machine-section-${index}`}
+        />
+      ))}
+      <Skeleton className="h-40 w-full rounded-panel" />
+    </div>
   );
 }
 

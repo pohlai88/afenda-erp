@@ -44,6 +44,12 @@ export const systemAdminReadinessEnum = pgEnum("system_admin_readiness", [
   "deprecated",
 ]);
 
+export const systemAdminAvailabilityEnum = pgEnum("system_admin_availability", [
+  "enabled",
+  "disabled",
+  "preview",
+]);
+
 export const cronRunStatusEnum = pgEnum("cron_run_status", [
   "started",
   "success",
@@ -81,6 +87,27 @@ export const tenantSettings = pgTable(
       .default({}),
     ...timestampColumns,
   },
+);
+
+export const tenantCapabilitySettings = pgTable(
+  "tenant_capability_settings",
+  {
+    organizationId: organizationIdColumn()
+      .notNull()
+      .references(() => organizations.id, { onDelete: "cascade" }),
+    capabilityKey: text("capability_key").notNull(),
+    availability: systemAdminAvailabilityEnum("availability")
+      .notNull()
+      .default("enabled"),
+    ...timestampColumns,
+  },
+  (table) => [
+    primaryKey({
+      columns: [table.organizationId, table.capabilityKey],
+      name: "tenant_capability_settings_pk",
+    }),
+    index("tenant_capability_settings_org_idx").on(table.organizationId),
+  ],
 );
 
 export const tenantModuleSettings = pgTable(

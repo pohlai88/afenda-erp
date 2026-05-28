@@ -19,6 +19,7 @@ export function buildSystemAdminListToolbar(input: {
   scope: string;
   searchPlaceholder: string;
   sortColumn: string;
+  searchValue?: string;
   filters?: readonly ListSurfaceToolbarFilter[];
   sortOptions?: readonly ListSurfaceToolbarSortOption[];
 }): ListSurfaceToolbar {
@@ -44,6 +45,7 @@ export function buildSystemAdminListToolbar(input: {
       param: searchParam,
       label: "Search",
       placeholder: input.searchPlaceholder,
+      value: input.searchValue,
     },
     filters: input.filters ? [...input.filters] : undefined,
     sort: {

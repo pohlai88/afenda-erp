@@ -15,7 +15,7 @@ import { densityGapClass } from "../../schemas/surface-chrome.classes";
 import { cn } from "@afenda/ui/utils";
 
 const DATA_NATURE_CLASS: Record<ScorecardFormDataNature, string> = {
-  scoring: "@container flex flex-col gap-4",
+  scoring: "@container flex flex-col gap-surface-lg",
 };
 
 export function ScorecardFormSurface({
@@ -34,12 +34,12 @@ export function ScorecardFormSurface({
     >
       <Card>
         <CardHeader className="pb-2">
-          <CardTitle className="text-base">{form.title}</CardTitle>
+          <CardTitle>{form.title}</CardTitle>
         </CardHeader>
         <CardContent
           className={cn("flex flex-col", densityGapClass(form.chrome?.density))}
         >
-          <ul className="flex flex-col gap-4">
+          <ul className="flex flex-col gap-surface-lg">
             {form.criteria.map((criterion) => (
               <li key={criterion.id}>
                 <CriterionRow
@@ -89,11 +89,11 @@ function CriterionRow({
   const max = criterion.maxScore;
 
   return (
-    <div className="flex flex-col gap-2 border-b border-border/60 pb-4 last:border-0 last:pb-0">
+    <div className="flex flex-col gap-2 border-b border-border/60 pb-surface-lg last:border-0 last:pb-0">
       <div className="flex flex-col gap-0.5">
-        <p className="text-sm font-medium">{criterion.label}</p>
+        <p className="type-body font-medium">{criterion.label}</p>
         {criterion.description ? (
-          <p className="text-xs text-muted-foreground">
+          <p className="type-caption">
             {criterion.description}
           </p>
         ) : null}
@@ -111,7 +111,7 @@ function CriterionRow({
               type="button"
               size="sm"
               variant={value === score ? "default" : "outline"}
-              className="size-8 p-0 text-xs"
+              className="type-caption size-8 p-0"
               aria-pressed={value === score}
               onClick={() => onSelect(score)}
             >

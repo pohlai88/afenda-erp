@@ -11,7 +11,7 @@ import { StatCardBody } from "./stat-card-body.client";
 
 const GRID_DENSITY_CLASS: Record<StatCardDensity, string> = {
   comfortable: "grid grid-cols-1 gap-3 @sm:grid-cols-2 @2xl:grid-cols-4",
-  compact: "grid grid-cols-1 gap-2 @sm:grid-cols-2",
+  compact: "grid grid-cols-1 gap-2 @sm:grid-cols-2 @2xl:grid-cols-4",
 };
 
 export type StatCardRendererProps = {
@@ -45,9 +45,9 @@ export function StatCardRenderer({
   return (
     <section aria-label="Statistics" className="@container">
       <div className={GRID_DENSITY_CLASS[density]}>
-        {stats.map((stat, index) => (
+        {stats.map((stat) => (
           <StatTile
-            key={`${index}-${stat.label}`}
+            key={stat.label}
             stat={stat}
             density={density}
           />

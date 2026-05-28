@@ -2,7 +2,7 @@ import "server-only";
 
 import { cache } from "react";
 
-import { rootLogger } from "./adapters/logger.server";
+import { logGovernedListSurfaceRenderDiagnostic } from "./data/governed-logging.server";
 
 import {
   buildGovernedListSurfaceRenderFingerprint,
@@ -25,7 +25,7 @@ const logGovernedListSurfaceRenderOnce = cache(
       return;
     }
 
-    rootLogger.info(
+    logGovernedListSurfaceRenderDiagnostic(
       {
         governedSurface: {
           fingerprint,

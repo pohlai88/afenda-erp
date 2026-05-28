@@ -1,24 +1,39 @@
+import { GovernedEmpty } from "../../client";
 import { GovernedListSurface } from "../../components/governed-list-surface";
 import {
   parseListSurfaceRendererConfiguration,
   type ListSurfaceRendererConfiguration,
 } from "../../schemas/list-surface-renderer.schema";
 
+import type { GovernedComponentRendererDiagnostics } from "../registry";
 import type { ListSurfaceTableClientProps } from "./list-surface-table.client";
 import { ListSurfaceTable } from "./list-surface-table";
 
 export type ListSurfaceRendererProps = {
   configuration: unknown;
+  diagnostics?: GovernedComponentRendererDiagnostics;
   variant?: "full" | "table-only";
 };
 
 export function ListSurfaceRenderer({
   configuration,
+  diagnostics = "user",
   variant,
 }: ListSurfaceRendererProps) {
   const parsed = parseListSurfaceRendererConfiguration(configuration);
   if (!parsed.success) {
-    return null;
+    return (
+      <GovernedEmpty
+        model={{
+          variant: "error",
+          title: "Section unavailable",
+          description:
+            diagnostics === "operator"
+              ? "The list surface configuration failed validation."
+              : "This section could not be loaded safely.",
+        }}
+      />
+    );
   }
 
   const config: ListSurfaceRendererConfiguration = parsed.data;

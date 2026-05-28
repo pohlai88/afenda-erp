@@ -2,15 +2,17 @@ import {
   buildInvitationsListSurface,
   buildMembersListSurface,
   buildRoleOverridesListSurface,
+  systemAdminInvitationsSurfaceKey,
+  systemAdminMembersSurfaceKey,
+  systemAdminRoleOverridesSurfaceKey,
+} from "@afenda/feature-system-admin/metadata";
+import {
   inviteMemberAction,
   listOrganizationInvitations,
   listRoleOverridesForOrganization,
   listTenantMembers,
   requireSystemAdminUsersRead,
   setRoleOverrideAction,
-  systemAdminInvitationsSurfaceKey,
-  systemAdminMembersSurfaceKey,
-  systemAdminRoleOverridesSurfaceKey,
 } from "@afenda/feature-system-admin/server";
 import {
   InvitationTrailingCell,

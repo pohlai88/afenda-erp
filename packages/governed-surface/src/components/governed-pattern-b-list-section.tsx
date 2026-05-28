@@ -2,7 +2,7 @@ import "server-only";
 
 import type { ReactNode } from "react";
 import { GovernedComponentRenderer } from "../metadata/index";
-import { logUnexpectedServerError } from "../adapters/logger.server";
+import { logUnexpectedServerError } from "../data/governed-logging.server";
 import { getGovernedSurfaceTranslations } from "../i18n/governed-surface-copy";
 
 import type { EmptyState } from "../schemas/list-surface.schema";
@@ -18,13 +18,15 @@ import {
   governedListSectionTestId as buildGovernedListSectionTestId,
   summarizeListSurfaceTrailingActions,
 } from "../list-surface-identity.shared";
-import { GovernedEmpty } from "./governed-empty";
 import {
-  GovernedSurfaceSectionCard,
   type GovernedSurfaceSectionCardBody,
 } from "./governed-surface-section-card";
+import {
+  renderGovernedPatternSectionShell,
+  type GovernedPatternSectionLayout,
+} from "./governed-pattern-section-shell.shared";
 
-export type GovernedPatternBListSectionLayout = "card" | "embedded";
+export type GovernedPatternBListSectionLayout = GovernedPatternSectionLayout;
 
 export type GovernedPatternBListSectionProps = {
   title: string;
@@ -46,66 +48,6 @@ export type GovernedPatternBListSectionProps = {
   cardClassName?: string;
   contentClassName?: string;
 };
-
-function renderListBody(body: GovernedSurfaceSectionCardBody) {
-  if (body.state === "forbidden" || body.state === "invalid") {
-    return <GovernedEmpty model={body.model} />;
-  }
-  return body.children;
-}
-
-type RenderSectionShellInput = {
-  layout: GovernedPatternBListSectionLayout;
-  className?: string;
-  sectionTestId: string;
-  sectionDomId: string;
-  headerSlot?: ReactNode;
-  title: string;
-  description?: string;
-  headerAction?: ReactNode;
-  body: GovernedSurfaceSectionCardBody;
-  cardClassName?: string;
-  contentClassName?: string;
-};
-
-function renderSectionShell({
-  layout,
-  className,
-  sectionTestId,
-  sectionDomId,
-  headerSlot,
-  title,
-  description,
-  headerAction,
-  body,
-  cardClassName,
-  contentClassName,
-}: RenderSectionShellInput) {
-  const listBody = renderListBody(body);
-
-  if (layout === "embedded") {
-    return (
-      <div id={sectionDomId} className={className} data-testid={sectionTestId}>
-        {headerSlot}
-        <div className={contentClassName}>{listBody}</div>
-      </div>
-    );
-  }
-
-  return (
-    <div id={sectionDomId} className={className} data-testid={sectionTestId}>
-      {headerSlot}
-      <GovernedSurfaceSectionCard
-        title={title}
-        description={description}
-        body={body}
-        headerAction={headerAction}
-        className={cardClassName}
-        contentClassName={contentClassName}
-      />
-    </div>
-  );
-}
 
 export async function GovernedPatternBListSection({
   title,
@@ -148,7 +90,7 @@ export async function GovernedPatternBListSection({
       state: "invalid",
       model: loadError,
     };
-    return renderSectionShell({ ...shellInput, body });
+    return renderGovernedPatternSectionShell({ ...shellInput, body });
   }
 
   const [allowedFromConfig, parsed] = await Promise.all([
@@ -219,5 +161,5 @@ export async function GovernedPatternBListSection({
     };
   }
 
-  return renderSectionShell({ ...shellInput, body });
+  return renderGovernedPatternSectionShell({ ...shellInput, body });
 }

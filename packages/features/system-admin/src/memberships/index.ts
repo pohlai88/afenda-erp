@@ -9,4 +9,3 @@ export {
   changeMemberRole as assignSystemAdminMembershipRole,
   changeMemberRoleByInput as assignSystemAdminMembershipRoleByInput,
 } from "../actions/system-admin.identity.actions.server";
-export { buildMembersListSurface as buildSystemAdminMembershipsListSurface } from "../surfaces/system-admin.identity.surface";

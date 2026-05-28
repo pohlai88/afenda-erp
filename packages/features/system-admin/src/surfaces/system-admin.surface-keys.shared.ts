@@ -1,7 +1,6 @@
-import {
-  systemAdminAuditLogSurfaceKey,
-  systemAdminRetentionSurfaceKey,
-} from "./system-admin.audit.surface";
+import { systemAdminAuditViewerSurfaceKey } from "../audit-viewer/data/system-admin.audit.surface";
+import { systemAdminRetentionSurfaceKey } from "../audit-viewer/data/system-admin.retention.surface";
+import { systemAdminSecuritySurfaceKey } from "../security/data/system-admin.security.surface";
 import {
   systemAdminInvitationsSurfaceKey,
   systemAdminMembersSurfaceKey,
@@ -23,10 +22,24 @@ import { systemAdminGatewaySpendSurfaceKey } from "./system-admin.gateway-spend.
 import { systemAdminBillingSurfaceKey } from "./system-admin.billing.surface";
 import { systemAdminCronSurfaceKey } from "./system-admin.cron-health.surface";
 import { systemAdminSettingsSurfaceKey } from "./system-admin.settings.surface";
+import {
+  systemAdminCapabilitiesSurfaceKey,
+  systemAdminDiagnosticsSurfaceKey,
+  systemAdminModulesSurfaceKey,
+  systemAdminOrganizationSurfaceKey,
+  systemAdminPermissionsSurfaceKey,
+} from "./system-admin.control.surface";
+import {
+  systemAdminDiagnosticsModuleCoverageSurfaceKey,
+  systemAdminDiagnosticsRecentChangesSurfaceKey,
+} from "../diagnostics/data/system-admin.diagnostics.surface";
+import { systemAdminApprovalsSurfaceKey } from "../approvals/data/system-admin.approval-rules.surface";
+import { systemAdminPoliciesSurfaceKey } from "../policies/data/system-admin.policy-rules.surface";
 
 export {
-  systemAdminAuditLogSurfaceKey,
+  systemAdminAuditViewerSurfaceKey,
   systemAdminRetentionSurfaceKey,
+  systemAdminSecuritySurfaceKey,
   systemAdminInvitationsSurfaceKey,
   systemAdminMembersSurfaceKey,
   systemAdminRoleOverridesSurfaceKey,
@@ -42,12 +55,22 @@ export {
   systemAdminSettingsSurfaceKey,
   systemAdminCronSurfaceKey,
   systemAdminBillingSurfaceKey,
+  systemAdminModulesSurfaceKey,
+  systemAdminCapabilitiesSurfaceKey,
+  systemAdminPermissionsSurfaceKey,
+  systemAdminOrganizationSurfaceKey,
+  systemAdminDiagnosticsSurfaceKey,
+  systemAdminDiagnosticsModuleCoverageSurfaceKey,
+  systemAdminDiagnosticsRecentChangesSurfaceKey,
+  systemAdminPoliciesSurfaceKey,
+  systemAdminApprovalsSurfaceKey,
 };
 
 export function getSystemAdminSurfaceKeys() {
   return {
-    auditLog: systemAdminAuditLogSurfaceKey,
+    auditViewer: systemAdminAuditViewerSurfaceKey,
     retention: systemAdminRetentionSurfaceKey,
+    security: systemAdminSecuritySurfaceKey,
     members: systemAdminMembersSurfaceKey,
     invitations: systemAdminInvitationsSurfaceKey,
     roleOverrides: systemAdminRoleOverridesSurfaceKey,
@@ -63,5 +86,14 @@ export function getSystemAdminSurfaceKeys() {
     settings: systemAdminSettingsSurfaceKey,
     cron: systemAdminCronSurfaceKey,
     billing: systemAdminBillingSurfaceKey,
+    modules: systemAdminModulesSurfaceKey,
+    capabilities: systemAdminCapabilitiesSurfaceKey,
+    permissions: systemAdminPermissionsSurfaceKey,
+    organization: systemAdminOrganizationSurfaceKey,
+    diagnostics: systemAdminDiagnosticsSurfaceKey,
+    diagnosticsModuleCoverage: systemAdminDiagnosticsModuleCoverageSurfaceKey,
+    diagnosticsRecentChanges: systemAdminDiagnosticsRecentChangesSurfaceKey,
+    policies: systemAdminPoliciesSurfaceKey,
+    approvals: systemAdminApprovalsSurfaceKey,
   } as const;
 }

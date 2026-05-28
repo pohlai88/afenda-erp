@@ -1,8 +1,10 @@
-import { requireCapability } from "@afenda/auth/server";
 import {
   buildCronHealthListSurface,
-  getCronHealthSurfaceRows,
   systemAdminCronSurfaceKey,
+} from "@afenda/feature-system-admin/metadata";
+import {
+  getCronHealthSurfaceRows,
+  requireSystemAdminReliabilityRead,
 } from "@afenda/feature-system-admin/server";
 import { GovernedPatternCListSection } from "@afenda/governed-surface/server";
 import { SectionPanel } from "@afenda/ui";
@@ -15,7 +17,7 @@ export const metadata: Metadata = {
 };
 
 export default async function SystemAdminReliabilityPage() {
-  await requireCapability("system-admin.reliability.read");
+  await requireSystemAdminReliabilityRead();
 
   const cronRows = await getCronHealthSurfaceRows();
   const cronSurface = buildCronHealthListSurface({ rows: cronRows });

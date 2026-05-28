@@ -47,3 +47,16 @@ export function surfaceMaterialClass(
       return "bg-card";
   }
 }
+
+/** Raised section/stack chrome — Card-adjacent panel frame (shadcn Card recipe). */
+export function elevatedChromeFrameClass(
+  elevation: GovernedSurfaceElevation = "card",
+  surface: GovernedSurfaceMaterial = "solid",
+): string {
+  const material = surfaceMaterialClass(surface);
+  const elevationCls = elevationClass(elevation);
+  if (elevation === "flat") {
+    return `${elevationCls} ${material}`.trim();
+  }
+  return `rounded-panel border border-border/60 p-4 ${elevationCls} ${material}`.trim();
+}

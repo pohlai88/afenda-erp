@@ -14,6 +14,7 @@ import {
 import { useRouter } from "next/navigation";
 import { Badge } from "@afenda/ui/badge";
 import { Button } from "@afenda/ui/button";
+import { Checkbox } from "@afenda/ui/checkbox";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -136,7 +137,7 @@ export function ListSurfaceToolbarClient({
 
   return (
     <div
-      className="mb-3 flex flex-wrap items-center justify-end gap-2"
+      className="mb-density-comfortable flex flex-wrap items-center justify-end gap-2"
       data-testid="governed-list-toolbar"
     >
       {selectedCount > 0 ? (
@@ -190,7 +191,7 @@ export function ListSurfaceToolbarClient({
             defaultValue={toolbar.search.value}
             placeholder={toolbar.search.placeholder ?? toolbar.search.label}
             aria-label={toolbar.search.label}
-            className="h-8"
+            className="h-field-sm"
           />
           <Button type="submit" variant="outline" size="sm">
             <Search aria-hidden />
@@ -201,7 +202,7 @@ export function ListSurfaceToolbarClient({
       {toolbar.filters?.map((filter) => (
         <label
           key={filter.id}
-          className="flex items-center gap-1 text-label-small text-muted-foreground"
+          className="type-caption flex items-center gap-1"
         >
           <span>{filter.label}</span>
           <NativeSelect
@@ -229,7 +230,7 @@ export function ListSurfaceToolbarClient({
         </label>
       ))}
       {toolbar.sort ? (
-        <label className="flex items-center gap-1 text-label-small text-muted-foreground">
+        <label className="type-caption flex items-center gap-1">
           <span>{toolbar.sort.label}</span>
           <NativeSelect
             size="sm"
@@ -319,19 +320,19 @@ export function ListSurfaceToolbarClient({
           {showColumns ? (
             <div
               className={cn(
-                "absolute end-0 top-full z-10 mt-1 min-w-[10rem] rounded-md border border-border bg-popover p-2 shadow-md",
+                "absolute end-0 top-full z-raised mt-1 min-w-[10rem] rounded-popover border border-border bg-popover p-2 shadow-elevation-2", // audit-ds: ignore no-arbitrary-value — column picker dropdown minimum width
               )}
               role="menu"
             >
               {columnIds.map((columnId) => (
                 <label
                   key={columnId}
-                  className="flex cursor-pointer items-center gap-2 rounded px-2 py-1 text-sm hover:bg-muted"
+                  className="flex cursor-pointer items-center gap-2 rounded px-2 py-1 type-body hover:bg-muted"
                 >
-                  <input
-                    type="checkbox"
+                  <Checkbox
                     checked={!hiddenColumnIds?.has(columnId)}
-                    onChange={() => onToggleColumn?.(columnId)}
+                    onCheckedChange={() => onToggleColumn?.(columnId)}
+                    aria-label={`Toggle column ${columnId}`}
                   />
                   {columnId}
                 </label>

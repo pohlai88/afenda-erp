@@ -23,6 +23,14 @@ export { SandboxTrailingCell } from "./components/system-admin.sandbox-trailing-
 export { AiFeatureEntitlementTrailingCell } from "./components/system-admin.ai-feature-entitlement-trailing-cell.component.client";
 export { SystemAdminInviteUserDialog } from "./users/components/system-admin.invite-user-dialog.component.client";
 export { SystemAdminAssignRoleDialog } from "./roles/components/system-admin.assign-role-dialog.component.client";
+export { SystemAdminModuleSettingsDialog } from "./modules/components/system-admin.module-settings-dialog.component.client";
+export { SystemAdminCapabilitySettingsDialog } from "./capabilities/components/system-admin.capability-settings-dialog.component.client";
+export { SystemAdminPolicyRuleEditor } from "./policies/components/system-admin.policy-rule-editor.component.client";
+export { SystemAdminApprovalRuleEditor } from "./approvals/components/system-admin.approval-rule-editor.component.client";
+export { SystemAdminAuditExportButton } from "./audit-viewer/components/system-admin.audit-export-button.component.client";
+export { SystemAdminSecurityForm } from "./security/components/system-admin.security-form.component.client";
+export { SystemAdminOrganizationDefaultsForm } from "./organization/components/system-admin.organization-defaults-form.component.client";
+export type { OrganizationDefaultsFormDefaults } from "./organization/components/system-admin.organization-defaults-form.component.client";
 
 export {
   isSystemAdminApiScope,

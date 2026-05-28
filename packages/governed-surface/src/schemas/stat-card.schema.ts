@@ -123,6 +123,9 @@ export const statCardConfigurationSchema = statCardConfigurationCoreSchema
 
 export type StatCardTone = z.infer<typeof statCardToneSchema>;
 export type StatCardIcon = z.infer<typeof statCardIconSchema>;
+export type StatCardSparkPoint = z.infer<typeof statCardSparkPointSchema>;
+export type StatCardProgress = z.infer<typeof statCardProgressSchema>;
+export type StatCardComparison = z.infer<typeof statCardComparisonSchema>;
 export type StatCardItem = z.infer<typeof statCardItemSchema>;
 export type StatCardConfiguration = z.output<
   typeof statCardConfigurationSchema

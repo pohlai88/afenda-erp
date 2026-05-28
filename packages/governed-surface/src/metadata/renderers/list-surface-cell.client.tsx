@@ -20,16 +20,16 @@ import { cn } from "@afenda/ui/utils";
 import { ListSurfaceSparkline } from "./list-surface-sparkline.client";
 
 const BADGE_TONE_CLASS: Record<ListCellTone, string> = {
-  positive: "bg-success/15 text-success",
+  positive: "bg-success/15 text-success-foreground",
   attention: "bg-warning/15 text-warning-foreground",
-  critical: "bg-destructive/15 text-destructive",
+  critical: "bg-critical/15 text-critical-foreground",
   default: "bg-muted text-muted-foreground",
 };
 
 const SEMANTIC_TONE_CLASS: Record<ListCellTone, string> = {
   positive: "text-success",
   attention: "text-warning-foreground",
-  critical: "text-destructive",
+  critical: "text-critical",
   default: "text-foreground",
 };
 
@@ -138,15 +138,13 @@ export function ListSurfaceCell({ column, row }: ListSurfaceCellProps) {
   if (kind === "meter" && cellKind?.kind === "meter") {
     const { value, max, label } = cellKind;
     return (
-      <div className="flex min-w-[6rem] flex-col gap-1">
+      <div className="flex min-w-[6rem] flex-col gap-1"> {/* audit-ds: ignore no-arbitrary-value — meter cell minimum width contract */}
         <Progress
           value={(value / max) * 100}
           aria-label={label ?? column.header}
         />
         {label ? (
-          <span className="text-label-small text-muted-foreground">
-            {label}
-          </span>
+          <span className="type-caption">{label}</span>
         ) : null}
       </div>
     );
@@ -157,7 +155,7 @@ export function ListSurfaceCell({ column, row }: ListSurfaceCellProps) {
     return (
       <span
         className={cn(
-          "inline-flex items-center gap-1 font-medium",
+          "type-body inline-flex items-center gap-1 font-medium",
           SEMANTIC_TONE_CLASS[tone],
         )}
       >
@@ -172,19 +170,20 @@ export function ListSurfaceCell({ column, row }: ListSurfaceCellProps) {
   if (kind === "avatar-stack" && cellKind?.kind === "avatar-stack") {
     const { initials, overflow } = cellKind;
     return (
-      <div className="flex -space-x-2">
+      <div className="flex items-center">
         {initials.slice(0, 3).map((initial, index) => (
           <Avatar
             key={`${initial}-${index}`}
-            className="size-7 border-2 border-card"
+            className={cn(
+              "size-7 border-2 border-card",
+              index > 0 && "-ms-2",
+            )}
           >
-            <AvatarFallback className="text-[10px]">{initial}</AvatarFallback>
+            <AvatarFallback className="type-mono-cell">{initial}</AvatarFallback>
           </Avatar>
         ))}
         {overflow && overflow > 0 ? (
-          <span className="ms-2 text-label-small text-muted-foreground">
-            +{overflow}
-          </span>
+          <span className="type-caption ms-2">+{overflow}</span>
         ) : null}
       </div>
     );

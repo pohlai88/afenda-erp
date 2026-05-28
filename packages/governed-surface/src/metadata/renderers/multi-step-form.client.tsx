@@ -25,7 +25,7 @@ import { densityGapClass } from "../../schemas/surface-chrome.classes";
 import { cn } from "@afenda/ui/utils";
 
 const DATA_NATURE_CLASS: Record<MultiStepFormDataNature, string> = {
-  wizard: "@container flex flex-col gap-4",
+  wizard: "@container flex flex-col gap-surface-lg",
 };
 
 function buildInitialWizardValues(
@@ -68,12 +68,12 @@ export function MultiStepFormSurface({
     >
       <Card>
         <CardHeader className="pb-2">
-          <p className="text-xs text-muted-foreground">
+          <p className="type-caption">
             Step {stepIndex + 1} of {form.steps.length}
           </p>
-          <CardTitle className="text-base">{step.title}</CardTitle>
+          <CardTitle>{step.title}</CardTitle>
           {step.description ? (
-            <p className="text-sm text-muted-foreground">{step.description}</p>
+            <p className="type-muted">{step.description}</p>
           ) : null}
         </CardHeader>
         <CardContent
@@ -86,7 +86,7 @@ export function MultiStepFormSurface({
                   type="button"
                   size="sm"
                   variant={index === stepIndex ? "default" : "outline"}
-                  className="h-7 text-xs"
+                  className="type-caption h-7"
                   onClick={() => setStepIndex(index)}
                   aria-current={index === stepIndex ? "step" : undefined}
                 >
@@ -179,7 +179,7 @@ function WizardField({
           <Label htmlFor={id}>
             {field.label}
             {field.required ? (
-              <span className="text-destructive" aria-hidden>
+              <span className="text-critical" aria-hidden>
                 {" "}
                 *
               </span>

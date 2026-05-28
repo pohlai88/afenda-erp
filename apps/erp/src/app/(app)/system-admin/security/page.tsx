@@ -1,11 +1,13 @@
 import {
-  buildSecuritySettingsListSurface,
-  ensureTenantSecuritySettings,
-  getTenantSecuritySettings,
-  requireSystemAdminSecurityRead,
+  buildSystemAdminSecuritySettingsListSurface,
   systemAdminSecuritySurfaceKey,
-  updateSystemAdminSecurityAction,
+} from "@afenda/feature-system-admin/metadata";
+import {
+  getSystemAdminOrganizationSecuritySettings,
+  requireSystemAdminSecurityRead,
+  updateSystemAdminSecuritySettingsAction,
 } from "@afenda/feature-system-admin/server";
+import { SystemAdminSecurityForm } from "@afenda/feature-system-admin/client";
 import { GovernedPatternCListSection } from "@afenda/governed-surface/server";
 import { SectionPanel } from "@afenda/ui";
 import type { Metadata } from "next";
@@ -21,49 +23,37 @@ export default async function SystemAdminSecurityPage() {
     organization.capabilities.includes("system-admin.security.manage") ||
     organization.capabilities.includes("system-admin.settings.write");
 
-  await ensureTenantSecuritySettings({ organizationId: organization.id });
-  const security = await getTenantSecuritySettings({
+  const security = await getSystemAdminOrganizationSecuritySettings({
     organizationId: organization.id,
   });
-
-  async function updateSecurity(formData: FormData) {
-    "use server";
-    await updateSystemAdminSecurityAction(undefined, formData);
-  }
 
   return (
     <div className="flex flex-col gap-6">
       <SectionPanel
         headingLevel={1}
         title="Security"
-        description="Tenant security settings are durable, audited, and separate from low-level auth implementation."
+        description="Organization-level security posture. Sensitive changes are guarded, scoped, and audited."
       />
 
       <GovernedPatternCListSection
         title="Security posture"
         surfaceKey={systemAdminSecuritySurfaceKey}
-        listConfiguration={buildSecuritySettingsListSurface({ security })}
+        listConfiguration={buildSystemAdminSecuritySettingsListSurface({
+          security,
+        })}
         parentAccessAllowed
         layout="embedded"
       />
 
-      {canMutate ? (
-        <SectionPanel title="Update security settings">
-          <form action={updateSecurity} className="grid gap-3 md:grid-cols-4">
-            <select name="mfaRequired" className="rounded-md border border-line bg-background px-3 py-2 text-sm" defaultValue={security?.mfaRequired ? "true" : "false"}>
-              <option value="false">MFA optional</option>
-              <option value="true">MFA required</option>
-            </select>
-            <input name="trustedDomains" placeholder="example.com, afenda.com" defaultValue={security?.trustedDomains.join(", ") ?? ""} className="rounded-md border border-line bg-background px-3 py-2 text-sm" />
-            <select name="sensitiveActionConfirmation" className="rounded-md border border-line bg-background px-3 py-2 text-sm" defaultValue={security?.sensitiveActionConfirmation === false ? "false" : "true"}>
-              <option value="true">Confirm sensitive actions</option>
-              <option value="false">Do not require confirmation</option>
-            </select>
-            <input name="sessionTimeoutMinutes" type="number" min="15" max="1440" defaultValue={String(security?.sessionPolicy.sessionTimeoutMinutes ?? 720)} className="rounded-md border border-line bg-background px-3 py-2 text-sm" />
-            <button className="rounded-md bg-foreground px-3 py-2 text-sm font-medium text-background md:col-span-4">
-              Save security settings
-            </button>
-          </form>
+      {canMutate && security ? (
+        <SectionPanel
+          title="Update security settings"
+          description="Dangerous downgrades require explicit confirmation. Domain and session values are validated server-side."
+        >
+          <SystemAdminSecurityForm
+            security={security}
+            updateSecuritySettingsAction={updateSystemAdminSecuritySettingsAction}
+          />
         </SectionPanel>
       ) : null}
     </div>

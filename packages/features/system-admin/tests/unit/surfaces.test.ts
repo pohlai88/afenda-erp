@@ -6,15 +6,16 @@ import {
   buildWebhooksListSurface,
 } from "../../src/surfaces/system-admin.integrations.surface";
 import {
-  buildApprovalsListSurface,
   buildCapabilitiesListSurface,
-  buildDiagnosticsListSurface,
   buildModulesListSurface,
   buildOrganizationDefaultsListSurface,
   buildPermissionsListSurface,
-  buildPoliciesListSurface,
-  buildSecuritySettingsListSurface,
 } from "../../src/surfaces/system-admin.control.surface";
+import { buildSystemAdminDiagnosticsIssuesListSurface } from "../../src/diagnostics/data/system-admin.diagnostics.surface";
+import { buildSystemAdminAuditViewerListSurface } from "../../src/audit-viewer/data/system-admin.audit.surface";
+import { buildSystemAdminSecuritySettingsListSurface } from "../../src/security/data/system-admin.security.surface";
+import { buildApprovalsListSurface } from "../../src/approvals/data/system-admin.approval-rules.surface";
+import { buildPoliciesListSurface } from "../../src/policies/data/system-admin.policy-rules.surface";
 import {
   buildSystemAdminAiSandboxesListSurface,
   buildSystemAdminAiUsageListSurface,
@@ -30,6 +31,36 @@ describe("system admin governed surfaces", () => {
     if (parsed.success) {
       expect(parsed.data.pagination?.pageSize).toBe(1);
       expect(parsed.data.presentation?.toolbar?.search?.param).toBe("membersQ");
+    }
+  });
+
+  it("parses the audit viewer governed list surface", () => {
+    const parsed = parseListSurfaceRendererConfiguration(
+      buildSystemAdminAuditViewerListSurface({
+        rows: [
+          {
+            id: "audit_1",
+            occurredAt: "2026-01-01",
+            actorId: "user_1",
+            action: "system-admin.security.update",
+            target: "organization:org_1",
+            moduleKey: "system-admin",
+            result: "recorded",
+            summary: "Security settings updated.",
+          },
+        ],
+        params: { auditPage: 1, auditPageSize: 25 },
+        totalCount: 1,
+        pageSize: 25,
+        page: 1,
+        hasNextPage: false,
+      }),
+    );
+
+    expect(parsed.success).toBe(true);
+    if (parsed.success) {
+      expect(parsed.data.pagination?.totalCount).toBe(1);
+      expect(parsed.data.presentation?.toolbar?.search?.param).toBe("auditQ");
     }
   });
 
@@ -108,16 +139,16 @@ describe("system admin governed surfaces", () => {
   it("parses granular domain control surfaces", () => {
     const surfaces = [
       buildPermissionsListSurface({ permissions: [] }),
-      buildModulesListSurface({ modules: [], settings: [] }),
+      buildModulesListSurface({ modules: [] }),
       buildCapabilitiesListSurface({ capabilities: [] }),
       buildPoliciesListSurface({ policies: [] }),
       buildApprovalsListSurface({ approvals: [] }),
-      buildSecuritySettingsListSurface({ security: null }),
+      buildSystemAdminSecuritySettingsListSurface({ security: null }),
       buildOrganizationDefaultsListSurface({
         settings: null,
         organizationName: "Afenda",
       }),
-      buildDiagnosticsListSurface({ rows: [] }),
+      buildSystemAdminDiagnosticsIssuesListSurface({ issues: [] }),
     ];
 
     for (const surface of surfaces) {

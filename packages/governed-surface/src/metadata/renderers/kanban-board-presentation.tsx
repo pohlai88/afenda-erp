@@ -121,7 +121,7 @@ export function KanbanColumnPanel({
       onDragLeave={columnDropSurface?.onDragLeave}
     >
       <CardHeader className="flex flex-row items-center justify-between gap-2 pb-2">
-        <CardTitle id={headingId} className="text-sm font-medium">
+        <CardTitle id={headingId} className="type-control font-medium">
           {column.label}
         </CardTitle>
         {column.badgeTone ? (
@@ -132,7 +132,7 @@ export function KanbanColumnPanel({
             {cards.length}
           </Badge>
         ) : (
-          <span className="text-xs text-muted-foreground" aria-hidden="true">
+          <span className="type-caption" aria-hidden="true">
             {cards.length}
           </span>
         )}
@@ -183,31 +183,31 @@ export function KanbanCardTile({
       )}
     >
       <CardContent className="flex flex-col gap-2">
-        <article aria-labelledby={titleId}>
+        <article className="flex flex-col gap-2" aria-labelledby={titleId}>
           <div className="flex flex-col gap-0.5">
             {card.href ? (
               <Link
                 id={titleId}
                 href={card.href as Route}
                 prefetch={false}
-                className="text-sm leading-snug font-medium text-primary hover:underline"
+                className="type-control font-medium leading-snug text-primary hover:underline"
               >
                 {card.title}
               </Link>
             ) : (
-              <p id={titleId} className="text-sm leading-snug font-medium">
+              <p id={titleId} className="type-control font-medium leading-snug">
                 {card.title}
               </p>
             )}
             {card.subtitle ? (
-              <p className="text-xs text-muted-foreground">{card.subtitle}</p>
+              <p className="type-caption">{card.subtitle}</p>
             ) : null}
           </div>
           {card.badges?.length ? (
-            <ul className="mt-2 flex flex-wrap gap-1" aria-label="Status">
+            <ul className="flex flex-wrap gap-1" aria-label="Status">
               {card.badges.map((badge) => (
                 <li key={badge}>
-                  <Badge variant="outline" className="text-xs">
+                  <Badge variant="outline" className="type-caption font-normal">
                     {badge}
                   </Badge>
                 </li>
@@ -215,12 +215,12 @@ export function KanbanCardTile({
             </ul>
           ) : null}
           {card.metadataChips?.length ? (
-            <ul className="mt-2 flex flex-wrap gap-1" aria-label="Metadata">
+            <ul className="flex flex-wrap gap-1" aria-label="Metadata">
               {card.metadataChips.map((chip) => (
                 <li key={chip.label}>
                   <Badge
                     variant={COLUMN_BADGE_VARIANT[chip.tone ?? "default"]}
-                    className="text-xs"
+                    className="type-caption font-normal"
                   >
                     {chip.label}
                   </Badge>

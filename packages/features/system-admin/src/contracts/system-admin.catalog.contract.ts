@@ -130,9 +130,24 @@ export const systemAdminWebhookEvents = [
     description: "Tenant module visibility or readiness changed.",
   },
   {
+    value: "system-admin.capability-settings.updated",
+    label: "Capability settings updated",
+    description: "Tenant capability availability changed.",
+  },
+  {
     value: "system-admin.policy.updated",
     label: "Policy updated",
     description: "Tenant policy configuration changed.",
+  },
+  {
+    value: "system-admin.policy_rule.create",
+    label: "Policy rule created",
+    description: "A tenant execution policy rule was created.",
+  },
+  {
+    value: "system-admin.policy_rule.update",
+    label: "Policy rule updated",
+    description: "A tenant execution policy rule was updated.",
   },
   {
     value: "system-admin.approval.updated",
@@ -140,9 +155,54 @@ export const systemAdminWebhookEvents = [
     description: "Tenant approval configuration changed.",
   },
   {
+    value: "system-admin.approval_rule.create",
+    label: "Approval rule created",
+    description: "A tenant approval rule was created.",
+  },
+  {
+    value: "system-admin.approval_rule.update",
+    label: "Approval rule updated",
+    description: "A tenant approval rule was updated.",
+  },
+  {
+    value: "system-admin.audit.view",
+    label: "Audit viewer opened",
+    description: "An operator reviewed the administrative audit log.",
+  },
+  {
+    value: "system-admin.audit.export",
+    label: "Audit evidence exported",
+    description: "Administrative audit evidence was exported to CSV.",
+  },
+  {
     value: "system-admin.security.updated",
     label: "Security updated",
     description: "Tenant security posture changed.",
+  },
+  {
+    value: "system-admin.security.update",
+    label: "Security settings update",
+    description: "Organization security posture was updated.",
+  },
+  {
+    value: "system-admin.security.domain.add",
+    label: "Allowed domain added",
+    description: "A trusted invite domain was added.",
+  },
+  {
+    value: "system-admin.security.domain.remove",
+    label: "Allowed domain removed",
+    description: "A trusted invite domain was removed.",
+  },
+  {
+    value: "system-admin.security.mfa_requirement.update",
+    label: "MFA requirement updated",
+    description: "Admin MFA requirement changed.",
+  },
+  {
+    value: "system-admin.security.session_policy.update",
+    label: "Session policy updated",
+    description: "Session max age or idle timeout changed.",
   },
   {
     value: "system-admin.organization.updated",

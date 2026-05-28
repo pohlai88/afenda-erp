@@ -358,4 +358,11 @@ export const routeErrorCopy = {
       "The sign-in flow could not be completed. Retry or return to the sign-in page.",
     actionLabel: "Try again",
   },
+  systemAdmin: {
+    title: "System admin error",
+    description:
+      "This governance surface could not load. Retry or return to the System Admin hub.",
+    actionLabel: "Try again",
+    hubActionLabel: "Back to hub",
+  },
 } as const;

@@ -1,0 +1,40 @@
+---
+description: Governed renderer contracts — accepted data natures, minimum container widths, maturity gates
+globs: packages/governed-surface/src/metadata/**/*,packages/governed-surface/src/schemas/**/*,packages/governed-surface/scripts/**/*
+alwaysApply: false
+---
+
+# Governed renderer contracts
+
+Single source of truth for renderer-side constraints in `@afenda/governed-surface`.
+**Authoritative TypeScript definition:** `packages/governed-surface/src/metadata/registry.ts` — `AFENDA_GOVERNED_RENDERER_CONTRACTS`.
+**Parity script:** `packages/governed-surface/scripts/check-renderer-contracts.mts` (run via `pnpm lint:governed-renderers`).
+
+> Mutate the table below, the TypeScript map, and the renderer's `*DataNatureSchema` enum **in the same PR**.
+
+## Accepted data natures per renderer
+
+| Renderer id | Accepted `dataNature` values | Min container px | Maturity |
+|---|---|---|---|
+| `stat-card` | `kpi`, `snapshot-summary` | 280 | — |
+| `list-surface` | `table`, `document-lines` | 480 | — |
+| `action-bar` | `actions` | 320 | — |
+| `audit-panel` | `audit-trail` | 360 | — |
+| `detail-tabs` | `tabbed-detail` | 480 | — |
+| `chart` | `time-series`, `categorical` | 360 | — |
+| `kanban-board` | `kanban` | 720 | **production** |
+| `multi-step-form` | `wizard` | 480 | — |
+| `scorecard-form` | `scoring` | 360 | — |
+| `approval-timeline` | `approval-flow` | 320 | — |
+| `section` | *(container — no dataNature)* | 0 | — |
+| `stack` | *(container — no dataNature)* | 0 | — |
+| `empty` | *(container — no dataNature)* | 0 | — |
+
+## Rules
+
+1. **One renderer file per id** — `src/metadata/renderers/<id>.renderer.tsx`. Verified by `pnpm lint:governed-renderers`.
+2. **dataNature contract** — every non-container renderer must declare a Zod `z.enum([...])` of its `acceptedNatures` and reject unknown values at parse time.
+3. **Maturity gate** — renderers with `maturity: "production"` may back mutations. `"preview"` renderers must not trigger writes without a maturity bump PR that also updates this table.
+4. **min container** — renderers below `minContainerPx` must render a denser fallback or be moved to a wider surface; never clip content silently.
+5. **Renderer import allowlist** — renderers may only import from `@afenda/ui`, `@afenda/governed-surface` (shared utils), and external libraries listed in the package's `dependencies`. Run `pnpm lint:governed-renderers` to verify.
+6. **Containers** (`section`, `stack`, `empty`) — never carry `dataNature`; config validated independently of this contract table.

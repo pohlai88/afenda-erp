@@ -1,5 +1,12 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@afenda/ui/tabs";
-
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@afenda/ui/table";
 import type {
   GovernedDetailTabsInput,
   GovernedDetailSection,
@@ -34,42 +41,48 @@ function renderSectionSlot(section: GovernedDetailSection) {
 function RevisionsTable({ rows }: { rows: GovernedRevisionEntry[] }) {
   if (rows.length === 0) {
     return (
-      <p className="rounded-md border border-dashed p-8 text-center text-sm text-muted-foreground">
-        No revision history.
-      </p>
+      <GovernedEmpty
+        model={{ variant: "muted", title: "No revision history." }}
+      />
     );
   }
 
+  // audit-ds: ignore no-raw-typography — column header; no non-uppercase header-cell token exists yet
+  const headerCellClass = "text-xs font-medium";
+
   return (
-    <div className="overflow-x-auto rounded-md border">
-      <table className="w-full min-w-[560px] text-left text-sm">
-        <thead className="border-b bg-muted/40">
-          <tr>
-            <th className="px-3 py-2 font-medium">When</th>
-            <th className="px-3 py-2 font-medium">Verb</th>
-            <th className="px-3 py-2 font-medium">Actor</th>
-            <th className="px-3 py-2 font-medium">Narrative</th>
-          </tr>
-        </thead>
-        <tbody className="divide-y">
+    <div className="rounded-section border">
+      {/* audit-ds: ignore no-arbitrary-value — table minimum scroll width */}
+      <Table className="min-w-[560px] text-left type-control">
+        <TableHeader className="bg-muted/40">
+          <TableRow>
+            <TableHead className={headerCellClass}>When</TableHead>
+            <TableHead className={headerCellClass}>Verb</TableHead>
+            <TableHead className={headerCellClass}>Actor</TableHead>
+            <TableHead className={headerCellClass}>Narrative</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
           {rows.map((row) => (
-            <tr key={row.id}>
-              <td className="px-3 py-2 font-mono text-xs whitespace-nowrap text-muted-foreground">
+            <TableRow key={row.id}>
+              <TableCell className="type-mono-cell whitespace-nowrap">
                 {row.occurredAt}
-              </td>
-              <td className="px-3 py-2 font-mono text-xs uppercase">
+              </TableCell>
+              <TableCell className="type-mono-cell uppercase">
                 {row.verb}
-              </td>
-              <td className="max-w-[180px] truncate px-3 py-2">
+              </TableCell>
+              {/* audit-ds: ignore no-arbitrary-value — revision actor column max-width */}
+              <TableCell className="max-w-[180px] truncate">
                 {row.actorLabel}
-              </td>
-              <td className="max-w-[480px] px-3 py-2 text-muted-foreground">
+              </TableCell>
+              {/* audit-ds: ignore no-arbitrary-value — revision narrative column max-width */}
+              <TableCell className="max-w-[480px] type-muted">
                 {row.narrative}
-              </td>
-            </tr>
+              </TableCell>
+            </TableRow>
           ))}
-        </tbody>
-      </table>
+        </TableBody>
+      </Table>
     </div>
   );
 }
@@ -125,41 +138,41 @@ export function GovernedDetailTabs({ model }: GovernedDetailTabsProps) {
   const auditRows = normalizedModel.audit ?? [];
 
   return (
-    <div data-test="governed-detail-tabs">
-      <Tabs defaultValue={defaultValue} className="gap-4">
+    <div data-testid="governed-detail-tabs">
+      <Tabs defaultValue={defaultValue} className="gap-surface-lg">
         <TabsList
           variant="line"
           className="w-full justify-start overflow-x-auto"
         >
           {kinds.includes("overview") ? (
-            <TabsTrigger value="overview" data-test="tab-overview">
+            <TabsTrigger value="overview" data-testid="tab-overview">
               {normalizedModel.overview.label}
             </TabsTrigger>
           ) : null}
           {kinds.includes("relations") ? (
-            <TabsTrigger value="relations" data-test="tab-relations">
+            <TabsTrigger value="relations" data-testid="tab-relations">
               Relations
             </TabsTrigger>
           ) : null}
           {kinds.includes("referrers") ? (
-            <TabsTrigger value="referrers" data-test="tab-referrers">
+            <TabsTrigger value="referrers" data-testid="tab-referrers">
               Referrers
             </TabsTrigger>
           ) : null}
           {kinds.includes("revisions") ? (
-            <TabsTrigger value="revisions" data-test="tab-revisions">
+            <TabsTrigger value="revisions" data-testid="tab-revisions">
               Revisions
             </TabsTrigger>
           ) : null}
           {kinds.includes("audit") ? (
-            <TabsTrigger value="audit" data-test="tab-audit">
+            <TabsTrigger value="audit" data-testid="tab-audit">
               Audit
             </TabsTrigger>
           ) : null}
         </TabsList>
 
         {kinds.includes("overview") ? (
-          <TabsContent value="overview" data-test="tab-panel-overview">
+          <TabsContent value="overview" data-testid="tab-panel-overview">
             {normalizedModel.overview.hidden ? (
               <GovernedEmpty
                 model={{
@@ -169,9 +182,9 @@ export function GovernedDetailTabs({ model }: GovernedDetailTabsProps) {
                 }}
               />
             ) : (
-              <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-surface-lg">
                 {normalizedModel.overview.description ? (
-                  <p className="text-sm text-muted-foreground">
+                  <p className="type-muted">
                     {normalizedModel.overview.description}
                   </p>
                 ) : null}
@@ -182,8 +195,8 @@ export function GovernedDetailTabs({ model }: GovernedDetailTabsProps) {
         ) : null}
 
         {kinds.includes("relations") ? (
-          <TabsContent value="relations" data-test="tab-panel-relations">
-            <div className="flex flex-col gap-6">
+          <TabsContent value="relations" data-testid="tab-panel-relations">
+            <div className="flex flex-col gap-surface-2xl">
               {relations.map((section) => (
                 <section
                   key={section.id}
@@ -191,13 +204,13 @@ export function GovernedDetailTabs({ model }: GovernedDetailTabsProps) {
                   aria-labelledby={`governed-detail-relations-${section.id}`}
                 >
                   <h3
-                    className="text-base font-semibold tracking-tight"
+                    className="type-subtitle"
                     id={`governed-detail-relations-${section.id}`}
                   >
                     {section.label}
                   </h3>
                   {section.description ? (
-                    <p className="text-sm text-muted-foreground">
+                    <p className="type-muted">
                       {section.description}
                     </p>
                   ) : null}
@@ -209,8 +222,8 @@ export function GovernedDetailTabs({ model }: GovernedDetailTabsProps) {
         ) : null}
 
         {kinds.includes("referrers") ? (
-          <TabsContent value="referrers" data-test="tab-panel-referrers">
-            <div className="flex flex-col gap-6">
+          <TabsContent value="referrers" data-testid="tab-panel-referrers">
+            <div className="flex flex-col gap-surface-2xl">
               {referrers.map((section) => (
                 <section
                   key={section.id}
@@ -218,13 +231,13 @@ export function GovernedDetailTabs({ model }: GovernedDetailTabsProps) {
                   aria-labelledby={`governed-detail-referrers-${section.id}`}
                 >
                   <h3
-                    className="text-base font-semibold tracking-tight"
+                    className="type-subtitle"
                     id={`governed-detail-referrers-${section.id}`}
                   >
                     {section.label}
                   </h3>
                   {section.description ? (
-                    <p className="text-sm text-muted-foreground">
+                    <p className="type-muted">
                       {section.description}
                     </p>
                   ) : null}
@@ -236,13 +249,13 @@ export function GovernedDetailTabs({ model }: GovernedDetailTabsProps) {
         ) : null}
 
         {kinds.includes("revisions") ? (
-          <TabsContent value="revisions" data-test="tab-panel-revisions">
+          <TabsContent value="revisions" data-testid="tab-panel-revisions">
             <RevisionsTable rows={revisions} />
           </TabsContent>
         ) : null}
 
         {kinds.includes("audit") ? (
-          <TabsContent value="audit" data-test="tab-panel-audit">
+          <TabsContent value="audit" data-testid="tab-panel-audit">
             <GovernedAuditPanel
               model={{
                 dataNature: "audit-trail",

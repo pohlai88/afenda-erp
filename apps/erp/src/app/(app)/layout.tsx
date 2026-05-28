@@ -1,5 +1,10 @@
 import { getOrganizationContext } from "@afenda/auth/server";
 import {
+  listTenantCapabilitySettings,
+  listTenantModuleSettings,
+} from "@afenda/feature-system-admin/server";
+import {
+  applyTenantNavigationAvailability,
   getAccessibleModules,
   getNavigationExtensions,
   roleOperatingPosture,
@@ -29,7 +34,20 @@ async function ProtectedLayoutInner({
   children: React.ReactNode;
 }>) {
   const { session, organization } = await getOrganizationContext();
-  const accessibleModules = getAccessibleModules(organization.capabilities);
+  const [moduleSettings, capabilitySettings] = await Promise.all([
+    listTenantModuleSettings({
+      organizationId: organization.id,
+      limit: 100,
+    }),
+    listTenantCapabilitySettings({
+      organizationId: organization.id,
+      limit: 500,
+    }),
+  ]);
+  const accessibleModules = applyTenantNavigationAvailability(
+    getAccessibleModules(organization.capabilities),
+    { moduleSettings, capabilitySettings },
+  );
   const navigationExtensions = getNavigationExtensions(
     organization.capabilities,
   );

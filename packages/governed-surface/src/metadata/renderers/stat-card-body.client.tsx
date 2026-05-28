@@ -36,20 +36,20 @@ const ICON_MAP: Record<StatCardIcon, LucideIcon> = {
 const ACCENT_RAIL_CLASS: Record<StatCardTone, string> = {
   positive: "border-l-success",
   attention: "border-l-warning",
-  critical: "border-l-destructive",
+  critical: "border-l-critical",
   default: "border-l-transparent",
 };
 
 const DELTA_TONE_CLASS: Record<StatCardTone, string> = {
   positive: "text-success",
   attention: "text-warning-foreground",
-  critical: "text-destructive",
+  critical: "text-critical",
   default: "text-muted-foreground",
 };
 
 const COMPARISON_DIRECTION_CLASS = {
   up: "text-success",
-  down: "text-destructive",
+  down: "text-critical",
   flat: "text-muted-foreground",
 } as const;
 
@@ -74,14 +74,12 @@ export function StatCardBody({ stat, density }: StatCardBodyProps) {
   const inner = (
     <>
       <div className="flex items-start justify-between gap-2">
-        <span className="text-label-small font-medium tracking-wide text-muted-foreground uppercase">
-          {stat.label}
-        </span>
+        <span className="type-label">{stat.label}</span>
         {Icon ? (
           <Icon className="size-4 shrink-0 text-muted-foreground" aria-hidden />
         ) : null}
       </div>
-      <span className="text-headline-small font-semibold tracking-tight text-foreground tabular-nums">
+      <span className="type-card-title tabular-nums text-foreground">
         {numericValue !== null &&
         stat.animateValue !== false &&
         !reduceMotion ? (
@@ -103,16 +101,14 @@ export function StatCardBody({ stat, density }: StatCardBodyProps) {
             aria-label={stat.progress.label ?? stat.label}
           />
           {stat.progress.label ? (
-            <span className="text-label-small text-muted-foreground">
-              {stat.progress.label}
-            </span>
+            <span className="type-caption">{stat.progress.label}</span>
           ) : null}
         </div>
       ) : null}
       {stat.comparison ? (
         <span
           className={cn(
-            "text-label-small font-medium",
+            "type-caption font-medium",
             COMPARISON_DIRECTION_CLASS[stat.comparison.direction],
           )}
         >
@@ -121,7 +117,7 @@ export function StatCardBody({ stat, density }: StatCardBodyProps) {
       ) : stat.delta !== undefined ? (
         <span
           className={cn(
-            "text-label-small font-medium",
+            "type-caption font-medium",
             DELTA_TONE_CLASS[stat.tone],
           )}
         >
@@ -141,7 +137,7 @@ export function StatCardBody({ stat, density }: StatCardBodyProps) {
   if (stat.href) {
     const linkClass = cn(
       contentClass,
-      "rounded-xl transition-colors hover:bg-muted/40 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none",
+      "rounded-card transition-colors hover:bg-muted/40 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none",
     );
     if (stat.href.startsWith("?") || stat.href.startsWith("#")) {
       return (

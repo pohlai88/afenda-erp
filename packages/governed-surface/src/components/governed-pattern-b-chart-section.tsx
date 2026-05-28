@@ -2,7 +2,7 @@ import "server-only";
 
 import type { ReactNode } from "react";
 import { GovernedComponentRenderer } from "../metadata/index";
-import { logUnexpectedServerError } from "../adapters/logger.server";
+import { logUnexpectedServerError } from "../data/governed-logging.server";
 import { getGovernedSurfaceTranslations } from "../i18n/governed-surface-copy";
 
 import type { EmptyState } from "../schemas/list-surface.schema";
@@ -10,13 +10,13 @@ import {
   parseGovernedChartConfiguration,
   type GovernedChartConfigurationInput,
 } from "../schemas/chart.schema";
-import { GovernedEmpty } from "./governed-empty";
+import { type GovernedSurfaceSectionCardBody } from "./governed-surface-section-card";
 import {
-  GovernedSurfaceSectionCard,
-  type GovernedSurfaceSectionCardBody,
-} from "./governed-surface-section-card";
+  renderGovernedPatternSectionShell,
+  type GovernedPatternSectionLayout,
+} from "./governed-pattern-section-shell.shared";
 
-export type GovernedPatternBChartSectionLayout = "card" | "embedded";
+export type GovernedPatternBChartSectionLayout = GovernedPatternSectionLayout;
 
 export type GovernedPatternBChartSectionProps = {
   title: string;
@@ -36,64 +36,6 @@ export type GovernedPatternBChartSectionProps = {
 
 export function governedChartSectionTestId(surfaceKey: string): string {
   return `governed-chart-section:${surfaceKey}`;
-}
-
-function renderChartBody(body: GovernedSurfaceSectionCardBody) {
-  if (body.state === "forbidden" || body.state === "invalid") {
-    return <GovernedEmpty model={body.model} />;
-  }
-  return body.children;
-}
-
-type RenderSectionShellInput = {
-  layout: GovernedPatternBChartSectionLayout;
-  className?: string;
-  sectionTestId: string;
-  headerSlot?: ReactNode;
-  title: string;
-  description?: string;
-  headerAction?: ReactNode;
-  body: GovernedSurfaceSectionCardBody;
-  cardClassName?: string;
-  contentClassName?: string;
-};
-
-function renderSectionShell({
-  layout,
-  className,
-  sectionTestId,
-  headerSlot,
-  title,
-  description,
-  headerAction,
-  body,
-  cardClassName,
-  contentClassName,
-}: RenderSectionShellInput) {
-  const chartBody = renderChartBody(body);
-
-  if (layout === "embedded") {
-    return (
-      <div className={className} data-testid={sectionTestId}>
-        {headerSlot}
-        <div className={contentClassName}>{chartBody}</div>
-      </div>
-    );
-  }
-
-  return (
-    <div className={className} data-testid={sectionTestId}>
-      {headerSlot}
-      <GovernedSurfaceSectionCard
-        title={title}
-        description={description}
-        body={body}
-        headerAction={headerAction}
-        className={cardClassName}
-        contentClassName={contentClassName}
-      />
-    </div>
-  );
 }
 
 export async function GovernedPatternBChartSection({
@@ -137,11 +79,11 @@ export async function GovernedPatternBChartSection({
       state: "invalid",
       model: loadError,
     };
-    return renderSectionShell({ ...shellInput, body });
+    return renderGovernedPatternSectionShell({ ...shellInput, body });
   }
 
   if (forbidden) {
-    return renderSectionShell({
+    return renderGovernedPatternSectionShell({
       ...shellInput,
       body: { state: "forbidden", model: forbidden },
     });
@@ -173,5 +115,5 @@ export async function GovernedPatternBChartSection({
     };
   }
 
-  return renderSectionShell({ ...shellInput, body });
+  return renderGovernedPatternSectionShell({ ...shellInput, body });
 }

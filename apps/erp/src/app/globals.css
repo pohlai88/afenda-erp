@@ -112,6 +112,19 @@
   --sidebar-accent-foreground: var(--foreground);
   --sidebar-border: var(--line);
   --sidebar-ring: var(--ring);
+
+  /* Split-panel detail width — tokenised so layout compositions stay aligned. */
+  --split-panel: 22rem;
+
+  /* Z-index stacking contexts — deterministic ERP shell layering. */
+  --z-base: 0;
+  --z-raised: 10;
+  --z-sidebar: 100;
+  --z-commandbar: 200;
+  --z-overlay: 300;
+  --z-modal: 400;
+  --z-tooltip: 500;
+  --z-toast: 600;
 }
 
 @theme inline {
@@ -223,6 +236,15 @@
   --spacing-commandbar: var(--commandbar);
   --spacing-page-gutter: var(--page-gutter);
   --spacing-page-gutter-lg: var(--page-gutter-lg);
+  --spacing-field-px: var(--af-field-px);
+  --spacing-field-py: var(--af-field-py);
+  --spacing-textarea-px: var(--af-textarea-px);
+  --spacing-textarea-py: var(--af-textarea-py);
+  --spacing-menu-item-px: var(--af-menu-item-px);
+  --spacing-menu-item-py: var(--af-menu-item-py);
+  --spacing-table-head: var(--af-table-head-height);
+  --spacing-table-cell-px: var(--af-table-cell-px);
+  --spacing-table-cell-py: var(--af-table-cell-py);
   --spacing-surface-xs: var(--space-surface-xs);
   --spacing-surface-sm: var(--space-surface-sm);
   --spacing-surface-md: var(--space-surface-md);
@@ -260,6 +282,23 @@
   --animate-material-resolving: material-resolving 1.4s
     var(--motion-ease-standard) infinite;
   --breakpoint-3xl: 120rem;
+  --text-title-5: 1.125rem;
+  --duration-fast: var(--motion-duration-fast);
+  --duration-base: var(--motion-duration-base);
+  --duration-slow: var(--motion-duration-slow);
+  --z-base: var(--z-base);
+  --z-raised: var(--z-raised);
+  --z-sidebar: var(--z-sidebar);
+  --z-commandbar: var(--z-commandbar);
+  --z-overlay: var(--z-overlay);
+  --z-modal: var(--z-modal);
+  --z-tooltip: var(--z-tooltip);
+  --z-toast: var(--z-toast);
+  --container-xs: 20rem;
+  --container-sm: 32rem;
+  --container-md: 48rem;
+  --container-lg: 64rem;
+  --spacing-split-panel: var(--split-panel);
 
   @keyframes surface-in {
     from {
@@ -330,6 +369,30 @@ a {
   text-decoration: none;
 }
 
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@media print {
+  body {
+    background: white;
+    color: black;
+  }
+  .af-material-opaque,
+  .af-material-muted,
+  .af-material-subtle {
+    background: white !important;
+    box-shadow: none !important;
+  }
+}
+
 .dark {
   color-scheme: dark;
 
@@ -386,7 +449,7 @@ a {
   --sidebar-primary-foreground: var(--primary-foreground);
   --sidebar-accent: var(--surface);
   --sidebar-accent-foreground: var(--foreground);
-  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-border: var(--line);
   --sidebar-ring: var(--ring);
 }
 
@@ -411,84 +474,86 @@ a {
   }
 }
 
-@layer components {
-  .af-material-opaque {
-    background: color-mix(
-      in oklab,
-      var(--card) var(--material-opacity-solid),
-      transparent
-    );
-    border-color: var(--border);
-    box-shadow: var(--shadow-elevation-1);
-  }
+@utility af-material-opaque {
+  background: color-mix(
+    in oklab,
+    var(--card) var(--material-opacity-solid),
+    transparent
+  );
+  border-color: var(--border);
+  box-shadow: var(--shadow-elevation-1);
 
-  .af-material-muted {
-    background: color-mix(
-      in oklab,
-      var(--muted) var(--material-opacity-muted),
-      transparent
-    );
-    border-color: var(--border);
-  }
-
-  .af-material-subtle {
-    background: color-mix(
-      in oklab,
-      var(--card) var(--material-opacity-subtle),
-      transparent
-    );
-    border-color: color-mix(in oklab, var(--border) 70%, transparent);
-  }
-
-  .af-material-interactive {
-    transition:
-      background-color var(--motion-duration-fast) var(--motion-ease-standard),
-      border-color var(--motion-duration-fast) var(--motion-ease-standard),
-      box-shadow var(--motion-duration-fast) var(--motion-ease-standard),
-      transform var(--motion-duration-fast) var(--motion-ease-standard);
-  }
-
-  .af-material-interactive:hover {
-    background: var(--surface-hover);
-    border-color: color-mix(in oklab, var(--foreground) 18%, var(--border));
-  }
-
-  .af-material-opaque:focus-within,
-  .af-material-opaque[data-phase="focus"] {
+  &:focus-within,
+  &[data-phase="focus"] {
     box-shadow: var(--shadow-elevation-2), var(--shadow-focus-ring);
   }
 
-  .af-material-opaque[data-phase="resolving"],
-  .af-material-opaque[data-lynx="resolving"] {
+  &[data-phase="resolving"],
+  &[data-lynx="resolving"] {
     animation: var(--animate-material-resolving);
     border-color: color-mix(in oklab, var(--info) 42%, var(--border));
   }
 
-  .af-material-opaque[data-phase="execution"] {
+  &[data-phase="execution"] {
     border-color: color-mix(in oklab, var(--warning) 48%, var(--border));
   }
 
-  .af-material-opaque[data-lynx="warning"] {
+  &[data-lynx="warning"] {
     border-color: color-mix(in oklab, var(--warning) 58%, var(--border));
   }
 
-  .af-material-opaque[data-lynx="mismatch"] {
+  &[data-lynx="mismatch"] {
     border-color: color-mix(in oklab, var(--critical) 58%, var(--border));
   }
+}
 
-  .af-enterprise-grid {
-    display: grid;
-    gap: var(--space-surface-lg);
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+@utility af-material-muted {
+  background: color-mix(
+    in oklab,
+    var(--muted) var(--material-opacity-muted),
+    transparent
+  );
+  border-color: var(--border);
+}
+
+@utility af-material-subtle {
+  background: color-mix(
+    in oklab,
+    var(--card) var(--material-opacity-subtle),
+    transparent
+  );
+  border-color: color-mix(in oklab, var(--border) 70%, transparent);
+}
+
+@utility af-material-interactive {
+  transition:
+    background-color var(--motion-duration-fast) var(--motion-ease-standard),
+    border-color var(--motion-duration-fast) var(--motion-ease-standard),
+    box-shadow var(--motion-duration-fast) var(--motion-ease-standard),
+    transform var(--motion-duration-fast) var(--motion-ease-standard);
+
+  &:hover {
+    background: var(--surface-hover);
+    border-color: color-mix(in oklab, var(--foreground) 18%, var(--border));
   }
+}
 
-  .af-focus-ring {
-    outline: none;
-  }
+@utility af-enterprise-grid {
+  @apply grid gap-surface-lg;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+}
 
-  .af-focus-ring:focus-visible {
+@utility af-focus-ring {
+  outline: none;
+
+  &:focus-visible {
     box-shadow: var(--shadow-focus-ring);
   }
+}
+
+@utility af-backdrop {
+  backdrop-filter: blur(var(--material-blur));
+  -webkit-backdrop-filter: blur(var(--material-blur));
 }
 
 @utility type-display {
@@ -576,14 +641,11 @@ a {
 }
 
 @utility table-header-cell {
-  height: var(--af-table-head-height);
-  padding-inline: var(--af-table-cell-px);
-  @apply text-left text-micro leading-caption font-semibold tracking-label text-muted-foreground uppercase;
+  @apply h-table-head px-table-cell-px text-left text-micro leading-caption font-semibold tracking-label text-muted-foreground uppercase;
 }
 
 @utility table-cell {
-  padding: var(--af-table-cell-py) var(--af-table-cell-px);
-  @apply text-body-sm leading-body align-middle;
+  @apply px-table-cell-px py-table-cell-py text-body-sm leading-body align-middle;
 }
 
 @utility table-row-interactive {
@@ -651,5 +713,13 @@ a {
 }
 
 @utility split-grid {
-  @apply grid gap-surface-lg lg:grid-cols-[minmax(0,1fr)_22rem];
+  @apply grid gap-surface-lg lg:grid-cols-[minmax(0,1fr)_var(--split-panel)];
+}
+
+@utility surface-section {
+  @apply rounded-section border border-border bg-surface;
+}
+
+@utility type-subtitle {
+  @apply font-heading text-title-5 leading-title tracking-title font-semibold;
 }

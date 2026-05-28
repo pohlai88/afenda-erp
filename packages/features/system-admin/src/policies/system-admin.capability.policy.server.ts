@@ -226,6 +226,13 @@ export function requireSystemAdminDiagnosticsRead() {
   ]);
 }
 
+export function requireSystemAdminAuditRead() {
+  return requireSystemAdminAnyCapability([
+    "system-admin.audit.read",
+    "system-admin.settings.read",
+  ]);
+}
+
 export function requireSystemAdminAuditExport() {
   return requireSystemAdminCapability("system-admin.audit.export");
 }
@@ -254,4 +261,23 @@ export function requireSystemAdminSettingsWrite() {
     "system-admin.security.manage",
     "system-admin.settings.write",
   ]);
+}
+
+export function requireSystemAdminIntegrationsRead() {
+  return requireSystemAdminCapability("system-admin.integrations.read");
+}
+
+export function requireSystemAdminMachineLayerRead() {
+  return requireSystemAdminCapability("system-admin.machine-layer.read");
+}
+
+export function requireSystemAdminReliabilityRead() {
+  return requireSystemAdminAnyCapability([
+    "system-admin.reliability.read",
+    "system-admin.diagnostics.read",
+  ]);
+}
+
+export function requireSystemAdminBillingRead() {
+  return requireSystemAdminCapability("system-admin.billing.read");
 }

@@ -27,9 +27,33 @@ export class ExecutionPolicyDeniedError extends Error {
     readonly targetType: string,
     readonly targetId: string | undefined,
     readonly reason = "Execution policy denied this action.",
+    readonly effect:
+      | "deny"
+      | "lock"
+      | "require_approval"
+      | "warn"
+      | "allow" = "deny",
+    readonly policyRuleId?: string,
+    readonly approvalRuleId?: string,
   ) {
     super(reason);
     this.name = "ExecutionPolicyDeniedError";
+  }
+}
+
+export class ExecutionPolicyApprovalRequiredError extends Error {
+  readonly code = "EXECUTION_POLICY_APPROVAL_REQUIRED";
+
+  constructor(
+    readonly action: string,
+    readonly targetType: string,
+    readonly targetId: string | undefined,
+    readonly reason = "This action requires approval before it can execute.",
+    readonly policyRuleId?: string,
+    readonly approvalRuleId?: string,
+  ) {
+    super(reason);
+    this.name = "ExecutionPolicyApprovalRequiredError";
   }
 }
 

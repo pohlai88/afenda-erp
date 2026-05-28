@@ -8,8 +8,7 @@ import {
 import { parseGovernedStackConfiguration } from "../../schemas/stack.schema";
 import {
   densityGapClass,
-  elevationClass,
-  surfaceMaterialClass,
+  elevatedChromeFrameClass,
 } from "../../schemas/surface-chrome.classes";
 import { cn } from "@afenda/ui/utils";
 
@@ -67,8 +66,8 @@ export function StackRenderer({
   const bentoClass =
     direction === "bento"
       ? bentoTemplate === "chart-sidebar-table"
-        ? "grid gap-4 @lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] @lg:grid-rows-[auto_1fr]"
-        : "grid gap-4 @sm:grid-cols-2 @xl:grid-cols-4"
+        ? "grid gap-surface-lg @lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] @lg:grid-rows-[auto_1fr]"
+        : "grid gap-surface-lg @sm:grid-cols-2 @xl:grid-cols-4"
       : undefined;
 
   return (
@@ -83,11 +82,8 @@ export function StackRenderer({
             : "flex-col",
         bentoClass,
         direction !== "bento" && densityGapClass(chrome?.density),
-        direction === "bento" && "gap-4",
-        elevationClass(chrome?.elevation),
-        surfaceMaterialClass(chrome?.surface),
-        chrome?.elevation !== "flat" &&
-          "rounded-2xl border border-border/60 p-4",
+        direction === "bento" && "gap-surface-lg",
+        elevatedChromeFrameClass(chrome?.elevation, chrome?.surface),
       )}
     >
       {renderChildren(children, diagnostics)}

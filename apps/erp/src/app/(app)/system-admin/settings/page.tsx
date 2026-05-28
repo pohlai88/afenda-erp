@@ -1,10 +1,12 @@
 import {
   buildTenantSettingsListSurface,
+  systemAdminSettingsSurfaceKey,
+} from "@afenda/feature-system-admin/metadata";
+import {
   ensureTenantSettings,
   getOrganizationProfile,
   getTenantSettings,
   requireSystemAdminOrganizationRead,
-  systemAdminSettingsSurfaceKey,
   updateTenantSettingsAction,
 } from "@afenda/feature-system-admin/server";
 import { TenantSettingsForm } from "@afenda/feature-system-admin/client";

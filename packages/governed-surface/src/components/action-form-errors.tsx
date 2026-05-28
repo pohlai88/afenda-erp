@@ -31,10 +31,10 @@ export function ActionFormErrors<T>({
       <AlertDescription className="flex flex-col gap-2">
         {title ? <p>{result.error}</p> : null}
         {result.code ? (
-          <p className="font-mono text-xs text-destructive/90">{result.code}</p>
+          <p className="type-mono-cell text-critical/90">{result.code}</p>
         ) : null}
         {entries.length > 0 ? (
-          <ul className="flex list-inside list-disc flex-col gap-1 text-sm">
+          <ul className="flex list-inside list-disc flex-col gap-1 type-body">
             {entries.map(([field, message]) => (
               <li key={field}>
                 <span className="font-medium">{field}</span>

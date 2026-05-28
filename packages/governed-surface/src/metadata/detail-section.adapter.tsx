@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-import { GovernedEmpty } from "../components/governed-empty";
+import { GovernedEmpty } from "../client";
 import { toGovernedComponentEnvelopeFromDetailSection } from "../governed-configuration.shared";
 import type { GovernedDetailSection } from "../schemas/detail-tabs.schema";
 

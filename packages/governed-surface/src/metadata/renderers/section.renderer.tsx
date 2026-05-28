@@ -7,8 +7,7 @@ import {
 import { parseGovernedSectionConfiguration } from "../../schemas/section.schema";
 import {
   densityGapClass,
-  elevationClass,
-  surfaceMaterialClass,
+  elevatedChromeFrameClass,
 } from "../../schemas/surface-chrome.classes";
 import { cn } from "@afenda/ui/utils";
 
@@ -72,10 +71,7 @@ export function SectionRenderer({
         className={cn(
           "flex flex-col",
           gapClass,
-          elevationClass(chrome?.elevation),
-          surfaceMaterialClass(chrome?.surface),
-          chrome?.elevation !== "flat" &&
-            "rounded-2xl border border-border/60 p-4",
+          elevatedChromeFrameClass(chrome?.elevation, chrome?.surface),
         )}
       >
         {renderChildren(children, diagnostics)}
@@ -90,10 +86,7 @@ export function SectionRenderer({
       className={cn(
         "flex flex-col",
         gapClass,
-        elevationClass(chrome?.elevation),
-        surfaceMaterialClass(chrome?.surface),
-        chrome?.elevation !== "flat" &&
-          "rounded-2xl border border-border/60 p-4",
+        elevatedChromeFrameClass(chrome?.elevation, chrome?.surface),
       )}
     >
       {renderChildren(children, diagnostics)}

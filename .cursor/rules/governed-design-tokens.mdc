@@ -1,0 +1,142 @@
+---
+description: Design-system token contracts — banned raw Tailwind primitives, required semantic replacements, suppression syntax
+globs: packages/governed-surface/src/**/*,apps/erp/src/**/*,packages/features/*/src/**/*
+alwaysApply: false
+---
+
+# Design-system token contracts
+
+Single source of truth for token usage in `@afenda/governed-surface` and consumer packages.
+**Authoritative TypeScript definition:** `packages/ui/src/design-system.ts` — `uiTypography`, `uiRadius`, `uiZIndex`, `uiStatusToneClasses`, `uiRiskToneClasses`, `uiSurfaceElevation`.
+**Enforcement script:** `pnpm audit:governed-design-tokens --strict` (gates CI; exits 1 on error-level violations).
+**Suppression syntax:** add a same-line comment `// audit-ds: ignore <rule-id> — <reason>`.
+
+---
+
+## Required token mappings
+
+### Typography — `no-raw-typography`
+
+Never write raw `text-xs`, `text-sm`, `text-base`, `text-lg`, `text-xl`, `text-2xl`, `text-3xl` in `.tsx` files inside governed-surface or feature packages. Use the `type-*` semantic utilities from `globals.css` and `uiTypography` from `@afenda/ui/design-system`.
+
+| Raw class | Semantic replacement | Intent |
+|---|---|---|
+| `text-xs text-muted-foreground` | `type-caption` | Secondary metadata, timestamps |
+| `text-xs font-medium` | `type-label` | Badge/chip text, column headers |
+| `text-xs` (mono table cell) | `type-mono-cell` | Code, IDs, audit field values |
+| `text-sm` (body copy) | `type-body` | Paragraph text, descriptions |
+| `text-sm text-muted-foreground` | `type-muted` | Secondary body paragraph |
+| `text-sm` (form/input label) | `type-control` | Input labels, form field text |
+| `text-base` on `<CardTitle>` | remove override — `CardTitle` default is correct | CardTitle already applies `type-card-title` |
+| `text-lg` | `type-card-title` | Card / dialog header |
+| `text-xl`, `text-2xl` | `type-section-title` | Section header |
+| `text-3xl` | `type-page-title` | Page-level title |
+
+Utility class reference (defined in `apps/erp/src/app/globals.css`):
+- `type-caption` — `text-caption leading-caption text-muted-foreground`
+- `type-body` — `text-body leading-body`
+- `type-muted` — `text-body leading-body text-muted-foreground`
+- `type-control` — `text-body-sm leading-control tracking-control`
+- `type-label` — `text-micro leading-caption font-semibold tracking-label text-muted-foreground uppercase`
+- `type-mono-cell` — `font-mono text-caption leading-caption tracking-code`
+- `type-card-title` — `font-heading text-title-4 leading-title tracking-title font-semibold`
+- `type-section-title` — `font-heading text-title-3 leading-title tracking-title font-semibold`
+- `type-subtitle` — `font-heading text-title-5 leading-title tracking-title font-semibold`
+- `type-page-title` — `font-heading text-title-1 leading-heading tracking-heading font-semibold`
+
+---
+
+### Radius — `no-raw-radius`
+
+Never write `rounded-sm/md/lg/xl/2xl/3xl`. Use semantic radius tokens:
+
+| Raw | Replacement | Context |
+|---|---|---|
+| `rounded-md` | `rounded-control` | Inputs, buttons, chips, small UI |
+| `rounded-lg` | `rounded-section` | Section containers, timeline items |
+| `rounded-xl` | `rounded-card` | Cards, panels, skeleton placeholders |
+| `rounded-2xl` | `rounded-panel` | Elevated chrome shells |
+| `rounded-3xl` | `rounded-panel` | Same as 2xl — use `rounded-panel` |
+
+---
+
+### Z-index — `no-raw-z-numeric`
+
+Never write `z-10`, `z-50`, `z-[1]`, or any numeric/bracket z-index. Use `uiZIndex` tokens:
+
+| Replacement | CSS variable | Typical usage |
+|---|---|---|
+| `z-raised` | `--z-raised` | Sticky table headers, floating toolbars |
+| `z-overlay` | `--z-overlay` | Dropdown/popover overlays |
+| `z-modal` | `--z-modal` | Modal dialogs, drawers |
+| `z-tooltip` | `--z-tooltip` | Tooltips |
+| `z-sidebar` | `--z-sidebar` | Sidebar navigation |
+
+---
+
+### Status/severity tones — `no-destructive-as-status`
+
+`bg-destructive`, `text-destructive`, `border-destructive` are reserved for **destructive actions** (delete buttons, confirm-destroy dialogs). They must **not** be used for operational status or severity.
+
+Use `critical` tokens for ERP severity states:
+
+| Wrong | Correct |
+|---|---|
+| `bg-destructive/10` | `bg-critical/10` |
+| `border-destructive/40` | `border-critical/40` |
+| `text-destructive` | `text-critical` |
+| `text-destructive/90` | `text-critical/90` |
+
+---
+
+### Shadows — `no-raw-elevation-shadow`
+
+Never write `shadow-sm`, `shadow-md`, `shadow-lg`, `shadow-xl`, `shadow-2xl`. Use elevation tokens:
+
+| Raw | Replacement |
+|---|---|
+| `shadow-sm` | `shadow-elevation-1` |
+| `shadow-md` | `shadow-elevation-2` |
+| `shadow-lg` | `shadow-elevation-3` |
+
+---
+
+### Arbitrary values — `no-arbitrary-value`
+
+Arbitrary Tailwind values (`w-[28rem]`, `text-[11px]`, `z-[1]`, etc.) are banned unless suppressed with a documented reason. **Every unsuppressed arbitrary value is a token bypass.**
+
+**Allowlist via suppression:**
+```tsx
+// Correct — documents the layout contract
+const cls = "min-w-[720px]"; // audit-ds: ignore no-arbitrary-value — table minimum scroll width
+<div className="max-h-[32rem] overflow-auto"> {/* audit-ds: ignore no-arbitrary-value — virtual scroll viewport */}
+```
+
+**Never suppress without a reason string after the `—`.**
+
+---
+
+### Viewport breakpoints — `no-viewport-breakpoint`
+
+Inside governed renderers, never use viewport breakpoints (`sm:`, `md:`, `lg:`, `xl:`, `2xl:`). Governed renderers are placed in containers of unknown width — only container queries are correct.
+
+| Wrong | Correct |
+|---|---|
+| `sm:grid-cols-2` | `@sm:grid-cols-2` (requires `@container` on parent) |
+| `lg:flex-row` | `@lg:flex-row` |
+
+Exception: top-level page layout components (e.g. `GovernedSurface`) that are always full-viewport may use viewport breakpoints with a suppression comment.
+
+---
+
+## Enforcement
+
+| Gate | Command | Fail condition |
+|---|---|---|
+| Build gate | `@afenda/governed-surface` `pnpm build` (runs `audit:design-tokens` first) | Any `error`-level violation in `governed-surface` |
+| CI / local | `pnpm audit:governed-design-tokens --strict` | Same as build gate |
+| Advisory scan | `pnpm audit:governed-design-tokens --scope=all` | Never fails (informational) |
+| Renderer parity | `pnpm lint:governed-renderers` | Registry/contract mismatch |
+| Architecture | `pnpm architecture:check` | Package boundary violation |
+
+Run all gates before closing a PR that touches `packages/governed-surface`, `packages/ui/src/design-system.ts`, or `apps/erp/src/app/globals.css`.

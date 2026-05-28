@@ -22,6 +22,26 @@ const overviewLinks = [
     title: "Roles",
     description: "Assign or remove seeded tenant roles.",
   },
+  {
+    href: systemAdminRoutePaths.policies,
+    title: "Policies",
+    description: "Configure lock, deny, and approval-required execution rules.",
+  },
+  {
+    href: systemAdminRoutePaths.approvals,
+    title: "Approvals",
+    description: "Define approver roles and minimum approvals for governed actions.",
+  },
+  {
+    href: systemAdminRoutePaths.audit,
+    title: "Audit viewer",
+    description: "Search administrative evidence with redacted metadata detail.",
+  },
+  {
+    href: systemAdminRoutePaths.security,
+    title: "Security",
+    description: "Manage MFA, session policy, invite domains, and admin protections.",
+  },
 ] as const;
 
 export function SystemAdminOverviewPage({
@@ -34,6 +54,8 @@ export function SystemAdminOverviewPage({
     { label: "Pending invites", value: snapshot.pendingInviteCount },
     { label: "Active memberships", value: snapshot.activeMembershipCount },
     { label: "Roles", value: snapshot.roleCount },
+    { label: "Active policy rules", value: snapshot.activePolicyRuleCount },
+    { label: "Active approval rules", value: snapshot.activeApprovalRuleCount },
     { label: "Recent admin changes", value: snapshot.recentAdminChangeCount },
   ];
 
@@ -42,18 +64,18 @@ export function SystemAdminOverviewPage({
       <SectionPanel
         headingLevel={1}
         title="System Admin"
-        description="Phase 1 control surface for users, memberships, roles, and recent audit evidence."
+        description="Tenant governance hub for identity, execution policy, approvals, and audit evidence."
       >
-        <div className="grid gap-3 md:grid-cols-5">
+        <div className="grid gap-3 md:grid-cols-3 lg:grid-cols-4">
           {stats.map((stat) => (
             <div
               key={stat.label}
               className={cn(ui.radius.panel, "border border-line bg-card p-4")}
             >
-              <div className="text-xs uppercase tracking-wide text-muted-foreground">
+              <div className="type-label">
                 {stat.label}
               </div>
-              <div className="mt-2 text-2xl font-semibold text-foreground">
+              <div className="mt-2 type-section-title">
                 {stat.value}
               </div>
             </div>
@@ -71,10 +93,10 @@ export function SystemAdminOverviewPage({
               "border border-line bg-card p-4 transition hover:bg-surface-strong",
             )}
           >
-            <h2 className="text-base font-semibold text-foreground">
+            <h2 className="type-card-title">
               {link.title}
             </h2>
-            <p className="mt-2 text-sm text-muted-foreground">
+            <p className="mt-2 type-muted">
               {link.description}
             </p>
           </Link>
@@ -86,26 +108,30 @@ export function SystemAdminOverviewPage({
         description="Latest administrative changes written to the audit contract."
       >
         {snapshot.recentAdminChanges.length === 0 ? (
-          <p className="text-sm text-muted-foreground">
+          <p className="type-muted">
             No recent administrative audit events were found.
           </p>
         ) : (
           <div className="flex flex-col gap-3">
             {snapshot.recentAdminChanges.map((event) => (
-              <div
+              <Link
                 key={event.id}
-                className={cn(ui.radius.chip, "border border-line p-3")}
+                href={`${systemAdminRoutePaths.audit}?auditId=${encodeURIComponent(event.id)}`}
+                className={cn(
+                  ui.radius.chip,
+                  "border border-line p-3 transition-colors hover:bg-muted/40",
+                )}
               >
-                <div className="text-sm font-medium text-foreground">
+                <div className="type-body font-medium text-foreground">
                   {event.action}
                 </div>
-                <div className="mt-1 text-sm text-muted-foreground">
+                <div className="mt-1 type-muted">
                   {event.summary}
                 </div>
-                <div className="mt-2 text-xs text-muted-foreground">
+                <div className="mt-2 type-caption">
                   {formatErpDateTime(event.createdAt)}
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         )}

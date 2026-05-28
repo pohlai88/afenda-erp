@@ -4,6 +4,8 @@
   "type": "module",
   "private": true,
   "scripts": {
+    "audit:design-tokens": "pnpm -w audit:governed-design-tokens --strict",
+    "prebuild": "pnpm audit:design-tokens",
     "build": "tsc -p tsconfig.build.json",
     "lint": "tsc -p tsconfig.json --noEmit",
     "typecheck": "tsc -p tsconfig.json --noEmit",
@@ -38,6 +40,7 @@
   },
   "dependencies": {
     "@afenda/auth": "workspace:*",
+    "@afenda/observability": "workspace:*",
     "@afenda/ui": "workspace:*",
     "@number-flow/react": "^0.6.0",
     "@opentelemetry/api": "^1.9.1",

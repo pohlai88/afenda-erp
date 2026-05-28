@@ -1,19 +1,21 @@
-import { requireCapability } from "@afenda/auth/server";
 import {
   buildApiCredentialsListSurface,
   buildSsoConnectionsListSurface,
   buildWebhookDeliveriesListSurface,
   buildWebhooksListSurface,
+  systemAdminApiCredentialsSurfaceKey,
+  systemAdminSsoSurfaceKey,
+  systemAdminWebhookDeliveriesSurfaceKey,
+  systemAdminWebhooksSurfaceKey,
+} from "@afenda/feature-system-admin/metadata";
+import {
   createApiCredentialFormAction,
   createWebhookFormAction,
   listApiCredentials,
   listSsoConnections,
   listWebhookDeliveries,
   listWebhooks,
-  systemAdminApiCredentialsSurfaceKey,
-  systemAdminSsoSurfaceKey,
-  systemAdminWebhookDeliveriesSurfaceKey,
-  systemAdminWebhooksSurfaceKey,
+  requireSystemAdminIntegrationsRead,
   upsertSsoConnectionForm,
 } from "@afenda/feature-system-admin/server";
 import {
@@ -35,9 +37,7 @@ export const metadata: Metadata = {
 };
 
 export default async function SystemAdminIntegrationsPage() {
-  const { organization } = await requireCapability(
-    "system-admin.integrations.read",
-  );
+  const { organization } = await requireSystemAdminIntegrationsRead();
   const canWrite = organization.capabilities.includes(
     "system-admin.integrations.write",
   );

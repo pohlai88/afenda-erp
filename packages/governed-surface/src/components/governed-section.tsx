@@ -17,10 +17,10 @@ export function GovernedSection({
 }: GovernedSectionProps) {
   return (
     <section className={cn("flex flex-col gap-surface-md", className)}>
-      <div className="space-y-1">
-        <h3 className="text-base font-semibold tracking-tight">{title}</h3>
+      <div className="flex flex-col gap-1">
+        <h3 className="type-subtitle">{title}</h3>
         {description ? (
-          <p className="text-sm text-muted-foreground">{description}</p>
+          <p className="type-muted">{description}</p>
         ) : null}
       </div>
       {children}
