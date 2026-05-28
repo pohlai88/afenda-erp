@@ -5,11 +5,11 @@ export const navigationExtensions = [
   {
     id: "solution-console",
     href: "/solution-console",
-    label: "Solution Console",
+    label: "Lynx Console",
     description:
       "Diagnose business problems and draft approved recovery actions.",
     requiredCapability: "dashboard.view",
-    status: { label: "AI native", tone: "positive" },
+    status: { label: "Lynx native", tone: "positive" },
   },
 ] as const satisfies readonly NavigationExtension[];
 

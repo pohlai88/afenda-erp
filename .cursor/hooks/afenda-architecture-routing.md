@@ -1,6 +1,6 @@
 # Afenda architecture & rules routing (injected once per agent session)
 
-Canonical index: `docs/architecture/README.md` (`ARCH-001`–`ARCH-007`).
+Canonical index: `docs/architecture/README.md` (`ARCH-001`–`ARCH-008`).
 
 **When docs conflict:** ARCH-002 (feature packages) → ARCH-001 (runtime) → update the other doc in the same PR.
 
@@ -11,8 +11,10 @@ Canonical index: `docs/architecture/README.md` (`ARCH-001`–`ARCH-007`).
 | `apps/erp/**`                                                       | `afenda-erp-app`          | **ARCH-001**, `AGENTS.md` (root)       |
 | `packages/db/**`                                                    | `afenda-database`         | **ARCH-005**, **ARCH-002** (ownership) |
 | `packages/governed-surface/**` or domain `*surface*` / `*metadata*` | `afenda-governed-ui`      | **ARCH-006**, **ARCH-007**             |
-| `packages/features/**`                                              | `afenda-feature-packages` | **ARCH-002**, **ARCH-004**             |
-| Monorepo layout, imports, exports, `packages/*` generally           | `afenda-core` (always on) | **ARCH-002**, **ARCH-003**             |
+| `packages/features/**`                                              | `afenda-feature-packages` | **ARCH-008**, **ARCH-002**, **ARCH-004** |
+| `packages/config/src/next.ts` (transpile list)                      | `afenda-core`             | **ARCH-008** (app ↔ transpile sync)    |
+| `scripts/check-directory-architecture.mts`                          | —                         | **ARCH-003**, **ARCH-008**             |
+| Monorepo layout, imports, exports, `packages/*` generally           | `afenda-core` (always on) | **ARCH-008**, **ARCH-002**, **ARCH-003** |
 | `docs/architecture/**`                                              | —                         | This README + authority table          |
 
 ## Verification (run before finishing when touching…)
@@ -21,7 +23,7 @@ Canonical index: `docs/architecture/README.md` (`ARCH-001`–`ARCH-007`).
 | ---------------------------------- | ---------------------------------------------------- |
 | Layout, exports, architecture docs | `pnpm architecture:check`                            |
 | Governed renderers / list metadata | `pnpm lint:governed-renderers`                       |
-| Drizzle schema                     | `pnpm db:generate` (+ migration review)              |
+| Drizzle schema                     | `pnpm db:generate` → review SQL → `pnpm db:migrate` (no hand-written `drizzle/*.sql`) |
 | App routes / flows                 | `pnpm typecheck`, `pnpm test`, often `pnpm test:e2e` |
 | Any substantive change             | `pnpm typecheck`                                     |
 
@@ -37,4 +39,6 @@ Canonical index: `docs/architecture/README.md` (`ARCH-001`–`ARCH-007`).
 - One deployable app: `apps/erp` (`@afenda/erp`).
 - Module routes: `(app)/[moduleId]/…` only — no per-module route folders unless URL tree differs.
 - Governed lists: server windows / `GovernedPatternCListSection` — never ship full datasets for client pagination.
-- Feature packages import domain/db/auth/ui — never `apps/erp`.
+- Feature packages: flat `packages/features/<moduleId>`; public doors `.` / `./client` / `./server` / `./metadata` only; never import `apps/erp`; `./client` stays server-graph-free.
+- App workspace deps ↔ `afendaTranspilePackages` must stay in sync (`pnpm architecture:check`).
+- Database schema: `packages/db/src/schema` → `pnpm db:generate` → `pnpm db:migrate` — no agent-authored DDL in `drizzle/*.sql` or live SQL unless the user explicitly requires it (rule `afenda-database-migrations`).

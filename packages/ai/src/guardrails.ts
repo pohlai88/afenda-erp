@@ -12,6 +12,8 @@ export const aiTokenBudgets = {
   "anomaly-explanation": 8000,
   "admin-audit-summary": 8000,
   "solution-provider": 14000,
+  "lynx-truth": 10000,
+  "lynx-operator": 16000,
 } as const satisfies Record<AiGatewayFeature, number>;
 
 export class AiBudgetError extends Error {
@@ -65,6 +67,12 @@ export function assertAiBudget(input: {
 
 export function isAiBudgetError(error: unknown): error is AiBudgetError {
   return error instanceof AiBudgetError;
+}
+
+export function isAiPermissionError(
+  error: unknown,
+): error is AiPermissionError {
+  return error instanceof AiPermissionError;
 }
 
 export function isAiSensitiveContentError(

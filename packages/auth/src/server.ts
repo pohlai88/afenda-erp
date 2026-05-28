@@ -4,6 +4,7 @@ import {
   bootstrapOrganizationForUser,
   getUserProfile,
   listPermissionKeysByRole,
+  listRoleOverridesForOrganization,
   listOrganizationsForUser,
   upsertUserProfile,
 } from "@afenda/db";
@@ -20,6 +21,7 @@ import {
   DEMO_USER_NAME,
   DEV_SESSION_MAX_AGE_SECONDS,
   appCapabilities,
+  capabilitiesForRole,
   normalizeCapabilities,
   userSessionSchema,
   type AppCapability,
@@ -102,13 +104,24 @@ async function getSessionFromNeonAuth() {
       organizations.map((organization) => organization.role),
     );
 
-    const sessionOrganizations: OrganizationSummary[] = organizations.map(
-      (organization) => ({
-        ...organization,
-        capabilities: getCapabilitiesForOrganizationRole(
+    const sessionOrganizations: OrganizationSummary[] = await Promise.all(
+      organizations.map(async (organization) => {
+        const baseKeys =
+          permissionsByRole.get(organization.role) ??
+          capabilitiesForRole(organization.role);
+        const overrides = await listRoleOverridesForOrganization({
+          organizationId: organization.id,
+        });
+        const permissionKeys = applyRoleOverrides(
+          baseKeys,
+          overrides,
           organization.role,
-          permissionsByRole,
-        ),
+        );
+
+        return {
+          ...organization,
+          capabilities: normalizeCapabilities(permissionKeys, organization.role),
+        };
       }),
     );
 
@@ -174,12 +187,30 @@ export async function getApiAuthContext(): Promise<
   return { session, organization };
 }
 
-function getCapabilitiesForOrganizationRole(
+function applyRoleOverrides(
+  baseKeys: readonly string[],
+  overrides: ReadonlyArray<{
+    role: OrganizationRole;
+    permissionKey: string;
+    enabled: boolean;
+  }>,
   role: OrganizationRole,
-  permissionsByRole: ReadonlyMap<OrganizationRole, string[]>,
 ) {
-  const permissionKeys = permissionsByRole.get(role) ?? [];
-  return normalizeCapabilities(permissionKeys, role);
+  const keys = new Set(baseKeys);
+
+  for (const override of overrides) {
+    if (override.role !== role) {
+      continue;
+    }
+
+    if (override.enabled) {
+      keys.add(override.permissionKey);
+    } else {
+      keys.delete(override.permissionKey);
+    }
+  }
+
+  return [...keys];
 }
 
 export async function getSession() {

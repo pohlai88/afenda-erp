@@ -14,12 +14,16 @@
     "build": "tsc -p tsconfig.build.json",
     "lint": "tsc -p tsconfig.json --noEmit",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "tsx ./scripts/evaluate.mts"
+    "test": "vitest run && tsx --conditions development ./scripts/evaluate.mts"
   },
   "dependencies": {
     "@afenda/config": "workspace:*",
+    "@afenda/db": "workspace:*",
     "@afenda/domain": "workspace:*",
     "ai": "^6.0.191",
     "zod": "catalog:"
+  },
+  "devDependencies": {
+    "vitest": "catalog:"
   }
 }

@@ -41,6 +41,6 @@ describe("domain modules", () => {
     const extension = getNavigationExtensionById("solution-console");
 
     expect(extension?.href).toBe("/solution-console");
-    expect(extension?.label).toBe("Solution Console");
+    expect(extension?.label).toBe("Lynx Console");
   });
 });

@@ -30,6 +30,11 @@ type WorkspacePackage = {
   packageJson: Record<string, unknown>;
 };
 
+type WorkspacePackageWithName = WorkspacePackage & {
+  packageName: string;
+  rule: PackageArchitectureRule;
+};
+
 const packageArchitectureRules: Record<string, PackageArchitectureRule> = {
   "@afenda/erp": {
     category: "next-app",
@@ -155,6 +160,15 @@ function isGeneratedSourceFile(filePath: string) {
 
 function isMarkdownFile(filePath: string) {
   return filePath.endsWith(".md");
+}
+
+function isSourceFile(filePath: string) {
+  return (
+    filePath.endsWith(".ts") ||
+    filePath.endsWith(".tsx") ||
+    filePath.endsWith(".mts") ||
+    filePath.endsWith(".cts")
+  );
 }
 
 function isExternalMarkdownTarget(target: string) {
@@ -439,6 +453,27 @@ function readAllWorkspacePackages() {
   ];
 }
 
+function readClassifiedWorkspacePackages() {
+  return readAllWorkspacePackages()
+    .map((workspacePackage): WorkspacePackageWithName | null => {
+      const packageName = getPackageName(workspacePackage);
+      if (!packageName) {
+        return null;
+      }
+
+      const rule = getPackageRule(packageName, workspacePackage);
+      if (!rule) {
+        return null;
+      }
+
+      return { ...workspacePackage, packageName, rule };
+    })
+    .filter(
+      (workspacePackage): workspacePackage is WorkspacePackageWithName =>
+        Boolean(workspacePackage),
+    );
+}
+
 function checkWorkspacePackageRegistry() {
   const seenPackages = new Set<string>();
 
@@ -472,6 +507,273 @@ function checkWorkspacePackageRegistry() {
       );
     }
   }
+}
+
+function checkFeatureWorkspaceDiscipline() {
+  const featuresRoot = path.join(root, "packages/features");
+  if (!fs.existsSync(featuresRoot)) {
+    return;
+  }
+
+  const requiredFeatureExports = [".", "./client", "./server", "./metadata"];
+
+  for (const workspacePackage of readWorkspacePackages("packages")) {
+    if (!workspacePackage.packageDirectory.startsWith("packages/features/")) {
+      continue;
+    }
+
+    const packageName = getPackageName(workspacePackage);
+    if (!packageName) {
+      continue;
+    }
+
+    const expectedName = `@afenda/feature-${workspacePackage.directoryName}`;
+    if (packageName !== expectedName) {
+      problems.push(
+        `${workspacePackage.packageDirectory} package name must be ${expectedName}, found ${packageName}`,
+      );
+    }
+
+    const exportEntries = getExports(workspacePackage.packageJson);
+    for (const requiredExport of requiredFeatureExports) {
+      if (!(requiredExport in exportEntries)) {
+        problems.push(
+          `${packageName} must expose ${requiredExport} public export door`,
+        );
+      }
+    }
+  }
+
+  function walkFeatureDir(dir: string, depthFromFeaturesRoot: number) {
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+      if (!entry.isDirectory()) {
+        continue;
+      }
+
+      if (isIgnoredDirectory(entry.name)) {
+        continue;
+      }
+
+      const entryPath = path.join(dir, entry.name);
+      const packageJsonPath = path.join(entryPath, "package.json");
+      if (depthFromFeaturesRoot >= 1 && fs.existsSync(packageJsonPath)) {
+        const rel = relativePath(packageJsonPath);
+        if (!/^packages\/features\/[^/]+\/package\.json$/.test(rel)) {
+          problems.push(
+            `Nested feature workspaces are not allowed by default: ${rel}`,
+          );
+        }
+      }
+
+      walkFeatureDir(entryPath, depthFromFeaturesRoot + 1);
+    }
+  }
+
+  walkFeatureDir(featuresRoot, 0);
+}
+
+function readTranspilePackages() {
+  const nextConfigPath = path.join(root, "packages/config/src/next.ts");
+  if (!fs.existsSync(nextConfigPath)) {
+    problems.push("packages/config/src/next.ts is required");
+    return new Set<string>();
+  }
+
+  const content = fs.readFileSync(nextConfigPath, "utf8");
+  const arrayMatch = content.match(
+    /afendaTranspilePackages\s*=\s*\[([\s\S]*?)\]\s*as const/,
+  );
+  if (!arrayMatch?.[1]) {
+    problems.push(
+      "packages/config/src/next.ts must export afendaTranspilePackages as a const string array",
+    );
+    return new Set<string>();
+  }
+
+  const packageNames = new Set<string>();
+  const stringPattern = /"([^"]+)"/g;
+  let match: RegExpExecArray | null;
+  while ((match = stringPattern.exec(arrayMatch[1]))) {
+    if (match[1]) {
+      packageNames.add(match[1]);
+    }
+  }
+
+  return packageNames;
+}
+
+function getDependencies(packageJson: Record<string, unknown>) {
+  const dependencyNames = new Set<string>();
+
+  for (const field of ["dependencies", "devDependencies", "peerDependencies"]) {
+    const dependencies = packageJson[field];
+    if (
+      !dependencies ||
+      typeof dependencies !== "object" ||
+      Array.isArray(dependencies)
+    ) {
+      continue;
+    }
+
+    for (const dependencyName of Object.keys(dependencies)) {
+      dependencyNames.add(dependencyName);
+    }
+  }
+
+  return dependencyNames;
+}
+
+function checkAppWorkspaceDependencySync() {
+  const appPackagePath = path.join(root, "apps/erp/package.json");
+  if (!fs.existsSync(appPackagePath)) {
+    problems.push("apps/erp/package.json is required");
+    return;
+  }
+
+  const appPackageJson = readJson(appPackagePath);
+  const appDependencies = getDependencies(appPackageJson);
+  const transpilePackages = readTranspilePackages();
+
+  for (const { packageName, rule } of readClassifiedWorkspacePackages()) {
+    if (packageName === "@afenda/erp") {
+      continue;
+    }
+
+    if (!appDependencies.has(packageName)) {
+      continue;
+    }
+
+    if (rule.category === "next-app") {
+      continue;
+    }
+
+    if (!transpilePackages.has(packageName)) {
+      problems.push(
+        `${packageName} is an apps/erp workspace dependency but is missing from afendaTranspilePackages`,
+      );
+    }
+  }
+
+  for (const packageName of transpilePackages) {
+    if (!packageName.startsWith("@afenda/")) {
+      continue;
+    }
+
+    if (!appDependencies.has(packageName)) {
+      problems.push(
+        `${packageName} is listed in afendaTranspilePackages but is not an apps/erp dependency`,
+      );
+    }
+  }
+}
+
+function getImportSpecifiers(content: string) {
+  const specifiers: string[] = [];
+  const patterns = [
+    /\bimport\s+(?:type\s+)?(?:[^'"]+\s+from\s+)?["']([^"']+)["']/g,
+    /\bexport\s+(?:type\s+)?[^'"]+\s+from\s+["']([^"']+)["']/g,
+    /\bimport\(\s*["']([^"']+)["']\s*\)/g,
+  ];
+
+  for (const pattern of patterns) {
+    let match: RegExpExecArray | null;
+    while ((match = pattern.exec(content))) {
+      if (match[1]) {
+        specifiers.push(match[1]);
+      }
+    }
+  }
+
+  return specifiers;
+}
+
+function walkSourceFiles(dir: string, visit: (filePath: string) => void) {
+  if (!fs.existsSync(dir)) {
+    return;
+  }
+
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    const fullPath = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      if (!isIgnoredDirectory(entry.name)) {
+        walkSourceFiles(fullPath, visit);
+      }
+      continue;
+    }
+
+    if (entry.isFile() && isSourceFile(fullPath)) {
+      visit(fullPath);
+    }
+  }
+}
+
+function checkImportBoundaries() {
+  const packagesRoot = path.join(root, "packages");
+  walkSourceFiles(packagesRoot, (filePath) => {
+    const rel = relativePath(filePath);
+    const content = fs.readFileSync(filePath, "utf8");
+    const importSpecifiers = getImportSpecifiers(content);
+    const isFeaturePackageFile = rel.startsWith("packages/features/");
+    const isClientEntry =
+      isFeaturePackageFile &&
+      (rel.endsWith("/src/client.ts") ||
+        rel.endsWith("/src/client.tsx") ||
+        rel.includes("/src/client/") ||
+        rel.endsWith(".client.ts") ||
+        rel.endsWith(".client.tsx"));
+
+    for (const specifier of importSpecifiers) {
+      if (
+        specifier.startsWith("@afenda/feature-") &&
+        /\/(?:src|dist|internal)(?:\/|$)/.test(specifier)
+      ) {
+        problems.push(
+          `${rel} imports a feature package internal path; use public export doors: ${specifier}`,
+        );
+      }
+
+      if (
+        specifier.startsWith("@afenda/feature-") &&
+        !isFeaturePackageFile &&
+        !rel.startsWith("packages/domain/")
+      ) {
+        const packageRoot = specifier.split("/").slice(0, 2).join("/");
+        if (
+          packageRoot !== specifier &&
+          !/^@afenda\/feature-[^/]+\/(?:client|server|metadata)$/.test(
+            specifier,
+          )
+        ) {
+          problems.push(
+            `${rel} must import feature packages through ., ./client, ./server, or ./metadata: ${specifier}`,
+          );
+        }
+      }
+
+      if (specifier.includes("apps/erp") || specifier.startsWith("../apps/")) {
+        problems.push(
+          `${rel} must not import from apps/erp; app code depends on packages, not the other way around`,
+        );
+      }
+
+      if (
+        isClientEntry &&
+        (specifier === "@afenda/db" ||
+          specifier.startsWith("@afenda/db/") ||
+          specifier === "@afenda/ai" ||
+          specifier.startsWith("@afenda/ai/") ||
+          specifier === "@afenda/workflows" ||
+          specifier.startsWith("@afenda/workflows/") ||
+          specifier === "@afenda/auth/server" ||
+          specifier.startsWith("@afenda/auth/server/") ||
+          specifier.startsWith("node:"))
+      ) {
+        problems.push(
+          `${rel} is a client export path and must not import server-only module ${specifier}`,
+        );
+      }
+    }
+  });
 }
 
 function checkPackageBuildPolicy() {
@@ -621,8 +923,11 @@ function checkTurboBuildOutputs() {
 walk(root);
 checkAppUiBoundary();
 checkWorkspacePackageRegistry();
+checkFeatureWorkspaceDiscipline();
 checkPackageBuildPolicy();
 checkTurboBuildOutputs();
+checkAppWorkspaceDependencySync();
+checkImportBoundaries();
 
 if (problems.length > 0) {
   console.error("[architecture:check] Directory architecture violations:");

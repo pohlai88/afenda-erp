@@ -16,11 +16,11 @@ export function getAppShellSkeletonNavItemIds() {
 }
 
 export const solutionConsoleAgentCopy = {
-  title: "Solution Provider Agent",
+  title: "Lynx Operator",
   description:
     "Diagnose business problems, cite ERP evidence, and draft human-approved recovery actions.",
   inputPlaceholder: "Describe the business problem you need Afenda to solve...",
-  toolRejectReason: "Rejected by Solution Console operator.",
+  toolRejectReason: "Rejected by Lynx operator.",
 } as const;
 
 export const solutionConsoleUxCards = [
@@ -28,7 +28,7 @@ export const solutionConsoleUxCards = [
     id: "root-causes",
     title: "Root causes",
     description:
-      "The agent must identify drivers, missing data, source modules, and confidence before recommending action.",
+      "Lynx identifies drivers, missing data, source modules, and confidence before recommending action.",
     iconKey: "alert-triangle" as const,
   },
   {
@@ -83,7 +83,7 @@ export const solutionConsoleMetrics = [
 
 export const solutionConsoleSections = {
   hero: {
-    eyebrow: "Solution Provider Console",
+    eyebrow: "Lynx Console",
   },
   playbookCatalog: {
     title: "Recovery playbook catalog",
@@ -96,9 +96,9 @@ export const solutionConsoleSections = {
       "Reusable module skills turn context, grounding, confidence, and action sandboxes into repeatable ERP operations.",
   },
   agentWorkspace: {
-    title: "Agent workspace",
+    title: "Lynx workspace",
     description:
-      "Ask the Solution Provider Agent to run a recovery workflow, inspect ERP signals, draft tasks, or prepare a human-approved action proposal.",
+      "Ask Lynx to run a recovery workflow, inspect ERP signals, draft tasks, or prepare a human-approved action proposal.",
   },
   evidenceCoverage: {
     title: "Evidence coverage",
@@ -106,9 +106,9 @@ export const solutionConsoleSections = {
       "Recovery recommendations are constrained by modules and records available under the current role.",
   },
   aiUsageLedger: {
-    title: "AI usage ledger",
+    title: "Lynx usage ledger",
     description:
-      "Solution Provider calls are tagged by feature, tenant, user, workflow, risk, and model through AI Gateway.",
+      "Lynx runs are tagged by feature, tenant, user, workflow, risk, and model through AI Gateway.",
     emptyRow: ["No usage", "-", "-", "0", "-"] as const,
   },
   connectedModules: {
@@ -188,7 +188,7 @@ export const moduleScreenSections = {
       "Use route metadata to move into adjacent workflows without losing organizational context.",
   },
   aiAssistant: {
-    title: "AI assistant",
+    title: "Lynx review",
     description:
       "Gateway-backed chat for workflow review, record queries, document guidance, and human-approved action proposals.",
   },
@@ -231,11 +231,11 @@ export const dashboardRouteSections = {
     scheduledAutomationsTitle: "Scheduled automations",
   },
   aiAssistant: {
-    title: "AI assistant",
+    title: "Lynx review",
     description:
       "Gateway-backed chat for workflow review, document extraction guidance, and human-approved approval proposals.",
     aiUsageLedger: {
-      title: "AI usage ledger",
+      title: "Lynx usage ledger",
       description:
         "Gateway calls are logged by tenant, user, feature, model, token count, and latency after completion.",
       emptyRow: ["No usage", "-", "-", "0", "-"] as const,
@@ -272,13 +272,13 @@ export function getNavigationExtensionHeroCopy(
 }
 
 export const solutionConsolePageMetadata = {
-  title: "Solution Console",
+  title: "Lynx Console",
   description:
-    "AI-native ERP problem solving for evidence-backed recovery plans and human-approved execution.",
+    "Lynx-native ERP problem solving for evidence-backed recovery plans and human-approved execution.",
 } as const;
 
 export const erpAssistantPanelCopy = {
-  title: "ERP assistant",
+  title: "Lynx workspace",
   description: "Gateway-backed guidance with approved tool execution.",
   inputPlaceholder:
     "Ask for a workflow summary or draft an approval proposal...",

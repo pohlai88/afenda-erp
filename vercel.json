@@ -14,6 +14,14 @@
     {
       "path": "/api/cron/housekeeping",
       "schedule": "0 2 * * *"
+    },
+    {
+      "path": "/api/cron/lynx-outcomes",
+      "schedule": "0 3 * * *"
+    },
+    {
+      "path": "/api/cron/knowledge-sync",
+      "schedule": "0 4 * * *"
     }
   ]
 }

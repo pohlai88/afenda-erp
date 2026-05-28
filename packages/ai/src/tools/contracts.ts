@@ -2,6 +2,14 @@ import { approvalToolModuleIds, moduleIds } from "@afenda/config/module-ids";
 import { z } from "zod";
 import { actionSandboxSchema } from "../schemas/operations";
 
+export type GovernedToolMeta = {
+  risk: "low" | "medium" | "high";
+  category: "records" | "documents" | "approvals" | "operations" | "knowledge";
+  access: "read" | "write";
+  dataSensitivity: "none" | "low" | "medium" | "high";
+  audit: "silent" | "record";
+};
+
 const toolRecordSchema = z.object({
   id: z.string(),
   reference: z.string(),

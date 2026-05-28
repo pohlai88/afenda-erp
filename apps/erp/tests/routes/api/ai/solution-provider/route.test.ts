@@ -7,7 +7,6 @@ vi.mock("@afenda/ai", () => ({
   assertNoSensitiveCredentialContent: vi.fn(),
   createGatewayOptions: vi.fn(),
   createSolutionProviderAgent: vi.fn(),
-  createSolutionProviderTools: vi.fn(),
   estimateTokenCount: vi.fn(() => 120),
   getAiGatewayEnvironment: vi.fn(() => "development"),
   getAiModelForFeature: vi.fn(() => "openai/gpt-5.4"),
@@ -15,6 +14,7 @@ vi.mock("@afenda/ai", () => ({
   getUsageMetrics: vi.fn(),
   hasAiGatewayCredentials: vi.fn(),
   isAiBudgetError: vi.fn(() => false),
+  isAiPermissionError: vi.fn(() => false),
   isAiSensitiveContentError: vi.fn(() => false),
 }));
 
@@ -65,6 +65,10 @@ vi.mock("ai", () => ({
   ),
 }));
 
+vi.mock("@/lib/api/solution-provider-tool-bindings", () => ({
+  createErpSolutionProviderTools: vi.fn(() => ({})),
+}));
+
 import { hasAiGatewayCredentials } from "@afenda/ai";
 import { getApiAuthContext } from "@afenda/auth/server";
 import { POST } from "@/app/api/ai/solution-provider/route";
@@ -88,6 +92,8 @@ describe("solution provider route", () => {
     );
 
     expect(response.status).toBe(503);
+    expect(response.headers.get("Deprecation")).toBeTruthy();
+    expect(response.headers.get("Link")).toContain("/api/lynx/operator");
   });
 
   it("returns auth response when session is unavailable", async () => {

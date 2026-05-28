@@ -4,7 +4,6 @@ import {
   isCoreModuleId,
   isModuleId,
   moduleIds,
-  resolveModuleWorkspaceListQuery,
   type CoreModuleId,
   type ModuleWorkspaceSearchParams,
 } from "@afenda/domain";
@@ -49,7 +48,7 @@ export default async function DynamicModulePage({
   return (
     <ModuleRoutePage
       moduleId={resolveModuleId(moduleId)}
-      query={resolveModuleWorkspaceListQuery(resolvedSearchParams)}
+      searchParams={resolvedSearchParams}
     />
   );
 }

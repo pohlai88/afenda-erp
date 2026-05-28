@@ -90,7 +90,7 @@ export default async function WorkItemDetailPage(
         eyebrow={moduleDefinition.label}
         headingLevel={1}
         title={workItem.subject}
-        description="Workflow item drilldown with governed audit readiness."
+        description={`${workItem.priority} priority · ${workItem.status}`}
         aside={
           <div className="space-y-3 text-right">
             <StatusBadge label={workItem.status} tone="neutral" />

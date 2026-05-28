@@ -339,7 +339,7 @@ const moduleSeedRecords: readonly ModuleSeedRecord[] = [
     metadata: { freshnessTargetMinutes: 60, exportable: true },
   },
   {
-    moduleId: "admin",
+    moduleId: "system-admin",
     recordType: "governance-review",
     reference: "ADM-ROLE-002",
     title: "Privileged role assignment review",
@@ -576,6 +576,43 @@ export async function listTenantWorkItems(input: {
   const window = await listTenantWorkItemWindow(input);
 
   return window.rows;
+}
+
+export async function createTenantWorkItemForApprovedSandbox(input: {
+  organizationId: string;
+  moduleId: ErpModuleId;
+  sandboxId: string;
+  title: string;
+  actorAuthUserId: string;
+  sourceRecordId?: string | null;
+  priority?: ErpPriority;
+}): Promise<string> {
+  const subject = `[AI] ${input.title}`.slice(0, 240);
+  const workItemId = createEntityId("work");
+  const dueAt = new Date();
+  dueAt.setDate(dueAt.getDate() + 7);
+
+  await runWithOrganizationContext(input.organizationId, async (db) => {
+    await db.insert(erpWorkItems).values({
+      id: workItemId,
+      organizationId: input.organizationId,
+      moduleId: input.moduleId,
+      subject,
+      owner: input.actorAuthUserId,
+      status: "pending",
+      priority: input.priority ?? "medium",
+      dueAt,
+      sourceRecordId: input.sourceRecordId ?? null,
+      createdByAuthUserId: input.actorAuthUserId,
+      updatedByAuthUserId: input.actorAuthUserId,
+      metadata: {
+        sandboxId: input.sandboxId,
+        source: "ai-sandbox-executor",
+      },
+    });
+  });
+
+  return workItemId;
 }
 
 export async function getTenantWorkItem(input: {

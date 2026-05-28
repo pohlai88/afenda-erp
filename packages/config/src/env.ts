@@ -44,6 +44,10 @@ const aiEnvSchema = z.object({
   AFENDA_AI_FAST_MODEL: z.string().min(1).optional(),
   AFENDA_AI_HIGH_CONFIDENCE_MODEL: z.string().min(1).optional(),
   AI_GATEWAY_API_KEY: z.string().min(1).optional(),
+  /** Vercel account API token (Gateway billing report, REST). */
+  VERCEL_API_TOKEN: z.string().min(1).optional(),
+  /** CLI / tooling token; used for Gateway reporting when VERCEL_API_TOKEN is unset. */
+  VERCEL_TOKEN: z.string().min(1).optional(),
   VERCEL_OIDC_TOKEN: z.string().min(1).optional(),
   VERCEL_ENV: z.string().optional(),
 });
@@ -156,7 +160,54 @@ export function hasAiGatewayCredentials(
   input: NodeJS.ProcessEnv = process.env,
 ) {
   const env = getAiEnv(input);
-  return Boolean(env.AI_GATEWAY_API_KEY || env.VERCEL_OIDC_TOKEN);
+  return Boolean(
+    env.AI_GATEWAY_API_KEY ||
+      env.VERCEL_API_TOKEN ||
+      env.VERCEL_TOKEN ||
+      env.VERCEL_OIDC_TOKEN,
+  );
+}
+
+export function resolveAiGatewayReportApiKey(
+  input: NodeJS.ProcessEnv = process.env,
+): string | undefined {
+  const env = getAiEnv(input);
+  return (
+    env.AI_GATEWAY_API_KEY ??
+    env.VERCEL_API_TOKEN ??
+    env.VERCEL_TOKEN ??
+    env.VERCEL_OIDC_TOKEN
+  );
+}
+
+export function describeAiGatewayCredentialSources(
+  input: NodeJS.ProcessEnv = process.env,
+): {
+  hasAiGatewayCredentials: boolean;
+  reportApiKeyConfigured: boolean;
+  reportApiKeySource:
+    | "AI_GATEWAY_API_KEY"
+    | "VERCEL_API_TOKEN"
+    | "VERCEL_TOKEN"
+    | "VERCEL_OIDC_TOKEN"
+    | "none";
+} {
+  const env = getAiEnv(input);
+  const reportApiKeySource = env.AI_GATEWAY_API_KEY
+    ? "AI_GATEWAY_API_KEY"
+    : env.VERCEL_API_TOKEN
+      ? "VERCEL_API_TOKEN"
+      : env.VERCEL_TOKEN
+        ? "VERCEL_TOKEN"
+        : env.VERCEL_OIDC_TOKEN
+          ? "VERCEL_OIDC_TOKEN"
+          : "none";
+
+  return {
+    hasAiGatewayCredentials: hasAiGatewayCredentials(input),
+    reportApiKeyConfigured: reportApiKeySource !== "none",
+    reportApiKeySource,
+  };
 }
 
 export function isNeonAuthEnabled(input: NodeJS.ProcessEnv = process.env) {

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-label="Lynx Operator">
+  <!-- Lynx stylised mark: two acute eye shapes representing machine precision + animal sharpness -->
+  <path d="M2 12 C5 7, 9 5, 12 7 C15 5, 19 7, 22 12 C19 17, 15 19, 12 17 C9 19, 5 17, 2 12 Z" />
+  <circle cx="9" cy="11" r="1.5" fill="currentColor" stroke="none" />
+  <circle cx="15" cy="11" r="1.5" fill="currentColor" stroke="none" />
+  <!-- Acute ear nicks at top corners -->
+  <path d="M6 7 L8 4 L10 7" />
+  <path d="M14 7 L16 4 L18 7" />
+</svg>

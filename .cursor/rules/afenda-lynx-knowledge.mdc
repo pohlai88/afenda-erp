@@ -1,0 +1,116 @@
+---
+description: Lynx machine layer + Knowledge substrate — boundaries, import doors, contract files, brand contract for afenda-erp
+globs: "packages/features/knowledge/**,packages/features/lynx/**,apps/erp/src/app/api/lynx/**,apps/erp/src/app/**/knowledge/**,packages/ai/src/tools/**"
+alwaysApply: false
+---
+
+# Lynx + Knowledge directory contract
+
+**Canonical doctrine:** `docs/architecture/009-machine-layer-doctrine.md` (**ARCH-009**)
+**Delivery plan:** `docs/roadmap/005-lynx-knowledge-substrate.md` (**TRACK-005**)
+
+---
+
+## Boundary split
+
+| Module | Role | Public door |
+|---|---|---|
+| **`@afenda/feature-knowledge`** | Substrate — pgvector, `knowledge_chunk`, embeddings, chunk CRUD, eval harness | `@afenda/feature-knowledge`, `@afenda/feature-knowledge/server`, `@afenda/feature-knowledge/client`, `@afenda/feature-knowledge/metadata` |
+| **`@afenda/feature-lynx`** | Product — Truth Retrieval UI, streaming truth, Operator Assist | `@afenda/feature-lynx`, `@afenda/feature-lynx/server`, `@afenda/feature-lynx/client`, `@afenda/feature-lynx/metadata` |
+| **`@afenda/ai`** | Provider-agnostic agent + tool layer | Stays substrate-blind — no import of `@afenda/feature-knowledge` |
+
+`@afenda/feature-lynx` composes `@afenda/feature-knowledge` via barrel only — no deep imports.
+
+---
+
+## Lynx — machine layer doctrine
+
+```
+Lynx is Afenda's machine layer for resolving truth, preparing work, and recommending controlled action.
+```
+
+- **Single product home** for all machine-assisted modalities (retrieval, structured generation, chart inference, operator decisions). Do not introduce parallel "AI assistant" / "copilot" modules.
+- **Providers** (OpenAI, AI SDK, embeddings) are implementation details — not user-facing brands.
+- **Four product layers:** Truth Retrieval → Operating Briefs → Canonical Intake → Decision Operator. Layers 2 and 3 are deferred until product validates demand.
+
+### Canonical contract file
+
+`packages/features/lynx/src/lynx.contract.ts` — `LYNX_MODULE_ID`, `LYNX_LAYERS`, `LYNX_AUDIT_ACTIONS`, `LYNX_ERP_HTTP_ROUTES`. Derive audits, tests, and guards from here.
+
+### Truth response format (mandatory)
+
+Every truth response must produce exactly these four sections:
+
+```
+### Answer
+### Evidence used
+### Limitations
+### Next safe action
+```
+
+Do not omit any section. Do not invent facts. Cite passage numbers `[1]`, `[2]` inside `### Answer`.
+
+### Banned user-facing vocabulary
+
+Do **not** use in product copy, nav labels, or message files: **AI assistant**, **chatbot**, **copilot**, **AI mode**, **AI active**, **Thinking**, **Processing**, **Generating**.
+Use: **Lynx**, **The Machine**, "resolving", "listening", "high confidence".
+
+---
+
+## Knowledge — substrate invariants
+
+### Invariant A — Adapter purity
+
+`KnowledgeSourceAdapter.listDocuments` returns plain `RawKnowledgeDocument` items only.
+Adapters must **not**: write DB rows, call embedding functions, choose chunking strategy, influence ranking.
+Only `pipeline-commit.ts` may write `knowledge_document` or `knowledge_chunk`.
+
+### Invariant B — Retrieval is source-blind
+
+Retrieval and reranking must not branch on `knowledge_source.kind`. Do not join source metadata for ranking heuristics. Allowed inputs: tenant id, query, optional explicit document allowlists.
+
+### Invariant C — Embedding runs outside Route Handlers
+
+Never call `embedKnowledgeBatch` inline in a Route Handler. Embedding runs in background jobs (cron + queue). Embedding in Route Handlers for single queries (truth search, operator tool) is acceptable only when the query is user-initiated and the latency budget is known.
+
+### Invariant D — Tenant isolation
+
+All queries include `WHERE organization_id = $orgId`. RLS policies are defense-in-depth — app-level filters are still mandatory.
+
+---
+
+## Import boundary
+
+| Consumer | Import |
+|---|---|
+| `apps/erp/app/**` RSC, Route Handlers, Server Actions | `@afenda/feature-knowledge`, `@afenda/feature-lynx` |
+| Any `"use client"` file, client islands | `@afenda/feature-knowledge/client`, `@afenda/feature-lynx/client` only |
+| `@afenda/ai` | No import of `@afenda/feature-knowledge` — substrate-blind |
+
+`./client` exports: serializable DTOs, client-safe constants, Zod schemas. No `server-only`, no `next/headers`, no `@afenda/db`, no `@afenda/ai`.
+
+---
+
+## Governed tool envelope
+
+Every tool exported from `@afenda/ai` must carry:
+
+```ts
+type GovernedToolMeta = {
+  risk: "low" | "medium" | "high";
+  category: "contacts" | "knowledge" | "operations" | "approvals" | "records" | "documents";
+  access: "read" | "write";
+  dataSensitivity: "none" | "low" | "medium" | "high";
+  audit: "silent" | "record";
+};
+```
+
+- `audit: "record"` → emit structured audit entry per call.
+- `access: "write"` → route through sandbox/approval flow, never direct table writes.
+- Tool id list and meta must be stable — changes require extending tests that assert id order/membership.
+
+---
+
+## Contract changes
+
+Update `AGENTS.md`, `docs/architecture/009-machine-layer-doctrine.md`, and this rule together when Lynx or Knowledge boundaries change.

@@ -234,25 +234,33 @@ export async function DashboardRoutePage({
         title={dashboardRouteSections.aiAssistant.title}
         description={dashboardRouteSections.aiAssistant.description}
       >
-        <div className="grid gap-4 xl:grid-cols-[minmax(0,1.2fr)_minmax(340px,0.8fr)]">
+        <div
+          className={
+            aiUsageRows.length > 0
+              ? "grid gap-4 xl:grid-cols-[minmax(0,1.2fr)_minmax(340px,0.8fr)]"
+              : undefined
+          }
+        >
           <ErpAssistantPanel />
-          <div className="rounded-lg border border-line bg-surface-strong p-4">
-            <div className="text-sm font-semibold text-foreground">
-              {dashboardRouteSections.aiAssistant.aiUsageLedger.title}
+          {aiUsageRows.length > 0 ? (
+            <div className="rounded-lg border border-line bg-surface-strong p-4">
+              <div className="text-sm font-semibold text-foreground">
+                {dashboardRouteSections.aiAssistant.aiUsageLedger.title}
+              </div>
+              <div className="mt-2 text-sm leading-6 text-muted">
+                {dashboardRouteSections.aiAssistant.aiUsageLedger.description}
+              </div>
+              <div className="mt-4">
+                <GovernedPatternCListSection
+                  title={dashboardRouteSections.aiAssistant.aiUsageLedger.title}
+                  surfaceKey={surfaceKeys.aiUsage}
+                  listConfiguration={aiUsageListSurface}
+                  parentAccessAllowed
+                  layout="embedded"
+                />
+              </div>
             </div>
-            <div className="mt-2 text-sm leading-6 text-muted">
-              {dashboardRouteSections.aiAssistant.aiUsageLedger.description}
-            </div>
-            <div className="mt-4">
-              <GovernedPatternCListSection
-                title={dashboardRouteSections.aiAssistant.aiUsageLedger.title}
-                surfaceKey={surfaceKeys.aiUsage}
-                listConfiguration={aiUsageListSurface}
-                parentAccessAllowed
-                layout="embedded"
-              />
-            </div>
-          </div>
+          ) : null}
         </div>
       </SectionPanel>
 

@@ -1,6 +1,5 @@
 import type { AppCapability, OrganizationRole } from "@afenda/auth";
 import {
-  listAiApprovalProposals,
   listAiUsageEvents,
   getTenantWorkItem,
   getTenantErpRecord,
@@ -11,7 +10,6 @@ import {
   listTenantWorkItemWindow,
   summarizeTenantModuleMetrics,
   summarizeTenantOrganizationMetrics,
-  type AiApprovalProposalSummary,
   type AiUsageSummary,
   type TenantAuditLog,
   type TenantErpDocument,
@@ -49,10 +47,6 @@ export {
   type ModuleId,
 } from "@afenda/config/module-ids";
 export {
-  adminAiApprovalsSurfaceKey,
-  adminAiUsageSurfaceKey,
-  buildAdminAiApprovalsListSurface,
-  buildAdminAiUsageListSurface,
   buildDashboardAiUsageListSurface,
   buildDashboardAutomationListSurface,
   buildDashboardHardeningChecklistSurface,
@@ -981,39 +975,4 @@ export async function getResolvedDashboardMetrics(organizationId: string) {
   const summary = await summarizeTenantOrganizationMetrics({ organizationId });
 
   return resolveModuleMetrics(getDashboardMetrics(), summary);
-}
-
-export type AiApprovalRouteSummary = {
-  id: string;
-  moduleId: string;
-  proposedAction: string;
-  rationale: string;
-  riskLevel: string;
-  status: string;
-  created: string;
-};
-
-function serializeAiApprovalProposal(
-  row: AiApprovalProposalSummary,
-): AiApprovalRouteSummary {
-  return {
-    id: row.id,
-    moduleId: row.moduleId,
-    proposedAction: row.proposedAction,
-    rationale: row.rationale,
-    riskLevel: row.riskLevel,
-    status: row.status,
-    created: formatDate(row.createdAt),
-  };
-}
-
-export async function getAiApprovalsSummary(input: {
-  organizationId: string;
-  limit?: number;
-}): Promise<AiApprovalRouteSummary[]> {
-  const rows = await listAiApprovalProposals({
-    organizationId: input.organizationId,
-    limit: input.limit,
-  });
-  return rows.map(serializeAiApprovalProposal);
 }

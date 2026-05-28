@@ -43,6 +43,55 @@ Also confirm Neon Auth, migrations, AI routes, and governed list surfaces in a p
 4. First **preview**: `vercel deploy` (or push to GitHub for automatic preview). Fix builder-only issues before `vercel deploy --prod`.
 5. Enable Vercel Remote Cache for Turborepo when builds are stable.
 
+## AI route preview smoke (Phase H gate)
+
+After Phases A–G land green, run the following against a Vercel preview deploy:
+
+**Auth:** `/api/ai/*` routes use Neon session cookies via `getApiAuthContext` (JSON 401/403), not `Authorization: Bearer`. Sign in on the preview first, then pass cookies to `curl` (`-b cookies.txt`), or smoke from the authenticated ERP UI. `VERCEL_OIDC_TOKEN` is for AI Gateway provider auth only.
+
+```bash
+# 1. Deploy a preview
+vercel deploy
+
+PREVIEW_URL="<paste preview URL here>"
+# 2. Export session cookies after signing in (browser devtools → Application → Cookies)
+COOKIE_JAR="./preview-cookies.txt"
+
+# 3. Smoke each AI route
+curl -sf -X POST "$PREVIEW_URL/api/ai/chat" \
+  -b "$COOKIE_JAR" \
+  -H "Content-Type: application/json" \
+  -d '{"messages":[{"role":"user","parts":[{"type":"text","text":"Hello"}]}],"contextModuleId":"dashboard"}'
+
+curl -sf -X GET "$PREVIEW_URL/api/ai/spend" \
+  -b "$COOKIE_JAR"
+
+curl -sf -X POST "$PREVIEW_URL/api/ai/extract" \
+  -b "$COOKIE_JAR" \
+  -H "Content-Type: application/json" \
+  -d '{"moduleId":"finance","documentId":"doc_test","documentText":"Invoice INV-001 total 1000 MYR"}'
+
+curl -sf -X POST "$PREVIEW_URL/api/lynx/operator" \
+  -b "$COOKIE_JAR" \
+  -H "Content-Type: application/json" \
+  -d '{"messages":[{"role":"user","parts":[{"type":"text","text":"Analyze revenue"}]}]}'
+
+# Legacy (deprecated — prefer /api/lynx/operator):
+# curl -sf -X POST "$PREVIEW_URL/api/ai/solution-provider" ...
+```
+
+Expected: each route returns HTTP 200 (or 503 if Gateway credentials are absent on preview) — no 401/403/500.
+
+### New env vars for AI enterprise features
+
+| Variable | Purpose | Required |
+| -------- | ------- | -------- |
+| `VERCEL_API_TOKEN` | Gateway spend API reads | No (graceful fallback; `pnpm env:sync` aliases from `AI_GATEWAY_API_KEY` when unset) |
+| `VERCEL_TEAM_ID` | Gateway spend API | No (graceful fallback) |
+| `VERCEL_AI_GATEWAY_NAME` | Gateway name for spend API | No (graceful fallback) |
+
+Add these to the Vercel project via `vercel env add` or the dashboard.
+
 ## Still out of scope until preview is green
 
 - Production domain and promotion

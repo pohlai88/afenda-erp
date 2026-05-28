@@ -39,6 +39,12 @@ When working on `apps/erp` (routes, RSC, handlers, caching, or Next.js APIs), ca
 - Tenant-scoped lists and dashboards: dynamic reads inside org context — do not CDN-cache another tenant's rows.
 - `'use cache'` / `'use cache: remote'` only for shared reference data; prefer `cache: 'no-store'` over blanket `force-dynamic` when one subtree must stay fresh.
 
+## Feature package imports
+
+- Import `@afenda/feature-*` through public doors only (`.`, `./client`, `./server`, `./metadata`) — never `/src`, `/dist`, or `/internal`.
+- Routes and Server Components: prefer `./server` or `./metadata`; Client Components: `./client` only.
+- Adding a workspace dependency requires the same package in `afendaTranspilePackages` (`packages/config/src/next.ts`). **ARCH-008**.
+
 ## Governed lists in this app
 
 - Compose `GovernedPatternCListSection` from `@afenda/governed-surface/server`.

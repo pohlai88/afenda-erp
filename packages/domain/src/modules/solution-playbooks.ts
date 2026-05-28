@@ -35,7 +35,7 @@ export const solutionToolModuleBindings = {
   reviewCashConversion: ["finance", "sales", "purchasing", "approvals"],
   assessInventoryRisk: ["inventory", "purchasing", "sales"],
   reviewApprovalThroughput: ["approvals", "finance", "purchasing", "hr"],
-  reviewAuditReadiness: ["reports", "finance", "approvals", "admin"],
+  reviewAuditReadiness: ["reports", "finance", "approvals", "system-admin"],
 } as const satisfies Record<string, readonly ModuleId[]>;
 
 export function getBusinessProblemTypeLabels() {

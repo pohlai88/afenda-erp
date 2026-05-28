@@ -30,7 +30,7 @@ export const erpModuleIdEnum = pgEnum("erp_module_id", [
   "crm",
   "approvals",
   "reports",
-  "admin",
+  "system-admin",
 ]);
 
 export const erpRecordStatusEnum = pgEnum("erp_record_status", [
@@ -83,6 +83,8 @@ export const aiFeatureEnum = pgEnum("ai_feature", [
   "document-extraction",
   "approval-tool",
   "solution-provider",
+  "lynx-truth",
+  "lynx-operator",
 ]);
 
 export const aiRequestStatusEnum = pgEnum("ai_request_status", [
@@ -110,6 +112,21 @@ export const aiSandboxStatusEnum = pgEnum("ai_sandbox_status", [
   "rejected",
   "discarded",
 ]);
+
+export const lynxWorkflowSessionStatusEnum = pgEnum(
+  "lynx_workflow_session_status",
+  ["active", "paused", "completed", "failed", "cancelled"],
+);
+
+export const lynxRunFeedbackRatingEnum = pgEnum("lynx_run_feedback_rating", [
+  "positive",
+  "negative",
+]);
+
+export const lynxRunFeedbackCategoryEnum = pgEnum(
+  "lynx_run_feedback_category",
+  ["accurate", "unsupported", "wrong-tool", "slow", "unsafe", "other"],
+);
 
 export const timestampColumns = {
   createdAt: timestamp("created_at", { withTimezone: true })

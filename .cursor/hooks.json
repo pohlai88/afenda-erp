@@ -11,6 +11,24 @@
         "command": "node .cursor/hooks/session-inject-architecture.mjs"
       }
     ],
+    "preToolUse": [
+      {
+        "command": "node .cursor/hooks/guard-database-ddl.mjs",
+        "matcher": "Write|StrReplace"
+      }
+    ],
+    "beforeShellExecution": [
+      {
+        "command": "node .cursor/hooks/guard-database-ddl.mjs",
+        "matcher": "psql"
+      }
+    ],
+    "beforeMCPExecution": [
+      {
+        "command": "node .cursor/hooks/guard-database-ddl.mjs",
+        "matcher": "run_sql"
+      }
+    ],
     "postToolUse": [
       {
         "command": "node .cursor/hooks/post-edit-architecture-hints.mjs",

@@ -1,6 +1,7 @@
 "use client";
 
 import { StatusBadge, type Tone } from "@afenda/ui";
+import Link from "next/link";
 import { CodeBlock } from "./code-block";
 
 export type ToolPart = {
@@ -49,13 +50,21 @@ function getToneForRisk(value: unknown): Tone {
 }
 
 function getToneForStatus(value: unknown): Tone {
-  return value === "approved" || value === "human-approved" || value === "high"
+  return value === "available" ||
+    value === "approved" ||
+    value === "completed" ||
+    value === "human-approved" ||
+    value === "high"
     ? "positive"
-    : value === "pending" || value === "medium"
-      ? "neutral"
-      : value === "rejected" || value === "low"
-        ? "warning"
-        : "neutral";
+    : value === "partial" ||
+        value === "pending" ||
+        value === "failed" ||
+        value === "rejected" ||
+        value === "unavailable" ||
+        value === "low" ||
+        value === "medium"
+      ? "warning"
+      : "neutral";
 }
 
 function ToolHeader({
@@ -143,26 +152,41 @@ function EvidenceList({ value }: { value: unknown }) {
   return (
     <div className="space-y-2">
       <div className="text-xs uppercase tracking-wide text-muted">Evidence</div>
-      {evidence.map((item, index) => (
-        <div
-          className="rounded-lg border border-line bg-surface-strong px-3 py-2"
-          key={`${getString(item.recordId) ?? getString(item.sourceId) ?? index}-${index}`}
-        >
-          <div className="flex items-center justify-between gap-3">
-            <div className="text-sm font-medium text-foreground">
-              {getString(item.label) ?? getString(item.sourceId) ?? "Source"}
+      {evidence.map((item, index) => {
+        const label =
+          getString(item.label) ?? getString(item.sourceId) ?? "Source";
+        const href = getString(item.href);
+
+        return (
+          <div
+            className="rounded-lg border border-line bg-surface-strong px-3 py-2"
+            key={`${getString(item.recordId) ?? getString(item.sourceId) ?? index}-${index}`}
+          >
+            <div className="flex items-center justify-between gap-3">
+              {href ? (
+                <Link
+                  className="text-sm font-medium text-foreground underline-offset-2 hover:underline"
+                  href={href}
+                >
+                  {label}
+                </Link>
+              ) : (
+                <div className="text-sm font-medium text-foreground">
+                  {label}
+                </div>
+              )}
+              <div className="text-xs text-muted">
+                {getString(item.moduleId) ?? "module"}
+              </div>
             </div>
-            <div className="text-xs text-muted">
-              {getString(item.moduleId) ?? "module"}
+            <div className="mt-1 text-sm leading-6 text-muted">
+              {getString(item.signal) ??
+                getString(item.recordId) ??
+                "Evidence source"}
             </div>
           </div>
-          <div className="mt-1 text-sm leading-6 text-muted">
-            {getString(item.signal) ??
-              getString(item.recordId) ??
-              "Evidence source"}
-          </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }
@@ -185,6 +209,8 @@ function SandboxCard({ value }: { value: unknown }) {
     ? risk.requiredHumanChecks
     : [];
 
+  const sandboxId = getString(value.id);
+
   return (
     <div className="rounded-lg border border-line bg-surface-strong p-3">
       <ToolHeader
@@ -192,6 +218,14 @@ function SandboxCard({ value }: { value: unknown }) {
         tone={getToneForStatus(status)}
         value={status}
       />
+      {sandboxId ? (
+        <Link
+          className="mt-1 inline-flex items-center rounded bg-muted/30 px-2 py-0.5 font-mono text-xs text-muted underline-offset-2 hover:underline"
+          href={`/system-admin#ai-sandboxes-${sandboxId}`}
+        >
+          sandbox: {sandboxId}
+        </Link>
+      ) : null}
       <div className="mt-2 text-sm leading-6 text-muted">
         {getString(diff.summary) ?? "Action preview"}
       </div>
@@ -323,6 +357,14 @@ function ApprovalOutputCard({ value }: { value: unknown }) {
         <div className="mt-2 text-sm leading-6 text-muted">
           Proposal {getString(value.proposalId) ?? "pending"} for{" "}
           {getString(value.moduleId) ?? "module"}.
+          {getString(value.sandboxId) ? (
+            <Link
+              className="ml-2 inline-flex items-center rounded bg-muted/30 px-2 py-0.5 font-mono text-xs underline-offset-2 hover:underline"
+              href={`/system-admin#ai-sandboxes-${getString(value.sandboxId)}`}
+            >
+              {getString(value.sandboxId)}
+            </Link>
+          ) : null}
         </div>
       </div>
       <SandboxCard value={sandbox} />
@@ -330,9 +372,138 @@ function ApprovalOutputCard({ value }: { value: unknown }) {
   );
 }
 
+function ErpReadToolOutputCard({ value }: { value: unknown }) {
+  if (!isRecord(value) || value.source !== "tenant-erp-read-tool") {
+    return null;
+  }
+
+  const modules = Array.isArray(value.modules)
+    ? value.modules.filter(isRecord)
+    : [];
+  const signals = Array.isArray(value.signals)
+    ? value.signals.filter(isRecord)
+    : [];
+  const evidence = Array.isArray(value.evidence)
+    ? value.evidence.filter(isRecord)
+    : [];
+  const missingData = isStringArray(value.missingData) ? value.missingData : [];
+  const safeNextActions = isStringArray(value.safeNextActions)
+    ? value.safeNextActions
+    : [];
+
+  return (
+    <div className="space-y-3">
+      <div className="rounded-lg border border-line bg-surface-strong p-3">
+        <ToolHeader
+          label={getString(value.summary) ?? "ERP-native read inspection"}
+          tone={getToneForStatus(value.readinessStatus)}
+          value={getString(value.readinessStatus)}
+        />
+        <div className="mt-3 grid gap-2 sm:grid-cols-3">
+          <MiniMetric label="Modules" value={modules.length} />
+          <MiniMetric label="Signals" value={signals.length} />
+          <MiniMetric label="Evidence" value={evidence.length} />
+        </div>
+      </div>
+
+      {modules.length > 0 ? (
+        <div className="grid gap-2 sm:grid-cols-2">
+          {modules.slice(0, 4).map((module, index) => (
+            <div
+              className="rounded-lg border border-line bg-surface-strong p-3"
+              key={`${getString(module.moduleId) ?? index}-${index}`}
+            >
+              <ToolHeader
+                label={getString(module.moduleLabel) ?? "Module"}
+                tone={getToneForStatus(module.readinessStatus)}
+                value={getString(module.readinessStatus)}
+              />
+              {isRecord(module.stats) ? (
+                <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                  <MiniMetric
+                    label="Records"
+                    value={getNumber(module.stats.recordCount) ?? 0}
+                  />
+                  <MiniMetric
+                    label="Work"
+                    value={getNumber(module.stats.workItemCount) ?? 0}
+                  />
+                  <MiniMetric
+                    label="Docs"
+                    value={getNumber(module.stats.documentCount) ?? 0}
+                  />
+                  <MiniMetric
+                    label="Views"
+                    value={getNumber(module.stats.savedViewCount) ?? 0}
+                  />
+                </div>
+              ) : null}
+            </div>
+          ))}
+        </div>
+      ) : null}
+
+      {signals.length > 0 ? (
+        <div className="space-y-2">
+          <div className="text-xs uppercase tracking-wide text-muted">
+            Signals
+          </div>
+          {signals.slice(0, 6).map((signal, index) => (
+            <div
+              className="rounded-lg border border-line bg-surface-strong px-3 py-2"
+              key={`${getString(signal.id) ?? index}-${index}`}
+            >
+              <ToolHeader
+                label={getString(signal.label) ?? "Signal"}
+                tone={getToneForStatus(signal.status)}
+                value={getString(signal.value) ?? getString(signal.status)}
+              />
+              <div className="mt-1 text-sm leading-6 text-muted">
+                {getString(signal.detail) ?? "No detail supplied."}
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : null}
+
+      <EvidenceList value={evidence} />
+
+      {missingData.length > 0 || safeNextActions.length > 0 ? (
+        <div className="grid gap-3 md:grid-cols-2">
+          {missingData.length > 0 ? (
+            <div className="rounded-lg border border-line bg-surface-strong p-3">
+              <div className="text-xs uppercase tracking-wide text-muted">
+                Missing data
+              </div>
+              <ul className="mt-2 space-y-1 text-sm leading-6 text-muted">
+                {missingData.slice(0, 5).map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
+          {safeNextActions.length > 0 ? (
+            <div className="rounded-lg border border-line bg-surface-strong p-3">
+              <div className="text-xs uppercase tracking-wide text-muted">
+                Safe next actions
+              </div>
+              <ul className="mt-2 space-y-1 text-sm leading-6 text-muted">
+                {safeNextActions.slice(0, 5).map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
 function StructuredToolOutput({ value }: { value: unknown }) {
   return (
     <div className="space-y-3">
+      <ErpReadToolOutputCard value={value} />
       <DiagnosisCards value={value} />
       <RecoveryPlanCard value={value} />
       <ApprovalOutputCard value={value} />

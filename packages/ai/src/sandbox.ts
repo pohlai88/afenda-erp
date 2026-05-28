@@ -65,7 +65,7 @@ function assessRisk(input: CreateActionSandboxInput): RiskAssessment {
 
 function assertSandboxCanTransition(input: {
   sandbox: ActionSandbox;
-  targetStatus: "approved" | "rejected";
+  targetStatus: "approved" | "rejected" | "discarded";
 }) {
   if (input.sandbox.status !== "pending") {
     throw new Error(
@@ -148,5 +148,23 @@ export function rejectActionSandbox(input: {
     rejectedAt,
     rejectionReason: input.reason,
     updatedAt: rejectedAt,
+  });
+}
+
+export function discardActionSandbox(input: {
+  sandbox: ActionSandbox;
+  discardedAt?: string;
+}): ActionSandbox {
+  assertSandboxCanTransition({
+    sandbox: input.sandbox,
+    targetStatus: "discarded",
+  });
+
+  const discardedAt = input.discardedAt ?? new Date().toISOString();
+
+  return actionSandboxSchema.parse({
+    ...input.sandbox,
+    status: "discarded",
+    updatedAt: discardedAt,
   });
 }

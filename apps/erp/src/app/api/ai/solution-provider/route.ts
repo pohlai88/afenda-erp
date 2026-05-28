@@ -1,10 +1,10 @@
 import {
   assertAiBudget,
   assertCapabilityAllowed,
+  assertGovernedToolset,
   assertNoSensitiveCredentialContent,
   createGatewayOptions,
   createSolutionProviderAgent,
-  createSolutionProviderTools,
   estimateTokenCount,
   getAiGatewayEnvironment,
   getAiModelForFeature,
@@ -12,40 +12,53 @@ import {
   getUsageMetrics,
   hasAiGatewayCredentials,
   isAiBudgetError,
+  isAiPermissionError,
   isAiSensitiveContentError,
+  solutionProviderToolMeta,
 } from "@afenda/ai";
 import { getApiAuthContext } from "@afenda/auth/server";
-import {
-  createAiActionSandbox,
-  createAiUsageEvent,
-  registerAiApprovalProposal,
-} from "@afenda/db";
-import {
-  getErpModuleById,
-  getModuleWorkspace,
-  getModuleWorkspaceStats,
-  moduleIds,
-  resolveWorkspaceDataMode,
-} from "@afenda/domain";
+import { createAiUsageEvent, isAiFeatureEnabledForOrganization } from "@afenda/db";
 import { getRequestId, logServerEvent } from "@afenda/observability";
 import { createAgentUIStreamResponse, type UIMessage } from "ai";
 import { NextResponse } from "next/server";
 import { z } from "zod";
+
 import { solutionProviderRequestSchema } from "@/lib/api/ai-request-schemas";
+import { createErpSolutionProviderTools } from "@/lib/api/solution-provider-tool-bindings";
+import { withAiSpan } from "@/lib/ai-tracing";
 
 export const maxDuration = 30;
 
+/**
+ * RFC 8594 deprecation headers for the legacy /api/ai/solution-provider endpoint.
+ * Canonical surface: /api/lynx/operator
+ */
+const DEPRECATION_HEADERS = {
+  Deprecation: "Thu, 01 May 2026 00:00:00 GMT",
+  Sunset: "Sat, 01 Aug 2026 00:00:00 GMT",
+  Link: '</api/lynx/operator>; rel="successor-version"',
+} as const;
+
+function addDeprecationHeaders(response: NextResponse): NextResponse {
+  for (const [key, value] of Object.entries(DEPRECATION_HEADERS)) {
+    response.headers.set(key, value);
+  }
+  return response;
+}
+
 function getGatewayUnavailableResponse() {
-  return NextResponse.json(
-    {
-      error:
-        "AI Gateway credentials are not configured. Run `vercel env pull` or set AI_GATEWAY_API_KEY.",
-    },
-    { status: 503 },
+  return addDeprecationHeaders(
+    NextResponse.json(
+      {
+        error:
+          "AI Gateway credentials are not configured. Run `vercel env pull` or set AI_GATEWAY_API_KEY.",
+      },
+      { status: 503 },
+    ),
   );
 }
 
-export async function POST(request: Request) {
+async function handlePost(request: Request): Promise<NextResponse | Response> {
   const startedAt = Date.now();
   const requestId = getRequestId(request);
   const route = "/api/ai/solution-provider";
@@ -62,7 +75,22 @@ export async function POST(request: Request) {
       return auth;
     }
 
-    const { session: activeSession, organization } = auth;
+    const { session, organization } = auth;
+    const isSolutionProviderEnabled = await isAiFeatureEnabledForOrganization({
+      organizationId: organization.id,
+      feature: "solution-provider",
+    });
+    if (!isSolutionProviderEnabled) {
+      return NextResponse.json(
+        { error: "Solution provider is disabled for this tenant." },
+        { status: 403 },
+      );
+    }
+    const isApprovalToolEnabled = await isAiFeatureEnabledForOrganization({
+      organizationId: organization.id,
+      feature: "approval-tool",
+    });
+
     assertCapabilityAllowed({
       capability: "dashboard.view",
       capabilities: organization.capabilities,
@@ -84,11 +112,11 @@ export async function POST(request: Request) {
 
     logServerEvent(
       "info",
-      "Solution Provider stream started.",
+      "Legacy solution-provider stream started (deprecated).",
       {
         requestId,
         organizationId: organization.id,
-        userId: activeSession.id,
+        userId: session.id,
         module: "dashboard",
         operation: "ai.solution-provider.stream",
       },
@@ -100,101 +128,26 @@ export async function POST(request: Request) {
       },
     );
 
-    async function getAllowedWorkspace(moduleId: (typeof moduleIds)[number]) {
-      const moduleDefinition = getErpModuleById(moduleId);
+    const tools = createErpSolutionProviderTools(auth, model, {
+      approvalToolEnabled: isApprovalToolEnabled,
+    });
 
-      if (!moduleDefinition) {
-        throw new Error(`Unknown ERP module: ${moduleId}`);
-      }
-
-      assertCapabilityAllowed({
-        capability: moduleDefinition.requiredCapability,
-        capabilities: organization.capabilities,
-      });
-
-      const workspace = await getModuleWorkspace({
-        organizationId: organization.id,
-        moduleId,
-        dataMode: resolveWorkspaceDataMode(activeSession.source),
-      });
-
-      return {
-        moduleDefinition,
-        workspace,
-      };
-    }
-
-    const tools = createSolutionProviderTools({
-      organization,
-      session: activeSession,
-      model,
-      getModuleDefinition: (moduleId) =>
-        getErpModuleById(moduleId) ?? undefined,
-      getAllowedWorkspace,
-      getWorkspaceStats: getModuleWorkspaceStats,
-      registerSolutionActionProposal: async (proposal) =>
-        registerAiApprovalProposal({
-          organizationId: proposal.organizationId,
-          moduleId: proposal.moduleId,
-          requestedByAuthUserId: proposal.requestedByAuthUserId,
-          model: proposal.model,
-          status: "approved",
-          proposedAction: "solution-action",
-          rationale: proposal.rationale,
-          riskLevel: proposal.riskLevel,
-          toolInput: {
-            title: proposal.title,
-            sourceRecordIds: proposal.sourceRecordIds,
-            requiredHumanChecks: proposal.requiredHumanChecks,
-            sandbox: proposal.sandbox ?? null,
-          },
-          toolOutput: {
-            humanApproved: true,
-            solutionProvider: true,
-            sandboxStatus: proposal.sandbox?.status ?? "approved",
-          },
-        }),
-      persistActionSandbox: async (sandbox, approvalProposalId) =>
-        createAiActionSandbox({
-          id: sandbox.id,
-          organizationId: sandbox.organizationId,
-          moduleId: sandbox.moduleId,
-          actionType: sandbox.actionType,
-          title: sandbox.title,
-          proposedBy: sandbox.proposedBy,
-          status: sandbox.status,
-          diff: sandbox.diff as Record<string, unknown>,
-          riskAssessment: sandbox.riskAssessment as Record<string, unknown>,
-          sourceEvidence: (sandbox.sourceEvidence ?? []) as Record<
-            string,
-            unknown
-          >[],
-          rollbackMetadata: sandbox.rollbackMetadata as
-            | Record<string, unknown>
-            | null
-            | undefined,
-          approvalProposalId,
-          rejectionReason: sandbox.rejectionReason,
-          approvedAt: sandbox.approvedAt
-            ? new Date(sandbox.approvedAt)
-            : undefined,
-          rejectedAt: sandbox.rejectedAt
-            ? new Date(sandbox.rejectedAt)
-            : undefined,
-          createdAt: new Date(sandbox.createdAt),
-          updatedAt: new Date(sandbox.updatedAt),
-        }),
+    assertGovernedToolset({
+      tools,
+      meta: solutionProviderToolMeta,
+      capabilities: organization.capabilities,
     });
 
     const agent = createSolutionProviderAgent({
       model,
       organizationName: organization.name,
       role: organization.role,
+      workflowId,
       tools,
       stopSteps: 8,
       providerOptions: createGatewayOptions({
         organizationId: organization.id,
-        userId: activeSession.id,
+        userId: session.id,
         feature: "solution-provider",
         moduleId: "dashboard",
         workflowId,
@@ -208,7 +161,7 @@ export async function POST(request: Request) {
 
         await createAiUsageEvent({
           organizationId: organization.id,
-          userAuthId: activeSession.id,
+          userAuthId: session.id,
           moduleId: "dashboard",
           feature: "solution-provider",
           model,
@@ -224,14 +177,20 @@ export async function POST(request: Request) {
       },
     });
 
-    return createAgentUIStreamResponse({
-      agent,
-      uiMessages: messages,
-    });
+    return withAiSpan(
+      "ai.solution-provider.stream",
+      {
+        feature: "solution-provider",
+        model,
+        organizationId: organization.id,
+        requestId,
+      },
+      () => createAgentUIStreamResponse({ agent, uiMessages: messages }),
+    );
   } catch (error) {
     logServerEvent(
       "error",
-      "Solution Provider stream failed.",
+      "Legacy solution-provider stream failed.",
       {
         requestId,
         module: "dashboard",
@@ -261,20 +220,36 @@ export async function POST(request: Request) {
       {
         error:
           error instanceof z.ZodError
-            ? "Invalid Solution Provider request."
+            ? "Invalid request."
             : isAiBudgetError(error)
-              ? "Solution Provider request exceeds the configured AI budget."
+              ? "Request exceeds the configured token budget."
               : isAiSensitiveContentError(error)
-                ? "Solution Provider request contains credential-like sensitive content."
-                : "Solution Provider failed.",
+                ? "Request contains credential-like sensitive content."
+                : isAiPermissionError(error)
+                  ? "Insufficient permissions."
+                  : "Request failed.",
       },
       {
         status: isAiBudgetError(error)
           ? 413
           : isAiSensitiveContentError(error)
             ? 422
-            : 400,
+            : isAiPermissionError(error)
+              ? 403
+              : 400,
       },
     );
   }
+}
+
+export async function POST(request: Request): Promise<NextResponse | Response> {
+  const response = await handlePost(request);
+  if (response instanceof NextResponse) {
+    return addDeprecationHeaders(response);
+  }
+  const headers = new Headers(response.headers);
+  for (const [key, value] of Object.entries(DEPRECATION_HEADERS)) {
+    headers.set(key, value);
+  }
+  return new Response(response.body, { status: response.status, headers });
 }

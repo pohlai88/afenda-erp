@@ -1,5 +1,6 @@
 import {
   assertAiBudget,
+  assertCapabilityAllowed,
   assertNoSensitiveCredentialContent,
   createGatewayOptions,
   documentExtractionRequestSchema,
@@ -12,15 +13,21 @@ import {
   hasAiGatewayCredentials,
   getDocumentExtractionPrompt,
   isAiBudgetError,
+  isAiPermissionError,
   isAiSensitiveContentError,
 } from "@afenda/ai";
-import { requireCapability } from "@afenda/auth/server";
-import { createAiUsageEvent, registerAiDocumentExtraction } from "@afenda/db";
+import { getApiAuthContext, requireCapability } from "@afenda/auth/server";
+import {
+  createAiUsageEvent,
+  isAiFeatureEnabledForOrganization,
+  registerAiDocumentExtraction,
+} from "@afenda/db";
 import { getErpModuleById } from "@afenda/domain";
 import { getRequestId, logServerEvent } from "@afenda/observability";
 import { generateText, Output } from "ai";
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { withAiSpan } from "@/lib/ai-tracing";
 
 export const maxDuration = 30;
 
@@ -45,6 +52,24 @@ export async function POST(request: Request) {
   }
 
   try {
+    const auth = await getApiAuthContext();
+
+    if (auth instanceof NextResponse) {
+      return auth;
+    }
+
+    const { session, organization } = auth;
+    const isExtractionEnabled = await isAiFeatureEnabledForOrganization({
+      organizationId: organization.id,
+      feature: "document-extraction",
+    });
+    if (!isExtractionEnabled) {
+      return NextResponse.json(
+        { error: "Document extraction is disabled for this tenant." },
+        { status: 403 },
+      );
+    }
+
     const parsedRequest = documentExtractionRequestSchema.parse(
       await request.json(),
     );
@@ -57,9 +82,11 @@ export async function POST(request: Request) {
       );
     }
 
-    const { session, organization } = await requireCapability(
-      moduleDefinition.requiredCapability,
-    );
+    await requireCapability(moduleDefinition.requiredCapability);
+    assertCapabilityAllowed({
+      capability: moduleDefinition.requiredCapability,
+      capabilities: organization.capabilities,
+    });
     const riskLevel = statusRiskFromDocumentText(parsedRequest.documentText);
     model = getAiModelForFeature("document-extraction", riskLevel);
     const estimatedPromptTokens = estimateTokenCount(
@@ -89,22 +116,33 @@ export async function POST(request: Request) {
       },
     );
 
-    const result = await generateText({
-      model,
-      output: Output.object({
-        schema: documentExtractionSchema,
-      }),
-      prompt: getDocumentExtractionPrompt(parsedRequest),
-      providerOptions: createGatewayOptions({
-        organizationId: organization.id,
-        userId: session.id,
+    const result = await withAiSpan(
+      "ai.extract.generateText",
+      {
         feature: "document-extraction",
+        model,
         moduleId: parsedRequest.moduleId,
-        riskLevel,
-        environment: getAiGatewayEnvironment(),
-        zeroDataRetention: true,
-      }),
-    });
+        organizationId: organization.id,
+        requestId,
+      },
+      () =>
+        generateText({
+          model,
+          output: Output.object({
+            schema: documentExtractionSchema,
+          }),
+          prompt: getDocumentExtractionPrompt(parsedRequest),
+          providerOptions: createGatewayOptions({
+            organizationId: organization.id,
+            userId: session.id,
+            feature: "document-extraction",
+            moduleId: parsedRequest.moduleId,
+            riskLevel,
+            environment: getAiGatewayEnvironment(),
+            zeroDataRetention: true,
+          }),
+        }),
+    );
 
     const extraction = result.output;
     const status = extraction.confidence >= 80 ? "completed" : "needs-review";
@@ -179,14 +217,18 @@ export async function POST(request: Request) {
               ? "Document exceeds the configured AI extraction budget."
               : isAiSensitiveContentError(error)
                 ? "Document contains credential-like sensitive content."
-                : "Document extraction failed.",
+                : isAiPermissionError(error)
+                  ? "Insufficient permissions for document extraction."
+                  : "Document extraction failed.",
       },
       {
         status: isAiBudgetError(error)
           ? 413
           : isAiSensitiveContentError(error)
             ? 422
-            : 400,
+            : isAiPermissionError(error)
+              ? 403
+              : 400,
       },
     );
   }

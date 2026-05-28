@@ -140,7 +140,7 @@ const moduleObservabilityIndicators: Record<
       tone: "warning",
     },
   ],
-  admin: [
+  "system-admin": [
     {
       label: "Privileged action logging",
       value: "Planned",

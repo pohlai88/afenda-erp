@@ -1,5 +1,5 @@
 /**
  * Server-only exports for @afenda/feature-hr.
- * Safe to import database helpers, auth server modules, and Node-only SDKs.
+ * HR query/command services and Drizzle-backed reads land here per TRACK-004 slices.
  */
 export * from "./metadata";

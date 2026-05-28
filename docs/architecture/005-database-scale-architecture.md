@@ -6,7 +6,7 @@
 | --------- | ------------------------------------------------------------------------------- |
 | Status    | Active — scale plan with as-built schema inventory (May 2026)                   |
 | Authority | Schema growth, ownership, promotion, performance on Neon + Vercel               |
-| Related   | **ARCH-002** (packages) · **ARCH-006** (query windows) · **ARCH-001** (runtime) |
+| Related   | **ARCH-002** (packages) · **ARCH-006** (query windows) · **ARCH-001** (runtime) · **ARCH-008** (package discipline) |
 
 Afenda ERP must be designed as a large transactional system before full module
 coding begins. The current shared ERP record tables are a useful foundation for
@@ -162,9 +162,10 @@ directly for module behavior.
 
 Start each mature module with explicit tables in
 `packages/db/src/schema/<moduleId>` and module-owned services in
-`packages/features/<moduleId>`. No feature packages exist on disk yet; shared
-ERP tables remain the compatibility layer until extraction per
-[ERP Domain Package Architecture](002-erp-domain-package-architecture.md).
+`packages/features/<moduleId>`. Feature packages are scaffolded on disk today;
+shared ERP tables remain the compatibility layer until extraction per
+[ERP Domain Package Architecture](002-erp-domain-package-architecture.md) and
+[Workspace Package Discipline](008-workspace-package-discipline.md).
 
 Use the current shared ERP tables for:
 
@@ -203,3 +204,4 @@ and telemetry.
 - **ARCH-006** [Metadata-Driven UI Architecture](006-metadata-driven-ui-architecture.md)
 - **ARCH-001** [System Architecture](001-system-architecture.md)
 - **ARCH-003** [Directory Architecture Audit](003-directory-architecture-audit.md)
+- **ARCH-008** [Workspace Package Discipline](008-workspace-package-discipline.md)

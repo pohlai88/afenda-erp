@@ -1,0 +1,119 @@
+import { getTranslations } from "next-intl/server"
+
+import { logUnexpectedServerError } from "@afenda/platform/logger.server"
+import { requireOrgSession } from "@afenda/platform/auth"
+
+import { buildEmbeddedListSurfaceErrorConfiguration } from "../data/lam-embedded-list-surface-error.server"
+import { buildLeaveRecentListSurfaceConfiguration } from "../data/leave-list-surface.server"
+import { LEAVE_LIST_SURFACE_IDS } from "../data/leave-surface-metadata.shared"
+import {
+  type OrgLeaveRequestRow,
+  listAllLeaveRequestsForOrg,
+} from "../data/leave-request.queries.server"
+
+import { GovernedPatternCListSection } from "@afenda/governed-surface/server"
+
+import { LeaveRecentTrailingCell } from "./leave-recent-trailing-cell.client"
+
+const RECENT_STATES = [
+  "approved",
+  "rejected",
+  "returned",
+  "cancelled",
+  "taken",
+] as const
+
+type RecentState = (typeof RECENT_STATES)[number]
+
+const STATE_LABEL_KEY: Record<RecentState, `state.${RecentState}`> = {
+  approved: "state.approved",
+  rejected: "state.rejected",
+  returned: "state.returned",
+  cancelled: "state.cancelled",
+  taken: "state.taken",
+}
+
+function isRecentState(value: string): value is RecentState {
+  return (RECENT_STATES as readonly string[]).includes(value)
+}
+
+export async function LeaveRecentTable({
+  orgSlug,
+  isAdmin,
+}: {
+  orgSlug: string
+  isAdmin: boolean
+}) {
+  const [orgSession, t] = await Promise.all([
+    requireOrgSession(),
+    getTranslations("Erp.Hrm.leave"),
+  ])
+
+  let rows: OrgLeaveRequestRow[]
+  try {
+    rows = await listAllLeaveRequestsForOrg(orgSession.organizationId, {
+      states: RECENT_STATES,
+      limit: 50,
+    })
+  } catch (err) {
+    logUnexpectedServerError("leave-recent-table: query failed", err, {
+      organizationId: orgSession.organizationId,
+    })
+    return (
+      <GovernedPatternCListSection
+        layout="embedded"
+        title=""
+        listConfiguration={buildEmbeddedListSurfaceErrorConfiguration({
+          columnsId: LEAVE_LIST_SURFACE_IDS.recent,
+          emptyTitle: t("recentEmpty"),
+          firstColumn: { id: "employee", header: t("colEmployee") },
+        })}
+        surfaceKey="hrm:leave:recent:error"
+        resolveConfiguredPermission={false}
+        loadError={{
+          variant: "error",
+          title: t("recentLoadFailed"),
+        }}
+      />
+    )
+  }
+
+  const stateLabelFor = (state: string) =>
+    isRecentState(state) ? t(STATE_LABEL_KEY[state]) : state
+
+  const listConfiguration = buildLeaveRecentListSurfaceConfiguration(
+    rows,
+    orgSlug,
+    {
+      empty: t("recentEmpty"),
+      colEmployee: t("colEmployee"),
+      colLeaveType: t("colLeaveType"),
+      colDates: t("colDates"),
+      colState: t("colState"),
+      colUpdated: t("colUpdated"),
+      stateLabelFor,
+      exportReportLabel: isAdmin ? t("exportReport") : undefined,
+    }
+  )
+
+  return (
+    <GovernedPatternCListSection
+      layout="embedded"
+      title=""
+      listConfiguration={listConfiguration}
+      surfaceKey="hrm:leave:recent"
+      invalid={{
+        variant: "error",
+        title: t("recentLoadFailed"),
+      }}
+      trailingColumn={
+        isAdmin
+          ? {
+              header: t("colActions"),
+              Cell: LeaveRecentTrailingCell,
+            }
+          : undefined
+      }
+    />
+  )
+}

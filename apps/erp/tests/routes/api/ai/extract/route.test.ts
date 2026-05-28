@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("@afenda/ai", () => ({
   assertAiBudget: vi.fn(),
+  assertCapabilityAllowed: vi.fn(),
   assertNoSensitiveCredentialContent: vi.fn(),
   createGatewayOptions: vi.fn(),
   documentExtractionRequestSchema: {
@@ -18,11 +19,12 @@ vi.mock("@afenda/ai", () => ({
   getUsageMetrics: vi.fn(),
   hasAiGatewayCredentials: vi.fn(),
   isAiBudgetError: vi.fn(() => false),
+  isAiPermissionError: vi.fn(() => false),
   isAiSensitiveContentError: vi.fn(() => false),
 }));
 
 vi.mock("@afenda/auth/server", () => ({
-  requireCapability: vi.fn(),
+  getApiAuthContext: vi.fn(),
 }));
 
 vi.mock("@afenda/db", () => ({
@@ -46,13 +48,37 @@ vi.mock("ai", () => ({
   },
 }));
 
+vi.mock("@/lib/ai-tracing", () => ({
+  withAiSpan: vi.fn((_name, _attrs, fn: () => unknown) => fn()),
+}));
+
 import { hasAiGatewayCredentials } from "@afenda/ai";
+import { getApiAuthContext, type ApiAuthContext } from "@afenda/auth/server";
 import { getErpModuleById } from "@afenda/domain";
 import { POST } from "@/app/api/ai/extract/route";
+
+const authContext: ApiAuthContext = {
+  session: {
+    id: "user_test",
+    source: "neon",
+    name: "Test User",
+    email: "test@example.com",
+    activeOrganizationId: "org_test",
+    organizations: [],
+  },
+  organization: {
+    id: "org_test",
+    name: "Test Org",
+    slug: "test-org",
+    role: "owner",
+    capabilities: ["finance.view"],
+  },
+};
 
 describe("extract route", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.mocked(getApiAuthContext).mockResolvedValue(authContext);
   });
 
   it("returns 503 when AI gateway credentials are missing", async () => {

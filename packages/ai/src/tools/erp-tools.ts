@@ -88,6 +88,7 @@ export function createErpAssistantTools<
     workspace: TWorkspace;
   }>;
   getWorkspaceStats: (workspace: TWorkspace) => ErpAssistantToolWorkspaceStats;
+  isApprovalToolEnabled?: () => boolean | Promise<boolean>;
   registerApprovalProposal: (
     proposal: RegisterApprovalProposalInput,
   ) => Promise<string>;
@@ -103,6 +104,7 @@ export function createErpAssistantTools<
     getModuleDefinition,
     getAllowedWorkspace,
     getWorkspaceStats,
+    isApprovalToolEnabled,
     registerApprovalProposal,
     persistActionSandbox,
   } = input;
@@ -241,6 +243,10 @@ export function createErpAssistantTools<
       strict: true,
       needsApproval: true,
       execute: async (proposal) => {
+        if (isApprovalToolEnabled && !(await isApprovalToolEnabled())) {
+          throw new Error("Approval tools are disabled for this tenant.");
+        }
+
         const moduleDefinition = getModuleDefinition(proposal.moduleId);
 
         if (!moduleDefinition) {

@@ -1,9 +1,9 @@
 /**
  * @afenda/feature-hr
  *
- * Public surface for the hr feature module.
- * Server-only exports are available via `./server`.
- * Client component exports are available via `./client`.
- * Metadata builder exports are available via `./metadata`.
+ * Target home for ERP HR (moduleId: `hr`). Server-only code: `./server`.
+ * Client-safe code: `./client`. Governed metadata: `./metadata`.
+ *
+ * Legacy HRM migration input: `packages/features/hrm`. Doctrine: ARCH-010.
  */
 export * from "./metadata";

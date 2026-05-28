@@ -8,7 +8,7 @@ export const moduleIds = [
   "crm",
   "approvals",
   "reports",
-  "admin",
+  "system-admin",
 ] as const;
 
 export type ModuleId = (typeof moduleIds)[number];
@@ -22,7 +22,7 @@ export const coreModuleIds = [
   "crm",
   "approvals",
   "reports",
-  "admin",
+  "system-admin",
 ] as const satisfies readonly ModuleId[];
 
 export const documentExtractionModuleIds = coreModuleIds;
@@ -32,7 +32,7 @@ export const approvalToolModuleIds = [
   "finance",
   "purchasing",
   "hr",
-  "admin",
+  "system-admin",
 ] as const satisfies readonly ModuleId[];
 
 export function isModuleId(value: string): value is ModuleId {

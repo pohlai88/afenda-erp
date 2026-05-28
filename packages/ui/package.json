@@ -24,10 +24,16 @@
       "import": "./src/utils.ts",
       "default": "./dist/utils.js"
     },
+    "./use-hydrated.client": {
+      "types": "./src/use-hydrated.client.ts",
+      "development": "./src/use-hydrated.client.ts",
+      "import": "./src/use-hydrated.client.ts",
+      "default": "./dist/use-hydrated.client.js"
+    },
     "./*": {
-      "types": "./src/*",
-      "development": "./src/*",
-      "import": "./src/*",
+      "types": "./src/*.tsx",
+      "development": "./src/*.tsx",
+      "import": "./src/*.tsx",
       "default": "./dist/*.js"
     }
   },

@@ -12,8 +12,16 @@ const ROUTES = [
     test: (p) => p.startsWith("apps/erp/"),
     hint: [
       "**apps/erp** — rule `@afenda-erp-app` / `afenda-erp-app`.",
-      "Doctrine: **ARCH-001** + `AGENTS.md` (repo root).",
-      "Before done: `pnpm typecheck`; routes/flows → `pnpm test` / `pnpm test:e2e`.",
+      "Doctrine: **ARCH-001** + `AGENTS.md`; feature deps via public doors + `afendaTranspilePackages` (**ARCH-008**).",
+      "Before done: `pnpm typecheck`; dep/export changes → `pnpm architecture:check`; routes/flows → `pnpm test` / `pnpm test:e2e`.",
+    ].join(" "),
+  },
+  {
+    test: (p) => /^packages\/db\/src\/schema\/.+\.ts$/.test(p),
+    hint: [
+      "**schema edit** — rules `afenda-database`, `afenda-database-migrations`.",
+      "Do not hand-write `drizzle/*.sql` or raw DDL.",
+      "Before done: `pnpm db:generate` → review SQL → `pnpm db:migrate`.",
     ].join(" "),
   },
   {
@@ -21,7 +29,7 @@ const ROUTES = [
     hint: [
       "**packages/db** — rule `afenda-database`.",
       "Doctrine: **ARCH-005** (schema/promotion), **ARCH-002** (ownership).",
-      "Schema changes: `pnpm db:generate` and review migrations.",
+      "Schema: edit `src/schema` only; `pnpm db:generate` + `pnpm db:migrate`.",
     ].join(" "),
   },
   {
@@ -39,7 +47,22 @@ const ROUTES = [
     test: (p) => p.startsWith("packages/features/"),
     hint: [
       "**feature package** — rule `afenda-feature-packages`.",
-      "Doctrine: **ARCH-002**, **ARCH-004**.",
+      "Doctrine: **ARCH-008** (export doors, flat workspace), **ARCH-002**, **ARCH-004**.",
+      "Doors: `.`, `./client`, `./server`, `./metadata` — no `/src`, `/dist`, `/internal`; `./client` must not pull db/ai/workflows/auth/server.",
+      "Before done: `pnpm architecture:check`.",
+    ].join(" "),
+  },
+  {
+    test: (p) => p === "packages/config/src/next.ts",
+    hint: [
+      "**afendaTranspilePackages** — keep in sync with `apps/erp` workspace deps.",
+      "Doctrine: **ARCH-008**. Before done: `pnpm architecture:check`.",
+    ].join(" "),
+  },
+  {
+    test: (p) => p === "scripts/check-directory-architecture.mts",
+    hint: [
+      "**architecture guard** — update **ARCH-008** / **ARCH-003** in the same PR when changing enforcement.",
       "Before done: `pnpm architecture:check`.",
     ].join(" "),
   },
@@ -47,8 +70,8 @@ const ROUTES = [
     test: (p) => p.startsWith("packages/"),
     hint: [
       "**workspace package** — rule `afenda-core` (+ package-specific rules).",
-      "Boundaries: **ARCH-002**, **ARCH-003**.",
-      "Before done: `pnpm architecture:check` if layout/exports changed.",
+      "Boundaries: **ARCH-008**, **ARCH-002**, **ARCH-003**.",
+      "Before done: `pnpm architecture:check` if layout/exports/imports changed.",
     ].join(" "),
   },
   {

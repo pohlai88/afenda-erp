@@ -31,6 +31,10 @@ function isDuplicateDdlError(error: unknown) {
   return message.includes("already exists");
 }
 
+async function ensurePgVectorExtension() {
+  await sql.query(`create extension if not exists vector`);
+}
+
 async function ensureMigrationTable() {
   await sql.query(`
     create table if not exists afenda_schema_migrations (
@@ -106,6 +110,7 @@ async function applyMigration(
 }
 
 async function main() {
+  await ensurePgVectorExtension();
   await ensureMigrationTable();
   const applied = await getAppliedMigrations();
   const allowExistingObjects =

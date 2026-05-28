@@ -83,7 +83,7 @@ assert.equal(
 assert.equal(estimateTokenCount("12345678"), 2);
 assert.equal(
   getAiModelForFeature("approval-tools", "high", {}),
-  "openai/gpt-5.4",
+  "anthropic/claude-opus-4.7",
 );
 assert.equal(
   getAiModelForFeature("record-search", "low", {

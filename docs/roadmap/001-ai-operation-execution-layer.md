@@ -141,11 +141,13 @@ Reuse existing components — no new renderer infrastructure required.
 
 ## Out of scope (explicit YAGNI)
 
-- New `lms` module, `lms_*` tables, LMS capabilities, `/lms` route.
+**Final disposition:** **TRACK-003** (no further “defer” — implement or cancel).
+
+- New `lms` module, `lms_*` tables, LMS capabilities, `/lms` route — **cancelled** until Appendix A track.
 - New AI schemas for training plans, schedules, learners, assessments, certifications.
 - New AI tools (`analyzeTrainingNeeds`, `designTrainingPlan`, etc.).
-- Vercel Workflow DevKit (`'use workflow'`, `defineHook`).
-- Embeddings or semantic search.
+- Vercel Workflow DevKit (`'use workflow'`, `defineHook`) — **cancelled**; use cron routes.
+- Embeddings or semantic search — **cancelled** for v1.
 - Per-module sandbox tables or per-module state machines.
 
 ---

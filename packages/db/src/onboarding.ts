@@ -158,7 +158,7 @@ export async function bootstrapOrganizationForUser(input: {
             "crm",
             "approvals",
             "reports",
-            "admin",
+            "system-admin",
           ],
         },
       });

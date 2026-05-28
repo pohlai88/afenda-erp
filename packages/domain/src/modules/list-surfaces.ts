@@ -18,15 +18,6 @@ import {
   solutionConsoleSections,
 } from "../shell/route-copy-metadata";
 
-type AiApprovalProposalListRow = {
-  id: string;
-  moduleId: string;
-  proposedAction: string;
-  rationale: string;
-  riskLevel: string;
-  status: string;
-  created: string;
-};
 type AiUsageListRow = {
   id: string;
   feature: string;
@@ -1184,102 +1175,6 @@ export function buildOperationalSkillsListSurface(input: {
         approvalPolicy: skill.approvalPolicy,
         description: skill.description,
       },
-    })),
-  });
-}
-
-export const adminAiUsageSurfaceKey = "admin.ai-usage.list";
-export const adminAiApprovalsSurfaceKey = "admin.ai-approvals.list";
-
-export function buildAdminAiUsageListSurface(input: {
-  events: readonly AiUsageListRow[];
-}): ListSurfaceRendererConfigurationResolvedInput {
-  const rows = input.events;
-
-  return buildGovernedListSurface({
-    __schemaVersion: GOVERNED_METADATA_SCHEMA_VERSION,
-    dataNature: "table",
-    presentationProfile: "erp-operational-table",
-    requiresErpPermission: {
-      module: "admin",
-      object: "ai-usage",
-      function: "read",
-    },
-    pagination: buildPagination(undefined, rows.length),
-    surface: {
-      header: { title: "AI usage ledger" },
-      columnsId: "admin-ai-usage",
-      rowKey: "id",
-      empty: {
-        variant: "muted",
-        title: "No AI usage events recorded yet.",
-      },
-    },
-    columns: DASHBOARD_AI_USAGE_COLUMNS,
-    rows: rows.map((event) => ({
-      id: event.id,
-      cells: {
-        feature: event.feature,
-        model: event.model,
-        status: event.status,
-        totalTokens: event.totalTokens,
-        latency: event.latency,
-      },
-    })),
-  });
-}
-
-const ADMIN_AI_APPROVALS_COLUMNS = [
-  {
-    id: "proposedAction",
-    header: "Action",
-    priority: "primary" as const,
-    pin: "start" as const,
-  },
-  { id: "moduleId", header: "Module" },
-  { id: "riskLevel", header: "Risk", cellKind: { kind: "badge" as const } },
-  { id: "status", header: "Status", cellKind: { kind: "badge" as const } },
-  { id: "created", header: "Created" },
-];
-
-export function buildAdminAiApprovalsListSurface(input: {
-  proposals: readonly AiApprovalProposalListRow[];
-}): ListSurfaceRendererConfigurationResolvedInput {
-  const rows = input.proposals;
-
-  return buildGovernedListSurface({
-    __schemaVersion: GOVERNED_METADATA_SCHEMA_VERSION,
-    dataNature: "table",
-    presentationProfile: "erp-operational-table",
-    requiresErpPermission: {
-      module: "admin",
-      object: "ai-approvals",
-      function: "read",
-    },
-    pagination: buildPagination(undefined, rows.length),
-    surface: {
-      header: { title: "AI approval proposals" },
-      columnsId: "admin-ai-approvals",
-      rowKey: "id",
-      empty: {
-        variant: "muted",
-        title: "No AI approval proposals recorded yet.",
-      },
-    },
-    columns: ADMIN_AI_APPROVALS_COLUMNS,
-    rows: rows.map((proposal) => ({
-      id: proposal.id,
-      cells: {
-        proposedAction: proposal.proposedAction,
-        moduleId: proposal.moduleId,
-        riskLevel: proposal.riskLevel,
-        status: proposal.status,
-        created: proposal.created,
-      },
-      rowTone:
-        proposal.riskLevel === "high"
-          ? ("attention" as const)
-          : ("default" as const),
     })),
   });
 }

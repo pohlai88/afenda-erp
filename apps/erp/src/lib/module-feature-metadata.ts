@@ -1,6 +1,6 @@
 import type { CoreModuleId, ModuleFeatureMetadata, ModuleId } from "@afenda/domain";
 import { isCoreModuleId } from "@afenda/domain";
-import * as admin from "@afenda/feature-admin/metadata";
+import * as systemAdmin from "@afenda/feature-system-admin/metadata";
 import * as approvals from "@afenda/feature-approvals/metadata";
 import * as crm from "@afenda/feature-crm/metadata";
 import * as finance from "@afenda/feature-finance/metadata";
@@ -11,7 +11,7 @@ import * as reports from "@afenda/feature-reports/metadata";
 import * as sales from "@afenda/feature-sales/metadata";
 
 const moduleFeatureMetadataById = {
-  admin,
+  "system-admin": systemAdmin,
   approvals,
   crm,
   finance,

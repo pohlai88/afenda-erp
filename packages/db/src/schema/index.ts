@@ -3,5 +3,7 @@ export * from "./ai";
 export * from "./common";
 export * from "./erp";
 export * from "./identity";
+export * from "./knowledge";
 export * from "./organizations";
 export * from "./permissions";
+export * from "./system-admin";

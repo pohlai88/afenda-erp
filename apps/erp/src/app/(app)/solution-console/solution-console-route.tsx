@@ -1,5 +1,15 @@
 import { requireCapability } from "@afenda/auth/server";
 import { getOperationalSkills } from "@afenda/ai";
+import { listLynxRunLedger, type LynxRunLedgerSummary } from "@afenda/db";
+import { getLynxReadinessSnapshot } from "@afenda/feature-lynx/server";
+import {
+  buildLynxActivityLedgerListSurface,
+  buildLynxEnterpriseControlsListSurface,
+  buildLynxModuleReadinessListSurface,
+  buildLynxReadinessStatGrid,
+  buildLynxToolAvailabilityListSurface,
+  getLynxReadinessSurfaceKeys,
+} from "@afenda/feature-lynx/metadata";
 import {
   buildOperationalSkillsListSurface,
   buildRecoveryPlaybookListSurface,
@@ -27,15 +37,19 @@ import {
   GovernedPatternBStatSection,
   GovernedPatternCListSection,
 } from "@afenda/governed-surface/server";
-import {
-  ModuleLinkGrid,
-  SectionPanel,
-  StatusBadge,
-} from "@afenda/ui";
+import { Button, ModuleLinkGrid, SectionPanel, StatusBadge } from "@afenda/ui";
 import Link from "next/link";
-import { SolutionProviderPanel } from "./solution-provider-panel";
+import { LynxOperatorPanel } from "./lynx-operator-panel";
 
 const recoveryModuleIds = getRecoveryConsoleModuleIds();
+
+function formatSolutionConsoleMetricValue(metricId: string, value: number) {
+  if (metricId === "evidence-records") return `${value} records`;
+  if (metricId === "workflow-items") return `${value} items`;
+  if (metricId === "high-priority") return `${value} urgent`;
+  if (metricId === "documents") return `${value} documents`;
+  return `${value} total`;
+}
 
 export async function SolutionConsoleRoutePage() {
   const { session, organization } = await requireCapability("dashboard.view");
@@ -68,10 +82,28 @@ export async function SolutionConsoleRoutePage() {
           limit: 8,
         })
       : Promise.resolve([]);
-  const [workspaces, aiUsageRows] = await Promise.all([
-    workspacesPromise,
-    aiUsageRowsPromise,
-  ]);
+  const lynxActivityPromise =
+    session.source === "neon"
+      ? listLynxRunLedger({
+          organizationId: organization.id,
+          limit: 8,
+        })
+      : Promise.resolve([]);
+  const lynxReadinessPromise =
+    session.source === "neon"
+      ? getLynxReadinessSnapshot({
+          organizationId: organization.id,
+          capabilities: organization.capabilities,
+          sessionSource: session.source,
+        })
+      : Promise.resolve(null);
+  const [workspaces, aiUsageRows, lynxActivity, lynxReadiness] =
+    await Promise.all([
+      workspacesPromise,
+      aiUsageRowsPromise,
+      lynxActivityPromise,
+      lynxReadinessPromise,
+    ]);
   const totals = workspaces.reduce(
     (current, item) => ({
       records: current.records + item.stats.recordCount,
@@ -114,6 +146,7 @@ export async function SolutionConsoleRoutePage() {
     totals.documents > 0 ? "positive" : "neutral",
   ] as const;
   const surfaceKeys = getSolutionConsoleListSurfaceKeys();
+  const lynxSurfaceKeys = getLynxReadinessSurfaceKeys();
   const evidenceListSurface = buildSolutionConsoleEvidenceListSurface({
     rows: workspaces.map((item) => ({
       moduleId: item.moduleId,
@@ -127,16 +160,49 @@ export async function SolutionConsoleRoutePage() {
   const aiUsageListSurface = buildSolutionConsoleAiUsageListSurface({
     events: aiUsageRows,
   });
+  const lynxActivityLedgerListSurface = buildLynxActivityLedgerListSurface({
+    rows: (lynxActivity as readonly LynxRunLedgerSummary[]).map((item) => ({
+      id: item.id,
+      kind: "run",
+      label: item.workflowId ?? item.route,
+      detail: item.promptSummary,
+      status: item.status,
+      moduleId:
+        typeof item.metadata.moduleId === "string"
+          ? item.metadata.moduleId
+          : "solution-console",
+      createdAt: item.startedAt.toLocaleString(),
+      href: `/solution-console/runs/${item.id}`,
+    })),
+  });
+  const lynxReadinessStatGrid = lynxReadiness
+    ? buildLynxReadinessStatGrid({ snapshot: lynxReadiness })
+    : null;
+  const lynxModuleReadinessListSurface = lynxReadiness
+    ? buildLynxModuleReadinessListSurface({
+        modules: lynxReadiness.modules.slice(0, 8),
+      })
+    : null;
+  const lynxEnterpriseControlsListSurface = lynxReadiness
+    ? buildLynxEnterpriseControlsListSurface({
+        controls: lynxReadiness.enterpriseControls,
+      })
+    : null;
+  const lynxToolAvailabilityListSurface = lynxReadiness
+    ? buildLynxToolAvailabilityListSurface({
+        tools: lynxReadiness.tools,
+      })
+    : null;
 
   return (
-    <div className="space-y-6">
+    <div className="flex flex-col gap-6">
       <SectionPanel
         eyebrow={heroSection.eyebrow}
         headingLevel={1}
         title={heroCopy.title}
         description={heroCopy.description}
         aside={
-          <div className="space-y-3 text-right">
+          <div className="flex flex-col gap-3 text-right">
             <StatusBadge
               label={heroCopy.statusLabel}
               tone={heroCopy.statusTone}
@@ -157,7 +223,10 @@ export async function SolutionConsoleRoutePage() {
               configuration: buildSolutionConsoleStatGrid({
                 metrics: solutionConsoleMetrics.map((metric, index) => ({
                   label: metric.label,
-                  value: String(metricValues[index] ?? 0),
+                  value: formatSolutionConsoleMetricValue(
+                    metric.id,
+                    metricValues[index] ?? 0,
+                  ),
                   detail: metric.detail,
                   tone: metricTones[index] ?? "neutral",
                 })),
@@ -174,6 +243,16 @@ export async function SolutionConsoleRoutePage() {
         listConfiguration={playbookListSurface}
         parentAccessAllowed
         layout="embedded"
+        headerSlot={
+          <div className="mb-3">
+            <h2 className="text-base font-semibold tracking-tight">
+              {playbookSection.title}
+            </h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              {playbookSection.description}
+            </p>
+          </div>
+        }
       />
 
       <GovernedPatternCListSection
@@ -183,6 +262,16 @@ export async function SolutionConsoleRoutePage() {
         listConfiguration={skillsListSurface}
         parentAccessAllowed
         layout="embedded"
+        headerSlot={
+          <div className="mb-3">
+            <h2 className="text-base font-semibold tracking-tight">
+              {skillsSection.title}
+            </h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              {skillsSection.description}
+            </p>
+          </div>
+        }
       />
 
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1.25fr)_minmax(360px,0.75fr)]">
@@ -190,39 +279,112 @@ export async function SolutionConsoleRoutePage() {
           title={agentSection.title}
           description={agentSection.description}
         >
-          <SolutionProviderPanel />
+          <LynxOperatorPanel />
         </SectionPanel>
 
         <SectionPanel
           title={evidenceSection.title}
           description={evidenceSection.description}
         >
-          <div className="space-y-4">
+          <div className="flex flex-col gap-4">
             <GovernedPatternCListSection
               title={evidenceSection.title}
-              description={evidenceSection.description}
               surfaceKey={surfaceKeys.evidence}
               listConfiguration={evidenceListSurface}
               parentAccessAllowed
               layout="embedded"
             />
-            <div className="rounded-lg border border-line bg-surface-strong p-4">
-              <div className="text-sm font-semibold text-foreground">
-                {aiLedgerSection.title}
+            {lynxReadiness ? (
+              <div className="flex flex-col gap-4">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <div className="text-sm font-semibold text-foreground">
+                      Lynx readiness
+                    </div>
+                    <div className="mt-2 text-sm leading-6 text-muted">
+                      {lynxReadiness.summary}
+                    </div>
+                  </div>
+                  <StatusBadge
+                    label={lynxReadiness.status}
+                    tone={
+                      lynxReadiness.status === "available"
+                        ? "positive"
+                        : lynxReadiness.status === "partial"
+                          ? "warning"
+                          : "neutral"
+                    }
+                  />
+                </div>
+                {lynxReadinessStatGrid ? (
+                  <GovernedPatternBStatSection
+                    title="Lynx readiness"
+                    surfaceKey={lynxSurfaceKeys.stats}
+                    layout="embedded"
+                    statGroups={[
+                      {
+                        groupKey: "lynx-readiness",
+                        configuration: lynxReadinessStatGrid,
+                      },
+                    ]}
+                  />
+                ) : null}
+                {lynxModuleReadinessListSurface ? (
+                  <GovernedPatternCListSection
+                    title="Module readiness"
+                    surfaceKey={lynxSurfaceKeys.modules}
+                    listConfiguration={lynxModuleReadinessListSurface}
+                    parentAccessAllowed
+                    layout="embedded"
+                  />
+                ) : null}
+                {lynxEnterpriseControlsListSurface ? (
+                  <GovernedPatternCListSection
+                    title="Enterprise controls"
+                    surfaceKey={lynxSurfaceKeys.controls}
+                    listConfiguration={lynxEnterpriseControlsListSurface}
+                    parentAccessAllowed
+                    layout="embedded"
+                  />
+                ) : null}
+                {lynxToolAvailabilityListSurface ? (
+                  <GovernedPatternCListSection
+                    title="Lynx tool availability"
+                    surfaceKey={lynxSurfaceKeys.tools}
+                    listConfiguration={lynxToolAvailabilityListSurface}
+                    parentAccessAllowed
+                    layout="embedded"
+                  />
+                ) : null}
               </div>
-              <div className="mt-2 text-sm leading-6 text-muted">
-                {aiLedgerSection.description}
-              </div>
-              <div className="mt-4">
-                <GovernedPatternCListSection
-                  title={aiLedgerSection.title}
-                  surfaceKey={surfaceKeys.aiUsage}
-                  listConfiguration={aiUsageListSurface}
-                  parentAccessAllowed
-                  layout="embedded"
-                />
+            ) : null}
+            <GovernedPatternCListSection
+              title="Lynx run ledger"
+              description="Prompts, retrieval, approvals, sandboxes, and execution state for the active organization."
+              surfaceKey={lynxSurfaceKeys.activity}
+              listConfiguration={lynxActivityLedgerListSurface}
+              parentAccessAllowed
+              layout="embedded"
+            />
+            <div className="flex justify-end">
+              <div className="flex flex-wrap justify-end gap-2">
+                <Button asChild variant="outline">
+                  <Link href="/solution-console/workflows">
+                    Open workflow sessions
+                  </Link>
+                </Button>
+                <Button asChild variant="outline">
+                  <Link href="/solution-console/runs">Open run console</Link>
+                </Button>
               </div>
             </div>
+            <GovernedPatternCListSection
+              title={aiLedgerSection.title}
+              surfaceKey={surfaceKeys.aiUsage}
+              listConfiguration={aiUsageListSurface}
+              parentAccessAllowed
+              layout="embedded"
+            />
           </div>
         </SectionPanel>
       </div>

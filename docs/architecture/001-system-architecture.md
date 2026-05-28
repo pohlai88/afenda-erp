@@ -7,7 +7,7 @@
 | Status     | Active — aligned with `afenda-erp` repo as-built (May 2026)                    |
 | Authority  | Product-wide runtime, deployment, data, auth, AI, observability                |
 | Supersedes | Informal root architecture draft (removed; do not add new copies)              |
-| Related    | **ARCH-002** (packages) · **ARCH-006** (metadata UI) · **ARCH-005** (database) |
+| Related    | **ARCH-002** (packages) · **ARCH-006** (metadata UI) · **ARCH-005** (database) · **ARCH-008** (package discipline) |
 
 ## Executive Summary
 
@@ -132,6 +132,12 @@ Package ownership rules:
 - `packages/ui` must stay primitive-focused and cannot access metadata render
   registries, the database, auth session, or AI models directly.
 
+Workspace package split discipline is defined in
+[Workspace Package Discipline](008-workspace-package-discipline.md). Large
+modules use one feature workspace per canonical module with grouped internal
+folders until a separate workspace has independent ownership, reuse, or
+dependency pressure that justifies a new package class.
+
 ## Application Architecture
 
 `apps/erp` uses the Next.js App Router with Server Components as the default.
@@ -200,7 +206,7 @@ Afenda ERP v1 targets SME core ERP modules:
 | CRM        | Leads, accounts, contacts, activities                 | `features/crm`, `db`                        |
 | Approvals  | Approval rules, tasks, escalations, comments          | `features/approvals`, `workflows`, `db`     |
 | Reports    | Operational reports, exports, saved views             | `features/reports`, `observability`, `db`   |
-| Admin      | Tenant settings, users, roles, audit log              | `features/admin`, `auth`, `db`              |
+| System admin | Tenant settings, users, roles, audit log            | `features/system-admin`, `auth`, `db`       |
 
 Business rules live in feature packages once a module becomes real; they do not
 live in React route components. `packages/domain` remains the cross-module
@@ -809,12 +815,13 @@ by tenant. Local development requires `AI_GATEWAY_API_KEY` (or
 `VERCEL_OIDC_TOKEN` from `vercel env pull` when testing OIDC flows) before model
 calls execute; Vercel deployments use OIDC automatically when AI Gateway is
 enabled.
-The `/solution-console` route and `/api/ai/solution-provider` handler extend the
-AI layer into a problem-first Solution Provider Console. The first flagship
-workflow is negative P&L recovery: the agent gathers module evidence, diagnoses
+The `/solution-console` route and `/api/lynx/operator` handler extend the
+machine layer (Lynx Operator) for problem-first ERP recovery. The first flagship
+workflow is negative P&L recovery: Lynx gathers module evidence, diagnoses
 likely root causes, drafts recovery playbooks, and requires human approval
-before recording audit-sensitive action proposals. Solution Provider usage is
-tagged separately in AI Gateway and persisted as a tenant AI usage feature.
+before recording audit-sensitive action proposals. Operator usage is tagged
+as `lynx-operator` in AI Gateway and persisted as a tenant usage feature.
+`/api/ai/solution-provider` remains as a deprecated compatibility shim (RFC 8594).
 The AI layer also exposes a reusable operation skill foundation: context
 assembly, source grounding, confidence scoring, action sandboxes, and an
 operational skill catalog. This moves Afenda AI toward operation design, where a
@@ -846,10 +853,12 @@ accepts signed Vercel Drain payloads with raw-body HMAC-SHA1 verification throug
 `VERCEL_DRAIN_SECRET`. Root scripts include `pnpm performance:budget` for
 post-build static asset budgets, `pnpm analyze:erp` for Next.js bundle analysis,
 and `pnpm security:review` for automated guard checks across auth, tenant
-scoping, uploads, AI tools, cron, drains, and persistence. Postgres RLS remains
-in evaluation mode: tenant-scoped tables are identified as candidates, but
-enforcement should wait until every request sets a database-local organization
-context for policy evaluation.
+scoping, uploads, AI tools, cron, drains, and persistence. Postgres RLS policies
+apply to tenant-scoped ERP and AI tables (see `packages/db/drizzle/0006_tenant_rls.sql`,
+`0007_audit_logs_rls.sql`, `0013_ai_tenant_rls.sql`); queries must use
+`runWithOrganizationContext`. Application capability checks remain required at
+every mutation boundary. Deferred platform items (Workflow DevKit, embeddings,
+LMS module) are **cancelled** for the AI uplift scope — see **TRACK-003**.
 
 ## Acceptance Criteria
 
@@ -883,6 +892,7 @@ context for policy evaluation.
 - [Directory Architecture Audit](003-directory-architecture-audit.md)
 - [Database Scale Architecture](005-database-scale-architecture.md)
 - [Naming Conventions](004-naming-conventions.md)
+- [Workspace Package Discipline](008-workspace-package-discipline.md)
 
 ### External (Vercel platform)
 

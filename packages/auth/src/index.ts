@@ -36,9 +36,21 @@ export const appCapabilities = [
   "reports.view",
   "reports.documents.read",
   "reports.documents.write",
-  "admin.view",
-  "admin.documents.read",
-  "admin.documents.write",
+  "system-admin.view",
+  "system-admin.documents.read",
+  "system-admin.documents.write",
+  "system-admin.identity.read",
+  "system-admin.identity.write",
+  "system-admin.settings.read",
+  "system-admin.settings.write",
+  "system-admin.audit.read",
+  "system-admin.audit.export",
+  "system-admin.integrations.read",
+  "system-admin.integrations.write",
+  "system-admin.machine-layer.read",
+  "system-admin.machine-layer.approve",
+  "system-admin.reliability.read",
+  "system-admin.billing.read",
 ] as const;
 
 export const organizationRoles = [
@@ -178,7 +190,7 @@ const documentCapabilityModules = new Set([
   "crm",
   "approvals",
   "reports",
-  "admin",
+  "system-admin",
 ]);
 
 export function documentReadCapability(

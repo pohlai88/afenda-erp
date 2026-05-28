@@ -9,6 +9,10 @@ export default createVitestConfig("@afenda/erp", {
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
+      "@afenda/domain": path.resolve(
+        __dirname,
+        "../../packages/domain/src/index.ts",
+      ),
     },
   },
 });

@@ -6,7 +6,7 @@ alwaysApply: false
 
 # Afenda feature packages (`@afenda/feature-*`)
 
-**ARCH-002** · **ARCH-004** (naming). Nine `@afenda/feature-*` packages exist under `packages/features/*`.
+**ARCH-002** (ownership) · **ARCH-004** (naming) · **ARCH-008** (discipline, guards). Nine `@afenda/feature-*` packages exist under `packages/features/*`.
 
 ## Create when
 
@@ -15,16 +15,22 @@ Module has its own command/query service, module-specific components, tables und
 ## Scaffold checklist
 
 1. `packages/features/<moduleId>/` with `name`: `@afenda/feature-<moduleId>` (folder slug = `module-ids.ts`).
-2. Export subpaths: `.`, `./client`, `./server`, `./metadata` — `default` → `./dist/*.js`.
+2. Required export doors: `.`, `./client`, `./server`, `./metadata` — `default` → `./dist/*.js`; `types`/`development` may point at `./src`.
 3. `build`: `tsc -p tsconfig.build.json` → `dist/**`.
-4. Add `workspace:*` dep in `apps/erp/package.json`.
-5. Append to `afendaTranspilePackages` in `packages/config/src/next.ts`.
-6. Thin route imports `./server` or `./metadata` only — never barrels that re-export server code into client bundles.
+4. Add `workspace:*` dep in `apps/erp/package.json` **and** append the same name to `afendaTranspilePackages` in `packages/config/src/next.ts` (guard enforces sync).
+5. Organize categories as nested `src/` folders (`employees/`, `payroll/`, …) — not nested workspace `package.json` files.
+6. App and other packages import only public doors — never `@afenda/feature-*/src`, `/dist`, or `/internal`.
+7. Thin routes import `./server` or `./metadata`; client bundles use `./client` only — never barrels that re-export server graphs.
+
+## `./client` must not import
+
+`@afenda/db`, `@afenda/ai`, `@afenda/workflows`, `@afenda/auth/server`, or `node:*` (enforced by `pnpm architecture:check`).
 
 ## Must not
 
-- Import from `apps/erp`.
+- Import from `apps/erp` (packages never depend on the app).
+- Create nested feature workspaces (`packages/features/hr/payroll/package.json`) without updating **ARCH-008** and `scripts/check-directory-architecture.mts`.
 - Own Drizzle migration files (change schema in `@afenda/db`).
 - Skip `@afenda/auth` permission checks on tenant reads/writes.
 
-Run `pnpm architecture:check` after adding a package.
+Run `pnpm architecture:check` after adding or changing a feature package, export map, or app transpile list.

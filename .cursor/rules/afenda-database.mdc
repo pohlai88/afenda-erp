@@ -26,7 +26,20 @@ alwaysApply: false
 - Lazy `getDb()` — no module-scope pool creation in new code.
 - On Fluid Compute with a dedicated pool, call `attachDatabasePool` from `@vercel/functions` after pool creation.
 
+## Schema changes (Drizzle)
+
+1. Change **`src/schema/`** only — never hand-edit `drizzle/*.sql` unless the user explicitly requires it (see rule **`afenda-database-migrations`**, always on).
+2. **`pnpm db:generate`** — `node ./node_modules/drizzle-kit/bin.cjs` via package script.
+3. Review generated SQL; confirm pgvector (`CREATE EXTENSION vector`) when `knowledge_chunks.embedding` is present (`migrate.mts` also ensures the extension).
+4. **`pnpm db:generate`** then **`pnpm db:migrate`** before marking DB work done.
+
+| Artifact | Owner |
+| -------- | ----- |
+| `src/schema/**/*.ts` | Agents (source of truth) |
+| `drizzle/*.sql`, `drizzle/meta/` | `drizzle-kit generate` only |
+| `scripts/migrate.mts` | Migration runner + extension bootstrap |
+
 ## Changes
 
-- PRs touching schema: `pnpm db:generate`, review migration SQL, run `pnpm db:migrate` locally when appropriate.
+- PRs touching schema: `pnpm db:generate`, review migration SQL, `pnpm db:migrate` when appropriate.
 - Keep `DATABASE_*` in Turborepo `globalEnv` when adding env vars that affect builds.

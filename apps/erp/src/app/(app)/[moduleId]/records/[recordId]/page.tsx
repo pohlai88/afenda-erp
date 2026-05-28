@@ -3,13 +3,13 @@ import { GovernedDetailTabs } from "@afenda/governed-surface/server";
 import {
   describeWorkspaceDataSource,
   getErpModuleById,
-  getModuleWorkspaceRecord,
   isCoreModuleId,
   isModuleId,
   resolveWorkspaceDataMode,
   type CoreModuleId,
 } from "@afenda/domain";
 import { getModuleFeatureMetadata } from "@/lib/module-feature-metadata";
+import { resolveModuleRecordDetail } from "@/lib/module-workspace-resolver";
 import { SectionPanel, StatusBadge } from "@afenda/ui";
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -42,8 +42,9 @@ async function loadRecordDetail({ params }: RecordDetailPageProps) {
   const { session, organization } = await requireCapability(
     moduleDefinition.requiredCapability,
   );
+
   const dataMode = resolveWorkspaceDataMode(session.source);
-  const record = await getModuleWorkspaceRecord({
+  const record = await resolveModuleRecordDetail({
     organizationId: organization.id,
     moduleId: resolvedModuleId,
     recordId,

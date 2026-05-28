@@ -12,7 +12,7 @@ import {
 
 describe("auth capabilities", () => {
   it("returns full access for owner role", () => {
-    expect(capabilitiesForRole("owner")).toContain("admin.view");
+    expect(capabilitiesForRole("owner")).toContain("system-admin.view");
     expect(capabilitiesForRole("owner")).toContain("finance.view");
   });
 

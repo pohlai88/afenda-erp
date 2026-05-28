@@ -73,15 +73,15 @@ permissions, and database promotion use the same slug.
 | `crm`        | `/crm`                      | `packages/features/crm`        | `@afenda/feature-crm`        |
 | `approvals`  | `/approvals`                | `packages/features/approvals`  | `@afenda/feature-approvals`  |
 | `reports`    | `/reports`                  | `packages/features/reports`    | `@afenda/feature-reports`    |
-| `admin`      | `/admin`                    | `packages/features/admin`      | `@afenda/feature-admin`      |
+| `system-admin` | `/system-admin`           | `packages/features/system-admin` | `@afenda/feature-system-admin` |
 
 Core ERP modules share one dynamic route tree:
 `apps/erp/src/app/(app)/[moduleId]/…`. Do not create per-module route folders
 unless a module needs a genuinely different URL tree.
 
 Do not invent alternate slugs (`hrm`, `human-resources`) unless the module ID
-changes in `@afenda/config`. Feature packages do not exist on disk yet; this
-table is the naming contract for extraction per
+changes in `@afenda/config`. Feature packages are scaffolded on disk; mature
+logic moves into those packages per
 [ERP Domain Package Architecture](002-erp-domain-package-architecture.md).
 
 Target database schema folders follow the same moduleId slug:
@@ -127,6 +127,7 @@ Import rules (Vercel/Next.js server-client separation):
 - `@afenda/ui` may use `./*` deep imports for primitives; do not copy that pattern into feature or domain packages without an ADR.
 
 Feature package template: [ERP Domain Package Architecture](002-erp-domain-package-architecture.md).
+Workspace split discipline: [Workspace Package Discipline](008-workspace-package-discipline.md).
 
 ## Directories
 
@@ -205,3 +206,4 @@ Package `package.json` scripts use standard task names consumed by `turbo.json`:
 - **ARCH-003** [Directory Architecture Audit](003-directory-architecture-audit.md) — enforced package categories
 - **ARCH-006** [Metadata-Driven UI Architecture](006-metadata-driven-ui-architecture.md) — import doors for governed UI
 - **ARCH-001** [System Architecture](001-system-architecture.md) — route shape and deployment model
+- **ARCH-008** [Workspace Package Discipline](008-workspace-package-discipline.md) — package classes and split policy

@@ -381,7 +381,7 @@ export const recordTypeDefinitions = [
     columns: nonMonetaryOperationalColumns,
   }),
   defineRecordType({
-    moduleId: "admin",
+    moduleId: "system-admin",
     recordType: "governance-review",
     title: "Governance review",
     description:

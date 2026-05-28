@@ -45,7 +45,7 @@ Run `pnpm typecheck` after TS config changes.
 | Topic                         | Source                                                |
 | ----------------------------- | ----------------------------------------------------- |
 | Next.js 16 breaking changes   | `node_modules/next/dist/docs/` (see `AGENTS.md`)      |
-| Afenda architecture           | `docs/architecture/README.md` (`ARCH-001`–`ARCH-007`) |
+| Afenda architecture           | `docs/architecture/README.md` (`ARCH-001`–`ARCH-008`) |
 | ERP app routes / handlers     | `AGENTS.md`, rule `afenda-erp-app`                    |
 | Governed UI                   | **ARCH-006**, **ARCH-007**, rule `afenda-governed-ui` |
 | shadcn components in monorepo | `@afenda/ui`, `apps/erp/components.json` aliases      |

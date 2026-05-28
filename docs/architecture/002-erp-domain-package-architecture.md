@@ -7,7 +7,7 @@
 | Status     | Active — target boundaries with as-built compatibility layer (May 2026)                      |
 | Authority  | Feature-package extraction, import rules, Vercel single-app build model                      |
 | Supersedes | Per-module route folders and microfrontend deployment assumptions                            |
-| Related    | **ARCH-001** (runtime/deploy) · **ARCH-005** (schema promotion) · **ARCH-006** (metadata UI) |
+| Related    | **ARCH-001** (runtime/deploy) · **ARCH-005** (schema promotion) · **ARCH-006** (metadata UI) · **ARCH-008** (workspace discipline) |
 
 Afenda ERP domains are package-scale product capabilities. The deployable app
 owns routing and composition; feature packages own ERP-specific implementation.
@@ -24,6 +24,7 @@ finance, HR, sales, inventory, or CRM business logic.
 | Database schema          | Flat `packages/db/src/schema/*.ts` + shared `erp.ts` | `schema/<moduleId>/` for ledger-grade tables              |
 | Vercel project link      | **Deferred** until repo stable (see **ARCH-001**)    | Root-linked monorepo; `vercel.json` already defines build |
 | Feature packages on disk | **Nine scaffold packages** (`@afenda/feature-*`)     | Module logic moves in as extraction threshold is met      |
+| HR module                | Scaffold only — `@afenda/feature-hr` exposes public doors and metadata compatibility. Legacy HRM migration source remains under `packages/features/hrm`; accepted HR implementation slices must land through **TRACK-004** with validation gates. | Migrate by slice into `@afenda/feature-hr` |
 
 ## Decision
 
@@ -44,6 +45,12 @@ libraries):
 This is **not** microfrontends or multi-project deployment. ERP modules stay in
 one application boundary so tenancy, auth, posting, audit, and workflow state
 remain coherent.
+
+Workspace package discipline is defined in
+[Workspace Package Discipline](008-workspace-package-discipline.md). In short:
+keep one workspace package per canonical module and use internal grouped folders
+for large module categories until independent ownership, reuse, or dependency
+pressure justifies a new package class.
 
 ## Why this fits ERP
 
@@ -83,7 +90,7 @@ packages/
     crm/                      # @afenda/feature-crm
     approvals/                # @afenda/feature-approvals
     reports/                  # @afenda/feature-reports
-    admin/                    # @afenda/feature-admin
+    system-admin/             # @afenda/feature-system-admin
   domain/                     # shared ERP contracts and module registry
   db/                         # schema, migrations, tenancy, query primitives
   governed-surface/           # metadata schemas and renderers
@@ -156,6 +163,12 @@ through typed query/command services in the feature package.
 
 Every tenant-scoped read and write must go through `@afenda/db` tenancy helpers
 and `@afenda/auth` permission checks.
+
+Large modules may organize implementation by internal category folders, for
+example `packages/features/hr/src/payroll` or
+`packages/features/hr/src/time-attendance`. Do not add nested package.json files
+below a feature package unless **ARCH-008** and `pnpm architecture:check` are
+changed in the same pull request.
 
 ### Public export doors
 
@@ -331,8 +344,9 @@ wiring is a later milestone.
 
 - `pnpm-workspace.yaml` includes `packages/features/*`.
 - `pnpm architecture:check` registers `@afenda/feature-*` under
-  `packages/features/*`, requires compiled `dist` runtime exports, and validates
-  Turborepo outputs.
+  `packages/features/*`, requires public export doors, rejects nested feature
+  workspaces by default, requires compiled `dist` runtime exports, validates
+  import boundaries, syncs app transpilation, and validates Turborepo outputs.
 - `pnpm lint:governed-renderers` guards metadata renderer parity when feature
   packages add governed surfaces.
 
@@ -343,6 +357,7 @@ wiring is a later milestone.
 - **ARCH-006** [Metadata-Driven UI Architecture](006-metadata-driven-ui-architecture.md) — builders and renderers
 - **ARCH-003** [Directory Architecture Audit](003-directory-architecture-audit.md) — package categories
 - **ARCH-004** [Naming Conventions](004-naming-conventions.md) — `@afenda/feature-*` naming
+- **ARCH-008** [Workspace Package Discipline](008-workspace-package-discipline.md) — package classes and split policy
 
 ### External (Vercel monorepo)
 

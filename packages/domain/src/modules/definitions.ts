@@ -364,7 +364,7 @@ const modules = [
     defaultViews: ["Workforce changes", "Leave pressure", "Record quality"],
     actions: [
       { label: "Open approvals", href: "/approvals" },
-      { label: "Check admin", href: "/admin" },
+      { label: "Check system admin", href: "/system-admin" },
     ],
     focusAreas: [
       {
@@ -562,7 +562,7 @@ const modules = [
     defaultViews: ["Saved views", "Export activity", "Freshness health"],
     actions: [
       { label: "Go to dashboard", href: "/dashboard" },
-      { label: "Open admin", href: "/admin" },
+      { label: "Open system admin", href: "/system-admin" },
     ],
     focusAreas: [
       {
@@ -592,16 +592,16 @@ const modules = [
     ],
   },
   {
-    id: "admin",
-    href: "/admin",
-    label: "Admin",
-    navigationLabel: "Admin",
+    id: "system-admin",
+    href: "/system-admin",
+    label: "System admin",
+    navigationLabel: "System admin",
     description:
       "Users, roles, settings, audit access, and tenant-level controls.",
     summary:
-      "Admin is the system control surface for identity, role assignment, and tenant governance.",
+      "System admin is the tenant governance surface for identity, role assignment, and platform controls.",
     ownerTeam: "Platform Administration",
-    requiredCapability: "admin.view",
+    requiredCapability: "system-admin.view",
     status: { label: "Governance route", tone: "warning" },
     metrics: [
       {
@@ -625,14 +625,16 @@ const modules = [
     ],
     defaultViews: ["Role control", "Tenant settings", "Audit access"],
     actions: [
-      { label: "Review reports", href: "/reports" },
-      { label: "Open dashboard", href: "/dashboard" },
+      { label: "Identity & access", href: "/system-admin/identity" },
+      { label: "Tenant settings", href: "/system-admin/settings" },
+      { label: "Audit log", href: "/system-admin/audit" },
+      { label: "Machine layer ops", href: "/system-admin/machine-layer" },
     ],
     focusAreas: [
       {
         title: "Governance boundaries",
         summary:
-          "Admin routes must aggressively re-check authorization and keep state changes observable.",
+          "System admin routes must aggressively re-check authorization and keep state changes observable.",
         bullets: [
           "Do not trust client role state for privileged actions.",
           "Log membership changes and tenant settings updates.",
@@ -642,7 +644,7 @@ const modules = [
       {
         title: "Operational fit",
         summary:
-          "Admin should expose tenant control without becoming a dumping ground for unrelated configuration.",
+          "System admin should expose tenant control without becoming a dumping ground for unrelated configuration.",
         bullets: [
           "Keep identity, membership, and governance surfaces distinct.",
           "Prefer explicit workflows to hidden settings.",
@@ -653,7 +655,7 @@ const modules = [
     milestones: [
       "Add membership management backed by Neon Auth identity.",
       "Persist tenant settings and audit-read controls.",
-      "Introduce admin-only traces and mutation logging.",
+      "Introduce system-admin-only traces and mutation logging.",
     ],
   },
 ] as const satisfies readonly ErpModuleDefinition[];

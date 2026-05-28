@@ -1,27 +1,23 @@
 import {
-  adminAiApprovalsSurfaceKey,
-  adminAiUsageSurfaceKey,
-  buildAdminAiApprovalsListSurface,
-  buildAdminAiUsageListSurface,
   describeWorkspaceDataSource,
   formatModuleObservabilityFooter,
   getAccessibleModules,
-  getAiApprovalsSummary,
-  getAiUsageRouteSummary,
   getErpModuleById,
   getModuleObservabilityIndicators,
-  getModuleWorkspace,
-  getModuleWorkspaceStats,
   getResolvedModuleMetrics,
   moduleScreenDetailListLabels,
   moduleScreenSections,
   resolveWorkspaceDataMode,
   type CoreModuleId,
-  type ModuleWorkspaceListQuery,
+  type ModuleWorkspaceSearchParams,
 } from "@afenda/domain";
 import { requireCapability } from "@afenda/auth/server";
 import { getBlobEnv } from "@afenda/config/env";
 import { getModuleFeatureMetadata } from "@/lib/module-feature-metadata";
+import {
+  getResolvedModuleWorkspaceStats,
+  resolveModuleWorkspace,
+} from "@/lib/module-workspace-resolver";
 import {
   BulletColumns,
   ModuleLinkGrid,
@@ -41,7 +37,6 @@ import { notFound } from "next/navigation";
 import { DocumentExtractionForm } from "./document-extraction-form";
 import { DocumentUploadForm } from "./document-upload-form";
 import { ErpAssistantPanel } from "./erp-assistant-panel";
-
 function getModuleOrThrow(moduleId: CoreModuleId) {
   const moduleDefinition = getErpModuleById(moduleId);
 
@@ -63,25 +58,28 @@ export function createModuleMetadata(moduleId: CoreModuleId): Metadata {
 
 export async function ModuleRoutePage({
   moduleId,
-  query,
+  searchParams,
 }: {
   moduleId: CoreModuleId;
-  query?: ModuleWorkspaceListQuery;
+  searchParams?: ModuleWorkspaceSearchParams;
 }) {
   const moduleDefinition = getModuleOrThrow(moduleId);
   const metadata = getModuleFeatureMetadata(moduleId);
   const { session, organization } = await requireCapability(
     moduleDefinition.requiredCapability,
   );
+
   const blobEnv = getBlobEnv();
-  const workspace = await getModuleWorkspace({
+  const dataMode = resolveWorkspaceDataMode(session.source);
+  const resolvedWorkspace = await resolveModuleWorkspace({
     organizationId: organization.id,
     moduleId,
-    dataMode: resolveWorkspaceDataMode(session.source),
-    query,
+    dataMode,
+    searchParams,
   });
+  const workspace = resolvedWorkspace.workspace;
   const observabilityIndicators = getModuleObservabilityIndicators(moduleId);
-  const workspaceStats = getModuleWorkspaceStats(workspace);
+  const workspaceStats = getResolvedModuleWorkspaceStats(resolvedWorkspace);
   const neighboringModules = getAccessibleModules(organization.capabilities)
     .filter((module) => module.id !== moduleId)
     .slice(0, 3);
@@ -89,12 +87,12 @@ export async function ModuleRoutePage({
   const recordListSurface = metadata.buildRecordListSurface({
     records: workspace.records,
     window: workspace.recordWindow,
-    query,
+    query: resolvedWorkspace.moduleQuery,
   });
   const workItemListSurface = metadata.buildWorkItemListSurface({
     workItems: workspace.workItems,
     window: workspace.workItemWindow,
-    query,
+    query: resolvedWorkspace.moduleQuery,
   });
   const savedViewsListSurface = metadata.buildSavedViewsListSurface({
     views: workspace.savedViews,
@@ -102,7 +100,7 @@ export async function ModuleRoutePage({
   const documentListSurface = metadata.buildDocumentRegistryListSurface({
     documents: workspace.documents,
     window: workspace.documentWindow,
-    query,
+    query: resolvedWorkspace.moduleQuery,
   });
   const workItemKanbanSurface =
     moduleId === "approvals"
@@ -118,25 +116,6 @@ export async function ModuleRoutePage({
     (item) => item.status === "escalated",
   ).length;
 
-  const isAdminModule = moduleId === "admin" && session.source === "neon";
-  const [adminAiUsageRows, adminAiApprovalRows] = isAdminModule
-    ? await Promise.all([
-        getAiUsageRouteSummary({
-          organizationId: organization.id,
-          limit: 20,
-        }),
-        getAiApprovalsSummary({
-          organizationId: organization.id,
-          limit: 20,
-        }),
-      ])
-    : [[], []];
-  const adminAiUsageSurface = isAdminModule
-    ? buildAdminAiUsageListSurface({ events: adminAiUsageRows })
-    : null;
-  const adminAiApprovalsSurface = isAdminModule
-    ? buildAdminAiApprovalsListSurface({ proposals: adminAiApprovalRows })
-    : null;
   const usesPersistedMetrics =
     workspace.dataMode === "persisted" && !workspace.fallbackApplied;
   const headlineMetrics = usesPersistedMetrics
@@ -348,30 +327,6 @@ export async function ModuleRoutePage({
           layout="embedded"
         />
       </SectionPanel>
-
-      {adminAiUsageSurface && adminAiApprovalsSurface ? (
-        <SectionPanel
-          title="AI operation ledger"
-          description="Org-scoped log of AI usage events and human-approved action proposals."
-        >
-          <div className="space-y-4">
-            <GovernedPatternCListSection
-              title="Usage events"
-              surfaceKey={adminAiUsageSurfaceKey}
-              listConfiguration={adminAiUsageSurface}
-              parentAccessAllowed
-              layout="embedded"
-            />
-            <GovernedPatternCListSection
-              title="Approval proposals"
-              surfaceKey={adminAiApprovalsSurfaceKey}
-              listConfiguration={adminAiApprovalsSurface}
-              parentAccessAllowed
-              layout="embedded"
-            />
-          </div>
-        </SectionPanel>
-      ) : null}
 
       <SectionPanel
         title={moduleScreenSections.aiAssistant.title}

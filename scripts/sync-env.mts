@@ -46,6 +46,22 @@ function formatEnvValue(value: string) {
   return value;
 }
 
+/** Ensures `VERCEL_API_TOKEN` is present locally for Gateway billing reads. */
+function buildAiGatewayAliasBlock(parsed: Record<string, string>) {
+  if (parsed.VERCEL_API_TOKEN?.trim()) {
+    return "";
+  }
+
+  const aliasValue = parsed.AI_GATEWAY_API_KEY?.trim();
+  if (!aliasValue) {
+    return "";
+  }
+
+  const source = "AI_GATEWAY_API_KEY";
+
+  return `\n# --- Aliased by pnpm env:sync (Gateway billing expects VERCEL_API_TOKEN) ---\n# Source: ${source}\nVERCEL_API_TOKEN=${formatEnvValue(aliasValue)}\n`;
+}
+
 /** Dry-run must not echo secrets from `.env.config` to the terminal. */
 function redactEnvFileContent(content: string) {
   return content
@@ -97,7 +113,7 @@ async function main() {
       preserved = {};
     }
 
-    let output = `${banner}${normalizedSource}`;
+    let output = `${banner}${normalizedSource}${buildAiGatewayAliasBlock(parsedSource)}`;
     const preservedEntries = Object.entries(preserved);
     if (preservedEntries.length > 0) {
       output += `\n# --- Not in .env.config (kept from previous ${targetPath.endsWith(".env.local") ? ".env.local" : "env file"}) ---\n`;

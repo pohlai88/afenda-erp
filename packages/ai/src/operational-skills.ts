@@ -104,9 +104,13 @@ export const operationalSkills = [
     moduleId: "reports",
     label: "Audit readiness",
     description:
-      "Review control evidence, report freshness, unresolved approvals, and admin posture before drafting remediation tasks.",
+      "Review control evidence, report freshness, unresolved approvals, and system-admin posture before drafting remediation tasks.",
     problemTypes: ["audit_readiness", "control_gap", "report_freshness"],
-    requiredCapabilities: ["reports.view", "finance.view", "admin.view"],
+    requiredCapabilities: [
+      "reports.view",
+      "finance.view",
+      "system-admin.view",
+    ],
     inputSchemaName: "BusinessProblemInput",
     outputSchemaName: "RecoveryPlaybook",
     readToolNames: ["reviewAuditReadiness"],

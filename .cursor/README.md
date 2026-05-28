@@ -38,7 +38,7 @@ Duplicate MCP files under `AppData\Roaming\Cursor\...` and `AppData\Roaming\.cur
 | Layer   | Location                            | Role                                          |
 | ------- | ----------------------------------- | --------------------------------------------- |
 | Rules   | `.cursor/rules/*.mdc`               | Always-on + path-scoped doctrine              |
-| Hooks   | `.cursor/hooks.json`                | Session routing + post-edit ARCH hints        |
+| Hooks   | `.cursor/hooks.json`                | Session routing, DDL guard, post-edit ARCH hints |
 | Index   | `.cursorignore`                     | Exclude artifacts and lockfile noise          |
 | Stack   | `.agents/stack-context.md`          | Pinned versions + Context7 library hints      |
 | VS Code | `.vscode/settings.json`, `mcp.json` | Editor + MCP for VS Code (parallel to Cursor) |
@@ -49,8 +49,10 @@ Duplicate MCP files under `AppData\Roaming\Cursor\...` and `AppData\Roaming\.cur
 2. Copy `.env.config.example` → `.env.config`, fill secrets, then `pnpm env:sync:all` — see [`docs/development/env.md`](../docs/development/env.md)
 3. Confirm global + project MCP in **Cursor Settings → MCP**
 4. **Extensions: Show Recommended Extensions**
-5. **Indexing & Docs** — add `docs/architecture/`, `docs/testing/`
+5. **Indexing & Docs** — add `docs/architecture/` (ARCH-001–008), `docs/roadmap/`, `docs/testing/`
 
 See rule `afenda-external-context` for Context7 vs ARCH doc priority.
+
+**Database hooks:** `guard-database-ddl.mjs` blocks agent edits to `packages/db/drizzle/*.sql`, `psql` DDL, and prompts before Neon `run_sql` DDL — use `src/schema` → `pnpm db:generate` → `pnpm db:migrate` (rule `afenda-database-migrations`).
 
 Vercel linking is deferred — [`docs/development/vercel-link.md`](../docs/development/vercel-link.md).

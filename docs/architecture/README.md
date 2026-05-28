@@ -19,6 +19,10 @@ Search tip: every document has a stable **`ARCH-###`** ID and a matching
 | **ARCH-005** | [005-database-scale-architecture.md](005-database-scale-architecture.md)         | Schema scale, promotion, migration strategy                              |
 | **ARCH-006** | [006-metadata-driven-ui-architecture.md](006-metadata-driven-ui-architecture.md) | Governed ERP UI intent, runtime authority, metadata contracts            |
 | **ARCH-007** | [007-governed-metadata-architecture.md](007-governed-metadata-architecture.md)   | Governed-surface renderer kernel, schemas, profiles, resolver            |
+| **ARCH-008** | [008-workspace-package-discipline.md](008-workspace-package-discipline.md)       | Workspace package classes, export doors, split policy, guard policy      |
+| **ARCH-009** | [009-machine-layer-doctrine.md](009-machine-layer-doctrine.md)                   | Lynx machine layer, four product layers, Knowledge substrate, brand contract |
+| **ARCH-010** | [010-hr-feature-package-architecture.md](010-hr-feature-package-architecture.md) | `@afenda/feature-hr` boundaries, export doors, TRACK-004 migration layout |
+| **ARCH-011** | [011-system-admin-enterprise-architecture.md](011-system-admin-enterprise-architecture.md) | System admin tenant control plane, enterprise admin domains, development rules |
 
 ## Document Hierarchy
 
@@ -28,11 +32,13 @@ then update the other document in the same change.
 
 | Authority                              | Doc ID       |
 | -------------------------------------- | ------------ |
+| System admin control plane             | **ARCH-011** |
 | Feature packages and extraction        | **ARCH-002** |
 | Product runtime, modules, deployment   | **ARCH-001** |
 | Metadata UI runtime and contracts      | **ARCH-006** |
 | Governed-surface kernel detail         | **ARCH-007** |
 | Monorepo guards and package categories | **ARCH-003** |
+| Workspace package discipline           | **ARCH-008** |
 | Schema scale and promotion             | **ARCH-005** |
 | Naming                                 | **ARCH-004** |
 
@@ -41,7 +47,7 @@ then update the other document in the same change.
 | Area                     | Current                                                           | Target                                                         |
 | ------------------------ | ----------------------------------------------------------------- | -------------------------------------------------------------- |
 | ERP modules              | Shared contracts in `@afenda/domain`; routes in `apps/erp`        | `@afenda/feature-*` packages under `packages/features/*`       |
-| Feature packages on disk | None yet; workspace glob and guards are ready                     | One package per mature module                                  |
+| Feature packages on disk | Scaffolded `@afenda/feature-*` packages with public export doors  | One package per mature module with module-owned services       |
 | Module routes            | Dynamic `(app)/[moduleId]/…`                                      | Same route shape; thinner adapters calling feature packages    |
 | Database schema          | Flat `packages/db/src/schema/*.ts` with shared ERP tables         | Module subdirs under `schema/<moduleId>/` as modules mature    |
 | Vercel deploy            | Single repo-root project; `pnpm turbo build --filter=@afenda/erp` | Same single-app model; link + Remote Cache after stabilization |
@@ -59,4 +65,5 @@ then update the other document in the same change.
 | Doc          | Vercel MCP alignment                                                               |
 | ------------ | ---------------------------------------------------------------------------------- |
 | ARCH-001–003 | Reviewed — deploy deferral, Turborepo outputs, conformance                         |
-| ARCH-004–007 | Reviewed — naming/deploy, Neon/Fluid Compute, Cache Components, governed RSC rules |
+| ARCH-004–008 | Reviewed — naming/deploy, Neon/Fluid Compute, Cache Components, governed RSC rules |
+| ARCH-009–011 | Doctrine-specific — defer to ARCH-001/002 for deploy and runtime alignment         |

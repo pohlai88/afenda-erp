@@ -23,8 +23,19 @@ You are working in the **deployable Next.js 16 App Router application** for Afen
 | **ARCH-005** | `docs/architecture/005-database-scale-architecture.md`     | Schema ownership, promotion                        |
 | **ARCH-006** | `docs/architecture/006-metadata-driven-ui-architecture.md` | Metadata vs runtime authority, list windows        |
 | **ARCH-007** | `docs/architecture/007-governed-metadata-architecture.md`  | Renderer kernel, profiles, builders                |
+| **ARCH-008** | `docs/architecture/008-workspace-package-discipline.md`    | Package classes, export doors, split discipline    |
+| **ARCH-009** | `docs/architecture/009-machine-layer-doctrine.md`          | Lynx machine layer, Knowledge substrate, brand contract |
 
 Index: `docs/architecture/README.md`.
+
+## Machine layer (Lynx)
+
+Lynx is the ERP machine layer — every machine-assisted modality routes through it. When editing `packages/features/knowledge/**`, `packages/features/lynx/**`, `apps/erp/src/app/api/lynx/**`, or `packages/ai/src/tools/**`, read **ARCH-009** and `.cursor/rules/afenda-lynx-knowledge.mdc`. Key invariants:
+
+- Substrate (`@afenda/feature-knowledge`) and product (`@afenda/feature-lynx`) are separate packages. `@afenda/ai` is substrate-blind.
+- Banned user-facing vocabulary: "AI assistant", "chatbot", "copilot", "AI mode", "Thinking", "Processing", "Generating". Use **Lynx**, "resolving", "listening".
+- All operator tools declare `GovernedToolMeta` (risk, category, access, dataSensitivity, audit).
+- Retrieval: pgvector `vector(1536)` HNSW via Neon. No external vector databases.
 
 ## What this app owns
 
@@ -40,11 +51,12 @@ Index: `docs/architecture/README.md`.
 2. **Authorization** — `src/proxy.ts` refreshes Neon Auth sessions; **re-check capabilities** in Server Components, Server Actions, and Route Handlers before reads or mutations.
 3. **One app, one deploy** — Single Vercel project from repo root (`vercel.json` → `pnpm turbo build --filter=@afenda/erp`). No per-module Vercel projects. Linking is **deferred** until ARCH-001 stabilization gate passes.
 4. **Module routes** — Core modules use `(app)/[moduleId]/…` only. Do not add per-module route folders unless the URL tree genuinely differs.
-5. **Governed UI** — Metadata declares intent; runtime owns authority. Lists use server windows and `GovernedPatternCListSection`; never ship full datasets to the client for pagination.
-6. **Lazy clients** — Use `getDb()` and package auth doors; do not create Neon pools or SDK clients at module scope in new app code.
-7. **Caching** — `cacheComponents: true` via `@afenda/config`. Cache only shared/non-tenant data. Tenant dashboards and org-scoped lists stay dynamic.
-8. **Cron** — `/api/cron/*` must validate `Authorization: Bearer ${CRON_SECRET}` (`src/lib/cron.ts`).
-9. **AI** — Gateway auth: `AI_GATEWAY_API_KEY` or `VERCEL_OIDC_TOKEN`. Mutating AI tools require human approval and domain services, not direct table writes.
+5. **Package discipline** — Feature packages stay flat at workspace level (`packages/features/<moduleId>`). Use nested internal folders for categories; do not create nested feature workspaces without updating ARCH-008 and the guard script.
+6. **Governed UI** — Metadata declares intent; runtime owns authority. Lists use server windows and `GovernedPatternCListSection`; never ship full datasets to the client for pagination.
+7. **Lazy clients** — Use `getDb()` and package auth doors; do not create Neon pools or SDK clients at module scope in new app code.
+8. **Caching** — `cacheComponents: true` via `@afenda/config`. Cache only shared/non-tenant data. Tenant dashboards and org-scoped lists stay dynamic.
+9. **Cron** — `/api/cron/*` must validate `Authorization: Bearer ${CRON_SECRET}` (`src/lib/cron.ts`).
+10. **AI** — Gateway auth: `AI_GATEWAY_API_KEY` or `VERCEL_OIDC_TOKEN`. Mutating AI tools require human approval and domain services, not direct table writes.
 
 ## As-built vs target
 
@@ -66,7 +78,7 @@ src/app/
   (app)/solution-console/
   (app)/[moduleId]/page.tsx
   (app)/[moduleId]/records/[recordId]/page.tsx
-  api/ai/*, api/uploads, api/cron/*, api/observability/drain
+  api/ai/*, api/lynx/*, api/uploads, api/cron/*, api/observability/drain
 ```
 
 Server Actions: internal mutations. Route Handlers: webhooks, uploads, AI streams, cron, public APIs.
@@ -80,7 +92,7 @@ pnpm lint:governed-renderers   # if governed-surface or list metadata changed
 pnpm test                      # and pnpm test:e2e when routes/flows change
 ```
 
-DB changes: `pnpm db:generate` and migration validation. Security-sensitive paths: `pnpm security:review`.
+DB changes: edit `packages/db/src/schema` only → `pnpm db:generate` → review SQL → `pnpm db:migrate`. Do not hand-write `packages/db/drizzle/*.sql` or run schema DDL via shell/MCP unless the user explicitly requires it (`.cursor/rules/afenda-database-migrations.mdc`). Security-sensitive paths: `pnpm security:review`.
 
 ## Programmatic agents (Cursor SDK)
 

@@ -7,7 +7,7 @@
 | Status      | Active — enforced by `pnpm architecture:check` (May 2026)                       |
 | Authority   | Monorepo layout, package categories, output locations, guard scripts            |
 | Enforced by | `scripts/check-directory-architecture.mts`                                      |
-| Related     | **ARCH-001** (deploy) · **ARCH-002** (feature packages) · **ARCH-004** (naming) |
+| Related     | **ARCH-001** (deploy) · **ARCH-002** (feature packages) · **ARCH-004** (naming) · **ARCH-008** (package discipline) |
 
 This document describes **what the repository enforces today**. The guard script is the
 source of truth when this file and code disagree — update both in the same change.
@@ -23,7 +23,7 @@ intended production build.
 | -------------------- | --------------------------------- | ------------------------------------------------------------------ |
 | `apps/erp/`          | Deployable App Router application | routes, layouts, handlers, app-only composition, Playwright/Vitest |
 | `packages/`          | Workspace libraries               | domain, db, auth, AI, UI, workflows, config, governed-surface      |
-| `packages/features/` | Future ERP modules                | glob ready; **no packages on disk yet**                            |
+| `packages/features/` | ERP module packages               | scaffolded `@afenda/feature-*`; one workspace per canonical module |
 | `scripts/`           | Repo automation                   | architecture, artifacts, security, performance, env sync           |
 | `docs/architecture/` | Stable doctrine                   | `ARCH-###` + `00N-*.md` (see **ARCH-004**)                         |
 | `docs/roadmap/`      | Tracking / plans                  | `TRACK-###` + `00N-*.md`                                           |
@@ -44,7 +44,7 @@ intended production build.
 | `@afenda/observability`    | `runtime-library` | logging/tracing helpers → `dist/**`                                               |
 | `@afenda/ui`               | `ui-primitives`   | shadcn primitives + `erp-shell` → `dist/**`                                       |
 | `@afenda/workflows`        | `runtime-library` | workflow helpers → `dist/**`                                                      |
-| `@afenda/feature-*`        | `feature-package` | **dynamic** when added under `packages/features/*`                                |
+| `@afenda/feature-*`        | `feature-package` | dynamic under `packages/features/*`; required public export doors                 |
 
 ## Package categories (guard rules)
 
@@ -59,7 +59,7 @@ Every workspace package must map to a category in
 | `ui-primitives`   | `@afenda/ui`                                                 | Sole owner of reusable primitives; **forbidden:** `apps/erp/src/components/ui`                                  |
 | `config`          | `@afenda/config`                                             | Shared Next/env/Vitest; compiled subpaths where required                                                        |
 | `database`        | `@afenda/db`                                                 | Migrations and Drizzle source stay in package; emits `dist`                                                     |
-| `feature-package` | `@afenda/feature-*`                                          | Under `packages/features/<moduleId>`; compiled `dist`; must not import `apps/erp`                               |
+| `feature-package` | `@afenda/feature-*`                                          | Under `packages/features/<moduleId>`; compiled `dist`; public export doors; no nested workspaces by default     |
 
 Adding a category requires updating the guard script in the same PR that introduces
 the package type.
@@ -78,6 +78,13 @@ For packages with `requiresCompiledDistExports: true`:
 
 `@afenda/erp` is exempt from compiled dist exports (the Next.js app is the runtime
 consumer of its own `.next` output).
+
+Feature packages additionally require the public export doors defined in
+[Workspace Package Discipline](008-workspace-package-discipline.md): `.`,
+`./client`, `./server`, and `./metadata`. Large modules should use grouped
+folders inside `src/`; nested workspaces below `packages/features/<moduleId>/`
+are rejected unless the architecture doctrine and guard script are updated
+together.
 
 ## Turborepo integration (Vercel-aligned)
 
@@ -147,7 +154,7 @@ Agent skill markdown under `.agents/skills/` and Cursor IDE config under
 
 | Command                        | What it guards                                         |
 | ------------------------------ | ------------------------------------------------------ |
-| `pnpm architecture:check`      | Layout, exports, turbo outputs, UI boundary, doc links |
+| `pnpm architecture:check`      | Layout, exports, imports, turbo outputs, UI boundary, doc links |
 | `pnpm lint:governed-renderers` | Governed-surface renderer registry parity              |
 | `pnpm artifacts:check`         | Test artifact directories under `.artifacts/`          |
 | `pnpm security:review`         | Auth, cron, uploads, tenant scoping (complementary)    |
@@ -184,6 +191,7 @@ Recorded for audit history — not open work.
 - **ARCH-002** [ERP Domain Package Architecture](002-erp-domain-package-architecture.md) — feature extraction and imports
 - **ARCH-004** [Naming Conventions](004-naming-conventions.md) — files, docs, packages
 - **ARCH-005** [Database Scale Architecture](005-database-scale-architecture.md) — schema ownership
+- **ARCH-008** [Workspace Package Discipline](008-workspace-package-discipline.md) — package classes and export doors
 
 ### External (Vercel monorepo)
 

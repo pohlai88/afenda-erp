@@ -158,6 +158,7 @@ export function createSolutionProviderTools<
     workspace: TWorkspace;
   }>;
   getWorkspaceStats: (workspace: TWorkspace) => ErpAssistantToolWorkspaceStats;
+  isApprovalToolEnabled?: () => boolean | Promise<boolean>;
   registerSolutionActionProposal: (
     proposal: RegisterSolutionActionProposalInput,
   ) => Promise<string>;
@@ -173,6 +174,7 @@ export function createSolutionProviderTools<
     getModuleDefinition,
     getAllowedWorkspace,
     getWorkspaceStats,
+    isApprovalToolEnabled,
     registerSolutionActionProposal,
     persistActionSandbox,
   } = input;
@@ -428,7 +430,7 @@ export function createSolutionProviderTools<
     }),
     reviewAuditReadiness: tool({
       description:
-        "Review audit readiness signals across reports, finance, approvals, and admin controls evidence.",
+        "Review audit readiness signals across reports, finance, approvals, and system-admin controls evidence.",
       inputSchema: businessProblemInputSchema,
       outputSchema: rootCauseAnalysisSchema.array().min(1).max(4),
       strict: true,
@@ -452,7 +454,7 @@ export function createSolutionProviderTools<
               userGoal: "Review audit readiness and control evidence.",
               taskRiskLevel: "medium",
             }),
-            explanation: `${moduleDefinition.label} was reviewed for control evidence, report freshness, unresolved approvals, and admin posture gaps.`,
+            explanation: `${moduleDefinition.label} was reviewed for control evidence, report freshness, unresolved approvals, and system-admin posture gaps.`,
             missingData:
               stats.recordCount > 0
                 ? []
@@ -584,6 +586,10 @@ export function createSolutionProviderTools<
       strict: true,
       needsApproval: true,
       execute: async (proposal) => {
+        if (isApprovalToolEnabled && !(await isApprovalToolEnabled())) {
+          throw new Error("Approval tools are disabled for this tenant.");
+        }
+
         const moduleDefinition = getModuleDefinition(proposal.moduleId);
 
         if (!moduleDefinition) {

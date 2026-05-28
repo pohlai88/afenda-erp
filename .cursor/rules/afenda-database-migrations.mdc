@@ -1,0 +1,47 @@
+---
+description: Schema changes via Drizzle generate/migrate — no hand-written DDL unless user explicitly requires it
+alwaysApply: true
+---
+
+# Database migrations (agents)
+
+Physical schema lives in **`packages/db/src/schema/`**. Agents do **not** author DDL by default.
+
+## Required workflow
+
+1. Edit Drizzle schema (`packages/db/src/schema/**/*.ts`, `index.ts` exports).
+2. **`pnpm db:generate`** — creates/updates `packages/db/drizzle/*.sql` and `meta/`.
+3. Review generated SQL (RLS, `vector` / pgvector, indexes).
+4. **`pnpm db:migrate`** — applies via `packages/db/scripts/migrate.mts` (enables `vector` extension before statements).
+
+`db:generate` uses `node ./node_modules/drizzle-kit/bin.cjs` (Windows-safe). Do not call bare `drizzle-kit` in scripts.
+
+## Do not (unless the user explicitly asks)
+
+| Avoid | Use instead |
+| ----- | ----------- |
+| Writing/editing `packages/db/drizzle/*.sql` by hand | `pnpm db:generate` after schema edits |
+| `CREATE TABLE` / `ALTER` / `DROP` via shell, `psql`, or Neon `run_sql` for schema changes | Schema → generate → migrate |
+| Deleting migration SQL + journal without user direction | Follow user’s reset/regenerate plan |
+| `drizzle-kit push` or ad-hoc schema sync unless user requires it | `db:generate` + `db:migrate` |
+
+## Allowed SQL without an explicit DDL request
+
+- **Drizzle query code** in `packages/db/src/**/*.ts` (`.select()`, `.insert()`, etc.) — not DDL strings for schema.
+- **Seed scripts** (`packages/db/scripts/seed-*.mts`) — DML/`INSERT` only; no new tables/enums.
+- **`migrate.mts` bootstrap** — e.g. `create extension if not exists vector`, migration ledger table.
+- **One-off data fixes** only when the user explicitly requests a data migration or hotfix SQL.
+
+## Explicit override
+
+Hand-written migration SQL or live DDL is allowed **only** when the user clearly says so in the current task (e.g. “edit the migration SQL directly”, “run this DDL on Neon”, “hand-write a hotfix migration”). Say what you are doing and why.
+
+## After schema work
+
+```bash
+pnpm db:generate
+pnpm db:migrate
+pnpm architecture:check   # includes drizzle journal guard
+```
+
+Path-scoped detail: rule **`afenda-database`** · **ARCH-005**.

@@ -1,9 +1,11 @@
 import {
   assertAiBudget,
   assertCapabilityAllowed,
+  assertGovernedToolset,
   assertNoSensitiveCredentialContent,
   createErpAssistantAgent,
   createErpAssistantTools,
+  erpAssistantToolMeta,
   createGatewayOptions,
   estimateTokenCount,
   getAiGatewayEnvironment,
@@ -12,12 +14,14 @@ import {
   getUsageMetrics,
   hasAiGatewayCredentials,
   isAiBudgetError,
+  isAiPermissionError,
   isAiSensitiveContentError,
 } from "@afenda/ai";
 import { getApiAuthContext } from "@afenda/auth/server";
 import {
   createAiActionSandbox,
   createAiUsageEvent,
+  isAiFeatureEnabledForOrganization,
   registerAiApprovalProposal,
 } from "@afenda/db";
 import {
@@ -26,12 +30,14 @@ import {
   getModuleWorkspaceStats,
   moduleIds,
   resolveWorkspaceDataMode,
+  type ModuleId,
 } from "@afenda/domain";
 import { getRequestId, logServerEvent } from "@afenda/observability";
 import { createAgentUIStreamResponse, type UIMessage } from "ai";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { chatRequestSchema } from "@/lib/api/ai-request-schemas";
+import { withAiSpan } from "@/lib/ai-tracing";
 
 export const maxDuration = 30;
 
@@ -50,6 +56,7 @@ export async function POST(request: Request) {
   const requestId = getRequestId(request);
   const route = "/api/ai/chat";
   const model = getAiModelForFeature("erp-assistant");
+  let contextModuleId: ModuleId = "dashboard";
 
   if (!hasAiGatewayCredentials()) {
     return getGatewayUnavailableResponse();
@@ -63,9 +70,33 @@ export async function POST(request: Request) {
     }
 
     const { session: activeSession, organization } = auth;
+    const isAssistantEnabled = await isAiFeatureEnabledForOrganization({
+      organizationId: organization.id,
+      feature: "assistant",
+    });
+    if (!isAssistantEnabled) {
+      return NextResponse.json(
+        { error: "AI assistant is disabled for this tenant." },
+        { status: 403 },
+      );
+    }
+
+    const isApprovalToolEnabled = await isAiFeatureEnabledForOrganization({
+      organizationId: organization.id,
+      feature: "approval-tool",
+    });
+
     const parsedRequest = chatRequestSchema.parse(await request.json());
     const messages = parsedRequest.messages as UIMessage[];
-    const contextModuleId = parsedRequest.contextModuleId ?? "dashboard";
+    contextModuleId = parsedRequest.contextModuleId ?? "dashboard";
+
+    // Gate on the module the operator actually opened — not always dashboard.
+    const contextModuleDefinition = getErpModuleById(contextModuleId);
+    assertCapabilityAllowed({
+      capability:
+        contextModuleDefinition?.requiredCapability ?? "dashboard.view",
+      capabilities: organization.capabilities,
+    });
     const serializedMessages = JSON.stringify(parsedRequest.messages);
     const estimatedPromptTokens = estimateTokenCount(serializedMessages);
 
@@ -125,6 +156,7 @@ export async function POST(request: Request) {
       getAllowedWorkspace,
       getWorkspaceStats: getModuleWorkspaceStats,
       registerApprovalProposal: registerAiApprovalProposal,
+      isApprovalToolEnabled: () => isApprovalToolEnabled,
       persistActionSandbox: async (sandbox, approvalProposalId) =>
         createAiActionSandbox({
           id: sandbox.id,
@@ -155,6 +187,12 @@ export async function POST(request: Request) {
           createdAt: new Date(sandbox.createdAt),
           updatedAt: new Date(sandbox.updatedAt),
         }),
+    });
+
+    assertGovernedToolset({
+      tools,
+      meta: erpAssistantToolMeta,
+      capabilities: organization.capabilities,
     });
 
     const agent = createErpAssistantAgent({
@@ -193,17 +231,24 @@ export async function POST(request: Request) {
       },
     });
 
-    return createAgentUIStreamResponse({
-      agent,
-      uiMessages: messages,
-    });
+    return withAiSpan(
+      "ai.chat.stream",
+      {
+        feature: "erp-assistant",
+        model,
+        moduleId: contextModuleId,
+        organizationId: organization.id,
+        requestId,
+      },
+      () => createAgentUIStreamResponse({ agent, uiMessages: messages }),
+    );
   } catch (error) {
     logServerEvent(
       "error",
       "AI assistant stream failed.",
       {
         requestId,
-        module: "dashboard",
+        module: contextModuleId,
         operation: "ai.assistant.stream",
       },
       {
@@ -235,14 +280,18 @@ export async function POST(request: Request) {
               ? "Assistant request exceeds the configured AI budget."
               : isAiSensitiveContentError(error)
                 ? "Assistant request contains credential-like sensitive content."
-                : "AI assistant failed.",
+                : isAiPermissionError(error)
+                  ? "Insufficient permissions for this AI request."
+                  : "AI assistant failed.",
       },
       {
         status: isAiBudgetError(error)
           ? 413
           : isAiSensitiveContentError(error)
             ? 422
-            : 400,
+            : isAiPermissionError(error)
+              ? 403
+              : 400,
       },
     );
   }

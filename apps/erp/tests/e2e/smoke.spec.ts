@@ -62,7 +62,7 @@ test.describe("Afenda ERP smoke", () => {
     await expect(page).toHaveURL(/\/solution-console/);
     await expect(page.getByText("Recovery playbook catalog")).toBeVisible();
     await expect(
-      page.getByRole("article").filter({ hasText: "Negative P&L" }).first(),
+      page.getByRole("row").filter({ hasText: "Negative P&L" }).first(),
     ).toBeVisible();
   });
 

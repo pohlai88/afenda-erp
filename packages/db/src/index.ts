@@ -11,3 +11,4 @@ export * from "./rls";
 export * from "./schema";
 export * from "./session";
 export * from "./tenancy";
+export * from "./system-admin";

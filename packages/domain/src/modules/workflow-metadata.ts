@@ -136,13 +136,13 @@ export const recoveryPlaybookDefinitions = [
     label: "Improve audit readiness",
     problem: "Audit readiness",
     diagnosis:
-      "Missing controls evidence, stale reports, unresolved approvals, and incomplete admin posture.",
+      "Missing controls evidence, stale reports, unresolved approvals, and incomplete system-admin posture.",
     action:
-      "Prepare audit evidence review tasks across reports, finance, approvals, and admin.",
+      "Prepare audit evidence review tasks across reports, finance, approvals, and system admin.",
     starterPrompt:
-      "Review audit readiness using reports, finance, approvals, and admin evidence. Identify control gaps and propose human-approved remediation steps.",
+      "Review audit readiness using reports, finance, approvals, and system-admin evidence. Identify control gaps and propose human-approved remediation steps.",
     iconKey: "shield",
-    moduleIds: ["reports", "finance", "approvals", "admin"] as const,
+    moduleIds: ["reports", "finance", "approvals", "system-admin"] as const,
     problemType: "audit_readiness",
     workflowId: "audit_readiness",
     risk: "medium",

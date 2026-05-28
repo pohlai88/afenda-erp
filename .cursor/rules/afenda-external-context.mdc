@@ -34,5 +34,5 @@ TypeScript: `packages/config/tsconfig.base.json` (`strict`, `noUncheckedIndexedA
 
 - Tenancy, capabilities, org resolution (**ARCH-001**, `@afenda/auth`)
 - Governed list authority, metadata vs runtime (**ARCH-006**, **ARCH-007**)
-- Package boundaries and imports (**ARCH-002**, **ARCH-003**)
+- Package boundaries, export doors, and imports (**ARCH-008**, **ARCH-002**, **ARCH-003**)
 - Afenda-specific shadcn paths — components live in `packages/ui`; use shadcn MCP from ERP `components.json` aliases
