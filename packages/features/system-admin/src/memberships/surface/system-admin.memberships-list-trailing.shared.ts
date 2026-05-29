@@ -14,14 +14,14 @@ export function resolveSystemAdminMembershipRowTrailingAction(input: {
 }) {
   const canInteract = input.canMutate || input.canManageRoles;
   const visible = input.status !== "removed" && canInteract;
+  const disabledReason = !input.canMutate
+    ? SYSTEM_ADMIN_MEMBERSHIPS_MANAGE_DENIED
+    : SYSTEM_ADMIN_MEMBERSHIPS_ROLES_MANAGE_DENIED;
 
   return resolveListSurfaceRowTrailingAction({
     visible,
     allowed: canInteract,
-    disabledReason:
-      !input.canMutate && input.canManageRoles
-        ? SYSTEM_ADMIN_MEMBERSHIPS_MANAGE_DENIED
-        : SYSTEM_ADMIN_MEMBERSHIPS_ROLES_MANAGE_DENIED,
+    disabledReason,
     descriptor: {
       id: "system-admin.membership.manage",
       label: "Manage membership",

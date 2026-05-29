@@ -1,23 +1,16 @@
-export type {
-  SystemAdminApprovalRule,
-  SystemAdminApprovalRuleListRow,
-  SystemAdminApprovalRuleStatus,
-} from "./contracts/system-admin.approval-rule.contract";
+export * from "./actions";
+export * from "./components";
+export * from "./contracts";
+export * from "./data";
+export * from "./events";
+export * from "./schemas";
+export * from "./surface";
 export {
-  buildSystemAdminApprovalRuleRows,
-  buildSystemAdminApprovalsPageModel,
-} from "./data/system-admin.approval-rules.query.server";
-export {
-  mapTenantApprovalSettingToKernelRecord,
-  mapTenantApprovalSettingToListRow,
-  mapTenantApprovalSettingToRule,
-} from "./data/system-admin.approval-rules.mapper";
+  assertApprovalRuleChangeAllowed,
+  requireSystemAdminApprovalsManage,
+  requireSystemAdminApprovalsRead,
+} from "./policies/system-admin.approval-rules.policy.server";
 export {
   updateSystemAdminApprovalAction,
   updateSystemAdminApprovalRuleAction,
 } from "./actions/system-admin.approval-rules.actions.server";
-export { listTenantApprovalSettings as listSystemAdminApprovals } from "../tenant-execution/data/system-admin.execution-settings.repository.server";
-export {
-  requireSystemAdminApprovalsManage,
-  requireSystemAdminApprovalsRead,
-} from "./policies/system-admin.approvals.policy.server";

@@ -2,11 +2,11 @@ import {
   SystemAdminInviteUserDialog,
   systemAdminRoutePaths,
 } from "@afenda/feature-system-admin/client";
+import { systemAdminUsersUiCopy } from "@afenda/feature-system-admin/metadata";
 import {
   buildSystemAdminUsersPageModel,
   inviteSystemAdminUser,
   requireSystemAdminUsersRead,
-  systemAdminUsersUiCopy,
   SystemAdminUsersAccessDenied,
   SystemAdminUsersSection,
 } from "@afenda/feature-system-admin/server";
@@ -39,7 +39,7 @@ export default async function SystemAdminUsersPage({
   }
 
   const canManage = hasExecutionPermission(context, "system-admin.users.manage");
-  const { users, searchValue } = await buildSystemAdminUsersPageModel({
+  const { users, searchValue, totalCount } = await buildSystemAdminUsersPageModel({
     organizationId: organization.id,
     actorId: context.userId,
     actorType: context.actorType,
@@ -64,22 +64,21 @@ export default async function SystemAdminUsersPage({
       <Alert>
         <AlertTitle>{pageCopy.lifecycleAlertTitle}</AlertTitle>
         <AlertDescription>
-          Suspend, reactivate, and remove organization members on this surface.
-          For membership-only review and role coverage, use{" "}
+          {pageCopy.lifecycleAlertBeforeMembershipsLink}
           <Link
             href={systemAdminRoutePaths.memberships}
             className="font-medium underline"
           >
             Memberships
           </Link>
-          . Role overrides and identity policy invites live on{" "}
+          {pageCopy.lifecycleAlertBetweenLinks}
           <Link
             href={systemAdminRoutePaths.identity}
             className="font-medium underline"
           >
             Identity
           </Link>
-          .
+          {pageCopy.lifecycleAlertAfterIdentityLink}
         </AlertDescription>
       </Alert>
 
@@ -87,6 +86,7 @@ export default async function SystemAdminUsersPage({
         users={users}
         canMutate={canManage}
         searchValue={searchValue}
+        totalCount={totalCount}
       />
     </div>
   );

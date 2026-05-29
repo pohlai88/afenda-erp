@@ -32,3 +32,24 @@ export type SystemAdminPermissionCatalogRow = {
   coverageVerdict: SystemAdminPermissionCoverageVerdict;
   riskLevel: SystemAdminPermissionRiskLevel;
 };
+
+/** Serializable Pattern C row for the permission catalog list surface. */
+export type SystemAdminPermissionListRow = {
+  id: string;
+  permission: string;
+  module: string;
+  group: string;
+  label: string;
+  description: string;
+  capabilityCount: string;
+  roleCount: string;
+  status: string;
+  coverageVerdict: string;
+  riskLevel: string;
+};
+
+export type SystemAdminRoleOverrideListRow = {
+  role: string;
+  permissionKey: string;
+  enabled: boolean;
+};

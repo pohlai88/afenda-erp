@@ -193,6 +193,13 @@ const permissionCatalog = [
     description: "View tenant policy rules and enforcement posture.",
   },
   {
+    key: "system-admin.policies.review",
+    module: "system-admin",
+    label: "Review policies",
+    description:
+      "Inspect policy coverage, readiness, and execution-law detail without mutating rules.",
+  },
+  {
     key: "system-admin.policies.manage",
     module: "system-admin",
     label: "Manage policies",

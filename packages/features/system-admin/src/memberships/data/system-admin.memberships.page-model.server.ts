@@ -6,19 +6,11 @@ import {
   resolveSystemAdminListSearch,
   resolveSystemAdminListStatusFilter,
 } from "../../overview/contracts/system-admin.list-search.shared";
-import type {
-  SystemAdminMembershipRow,
-  SystemAdminMembershipStatus,
-} from "../contracts";
+import type { SystemAdminMembershipRow } from "../contracts";
+import { systemAdminMembershipStatusFilterSchema } from "../schemas/system-admin.memberships.schema";
 import { listSystemAdminMemberships } from "./system-admin.memberships.query.server";
 
 const MEMBERSHIP_LIST_SEARCH_FIELDS = ["name", "email"] as const;
-
-function isSystemAdminMembershipStatus(
-  value: string,
-): value is SystemAdminMembershipStatus {
-  return value === "active" || value === "suspended" || value === "removed";
-}
 
 const systemAdminMembershipRoleFilterSchema = z.enum(organizationRoles);
 
@@ -50,10 +42,10 @@ export async function buildSystemAdminMembershipsPageModel(input: {
     input.searchParams,
     "members",
   );
-  const statusFilter =
-    statusParam && isSystemAdminMembershipStatus(statusParam)
-      ? statusParam
-      : undefined;
+  const statusParsed = statusParam
+    ? systemAdminMembershipStatusFilterSchema.safeParse(statusParam)
+    : undefined;
+  const statusFilter = statusParsed?.success ? statusParsed.data : undefined;
   const roleFilter = resolveSystemAdminMembershipRoleFilter(input.searchParams);
 
   const allMemberships = await listSystemAdminMemberships({

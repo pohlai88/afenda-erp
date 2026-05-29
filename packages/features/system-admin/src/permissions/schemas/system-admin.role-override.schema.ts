@@ -2,6 +2,7 @@ import { organizationRoles } from "@afenda/auth";
 import { z } from "zod";
 import { isSystemAdminPermissionKey } from "../contracts/system-admin.permission-catalog.contract";
 import {
+  requiresElevatedPermissionConfirmation,
   requiresHighRiskPermissionConfirmation,
 } from "../contracts/system-admin.permission-risk.shared";
 import { systemAdminPermissionKeySchema } from "./system-admin.permission-key.schema";
@@ -23,7 +24,12 @@ export const systemAdminRoleOverrideActionSchema = z
     ) {
       context.addIssue({
         code: "custom",
-        message: "High-risk permission grants require explicit confirmation.",
+        message: requiresElevatedPermissionConfirmation(
+          value.permissionKey,
+          value.enabled,
+        )
+          ? "Critical permission grants require elevated confirmation."
+          : "High-risk permission grants require explicit confirmation.",
         path: ["confirmHighRisk"],
       });
     }

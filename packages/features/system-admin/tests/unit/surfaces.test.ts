@@ -13,7 +13,7 @@ import { buildRolesListSurface } from "../../src/roles/data/system-admin.roles-l
 import { buildSystemAdminDiagnosticsIssuesListSurface } from "../../src/diagnostics/data/system-admin.diagnostics.surface";
 import { buildSystemAdminAuditViewerListSurface } from "../../src/audit-viewer/data/system-admin.audit.surface";
 import { buildSystemAdminSecuritySettingsListSurface } from "../../src/security/data/system-admin.security.surface";
-import { buildApprovalsListSurface } from "../../src/approvals/data/system-admin.approval-rules.surface";
+import { buildApprovalsListSurface } from "../../src/approvals/surface/system-admin.approvals-list.surface";
 import { buildPoliciesListSurface } from "../../src/policies/data/system-admin.policy-rules.surface";
 import {
   buildSystemAdminAiSandboxesListSurface,

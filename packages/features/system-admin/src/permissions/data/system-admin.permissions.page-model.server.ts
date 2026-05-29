@@ -5,21 +5,16 @@ import {
   resolveSystemAdminListStatusFilter,
 } from "../../overview/contracts/system-admin.list-search.shared";
 import { listRoleOverridesForOrganization } from "../../users/data/system-admin.identity.repository.server";
+import type {
+  SystemAdminPermissionCatalogRow,
+  SystemAdminPermissionListRow,
+  SystemAdminRoleOverrideListRow,
+} from "../contracts";
 import { buildSystemAdminPermissionCatalogRows } from "./system-admin.permissions.query.server";
 
-function mapPermissionCatalogRow(permission: {
-  id: string;
-  permission: string;
-  module: string;
-  group: string;
-  label: string;
-  description: string;
-  capabilityCount: number;
-  roleCount: number;
-  status: string;
-  coverageVerdict: string;
-  riskLevel: string;
-}) {
+function mapPermissionCatalogRow(
+  permission: SystemAdminPermissionCatalogRow,
+): SystemAdminPermissionListRow {
   return {
     id: permission.id,
     permission: permission.permission,
@@ -32,6 +27,18 @@ function mapPermissionCatalogRow(permission: {
     status: permission.status,
     coverageVerdict: permission.coverageVerdict,
     riskLevel: permission.riskLevel,
+  };
+}
+
+function mapRoleOverrideListRow(
+  override: Awaited<
+    ReturnType<typeof listRoleOverridesForOrganization>
+  >[number],
+): SystemAdminRoleOverrideListRow {
+  return {
+    role: override.role,
+    permissionKey: override.permissionKey,
+    enabled: override.enabled,
   };
 }
 
@@ -50,11 +57,14 @@ export async function buildSystemAdminPermissionsPageModel(input: {
     "permissions",
   );
 
-  const roleOverrides = await listRoleOverridesForOrganization({
+  const roleOverrideRows = await listRoleOverridesForOrganization({
     organizationId: input.organizationId,
     limit: 500,
   });
-  const catalogRows = buildSystemAdminPermissionCatalogRows({ roleOverrides });
+  const roleOverrides = roleOverrideRows.map(mapRoleOverrideListRow);
+  const catalogRows = buildSystemAdminPermissionCatalogRows({
+    roleOverrides: roleOverrideRows,
+  });
 
   const filteredRows = filterSystemAdminListRows(
     catalogRows.map(mapPermissionCatalogRow),

@@ -1,4 +1,5 @@
 export const systemAdminUserAuditActions = [
+  "system-admin.user_directory.view",
   "system-admin.user.invite",
   "system-admin.user.invitation_resend",
   "system-admin.user.invitation_cancel",

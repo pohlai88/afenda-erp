@@ -2,6 +2,7 @@ import type { OrganizationRole } from "@afenda/auth";
 import {
   isSystemAdminDeprecatedPermissionKey,
   isSystemAdminProtectedAdminPermission,
+  requiresElevatedPermissionConfirmation,
   requiresHighRiskPermissionConfirmation,
 } from "../contracts/system-admin.permission-risk.shared";
 
@@ -20,7 +21,12 @@ export function assertRolePermissionBundleChangeAllowed(input: {
     input.confirmHighRisk !== true
   ) {
     throw new Error(
-      "High-risk permission grants require explicit confirmation.",
+      requiresElevatedPermissionConfirmation(
+        input.permissionKey,
+        input.enabled,
+      )
+        ? "Critical permission grants require elevated confirmation."
+        : "High-risk permission grants require explicit confirmation.",
     );
   }
 

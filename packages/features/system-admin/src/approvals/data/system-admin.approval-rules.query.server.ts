@@ -1,8 +1,6 @@
 import type { TenantApprovalSettingRow } from "@afenda/db";
 import { organizationRoles } from "@afenda/auth";
 import { listTenantApprovalSettings } from "../../tenant-execution/data/system-admin.execution-settings.repository.server";
-import { filterSystemAdminListRows } from "../../overview/contracts/system-admin.list-filter.shared";
-import { resolveSystemAdminListSearch } from "../../overview/contracts/system-admin.list-search.shared";
 import { mapTenantApprovalSettingToListRow } from "./system-admin.approval-rules.mapper";
 
 export function buildSystemAdminApprovalRuleRows(input: {
@@ -11,29 +9,24 @@ export function buildSystemAdminApprovalRuleRows(input: {
   return input.settings.map(mapTenantApprovalSettingToListRow);
 }
 
-export async function buildSystemAdminApprovalsPageModel(input: {
+/** Architecture alias for tenant-scoped approval rule reads. */
+export async function listSystemAdminApprovals(input: {
   organizationId: string;
-  searchParams?: Record<string, string | string[] | undefined>;
+  limit?: number;
 }) {
-  const searchValue = resolveSystemAdminListSearch(
-    input.searchParams,
-    "approvals",
-  );
   const settings = await listTenantApprovalSettings({
     organizationId: input.organizationId,
-    limit: 200,
+    limit: input.limit ?? 200,
   });
 
-  return {
-    searchValue,
-    approvals: filterSystemAdminListRows(
-      buildSystemAdminApprovalRuleRows({ settings }),
-      searchValue,
-      ["key", "name", "moduleKey", "action", "targetType", "approverRoles"],
-    ),
-    approverRoleOptions: organizationRoles.map((role) => ({
-      value: role,
-      label: role,
-    })),
-  };
+  return buildSystemAdminApprovalRuleRows({ settings });
+}
+
+export const listSystemAdminApprovalRules = listSystemAdminApprovals;
+
+export function buildSystemAdminApproverRoleOptions() {
+  return organizationRoles.map((role) => ({
+    value: role,
+    label: role,
+  }));
 }

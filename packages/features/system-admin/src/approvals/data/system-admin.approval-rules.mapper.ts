@@ -2,10 +2,13 @@ import type { TenantApprovalSettingRow } from "@afenda/db";
 import { organizationRoles } from "@afenda/auth";
 import type { TenantApprovalRuleRecord } from "@afenda/kernel/execution";
 import type {
+  SystemAdminApprovalMode,
   SystemAdminApprovalRule,
   SystemAdminApprovalRuleListRow,
   SystemAdminApprovalRuleStatus,
 } from "../contracts/system-admin.approval-rule.contract";
+import { evaluateApprovalRuleReadiness } from "./system-admin.approval-rules.readiness.server";
+import { approvalModeSchema } from "../schemas/system-admin.approval-rule.schema";
 
 function readString(value: unknown, fallback: string) {
   return typeof value === "string" && value.trim().length > 0
@@ -42,6 +45,28 @@ function readApproverRoles(
   }
 
   return fallbackRole ? [fallbackRole] : [];
+}
+
+function readDelegateRoles(
+  configuration: Record<string, unknown>,
+): readonly ApproverRole[] {
+  const configured = configuration.delegateToRoleKeys;
+  if (!Array.isArray(configured)) {
+    return [];
+  }
+
+  return configured.filter(
+    (role): role is ApproverRole =>
+      typeof role === "string" &&
+      (organizationRoles as readonly string[]).includes(role),
+  );
+}
+
+function readApprovalMode(
+  configuration: Record<string, unknown>,
+): SystemAdminApprovalMode {
+  const parsed = approvalModeSchema.safeParse(configuration.approvalMode);
+  return parsed.success ? parsed.data : "parallel";
 }
 
 function deriveApprovalStatus(
@@ -81,9 +106,11 @@ export function mapTenantApprovalSettingToRule(
     moduleKey: readString(configuration.moduleKey, "*"),
     action: readString(configuration.action, row.approvalKey),
     targetType: readString(configuration.targetType, "erp-record"),
+    approvalMode: readApprovalMode(configuration),
     approverRoleKeys: readApproverRoles(configuration, row.approverRole),
     minApprovals: readNumber(configuration.minApprovals, 1),
     escalationAfterHours,
+    delegateToRoleKeys: readDelegateRoles(configuration),
     status: deriveApprovalStatus(row, configuration.status),
     enabled: row.enabled,
   };
@@ -101,12 +128,14 @@ export function mapTenantApprovalSettingToListRow(
     moduleKey: rule.moduleKey,
     action: rule.action,
     targetType: rule.targetType,
+    approvalMode: rule.approvalMode,
     approverRoles: rule.approverRoleKeys.join(", "),
     minApprovals: rule.minApprovals,
     escalation: rule.escalationAfterHours
       ? `${rule.escalationAfterHours} hours`
       : "Not configured",
     status: rule.status,
+    readinessVerdict: evaluateApprovalRuleReadiness(rule),
   };
 }
 
@@ -138,9 +167,11 @@ export function serializeApprovalRuleConfiguration(
     | "moduleKey"
     | "action"
     | "targetType"
+    | "approvalMode"
     | "approverRoleKeys"
     | "minApprovals"
     | "escalationAfterHours"
+    | "delegateToRoleKeys"
     | "status"
   >,
 ) {
@@ -148,7 +179,9 @@ export function serializeApprovalRuleConfiguration(
     moduleKey: rule.moduleKey,
     action: rule.action,
     targetType: rule.targetType,
+    approvalMode: rule.approvalMode,
     approverRoleKeys: rule.approverRoleKeys,
+    delegateToRoleKeys: rule.delegateToRoleKeys,
     minApprovals: rule.minApprovals,
     escalationAfterHours: rule.escalationAfterHours,
     status: rule.status,

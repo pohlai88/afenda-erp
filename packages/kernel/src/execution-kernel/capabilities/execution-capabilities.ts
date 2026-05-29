@@ -49,6 +49,7 @@ const routeByCapability: Partial<Record<AppCapability, `/${string}`>> = {
   "system-admin.capabilities.read": "/system-admin/capabilities",
   "system-admin.capabilities.manage": "/system-admin/capabilities",
   "system-admin.policies.read": "/system-admin/policies",
+  "system-admin.policies.review": "/system-admin/policies",
   "system-admin.policies.manage": "/system-admin/policies",
   "system-admin.approvals.read": "/system-admin/approvals",
   "system-admin.approvals.manage": "/system-admin/approvals",

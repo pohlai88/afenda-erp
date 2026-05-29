@@ -12,16 +12,19 @@ export function SystemAdminUsersSection({
   users,
   canMutate,
   searchValue,
+  totalCount,
 }: {
   users: readonly SystemAdminUserRow[];
   canMutate: boolean;
   searchValue?: string;
+  totalCount?: number;
 }) {
   const copy = systemAdminUsersUiCopy.section;
   const listConfiguration = buildUsersListSurface({
     users,
     canMutate,
     searchValue,
+    totalCount,
   });
 
   return (

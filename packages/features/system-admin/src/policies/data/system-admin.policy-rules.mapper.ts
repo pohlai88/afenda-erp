@@ -9,6 +9,7 @@ import type {
   SystemAdminPolicyRuleListRow,
   SystemAdminPolicyRuleStatus,
 } from "../contracts/system-admin.policy-rule.contract";
+import { evaluatePolicyRuleReadiness } from "./system-admin.policy-rules.readiness.server";
 
 function readString(value: unknown, fallback: string) {
   return typeof value === "string" && value.trim().length > 0
@@ -88,6 +89,7 @@ export function mapTenantPolicySettingToListRow(
 ): SystemAdminPolicyRuleListRow {
   const rule = mapTenantPolicySettingToRule(row);
   const conditionKeys = Object.keys(rule.condition);
+  const readinessVerdict = evaluatePolicyRuleReadiness(rule);
 
   return {
     id: rule.id,
@@ -98,11 +100,19 @@ export function mapTenantPolicySettingToListRow(
     targetType: rule.targetType,
     effect: rule.effect,
     status: rule.status,
+    enabled: rule.enabled,
     priority: rule.priority,
     conditionSummary:
       conditionKeys.length === 0
         ? "No conditions"
         : `${conditionKeys.length} condition${conditionKeys.length === 1 ? "" : "s"}`,
+    readinessVerdict,
+    coverageSummary:
+      rule.effect === "require_approval"
+        ? "Approval chain"
+        : rule.effect === "warn"
+          ? "Warning only"
+          : "Execution gate",
   };
 }
 

@@ -1,20 +1,17 @@
-import {
-  buildApprovalsListSurface,
-  systemAdminApprovalsSurfaceKey,
-} from "@afenda/feature-system-admin/metadata";
+import { systemAdminApprovalsUiCopy } from "@afenda/feature-system-admin/metadata";
 import {
   buildSystemAdminApprovalsPageModel,
   requireSystemAdminApprovalsRead,
+  SystemAdminApprovalsAccessDenied,
+  SystemAdminApprovalsSection,
   updateSystemAdminApprovalRuleAction,
 } from "@afenda/feature-system-admin/server";
-import { SystemAdminApprovalRuleEditor } from "@afenda/feature-system-admin/client";
-import { GovernedPatternCListSection } from "@afenda/governed-surface/server";
-import { SectionPanel } from "@afenda/ui";
+import { hasExecutionPermission } from "@afenda/kernel/execution";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Approvals — System admin",
-  description: "Approval-chain configuration evaluated before protected execution.",
+  description: systemAdminApprovalsUiCopy.page.description,
 };
 
 export default async function SystemAdminApprovalsPage({
@@ -23,43 +20,39 @@ export default async function SystemAdminApprovalsPage({
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
-  const { organization } = await requireSystemAdminApprovalsRead();
+
+  let organization: Awaited<
+    ReturnType<typeof requireSystemAdminApprovalsRead>
+  >["organization"];
+  let context: Awaited<
+    ReturnType<typeof requireSystemAdminApprovalsRead>
+  >["context"];
+
+  try {
+    ({ organization, context } = await requireSystemAdminApprovalsRead());
+  } catch {
+    return <SystemAdminApprovalsAccessDenied />;
+  }
+
   const canMutate =
-    organization.capabilities.includes("system-admin.approvals.manage") ||
-    organization.capabilities.includes("system-admin.settings.write");
+    hasExecutionPermission(context, "system-admin.approvals.manage") ||
+    hasExecutionPermission(context, "system-admin.settings.write");
+
   const { searchValue, approvals, approverRoleOptions } =
     await buildSystemAdminApprovalsPageModel({
       organizationId: organization.id,
+      actorId: context.userId,
+      actorType: context.actorType,
       searchParams: resolvedSearchParams,
     });
 
   return (
-    <div className="flex flex-col gap-surface-2xl">
-      <SectionPanel
-        headingLevel={1}
-        title="Approvals"
-        description="Approval law is configured here. Orbit and workflow runtime create tasks; System Admin does not execute workflow work directly."
-      />
-
-      <GovernedPatternCListSection
-        title="Approval rules"
-        surfaceKey={systemAdminApprovalsSurfaceKey}
-        listConfiguration={buildApprovalsListSurface({ approvals, searchValue })}
-        parentAccessAllowed
-        layout="embedded"
-      />
-
-      {canMutate ? (
-        <SectionPanel
-          title="Create or update approval rule"
-          description="Approver roles are validated against organization roles. Disabled rules do not affect execution kernel verdicts."
-        >
-          <SystemAdminApprovalRuleEditor
-            updateApprovalRuleAction={updateSystemAdminApprovalRuleAction}
-            approverRoleOptions={approverRoleOptions}
-          />
-        </SectionPanel>
-      ) : null}
-    </div>
+    <SystemAdminApprovalsSection
+      approvals={approvals}
+      searchValue={searchValue}
+      canMutate={canMutate}
+      approverRoleOptions={approverRoleOptions}
+      updateApprovalRuleAction={updateSystemAdminApprovalRuleAction}
+    />
   );
 }

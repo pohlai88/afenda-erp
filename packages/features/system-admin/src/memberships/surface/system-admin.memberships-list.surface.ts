@@ -13,9 +13,10 @@ import {
   buildSystemAdminListToolbar,
   buildSystemAdminStaticPagination,
 } from "../../overview/surfaces/system-admin.list-surface.shared";
-import type {
-  SystemAdminMembershipRow,
-  SystemAdminMembershipStatus,
+import {
+  systemAdminMembershipStatuses,
+  type SystemAdminMembershipRow,
+  type SystemAdminMembershipStatus,
 } from "../contracts";
 import { resolveSystemAdminMembershipRowTrailingAction } from "./system-admin.memberships-list-trailing.shared";
 import { systemAdminMembershipsUiCopy } from "./system-admin.memberships-ui.copy.shared";
@@ -92,11 +93,10 @@ export function buildMembersListSurface(input: {
             id: "status",
             label: "Status",
             param: "membersStatus",
-            options: [
-              { label: "Active", value: "active" },
-              { label: "Suspended", value: "suspended" },
-              { label: "Removed", value: "removed" },
-            ],
+            options: systemAdminMembershipStatuses.map((status) => ({
+              label: status.charAt(0).toUpperCase() + status.slice(1),
+              value: status,
+            })),
           },
           {
             id: "role",

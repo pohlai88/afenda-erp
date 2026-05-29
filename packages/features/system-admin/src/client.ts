@@ -29,6 +29,7 @@ export { SystemAdminModuleTrailingCell } from "./modules/components/system-admin
 export { SystemAdminCapabilitySettingsDialog } from "./capabilities/components/system-admin.capability-settings-dialog.component.client";
 export { SystemAdminCapabilityTrailingCell } from "./capabilities/components/system-admin.capabilities-trailing-cells.component.client";
 export { SystemAdminPolicyRuleEditor } from "./policies/components/system-admin.policy-rule-editor.component.client";
+export { SystemAdminPolicyTrailingCell } from "./policies/components/system-admin.policy-rules-trailing-cells.component.client";
 export { SystemAdminApprovalRuleEditor } from "./approvals/components/system-admin.approval-rule-editor.component.client";
 export { SystemAdminAuditExportButton } from "./audit-viewer/components/system-admin.audit-export-button.component.client";
 export { SystemAdminSecurityForm } from "./security/components/system-admin.security-form.component.client";
@@ -45,6 +46,7 @@ export {
 } from "./permissions/contracts/system-admin.permission-catalog.contract";
 export {
   isSystemAdminDeprecatedPermissionKey,
+  requiresElevatedPermissionConfirmation,
   requiresHighRiskPermissionConfirmation,
   resolveSystemAdminPermissionRiskLevel,
 } from "./permissions/contracts/system-admin.permission-risk.shared";

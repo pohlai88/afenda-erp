@@ -7,24 +7,13 @@ import {
   permissionCoverageVerdictBadge,
   riskLevelBadge,
 } from "../../overview/surfaces/system-admin.control-list.shared";
+import type { SystemAdminPermissionListRow } from "../contracts";
 
 export const systemAdminPermissionsSurfaceKey =
   "system-admin.permissions.list";
 
 export function buildPermissionsListSurface(input: {
-  permissions: ReadonlyArray<{
-    id: string;
-    permission: string;
-    module: string;
-    group: string;
-    label: string;
-    description: string;
-    capabilityCount: string;
-    roleCount: string;
-    status: string;
-    coverageVerdict: string;
-    riskLevel: string;
-  }>;
+  permissions: readonly SystemAdminPermissionListRow[];
   searchValue?: string;
   coverageFilter?: string;
 }): ListSurfaceRendererConfigurationResolvedInput {

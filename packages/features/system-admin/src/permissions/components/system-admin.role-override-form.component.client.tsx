@@ -20,6 +20,7 @@ import type { SystemAdminActionResult } from "../../tenant-execution/contracts/s
 import { systemAdminPermissionCatalog } from "../contracts/system-admin.permission-catalog.contract";
 import {
   isSystemAdminDeprecatedPermissionKey,
+  requiresElevatedPermissionConfirmation,
   requiresHighRiskPermissionConfirmation,
   resolveSystemAdminPermissionRiskLevel,
 } from "../contracts/system-admin.permission-risk.shared";
@@ -50,6 +51,10 @@ export function RoleOverrideForm({
   );
   const isDeprecated = isSystemAdminDeprecatedPermissionKey(permissionKey);
   const needsHighRiskConfirmation = requiresHighRiskPermissionConfirmation(
+    permissionKey,
+    enabled,
+  );
+  const needsElevatedConfirmation = requiresElevatedPermissionConfirmation(
     permissionKey,
     enabled,
   );
@@ -138,8 +143,9 @@ export function RoleOverrideForm({
                 }
               />
               <FieldLabel htmlFor="confirmHighRisk">
-                I confirm this high-risk permission should be granted to the
-                selected role.
+                {needsElevatedConfirmation
+                  ? "I confirm this critical permission should be granted to the selected role."
+                  : "I confirm this high-risk permission should be granted to the selected role."}
               </FieldLabel>
             </Field>
           ) : (

@@ -27,6 +27,14 @@ export const systemAdminControlLinks = {
     ),
   policies: (query?: string) =>
     systemAdminListHref(systemAdminRoutePaths.policies, "policies", query),
+  policy: (policyKey: string, query?: string) => {
+    const params = new URLSearchParams();
+    params.set("policiesKey", policyKey);
+    if (query) {
+      params.set("policiesQ", query);
+    }
+    return `${systemAdminRoutePaths.policies}?${params.toString()}`;
+  },
   approvals: (query?: string) =>
     systemAdminListHref(systemAdminRoutePaths.approvals, "approvals", query),
   audit: (query?: string) =>

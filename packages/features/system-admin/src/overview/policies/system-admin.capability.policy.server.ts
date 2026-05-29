@@ -165,6 +165,16 @@ export function requireSystemAdminCapabilitiesManage() {
 export function requireSystemAdminPoliciesRead() {
   return requireSystemAdminAnyCapability([
     "system-admin.policies.read",
+    "system-admin.policies.review",
+    "system-admin.settings.read",
+  ]);
+}
+
+export function requireSystemAdminPoliciesReview() {
+  return requireSystemAdminAnyCapability([
+    "system-admin.policies.review",
+    "system-admin.policies.read",
+    "system-admin.policies.manage",
     "system-admin.settings.read",
   ]);
 }

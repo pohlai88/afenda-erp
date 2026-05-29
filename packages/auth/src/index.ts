@@ -54,6 +54,7 @@ export const appCapabilities = [
   "system-admin.capabilities.read",
   "system-admin.capabilities.manage",
   "system-admin.policies.read",
+  "system-admin.policies.review",
   "system-admin.policies.manage",
   "system-admin.approvals.read",
   "system-admin.approvals.manage",

@@ -1,24 +1,17 @@
-import {
-  buildPermissionsListSurface,
-  buildRoleOverridesListSurface,
-  systemAdminPermissionsSurfaceKey,
-  systemAdminRoleOverridesSurfaceKey,
-} from "@afenda/feature-system-admin/metadata";
+import { systemAdminPermissionsUiCopy } from "@afenda/feature-system-admin/metadata";
 import {
   buildSystemAdminPermissionsPageModel,
   requireSystemAdminPermissionsRead,
   setRoleOverrideAction,
   SystemAdminPermissionsAccessDenied,
+  SystemAdminPermissionsSection,
 } from "@afenda/feature-system-admin/server";
-import { RoleOverrideForm } from "@afenda/feature-system-admin/client";
 import { hasExecutionPermission } from "@afenda/kernel/execution";
-import { GovernedPatternCListSection } from "@afenda/governed-surface/server";
-import { Alert, AlertDescription, SectionPanel } from "@afenda/ui";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Permissions — System admin",
-  description: "Declared permission catalog and coverage matrix.",
+  description: systemAdminPermissionsUiCopy.page.description,
 };
 
 export default async function SystemAdminPermissionsPage({
@@ -58,55 +51,14 @@ export default async function SystemAdminPermissionsPage({
   });
 
   return (
-    <div className="flex flex-col gap-surface-2xl">
-      <SectionPanel
-        headingLevel={1}
-        title="Permissions"
-        description="Permissions are declared capability contracts grouped by module and action. Coverage verdicts flag orphan, unassigned, missing capability, and overprivileged grants."
-      />
-
-      {missingPermissionCount > 0 ? (
-        <Alert variant="destructive">
-          <AlertDescription>
-            {missingPermissionCount} execution capability reference
-            {missingPermissionCount === 1 ? "s" : ""} permission keys that are
-            not registered in the declared catalog. Review the coverage column
-            and reconcile the catalog before granting new role bundles.
-          </AlertDescription>
-        </Alert>
-      ) : null}
-
-      <GovernedPatternCListSection
-        title="Permission catalog"
-        surfaceKey={systemAdminPermissionsSurfaceKey}
-        listConfiguration={buildPermissionsListSurface({
-          searchValue,
-          coverageFilter,
-          permissions,
-        })}
-        parentAccessAllowed
-        layout="embedded"
-      />
-
-      <GovernedPatternCListSection
-        title="Role permission overrides"
-        description="Tenant overrides apply on top of the static role catalog when sessions are refreshed."
-        surfaceKey={systemAdminRoleOverridesSurfaceKey}
-        listConfiguration={buildRoleOverridesListSurface({
-          overrides: roleOverrides,
-        })}
-        parentAccessAllowed
-        layout="embedded"
-      />
-
-      {canManage ? (
-        <SectionPanel
-          title="Update role permission bundle"
-          description="Permissions are assigned through roles. High-risk and critical grants require explicit confirmation."
-        >
-          <RoleOverrideForm setRoleOverrideAction={setRoleOverrideAction} />
-        </SectionPanel>
-      ) : null}
-    </div>
+    <SystemAdminPermissionsSection
+      permissions={permissions}
+      roleOverrides={roleOverrides}
+      searchValue={searchValue}
+      coverageFilter={coverageFilter}
+      missingPermissionCount={missingPermissionCount}
+      canManage={canManage}
+      setRoleOverrideAction={setRoleOverrideAction}
+    />
   );
 }

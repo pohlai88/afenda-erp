@@ -13,6 +13,7 @@ import {
 import { ScaleIcon } from "lucide-react";
 import { useActionState } from "react";
 import type { SystemAdminActionResult } from "../../tenant-execution/contracts/system-admin.action-result.contract";
+import type { SystemAdminPolicyRuleEditorDefaults } from "../contracts/system-admin.policy-rule.contract";
 
 type PolicyRuleAction = (
   state: SystemAdminActionResult | undefined,
@@ -22,10 +23,13 @@ type PolicyRuleAction = (
 export function SystemAdminPolicyRuleEditor({
   updatePolicyRuleAction,
   effectOptions,
+  editorDefaults,
 }: {
   updatePolicyRuleAction: PolicyRuleAction;
   effectOptions: readonly string[];
+  editorDefaults?: SystemAdminPolicyRuleEditorDefaults;
 }) {
+  const mode = editorDefaults?.mode ?? "create";
   const [state, formAction, pending] = useActionState<
     SystemAdminActionResult | undefined,
     FormData
@@ -34,38 +38,63 @@ export function SystemAdminPolicyRuleEditor({
   return (
     <form action={formAction} className="@container">
       <FieldGroup className="grid gap-surface-md @md:grid-cols-2">
-        <input type="hidden" name="mode" value="create" />
+        <input type="hidden" name="mode" value={mode} />
+        {mode === "update" ? (
+          <input
+            type="hidden"
+            name="policyRuleId"
+            value={editorDefaults?.policyRuleId}
+          />
+        ) : (
+          <Field className="@md:col-span-2">
+            <FieldLabel>Policy key</FieldLabel>
+            <Input
+              name="policyKey"
+              placeholder="finance.invoice.posted.lock"
+              required
+            />
+          </Field>
+        )}
         <Field className="@md:col-span-2">
-          <FieldLabel>Policy key</FieldLabel>
+          <FieldLabel>Display name</FieldLabel>
           <Input
-            name="policyKey"
-            placeholder="finance.invoice.posted.lock"
+            name="name"
+            placeholder="Lock posted invoice edits"
+            defaultValue={editorDefaults?.name}
             required
           />
         </Field>
-        <Field className="@md:col-span-2">
-          <FieldLabel>Display name</FieldLabel>
-          <Input name="name" placeholder="Lock posted invoice edits" required />
-        </Field>
         <Field>
           <FieldLabel>Module</FieldLabel>
-          <Input name="moduleKey" placeholder="finance" defaultValue="*" />
+          <Input
+            name="moduleKey"
+            placeholder="finance"
+            defaultValue={editorDefaults?.moduleKey ?? "*"}
+          />
         </Field>
         <Field>
           <FieldLabel>Action</FieldLabel>
           <Input
             name="action"
             placeholder="finance.invoice.update"
+            defaultValue={editorDefaults?.action}
             required
           />
         </Field>
         <Field>
           <FieldLabel>Target type</FieldLabel>
-          <Input name="targetType" defaultValue="erp-record" required />
+          <Input
+            name="targetType"
+            defaultValue={editorDefaults?.targetType ?? "erp-record"}
+            required
+          />
         </Field>
         <Field>
           <FieldLabel>Effect</FieldLabel>
-          <NativeSelect name="effect" defaultValue="lock">
+          <NativeSelect
+            name="effect"
+            defaultValue={editorDefaults?.effect ?? "lock"}
+          >
             {effectOptions.map((effect) => (
               <option key={effect} value={effect}>
                 {effect}
@@ -75,11 +104,20 @@ export function SystemAdminPolicyRuleEditor({
         </Field>
         <Field>
           <FieldLabel>Priority</FieldLabel>
-          <Input name="priority" type="number" min={0} max={1000} defaultValue={100} />
+          <Input
+            name="priority"
+            type="number"
+            min={0}
+            max={1000}
+            defaultValue={editorDefaults?.priority ?? 100}
+          />
         </Field>
         <Field>
           <FieldLabel>Status</FieldLabel>
-          <NativeSelect name="status" defaultValue="active">
+          <NativeSelect
+            name="status"
+            defaultValue={editorDefaults?.status ?? "active"}
+          >
             <option value="active">Active</option>
             <option value="disabled">Disabled</option>
             <option value="deprecated">Deprecated</option>
@@ -87,7 +125,10 @@ export function SystemAdminPolicyRuleEditor({
         </Field>
         <Field>
           <FieldLabel>Enabled</FieldLabel>
-          <NativeSelect name="enabled" defaultValue="true">
+          <NativeSelect
+            name="enabled"
+            defaultValue={editorDefaults?.enabled === false ? "false" : "true"}
+          >
             <option value="true">Enabled</option>
             <option value="false">Disabled</option>
           </NativeSelect>
@@ -98,7 +139,7 @@ export function SystemAdminPolicyRuleEditor({
             name="conditionJson"
             rows={4}
             placeholder='{"status":"posted"}'
-            defaultValue="{}"
+            defaultValue={editorDefaults?.conditionJson ?? "{}"}
           />
         </Field>
         <div className="@md:col-span-2">
@@ -110,7 +151,7 @@ export function SystemAdminPolicyRuleEditor({
         <div className="flex items-end @md:col-span-2">
           <Button type="submit" disabled={pending}>
             <ScaleIcon data-icon="inline-start" />
-            Save policy rule
+            {mode === "update" ? "Update policy rule" : "Save policy rule"}
           </Button>
         </div>
         <div className="@md:col-span-2">

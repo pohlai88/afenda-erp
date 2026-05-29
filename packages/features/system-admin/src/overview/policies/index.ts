@@ -1,1 +1,1 @@
-export * from "./system-admin.overview.policy.server";
+export * from "./system-admin.capability.policy.server";

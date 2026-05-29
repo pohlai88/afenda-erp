@@ -29,7 +29,7 @@ import {
   systemAdminDiagnosticsRecentChangesSurfaceKey,
   systemAdminDiagnosticsSurfaceKey,
 } from "../../diagnostics/data/system-admin.diagnostics.surface";
-import { systemAdminApprovalsSurfaceKey } from "../../approvals/data/system-admin.approval-rules.surface";
+import { systemAdminApprovalsSurfaceKey } from "../../approvals/surface/system-admin.approvals-list.surface";
 import { systemAdminPoliciesSurfaceKey } from "../../policies/data/system-admin.policy-rules.surface";
 
 export {

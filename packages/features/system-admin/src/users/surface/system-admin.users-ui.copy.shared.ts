@@ -5,6 +5,10 @@ export const systemAdminUsersUiCopy = {
       "Invite users and inspect active tenant access without changing the execution-kernel boundary.",
     inviteSectionTitle: "Invite user",
     lifecycleAlertTitle: "Membership lifecycle",
+    lifecycleAlertBeforeMembershipsLink:
+      "Suspend, reactivate, and remove organization members on this surface. For membership-only review and role coverage, use ",
+    lifecycleAlertBetweenLinks: ". Role overrides and identity policy invites live on ",
+    lifecycleAlertAfterIdentityLink: ".",
   },
   listSurface: {
     title: "Organization users",

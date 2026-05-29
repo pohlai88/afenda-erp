@@ -3,12 +3,13 @@ import { SectionPanel } from "@afenda/ui";
 import { ui } from "@afenda/ui/design-system";
 import { cn } from "@afenda/ui/utils";
 import Link from "next/link";
-import { InviteMemberForm, RoleOverrideForm } from "@afenda/feature-system-admin/client";
+import { setRoleOverrideAction } from "../../permissions/actions/system-admin.permission-bundle.actions.server";
+import { RoleOverrideForm } from "../../permissions/components/system-admin.role-override-form.component.client";
 import {
   buildRoleOverridesListSurface,
   systemAdminRoleOverridesSurfaceKey,
-} from "@afenda/feature-system-admin/metadata";
-import { setRoleOverrideAction } from "@afenda/feature-system-admin/server";
+} from "../../permissions/surface/system-admin.role-overrides-list.surface";
+import { InviteMemberForm } from "../../client";
 import type { RoleOverrideRow } from "@afenda/db";
 import { systemAdminRoutePaths } from "../../overview/contracts/system-admin.route-paths.contract";
 import { inviteMemberAction } from "../actions/system-admin.identity-invitations.actions.server";

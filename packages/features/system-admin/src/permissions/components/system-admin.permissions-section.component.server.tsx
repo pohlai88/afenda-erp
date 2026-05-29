@@ -1,6 +1,9 @@
-import type { RoleOverrideRow } from "@afenda/db";
 import { GovernedPatternCListSection } from "@afenda/governed-surface/server";
 import { Alert, AlertDescription, SectionPanel } from "@afenda/ui";
+import type {
+  SystemAdminPermissionListRow,
+  SystemAdminRoleOverrideListRow,
+} from "../contracts";
 import type { SystemAdminActionResult } from "../../tenant-execution/contracts/system-admin.action-result.contract";
 import {
   buildPermissionsListSurface,
@@ -12,20 +15,6 @@ import {
 } from "../surface/system-admin.role-overrides-list.surface";
 import { systemAdminPermissionsUiCopy } from "../surface/system-admin.permissions-ui.copy.shared";
 import { RoleOverrideForm } from "./system-admin.role-override-form.component.client";
-
-type PermissionListRow = {
-  id: string;
-  permission: string;
-  module: string;
-  group: string;
-  label: string;
-  description: string;
-  capabilityCount: string;
-  roleCount: string;
-  status: string;
-  coverageVerdict: string;
-  riskLevel: string;
-};
 
 type SetRoleOverrideAction = (
   state: SystemAdminActionResult | undefined,
@@ -41,8 +30,8 @@ export function SystemAdminPermissionsSection({
   canManage,
   setRoleOverrideAction,
 }: {
-  permissions: readonly PermissionListRow[];
-  roleOverrides: readonly RoleOverrideRow[];
+  permissions: readonly SystemAdminPermissionListRow[];
+  roleOverrides: readonly SystemAdminRoleOverrideListRow[];
   searchValue?: string;
   coverageFilter?: string;
   missingPermissionCount: number;

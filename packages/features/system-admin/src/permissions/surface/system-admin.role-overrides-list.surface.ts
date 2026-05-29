@@ -7,6 +7,7 @@ import {
   buildSystemAdminListToolbar,
   buildSystemAdminStaticPagination,
 } from "../../overview/surfaces/system-admin.list-surface.shared";
+import type { SystemAdminRoleOverrideListRow } from "../contracts";
 
 export const systemAdminRoleOverridesSurfaceKey =
   "system-admin.role-overrides.list";
@@ -27,11 +28,7 @@ const OVERRIDE_COLUMNS = [
 ];
 
 export function buildRoleOverridesListSurface(input: {
-  overrides: ReadonlyArray<{
-    role: string;
-    permissionKey: string;
-    enabled: boolean;
-  }>;
+  overrides: readonly SystemAdminRoleOverrideListRow[];
 }): ListSurfaceRendererConfigurationResolvedInput {
   return buildGovernedListSurface({
     __schemaVersion: GOVERNED_METADATA_SCHEMA_VERSION,

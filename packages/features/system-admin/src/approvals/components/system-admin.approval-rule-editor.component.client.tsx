@@ -5,6 +5,7 @@ import { Button, Field, FieldGroup, FieldLabel, Input, NativeSelect } from "@afe
 import { GitPullRequestIcon } from "lucide-react";
 import { useActionState } from "react";
 import type { SystemAdminActionResult } from "../../tenant-execution/contracts/system-admin.action-result.contract";
+import type { SystemAdminApproverRoleOption } from "../contracts";
 
 type ApprovalRuleAction = (
   state: SystemAdminActionResult | undefined,
@@ -16,7 +17,7 @@ export function SystemAdminApprovalRuleEditor({
   approverRoleOptions,
 }: {
   updateApprovalRuleAction: ApprovalRuleAction;
-  approverRoleOptions: ReadonlyArray<{ value: string; label: string }>;
+  approverRoleOptions: readonly SystemAdminApproverRoleOption[];
 }) {
   const [state, formAction, pending] = useActionState<
     SystemAdminActionResult | undefined,
@@ -60,12 +61,26 @@ export function SystemAdminApprovalRuleEditor({
           <Input name="targetType" defaultValue="erp-record" required />
         </Field>
         <Field>
+          <FieldLabel>Approval mode</FieldLabel>
+          <NativeSelect name="approvalMode" defaultValue="parallel">
+            <option value="sequential">Sequential</option>
+            <option value="parallel">Parallel</option>
+          </NativeSelect>
+        </Field>
+        <Field>
           <FieldLabel>Approver roles</FieldLabel>
           <Input
             name="approverRoleKeys"
             placeholder="finance-manager,owner"
             defaultValue={approverRoleOptions[0]?.value ?? "admin"}
             required
+          />
+        </Field>
+        <Field>
+          <FieldLabel>Delegation roles (optional)</FieldLabel>
+          <Input
+            name="delegateToRoleKeys"
+            placeholder="operations-manager"
           />
         </Field>
         <Field>

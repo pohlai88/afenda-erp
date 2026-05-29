@@ -8,11 +8,11 @@ const mockDispatchWebhook = vi.fn();
 const mockLogServerEvent = vi.fn();
 
 vi.mock(
-  "../../src/overview/policies/system-admin.capability.policy.server",
+  "../../src/permissions/policies/system-admin.permissions.policy.server",
   async (importOriginal) => {
     const actual =
       await importOriginal<
-        typeof import("../../src/overview/policies/system-admin.capability.policy.server")
+        typeof import("../../src/permissions/policies/system-admin.permissions.policy.server")
       >();
     return {
       ...actual,
@@ -119,6 +119,18 @@ describe("system admin permissions", () => {
     );
   });
 
+  it("rejects permission bundle updates when manage capability is missing", async () => {
+    mockRequirePermissionsManage.mockRejectedValue(new Error("Forbidden"));
+
+    const formData = new FormData();
+    formData.set("role", "staff");
+    formData.set("permissionKey", "system-admin.audit.read");
+    formData.set("enabled", "true");
+
+    await expect(setRoleOverride(formData)).rejects.toThrow("Forbidden");
+    expect(mockUpsertRoleOverride).not.toHaveBeenCalled();
+  });
+
   it("writes audit events when permission bundles change", async () => {
     const formData = new FormData();
     formData.set("role", "staff");
@@ -174,10 +186,23 @@ describe("system admin permissions", () => {
     );
   });
 
-  it("requires confirmation for high-risk permission grants", async () => {
+  it("requires elevated confirmation for critical permission grants", async () => {
     const formData = new FormData();
     formData.set("role", "staff");
     formData.set("permissionKey", "system-admin.permissions.manage");
+    formData.set("enabled", "true");
+    formData.set("confirmHighRisk", "false");
+
+    const result = await setRoleOverride(formData);
+
+    expect(result.ok).toBe(false);
+    expect(mockUpsertRoleOverride).not.toHaveBeenCalled();
+  });
+
+  it("requires confirmation for high-risk permission grants", async () => {
+    const formData = new FormData();
+    formData.set("role", "staff");
+    formData.set("permissionKey", "system-admin.lynx.approve");
     formData.set("enabled", "true");
     formData.set("confirmHighRisk", "false");
 

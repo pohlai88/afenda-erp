@@ -7,6 +7,7 @@ import {
 import { writeExecutionAuditEvent } from "@afenda/kernel/execution";
 import { revalidatePath } from "next/cache";
 import {
+  systemAdminActionFailure,
   systemAdminActionSuccess,
   type SystemAdminActionResult,
   zodActionFailure,
@@ -159,4 +160,85 @@ export async function updateSystemAdminPolicyAction(
   formData: FormData,
 ): Promise<SystemAdminActionResult> {
   return updateSystemAdminPolicyRuleAction(previous, formData);
+}
+
+export async function setSystemAdminPolicyRuleEnabledAction(input: {
+  policyKey: string;
+  enabled: boolean;
+}): Promise<SystemAdminActionResult> {
+  const { context, organization, session } =
+    await requireSystemAdminPoliciesManage();
+
+  const existingSettings = await listTenantPolicySettings({
+    organizationId: organization.id,
+    limit: 200,
+  });
+  const previous = existingSettings.find(
+    (row) => row.policyKey === input.policyKey,
+  );
+
+  if (!previous) {
+    return systemAdminActionFailure(
+      "Policy rule was not found for this organization.",
+    );
+  }
+
+  const configuration =
+    previous.configuration &&
+    typeof previous.configuration === "object" &&
+    !Array.isArray(previous.configuration)
+      ? (previous.configuration as Record<string, unknown>)
+      : {};
+
+  const configuredStatus =
+    typeof configuration.status === "string" ? configuration.status : "active";
+  const nextStatus = input.enabled ? configuredStatus : "disabled";
+
+  await upsertTenantPolicySettings({
+    organizationId: organization.id,
+    actorAuthUserId: session.id,
+    policyKey: input.policyKey,
+    label: previous.label,
+    enabled: input.enabled,
+    readiness: input.enabled ? "active" : "blocked",
+    configuration: {
+      ...configuration,
+      status: nextStatus,
+    },
+  });
+
+  await writeExecutionAuditEvent({
+    organizationId: organization.id,
+    actorId: context.userId,
+    actorType: context.actorType,
+    action: input.enabled
+      ? systemAdminPolicyRuleAuditActionsByMode.update
+      : systemAdminPolicyRuleAuditActionsByMode.disable,
+    targetType: "policy_rule",
+    targetId: input.policyKey,
+    metadata: {
+      previous: {
+        enabled: previous.enabled,
+        readiness: previous.readiness,
+      },
+      next: {
+        enabled: input.enabled,
+        status: nextStatus,
+      },
+    },
+  });
+
+  await dispatchSystemAdminWebhook({
+    organizationId: organization.id,
+    userId: session.id,
+    eventType: systemAdminPolicyRuleWebhookEvents[0],
+    payload: {
+      policyKey: input.policyKey,
+      enabled: input.enabled,
+      status: nextStatus,
+    },
+  });
+
+  revalidatePolicies();
+  return systemAdminActionSuccess(undefined);
 }

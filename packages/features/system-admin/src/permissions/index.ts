@@ -5,7 +5,4 @@ export * from "./data";
 export * from "./events";
 export * from "./policies";
 export * from "./schemas";
-export {
-  SystemAdminPermissionsAccessDenied,
-  SystemAdminPermissionsSection,
-} from "./components";
+export * from "./surface";

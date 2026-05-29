@@ -69,8 +69,10 @@ export function buildUsersListSurface(input: {
   users: readonly SystemAdminUserRow[];
   canMutate?: boolean;
   searchValue?: string;
+  totalCount?: number;
 }): ListSurfaceRendererConfigurationResolvedInput {
   const canMutate = input.canMutate ?? false;
+  const totalCount = input.totalCount ?? input.users.length;
   const listCopy = systemAdminUsersUiCopy.listSurface;
 
   return buildGovernedListSurface({
@@ -103,7 +105,7 @@ export function buildUsersListSurface(input: {
       object: "users",
       function: "read",
     },
-    pagination: buildSystemAdminStaticPagination(input.users.length, input.users.length),
+    pagination: buildSystemAdminStaticPagination(totalCount, input.users.length),
     surface: {
       header: {
         title: listCopy.title,

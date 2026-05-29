@@ -7,15 +7,43 @@ import {
 import { writeExecutionAuditEvent } from "@afenda/kernel/execution";
 import { revalidatePath } from "next/cache";
 import {
+  systemAdminActionFailure,
   systemAdminActionSuccess,
   type SystemAdminActionResult,
   zodActionFailure,
 } from "../../tenant-execution/contracts/system-admin.action-result.contract";
 import { systemAdminRoutePaths } from "../../overview/contracts/system-admin.route-paths.contract";
 import { dispatchSystemAdminWebhook } from "../../integrations";
-import { requireSystemAdminApprovalsManage } from "../../overview/policies/system-admin.capability.policy.server";
-import { serializeApprovalRuleConfiguration } from "../data/system-admin.approval-rules.mapper";
+import {
+  assertApprovalRuleChangeAllowed,
+  requireSystemAdminApprovalsManage,
+} from "../policies/system-admin.approval-rules.policy.server";
+import {
+  mapTenantApprovalSettingToRule,
+  serializeApprovalRuleConfiguration,
+} from "../data/system-admin.approval-rules.mapper";
+import {
+  systemAdminApprovalRuleAuditActionsByMode,
+  systemAdminApprovalRuleWebhookEvents,
+  type SystemAdminApprovalRuleAuditAction,
+} from "../events/system-admin.approval-rules.event";
 import { systemAdminApprovalRuleActionSchema } from "../schemas/system-admin.approval-rule.schema";
+
+function resolveApprovalRuleAuditAction(input: {
+  mode: "create" | "update";
+  status: string;
+}): SystemAdminApprovalRuleAuditAction {
+  if (input.mode === "create") {
+    return systemAdminApprovalRuleAuditActionsByMode.create;
+  }
+  if (input.status === "disabled") {
+    return systemAdminApprovalRuleAuditActionsByMode.disable;
+  }
+  if (input.status === "deprecated") {
+    return systemAdminApprovalRuleAuditActionsByMode.deprecate;
+  }
+  return systemAdminApprovalRuleAuditActionsByMode.update;
+}
 
 function revalidateApprovals() {
   revalidatePath(systemAdminRoutePaths.approvals);
@@ -41,7 +69,9 @@ export async function updateSystemAdminApprovalRuleAction(
     moduleKey: formData.get("moduleKey"),
     action: formData.get("action"),
     targetType: formData.get("targetType"),
+    approvalMode: formData.get("approvalMode"),
     approverRoleKeys: formData.get("approverRoleKeys"),
+    delegateToRoleKeys: formData.get("delegateToRoleKeys") || undefined,
     minApprovals: formData.get("minApprovals"),
     escalationAfterHours: formData.get("escalationAfterHours") || undefined,
     status: formData.get("status"),
@@ -62,12 +92,34 @@ export async function updateSystemAdminApprovalRuleAction(
     limit: 200,
   });
   const previous = existingSettings.find((row) => row.approvalKey === approvalKey);
+  const previousRule = previous
+    ? mapTenantApprovalSettingToRule(previous)
+    : undefined;
+
+  try {
+    assertApprovalRuleChangeAllowed({
+      mode: parsed.data.mode,
+      status: parsed.data.status,
+      enabled: parsed.data.enabled,
+      approverRoleKeys: parsed.data.approverRoleKeys,
+      minApprovals: parsed.data.minApprovals,
+      previousStatus: previousRule?.status,
+    });
+  } catch (error) {
+    return systemAdminActionFailure(
+      error instanceof Error
+        ? error.message
+        : "Approval rule change rejected.",
+    );
+  }
 
   const configuration = serializeApprovalRuleConfiguration({
     moduleKey: parsed.data.moduleKey,
     action: parsed.data.action,
     targetType: parsed.data.targetType,
+    approvalMode: parsed.data.approvalMode,
     approverRoleKeys: parsed.data.approverRoleKeys,
+    delegateToRoleKeys: parsed.data.delegateToRoleKeys,
     minApprovals: parsed.data.minApprovals,
     escalationAfterHours: parsed.data.escalationAfterHours,
     status: parsed.data.status,
@@ -86,14 +138,10 @@ export async function updateSystemAdminApprovalRuleAction(
     configuration,
   });
 
-  const auditAction =
-    parsed.data.mode === "create"
-      ? "system-admin.approval_rule.create"
-      : parsed.data.status === "disabled"
-        ? "system-admin.approval_rule.disable"
-        : parsed.data.status === "deprecated"
-          ? "system-admin.approval_rule.deprecate"
-          : "system-admin.approval_rule.update";
+  const auditAction = resolveApprovalRuleAuditAction({
+    mode: parsed.data.mode,
+    status: parsed.data.status,
+  });
 
   await writeExecutionAuditEvent({
     organizationId: organization.id,
@@ -115,7 +163,9 @@ export async function updateSystemAdminApprovalRuleAction(
         label: parsed.data.name,
         enabled: parsed.data.enabled,
         status: parsed.data.status,
+        approvalMode: parsed.data.approvalMode,
         approverRoleKeys: parsed.data.approverRoleKeys,
+        delegateToRoleKeys: parsed.data.delegateToRoleKeys,
         minApprovals: parsed.data.minApprovals,
         configuration,
       },
@@ -125,10 +175,11 @@ export async function updateSystemAdminApprovalRuleAction(
   await dispatchSystemAdminWebhook({
     organizationId: organization.id,
     userId: session.id,
-    eventType: "system-admin.approval.updated",
+    eventType: systemAdminApprovalRuleWebhookEvents[0],
     payload: {
       approvalKey,
       status: parsed.data.status,
+      approvalMode: parsed.data.approvalMode,
       minApprovals: parsed.data.minApprovals,
     },
   });

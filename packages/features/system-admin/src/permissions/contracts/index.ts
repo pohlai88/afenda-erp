@@ -2,7 +2,9 @@ export type {
   SystemAdminPermissionCatalogRow,
   SystemAdminPermissionCatalogStatus,
   SystemAdminPermissionCoverageVerdict,
+  SystemAdminPermissionListRow,
   SystemAdminPermissionRiskLevel,
+  SystemAdminRoleOverrideListRow,
 } from "./system-admin.permissions.contract";
 export {
   isSystemAdminPermissionKey,
@@ -12,6 +14,7 @@ export {
 export {
   isSystemAdminDeprecatedPermissionKey,
   isSystemAdminProtectedAdminPermission,
+  requiresElevatedPermissionConfirmation,
   requiresHighRiskPermissionConfirmation,
   resolveSystemAdminPermissionRiskLevel,
   systemAdminDeprecatedPermissionKeys,

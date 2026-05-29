@@ -55,7 +55,10 @@ export { buildPermissionsListSurface } from "./permissions/surface/system-admin.
 export { buildRolesListSurface } from "./roles/data/system-admin.roles-list.surface";
 
 export { buildPoliciesListSurface } from "./policies/data/system-admin.policy-rules.surface";
-export { buildApprovalsListSurface } from "./approvals/data/system-admin.approval-rules.surface";
+export {
+  buildApprovalsListSurface,
+  systemAdminApprovalsUiCopy,
+} from "./approvals/surface";
 
 export { buildBillingPostureListSurface } from "./billing/data/system-admin.billing.surface";
 export { buildCronHealthListSurface } from "./reliability/data/system-admin.cron-health.surface";
@@ -63,6 +66,7 @@ export { buildMembersListSurface } from "./memberships/surface/system-admin.memb
 export { systemAdminMembershipsUiCopy } from "./memberships/surface/system-admin.memberships-ui.copy.shared";
 export { systemAdminMembershipsGalleryRows } from "./memberships/surface/system-admin.memberships-gallery.fixtures.shared";
 export { buildUsersListSurface } from "./users/surface/system-admin.users-list.surface";
+export { systemAdminUsersUiCopy } from "./users/surface/system-admin.users-ui.copy.shared";
 export { systemAdminUsersGalleryRows } from "./users/surface/system-admin.users-gallery.fixtures.shared";
 export { buildRoleOverridesListSurface } from "./permissions/surface/system-admin.role-overrides-list.surface";
 export { systemAdminPermissionsUiCopy } from "./permissions/surface/system-admin.permissions-ui.copy.shared";

@@ -70,3 +70,14 @@ export function requiresHighRiskPermissionConfirmation(
   const riskLevel = resolveSystemAdminPermissionRiskLevel(permissionKey);
   return riskLevel === "high" || riskLevel === "critical";
 }
+
+export function requiresElevatedPermissionConfirmation(
+  permissionKey: string,
+  enabled: boolean,
+): boolean {
+  if (!enabled) {
+    return false;
+  }
+
+  return resolveSystemAdminPermissionRiskLevel(permissionKey) === "critical";
+}
