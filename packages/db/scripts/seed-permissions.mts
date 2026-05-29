@@ -66,6 +66,125 @@ const permissionCatalog = [
       "Read people operations summaries and workforce exception state.",
   },
   {
+    key: "hr.employees.write",
+    module: "hr",
+    label: "Manage workforce employees",
+    description:
+      "Create, update, archive employees and record placement assignments.",
+  },
+  {
+    key: "hr.documents.read",
+    module: "hr",
+    label: "View HR documents",
+    description: "Read employee document vault metadata and verification state.",
+  },
+  {
+    key: "hr.documents.write",
+    module: "hr",
+    label: "Manage HR documents",
+    description:
+      "Register, verify, and archive employee document metadata in the vault.",
+  },
+  {
+    key: "hr.lifecycle.read",
+    module: "hr",
+    label: "View HR lifecycle",
+    description:
+      "Read employment lifecycle overview, events, and pending transitions.",
+  },
+  {
+    key: "hr.lifecycle.write",
+    module: "hr",
+    label: "Manage HR lifecycle",
+    description:
+      "Record status changes, probation outcomes, and employee movements.",
+  },
+  {
+    key: "hr.offboarding.read",
+    module: "hr",
+    label: "View HR offboarding",
+    description: "Read offboarding cases and exit workflow status.",
+  },
+  {
+    key: "hr.offboarding.write",
+    module: "hr",
+    label: "Manage HR offboarding",
+    description: "Start, complete, and cancel employee offboarding cases.",
+  },
+  {
+    key: "hr.compliance.read",
+    module: "hr",
+    label: "View HR compliance",
+    description: "Read compliance obligations and exception queues.",
+  },
+  {
+    key: "hr.compliance.write",
+    module: "hr",
+    label: "Manage HR compliance",
+    description:
+      "Register obligations, log exceptions, and resolve compliance items.",
+  },
+  {
+    key: "hr.leave.read",
+    module: "hr",
+    label: "View HR leave",
+    description: "Read employee leave requests and approval status.",
+  },
+  {
+    key: "hr.leave.write",
+    module: "hr",
+    label: "Manage HR leave",
+    description: "Submit, approve, reject, and cancel leave requests.",
+  },
+  {
+    key: "hr.onboarding.read",
+    module: "hr",
+    label: "View HR onboarding",
+    description: "Read onboarding cases and checklist progress.",
+  },
+  {
+    key: "hr.onboarding.write",
+    module: "hr",
+    label: "Manage HR onboarding",
+    description: "Start, complete checklist items, and close onboarding cases.",
+  },
+  {
+    key: "hr.attendance.read",
+    module: "hr",
+    label: "View HR attendance",
+    description: "Read employee clock-in and clock-out punches.",
+  },
+  {
+    key: "hr.attendance.write",
+    module: "hr",
+    label: "Manage HR attendance",
+    description: "Record and void attendance punches with idempotent keys.",
+  },
+  {
+    key: "hr.overtime.read",
+    module: "hr",
+    label: "View HR overtime",
+    description: "Read employee overtime requests and approval status.",
+  },
+  {
+    key: "hr.overtime.write",
+    module: "hr",
+    label: "Manage HR overtime",
+    description: "Submit, approve, reject, and cancel overtime requests.",
+  },
+  {
+    key: "hr.shifts.read",
+    module: "hr",
+    label: "View HR shifts",
+    description: "Read shift templates and employee shift assignments.",
+  },
+  {
+    key: "hr.shifts.write",
+    module: "hr",
+    label: "Manage HR shifts",
+    description: "Create templates, schedule shifts, publish, and cancel assignments.",
+  },
+  {
     key: "crm.view",
     module: "crm",
     label: "View CRM",

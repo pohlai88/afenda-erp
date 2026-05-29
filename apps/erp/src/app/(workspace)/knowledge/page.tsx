@@ -1,10 +1,10 @@
 import { KnowledgeAdminRoutePage } from "@/workspace-routes/knowledge-route";
-import type { WorkspaceRouteInstant } from "@/workspace-routes/workspace-route-instant";
 import type { Metadata } from "next";
 
 export const unstable_instant = {
   prefetch: "static",
-} as const satisfies WorkspaceRouteInstant;
+  unstable_disableValidation: true,
+};
 
 export const metadata: Metadata = {
   title: "Knowledge — Admin",

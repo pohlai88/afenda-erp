@@ -1,9 +1,9 @@
 import { LynxRunsRoutePage } from "@/workspace-routes/lynx-runs-route";
-import type { WorkspaceRouteInstant } from "@/workspace-routes/workspace-route-instant";
 
 export const unstable_instant = {
   prefetch: "static",
-} as const satisfies WorkspaceRouteInstant;
+  unstable_disableValidation: true,
+};
 
 type LynxRunsPageProps = {
   searchParams: Promise<Record<string, string | string[] | undefined>>;

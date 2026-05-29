@@ -1,8 +1,16 @@
 /**
- * System-admin section entry (catch-all). Does not encode which screen renders;
- * see `@/lib/system-admin-sections/manifest.shared.ts` (slug → adapter → feature).
+ * Module section catch-all (system-admin + HR). Slug → thin app adapter → feature package.
  */
 import { SystemAdminSectionSkeleton } from "@/app-route-state/route-states";
+import {
+  loadHrEmployeeCreate,
+  loadHrEmployeeDetail,
+  loadHrSection,
+  hrSectionSlugs,
+  resolveHrSectionRoute,
+  type HrSectionPageProps,
+} from "@/lib/hr-sections/registry.server";
+import { assertHrModuleId, HR_MODULE_ID } from "@/lib/hr-route.shared";
 import {
   loadSystemAdminSection,
   resolveSystemAdminSectionSlug,
@@ -13,48 +21,106 @@ import {
   assertSystemAdminModuleId,
   SYSTEM_ADMIN_MODULE_ID,
 } from "@/lib/system-admin-route.shared";
-import type { WorkspaceRouteInstant } from "@/workspace-routes/workspace-route-instant";
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import { Suspense } from "react";
 
 export const unstable_instant = {
   prefetch: "static",
-} as const satisfies WorkspaceRouteInstant;
+  unstable_disableValidation: true,
+};
 
-type SystemAdminSectionRouteProps = {
+type ModuleSectionRouteProps = {
   params: Promise<{ moduleId: string; section: string[] }>;
-} & SystemAdminSectionPageProps;
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
+};
 
 export function generateStaticParams() {
-  return systemAdminSectionSlugs.map((slug) => ({
-    moduleId: SYSTEM_ADMIN_MODULE_ID,
-    section: [slug],
-  }));
+  return [
+    ...systemAdminSectionSlugs.map((slug) => ({
+      moduleId: SYSTEM_ADMIN_MODULE_ID,
+      section: [slug],
+    })),
+    ...hrSectionSlugs.map((slug) => ({
+      moduleId: HR_MODULE_ID,
+      section: [slug],
+    })),
+  ];
 }
 
 export async function generateMetadata({
   params,
-}: SystemAdminSectionRouteProps): Promise<Metadata> {
+}: ModuleSectionRouteProps): Promise<Metadata> {
   const { moduleId, section } = await params;
-  assertSystemAdminModuleId(moduleId);
-  const slug = resolveSystemAdminSectionSlug(section);
-  const sectionModule = await loadSystemAdminSection(slug);
 
-  return sectionModule.metadata ?? {};
+  if (moduleId === SYSTEM_ADMIN_MODULE_ID) {
+    assertSystemAdminModuleId(moduleId);
+    const slug = resolveSystemAdminSectionSlug(section);
+    const sectionModule = await loadSystemAdminSection(slug);
+    return sectionModule.metadata ?? {};
+  }
+
+  if (moduleId === HR_MODULE_ID) {
+    assertHrModuleId(moduleId);
+    const route = resolveHrSectionRoute(section);
+    if (route.kind === "employee-detail") {
+      const sectionModule = await loadHrEmployeeDetail();
+      return sectionModule.metadata ?? {};
+    }
+    if (route.kind === "employee-create") {
+      const sectionModule = await loadHrEmployeeCreate();
+      return sectionModule.metadata ?? {};
+    }
+    const sectionModule = await loadHrSection(route.slug);
+    return sectionModule.metadata ?? {};
+  }
+
+  notFound();
 }
 
-export default function SystemAdminSectionRoute({
+export default function ModuleSectionRoute({
   params,
   searchParams,
-}: SystemAdminSectionRouteProps) {
+}: ModuleSectionRouteProps) {
   return (
     <Suspense fallback={<SystemAdminSectionSkeleton />}>
       {params.then(async ({ moduleId, section }) => {
-        assertSystemAdminModuleId(moduleId);
-        const slug = resolveSystemAdminSectionSlug(section);
-        const { default: SectionPage } = await loadSystemAdminSection(slug);
+        if (moduleId === SYSTEM_ADMIN_MODULE_ID) {
+          assertSystemAdminModuleId(moduleId);
+          const slug = resolveSystemAdminSectionSlug(section);
+          const { default: SectionPage } = await loadSystemAdminSection(slug);
+          return (
+            <SectionPage
+              searchParams={
+                searchParams as SystemAdminSectionPageProps["searchParams"]
+              }
+            />
+          );
+        }
 
-        return <SectionPage searchParams={searchParams} />;
+        if (moduleId === HR_MODULE_ID) {
+          assertHrModuleId(moduleId);
+          const route = resolveHrSectionRoute(section);
+
+          if (route.kind === "employee-detail") {
+            const { default: DetailPage } = await loadHrEmployeeDetail();
+            return <DetailPage employeeId={route.employeeId} />;
+          }
+
+          if (route.kind === "employee-create") {
+            const { default: CreatePage } = await loadHrEmployeeCreate();
+            return <CreatePage />;
+          }
+
+          const { default: SectionPage } = await loadHrSection(route.slug);
+          return (
+            <SectionPage
+              searchParams={searchParams as HrSectionPageProps["searchParams"]}
+            />
+          );
+        }
+
+        notFound();
       })}
     </Suspense>
   );

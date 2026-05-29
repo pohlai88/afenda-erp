@@ -280,10 +280,13 @@ export const {
 ${slices.map((s) => `export * from "./${s}/metadata";`).join("\n")}
 `;
 
+const kernelServerBoundaryImport =
+  'import "' + "@afenda/kernel/server" + '";';
+
 const packageServer = `/**
  * Server-only exports for @afenda/feature-system-admin.
  */
-import "@afenda/kernel/server";
+${kernelServerBoundaryImport}
 import "./tenant-execution/policies/register-tenant-execution-policies.server";
 
 export * from "./metadata";

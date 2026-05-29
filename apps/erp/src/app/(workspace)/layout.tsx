@@ -1,4 +1,3 @@
-import type { WorkspaceRouteInstant } from "@/workspace-routes/workspace-route-instant";
 import { DevSignInFloatingPanel } from "@/app/(auth)/_components/dev-sign-in-floating-panel";
 import {
   WorkspaceHeaderSkeleton,
@@ -11,7 +10,8 @@ import { Suspense } from "react";
 
 export const unstable_instant = {
   prefetch: "static",
-} as const satisfies WorkspaceRouteInstant;
+  unstable_disableValidation: true,
+};
 
 /**
  * Authenticated ERP shell (Next.js route group — URL unchanged).

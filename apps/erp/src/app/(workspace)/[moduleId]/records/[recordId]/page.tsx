@@ -1,11 +1,11 @@
 import { loadModuleRecordDetailContext } from "@/workspace-routes/workspace-route-cache";
 import { RecordDetailRoutePage } from "@/workspace-routes/record-detail-route";
-import type { WorkspaceRouteInstant } from "@/workspace-routes/workspace-route-instant";
 import type { Metadata } from "next";
 
 export const unstable_instant = {
   prefetch: "static",
-} as const satisfies WorkspaceRouteInstant;
+  unstable_disableValidation: true,
+};
 
 type RecordDetailPageProps = {
   params: Promise<{

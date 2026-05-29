@@ -14,6 +14,10 @@ describe("module feature metadata resolver", () => {
       workItems: "hr.work-items.list",
       savedViews: "hr.saved-views.list",
       documents: "hr.documents.list",
+      employees: "hr.workforce.employees.list",
+      workforceDocuments: "hr.workforce.documents.list",
+      workforceLifecycle: "hr.workforce.lifecycle.list",
+      workforceOffboarding: "hr.workforce.offboarding.list",
     });
   });
 

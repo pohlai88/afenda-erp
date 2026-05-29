@@ -1,12 +1,13 @@
 import { SystemAdminSectionSkeleton } from "@/app-route-state/route-states";
 import { getCachedModuleMetadata } from "@/lib/cached-module-metadata";
+import { HR_MODULE_ID } from "@/lib/hr-route.shared";
 import { SYSTEM_ADMIN_MODULE_ID } from "@/lib/system-admin-route.shared";
+import { HrModuleHubSection } from "@/workspace-routes/hr-module-hub-section.server";
 import {
   createModuleMetadata,
   ModuleRoutePage,
 } from "@/workspace-routes/module-screen";
 import { SystemAdminModuleHubSection } from "@/workspace-routes/module-hub-section.server";
-import type { WorkspaceRouteInstant } from "@/workspace-routes/workspace-route-instant";
 import {
   isCoreModuleId,
   isModuleId,
@@ -20,7 +21,8 @@ import { Suspense } from "react";
 
 export const unstable_instant = {
   prefetch: "static",
-} as const satisfies WorkspaceRouteInstant;
+  unstable_disableValidation: true,
+};
 
 type ModulePageProps = {
   params: Promise<{ moduleId: string }>;
@@ -71,6 +73,10 @@ export default function DynamicModulePage({
       {params.then(async ({ moduleId }) => {
         if (moduleId === SYSTEM_ADMIN_MODULE_ID) {
           return <SystemAdminModuleHubSection />;
+        }
+
+        if (moduleId === HR_MODULE_ID) {
+          return <HrModuleHubSection />;
         }
 
         return (

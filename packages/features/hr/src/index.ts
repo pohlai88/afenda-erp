@@ -1,7 +1,8 @@
 /**
  * @afenda/feature-hr
  *
- * Canonical ERP HR feature package (moduleId: `hr`). Server-only: `./server`.
- * Client-safe: `./client`. Governed metadata: `./metadata`. Doctrine: ARCH-010.
+ * Environment-neutral exports: metadata compatibility + stable contracts.
+ * Server-only: `./server`. Client-safe: `./client`. Governed metadata: `./metadata`.
  */
 export * from "./metadata";
+export * from "./contracts";

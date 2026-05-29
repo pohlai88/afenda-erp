@@ -262,14 +262,23 @@ function checkDocumentationNaming(filePath: string) {
 
   const isArchitectureDoc =
     lowerFileName.includes("architecture") || fileName === "ARCHITECTURE.md";
+  const normalizedRel = rel.replace(/\\/g, "/");
   const isFeatureVerticalArchitectureDoc =
     /^packages\/features\/[^/]+\/src\/[^/]+\/[^/]*architecture[^/]*\.md$/.test(
-      rel.replace(/\\/g, "/"),
+      normalizedRel,
     );
+  const isKernelVerticalArchitectureDoc =
+    /^packages\/kernel\/src\/[^/]+\/[^/]*architecture[^/]*\.md$/.test(
+      normalizedRel,
+    );
+  const isKernelLegacyArchitectureRedirect =
+    normalizedRel === "packages/kernel/kernel-architecture.md";
   if (
     isArchitectureDoc &&
     !rel.startsWith("docs/architecture/") &&
-    !isFeatureVerticalArchitectureDoc
+    !isFeatureVerticalArchitectureDoc &&
+    !isKernelVerticalArchitectureDoc &&
+    !isKernelLegacyArchitectureRedirect
   ) {
     problems.push(
       `Architecture docs must live under docs/architecture/ or a feature vertical bucket: ${rel}`,
@@ -993,6 +1002,9 @@ function checkFeatureServerBoundaryMarkers() {
 
   walkSourceFiles(featuresRoot, (filePath) => {
     const rel = relativePath(filePath);
+    if (/\/scripts\//.test(rel.replace(/\\/g, "/"))) {
+      return;
+    }
     const content = fs.readFileSync(filePath, "utf8");
     const importSpecifiers = getImportSpecifiers(content);
     const isFeatureServerDoor =

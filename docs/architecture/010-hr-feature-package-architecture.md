@@ -4,7 +4,7 @@
 
 | Field    | Value                                                                 |
 | -------- | --------------------------------------------------------------------- |
-| Status   | Active — scaffold only (May 2026)                                     |
+| Status   | Active — Slice 1 partial: employee directory at `/hr/employees`   |
 | Package  | `@afenda/feature-hr` (`packages/features/hr`, moduleId `hr`)        |
 | Track    | TRACK-004 (`docs/roadmap/004-hrm-migration.md`)                       |
 | Related  | **ARCH-002**, **ARCH-005**, **ARCH-008**                              |

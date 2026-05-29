@@ -8,7 +8,9 @@ export type CronJobName =
   | "syncs"
   | "housekeeping"
   | "knowledge-sync"
-  | "lynx-outcomes";
+  | "lynx-outcomes"
+  | "hr-lifecycle-transitions"
+  | "hr-document-expiry";
 
 export function authorizeCronRequest(request: Request) {
   const cronSecret = getCronSecret();

@@ -352,3 +352,8 @@ The current repository now includes:
 Broad route migration is intentionally deferred. Existing route-level
 `requireCapability(...)` usage remains valid until feature packages and app
 routes adopt the execution-kernel wrapper where it adds protection and reuse.
+
+## Package supplement
+
+Vision, naming map (`Erp*` → `Execution*`), and phased rollout notes:
+[`packages/kernel/src/execution-kernel/execution-kernel-architecture.md`](../../packages/kernel/src/execution-kernel/execution-kernel-architecture.md).

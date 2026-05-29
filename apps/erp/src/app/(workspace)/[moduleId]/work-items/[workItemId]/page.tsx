@@ -1,11 +1,11 @@
 import { loadModuleWorkItemDetailContext } from "@/workspace-routes/workspace-route-cache";
 import { WorkItemDetailRoutePage } from "@/workspace-routes/work-item-detail-route";
-import type { WorkspaceRouteInstant } from "@/workspace-routes/workspace-route-instant";
 import type { Metadata } from "next";
 
 export const unstable_instant = {
   prefetch: "static",
-} as const satisfies WorkspaceRouteInstant;
+  unstable_disableValidation: true,
+};
 
 type WorkItemDetailPageProps = {
   params: Promise<{

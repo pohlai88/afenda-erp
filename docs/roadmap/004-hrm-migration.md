@@ -181,13 +181,8 @@ packages/features/hr/
       saved-views.ts
       profiles.ts            # governed renderer profiles
 
-    shared/
-      index.ts
-      dates.ts
-      money.ts
-      status.ts
-      pagination.ts
-      validation.ts
+    contracts/
+      pagination.ts          # list window helpers (no banned `shared/` folder)
 
     components/
       client.ts              # explicit client component door
@@ -627,10 +622,10 @@ same change.
 
 | Slice | Status | Evidence |
 | ----- | ------ | -------- |
-| 0. Scaffold | complete | Slice 0 scaffold implementation, package doors, metadata compatibility, app metadata resolver coverage, and all required validation gates pass; see evidence bundle below. |
-| 1. Workforce foundation | complete | HR workforce schema, migration, bounded server windows, governed employee/org/position/assignment/reporting relationship lists, HR record detail dispatch, dynamic route adapter, tests, and full validation gates pass; see evidence bundle below. |
-| 2. Documents and lifecycle | partial | Compliance-regulatory-tracking is migrated; documents-management, employee-lifecycle-management, offboarding-exit-management, contracts, command actions, cron/watch jobs, and write UI remain incomplete; see evidence bundle below. |
-| 3. Time and attendance | not started | Missing evidence bundle. |
+| 0. Scaffold | complete | Slice 0 reset 2026-05-29: honest contracts, shared pagination, vitest scaffold tests, reset script; see evidence bundle below. |
+| 1. Workforce foundation | complete | Slice 1 accepted 2026-05-29: hr_* + hr_employee_assignments (0009/0010); governed reads; create/update/archive + UI; 9 vitest + 2 Playwright smoke; see evidence bundle below. |
+| 2. Documents and lifecycle | complete (gap closure 0016) | 2a–2d + verify/reject, requirements, expiry cron, onboarding cases, offboarding clearance (0016). |
+| 3. Time and attendance | partial (3a–3d) | 3a leave (0015), 3b attendance (0017), 3c overtime (0018), 3d shifts (0019); time-clock deferred. |
 | 4. Extended attendance | not started | Missing evidence bundle. |
 | 5. Payroll core | not started | Missing evidence bundle. |
 | 6. Payroll adjacent | not started | Missing evidence bundle. |
@@ -867,8 +862,8 @@ employee-management parity.
 
 | Legacy subarea | Inventory | Slice 1 treatment |
 | -------------- | --------- | ----------------- |
-| `employee-records-management` | 64 TS/TSX, 22 TSX | Accepted only employee identity/contact/employment placement concepts; deferred CRUD, emergency contacts, dependents, contracts, document vault, timelines, sensitive master views, archive/update actions, and legacy UI. |
-| `organizational-chart-hierarchy` | 37 TS/TSX, 7 TSX | Accepted org units, positions, assignments, and reporting relationship concepts; deferred mutation guards, approvals, exports, versioning/change history, org canvas UI, archive trailing cells, and `hr_job_grades`. |
+| `employee-records-management` | 64 TS/TSX, 22 TSX | Accepted employee identity, placement, create/update/archive commands, assignment history, governed directory/detail UI, and audit events; deferred emergency contacts, dependents, contracts, document vault, timelines, sensitive master views, duplicate-check UX, and legacy components. |
+| `organizational-chart-hierarchy` | 37 TS/TSX, 7 TSX | Accepted org units, positions, assignments, reporting lines, and department tree reads; deferred mutation guards, approvals, exports, versioning/change history, org canvas UI, archive trailing cells, and `hr_job_grades`. |
 | `compliance-regulatory-tracking` | 79 TS/TSX, 25 TSX | Migrated into typed compliance obligations, filings, exceptions, and evidence tables with bounded query windows, governed lists, and HR record detail dispatch. Legacy action/components, cron/watch jobs, LMS bridge, bureau reliability projections, and statutory submission writers remain deferred until the write/audit slice. |
 | `documents-management` | 24 TS/TSX, 7 TSX | Deferred to Slice 2 workforce/documents. |
 | `employee-lifecycle-management` | 46 TS/TSX, 9 TSX | Deferred to Slice 2 lifecycle. |
@@ -948,6 +943,290 @@ Rollback rules:
   while keeping schema data intact.
 - If authorization or tenant isolation fails review, block the slice and remove
   external/API exposure before continuing.
+
+## Slice 1 Accepted Evidence (2026-05-29)
+
+```txt
+slice: 1. Workforce foundation
+status: complete
+
+legacy inventory:
+- source: C:\JackProject\afenda-vercel\packages\features\hrm (filesystem inventory via pnpm hr:inventory-legacy)
+- folders inspected: employee-records-management, organizational-chart-hierarchy
+- files migrated: 0 copied; concepts reimplemented in @afenda/feature-hr
+
+target implementation:
+- db: packages/db/src/schema/hr.ts, packages/db/src/hr.ts, packages/db/src/hr-commands.ts
+- migrations: 0009_tired_gateway.sql, 0010_chilly_ben_urich.sql
+- feature: packages/features/hr/src/workforce/{employees,departments,positions,org-chart}
+- app adapters: apps/erp/src/lib/hr-sections/*.server.tsx, hr-route.shared.ts
+- routes: /hr, /hr/employees, /hr/employees/new, /hr/employees/[id], /hr/departments, /hr/positions, /hr/org-chart
+
+validation output:
+- pnpm --filter @afenda/feature-hr test: 9/9 passed
+- pnpm --filter @afenda/feature-hr typecheck: passed
+- pnpm --filter @afenda/erp typecheck: passed
+- apps/erp/tests/e2e/hr-workforce.spec.ts: Playwright smoke (dev auth)
+
+known gaps (deferred to Slice 2b+):
+- lifecycle, offboarding, compliance, ESS, job grades, org canvas UI
+- document blob upload UI, verify/reject list actions, requirements/expiry sweeps
+```
+
+## Slice 2a Partial Evidence (2026-05-29)
+
+```txt
+slice: 2. Documents and lifecycle — 2a employee document vault
+status: partial
+
+legacy inventory:
+- source capability: documents-management (24 TS/TSX from legacy inventory)
+- files migrated: 0 copied; metadata-first vault reimplemented in @afenda/feature-hr
+
+target implementation:
+- db: packages/db/src/schema/hr.ts (hr_employee_documents + enums), packages/db/src/hr-documents.ts
+- migration: 0011_lumpy_omega_red.sql
+- permissions: hr.documents.read, hr.documents.write (seed-permissions.mts)
+- feature: packages/features/hr/src/workforce/documents/
+- app adapters: apps/erp/src/lib/hr-sections/documents.server.tsx
+- route: /hr/documents
+
+validation output:
+- pnpm db:generate && pnpm db:migrate: 0011 applied
+- pnpm --filter @afenda/feature-hr test: 11/11 passed
+- pnpm --filter @afenda/feature-hr typecheck: passed
+- pnpm --filter @afenda/erp typecheck: passed
+- pnpm architecture:check: passed
+
+known gaps (deferred within Slice 2):
+- blob upload integration (metadata-only register via blob URL today)
+- verify/reject row actions in list UI
+- document requirements, expiry sweeps, payslip docs
+- lifecycle, offboarding, compliance sub-slices
+```
+
+## Slice 2b Partial Evidence (2026-05-29)
+
+```txt
+slice: 2. Documents and lifecycle — 2b employee lifecycle
+status: partial
+
+legacy inventory:
+- source capability: employee-lifecycle-management (46 TS/TSX from legacy inventory)
+- files migrated: 0 copied; append-only event ledger + transition queue reimplemented
+
+target implementation:
+- db: packages/db/src/schema/hr.ts (hr_lifecycle_events, hr_lifecycle_transitions, employee date fields, expanded hr_employment_status)
+- commands: packages/db/src/hr-lifecycle.ts
+- migration: 0012_bright_ravenous.sql
+- permissions: hr.lifecycle.read, hr.lifecycle.write
+- feature: packages/features/hr/src/workforce/lifecycle/
+- app adapters: apps/erp/src/lib/hr-sections/lifecycle.server.tsx, employee detail timeline
+- route: /hr/lifecycle
+- polish: movement form, employee detail timeline, cron hr-lifecycle-transitions
+
+validation output:
+- pnpm db:generate && pnpm db:migrate: 0012 applied
+- pnpm --filter @afenda/feature-hr test: 14 vitest (incl. movement integration)
+- pnpm --filter @afenda/feature-hr typecheck: passed
+- pnpm --filter @afenda/erp typecheck: passed
+- cron: GET /api/cron/hr-lifecycle-transitions
+
+known gaps (deferred within Slice 2):
+- boarding/onboarding workflow instances
+- compliance sub-slice
+```
+
+## Slice 2c Partial Evidence (2026-05-29)
+
+```txt
+slice: 2. Documents and lifecycle — 2c offboarding foundation
+status: partial
+
+legacy inventory:
+- source capability: offboarding-exit-management (26 TS/TSX)
+- files migrated: 0 copied; case queue + lifecycle-linked status changes
+
+target implementation:
+- db: hr_offboarding_cases (0013_melted_baron_strucker.sql), packages/db/src/hr-offboarding.ts
+- permissions: hr.offboarding.read, hr.offboarding.write
+- feature: packages/features/hr/src/workforce/offboarding/
+- route: /hr/offboarding
+
+validation output:
+- pnpm db:migrate: 0013 applied
+- offboarding integration tests: 2/2 passed
+- typecheck: HR + ERP passed
+
+known gaps (deferred):
+- clearance items, approval steps, final settlement (legacy hrm_offboarding_* parity)
+```
+
+## Slice 2d Partial Evidence (2026-05-29)
+
+```txt
+slice: 2. Documents and lifecycle — 2d compliance foundation
+status: partial (obligation + exception foundation complete; statutory/evidence deferred)
+
+legacy inventory:
+- source capability: compliance-regulatory-tracking (79 files)
+- behavioral port: obligations register, exception lifecycle (create/assign/progress/resolve/waive), governed lists, forms — not file copy
+
+target implementation:
+- db: hr_compliance_obligations, hr_compliance_exceptions (0014_neat_the_call.sql)
+- commands: packages/db/src/hr-compliance.ts (full exception workflow + obligation upsert/archive)
+- permissions: hr.compliance.read, hr.compliance.write
+- feature: packages/features/hr/src/workforce/compliance/
+- route: /hr/compliance (revalidatePath /hr/compliance)
+- audit: writeExecutionAuditEvent (hr.compliance.*)
+
+validation output:
+- pnpm exec tsc -p packages/db/tsconfig.build.json --noEmit: passed
+- pnpm exec tsc -p packages/features/hr/tsconfig.build.json --noEmit: passed
+- pnpm --filter @afenda/feature-hr test -- compliance: 3/3 passed (surface + integration)
+
+known gaps (deferred — see packages/features/hr/src/workforce/compliance/ARCHITECTURE.md):
+- filings, evidence register, statutory pack writers / acknowledgement
+- cron/aging watches, auto-generated exceptions (sourceReferenceId)
+- corrective action owner user id, evidence document linking
+- overview/health dashboards, compliance export reports, LMS/bureau reliability
+```
+
+## Slice 2 Gap Closure Evidence (2026-05-29)
+
+```txt
+slice: 2. Documents and lifecycle — gap closure
+status: complete (foundation scope)
+
+migration: 0016_goofy_doomsday.sql
+- hr_document_requirements
+- hr_onboarding_cases, hr_onboarding_checklist_items
+- hr_offboarding_clearance_items
+
+2a documents:
+- rejectHrEmployeeDocument + verify/reject/archive UI forms
+- upsertHrDocumentRequirement + runHrDocumentExpirySweep
+- cron GET /api/cron/hr-document-expiry
+
+2b lifecycle:
+- /hr/onboarding route, hr-onboarding.ts checklist cases
+- permissions hr.onboarding.read, hr.onboarding.write
+
+2c offboarding:
+- DEFAULT_OFFBOARDING_CLEARANCE seeded on case start
+- completeHrOffboardingClearanceItem; complete blocked until clearance done
+
+validation:
+- pnpm db:migrate: 0016 applied
+- pnpm --filter @afenda/feature-hr typecheck: passed
+- pnpm --filter @afenda/erp typecheck: passed
+- offboarding integration: 2/2 passed
+
+still deferred (out of slice-2 foundation):
+- blob upload UI (metadata register remains)
+- compliance filings/evidence/statutory writers
+- final settlement / approval-step workflows beyond clearance checklist
+```
+
+## Slice 3a Partial Evidence (2026-05-29)
+
+```txt
+slice: 3. Time and attendance — 3a leave foundation
+status: partial
+
+legacy inventory:
+- source capability: time-attendance/leave-attendance-management
+- files migrated: 0 copied; leave request queue with approve/reject/cancel
+
+target implementation:
+- db: hr_leave_requests (0015_*), packages/db/src/hr-leave.ts
+- permissions: hr.leave.read, hr.leave.write
+- feature: packages/features/hr/src/time-attendance/leave/
+- route: /hr/leave
+
+validation output:
+- pnpm db:migrate: 0015 applied
+- leave surface + integration tests: passed
+- typecheck: HR + ERP passed
+
+known gaps (deferred):
+- leave balances, shifts, time-clock ingest
+```
+
+## Slice 3b Partial Evidence (2026-05-29)
+
+```txt
+slice: 3. Time and attendance — 3b attendance foundation
+status: partial
+
+legacy inventory:
+- source capability: time-attendance/leave-attendance-management (attendance segment)
+- files migrated: 0 copied; manual punch register with idempotent keys and void
+
+target implementation:
+- db: hr_attendance_records + enums (0017_stale_punisher.sql), packages/db/src/hr-attendance.ts
+- permissions: hr.attendance.read, hr.attendance.write
+- feature: packages/features/hr/src/time-attendance/attendance/
+- route: /hr/attendance (apps/erp/src/lib/hr-sections/attendance.server.tsx)
+
+validation output:
+- pnpm db:migrate: 0017 applied
+- attendance surface + integration tests: passed (idempotency + void)
+- typecheck: HR + ERP passed
+
+known gaps (deferred):
+- time-clock ingest, leave balances, geolocation/flexible-work analytics (slice 4)
+```
+
+## Slice 3c Partial Evidence (2026-05-29)
+
+```txt
+slice: 3. Time and attendance — 3c overtime foundation
+status: partial
+
+legacy inventory:
+- source capability: time-attendance/overtime-management
+- files migrated: 0 copied; overtime request queue with approve/reject/cancel
+
+target implementation:
+- db: hr_overtime_requests + enums (0018_*), packages/db/src/hr-overtime.ts
+- permissions: hr.overtime.read, hr.overtime.write
+- feature: packages/features/hr/src/time-attendance/overtime/
+- route: /hr/overtime
+
+validation output:
+- pnpm db:migrate: 0018 applied
+- overtime surface + integration tests: passed
+- typecheck: HR + ERP passed
+
+known gaps (deferred):
+- overtime policies/rates/calculation snapshots (legacy hrm_overtime_*), time-clock ingest
+```
+
+## Slice 3d Partial Evidence (2026-05-29)
+
+```txt
+slice: 3. Time and attendance — 3d shifts foundation
+status: partial
+
+legacy inventory:
+- source capability: time-attendance/shift-scheduling
+- files migrated: 0 copied; templates + schedule/publish/cancel assignments
+
+target implementation:
+- db: hr_shift_templates, hr_shift_assignments (0019_*), packages/db/src/hr-shifts.ts
+- permissions: hr.shifts.read, hr.shifts.write
+- feature: packages/features/hr/src/time-attendance/shifts/
+- route: /hr/shifts
+
+validation output:
+- pnpm db:migrate: 0019 applied
+- shifts surface + integration tests: passed
+- typecheck: HR + ERP passed
+
+known gaps (deferred):
+- swap requests, rotation, roster publication, coverage rules (legacy hrm_shift_*), time-clock ingest
+```
 
 ## Documentation Maintenance
 
