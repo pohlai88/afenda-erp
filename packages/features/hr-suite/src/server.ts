@@ -19,90 +19,124 @@ function EmptyState({
   title: string;
   description?: string;
 }) {
-  return (
-    <SectionPanel headingLevel={2} title={title} description={description}>
-      <p className="type-muted">
-        This area is now owned by <strong>HR Suite</strong> and is being wired up.
-      </p>
-    </SectionPanel>
+  return React.createElement(
+    SectionPanel as any,
+    { headingLevel: 2, title, description },
+    React.createElement(
+      "p",
+      { className: "type-muted" },
+      "This area is now owned by ",
+      React.createElement("strong", null, "HR Suite"),
+      " and is being wired up.",
+    ),
   );
 }
 
 export function HrAttendanceAccessDenied() {
-  return <EmptyState title="Access restricted" description="Attendance is not available." />;
+  return React.createElement(EmptyState, {
+    title: "Access restricted",
+    description: "Attendance is not available.",
+  });
 }
 export function HrComplianceAccessDenied() {
-  return <EmptyState title="Access restricted" description="Compliance is not available." />;
+  return React.createElement(EmptyState, {
+    title: "Access restricted",
+    description: "Compliance is not available.",
+  });
 }
 export function HrDocumentsAccessDenied() {
-  return <EmptyState title="Access restricted" description="Documents are not available." />;
+  return React.createElement(EmptyState, {
+    title: "Access restricted",
+    description: "Documents are not available.",
+  });
 }
 export function HrEmployeesAccessDenied() {
-  return <EmptyState title="Access restricted" description="Employees are not available." />;
+  return React.createElement(EmptyState, {
+    title: "Access restricted",
+    description: "Employees are not available.",
+  });
 }
 export function HrLifecycleAccessDenied() {
-  return <EmptyState title="Access restricted" description="Lifecycle is not available." />;
+  return React.createElement(EmptyState, {
+    title: "Access restricted",
+    description: "Lifecycle is not available.",
+  });
 }
 export function HrLeaveAccessDenied() {
-  return <EmptyState title="Access restricted" description="Leave is not available." />;
+  return React.createElement(EmptyState, {
+    title: "Access restricted",
+    description: "Leave is not available.",
+  });
 }
 export function HrOffboardingAccessDenied() {
-  return <EmptyState title="Access restricted" description="Offboarding is not available." />;
+  return React.createElement(EmptyState, {
+    title: "Access restricted",
+    description: "Offboarding is not available.",
+  });
 }
 export function HrOnboardingAccessDenied() {
-  return <EmptyState title="Access restricted" description="Onboarding is not available." />;
+  return React.createElement(EmptyState, {
+    title: "Access restricted",
+    description: "Onboarding is not available.",
+  });
 }
 export function HrOvertimeAccessDenied() {
-  return <EmptyState title="Access restricted" description="Overtime is not available." />;
+  return React.createElement(EmptyState, {
+    title: "Access restricted",
+    description: "Overtime is not available.",
+  });
 }
 export function HrShiftsAccessDenied() {
-  return <EmptyState title="Access restricted" description="Shifts are not available." />;
+  return React.createElement(EmptyState, {
+    title: "Access restricted",
+    description: "Shifts are not available.",
+  });
 }
 
 export function HrAttendanceSection(_props: any) {
-  return <EmptyState title="Attendance" />;
+  return React.createElement(EmptyState, { title: "Attendance" });
 }
 export function HrComplianceSection(_props: any) {
-  return <EmptyState title="Compliance" />;
+  return React.createElement(EmptyState, { title: "Compliance" });
 }
 export function HrDocumentsSection(_props: any) {
-  return <EmptyState title="Documents" />;
+  return React.createElement(EmptyState, { title: "Documents" });
 }
 export function HrEmployeesSection(_props: any) {
-  return <EmptyState title="Employees" />;
+  return React.createElement(EmptyState, { title: "Employees" });
 }
 export function HrEmployeeCreateSection(_props: any) {
-  return <EmptyState title="Add employee" />;
+  return React.createElement(EmptyState, { title: "Add employee" });
 }
 export function HrEmployeeDetailSection(_props: any) {
-  return <EmptyState title="Employee detail" />;
+  return React.createElement(EmptyState, { title: "Employee detail" });
 }
 export function HrLifecycleSection(_props: any) {
-  return <EmptyState title="Lifecycle" />;
+  return React.createElement(EmptyState, { title: "Lifecycle" });
 }
 export function HrLeaveSection(_props: any) {
-  return <EmptyState title="Leave" />;
+  return React.createElement(EmptyState, { title: "Leave" });
 }
 export function HrOffboardingSection(_props: any) {
-  return <EmptyState title="Offboarding" />;
+  return React.createElement(EmptyState, { title: "Offboarding" });
 }
 export function HrOnboardingSection(_props: any) {
-  return <EmptyState title="Onboarding" />;
+  return React.createElement(EmptyState, { title: "Onboarding" });
 }
 export function HrOrgChartSection(_props: any) {
-  return <EmptyState title="Org chart" />;
+  return React.createElement(EmptyState, { title: "Org chart" });
 }
 export function HrOvertimeSection(_props: any) {
-  return <EmptyState title="Overtime" />;
+  return React.createElement(EmptyState, { title: "Overtime" });
 }
 export function HrDepartmentsSection(_props: any) {
-  return <EmptyState title="Departments" />;
+  return React.createElement(EmptyState, { title: "Departments" });
 }
 export function HrPositionsSection(_props: any) {
-  return <EmptyState title="Positions" />;
+  return React.createElement(EmptyState, { title: "Positions" });
 }
 export function HrShiftsSection(_props: any) {
-  return <EmptyState title="Shifts" />;
+  return React.createElement(EmptyState, { title: "Shifts" });
 }
 
 export async function requireHrEmployeesRead() {

@@ -2,7 +2,7 @@
 
 **Tracking ID:** `TRACK-004` · **File:** `004-hrm-migration.md` · **Status:** Active workforce migration · **Owner:** Architecture / HR · **Related:** **ARCH-002**, **ARCH-005**, **ARCH-006**, **ARCH-008**
 
-This track grows `@afenda/feature-hr` into full ERP HR capability using the
+This track grows `@afenda/feature-hr-suite` into full ERP HR capability using the
 current Afenda architecture (governed UI, ARCH-008 export doors, schema in
 `@afenda/db`).
 
@@ -15,12 +15,12 @@ claiming completion before parity is proven.
 ## Current State
 
 **Scaffold reset (2026-05-28):** Failed HR implementation was removed. A clean
-`@afenda/feature-hr` package exists with ARCH-008 export doors only; metadata
+`@afenda/feature-hr-suite` package exists with ARCH-008 export doors only; metadata
 delegates to `createModuleFeatureMetadata("hr")` like other core modules.
 
 - **Legacy input:** `packages/features/hrm` removed (2026-05-28); re-scaffold by
-  slice into `@afenda/feature-hr` when implementing TRACK-004;
-- **Target package:** `packages/features/hr` — see `ARCHITECTURE.md`; no
+  slice into `@afenda/feature-hr-suite` when implementing TRACK-004;
+- **Target package:** `packages/features/hr-suite` — see `ARCHITECTURE.md`; no
   `schema/hr` or server queries until Slice 1 is accepted;
 - **Database:** migration `0030_revert_hr_migration_tables` drops tables from the
   withdrawn `0027` / `0029` attempt; run `pnpm db:migrate` on environments that
@@ -29,7 +29,7 @@ delegates to `createModuleFeatureMetadata("hr")` like other core modules.
   scaffold phase).
 
 Do not restore the deleted `packages/features/hrm` tree. New HR work lands only in
-`packages/features/hr` with schema in `packages/db` per ARCH-005.
+`packages/features/hr-suite` with schema in `packages/db` per ARCH-005.
 
 ## Audit Baseline
 

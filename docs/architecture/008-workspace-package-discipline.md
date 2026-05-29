@@ -50,8 +50,8 @@ update and guard update in the same change.
 Every feature package must be named and placed predictably:
 
 ```txt
-packages/features/hr
-  package.json      # name: @afenda/feature-hr
+packages/features/hr-suite
+  package.json      # name: @afenda/feature-hr-suite
   src/
     index.ts
     client.ts
@@ -99,7 +99,7 @@ that remain empty after the package audit. Do not use catch-all folder names
 ERP modules stay flat at the workspace level:
 
 ```txt
-packages/features/hr/                 # workspace package
+packages/features/hr-suite/                 # workspace package
   src/
     employees/
     time-attendance/
@@ -109,7 +109,7 @@ packages/features/hr/                 # workspace package
 ```
 
 Do not create nested workspaces such as
-`packages/features/hr/payroll/package.json` unless a later architecture change
+`packages/features/hr-suite/payroll/package.json` unless a later architecture change
 explicitly approves a new package class.
 
 Nested internal folders are preferred for maintenance because they keep one

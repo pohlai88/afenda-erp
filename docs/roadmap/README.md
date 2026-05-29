@@ -14,7 +14,7 @@ convention as architecture docs.
 | **TRACK-001** | [001-ai-operation-execution-layer.md](001-ai-operation-execution-layer.md)                                   | AI operation execution layer — sandbox persistence, human approval, domain executors |
 | **TRACK-002** | [002-workspace-package-discipline-upgrade.md](002-workspace-package-discipline-upgrade.md)                   | Package discipline rollout before large module migrations                            |
 | **TRACK-003** | [003-ai-enterprise-uplift-scope-decisions.md](003-ai-enterprise-uplift-scope-decisions.md)                   | Final implement/cancel decisions for AI Enterprise Uplift "deferred" items           |
-| **TRACK-004** | [004-hrm-migration.md](004-hrm-migration.md)                                                                 | HRM migration recovery: keep `@afenda/feature-hr` scaffolded and migrate by slice    |
+| **TRACK-004** | [004-hrm-migration.md](004-hrm-migration.md)                                                                 | HRM migration recovery: keep `@afenda/feature-hr-suite` scaffolded and migrate by slice    |
 | **TRACK-005** | [005-lynx-knowledge-substrate.md](005-lynx-knowledge-substrate.md)                                           | Lynx machine layer + Knowledge substrate (pgvector, Truth Retrieval, Operator)       |
 | **TRACK-006** | [006-lynx-readiness-layer-enterprise.md](006-lynx-readiness-layer-enterprise.md)                             | Enterprise readiness layer for Lynx governance, run ledger, Vercel controls          |
 | **TRACK-007** | [007-lynx-erp-native-read-tools.md](007-lynx-erp-native-read-tools.md)                                       | Read-only finance, approval, and audit readiness tools for Lynx Operator             |

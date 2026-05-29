@@ -22,7 +22,7 @@ export const {
   getWorkItemKanbanSurfaceKey,
 } = createModuleFeatureMetadata("hr");
 
-type HrUiCopyPage = { title: string; description: string };
+type HrUiCopyPage = { title: string; description: string; addEmployeeLabel?: string };
 
 export const hrAttendanceUiCopy = {
   page: {
@@ -49,6 +49,7 @@ export const hrEmployeesUiCopy = {
   page: {
     title: "Employees",
     description: "Employees are managed by HR Suite.",
+    addEmployeeLabel: "Add employee",
   } satisfies HrUiCopyPage,
   create: {
     accessDeniedTitle: "Access restricted",

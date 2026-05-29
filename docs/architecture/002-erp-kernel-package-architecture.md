@@ -100,7 +100,7 @@ packages/
     sales/                    # @afenda/feature-sales
     purchasing/               # @afenda/feature-purchasing
     inventory/                # @afenda/feature-inventory
-    hr/                       # @afenda/feature-hr (moduleId: hr)
+    hr-suite/                 # @afenda/feature-hr-suite (moduleId: hr)
     crm/                      # @afenda/feature-crm
     approvals/                # @afenda/feature-approvals
     reports/                  # @afenda/feature-reports

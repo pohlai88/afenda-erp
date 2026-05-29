@@ -5,7 +5,7 @@
 | Field    | Value                                                                 |
 | -------- | --------------------------------------------------------------------- |
 | Status   | Active — Slice 1 partial: employee directory at `/hr/employees`   |
-| Package  | `@afenda/feature-hr` (`packages/features/hr`, moduleId `hr`)        |
+| Package  | `@afenda/feature-hr-suite` (`packages/features/hr-suite`, moduleId `hr`)        |
 | Track    | TRACK-004 (`docs/roadmap/004-hrm-migration.md`)                       |
 | Related  | **ARCH-002**, **ARCH-005**, **ARCH-008**                              |
 
@@ -14,10 +14,10 @@
 | Layer | Owner | Notes |
 | ----- | ----- | ----- |
 | ERP `/hr` routes | `apps/erp` | Thin adapters only; no HR business rules in the app |
-| HR product logic | `packages/features/hr` | Commands, queries, metadata builders, internal categories |
+| HR product logic | `packages/features/hr-suite` | Commands, queries, metadata builders, internal categories |
 | Shared contracts | `@afenda/kernel` | Module registry, generic list/detail builders until extracted |
 | Physical schema | `@afenda/db` | `schema/hr/` only when a TRACK-004 slice is accepted |
-| Legacy reference | *(removed 2026-05-28)* | Former `packages/features/hrm` deleted; implement in `@afenda/feature-hr` only |
+| Legacy reference | *(removed 2026-05-28)* | Former `packages/features/hrm` deleted; implement in `@afenda/feature-hr-suite` only |
 
 ## Public export doors (ARCH-008)
 
@@ -31,7 +31,7 @@
 ## Internal layout (target)
 
 ```txt
-packages/features/hr/src/
+packages/features/hr-suite/src/
   metadata.ts          # export door (present)
   server.ts            # export door (present)
   client.ts            # export door (present)
