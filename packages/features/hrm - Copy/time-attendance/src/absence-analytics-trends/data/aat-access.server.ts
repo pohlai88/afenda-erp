@@ -1,0 +1,76 @@
+import "server-only"
+
+import { canUseErpPermission } from "@afenda/platform/erp/rbac.server"
+
+import { findAatManagerContextForUser } from "./aat-employee-context.server"
+
+export type AatSurfaceAccess = {
+  canEnter: boolean
+  canReadOrg: boolean
+  canAudit: boolean
+  canConfigureThresholds: boolean
+  canViewSensitiveReasons: boolean
+  canExportReport: boolean
+  canViewTeamScope: boolean
+}
+
+export async function resolveAatSurfaceAccess(input: {
+  organizationId: string
+  userId: string
+}): Promise<AatSurfaceAccess> {
+  const [canSearch, canRead, canAudit, canUpdate] = await Promise.all([
+    canUseErpPermission({
+      organizationId: input.organizationId,
+      userId: input.userId,
+      permission: {
+        module: "hrm",
+        object: "absence_analytics",
+        function: "search",
+      },
+    }),
+    canUseErpPermission({
+      organizationId: input.organizationId,
+      userId: input.userId,
+      permission: {
+        module: "hrm",
+        object: "absence_analytics",
+        function: "read",
+      },
+    }),
+    canUseErpPermission({
+      organizationId: input.organizationId,
+      userId: input.userId,
+      permission: {
+        module: "hrm",
+        object: "absence_analytics",
+        function: "audit",
+      },
+    }),
+    canUseErpPermission({
+      organizationId: input.organizationId,
+      userId: input.userId,
+      permission: {
+        module: "hrm",
+        object: "absence_analytics",
+        function: "update",
+      },
+    }),
+  ])
+
+  const canReadOrg = canSearch || canRead || canAudit
+
+  const managerContext = await findAatManagerContextForUser({
+    organizationId: input.organizationId,
+    userId: input.userId,
+  })
+
+  return {
+    canEnter: canReadOrg,
+    canReadOrg,
+    canAudit,
+    canConfigureThresholds: canUpdate,
+    canViewSensitiveReasons: canRead || canAudit,
+    canExportReport: canRead || canAudit,
+    canViewTeamScope: managerContext !== null,
+  }
+}

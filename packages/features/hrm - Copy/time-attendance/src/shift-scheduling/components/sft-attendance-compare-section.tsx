@@ -1,0 +1,113 @@
+import { getTranslations } from "next-intl/server"
+
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@afenda/ui/card"
+import { GovernedPatternCListSection } from "@afenda/governed-surface/server"
+import { logUnexpectedServerError } from "@afenda/platform/logger.server"
+
+import { buildSftEmbeddedListSurfaceErrorConfiguration } from "../data/sft-embedded-list-surface-error.server"
+import { buildSftAttendanceReconcileListSurfaceConfiguration } from "../data/sft-surface-builders.server"
+import { listSftAttendanceReconcileRowsForOrg } from "../data/sft-integration.server"
+import { SFT_LIST_SURFACE_IDS } from "../data/sft-surface-metadata.shared"
+
+function formatMinutes(minutes: number | null): string {
+  if (minutes == null) return "—"
+  return `${minutes} min`
+}
+
+export async function SftAttendanceCompareSection({
+  organizationId,
+  orgSlug,
+  rangeStart,
+  rangeEnd,
+}: {
+  organizationId: string
+  orgSlug: string
+  rangeStart: string
+  rangeEnd: string
+}) {
+  const t = await getTranslations("Erp.Hrm.shiftScheduling")
+
+  let rows: Awaited<ReturnType<typeof listSftAttendanceReconcileRowsForOrg>>
+  try {
+    rows = await listSftAttendanceReconcileRowsForOrg({
+      organizationId,
+      rangeStart,
+      rangeEnd,
+    })
+  } catch (err) {
+    logUnexpectedServerError("sft-attendance-compare: query failed", err, {
+      organizationId,
+    })
+    return (
+      <Card size="sm">
+        <CardHeader>
+          <CardTitle>{t("attendanceCompareTitle")}</CardTitle>
+          <CardDescription>
+            {t("attendanceCompareDescription", { rangeStart, rangeEnd })}
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <GovernedPatternCListSection
+            layout="embedded"
+            title=""
+            listConfiguration={buildSftEmbeddedListSurfaceErrorConfiguration({
+              columnsId: SFT_LIST_SURFACE_IDS.attendanceReconcile,
+              emptyTitle: t("attendanceCompareEmpty"),
+              firstColumn: { id: "employee", header: t("colEmployee") },
+            })}
+            surfaceKey="hrm:shift-scheduling:attendance-reconcile:error"
+            resolveConfiguredPermission={false}
+            loadError={{
+              variant: "error",
+              title: t("attendanceCompareLoadFailed"),
+            }}
+          />
+        </CardContent>
+      </Card>
+    )
+  }
+
+  const listConfiguration = buildSftAttendanceReconcileListSurfaceConfiguration(
+    rows,
+    orgSlug,
+    {
+      empty: t("attendanceCompareEmpty"),
+      colEmployee: t("colEmployee"),
+      colDate: t("colDate"),
+      colScheduled: t("colScheduledMinutes"),
+      colActual: t("colActualMinutes"),
+      colVariance: t("colVarianceMinutes"),
+      formatMinutes,
+    }
+  )
+
+  return (
+    <Card size="sm">
+      <CardHeader>
+        <CardTitle>{t("attendanceCompareTitle")}</CardTitle>
+        <CardDescription>
+          {t("attendanceCompareDescription", { rangeStart, rangeEnd })}
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <GovernedPatternCListSection
+          layout="embedded"
+          title=""
+          listConfiguration={listConfiguration}
+          surfaceKey={SFT_LIST_SURFACE_IDS.attendanceReconcile}
+          invalid={{
+            variant: "error",
+            title: t("attendanceCompareLoadFailed"),
+          }}
+          data-testid={`governed-list-section:${SFT_LIST_SURFACE_IDS.attendanceReconcile}`}
+        />
+      </CardContent>
+    </Card>
+  )
+}

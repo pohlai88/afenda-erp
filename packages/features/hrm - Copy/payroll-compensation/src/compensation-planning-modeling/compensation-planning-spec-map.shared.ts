@@ -1,0 +1,82 @@
+/**
+ * HRM-CPM spec area → implementation status (see enterprise pack in `docs/_draft/hrm-compensation-planning-modelling-enterprise.md`).
+ *
+ * Status: `shipped` | `partial` | `missing`
+ */
+export const HRM_COMPENSATION_PLANNING_SPEC_MAP = {
+  compensationCyclePlanning: {
+    status: "partial",
+    codes: ["HRM-CPM-001", "HRM-CPM-002"],
+    note: "Cycle CRUD + list surface; workflow states beyond draft deferred",
+  },
+  budgetPoolManagement: {
+    status: "partial",
+    codes: ["HRM-CPM-003", "HRM-CPM-018", "HRM-CPM-019"],
+    note: "Budget pool create + utilization display; over-budget flags on recommendations deferred",
+  },
+  meritIncreasePlanning: { status: "missing", codes: ["HRM-CPM-008"] },
+  salaryAdjustmentModeling: {
+    status: "partial",
+    codes: ["HRM-CPM-010", "HRM-CPM-011", "HRM-CPM-012", "HRM-CPM-013"],
+    note: "Shared proposed salary and exception model exists; persisted workflow is not shipped",
+  },
+  promotionIncreaseModeling: { status: "missing", codes: ["HRM-CPM-009"] },
+  totalCompensationModeling: {
+    status: "partial",
+    codes: ["HRM-CPM-014"],
+    note: "ADR-0015 allowance catalog in this folder; no scenario rollup",
+  },
+  compensationScenarioModeling: { status: "missing", codes: ["HRM-CPM-015"] },
+  compensationEligibility: {
+    status: "partial",
+    codes: ["HRM-CPM-004", "HRM-CPM-005", "HRM-CPM-006"],
+    note: "Participant sync evaluates rules; manual assignment UI deferred",
+  },
+  salaryStructureReference: {
+    status: "partial",
+    codes: ["HRM-CPM-007", "HRM-CPM-016", "HRM-CPM-017"],
+    note: "Participant roster shows grade band min/mid/max; band exception workflow deferred",
+  },
+  payEquityReference: { status: "missing", codes: [] },
+  marketBenchmarkReference: { status: "missing", codes: [] },
+  managerRecommendation: { status: "missing", codes: ["HRM-CPM-021"] },
+  hrReview: { status: "missing", codes: ["HRM-CPM-022"] },
+  approvalWorkflow: {
+    status: "missing",
+    codes: ["HRM-CPM-023", "HRM-CPM-024"],
+  },
+  budgetControl: {
+    status: "partial",
+    codes: ["HRM-CPM-020"],
+    note: "Shared model requires exception justification for over-budget and outside-band recommendations",
+  },
+  approvalLocking: { status: "missing", codes: ["HRM-CPM-025"] },
+  compensationChangeRecord: { status: "missing", codes: ["HRM-CPM-026"] },
+  employeeHistoryLink: { status: "missing", codes: ["HRM-CPM-028"] },
+  compensationReporting: { status: "missing", codes: ["HRM-CPM-029"] },
+  compensationLetterReference: { status: "missing", codes: [] },
+  payrollIntegration: {
+    status: "partial",
+    codes: ["HRM-CPM-027"],
+    note: "Payroll reads contract base salary; no approved recommendation feed",
+  },
+  compensationAuditTrail: {
+    status: "partial",
+    codes: ["HRM-CPM-030"],
+    note: "HRM_COMPENSATION_PLANNING_AUDIT reserved; contract revision uses erp.hrm.contract.*",
+  },
+} as const
+
+export type HrmCompensationPlanningSpecArea =
+  keyof typeof HRM_COMPENSATION_PLANNING_SPEC_MAP
+
+/** All HRM-CPM codes referenced in the spec map. */
+export function listHrmCompensationPlanningSpecCodes(): string[] {
+  const codes = new Set<string>()
+  for (const area of Object.values(HRM_COMPENSATION_PLANNING_SPEC_MAP)) {
+    for (const code of area.codes) {
+      codes.add(code)
+    }
+  }
+  return [...codes].sort()
+}
