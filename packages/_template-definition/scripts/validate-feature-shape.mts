@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import { spawnSync } from "node:child_process";
 import {
   appRouteAllowedTsxNames,
   bannedBucketNames,
@@ -139,6 +140,29 @@ if (isFeaturePath(rel)) {
 
 if (rel.startsWith("apps/erp/src/")) {
   validateAppPath(rel);
+}
+
+if (
+  rel.includes("employee-management/compliance-regulatory-tracking/") &&
+  isFeaturePath(rel)
+) {
+  const script = path.join(
+    root,
+    "packages/features/hr-suite/scripts/check-hr-feature-vertical-naming.mts",
+  );
+  if (fs.existsSync(script)) {
+    const result = spawnSync("pnpm", ["exec", "tsx", script], {
+      cwd: root,
+      encoding: "utf8",
+      shell: process.platform === "win32",
+    });
+    if (result.status !== 0) {
+      const output = [result.stdout, result.stderr].filter(Boolean).join("\n");
+      problems.push(
+        output.trim() || "HR vertical naming check failed (see script output)",
+      );
+    }
+  }
 }
 
 if (problems.length > 0) {

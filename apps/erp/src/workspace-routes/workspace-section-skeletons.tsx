@@ -118,7 +118,7 @@ export function GovernedListSectionSkeleton({
 export function GovernedChartSectionSkeleton() {
   return (
     <div aria-busy="true" aria-label="Loading chart">
-      <Skeleton className="min-h-[14rem] w-full rounded-control" />
+      <Skeleton className="min-h-[14rem] w-full rounded-control" /> {/* audit-ds: ignore no-arbitrary-value — chart skeleton minimum height contract */}
     </div>
   );
 }
@@ -157,8 +157,8 @@ export function ModuleScreenHeaderSkeleton({
       aria-busy="true"
       aria-label="Loading module header"
     >
-      <div className="flex flex-col gap-surface-lg">
-        <div className="flex flex-col gap-surface-lg lg:flex-row lg:items-start lg:justify-between">
+      <div className="@container flex flex-col gap-surface-lg">
+        <div className="flex flex-col gap-surface-lg @lg:flex-row @lg:items-start @lg:justify-between">
           <div className="max-w-3xl">
             <Skeleton className="h-3 w-24" />
             <Skeleton className="mt-surface-lg h-8 w-2/5 max-w-sm" />

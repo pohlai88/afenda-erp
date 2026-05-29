@@ -8,6 +8,10 @@ Scaffold default: `packages/_template-definition`.
 - `src/server.ts`
 - `src/metadata.ts`
 
+## Vertical slices (shipped capabilities)
+
+Implemented capabilities use the same bucket layout as `@afenda/feature-system-admin` under `src/<category>/<capability>/` with slice doors (`server.ts`, `client.ts`, `metadata.ts`). File prefix: `hr.<domain>.*` (e.g. `hr.workforce.compliance.actions.server.ts`). List surfaces live in `surface/`, not `data/`. See rule `afenda-hr-feature-vertical` and `scripts/check-hr-feature-vertical-naming.mts`.
+
 ## Buckets
 - `src/actions/`
 - `src/components/`
@@ -16,6 +20,7 @@ Scaffold default: `packages/_template-definition`.
 - `src/events/`
 - `src/policies/`
 - `src/schemas/`
+- `src/surface/` (governed list surfaces + UI copy for shipped slices)
 - `src/tests/`
 
 ## Constraints

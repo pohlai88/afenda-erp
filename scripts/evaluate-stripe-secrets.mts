@@ -4,7 +4,7 @@
  */
 import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { createRequire } from "node:module";
+import { loadStripeScriptClient } from "./stripe-script-client.shared.mts";
 
 const rootDir = resolve(import.meta.dirname, "..");
 const secretPath = resolve(rootDir, ".secret.config");
@@ -84,13 +84,8 @@ for (const key of keysToCheck) {
 
 const sk = secrets.STRIPE_SECRET_KEY?.trim();
 if (sk?.startsWith("sk_")) {
-  const require = createRequire(import.meta.url);
-  const Stripe = require(
-    "../packages/billing/node_modules/stripe/cjs/stripe.cjs.node.js",
-  ).default as typeof import("stripe").default;
-
   try {
-    const stripe = new Stripe(sk);
+    const stripe = loadStripeScriptClient(sk);
     const account = await stripe.accounts.retrieve();
     console.log("");
     console.log(`  API probe: connected to ${account.id}`);

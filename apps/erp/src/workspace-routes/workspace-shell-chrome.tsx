@@ -68,7 +68,7 @@ export function WorkspaceOrgPanel({
       <Card className="overflow-hidden shadow-elevation-1">
         <div className="h-1 bg-primary" aria-hidden />
         <CardHeader>
-          <p className="text-xs uppercase tracking-wide text-muted-foreground">
+          <p className="type-caption uppercase tracking-wide text-muted-foreground">
             Active tenant
           </p>
           <div className="mt-surface-md flex items-start gap-surface-md">
@@ -131,7 +131,7 @@ export function WorkspaceCommandHeader({
   const userInitials = initialsFromLabel(sessionName, 2);
 
   return (
-    <div className="flex flex-col gap-surface-lg lg:flex-row lg:items-center lg:justify-between">
+    <div className="@container flex flex-col gap-surface-lg @lg:flex-row @lg:items-center @lg:justify-between">
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
           <span
@@ -154,20 +154,20 @@ export function WorkspaceCommandHeader({
         </p>
       </div>
 
-      <div className="flex shrink-0 items-center gap-surface-sm rounded-panel border border-border bg-muted/30 p-2 pl-3 shadow-elevation-1">
+      <div className="@container flex shrink-0 items-center gap-surface-sm rounded-panel border border-border bg-muted/30 p-2 pl-3 shadow-elevation-1">
         <Avatar size="sm">
           <AvatarFallback className="bg-primary/10 text-primary type-label font-semibold">
             {userInitials}
           </AvatarFallback>
         </Avatar>
-        <div className="hidden min-w-0 max-w-56 sm:block">
+        <div className="hidden min-w-0 max-w-56 @sm:block">
           <div className="truncate type-body font-medium text-foreground">
             {sessionName}
           </div>
           <div className="truncate type-caption text-muted">{sessionEmail}</div>
         </div>
         <Separator
-          className="mx-1 hidden h-9 sm:block"
+          className="mx-1 hidden h-9 @sm:block"
           orientation="vertical"
         />
         <form action={signOutAction}>

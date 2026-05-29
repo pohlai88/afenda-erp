@@ -1,5 +1,2 @@
-/**
- * @afenda-bucket policies
- * Scaffold placeholder from packages/_template-definition.
- */
-export {};
+/** @afenda-bucket policies */
+export * from "./hr.workforce.compliance-access.policy.server";

@@ -19,12 +19,10 @@ import { existsSync, readFileSync } from "node:fs";
 import { readFile, writeFile } from "node:fs/promises";
 import { homedir } from "node:os";
 import { resolve } from "node:path";
-import { createRequire } from "node:module";
-
-const require = createRequire(import.meta.url);
-const Stripe = require(
-  "../packages/billing/node_modules/stripe/cjs/stripe.cjs.node.js",
-).default as typeof import("stripe").default;
+import {
+  loadStripeScriptClient,
+  type StripeScriptClient,
+} from "./stripe-script-client.shared.mts";
 
 const rootDir = resolve(import.meta.dirname, "..");
 const secretPath = resolve(rootDir, ".secret.config");
@@ -121,7 +119,10 @@ function readWebhookSecretFromCli(apiKey: string) {
   return secret;
 }
 
-async function validatePriceIds(stripe: Stripe, env: Record<string, string>) {
+async function validatePriceIds(
+  stripe: StripeScriptClient,
+  env: Record<string, string>,
+) {
   const results: string[] = [];
 
   for (const envKey of PLAN_ENV_KEYS) {
@@ -164,7 +165,7 @@ async function main() {
     process.exit(1);
   }
 
-  const stripe = new Stripe(secretKey);
+  const stripe = loadStripeScriptClient(secretKey);
   const account = await stripe.accounts.retrieve();
   console.log(`Stripe account: ${account.id} (${account.settings?.dashboard?.display_name ?? "connected"})`);
 

@@ -4,12 +4,7 @@
  */
 import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { createRequire } from "node:module";
-
-const require = createRequire(import.meta.url);
-const Stripe = require(
-  "../packages/billing/node_modules/stripe/cjs/stripe.cjs.node.js",
-).default as typeof import("stripe").default;
+import { loadStripeScriptClient } from "./stripe-script-client.shared.mts";
 import { getStripeConfigurationStatus } from "../packages/billing/src/stripe-config.shared.ts";
 import {
   listStripeBillingPlans,
@@ -65,7 +60,7 @@ for (const plan of plans) {
   }
 }
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+const stripe = loadStripeScriptClient(process.env.STRIPE_SECRET_KEY!);
 const account = await stripe.accounts.retrieve();
 console.log(`Account ${account.id} OK`);
 

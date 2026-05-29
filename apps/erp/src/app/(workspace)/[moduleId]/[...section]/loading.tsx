@@ -1,5 +1,5 @@
-import { SystemAdminSectionSkeleton } from "@/app-route-state/route-states";
+import { ModuleSectionRouteSkeleton } from "@/app-route-state/module-section-route-skeleton.client";
 
-export default function SystemAdminSectionLoading() {
-  return <SystemAdminSectionSkeleton />;
+export default function ModuleSectionLoading() {
+  return <ModuleSectionRouteSkeleton />;
 }

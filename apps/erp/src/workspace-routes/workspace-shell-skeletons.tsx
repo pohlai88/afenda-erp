@@ -48,7 +48,7 @@ export function WorkspaceSidebarSkeleton() {
 export function WorkspaceHeaderSkeleton() {
   return (
     <div
-      className="flex flex-col gap-surface-lg lg:flex-row lg:items-center lg:justify-between"
+      className="@container flex flex-col gap-surface-lg @lg:flex-row @lg:items-center @lg:justify-between"
       aria-busy="true"
       aria-label="Loading workspace header"
     >
@@ -57,7 +57,7 @@ export function WorkspaceHeaderSkeleton() {
         <Skeleton className="mt-2 h-7 w-56 max-w-full" />
         <Skeleton className="mt-2 h-4 w-40" />
       </div>
-      <Skeleton className="h-12 w-full max-w-xs rounded-panel lg:w-72" />
+      <Skeleton className="h-12 w-full max-w-xs rounded-panel @lg:w-72" />
     </div>
   );
 }

@@ -60,7 +60,12 @@ const RULES: DriftRule[] = [
 ];
 
 function runCommand(command: string[]) {
-  const result = spawnSync(command[0], command.slice(1), {
+  const [executable, ...args] = command;
+  if (!executable) {
+    return { ok: false, output: "empty command" };
+  }
+
+  const result = spawnSync(executable, args, {
     cwd: root,
     encoding: "utf8",
     shell: process.platform === "win32",

@@ -1,0 +1,77 @@
+---
+description: HR feature vertical slice layout and naming (mirrors system-admin discipline)
+globs: "packages/features/hr-suite/**/*"
+alwaysApply: false
+---
+
+# HR feature vertical slices (`@afenda/feature-hr-suite`)
+
+**ARCH-010** (HR package) · **ARCH-002** · **ARCH-008**. Reference implementation: `@afenda/feature-system-admin` (rule `afenda-system-admin`).
+
+## Shipped capability layout
+
+Each **implemented** capability lives under `src/<category>/<capability-slug>/` with standard buckets:
+
+```txt
+compliance-regulatory-tracking/
+  actions/       # *.actions.server.ts ("use server")
+  components/    # *.component.client.tsx
+  contracts/     # permission / DTO contracts
+  data/          # queries, page models, *.shared.ts — not list surfaces
+  events/        # audit action strings, domain events
+  policies/      # *-access.policy.server.ts capability guards
+  schemas/       # Zod
+  surface/       # *.surface.ts, *-ui.copy.shared.ts
+  server.ts      # slice server door (barrel + server chrome)
+  client.ts      # slice client door (components only)
+  metadata.ts    # slice metadata door (surfaces + copy only)
+  index.ts       # neutral door (metadata + client + contracts)
+  *-architecture.md
+```
+
+Scaffold-only capabilities may keep placeholder buckets until a TRACK-004 slice ships.
+
+## File naming (mirrors system-admin)
+
+Prefix: **`hr.<domain>.`** where `<domain>` matches governed surface keys (e.g. `hr.workforce.compliance` → keys `hr.workforce.compliance.obligations.list`).
+
+| Role | Pattern | Example |
+| ---- | ------- | ------- |
+| Actions | `hr.<domain>.actions.server.ts` | `hr.workforce.compliance.actions.server.ts` |
+| Policy | `hr.<domain>-access.policy.server.ts` | `hr.workforce.compliance-access.policy.server.ts` |
+| Page model | `hr.<domain>.page-model.server.ts` | `hr.workforce.compliance.page-model.server.ts` |
+| List surface | `hr.<domain>-<purpose>-list.surface.ts` | `hr.workforce.compliance-obligations-list.surface.ts` |
+| UI copy | `hr.<domain>-ui.copy.shared.ts` | `hr.workforce.compliance-ui.copy.shared.ts` |
+| Shared logic | `hr.<domain>-<topic>.shared.ts` | `hr.workforce.compliance-obligation.shared.ts` |
+| Schema | `hr.<domain>-<topic>.schema.ts` | `hr.workforce.compliance-obligation.schema.ts` |
+| Contract | `hr.<domain>.contract.ts` | `hr.workforce.compliance.contract.ts` |
+| Events / audit | `hr.<domain>.event.ts` | `hr.workforce.compliance.event.ts` |
+| Component | `hr.<domain>-<purpose>.component.client.tsx` | `hr.workforce.compliance-forms.component.client.tsx` |
+
+## Export doors
+
+| Door | May export |
+| ---- | ---------- |
+| `./server` | actions, data, policies, events, schemas, contracts, server chrome |
+| `./client` | client components and client-safe catalogs only |
+| `./metadata` | surface builders, surface keys, UI copy — **no tenant I/O** |
+
+Do not export list surfaces from `./server`. Do not export server actions from `./client`.
+
+## Capabilities & audit
+
+- Capability keys: `hr.<area>.read|write` (e.g. `hr.compliance.read`).
+- Audit strings: `hr.<area>.<entity>.<verb>` — define in `events/*.event.ts`, not contracts.
+- Mutations: `writeExecutionAuditEvent` + `revalidatePath` for the owning HR route.
+
+## Verification
+
+```bash
+pnpm exec tsx packages/features/hr-suite/scripts/check-hr-feature-vertical-naming.mts
+pnpm --filter @afenda/feature-hr-suite typecheck
+pnpm --filter @afenda/feature-hr-suite test
+pnpm architecture:check
+pnpm lint:governed-renderers   # when surfaces change
+```
+
+Guard runs in `pnpm architecture:check` and via `validate-feature-shape` hooks on edit.

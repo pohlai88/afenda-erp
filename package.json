@@ -15,7 +15,7 @@
     "lint": "turbo lint",
     "typecheck": "pnpm typecheck:scripts && turbo typecheck",
     "typecheck:scripts": "tsc -p tsconfig.json --noEmit",
-    "architecture:check": "tsx scripts/check-directory-architecture.mts && tsx scripts/check-kernel-boundary.mts && tsx packages/db/scripts/check-drizzle-journal.mts",
+    "architecture:check": "tsx scripts/check-directory-architecture.mts && tsx scripts/check-kernel-boundary.mts && tsx packages/db/scripts/check-drizzle-journal.mts && tsx packages/features/hr-suite/scripts/check-hr-feature-vertical-naming.mts",
     "kernel:check": "tsx scripts/check-kernel-boundary.mts",
     "system-admin:scorecard-audit": "tsx scripts/system-admin-scorecard-audit.mts",
     "artifacts:init": "tsx scripts/ensure-artifacts-layout.mts",

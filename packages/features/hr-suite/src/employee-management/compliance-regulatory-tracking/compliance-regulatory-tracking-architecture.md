@@ -23,7 +23,7 @@
 | **Regulatory Calendar**             | Filing deadlines, renewal dates, statutory submission due dates                                         |
 | **Exception Tracking**              | Non-compliance case, waiver, corrective action, escalation status                                       |
 | **Corrective Action Tracking**      | Action owner, due date, completion status, evidence reference                                           |
-| **Compliance Reporting**            | Compliance overview, exception report, expiry report, filing report                                    |
+| **Compliance Reporting**            | Compliance overview, exception report, expiry report, filing report                                     |
 | **Compliance Audit Trail**          | Created by, reviewed by, approved by, submitted by, timestamp, evidence, reason                         |
 
 ---
@@ -82,7 +82,7 @@
 | **HRM-CMP-019** | System shall track corrective action progress and completion.                                                                              |
 | **HRM-CMP-020** | System shall link compliance records to supporting evidence documents.                                                                     |
 | **HRM-CMP-021** | System shall support compliance review and approval workflow where required.                                                               |
-| **HRM-CMP-022** | System shall provide compliance overview surfaces by legal entity, department, location, employee category, and risk status.                      |
+| **HRM-CMP-022** | System shall provide compliance overview surfaces by legal entity, department, location, employee category, and risk status.               |
 | **HRM-CMP-023** | System shall provide compliance reports for filings, expiries, exceptions, training, acknowledgments, and work eligibility.                |
 | **HRM-CMP-024** | System shall restrict access to sensitive compliance records based on role and authorization.                                              |
 | **HRM-CMP-025** | System shall maintain audit trail for compliance checks, alerts, exceptions, filings, reviews, approvals, waivers, and corrective actions. |
@@ -91,25 +91,94 @@
 
 # Enterprise Acceptance Criteria
 
-| No. | Acceptance Criteria                                                                                                |
-| --: | ------------------------------------------------------------------------------------------------------------------ |
-|   1 | Compliance obligations can be configured by legal entity, country, location, employment type, and worker category. |
-|   2 | Employee compliance status can be viewed from a central compliance overview.                                      |
-|   3 | Work eligibility status can be tracked for applicable employees.                                                   |
-|   4 | Work permit, visa, passport, and right-to-work expiry dates can be tracked.                                        |
-|   5 | Missing compliance documents are flagged.                                                                          |
-|   6 | Expiring compliance documents generate alerts before expiry.                                                       |
-|   7 | Expired compliance documents are clearly marked as non-compliant or expired.                                       |
-|   8 | Mandatory filing deadlines can be recorded and monitored.                                                          |
-|   9 | Overdue mandatory filings are flagged.                                                                             |
-|  10 | Mandatory policy acknowledgments can be tracked by employee and policy version.                                    |
-|  11 | Missing policy acknowledgments are flagged.                                                                        |
-|  12 | Mandatory safety or compliance training can be tracked.                                                            |
-|  13 | Overdue compliance training is flagged.                                                                            |
-|  14 | Compliance exceptions can be created for non-compliant items.                                                      |
-|  15 | Corrective action owner, due date, and status can be assigned.                                                     |
-|  16 | Compliance evidence can be linked to document records.                                                             |
-|  17 | Compliance status can be filtered by company, department, location, employee category, and risk level.             |
-|  18 | Sensitive compliance records are hidden from unauthorized users.                                                   |
-|  19 | Compliance reports can be exported by authorized users.                                                            |
-|  20 | Every compliance status change, filing update, exception, waiver, and corrective action creates an audit event.    |
+|  No. | Acceptance Criteria                                                                                                |
+| ---: | ------------------------------------------------------------------------------------------------------------------ |
+|    1 | Compliance obligations can be configured by legal entity, country, location, employment type, and worker category. |
+|    2 | Employee compliance status can be viewed from a central compliance overview.                                       |
+|    3 | Work eligibility status can be tracked for applicable employees.                                                   |
+|    4 | Work permit, visa, passport, and right-to-work expiry dates can be tracked.                                        |
+|    5 | Missing compliance documents are flagged.                                                                          |
+|    6 | Expiring compliance documents generate alerts before expiry.                                                       |
+|    7 | Expired compliance documents are clearly marked as non-compliant or expired.                                       |
+|    8 | Mandatory filing deadlines can be recorded and monitored.                                                          |
+|    9 | Overdue mandatory filings are flagged.                                                                             |
+|   10 | Mandatory policy acknowledgments can be tracked by employee and policy version.                                    |
+|   11 | Missing policy acknowledgments are flagged.                                                                        |
+|   12 | Mandatory safety or compliance training can be tracked.                                                            |
+|   13 | Overdue compliance training is flagged.                                                                            |
+|   14 | Compliance exceptions can be created for non-compliant items.                                                      |
+|   15 | Corrective action owner, due date, and status can be assigned.                                                     |
+|   16 | Compliance evidence can be linked to document records.                                                             |
+|   17 | Compliance status can be filtered by company, department, location, employee category, and risk level.             |
+|   18 | Sensitive compliance records are hidden from unauthorized users.                                                   |
+|   19 | Compliance reports can be exported by authorized users.                                                            |
+|   20 | Every compliance status change, filing update, exception, waiver, and corrective action creates an audit event.    |
+
+---
+
+## HRM-CMP-001 As-built
+
+Compliance obligations are stored in `hr_compliance_obligations` with optional scope columns. A null scope value means the obligation applies to all employees for that dimension.
+
+| Column | HRM-CMP-001 dimension |
+| ------ | --------------------- |
+| `country_code` | Country |
+| `legal_entity_code` | Legal entity |
+| `work_location_code` | Location |
+| `employment_type` | Employment type |
+| `worker_category` | Worker category |
+| `department_id` | Department (org assignment reference) |
+
+Commands live in `@afenda/db` (`hr-compliance.ts`). Feature surfaces and forms live under `packages/features/hr-suite/src/employee-management/compliance-regulatory-tracking/`. Employee applicability uses `appliesComplianceObligationToEmployee()` — every configured dimension must match; unset obligation dimensions are wildcards.
+
+Permissions: `hr.compliance.read`, `hr.compliance.write`. Route revalidation target: `/hr/compliance`.
+
+## HRM-CMP-002 As-built
+
+Employee-level labor law tracking uses `hr_compliance_employee_requirements` joined to active `labor_law` obligations and `hr_employees` scope columns (`country_code`, `legal_entity_code`, `work_location_code`, `employment_type`, `worker_category`, plus `current_department_id` for department matching).
+
+| Layer | Responsibility |
+| ----- | -------------- |
+| `@afenda/db` | `syncHrEmployeeLaborLawRequirements`, `listHrEmployeeLaborLawRequirementsWindow`, `updateHrEmployeeLaborLawRequirementStatus` |
+| Applicability | `appliesComplianceObligationToEmployee()` in `hr-compliance-scope.shared.ts` |
+| Status model | HRM-CMP-015 enum on requirement rows; `deriveEffectiveLaborLawRequirementStatus()` derives overdue/at_risk from due dates |
+| Governed UI | Pattern C surface `hr.workforce.compliance.labor-law-requirements.list`, search param `complianceLaborLawSearch` |
+| Mutations | `syncHrEmployeeLaborLawRequirementsAction`, `updateHrEmployeeLaborLawRequirementAction` with audit events |
+
+Page load runs idempotent sync (inserts new rows, removes stale scope mismatches, updates due dates); write users can also sync manually from the workbench.
+
+### Governed UI (Pattern C)
+
+List surfaces use `buildGovernedListSurface` with `erp-operational-table` profile. ERP composition uses `HrComplianceWorkbenchSection` (`components/hr.workforce.compliance-section.component.server.tsx`) — **three** embedded `GovernedPatternCListSection` blocks:
+
+| Surface key | Section |
+| ----------- | ------- |
+| `hr.workforce.compliance.obligations.list` | Compliance obligations register |
+| `hr.workforce.compliance.labor-law-requirements.list` | Employee labor law requirements |
+| `hr.workforce.compliance.exceptions.list` | Open exceptions |
+
+Trailing row actions use `GovernedTrailingActionSlot` via `HrComplianceObligationsTrailingCell`, `HrComplianceLaborLawRequirementsTrailingCell`, and `HrComplianceExceptionsTrailingCell` when `hr.compliance.write` is granted. Standalone row mutation forms were removed in favor of trailing cells; register/create/sync forms remain in `SectionPanel` blocks above each list.
+
+Search params: `complianceObligationSearch`, `complianceLaborLawSearch`, `complianceExceptionSearch` (fallback: shared `search` on page model). UI copy and column labels live in `surface/hr.workforce.compliance-ui.copy.shared.ts` (metadata door).
+
+### Mutations & audit (HRM-CMP-025)
+
+Server Actions call `finalizeComplianceMutation()` — domain `*InTx` command plus `writeExecutionAuditEventInTransaction()` in one `runWithOrganizationContext` transaction. Action failures map through `toComplianceActionFailure()` without leaking internal errors. Audit action strings live in `events/hr.workforce.compliance.event.ts`.
+
+### ERP route wiring
+
+| Layer | Path |
+| ----- | ---- |
+| App catch-all | `apps/erp/src/app/(workspace)/[moduleId]/[...section]/page.tsx` (`moduleId=hr`, `section=compliance`) |
+| App adapter | `apps/erp/src/lib/hr-sections/compliance.server.tsx` |
+| Section registry | `apps/erp/src/lib/hr-sections/registry.server.ts` |
+| Module nav | `apps/erp/src/workspace-routes/hr-section-nav.server.tsx` |
+| Route contract | `contracts/hr.workforce.compliance-route.contract.ts` (`/hr/compliance`) |
+| Search param parser | `data/hr.workforce.compliance-search-params.parse.shared.ts` |
+| Execution routes | `hr.compliance.read` / `hr.compliance.write` → `/hr/compliance` in `@afenda/kernel` execution capabilities |
+
+Access guards use `@afenda/kernel/execution` (`requireExecutionPermission`); denied reads render `HrComplianceAccessDeniedPanel` in the app adapter. The app adapter resolves auth once and passes `canWrite` into `buildHrCompliancePageModel`; page-model loaders do not re-fetch execution context.
+
+### Naming & layout (system-admin mirror)
+
+Shipped implementation files use the prefix `hr.workforce.compliance.*` and standard buckets (`actions/`, `data/`, `events/`, `policies/`, `schemas/`, `surface/`, `components/`). List surfaces and UI copy live under `surface/`; audit strings live in `events/hr.workforce.compliance.event.ts`. Slice doors: `server.ts` (I/O), `client.ts` (components), `metadata.ts` (surfaces only). Enforced by `pnpm exec tsx packages/features/hr-suite/scripts/check-hr-feature-vertical-naming.mts` and rule `afenda-hr-feature-vertical`.

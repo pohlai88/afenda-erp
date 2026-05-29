@@ -37,6 +37,25 @@ const ROUTES = [
   },
   {
     test: (p) =>
+      p.startsWith("packages/features/hr-suite/") &&
+      p.includes("compliance-regulatory-tracking/"),
+    hint: [
+      "**HR compliance vertical** — rule `afenda-hr-feature-vertical` (mirrors system-admin).",
+      "Prefix files `hr.workforce.compliance.*`; list surfaces in `surface/`; audit in `events/`.",
+      "Doors: server (I/O), client (components), metadata (surfaces/copy only).",
+      "Before done: `pnpm exec tsx packages/features/hr-suite/scripts/check-hr-feature-vertical-naming.mts`.",
+    ].join(" "),
+  },
+  {
+    test: (p) => p.startsWith("packages/features/hr-suite/"),
+    hint: [
+      "**@afenda/feature-hr-suite** — rule `afenda-hr-feature-vertical` + `afenda-feature-packages`.",
+      "Doctrine: **ARCH-010**, **ARCH-008**. Shipped slices use `hr.<domain>.*` file naming like system-admin.",
+      "Before done: `pnpm architecture:check`; `pnpm --filter @afenda/feature-hr-suite test`.",
+    ].join(" "),
+  },
+  {
+    test: (p) =>
       p.startsWith("packages/features/knowledge/") ||
       p.startsWith("packages/features/lynx/") ||
       p.startsWith("apps/erp/src/app/api/lynx/"),

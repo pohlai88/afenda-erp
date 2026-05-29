@@ -1,7 +1,18 @@
 /**
- * Module section catch-all (system-admin). Slug → thin app adapter → feature package.
+ * Module section catch-all (system-admin, hr). Slug → thin app adapter → feature package.
  */
-import { SystemAdminSectionSkeleton } from "@/app-route-state/route-states";
+import {
+  HrCompliancePageSkeleton,
+  SystemAdminSectionSkeleton,
+} from "@/app-route-state/route-states";
+import { ModuleSectionRouteSkeleton } from "@/app-route-state/module-section-route-skeleton.client";
+import {
+  loadHrSection,
+  resolveHrSectionSlug,
+  hrSectionSlugs,
+  type HrSectionPageProps,
+} from "@/lib/hr-sections/registry.server";
+import { assertHrModuleId, HR_MODULE_ID } from "@/lib/hr-route.shared";
 import {
   loadSystemAdminSection,
   resolveSystemAdminSectionSlug,
@@ -27,17 +38,22 @@ type ModuleSectionRouteProps = {
 };
 
 export function generateStaticParams() {
-  return systemAdminSectionSlugs.map((slug) => ({
-    moduleId: SYSTEM_ADMIN_MODULE_ID,
-    section: [slug],
-  }));
+  return [
+    ...systemAdminSectionSlugs.map((slug) => ({
+      moduleId: SYSTEM_ADMIN_MODULE_ID,
+      section: [slug],
+    })),
+    ...hrSectionSlugs.map((slug) => ({
+      moduleId: HR_MODULE_ID,
+      section: [slug],
+    })),
+  ];
 }
 
-export async function generateMetadata({
-  params,
-}: ModuleSectionRouteProps): Promise<Metadata> {
-  const { moduleId, section } = await params;
-
+async function resolveSectionMetadata(
+  moduleId: string,
+  section: string[],
+): Promise<Metadata> {
   if (moduleId === SYSTEM_ADMIN_MODULE_ID) {
     assertSystemAdminModuleId(moduleId);
     const slug = resolveSystemAdminSectionSlug(section);
@@ -45,7 +61,28 @@ export async function generateMetadata({
     return sectionModule.metadata ?? {};
   }
 
+  if (moduleId === HR_MODULE_ID) {
+    assertHrModuleId(moduleId);
+    const slug = resolveHrSectionSlug(section);
+    const sectionModule = await loadHrSection(slug);
+    return sectionModule.metadata ?? {};
+  }
+
   notFound();
+}
+
+export async function generateMetadata({
+  params,
+}: ModuleSectionRouteProps): Promise<Metadata> {
+  const { moduleId, section } = await params;
+  return resolveSectionMetadata(moduleId, section);
+}
+
+function sectionSkeleton(moduleId: string) {
+  if (moduleId === HR_MODULE_ID) {
+    return <HrCompliancePageSkeleton />;
+  }
+  return <SystemAdminSectionSkeleton />;
 }
 
 export default function ModuleSectionRoute({
@@ -53,18 +90,33 @@ export default function ModuleSectionRoute({
   searchParams,
 }: ModuleSectionRouteProps) {
   return (
-    <Suspense fallback={<SystemAdminSectionSkeleton />}>
+    <Suspense fallback={<ModuleSectionRouteSkeleton />}>
       {params.then(async ({ moduleId, section }) => {
         if (moduleId === SYSTEM_ADMIN_MODULE_ID) {
           assertSystemAdminModuleId(moduleId);
           const slug = resolveSystemAdminSectionSlug(section);
           const { default: SectionPage } = await loadSystemAdminSection(slug);
           return (
-            <SectionPage
-              searchParams={
-                searchParams as SystemAdminSectionPageProps["searchParams"]
-              }
-            />
+            <Suspense fallback={sectionSkeleton(moduleId)}>
+              <SectionPage
+                searchParams={
+                  searchParams as SystemAdminSectionPageProps["searchParams"]
+                }
+              />
+            </Suspense>
+          );
+        }
+
+        if (moduleId === HR_MODULE_ID) {
+          assertHrModuleId(moduleId);
+          const slug = resolveHrSectionSlug(section);
+          const { default: SectionPage } = await loadHrSection(slug);
+          return (
+            <Suspense fallback={sectionSkeleton(moduleId)}>
+              <SectionPage
+                searchParams={searchParams as HrSectionPageProps["searchParams"]}
+              />
+            </Suspense>
           );
         }
 

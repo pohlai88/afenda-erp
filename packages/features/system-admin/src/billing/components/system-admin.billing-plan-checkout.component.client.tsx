@@ -51,7 +51,7 @@ export function SystemAdminBillingPlanCheckout({
   return (
     <div className="flex flex-col gap-surface-md">
       <FieldGroup className="flex flex-col gap-surface-sm @sm:flex-row @sm:items-end">
-        <Field className="min-w-[12rem] flex-1">
+        <Field className="min-w-48 flex-1">
           <FieldLabel>{systemAdminBillingUiCopy.plans.selectLabel}</FieldLabel>
           <NativeSelect
             value={planKey}

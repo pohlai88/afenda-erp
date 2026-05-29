@@ -1,6 +1,8 @@
 import {
   createAuditLog,
+  insertAuditLog,
   type AuditEntityType,
+  type AfendaTransaction,
 } from "@afenda/db";
 
 export type ExecutionAuditEvent = {
@@ -43,10 +45,10 @@ function buildExecutionAuditSummary(input: ExecutionAuditEvent) {
   return `${input.action} executed against ${targetLabel}.`;
 }
 
-export async function writeExecutionAuditEvent(input: ExecutionAuditEvent) {
+function buildExecutionAuditLogInput(input: ExecutionAuditEvent) {
   const entityType = resolveExecutionAuditEntityType(input.targetType);
 
-  await createAuditLog({
+  return {
     organizationId: input.organizationId,
     actorAuthUserId: input.actorId,
     entityType,
@@ -59,5 +61,17 @@ export async function writeExecutionAuditEvent(input: ExecutionAuditEvent) {
       ...(input.reason ? { reason: input.reason } : {}),
       ...(input.metadata ?? {}),
     },
-  });
+  };
+}
+
+export async function writeExecutionAuditEvent(input: ExecutionAuditEvent) {
+  await createAuditLog(buildExecutionAuditLogInput(input));
+}
+
+/** Persist audit in the same Postgres transaction as the domain mutation. */
+export async function writeExecutionAuditEventInTransaction(
+  db: AfendaTransaction,
+  input: ExecutionAuditEvent,
+) {
+  await insertAuditLog(db, buildExecutionAuditLogInput(input));
 }

@@ -31,12 +31,32 @@ export const hrAttendanceUiCopy = {
   } satisfies HrUiCopyPage,
 };
 
-export const hrComplianceUiCopy = {
-  page: {
-    title: "Compliance",
-    description: "Compliance is managed by HR Suite.",
-  } satisfies HrUiCopyPage,
-};
+export {
+  hrComplianceExceptionsSurfaceKey,
+  hrComplianceLaborLawRequirementsSurfaceKey,
+  hrComplianceObligationsSurfaceKey,
+  hrComplianceUiCopy,
+} from "./employee-management/compliance-regulatory-tracking/metadata";
+
+export {
+  hrComplianceRoutePaths,
+  type HrComplianceRoutePath,
+} from "./employee-management/compliance-regulatory-tracking/contracts/hr.workforce.compliance-route.contract";
+
+export {
+  resolveHrModuleNavItems,
+  type HrModuleNavItem,
+} from "./navigation/hr-module-nav.contract";
+
+export {
+  hrComplianceExceptionSearchParam,
+} from "./employee-management/compliance-regulatory-tracking/surface/hr.workforce.compliance-exceptions-list.surface";
+export {
+  hrComplianceLaborLawSearchParam,
+} from "./employee-management/compliance-regulatory-tracking/surface/hr.workforce.compliance-labor-law-requirements-list.surface";
+export {
+  hrComplianceObligationSearchParam,
+} from "./employee-management/compliance-regulatory-tracking/surface/hr.workforce.compliance-obligations-list.surface";
 
 export const hrDocumentsUiCopy = {
   page: {

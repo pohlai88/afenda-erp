@@ -26,16 +26,25 @@
     }
   },
   "dependencies": {
-    "@afenda/kernel": "workspace:*",
+    "@afenda/auth": "workspace:*",
+    "@afenda/db": "workspace:*",
     "@afenda/governed-surface": "workspace:*",
-    "@afenda/ui": "workspace:*"
+    "@afenda/kernel": "workspace:*",
+    "@afenda/ui": "workspace:*",
+    "zod": "catalog:"
   },
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "lint": "tsc -p tsconfig.json --noEmit"
+    "lint": "tsc -p tsconfig.json --noEmit",
+    "check:vertical-naming": "tsx scripts/check-hr-feature-vertical-naming.mts",
+    "test": "vitest run --config vitest.config.ts"
   },
   "devDependencies": {
-    "@afenda/config": "workspace:*"
+    "@afenda/config": "workspace:*",
+    "next": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "vitest": "catalog:"
   }
 }

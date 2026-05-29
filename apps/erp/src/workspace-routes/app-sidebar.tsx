@@ -36,7 +36,7 @@ function NavItem({
             <span className="truncate font-semibold">{label}</span>
             <span
               className={cn(
-                "truncate text-xs leading-5 font-normal",
+                "truncate type-caption leading-5 font-normal",
                 isActive ? "text-sidebar-accent-foreground/80" : "text-muted-foreground",
               )}
             >

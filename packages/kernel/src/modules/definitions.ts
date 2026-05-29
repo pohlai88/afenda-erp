@@ -363,6 +363,7 @@ const modules = [
     ],
     defaultViews: ["Workforce changes", "Leave pressure", "Record quality"],
     actions: [
+      { label: "Compliance obligations", href: "/hr/compliance" },
       { label: "Open approvals", href: "/approvals" },
       { label: "Check system admin", href: "/system-admin" },
     ],

@@ -1,5 +1,4 @@
-/**
- * @afenda-bucket components
- * Scaffold placeholder from packages/_template-definition.
- */
-export {};
+/** @afenda-bucket components */
+export * from "./hr.workforce.compliance-forms.component.client";
+export * from "./hr.workforce.compliance-list-trailing.component.client";
+export * from "./hr.workforce.compliance-section.component.server";

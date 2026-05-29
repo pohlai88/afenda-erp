@@ -97,6 +97,19 @@ export const hrComplianceExceptionStatusEnum = pgEnum(
   ["open", "in_progress", "resolved", "waived"],
 );
 
+export const hrComplianceRequirementStatusEnum = pgEnum(
+  "hr_compliance_requirement_status",
+  [
+    "compliant",
+    "pending",
+    "at_risk",
+    "overdue",
+    "expired",
+    "waived",
+    "non_compliant",
+  ],
+);
+
 export const hrComplianceFilingStatusEnum = pgEnum("hr_compliance_filing_status", [
   "pending",
   "submitted",
@@ -254,6 +267,11 @@ export const hrEmployees = pgTable(
     }),
     probationEndDate: timestamp("probation_end_date", { withTimezone: true }),
     confirmationDate: timestamp("confirmation_date", { withTimezone: true }),
+    countryCode: text("country_code"),
+    legalEntityCode: text("legal_entity_code"),
+    workLocationCode: text("work_location_code"),
+    employmentType: text("employment_type"),
+    workerCategory: text("worker_category"),
     archivedAt: timestamp("archived_at", { withTimezone: true }),
     ...timestampColumns,
   },
@@ -607,6 +625,11 @@ export const hrComplianceObligations = pgTable(
     status: hrComplianceObligationStatusEnum("status")
       .notNull()
       .default("active"),
+    countryCode: text("country_code"),
+    legalEntityCode: text("legal_entity_code"),
+    workLocationCode: text("work_location_code"),
+    employmentType: text("employment_type"),
+    workerCategory: text("worker_category"),
     departmentId: text("department_id").references(() => hrDepartments.id, {
       onDelete: "set null",
     }),
@@ -627,6 +650,12 @@ export const hrComplianceObligations = pgTable(
     index("hr_compliance_obligations_org_area_idx").on(
       table.organizationId,
       table.complianceArea,
+      table.status,
+    ),
+    index("hr_compliance_obligations_org_scope_idx").on(
+      table.organizationId,
+      table.countryCode,
+      table.legalEntityCode,
       table.status,
     ),
   ],
@@ -670,6 +699,42 @@ export const hrComplianceExceptions = pgTable(
       table.organizationId,
       table.complianceArea,
       table.status,
+    ),
+  ],
+);
+
+export const hrComplianceEmployeeRequirements = pgTable(
+  "hr_compliance_employee_requirements",
+  {
+    id: text("id").primaryKey(),
+    organizationId: organizationReference(),
+    employeeId: text("employee_id")
+      .notNull()
+      .references(() => hrEmployees.id, { onDelete: "cascade" }),
+    obligationId: text("obligation_id")
+      .notNull()
+      .references(() => hrComplianceObligations.id, { onDelete: "cascade" }),
+    status: hrComplianceRequirementStatusEnum("status")
+      .notNull()
+      .default("pending"),
+    dueDate: timestamp("due_date", { withTimezone: true }),
+    completedAt: timestamp("completed_at", { withTimezone: true }),
+    reviewNotes: text("review_notes"),
+    ...timestampColumns,
+  },
+  (table) => [
+    uniqueIndex("hr_compliance_employee_requirements_org_emp_obl_uidx").on(
+      table.organizationId,
+      table.employeeId,
+      table.obligationId,
+    ),
+    index("hr_compliance_employee_requirements_org_status_idx").on(
+      table.organizationId,
+      table.status,
+    ),
+    index("hr_compliance_employee_requirements_org_employee_idx").on(
+      table.organizationId,
+      table.employeeId,
     ),
   ],
 );

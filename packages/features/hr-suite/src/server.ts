@@ -8,6 +8,30 @@ import { SectionPanel } from "@afenda/ui";
  */
 export * from "./metadata";
 
+export {
+  HrComplianceAccessDenied,
+  HrComplianceAccessDeniedPanel,
+  HrComplianceOrganizationScopeError,
+  HrComplianceSection,
+  HrComplianceWorkbenchSection,
+  archiveHrComplianceObligationAction,
+  assignHrComplianceCorrectiveActionAction,
+  buildHrCompliancePageModel,
+  createHrComplianceExceptionAction,
+  loadComplianceFormOptions,
+  parseHrComplianceSearchParams,
+  requireHrComplianceRead,
+  requireHrComplianceWrite,
+  resolveHrComplianceExceptionAction,
+  syncHrEmployeeLaborLawRequirementsAction,
+  updateHrComplianceCorrectiveActionProgressAction,
+  updateHrEmployeeLaborLawRequirementAction,
+  upsertHrComplianceObligationAction,
+  waiveHrComplianceExceptionAction,
+} from "./employee-management/compliance-regulatory-tracking/server";
+
+export { requireHrRead } from "./policies/hr-module-access.policy.server";
+
 function denied() {
   throw new Error("HR Suite not yet implemented.");
 }
@@ -36,12 +60,6 @@ export function HrAttendanceAccessDenied() {
   return React.createElement(EmptyState, {
     title: "Access restricted",
     description: "Attendance is not available.",
-  });
-}
-export function HrComplianceAccessDenied() {
-  return React.createElement(EmptyState, {
-    title: "Access restricted",
-    description: "Compliance is not available.",
   });
 }
 export function HrDocumentsAccessDenied() {
@@ -96,9 +114,6 @@ export function HrShiftsAccessDenied() {
 export function HrAttendanceSection(_props: any) {
   return React.createElement(EmptyState, { title: "Attendance" });
 }
-export function HrComplianceSection(_props: any) {
-  return React.createElement(EmptyState, { title: "Compliance" });
-}
 export function HrDocumentsSection(_props: any) {
   return React.createElement(EmptyState, { title: "Documents" });
 }
@@ -150,10 +165,6 @@ export async function requireHrAttendanceRead() {
   denied();
   return { organization: { id: "" }, canWrite: false };
 }
-export async function requireHrComplianceRead() {
-  denied();
-  return { organization: { id: "" }, canWrite: false };
-}
 export async function requireHrDocumentsRead() {
   denied();
   return { organization: { id: "" }, canWrite: false };
@@ -190,15 +201,6 @@ export async function buildHrEmployeesPageModel(_args: any) {
 export async function buildHrAttendancePageModel(_args: any) {
   denied();
   return { window: { rows: [] }, searchValue: "" };
-}
-export async function buildHrCompliancePageModel(_args: any) {
-  denied();
-  return {
-    obligationsWindow: { rows: [] },
-    exceptionsWindow: { rows: [] },
-    obligationsSearch: "",
-    exceptionsSearch: "",
-  };
 }
 export async function buildHrDocumentsPageModel(_args: any) {
   denied();
@@ -238,10 +240,6 @@ export async function buildHrShiftsPageModel(_args: any) {
 export async function listHrEmployeeDirectory(_args: any) {
   denied();
   return { rows: [] as Array<{ id: string; employeeNumber: string; displayName: string }> };
-}
-export async function loadHrLifecycleFormOptions(_organizationId?: string) {
-  denied();
-  return { employees: [] as Array<{ id: string; label: string }>, formOptions: {} };
 }
 export async function loadHrOnboardingFormOptions(_organizationId?: string) {
   denied();

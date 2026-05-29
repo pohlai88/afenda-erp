@@ -1,5 +1,2 @@
-/**
- * @afenda-bucket actions
- * Scaffold placeholder from packages/_template-definition.
- */
-export {};
+/** @afenda-bucket actions */
+export * from "./hr.workforce.compliance.actions.server";

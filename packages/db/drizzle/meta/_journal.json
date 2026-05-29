@@ -141,6 +141,20 @@
       "when": 1780042680240,
       "tag": "0019_tiny_fixer",
       "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1780060889258,
+      "tag": "0020_handy_stephen_strange",
+      "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1780065453125,
+      "tag": "0021_giant_forgotten_one",
+      "breakpoints": true
     }
   ]
 }
