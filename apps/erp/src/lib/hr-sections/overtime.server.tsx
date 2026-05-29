@@ -1,12 +1,12 @@
 import { hrRoutePaths } from "@/lib/hr-route.shared";
-import { hrOvertimeUiCopy } from "@afenda/feature-hr/metadata";
+import { hrOvertimeUiCopy } from "@afenda/feature-hr-suite/metadata";
 import {
   buildHrOvertimePageModel,
   HrOvertimeAccessDenied,
   HrOvertimeSection,
   loadHrLifecycleFormOptions,
   requireHrOvertimeRead,
-} from "@afenda/feature-hr/server";
+} from "@afenda/feature-hr-suite/server";
 import { SectionPanel } from "@afenda/ui";
 import Link from "next/link";
 import type { Metadata } from "next";

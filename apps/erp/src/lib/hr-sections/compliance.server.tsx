@@ -1,12 +1,12 @@
 import { hrRoutePaths } from "@/lib/hr-route.shared";
-import { hrComplianceUiCopy } from "@afenda/feature-hr/metadata";
+import { hrComplianceUiCopy } from "@afenda/feature-hr-suite/metadata";
 import {
   buildHrCompliancePageModel,
   HrComplianceAccessDenied,
   HrComplianceSection,
   loadHrLifecycleFormOptions,
   requireHrComplianceRead,
-} from "@afenda/feature-hr/server";
+} from "@afenda/feature-hr-suite/server";
 import { SectionPanel } from "@afenda/ui";
 import Link from "next/link";
 import type { Metadata } from "next";

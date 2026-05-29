@@ -1,12 +1,12 @@
 import { hrRoutePaths } from "@/lib/hr-route.shared";
-import { hrEmployeesUiCopy } from "@afenda/feature-hr/metadata";
+import { hrEmployeesUiCopy } from "@afenda/feature-hr-suite/metadata";
 import {
   getHrEmployeeDetail,
   HrEmployeeDetailSection,
   listHrEmployeeLifecycleEvents,
   loadHrEmployeeFormOptions,
   requireHrEmployeesRead,
-} from "@afenda/feature-hr/server";
+} from "@afenda/feature-hr-suite/server";
 import { SectionPanel } from "@afenda/ui";
 import Link from "next/link";
 import { notFound } from "next/navigation";

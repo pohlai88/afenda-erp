@@ -1,12 +1,12 @@
 import { hrRoutePaths } from "@/lib/hr-route.shared";
-import { hrShiftsUiCopy } from "@afenda/feature-hr/metadata";
+import { hrShiftsUiCopy } from "@afenda/feature-hr-suite/metadata";
 import {
   buildHrShiftsPageModel,
   HrShiftsAccessDenied,
   HrShiftsSection,
   loadHrLifecycleFormOptions,
   requireHrShiftsRead,
-} from "@afenda/feature-hr/server";
+} from "@afenda/feature-hr-suite/server";
 import { SectionPanel } from "@afenda/ui";
 import Link from "next/link";
 import type { Metadata } from "next";

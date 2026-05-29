@@ -40,7 +40,6 @@
     "audit:skeleton-parity": "tsx packages/governed-surface/scripts/audit-streaming-skeleton-parity.mts --strict",
     "audit:list-surface-chrome": "tsx packages/governed-surface/scripts/audit-list-surface-chrome.mts --strict",
     "lint:lynx-brand": "tsx scripts/lint-lynx-brand.mts",
-    "hr:inventory-legacy": "tsx packages/features/hr/scripts/inventory-legacy-hrm.mts",
     "scaffold:feature": "tsx packages/_template-definition/scripts/scaffold-feature.mts",
     "scaffold:vertical": "tsx packages/_template-definition/scripts/scaffold-vertical.mts",
     "validate:feature-shape": "tsx packages/_template-definition/scripts/validate-feature-shape.mts",

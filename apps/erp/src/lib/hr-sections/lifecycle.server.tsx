@@ -1,12 +1,12 @@
 import { hrRoutePaths } from "@/lib/hr-route.shared";
-import { hrLifecycleUiCopy } from "@afenda/feature-hr/metadata";
+import { hrLifecycleUiCopy } from "@afenda/feature-hr-suite/metadata";
 import {
   buildHrLifecyclePageModel,
   HrLifecycleAccessDenied,
   HrLifecycleSection,
   loadHrLifecycleFormOptions,
   requireHrLifecycleRead,
-} from "@afenda/feature-hr/server";
+} from "@afenda/feature-hr-suite/server";
 import { SectionPanel } from "@afenda/ui";
 import Link from "next/link";
 import type { Metadata } from "next";
