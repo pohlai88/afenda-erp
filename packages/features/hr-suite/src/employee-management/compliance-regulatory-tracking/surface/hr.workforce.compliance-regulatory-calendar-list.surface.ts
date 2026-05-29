@@ -16,6 +16,7 @@ import {
   resolveRegulatoryCalendarPostureRowTone,
   resolveRegulatoryCalendarSourceStatusBadgeTone,
 } from "./hr.workforce.compliance-list.shared";
+import { maskComplianceSensitiveStoredValue } from "../data/hr.workforce.compliance-sensitive-access.shared";
 import { hrComplianceRegulatoryCalendarColumnsId } from "./hr.workforce.compliance-surface-columns.shared";
 import { hrComplianceUiCopy } from "./hr.workforce.compliance-ui.copy.shared";
 
@@ -28,8 +29,10 @@ export const hrComplianceRegulatoryCalendarSearchParam =
 export function buildHrComplianceRegulatoryCalendarListSurface(input: {
   window: HrComplianceRegulatoryCalendarWindow;
   searchValue?: string;
+  canViewSensitive?: boolean;
+  now?: Date;
 }): ListSurfaceRendererConfigurationResolvedInput {
-  const { window, searchValue } = input;
+  const { window, searchValue, canViewSensitive = false, now } = input;
   const copy = hrComplianceUiCopy.regulatoryCalendar;
 
   return buildComplianceOperationalListSurface({
@@ -93,13 +96,19 @@ export function buildHrComplianceRegulatoryCalendarListSurface(input: {
       const posture = deriveRegulatoryCalendarPosture({
         deadlineAt: row.deadlineAt,
       });
+      const redactedDocumentNumber = maskComplianceSensitiveStoredValue(
+        row.documentNumber,
+        canViewSensitive,
+      );
       const effectiveSourceStatus = deriveRegulatoryCalendarEffectiveSourceStatus(
         {
           entryKind: row.entryKind,
           sourceStatus: row.sourceStatus,
           deadlineAt: row.deadlineAt,
           requirementKind: row.requirementKind,
-          documentNumber: row.documentNumber,
+          documentNumber: redactedDocumentNumber || null,
+          linkedEvidenceCount: row.linkedEvidenceCount,
+          now,
         },
       );
 

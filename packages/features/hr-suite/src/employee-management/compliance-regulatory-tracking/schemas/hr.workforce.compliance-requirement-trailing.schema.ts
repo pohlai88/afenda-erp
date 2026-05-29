@@ -31,6 +31,9 @@ export const updateHrEmployeeWorkplaceSafetyRequirementFormSchema =
 export const updateHrEmployeePolicyAcknowledgementFormSchema =
   complianceRequirementTrailingBaseSchema;
 
+export const updateHrEmployeeStatutoryRequirementFormSchema =
+  complianceRequirementTrailingBaseSchema;
+
 export type UpdateHrEmployeeLaborLawRequirementFormInput = z.infer<
   typeof updateHrEmployeeLaborLawRequirementFormSchema
 >;
@@ -45,6 +48,10 @@ export type UpdateHrEmployeeWorkplaceSafetyRequirementFormInput = z.infer<
 
 export type UpdateHrEmployeePolicyAcknowledgementFormInput = z.infer<
   typeof updateHrEmployeePolicyAcknowledgementFormSchema
+>;
+
+export type UpdateHrEmployeeStatutoryRequirementFormInput = z.infer<
+  typeof updateHrEmployeeStatutoryRequirementFormSchema
 >;
 
 export function parseUpdateHrEmployeeLaborLawRequirementForm(formData: FormData) {
@@ -84,6 +91,14 @@ export function parseUpdateHrEmployeeWorkplaceSafetyRequirementForm(
 }
 
 export function parseUpdateHrEmployeePolicyAcknowledgementForm(formData: FormData) {
+  return complianceRequirementTrailingBaseSchema.safeParse({
+    requirementId: readComplianceFormTextField(formData, "requirementId"),
+    status: readComplianceFormTextField(formData, "status"),
+    reviewNotes: readComplianceFormTextField(formData, "reviewNotes"),
+  });
+}
+
+export function parseUpdateHrEmployeeStatutoryRequirementForm(formData: FormData) {
   return complianceRequirementTrailingBaseSchema.safeParse({
     requirementId: readComplianceFormTextField(formData, "requirementId"),
     status: readComplianceFormTextField(formData, "status"),

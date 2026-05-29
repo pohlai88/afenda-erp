@@ -1,5 +1,6 @@
 import { appBrandName, getAppShellSkeletonNavItemIds } from "@afenda/kernel";
 import { Skeleton } from "@afenda/ui/skeleton";
+import { HR_COMPLIANCE_LIST_SURFACE_KEYS } from "@afenda/feature-hr-suite/metadata";
 import { ui } from "@afenda/ui/design-system";
 import { cn } from "@afenda/ui/utils";
 import Link from "next/link";
@@ -149,7 +150,7 @@ export function HrCompliancePageSkeleton() {
       aria-label="Loading HR compliance"
     >
       <Skeleton className="h-20 w-full max-w-2xl rounded-panel" />
-      {Array.from({ length: 11 }, (_, index) => (
+      {Array.from({ length: HR_COMPLIANCE_LIST_SURFACE_KEYS.length }, (_, index) => (
         <SystemAdminListSectionPlaceholder
           key={`hr-compliance-list-${index}`}
         />

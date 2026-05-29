@@ -1,4 +1,6 @@
 export {
+  HrComplianceEvidenceLinkForm,
+  HrComplianceEvidenceLinksTrailingCell,
   HrComplianceExceptionCreateForm,
   HrComplianceExceptionsTrailingCell,
   HrComplianceFilingsTrailingCell,

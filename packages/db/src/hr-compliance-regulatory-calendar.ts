@@ -1,5 +1,6 @@
 import { and, eq, inArray, isNotNull, notInArray } from "drizzle-orm";
 import { runWithOrganizationContext } from "./client";
+import { buildWorkAuthLinkedEvidenceCountSelect } from "./hr-compliance-evidence-links";
 import { activeFilingObligationKindCondition } from "./hr-compliance-filings.shared";
 import {
   HR_COMPLIANCE_REGULATORY_CALENDAR_MERGE_CAP,
@@ -29,6 +30,7 @@ type CalendarEntryDraft = {
   requirementKind: string | null;
   employeeId: string | null;
   documentNumber?: string | null;
+  linkedEvidenceCount?: number;
   searchText: string;
 };
 
@@ -162,6 +164,9 @@ export async function listHrComplianceRegulatoryCalendarWindow(input: {
           status: hrComplianceWorkAuthorizationDocuments.status,
           documentNumber: hrComplianceWorkAuthorizationDocuments.documentNumber,
           expiresAt: hrComplianceWorkAuthorizationDocuments.expiresAt,
+          linkedEvidenceCount: buildWorkAuthLinkedEvidenceCountSelect(
+            input.organizationId,
+          ),
         })
         .from(hrComplianceWorkAuthorizationDocuments)
         .innerJoin(
@@ -273,6 +278,7 @@ export async function listHrComplianceRegulatoryCalendarWindow(input: {
         requirementKind: null,
         employeeId: row.employeeId,
         documentNumber: row.documentNumber,
+        linkedEvidenceCount: Number(row.linkedEvidenceCount ?? 0),
         searchText: `${title} ${subjectLabel} ${row.documentType}`,
       });
     }
@@ -321,6 +327,9 @@ export async function listHrComplianceRegulatoryCalendarWindow(input: {
       employeeId: entry.employeeId,
       ...(entry.documentNumber !== undefined
         ? { documentNumber: entry.documentNumber }
+        : undefined),
+      ...(entry.linkedEvidenceCount !== undefined
+        ? { linkedEvidenceCount: entry.linkedEvidenceCount }
         : undefined),
     }));
 

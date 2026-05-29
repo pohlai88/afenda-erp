@@ -4,3 +4,4 @@
  */
 export * from "./components/hr.workforce.compliance-forms.component.client";
 export * from "./components/hr.workforce.compliance-list-trailing.component.client";
+export * from "./components/hr.workforce.compliance-reports.component.client";

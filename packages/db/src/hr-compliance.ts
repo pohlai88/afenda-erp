@@ -10,6 +10,11 @@ export {
 } from "./hr-compliance-labor-law.shared";
 
 export {
+  HR_COMPLIANCE_STATUTORY_REQUIREMENT_KIND,
+  activeStatutoryObligationKindCondition,
+} from "./hr-compliance-statutory.shared";
+
+export {
   activeSafetyTrainingObligationKindCondition,
   HR_COMPLIANCE_SAFETY_TRAINING_REQUIREMENT_KIND,
   isSafetyTrainingRequirementKind,
@@ -106,6 +111,10 @@ export {
   type HrComplianceAlertSeverity,
   type HrComplianceAlertSourceKind,
   type HrComplianceAlertWindow,
+  type HrComplianceEvidenceLinkRow,
+  type HrComplianceEvidenceLinkWindow,
+  type HrComplianceReviewQueueRow,
+  type HrComplianceReviewQueueWindow,
 } from "./hr-compliance.types";
 
 export {
@@ -167,6 +176,30 @@ export {
 } from "./hr-compliance-labor-law";
 
 export {
+  listHrEmployeeStatutoryRequirementsWindow,
+  syncHrEmployeeStatutoryRequirements,
+  syncHrEmployeeStatutoryRequirementsInTx,
+  updateHrEmployeeStatutoryRequirementStatus,
+  updateHrEmployeeStatutoryRequirementStatusInTx,
+} from "./hr-compliance-statutory";
+
+export {
+  loadHrComplianceOverviewSnapshot,
+  HR_COMPLIANCE_OVERVIEW_DIMENSIONS,
+  HR_COMPLIANCE_REPORT_EXPORT_ROW_CAP,
+  HR_COMPLIANCE_REPORT_KINDS,
+  type HrComplianceOverviewDimension,
+  type HrComplianceReportKind,
+} from "./hr-compliance-overview";
+
+export type {
+  HrEmployeeStatutoryRequirementRow,
+  HrEmployeeStatutoryRequirementWindow,
+  HrComplianceOverviewDimensionBreakdownRow,
+  HrComplianceOverviewSnapshot,
+} from "./hr-compliance.types";
+
+export {
   listHrEmployeeSafetyTrainingRequirementsWindow,
   syncHrEmployeeSafetyTrainingRequirements,
   syncHrEmployeeSafetyTrainingRequirementsInTx,
@@ -217,3 +250,35 @@ export {
 export { listHrComplianceRegulatoryCalendarWindow } from "./hr-compliance-regulatory-calendar";
 
 export { listHrComplianceAlertsWindow } from "./hr-compliance-alerts";
+
+export { listHrComplianceReviewQueueWindow } from "./hr-compliance-review-queue";
+
+export {
+  HR_COMPLIANCE_REVIEW_QUEUE_ENTRY_KINDS,
+  buildHrComplianceReviewQueueRowId,
+  parseHrComplianceReviewQueueRowId,
+  type HrComplianceReviewQueueEntryKind,
+} from "./hr-compliance-review-queue.shared";
+
+export {
+  HR_COMPLIANCE_EVIDENCE_RECORD_KINDS,
+  HR_COMPLIANCE_EVIDENCE_SUBMISSION_STATES,
+  isHrComplianceEvidenceRecordKind,
+  isHrComplianceEvidenceSubmissionState,
+  type HrComplianceEvidenceRecordKind,
+  type HrComplianceEvidenceSubmissionState,
+} from "./hr-compliance-evidence-links.shared";
+
+export {
+  buildWorkAuthLinkedEvidenceCountSelect,
+  countHrComplianceEvidenceLinksForRecord,
+  linkHrComplianceEvidence,
+  linkHrComplianceEvidenceInTx,
+  listHrComplianceEvidenceLinksWindow,
+  loadHrComplianceEvidenceLinkAccessScopeInTx,
+  loadHrEmployeeDocumentClassificationInTx,
+  unlinkHrComplianceEvidence,
+  unlinkHrComplianceEvidenceInTx,
+  updateHrComplianceEvidenceSubmissionState,
+  updateHrComplianceEvidenceSubmissionStateInTx,
+} from "./hr-compliance-evidence-links";

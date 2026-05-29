@@ -143,7 +143,23 @@ Compliance obligations are stored in `hr_compliance_obligations` with optional s
 
 Commands live in `@afenda/db` (`hr-compliance.ts` re-exports obligations, filings, regulatory calendar, exceptions, labor-law, policy-acknowledgement, safety-training, workplace-safety, work-eligibility, and work-authorization modules). Feature surfaces and forms live under `packages/features/hr-suite/src/employee-management/compliance-regulatory-tracking/`. Employee applicability uses `appliesComplianceObligationToEmployee()` — every configured dimension must match; unset obligation dimensions are wildcards.
 
-Permissions: `hr.compliance.read`, `hr.compliance.write`. Route revalidation target: `/hr/compliance`.
+Permissions: `hr.compliance.read`, `hr.compliance.write`, `hr.compliance.sensitive.read`. Route revalidation target: `/hr/compliance`.
+
+## HRM-CMP-024 As-built
+
+Sensitive compliance detail is gated by execution capability `hr.compliance.sensitive.read` in addition to module read/write.
+
+
+| Layer         | Responsibility                                                                                                                                                                                                 |
+| ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Capability    | `hr.compliance.sensitive.read` in `@afenda/auth`, seeded in `seed-permissions.mts`, routed to `/hr/compliance` in execution capabilities                                                                     |
+| Access policy | `requireHrComplianceRead()` exposes `canViewSensitive`; `requireHrComplianceSensitiveWrite()` guards sensitive mutations (write + sensitive read)                                                                |
+| Sensitive scope | Work authorization document numbers and review notes; work eligibility review notes; evidence links whose employee document classification is `confidential` or `restricted`                                     |
+| Read model    | `buildHrCompliancePageModel` accepts `canViewSensitive`; surface builders mask display text and clear serialized trailing cell values via `hr.workforce.compliance-sensitive-access.shared.ts`; alerts and regulatory calendar redact `documentNumber` before work-auth status derivation; audit trail metadata masked at query time |
+| Document picker | `loadComplianceDocumentPickerOptions` excludes confidential/restricted employee documents when `canViewSensitive` is false                                                                                     |
+| Governed UI   | Work authorization, work eligibility, evidence link, audit trail, and alerts Pattern C sections show an `Alert` when sensitive detail is restricted; trailing actions on sensitive registers require write **and** sensitive read; helper defaults fail closed (`canViewSensitive` false when omitted) |
+| Mutations     | Work authorization and work eligibility updates use `requireHrComplianceSensitiveWrite()`; evidence link/unlink/submission checks record kind and linked document classification before allowing the mutation |
+| App adapter   | `apps/erp/src/lib/hr-sections/compliance.server.tsx` resolves `canViewSensitive` once from the read guard and passes it through `toHrCompliancePageModelInput`                                                  |
 
 ## HRM-CMP-002 As-built
 
@@ -242,7 +258,7 @@ Employee-level compliance posture uses the `hr_compliance_requirement_status` en
 | `@afenda/db`  | `hr_compliance_requirement_status` enum; `normalizeStoredRequirementStatusForMutation()` coerces derived-only writes to `pending`; search helpers match derived tokens `overdue` / `at risk` / `missing`         |
 | Feature data  | `HRM_COMPLIANCE_REQUIREMENT_*` constants and thin wrappers over `@afenda/db` `deriveRequirementEffectiveStatus()` in `hr.workforce.compliance-status.shared.ts`; filing/work-auth/eligibility wrappers delegate to `hr-compliance-effective-status.shared.ts`; `toEnumMember()` in `hr.workforce.compliance-enum-guard.shared.ts` rejects unexpected derivation output |
 | Zod           | Trailing schemas accept `HRM_COMPLIANCE_REQUIREMENT_STORED_STATUSES` only — derived tokens rejected at the form boundary                                                                                       |
-| Governed UI   | Status column displays `effectiveStatusValue`; trailing selects prefill `trailingStatusValue` (stored posture); badge/row tones via `resolve*RequirementListBadgeTone()` on all seven effective tokens          |
+| Governed UI   | Status column displays `effectiveStatusValue`; trailing selects prefill `trailingStatusValue` (stored posture); badge tones via `resolve*BadgeTone()` and row scanability via dedicated `resolve*RowTone()` helpers (`resolveRequirementListRowTone`, `resolveFilingListRowTone`, `resolveWorkEligibilityListRowTone`, `resolveWorkAuthDocumentListRowTone`, `resolveComplianceObligationRowTone`, etc.) on all effective tokens |
 | Surfaces      | Labor law, policy acknowledgments, safety training, workplace safety Pattern C lists; regulatory calendar `employee_requirement` rows reuse the same derivation for `effectiveSourceStatusValue`                 |
 
 
@@ -277,7 +293,37 @@ Compliance exceptions are auto-materialized from detected obligation gaps and re
 | Materialization | Page load runs `runHrComplianceSourceSyncSteps` first, then `syncHrComplianceExceptions` via `runHrCompliancePageLoadSync` in `buildHrCompliancePageModel` — exception gap detection reads fresh requirement/filing/eligibility rows |
 | Verification    | Unit: `compliance-exception-sync.test.ts`, `compliance-page-model-sync.test.ts`, `compliance-exception-trailing-config.test.ts`; integration (when `DATABASE_URL` set): `hr-compliance-commands.integration.test.ts` — filing overdue auto-resolve/reopen cycle |
 | Governed UI   | Pattern C surface `hr.workforce.compliance.exceptions.list` lists open exceptions (`openOnly`); serializes `gapKind` (falls back to `itemType` for manual rows); search matches `gap_kind`; empty copy documents auto-detection plus manual create                             |
-| Mutations     | Manual `createHrComplianceExceptionAction` unchanged (no `sourceReferenceId`); corrective action / resolve / waive workflows unchanged                                                                                                                                        |
+| Mutations     | Manual `createHrComplianceExceptionAction` accepts optional corrective owner/due pair at create (no `sourceReferenceId`); assign owner/due date, progress update, resolve, and waive workflows on open exceptions |
+
+## HRM-CMP-018 As-built
+
+Corrective action owners and due dates are assigned on open compliance exceptions via trailing row actions and optional fields at manual create.
+
+
+| Layer         | Responsibility                                                                                                                                                                                                 |
+| ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `@afenda/db`  | `corrective_action_owner_employee_id` FK on `hr_compliance_exceptions`; `assignHrComplianceCorrectiveAction` / `assignHrComplianceCorrectiveActionInTx`; org-scoped owner validation via `assertComplianceOwnerEmployeeInOrg` (active, non-archived employee in org) |
+| Assignment    | Sets `status: in_progress`, `correctiveActionDescription`, `correctiveActionOwnerEmployeeId`, and `correctiveActionDueDate`; manual create accepts the same optional owner/due fields as a pair (both required to enter `in_progress`)                        |
+| Governed UI   | Pattern C surface `hr.workforce.compliance.exceptions.list` — **Corrective owner** column; manual create form with optional owner/due pair; trailing assign form with labeled employee picker (`correctiveActionOwnerEmployeeIdValue`, `correctiveActionDescriptionValue` prefill); serialized `correctiveDuePostureValue` and due-date badge tone for in-progress rows; page model loads **active** employee directory (cap 200) for picker options |
+| Search        | `complianceExceptionSearch` matches corrective owner employee number and name in addition to exception subject employee; token `overdue` matches in-progress rows with past corrective due dates                                                                                        |
+| Calendar      | HRM-CMP-010 includes open corrective actions with due dates (`corrective_action` entry kind)                                                                                                                   |
+| Alerts        | HRM-CMP-016 surfaces overdue corrective actions with due dates                                                                                                                                                 |
+
+
+## HRM-CMP-019 As-built
+
+Corrective action progress and completion are tracked on exception rows through status transitions, appended progress notes, and resolve/waive closure.
+
+
+| Layer         | Responsibility                                                                                                                                                                                                 |
+| ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `@afenda/db`  | `updateHrComplianceCorrectiveActionProgress` appends dated progress lines to `correctiveActionDescription` while `status` remains `in_progress`; requires prior assignment (`corrective_action_not_assigned` when still `open`); `resolveHrComplianceException` / `waiveHrComplianceException` close the case |
+| Progress model | Progress notes are prefixed `[YYYY-MM-DD]` and appended to the corrective action description; assignment and progress both keep `in_progress` until resolve/waive                                                                               |
+| Completion    | **Resolve** sets `status: resolved` with optional `resolutionNote` and `resolvedAt`; **Waive** sets `status: waived` with waiver metadata — both are terminal for trailing actions                                                               |
+| Auto-sync     | HRM-CMP-017 auto-reopen clears owner, due date, and description residue via `buildAutoReopenedComplianceExceptionValues` when a recurring gap reopens                                                                                           |
+| Governed UI   | Trailing **Assign corrective action** on `open` or `in_progress`; **Update progress** only when `in_progress`; **Resolve** and **Waive** on open exceptions; field labels use dedicated copy keys (`trailingCorrectiveDescriptionLabel`, `trailingProgressNoteLabel`, `trailingResolutionNoteLabel`) — submit buttons remain action verbs; status badge reflects `open` → `in_progress` → `resolved` / `waived`; overdue corrective due dates escalate row tone to critical (aligned with HRM-CMP-016 alerts)                                                                                     |
+| Verification  | Unit: `compliance-exception-trailing-config.test.ts`, `compliance-trailing-serialization.test.ts`; integration (when `DATABASE_URL` set): assign/progress/resolve in `hr-compliance-commands.integration.test.ts`; E2E: trailing assign/progress/resolve in `apps/erp/tests/e2e/hr-compliance.spec.ts` |
+| Audit         | `hr.compliance.exception.corrective_action.assign`, `hr.compliance.exception.corrective_action.update`, `hr.compliance.exception.resolve`, `hr.compliance.exception.waive` (HRM-CMP-025)                                                        |
 
 
 ## HRM-CMP-007 As-built
@@ -383,40 +429,134 @@ The regulatory calendar aggregates org-scoped compliance deadlines from filings,
 | `@afenda/db`    | `listHrComplianceRegulatoryCalendarWindow` — merges bounded sources (cap 1000), sorts by `deadlineAt` ascending; sets `mergeTruncated` when sources exceed cap                                                                                                                                      |
 | Entry kinds     | `filing`, `employee_requirement`, `work_eligibility_renewal`, `work_auth_renewal`, `corrective_action`                                                                                                                                                                                              |
 | Posture model   | `@afenda/db` `deriveComplianceDeadlinePosture()` → `upcoming`, `due_today`, `overdue` (UTC calendar-day boundaries); feature door `deriveRegulatoryCalendarPosture()` delegates to the same function                                                                                                |
-| Source status   | Feature `deriveRegulatoryCalendarEffectiveSourceStatus()` aligns displayed status with sibling list surfaces (filing overdue, requirement at_risk/overdue, eligibility/auth expiry); work authorization renewals pass `documentNumber` for HRM-CMP-011 evidence alignment                                   |
+| Source status   | Feature `deriveRegulatoryCalendarEffectiveSourceStatus()` aligns displayed status with sibling list surfaces (filing overdue, requirement at_risk/overdue, eligibility/auth expiry); work authorization renewals pass redacted `documentNumber` and `linkedEvidenceCount` for HRM-CMP-011 evidence alignment (HRM-CMP-024 masks document number when sensitive read is denied) |
 | Governed UI     | Read-only Pattern C surface `hr.workforce.compliance.regulatory-calendar.list`, search param `complianceRegulatoryCalendarSearch`; serialized `postureValue`, `effectiveSourceStatusValue`, and `storedSourceStatusValue`; per-row badge tones on deadline type, posture, and derived source status |
 | Materialization | Page load `syncHrComplianceFilings`, employee sync/ensure steps, and `syncHrComplianceExceptions` feed calendar sources                                                                                                                                                                            |
 
 
 Employee-linked rows link to `/hr/records/[recordId]` via `rowHref` when `employeeId` is present (requirements, eligibility, work authorization, and employee-scoped exceptions). Organization-wide filing rows show an org-wide subject label.
 
+## HRM-CMP-020 As-built
+
+Compliance records link to supporting employee documents through `hr_compliance_evidence_links` — a polymorphic junction to `hr_employee_documents` with org-scoped uniqueness on `(recordKind, recordId, employeeDocumentId)`.
+
+
+| Layer         | Responsibility                                                                                                                                                                                                 |
+| ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `@afenda/db`  | `linkHrComplianceEvidenceInTx`, `unlinkHrComplianceEvidenceInTx`, `updateHrComplianceEvidenceSubmissionStateInTx`, `listHrComplianceEvidenceLinksWindow`, `countHrComplianceEvidenceLinksForRecord`               |
+| Record kinds  | `filing`, `employee_requirement`, `work_auth_document`, `work_eligibility`, `exception`                                                                                                                        |
+| Submission    | Reuses migrated enum `hr_compliance_evidence_submission_state` (`draft`, `submitted`, `acknowledged`) on link rows                                                                                             |
+| Validation    | Source record must exist in org; active employee document required; employee-scoped records reject documents for a different employee; list window and work-auth `linkedEvidenceCount` only include links whose document is still `active` |
+| Work-auth integration | `linkedEvidenceCount` on work-auth list window; `normalizeWorkAuthDocumentStatus()` / `deriveWorkAuthEffectiveStatus()` treat linked employee documents as evidence when `documentNumber` is absent (HRM-CMP-011 alignment) |
+| Governed UI   | Pattern C surface `hr.workforce.compliance.evidence-links.list`, search param `complianceEvidenceLinksSearch`; trailing update submission state + unlink; source lists expose **Link evidence** trailing on filings, work authorization, and open exceptions; inline link trailing shows `@afenda/ui` `Alert` when no active documents match the row scope |
+| Mutations     | `linkHrComplianceEvidenceAction`, `unlinkHrComplianceEvidenceAction`, `updateHrComplianceEvidenceSubmissionStateAction` via `finalizeComplianceMutation` with audit events                                   |
+
+
+Document storage remains owned by Document Management (`hr_employee_documents`); compliance owns the link register only.
+
+## HRM-CMP-021 As-built
+
+The compliance review and approval queue is a derived inbox merging submitted filings, pending work eligibility verification, pending work authorization verification, and evidence links awaiting acknowledgment.
+
+
+| Layer         | Responsibility                                                                                                                                                                                                 |
+| ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `@afenda/db`  | `listHrComplianceReviewQueueWindow` — bounded in-memory merge (cap 1000); entry kinds `filing_confirmation`, `work_eligibility_verification`, `work_auth_verification`, `evidence_acknowledgment`             |
+| Feature data  | `hr.workforce.compliance-review-queue.shared.ts` — entry kind labels, required-action copy, `isSensitiveComplianceReviewQueueEntryKind()`                                                                       |
+| Governed UI   | Pattern C surface `hr.workforce.compliance.review-queue.list`, search param `complianceReviewQueueSearch`; serialized `entryKindValue`, `sourceRecordIdValue`; second workbench section after alerts          |
+| Trailing      | `HrComplianceReviewQueueTrailingCell` → `decideHrComplianceReviewQueueItemAction` (approve/reject); sensitive entry kinds require `hr.compliance.sensitive.read` + write for trailing visibility             |
+| Mutations     | Approve/reject routes to filing confirm, eligibility verify, work-auth verify, or evidence acknowledge commands; audit via `reviewQueue.approved` / `reviewQueue.rejected`                                     |
+
+
+## HRM-CMP-003 As-built
+
+Statutory employment compliance tracking uses `hr_compliance_employee_requirements` joined to active `statutory` obligations and `hr_employees` scope columns — same materialization pattern as HRM-CMP-002 labor law.
+
+
+| Layer         | Responsibility                                                                                                                                                                                   |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `@afenda/db`  | `syncHrEmployeeStatutoryRequirements`, `listHrEmployeeStatutoryRequirementsWindow`, `updateHrEmployeeStatutoryRequirementStatus`                                                                 |
+| Applicability | `appliesComplianceObligationToEmployee()` in `hr-compliance-scope.shared.ts`                                                                                                                     |
+| Status model  | HRM-CMP-015 enum; `deriveEffectiveStatutoryRequirementStatus()` derives overdue/at_risk from due dates                                                                                             |
+| Governed UI   | Pattern C surface `hr.workforce.compliance.statutory-requirements.list`, search param `complianceStatutorySearch`; serialized `effectiveStatusValue` and `trailingStatusValue` for trailing cells |
+| Mutations     | `syncHrEmployeeStatutoryRequirementsAction`, `updateHrEmployeeStatutoryRequirementAction` with audit events                                                                                        |
+
+
+Page load runs idempotent sync; write users can re-run sync manually from the workbench.
+
+## HRM-CMP-022 As-built
+
+Compliance overview surfaces aggregate posture KPIs and dimension breakdown rows from `loadHrComplianceOverviewSnapshot`.
+
+
+| Layer         | Responsibility                                                                                                                                                                      |
+| ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `@afenda/db`  | `loadHrComplianceOverviewSnapshot` — parallel counts for open exceptions, critical alerts, overdue filings, pending reviews, and at-risk/overdue employee requirements               |
+| Dimensions    | Breakdown rows by department, legal entity, work location, and worker category with tracked/at-risk/overdue counts                                                                  |
+| Governed UI   | Pattern B stat grid `hr.workforce.compliance.overview.stats` via `GovernedPatternBStatSection`; read-only Pattern C breakdown `hr.workforce.compliance.overview-breakdown.list` at top of workbench |
+| Materialization | Derived at read time after page-load sync; no persisted overview tables                                                                                                            |
+
+
+## HRM-CMP-023 As-built
+
+Exportable compliance reports generate bounded CSV windows (cap 5000 rows) for operator download.
+
+
+| Layer         | Responsibility                                                                                                                                                                      |
+| ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `@afenda/db`  | `HR_COMPLIANCE_REPORT_KINDS`: filings, expiry, exceptions, training, acknowledgments, work eligibility; `HR_COMPLIANCE_REPORT_EXPORT_ROW_CAP`                                      |
+| Feature data  | `buildHrComplianceReportCsv()` in `data/hr.workforce.compliance.reports.shared.server.ts`                                                                                              |
+| Governed UI   | Workbench export panel with `useActionState` download buttons before audit trail                                                                                                      |
+| Mutations     | `exportHrComplianceReportAction` with audit event `hr.compliance.report.export`                                                                                                     |
+
+
 ### Governed UI (Pattern C)
 
-List surfaces use `buildGovernedListSurface` with `erp-operational-table` profile and `dataNature: "table"`. Every builder sets `requiresErpPermission: hr.compliance.read`, `surface.rowKey: "id"`, and a governed `columnsId` registry value (enforced by `compliance-list-eui-contract.test.ts`). ERP composition uses `HrComplianceWorkbenchSection` (`components/hr.workforce.compliance-section.component.server.tsx`) — **eleven** embedded `GovernedPatternCListSection` blocks with `layout="embedded"` (alerts and regulatory calendar are read-only — no trailing column). The workbench imports surface keys and UI copy via explicit `.shared` paths — not the surface builder barrel — to keep the RSC bundle lean.
+List surfaces use `buildGovernedListSurface` with `erp-operational-table` profile and `dataNature: "table"`. Every builder sets `requiresErpPermission: hr.compliance.read`, `surface.rowKey: "id"`, and a governed `columnsId` registry value (enforced by `compliance-list-eui-contract.test.ts`). ERP composition uses `HrComplianceWorkbenchSection` — **Pattern B overview stat groups** at the top, then **fifteen** embedded `GovernedPatternCListSection` blocks with `layout="embedded"` (alerts, regulatory calendar, and audit trail are read-only — no trailing column; review queue trailing actions require write and sensitive read for sensitive entry kinds). Reports export panel sits before audit trail.
 
 
 | Surface key                                                  | Section                                                    |
 | ------------------------------------------------------------ | ---------------------------------------------------------- |
 | `hr.workforce.compliance.alerts.list`                        | Compliance alerts (HRM-CMP-016)                            |
+| `hr.workforce.compliance.review-queue.list`                  | Review and approval queue (HRM-CMP-021)                    |
 | `hr.workforce.compliance.obligations.list`                   | Compliance obligations register                            |
 | `hr.workforce.compliance.filings.list`                       | Mandatory filing requirements and deadlines (HRM-CMP-009)  |
 | `hr.workforce.compliance.regulatory-calendar.list`           | Regulatory calendar (HRM-CMP-010)                          |
 | `hr.workforce.compliance.policy-acknowledgements.list`       | Mandatory HR policy acknowledgments (HRM-CMP-008)          |
 | `hr.workforce.compliance.labor-law-requirements.list`        | Employee labor law requirements                            |
+| `hr.workforce.compliance.statutory-requirements.list`      | Statutory employment register (HRM-CMP-003)                |
 | `hr.workforce.compliance.safety-training-requirements.list`  | Mandatory safety training and certifications (HRM-CMP-007) |
 | `hr.workforce.compliance.workplace-safety-requirements.list` | Employee workplace safety requirements (HRM-CMP-006)       |
 | `hr.workforce.compliance.work-eligibility.list`              | Employee work eligibility register                         |
 | `hr.workforce.compliance.work-auth-documents.list`           | Work authorization documents                               |
 | `hr.workforce.compliance.exceptions.list`                    | Open exceptions                                            |
+| `hr.workforce.compliance.evidence-links.list`                | Compliance evidence document links (HRM-CMP-020)           |
+| `hr.workforce.compliance.audit-trail.list`                   | Compliance audit trail (HRM-CMP-025)                       |
 
 
-Trailing row actions use `GovernedTrailingActionSlot` via list-specific trailing cells when `hr.compliance.write` is granted. Per-list query failures surface through `GovernedPatternCListSection` `loadError` (embedded error empty state) without failing the entire workbench; page load runs source sync/ensure via `runHrComplianceSourceSyncSteps` then exception materialization via `runHrCompliancePageLoadSync` (each step uses `Promise.allSettled` so one failure does not block siblings). Trailing selects and datetime fields prefill from serialized row cells (`statusValue`, `trailingStatusValue`, `effectiveStatusValue`, `filingDeadlineInput`, `dueDateInput`, `correctiveActionDueDateInput`, `expiresAtInput`, `reviewNotesValue`, etc.) — never from display-formatted badge text.
+Trailing row actions use `GovernedTrailingActionSlot` via list-specific trailing cells when `hr.compliance.write` is granted. Per-list query failures surface through `GovernedPatternCListSection` `loadError` (embedded error empty state) without failing the entire workbench; page load runs source sync/ensure via `runHrComplianceSourceSyncSteps` then exception materialization via `runHrCompliancePageLoadSync` (each step uses `Promise.allSettled` so one failure does not block siblings). Trailing selects and datetime fields prefill from serialized row cells (`statusValue`, `trailingStatusValue`, `effectiveStatusValue`, `filingDeadlineInput`, `dueDateInput`, `correctiveActionDueDateInput`, `correctiveActionOwnerEmployeeIdValue`, `correctiveActionDescriptionValue`, `correctiveDuePostureValue`, `expiresAtInput`, `reviewNotesValue`, etc.) — never from display-formatted badge text.
 
-Search params: `complianceAlertsSearch`, `complianceObligationSearch`, `complianceFilingSearch`, `complianceRegulatoryCalendarSearch`, `compliancePolicyAcknowledgementSearch`, `complianceLaborLawSearch`, `complianceSafetyTrainingSearch`, `complianceWorkplaceSafetySearch`, `complianceWorkEligibilitySearch`, `complianceWorkAuthDocumentSearch`, `complianceExceptionSearch`. Fallback order per list: list-specific param → legacy `complianceSearch` → shared `search`. `HR_COMPLIANCE_LIST_SURFACE_KEYS` registry order matches workbench section order above. UI copy lives in `surface/hr.workforce.compliance-ui.copy.shared.ts`; surface keys live in each `*.surface.ts` file; governed `columnsId` values live in `surface/hr.workforce.compliance-surface-columns.shared.ts` and are exported from the metadata door.
+| Search params | Per-list keys registered in `HR_COMPLIANCE_LIST_SEARCH_PARAMS_BY_KEY`; `HR_COMPLIANCE_LIST_SEARCH_PARAM_MODEL_FIELDS` maps each param to the page-model field parsed by `parseHrComplianceSearchParams` (registry-driven loop). Fallback order per list: list-specific param → legacy `complianceSearch` → shared `search`. Registries exported from `@afenda/feature-hr-suite/metadata`. UI copy lives in `surface/hr.workforce.compliance-ui.copy.shared.ts`; read-only workbench lists declared in `HR_COMPLIANCE_WORKBENCH_READ_ONLY_SURFACE_KEYS`.
 
 ### Mutations & audit (HRM-CMP-025)
 
-Server Actions call `finalizeComplianceMutation()` — domain `*InTx` command plus `writeExecutionAuditEventInTransaction()` in one `runWithOrganizationContext` transaction. Action failures map through `toComplianceActionFailure()` without leaking internal errors. Audit action strings live in `events/hr.workforce.compliance.event.ts`.
+Server Actions call `finalizeComplianceMutation()` — domain `*InTx` command plus `writeExecutionAuditEventInTransaction()` in one `runWithOrganizationContext` transaction. Action failures map through `toComplianceActionFailure()` without leaking internal errors. Audit action strings live in `events/hr.workforce.compliance.event.ts`; emitted action manifest in `events/hr.workforce.compliance.audit-emitted.shared.ts`.
+
+| Layer | Responsibility |
+| ----- | -------------- |
+| Write path | Every user mutation returns `ComplianceMutationAudit` with action, target, optional `summary`/`reason`, and structured metadata (status, review notes, waiver reason, corrective assignment, evidence link context) |
+| Transaction | `writeExecutionAuditEventInTransaction()` persists IAM audit rows with `targetType: hr_compliance` in the same Postgres transaction as the domain command |
+| Read path | `listHrComplianceAuditTrailWindow` queries `searchTenantAuditLogs` with `moduleKey: hr.compliance`; sensitive metadata masked when `canViewSensitive` is false |
+| Governed UI | Read-only Pattern C surface `hr.workforce.compliance.audit-trail.list` — last section on the compliance workbench; search param `complianceAuditTrailSearch` |
+| Categories | Audit register groups actions by domain segment (`filing`, `exception`, `work_eligibility`, `evidence`, etc.) for operator scanability |
+
+**Audit scope boundaries (HRM-CMP-025 vs adjacent requirements)**
+
+| Boundary | Requirement | Shipped posture | Rationale |
+| -------- | ----------- | --------------- | --------- |
+| Derived read models | HRM-CMP-016 alerts, HRM-CMP-010 regulatory calendar | No IAM audit rows | Alerts and calendar entries are read-time merges over filings, requirements, eligibility, work authorization, and corrective actions — not persisted mutations. Source changes audit through their owning registers. |
+| Page-load exception sync | HRM-CMP-017 auto-materialization | Silent (no audit) | `runHrCompliancePageLoadSync` → `syncHrComplianceExceptions` runs idempotently on every workbench load. Auditing each auto-create/auto-resolve would flood the trail; operator-visible exception lifecycle (create, assign, progress, resolve, waive) audits via Server Actions only. |
+| Review / approval queue | HRM-CMP-021 | Shipped inbox + trailing approve/reject | Derived queue merges pending reviews; decisions audit via `reviewQueue.approved` / `reviewQueue.rejected`. Multi-step approval routing remains future scope. |
 
 ### ERP route wiring
 
@@ -429,21 +569,19 @@ Server Actions call `finalizeComplianceMutation()` — domain `*InTx` command pl
 | Module nav          | `apps/erp/src/workspace-routes/hr-section-nav.server.tsx`                                                        |
 | Route contract      | `contracts/hr.workforce.compliance-route.contract.ts` (`/hr/compliance`)                                         |
 | Search param parser | `data/hr.workforce.compliance-search-params.parse.shared.ts` (exported from `@afenda/feature-hr-suite/metadata`) |
-| Execution routes    | `hr.compliance.read` / `hr.compliance.write` → `/hr/compliance` in `@afenda/kernel` execution capabilities       |
+| Execution routes    | `hr.compliance.read` / `hr.compliance.write` / `hr.compliance.sensitive.read` → `/hr/compliance` in `@afenda/kernel` execution capabilities       |
 
 
-Next.js 16 runtime: the app adapter is an async Server Component; it resolves `searchParams` (Promise) and `requireHrComplianceRead()` in parallel via `Promise.all`, then calls `parseHrComplianceSearchParams` and passes a serializable page model to `HrComplianceWorkbenchSection` (no client copy of list rows). Client trailing/forms use `useActionState` against feature `"use server"` actions; mutations revalidate `/hr/compliance` via `revalidatePath` in `finalizeComplianceMutation`. The catch-all route streams section content through nested `Suspense` boundaries with `HrCompliancePageSkeleton` as the HR fallback; `searchParams` opts the page into request-time dynamic rendering under Cache Components.
+Next.js 16 runtime: the app adapter (`apps/erp/src/lib/hr-sections/compliance.server.tsx`) is an async Server Component on catch-all `/[moduleId]/[...section]` (URL `/hr/compliance`). It resolves `searchParams` (Promise) and `requireHrComplianceRead()` in parallel via `Promise.all`, then calls `toHrCompliancePageModelInput()` (registry-driven `parseHrComplianceSearchParams`) and passes the JSON-serializable page model to `HrComplianceWorkbenchSection` (no client copy of list rows). `buildHrCompliancePageModel` runs `runHrCompliancePageLoadSync` in parallel with department and document picker loading, then batches overview snapshot plus fifteen list windows in one `Promise.all`. Client trailing/forms use `useActionState` against feature `"use server"` actions; mutations revalidate `/hr/compliance` via `revalidatePath` in `finalizeComplianceMutation`. The catch-all route streams section content through nested `Suspense` boundaries with `HrCompliancePageSkeleton` (`HR_COMPLIANCE_LIST_SURFACE_KEYS.length` placeholders) as the compliance fallback; `searchParams` opts the page into request-time dynamic rendering under Cache Components (request-time APIs — no `connection()` stub required on the adapter).
 
-Access guards use `@afenda/kernel/execution` (`requireExecutionPermission`); denied reads render `HrComplianceAccessDeniedPanel` in the app adapter. The app adapter resolves auth once and passes `canWrite` into `buildHrCompliancePageModel`; page-model loaders do not re-fetch execution context.
+Access guards use `@afenda/kernel/execution` (`requireExecutionPermission`); denied reads render `HrComplianceAccessDeniedPanel` in the app adapter. The app adapter resolves auth once and passes `canWrite` and `canViewSensitive` into `buildHrCompliancePageModel`; page-model loaders do not re-fetch execution context.
 
 ### Not yet shipped (enterprise backlog)
 
 | Code | Requirement | Current posture |
 | ---- | ----------- | --------------- |
-| **HRM-CMP-021** | Compliance review and approval workflow | Trailing status updates + audit events only; no dedicated review/approval queue |
-| **HRM-CMP-022** | Compliance overview by legal entity, department, location, category, risk | Workbench is flat Pattern C registers; no cross-dimension overview dashboard |
-| **HRM-CMP-023** | Exportable compliance reports | No report/export surfaces; lists are read-only windows with search only |
+| *(none)* | — | HRM-CMP-003, HRM-CMP-021, HRM-CMP-022, and HRM-CMP-023 are shipped in the compliance workbench |
 
 ### Naming & layout (system-admin mirror)
 
-Shipped implementation files use the prefix `hr.workforce.compliance.`* and standard buckets (`actions/`, `data/`, `events/`, `policies/`, `schemas/`, `surface/`, `components/`). List surfaces and UI copy live under `surface/`; audit strings live in `events/hr.workforce.compliance.event.ts`. Slice doors: `server.ts` (I/O), `client.ts` (components), `metadata.ts` (surfaces only). Enforced by `pnpm exec tsx packages/features/hr-suite/scripts/check-hr-feature-vertical-naming.mts` and rule `afenda-hr-feature-vertical`.
+Shipped implementation files use the prefix `hr.workforce.compliance.`* and standard buckets (`actions/`, `data/`, `events/`, `policies/`, `schemas/`, `surface/`, `components/`). List surfaces and UI copy live under `surface/`; audit strings live in `events/hr.workforce.compliance.event.ts`. Slice doors: `server.ts` (I/O), `client.ts` (components), `metadata.ts` (surface keys, columns registry, UI copy, search param parsing — **not** list surface builders). Enforced by `pnpm exec tsx packages/features/hr-suite/scripts/check-hr-feature-vertical-naming.mts` and rule `afenda-hr-feature-vertical`.

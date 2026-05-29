@@ -29,13 +29,15 @@ export async function settleComplianceListLoad<T>(input: {
   }
 }
 
-/** Minimal valid list config when `loadError` is shown (never rendered). */
+/** Minimal valid list config when `loadError` is shown (never rendered as empty state). */
 export function buildComplianceListLoadErrorPlaceholder(input: {
   columnsId: string;
   searchParam: string;
   searchLabel: string;
   searchPlaceholder: string;
   surfaceHeaderTitle: string;
+  emptyTitle?: string;
+  emptyDescription?: string;
 }) {
   return buildComplianceOperationalListSurface({
     primaryColumnId: "placeholder",
@@ -52,8 +54,10 @@ export function buildComplianceListLoadErrorPlaceholder(input: {
     surface: {
       headerTitle: input.surfaceHeaderTitle,
       columnsId: input.columnsId,
-      emptyTitle: "",
-      emptyDescription: "",
+      emptyTitle: input.emptyTitle ?? "Register unavailable",
+      emptyDescription:
+        input.emptyDescription ??
+        "This register could not be loaded. Refresh the page and try again.",
     },
     columns: [{ id: "placeholder", header: "—" }],
     rows: [],

@@ -10,5 +10,8 @@ export * from "./hr.workforce.compliance-alerts.shared";
 export * from "./hr.workforce.compliance-status.shared";
 export * from "./hr.workforce.compliance-work-eligibility.shared";
 export * from "./hr.workforce.compliance-work-auth-documents.shared";
+export * from "./hr.workforce.compliance-evidence-links.shared";
+export * from "./hr.workforce.compliance.audit-trail.shared";
+export * from "./hr.workforce.compliance.audit-trail.shared.server";
 export * from "./hr.workforce.compliance.page-model.server";
 export * from "./hr.workforce.compliance-search-params.parse.shared";

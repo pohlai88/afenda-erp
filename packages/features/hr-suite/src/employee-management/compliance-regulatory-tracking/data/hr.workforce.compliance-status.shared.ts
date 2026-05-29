@@ -3,6 +3,7 @@ import {
   HR_COMPLIANCE_LABOR_LAW_REQUIREMENT_KIND,
   HR_COMPLIANCE_POLICY_ACKNOWLEDGEMENT_REQUIREMENT_KIND,
   HR_COMPLIANCE_SAFETY_TRAINING_REQUIREMENT_KIND,
+  HR_COMPLIANCE_STATUTORY_REQUIREMENT_KIND,
   HR_COMPLIANCE_WORKPLACE_SAFETY_REQUIREMENT_KIND,
 } from "@afenda/db";
 
@@ -120,6 +121,20 @@ export function deriveEffectiveLaborLawRequirementStatus(input: {
     status: input.status,
     dueDate: input.dueDate ?? null,
     requirementKind: HR_COMPLIANCE_LABOR_LAW_REQUIREMENT_KIND,
+    now: input.now,
+  });
+}
+
+/** HRM-CMP-003 — statutory employment requirement posture aligned with labor law derivation. */
+export function deriveEffectiveStatutoryRequirementStatus(input: {
+  status: HrmComplianceRequirementStatus;
+  dueDate?: Date | null;
+  now?: Date;
+}): HrmComplianceRequirementStatus {
+  return deriveEffectiveRequirementStatus({
+    status: input.status,
+    dueDate: input.dueDate ?? null,
+    requirementKind: HR_COMPLIANCE_STATUTORY_REQUIREMENT_KIND,
     now: input.now,
   });
 }

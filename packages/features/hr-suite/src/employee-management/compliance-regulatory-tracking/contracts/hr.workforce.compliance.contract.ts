@@ -9,3 +9,9 @@ export const hrWorkforceComplianceWritePermission = {
   object: "compliance",
   function: "write",
 } as const;
+
+export const hrWorkforceComplianceSensitiveReadPermission = {
+  module: "hr",
+  object: "compliance",
+  function: "sensitive.read",
+} as const;

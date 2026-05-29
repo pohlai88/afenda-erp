@@ -33,7 +33,7 @@ export function HrComplianceSection({
   children: React.ReactNode;
 }) {
   return React.createElement(
-    SectionPanel as React.ComponentType<any>,
+    SectionPanel,
     { headingLevel: 2, title, description },
     children,
   );

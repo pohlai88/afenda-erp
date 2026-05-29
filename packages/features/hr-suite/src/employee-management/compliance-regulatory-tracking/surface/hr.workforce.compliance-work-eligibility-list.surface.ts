@@ -15,6 +15,7 @@ import {
   resolveWorkEligibilityListRowTone,
   resolveWorkEligibilityListTrailingAction,
 } from "./hr.workforce.compliance-list.shared";
+import { maskComplianceSensitiveStoredValue } from "../data/hr.workforce.compliance-sensitive-access.shared";
 import { hrComplianceWorkEligibilityColumnsId } from "./hr.workforce.compliance-surface-columns.shared";
 import { hrComplianceUiCopy } from "./hr.workforce.compliance-ui.copy.shared";
 
@@ -28,8 +29,10 @@ export function buildHrComplianceWorkEligibilityListSurface(input: {
   window: HrWorkEligibilityWindow;
   searchValue?: string;
   canWrite?: boolean;
+  canViewSensitive?: boolean;
 }): ListSurfaceRendererConfigurationResolvedInput {
-  const { window, searchValue, canWrite = false } = input;
+  const { window, searchValue, canWrite = false, canViewSensitive = false } =
+    input;
   const copy = hrComplianceUiCopy.workEligibility;
 
   return buildComplianceOperationalListSurface({
@@ -87,7 +90,10 @@ export function buildHrComplianceWorkEligibilityListSurface(input: {
           verifiedAt: row.verifiedAt?.toISOString() ?? "",
           expiresAt: row.expiresAt?.toISOString() ?? "",
           expiresAtInput: formatComplianceDateTimeLocalInput(row.expiresAt),
-          reviewNotesValue: row.reviewNotes ?? "",
+          reviewNotesValue: maskComplianceSensitiveStoredValue(
+            row.reviewNotes,
+            canViewSensitive,
+          ),
         },
         cellKinds: {
           status: {
@@ -98,6 +104,7 @@ export function buildHrComplianceWorkEligibilityListSurface(input: {
         trailingAction: resolveWorkEligibilityListTrailingAction(
           canWrite,
           effectiveStatus,
+          canViewSensitive,
         ),
       };
     }),

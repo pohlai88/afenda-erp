@@ -295,3 +295,23 @@ export async function loadComplianceExceptionForMutation(
   assertExceptionIsOpen(exception.status);
   return exception;
 }
+
+export async function assertComplianceOwnerEmployeeInOrg(
+  db: AfendaTransaction,
+  input: { organizationId: string; employeeId: string },
+): Promise<void> {
+  const [employee] = await db
+    .select({ id: hrEmployees.id })
+    .from(hrEmployees)
+    .where(
+      and(
+        eq(hrEmployees.id, input.employeeId),
+        activeEmployeeFilters(input.organizationId),
+      ),
+    )
+    .limit(1);
+
+  if (!employee) {
+    throw new HrComplianceCommandError("corrective_action_owner_not_found");
+  }
+}

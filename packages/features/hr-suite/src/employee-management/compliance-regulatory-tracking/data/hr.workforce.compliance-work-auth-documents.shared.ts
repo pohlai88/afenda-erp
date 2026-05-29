@@ -33,6 +33,7 @@ export function deriveEffectiveWorkAuthDocumentStatus(input: {
   status: HrmComplianceWorkAuthDocumentStatus;
   documentNumber?: string | null;
   expiresAt: Date | null | undefined;
+  hasLinkedEvidenceDocument?: boolean;
   now?: Date;
 }): HrmComplianceWorkAuthDocumentEffectiveStatus {
   return toEnumMember(
@@ -40,6 +41,7 @@ export function deriveEffectiveWorkAuthDocumentStatus(input: {
       status: input.status,
       documentNumber: input.documentNumber,
       expiresAt: input.expiresAt ?? null,
+      hasLinkedEvidenceDocument: input.hasLinkedEvidenceDocument,
       now: input.now ?? new Date(),
     }),
     WORK_AUTH_EFFECTIVE_STATUSES,

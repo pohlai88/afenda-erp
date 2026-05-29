@@ -67,29 +67,27 @@ function resolveTrailingFieldDefaultValue(
   row: GovernedListTrailingCellProps["row"],
   field: ComplianceTrailingFieldConfig,
 ): string | undefined {
+  const readSerializedCell = (cellId: string | undefined) => {
+    if (!cellId) {
+      return undefined;
+    }
+    const cellValue = row.cells[cellId];
+    if (cellValue === undefined || cellValue === "") {
+      return undefined;
+    }
+    return String(cellValue);
+  };
+
   if (field.kind === "select") {
-    if (field.defaultFromCell) {
-      const cellValue = row.cells[field.defaultFromCell];
-      if (cellValue === undefined || cellValue === "") {
-        return field.defaultValue;
-      }
-      return String(cellValue);
-    }
-    return field.defaultValue;
+    return readSerializedCell(field.defaultFromCell) ?? field.defaultValue;
   }
 
-  if (field.kind === "datetime-local") {
-    if (field.defaultFromCell) {
-      const cellValue = row.cells[field.defaultFromCell];
-      return cellValue === undefined ? undefined : String(cellValue);
-    }
+  if (field.kind === "labeled-select") {
+    return readSerializedCell(field.defaultFromCell);
   }
 
-  if (field.kind === "text") {
-    if (field.defaultFromCell) {
-      const cellValue = row.cells[field.defaultFromCell];
-      return cellValue === undefined ? undefined : String(cellValue);
-    }
+  if (field.kind === "datetime-local" || field.kind === "text") {
+    return readSerializedCell(field.defaultFromCell);
   }
 
   return undefined;
@@ -121,6 +119,31 @@ export function ComplianceTrailingActionFields({
                 {field.options.map((option) => (
                   <option key={option} value={option}>
                     {formatComplianceEnumLabel(option)}
+                  </option>
+                ))}
+              </select>
+            </Field>
+          );
+        }
+
+        if (field.kind === "labeled-select") {
+          return (
+            <Field key={field.name}>
+              <FieldLabel htmlFor={fieldId}>{field.label}</FieldLabel>
+              <select
+                id={fieldId}
+                name={field.name}
+                required={field.required}
+                className={COMPLIANCE_NATIVE_SELECT_CLASS}
+                defaultValue={resolveTrailingFieldDefaultValue(row, field) ?? ""}
+                aria-label={field.label}
+              >
+                <option value="">
+                  {field.placeholder ?? "Select"}
+                </option>
+                {field.options.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
                   </option>
                 ))}
               </select>

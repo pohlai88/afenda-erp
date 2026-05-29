@@ -74,6 +74,7 @@ export function deriveRegulatoryCalendarEffectiveSourceStatus(input: {
   deadlineAt: Date;
   requirementKind: string | null;
   documentNumber?: string | null;
+  linkedEvidenceCount?: number;
   now?: Date;
 }): string {
   const now = input.now;
@@ -104,6 +105,7 @@ export function deriveRegulatoryCalendarEffectiveSourceStatus(input: {
         status: input.sourceStatus as HrmComplianceWorkAuthDocumentStatus,
         documentNumber: input.documentNumber,
         expiresAt: deadlineAt,
+        hasLinkedEvidenceDocument: (input.linkedEvidenceCount ?? 0) > 0,
         now,
       });
     case "corrective_action":

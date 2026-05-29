@@ -45,12 +45,24 @@ export function classifyComplianceAlert(input: {
   triggerAt: Date | null;
   requirementKind: string | null;
   documentNumber?: string | null;
+  linkedEvidenceCount?: number;
   now?: Date;
 }): { alertKind: HrComplianceAlertKind; severity: HrComplianceAlertSeverity } | null {
   const now = input.now ?? new Date();
+  const hasLinkedEvidenceDocument = (input.linkedEvidenceCount ?? 0) > 0;
 
   if (input.sourceKind === "work_auth_missing") {
-    return { alertKind: "overdue_action", severity: "critical" };
+    const effectiveStatus = deriveWorkAuthEffectiveStatus({
+      status: input.sourceStatus,
+      documentNumber: input.documentNumber,
+      expiresAt: null,
+      hasLinkedEvidenceDocument,
+      now,
+    });
+    if (effectiveStatus === "missing") {
+      return { alertKind: "overdue_action", severity: "critical" };
+    }
+    return null;
   }
 
   const triggerAt = input.triggerAt;
@@ -148,6 +160,7 @@ export function classifyComplianceAlert(input: {
         status: input.sourceStatus,
         documentNumber: input.documentNumber,
         expiresAt: triggerAt,
+        hasLinkedEvidenceDocument,
         now,
       });
       if (effectiveStatus === "missing") {

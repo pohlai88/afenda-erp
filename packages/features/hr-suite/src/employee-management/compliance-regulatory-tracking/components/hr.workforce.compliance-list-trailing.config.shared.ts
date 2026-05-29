@@ -1,3 +1,5 @@
+import type { HrComplianceDocumentPickerOption } from "../data/hr.workforce.compliance-evidence-links.shared";
+
 export type ComplianceTrailingSelectFieldConfig = {
   kind: "select";
   name: string;
@@ -25,8 +27,19 @@ export type ComplianceTrailingDateTimeFieldConfig = {
   defaultFromCell?: string;
 };
 
+export type ComplianceTrailingLabeledSelectFieldConfig = {
+  kind: "labeled-select";
+  name: string;
+  label: string;
+  options: readonly { value: string; label: string }[];
+  required?: boolean;
+  placeholder?: string;
+  defaultFromCell?: string;
+};
+
 export type ComplianceTrailingFieldConfig =
   | ComplianceTrailingSelectFieldConfig
+  | ComplianceTrailingLabeledSelectFieldConfig
   | ComplianceTrailingTextFieldConfig
   | ComplianceTrailingDateTimeFieldConfig;
 
@@ -44,7 +57,24 @@ type CertificationRequirementTrailingCopy = {
   trailingReviewNotesPlaceholder: string;
 };
 
-/** Shared Pattern C trailing fields for certification-tracked employee requirements. */
+export type ComplianceExceptionTrailingActionKey =
+  | "assign"
+  | "progress"
+  | "resolve"
+  | "waive";
+
+export type ComplianceExceptionTrailingActionConfig =
+  ComplianceTrailingActionConfig & {
+    actionKey: ComplianceExceptionTrailingActionKey;
+    showWhen?: (status: string) => boolean;
+  };
+
+type ComplianceEmployeePickerOption = {
+  value: string;
+  label: string;
+};
+
+/** Shared Pattern C trailing fields for compliance exception corrective actions. */
 export function buildExceptionTrailingActions(
   copy: {
     trailingAssignLabel: string;
@@ -52,16 +82,25 @@ export function buildExceptionTrailingActions(
     trailingResolveLabel: string;
     trailingWaiveLabel: string;
     colDue: string;
+    trailingCorrectiveOwnerLabel: string;
+    trailingCorrectiveOwnerPlaceholder: string;
+    trailingCorrectiveDescriptionLabel: string;
     trailingCorrectiveDescriptionPlaceholder: string;
     trailingCorrectiveDuePlaceholder: string;
+    trailingProgressNoteLabel: string;
     trailingProgressPlaceholder: string;
+    trailingResolutionNoteLabel: string;
     trailingResolutionPlaceholder: string;
+    trailingWaiverReasonLabel: string;
     trailingWaiverReasonPlaceholder: string;
+    trailingApprovalReferenceLabel: string;
     trailingApprovalReferencePlaceholder: string;
   },
-): ComplianceTrailingActionConfig[] {
+  employeeOptions: readonly ComplianceEmployeePickerOption[],
+): ComplianceExceptionTrailingActionConfig[] {
   return [
     {
+      actionKey: "assign",
       submitLabel: copy.trailingAssignLabel,
       buttonVariant: "default",
       hiddenFieldName: "exceptionId",
@@ -69,9 +108,19 @@ export function buildExceptionTrailingActions(
         {
           kind: "text",
           name: "correctiveActionDescription",
-          label: copy.trailingAssignLabel,
+          label: copy.trailingCorrectiveDescriptionLabel,
           required: true,
           placeholder: copy.trailingCorrectiveDescriptionPlaceholder,
+          defaultFromCell: "correctiveActionDescriptionValue",
+        },
+        {
+          kind: "labeled-select",
+          name: "correctiveActionOwnerEmployeeId",
+          label: copy.trailingCorrectiveOwnerLabel,
+          required: true,
+          placeholder: copy.trailingCorrectiveOwnerPlaceholder,
+          options: employeeOptions,
+          defaultFromCell: "correctiveActionOwnerEmployeeIdValue",
         },
         {
           kind: "datetime-local",
@@ -84,31 +133,35 @@ export function buildExceptionTrailingActions(
       ],
     },
     {
+      actionKey: "progress",
       submitLabel: copy.trailingProgressLabel,
       hiddenFieldName: "exceptionId",
+      showWhen: (status) => status === "in_progress",
       fields: [
         {
           kind: "text",
           name: "progressNote",
-          label: copy.trailingProgressLabel,
+          label: copy.trailingProgressNoteLabel,
           required: true,
           placeholder: copy.trailingProgressPlaceholder,
         },
       ],
     },
     {
+      actionKey: "resolve",
       submitLabel: copy.trailingResolveLabel,
       hiddenFieldName: "exceptionId",
       fields: [
         {
           kind: "text",
           name: "resolutionNote",
-          label: copy.trailingResolveLabel,
+          label: copy.trailingResolutionNoteLabel,
           placeholder: copy.trailingResolutionPlaceholder,
         },
       ],
     },
     {
+      actionKey: "waive",
       submitLabel: copy.trailingWaiveLabel,
       buttonVariant: "outline",
       hiddenFieldName: "exceptionId",
@@ -116,14 +169,14 @@ export function buildExceptionTrailingActions(
         {
           kind: "text",
           name: "waiverReason",
-          label: copy.trailingWaiverReasonPlaceholder,
+          label: copy.trailingWaiverReasonLabel,
           required: true,
           placeholder: copy.trailingWaiverReasonPlaceholder,
         },
         {
           kind: "text",
           name: "approvalReference",
-          label: copy.trailingApprovalReferencePlaceholder,
+          label: copy.trailingApprovalReferenceLabel,
           required: true,
           placeholder: copy.trailingApprovalReferencePlaceholder,
         },
@@ -158,6 +211,84 @@ export function buildCertificationRequirementTrailingFields(
       label: copy.trailingReviewNotesPlaceholder,
       placeholder: copy.trailingReviewNotesPlaceholder,
       defaultFromCell: "reviewNotesValue",
+    },
+  ];
+}
+
+type EvidenceLinksTrailingCopy = {
+  trailingUpdateStateLabel: string;
+  trailingUnlinkLabel: string;
+  trailingSubmissionStateLabel: string;
+  trailingNotesPlaceholder: string;
+};
+
+/** Pattern C trailing fields for the evidence link register (HRM-CMP-020). */
+export function buildEvidenceLinksTrailingActions(
+  copy: EvidenceLinksTrailingCopy,
+  submissionStateOptions: readonly string[],
+): ComplianceTrailingActionConfig[] {
+  return [
+    {
+      submitLabel: copy.trailingUpdateStateLabel,
+      buttonVariant: "default",
+      hiddenFieldName: "evidenceLinkId",
+      fields: [
+        {
+          kind: "select",
+          name: "submissionState",
+          label: copy.trailingSubmissionStateLabel,
+          options: submissionStateOptions,
+          defaultFromCell: "trailingSubmissionStateValue",
+          defaultValue: "draft",
+        },
+        {
+          kind: "text",
+          name: "notes",
+          label: copy.trailingNotesPlaceholder,
+          placeholder: copy.trailingNotesPlaceholder,
+          defaultFromCell: "notesValue",
+        },
+      ],
+    },
+    {
+      submitLabel: copy.trailingUnlinkLabel,
+      buttonVariant: "outline",
+      hiddenFieldName: "evidenceLinkId",
+      fields: [],
+    },
+  ];
+}
+
+type LinkEvidenceTrailingCopy = {
+  trailingLinkLabel: string;
+  trailingDocumentLabel: string;
+  trailingDocumentPlaceholder: string;
+  trailingLinkNotesPlaceholder: string;
+};
+
+export function buildLinkEvidenceTrailingFields(
+  copy: LinkEvidenceTrailingCopy,
+  documentOptions: readonly HrComplianceDocumentPickerOption[],
+): ComplianceTrailingFieldConfig[] {
+  const pickerOptions = documentOptions.map(({ value, label }) => ({
+    value,
+    label,
+  }));
+
+  return [
+    {
+      kind: "labeled-select",
+      name: "employeeDocumentId",
+      label: copy.trailingDocumentLabel,
+      required: true,
+      placeholder: copy.trailingDocumentPlaceholder,
+      options: pickerOptions,
+    },
+    {
+      kind: "text",
+      name: "notes",
+      label: copy.trailingLinkNotesPlaceholder,
+      placeholder: copy.trailingLinkNotesPlaceholder,
     },
   ];
 }

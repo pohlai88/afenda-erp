@@ -15,6 +15,7 @@ const COMPLIANCE_REVALIDATE_PATH = hrComplianceRoutePaths.compliance;
 export { toComplianceActionFailure } from "../data/hr.workforce.compliance-action-result.shared";
 export {
   buildRequirementStatusAuditMetadata,
+  buildComplianceStatusUpdateAuditMetadata,
   resolveCertificationExpiresAtMutationInput,
   resolveFilingDeadlineMutationInput,
 } from "../data/hr.workforce.compliance-mutation.shared";
@@ -25,6 +26,8 @@ export type ComplianceMutationAudit = {
   action: HrWorkforceComplianceAuditAction;
   targetId: string;
   metadata?: Record<string, unknown>;
+  summary?: string;
+  reason?: string;
 };
 
 export async function finalizeComplianceMutation(
@@ -41,6 +44,8 @@ export async function finalizeComplianceMutation(
         action: audit.action,
         targetType: "hr_compliance",
         targetId: audit.targetId,
+        ...(audit.summary ? { summary: audit.summary } : {}),
+        ...(audit.reason ? { reason: audit.reason } : {}),
         metadata: audit.metadata,
       });
     });

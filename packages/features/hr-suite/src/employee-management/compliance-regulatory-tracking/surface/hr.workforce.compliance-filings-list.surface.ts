@@ -115,6 +115,7 @@ export function buildHrComplianceFilingsListSurface(input: {
           submittedAt: row.submittedAt?.toISOString() ?? "",
           confirmedAt: row.confirmedAt?.toISOString() ?? "",
           reviewNotesValue: row.reviewNotes ?? "",
+          employeeIdValue: "",
         },
         cellKinds: {
           status: {

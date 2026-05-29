@@ -70,6 +70,7 @@ export function buildAutoReopenedComplianceExceptionValues(
     resolutionNote: null,
     resolvedAt: null,
     correctiveActionDescription: null,
+    correctiveActionOwnerEmployeeId: null,
     correctiveActionDueDate: null,
   };
 }

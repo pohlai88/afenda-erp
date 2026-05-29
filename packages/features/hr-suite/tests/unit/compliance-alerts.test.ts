@@ -46,6 +46,20 @@ describe("hr compliance alerts (HRM-CMP-016)", () => {
     ).toEqual({ alertKind: "overdue_action", severity: "critical" });
   });
 
+  it("suppresses missing work authorization alerts when linked evidence satisfies HRM-CMP-011", () => {
+    expect(
+      classifyComplianceAlert({
+        sourceKind: "work_auth_missing",
+        sourceStatus: "pending_verification",
+        triggerAt: null,
+        requirementKind: null,
+        documentNumber: null,
+        linkedEvidenceCount: 1,
+        now,
+      }),
+    ).toBeNull();
+  });
+
   it("classifies expiring work authorization renewals as renewal alerts", () => {
     expect(
       classifyComplianceAlert({
@@ -179,6 +193,38 @@ describe("hr compliance alerts (HRM-CMP-016)", () => {
     expect(configuration.rows?.[1]?.rowHref).toContain("emp_1");
     expect(configuration.rows?.[1]?.cells?.effectiveSourceStatusValue).toBe(
       "missing",
+    );
+  });
+
+  it("derives non-missing work authorization alert status when linked evidence is present", () => {
+    const configuration = buildHrComplianceAlertsListSurface({
+      window: {
+        rows: [
+          {
+            id: "work_auth_missing:wad_linked",
+            alertKind: "overdue_action",
+            severity: "critical",
+            sourceKind: "work_auth_missing",
+            triggerAt: null,
+            title: "Missing work permit",
+            subjectLabel: "E-1001 · Alex Operator",
+            complianceArea: "work_authorization",
+            sourceStatus: "pending_verification",
+            requirementKind: null,
+            employeeId: "emp_1",
+            documentNumber: null,
+            linkedEvidenceCount: 1,
+          },
+        ],
+        pageSize: 25,
+        totalCount: 1,
+        hasNextPage: false,
+        mergeTruncated: false,
+      },
+    });
+
+    expect(configuration.rows?.[0]?.cells?.effectiveSourceStatusValue).toBe(
+      "pending_verification",
     );
   });
 });

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { parseListSurfaceRendererConfiguration } from "@afenda/governed-surface/schemas";
+import { parseListSurfaceRendererConfiguration, parseStatCardConfiguration } from "@afenda/governed-surface/schemas";
 import { buildMembersListSurface } from "../../src/memberships/surface/system-admin.memberships-list.surface";
 import {
   buildApiCredentialsListSurface,
@@ -22,8 +22,53 @@ import {
 } from "../../src/lynx/data/system-admin.lynx.surface";
 import { buildUsersListSurface } from "../../src/users/surface/system-admin.users-list.surface";
 import { systemAdminUsersGalleryRows } from "../../src/users/surface/system-admin.users-gallery.fixtures.shared";
+import {
+  buildSystemAdminOverviewGovernanceStatGrid,
+  buildSystemAdminOverviewIdentityStatGrid,
+} from "../../src/overview/surfaces/system-admin.overview-stat.surface";
 
 describe("system admin governed surfaces", () => {
+  it("formats overview snapshot stat values for governed display validation", () => {
+    const identity = parseStatCardConfiguration(
+      buildSystemAdminOverviewIdentityStatGrid({
+        snapshot: {
+          userCount: 1,
+          pendingInviteCount: 0,
+          activeMembershipCount: 1,
+          roleCount: 6,
+          activePolicyRuleCount: 2,
+          activeApprovalRuleCount: 1,
+          recentAdminChangeCount: 0,
+          recentAdminChanges: [],
+        },
+      }),
+    );
+    const governance = parseStatCardConfiguration(
+      buildSystemAdminOverviewGovernanceStatGrid({
+        snapshot: {
+          userCount: 1,
+          pendingInviteCount: 0,
+          activeMembershipCount: 1,
+          roleCount: 6,
+          activePolicyRuleCount: 2,
+          activeApprovalRuleCount: 1,
+          recentAdminChangeCount: 3,
+          recentAdminChanges: [],
+        },
+      }),
+    );
+
+    expect(identity.success).toBe(true);
+    expect(governance.success).toBe(true);
+    if (identity.success) {
+      expect(identity.data.stats[0]?.value).toBe("1 users");
+      expect(identity.data.stats[1]?.value).toBe("0 pending");
+    }
+    if (governance.success) {
+      expect(governance.data.stats[2]?.value).toBe("3 changes");
+    }
+  });
+
   it("normalizes empty pagination to schema-safe server windows", () => {
     const parsed = parseListSurfaceRendererConfiguration(
       buildMembersListSurface({ memberships: [] }),

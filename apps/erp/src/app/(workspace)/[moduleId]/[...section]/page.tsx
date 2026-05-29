@@ -78,9 +78,12 @@ export async function generateMetadata({
   return resolveSectionMetadata(moduleId, section);
 }
 
-function sectionSkeleton(moduleId: string) {
+function sectionSkeleton(moduleId: string, section: string[]) {
   if (moduleId === HR_MODULE_ID) {
-    return <HrCompliancePageSkeleton />;
+    if (section[0] === "compliance") {
+      return <HrCompliancePageSkeleton />;
+    }
+    return <ModuleSectionRouteSkeleton />;
   }
   return <SystemAdminSectionSkeleton />;
 }
@@ -150,7 +153,7 @@ export default function ModuleSectionRoute({
   return (
     <Suspense fallback={<ModuleSectionRouteSkeleton />}>
       {params.then(({ moduleId, section }) => (
-        <Suspense fallback={sectionSkeleton(moduleId)}>
+        <Suspense fallback={sectionSkeleton(moduleId, section)}>
           <ModuleSectionContent
             moduleId={moduleId}
             section={section}

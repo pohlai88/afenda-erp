@@ -42,9 +42,11 @@ const EVIDENCE_REQUIRED_WORK_AUTH_DOCUMENT_STATUSES =
 export function normalizeWorkAuthDocumentStatus(input: {
   status: HrComplianceWorkAuthDocumentStatus;
   documentNumber?: string | null;
+  /** HRM-CMP-020 — linked employee document satisfies evidence when number is absent. */
+  hasLinkedEvidenceDocument?: boolean;
 }): HrComplianceWorkAuthDocumentStatus {
   const documentNumber = input.documentNumber?.trim();
-  if (documentNumber) {
+  if (documentNumber || input.hasLinkedEvidenceDocument) {
     return input.status;
   }
 

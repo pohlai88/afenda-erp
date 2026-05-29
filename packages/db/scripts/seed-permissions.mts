@@ -125,6 +125,13 @@ const permissionCatalog = [
       "Register obligations, log exceptions, and resolve compliance items.",
   },
   {
+    key: "hr.compliance.sensitive.read",
+    module: "hr",
+    label: "View sensitive HR compliance records",
+    description:
+      "Read identity numbers, restricted evidence titles, and sensitive compliance review notes.",
+  },
+  {
     key: "hr.leave.read",
     module: "hr",
     label: "View HR leave",

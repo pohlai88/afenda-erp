@@ -32,6 +32,7 @@ const routeByCapability: Partial<Record<AppCapability, `/${string}`>> = {
   "hr.view": "/hr",
   "hr.compliance.read": "/hr/compliance",
   "hr.compliance.write": "/hr/compliance",
+  "hr.compliance.sensitive.read": "/hr/compliance",
   "crm.view": "/crm",
   "approvals.view": "/approvals",
   "reports.view": "/reports",

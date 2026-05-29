@@ -15,6 +15,10 @@ import {
   resolveWorkAuthDocumentListRowTone,
   resolveWorkAuthDocumentListTrailingAction,
 } from "./hr.workforce.compliance-list.shared";
+import {
+  maskComplianceSensitiveDisplayText,
+  maskComplianceSensitiveStoredValue,
+} from "../data/hr.workforce.compliance-sensitive-access.shared";
 import { hrComplianceWorkAuthDocumentsColumnsId } from "./hr.workforce.compliance-surface-columns.shared";
 import { hrComplianceUiCopy } from "./hr.workforce.compliance-ui.copy.shared";
 
@@ -28,8 +32,10 @@ export function buildHrComplianceWorkAuthDocumentsListSurface(input: {
   window: HrWorkAuthorizationDocumentWindow;
   searchValue?: string;
   canWrite?: boolean;
+  canViewSensitive?: boolean;
 }): ListSurfaceRendererConfigurationResolvedInput {
-  const { window, searchValue, canWrite = false } = input;
+  const { window, searchValue, canWrite = false, canViewSensitive = false } =
+    input;
   const copy = hrComplianceUiCopy.workAuthDocuments;
 
   return buildComplianceOperationalListSurface({
@@ -81,6 +87,7 @@ export function buildHrComplianceWorkAuthDocumentsListSurface(input: {
         status: row.status,
         documentNumber: row.documentNumber,
         expiresAt: row.expiresAt,
+        hasLinkedEvidenceDocument: row.linkedEvidenceCount > 0,
       });
 
       return {
@@ -101,14 +108,24 @@ export function buildHrComplianceWorkAuthDocumentsListSurface(input: {
             effectiveStatus,
             storedStatus: row.status,
           }),
-          documentNumber: row.documentNumber ?? "—",
-          documentNumberValue: row.documentNumber ?? "",
+          documentNumber: maskComplianceSensitiveDisplayText(
+            row.documentNumber,
+            canViewSensitive,
+          ),
+          documentNumberValue: maskComplianceSensitiveStoredValue(
+            row.documentNumber,
+            canViewSensitive,
+          ),
           issuedAt: row.issuedAt?.toISOString() ?? "",
           issuedAtInput: formatComplianceDateTimeLocalInput(row.issuedAt),
           expiresAt: row.expiresAt?.toISOString() ?? "",
           expiresAtInput: formatComplianceDateTimeLocalInput(row.expiresAt),
           verifiedAt: row.verifiedAt?.toISOString() ?? "",
-          reviewNotesValue: row.reviewNotes ?? "",
+          reviewNotesValue: maskComplianceSensitiveStoredValue(
+            row.reviewNotes,
+            canViewSensitive,
+          ),
+          employeeIdValue: row.employeeId ?? "",
         },
         cellKinds: {
           documentType: { kind: "badge", tone: "default" },
@@ -120,6 +137,7 @@ export function buildHrComplianceWorkAuthDocumentsListSurface(input: {
         trailingAction: resolveWorkAuthDocumentListTrailingAction(
           canWrite,
           effectiveStatus,
+          canViewSensitive,
         ),
       };
     }),

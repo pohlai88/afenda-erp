@@ -1,4 +1,4 @@
-import { hrComplianceUiCopy, parseHrComplianceSearchParams } from "@afenda/feature-hr-suite/metadata";
+import { hrComplianceUiCopy, toHrCompliancePageModelInput } from "@afenda/feature-hr-suite/metadata";
 import {
   buildHrCompliancePageModel,
   HrComplianceAccessDeniedPanel,
@@ -45,38 +45,14 @@ export default async function HrCompliancePage({
     throw error;
   }
 
-  const {
-    obligationSearch,
-    exceptionSearch,
-    laborLawSearch,
-    policyAcknowledgementSearch,
-    safetyTrainingSearch,
-    workplaceSafetySearch,
-    workEligibilitySearch,
-    workAuthDocumentSearch,
-    filingSearch,
-    regulatoryCalendarSearch,
-    alertsSearch,
-  } = parseHrComplianceSearchParams(resolvedSearchParams);
-
-  const { organization } = guard;
-  const canWrite = guard.hasCapability("hr.compliance.write");
-
-  const model = await buildHrCompliancePageModel({
-    organizationId: organization.id,
-    canWrite,
-    obligationSearch,
-    exceptionSearch,
-    laborLawSearch,
-    policyAcknowledgementSearch,
-    safetyTrainingSearch,
-    workplaceSafetySearch,
-    workEligibilitySearch,
-    workAuthDocumentSearch,
-    filingSearch,
-    regulatoryCalendarSearch,
-    alertsSearch,
-  });
+  const model = await buildHrCompliancePageModel(
+    toHrCompliancePageModelInput({
+      organizationId: guard.organization.id,
+      canWrite: guard.hasCapability("hr.compliance.write"),
+      canViewSensitive: guard.canViewSensitive,
+      searchParams: resolvedSearchParams,
+    }),
+  );
 
   return <HrComplianceWorkbenchSection model={model} />;
 }

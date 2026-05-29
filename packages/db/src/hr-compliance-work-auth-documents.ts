@@ -1,6 +1,7 @@
 import { and, count, eq, ilike, inArray, isNull, or, sql } from "drizzle-orm";
 import { runWithOrganizationContext, type AfendaTransaction } from "./client";
 import { createEntityId } from "./ids";
+import { buildWorkAuthLinkedEvidenceCountSelect } from "./hr-compliance-evidence-links";
 import {
   buildPaginatedWindow,
   buildWorkAuthDocumentExpiredSearchCondition,
@@ -259,6 +260,7 @@ export async function listHrWorkAuthorizationDocumentsWindow(input: {
           expiresAt: hrComplianceWorkAuthorizationDocuments.expiresAt,
           verifiedAt: hrComplianceWorkAuthorizationDocuments.verifiedAt,
           reviewNotes: hrComplianceWorkAuthorizationDocuments.reviewNotes,
+          linkedEvidenceCount: buildWorkAuthLinkedEvidenceCountSelect(input.organizationId),
         })
         .from(hrComplianceWorkAuthorizationDocuments)
         .innerJoin(
@@ -296,6 +298,7 @@ export async function listHrWorkAuthorizationDocumentsWindow(input: {
         expiresAt: row.expiresAt,
         verifiedAt: row.verifiedAt,
         reviewNotes: row.reviewNotes,
+        linkedEvidenceCount: Number(row.linkedEvidenceCount ?? 0),
       })),
       pageSize,
       offset,

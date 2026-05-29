@@ -15,6 +15,8 @@ import {
   resolveComplianceExceptionRowTone,
   resolveComplianceExceptionSeverityBadgeTone,
   resolveComplianceExceptionStatusBadgeTone,
+  deriveCorrectiveActionDuePosture,
+  resolveCorrectiveActionDueBadgeTone,
 } from "./hr.workforce.compliance-list.shared";
 import { hrComplianceExceptionsColumnsId } from "./hr.workforce.compliance-surface-columns.shared";
 import { hrComplianceUiCopy } from "./hr.workforce.compliance-ui.copy.shared";
@@ -78,12 +80,17 @@ export function buildHrComplianceExceptionsListSurface(input: {
         header: copy.colStatus,
         cellKind: { kind: "badge", tone: "attention" },
       },
+      { id: "owner", header: copy.colOwner },
       { id: "dueDate", header: copy.colDue, cellKind: { kind: "date" } },
     ],
     rows: window.rows.map((row) => {
       const employeeHref = row.employeeId
         ? hrEmployeeDetailRoutePath(row.employeeId)
         : undefined;
+      const correctiveDuePosture = deriveCorrectiveActionDuePosture({
+        status: row.status,
+        correctiveActionDueDate: row.correctiveActionDueDate,
+      });
 
       return {
         id: row.id,
@@ -91,6 +98,7 @@ export function buildHrComplianceExceptionsListSurface(input: {
           severity: row.severity,
           status: row.status,
           gapKind: row.gapKind,
+          correctiveActionDueDate: row.correctiveActionDueDate,
         }),
         rowHref: employeeHref,
         linkColumnId: employeeHref ? "title" : undefined,
@@ -110,10 +118,20 @@ export function buildHrComplianceExceptionsListSurface(input: {
           severity: formatComplianceListEnumCell(row.severity),
           status: formatComplianceListEnumCell(row.status),
           statusValue: row.status,
+          owner: formatComplianceEmployeeListCell({
+            employeeNumber: row.correctiveActionOwnerEmployeeNumber,
+            employeeDisplayName: row.correctiveActionOwnerDisplayName,
+            style: "name-first",
+          }),
+          correctiveActionOwnerEmployeeIdValue:
+            row.correctiveActionOwnerEmployeeId ?? "",
+          correctiveActionDescriptionValue: row.correctiveActionDescription ?? "",
+          correctiveDuePostureValue: correctiveDuePosture ?? "",
           dueDate: row.correctiveActionDueDate?.toISOString() ?? "",
           correctiveActionDueDateInput: formatComplianceDateTimeLocalInput(
             row.correctiveActionDueDate,
           ),
+          employeeIdValue: row.employeeId ?? "",
         },
         cellKinds: {
           gap: {
@@ -128,6 +146,14 @@ export function buildHrComplianceExceptionsListSurface(input: {
             kind: "badge",
             tone: resolveComplianceExceptionStatusBadgeTone(row.status),
           },
+          ...(correctiveDuePosture
+            ? {
+                dueDate: {
+                  kind: "badge" as const,
+                  tone: resolveCorrectiveActionDueBadgeTone(correctiveDuePosture),
+                },
+              }
+            : undefined),
         },
         trailingAction: canWrite
           ? resolveListSurfaceRowTrailingAction({

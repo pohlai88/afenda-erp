@@ -91,6 +91,7 @@ describe("hr workforce compliance list surfaces", () => {
       "MY · AFENDA-MY · KL-HQ · permanent · staff · Legal",
     );
     expect(configuration.rows[0]?.trailingAction?.state).toBe("ready");
+    expect(configuration.rows[0]?.rowTone).toBe("default");
     expect(configuration.surface?.empty?.description).toContain(
       "legal entity",
     );
@@ -111,6 +112,10 @@ describe("hr workforce compliance list surfaces", () => {
             title: "Missing: SAF-01 · Induction",
             severity: "high",
             status: "open",
+            correctiveActionOwnerEmployeeId: null,
+            correctiveActionOwnerEmployeeNumber: null,
+            correctiveActionOwnerDisplayName: null,
+            correctiveActionDescription: null,
             correctiveActionDueDate: null,
             createdAt: new Date("2026-05-01T12:00:00.000Z"),
           },
@@ -163,6 +168,10 @@ describe("hr workforce compliance list surfaces", () => {
             title: "Overdue: SAF-02",
             severity: "medium",
             status: "in_progress",
+            correctiveActionOwnerEmployeeId: "emp_owner",
+            correctiveActionOwnerEmployeeNumber: "E-200",
+            correctiveActionOwnerDisplayName: "Jordan Lee",
+            correctiveActionDescription: "Complete overdue safety training",
             correctiveActionDueDate: new Date("2026-06-15T08:30:00.000Z"),
             createdAt: new Date("2026-05-02T12:00:00.000Z"),
           },
@@ -179,6 +188,51 @@ describe("hr workforce compliance list surfaces", () => {
         new Date("2026-06-15T08:30:00.000Z"),
       ),
     );
+    expect(withDueDate.rows[0]?.cells.correctiveActionOwnerEmployeeIdValue).toBe(
+      "emp_owner",
+    );
+    expect(withDueDate.rows[0]?.cells.owner).toContain("Jordan Lee");
+    expect(withDueDate.rows[0]?.cells.correctiveActionDescriptionValue).toBe(
+      "Complete overdue safety training",
+    );
+
+    const overdueCorrective = buildHrComplianceExceptionsListSurface({
+      window: {
+        rows: [
+          {
+            id: "exc_overdue",
+            employeeId: "emp_3",
+            employeeNumber: "E-300",
+            employeeDisplayName: "Sam Rivera",
+            complianceArea: "safety",
+            itemType: "overdue",
+            gapKind: "overdue",
+            title: "Overdue corrective",
+            severity: "low",
+            status: "in_progress",
+            correctiveActionOwnerEmployeeId: "emp_owner",
+            correctiveActionOwnerEmployeeNumber: "E-300",
+            correctiveActionOwnerDisplayName: "Sam Rivera",
+            correctiveActionDescription: "Follow up",
+            correctiveActionDueDate: new Date("2020-01-01T00:00:00.000Z"),
+            createdAt: new Date("2026-05-02T12:00:00.000Z"),
+          },
+        ],
+        pageSize: 25,
+        totalCount: 1,
+        hasNextPage: false,
+      },
+      canWrite: true,
+    });
+
+    expect(overdueCorrective.rows[0]?.cells.correctiveDuePostureValue).toBe(
+      "overdue",
+    );
+    expect(overdueCorrective.rows[0]?.cellKinds?.dueDate).toEqual({
+      kind: "badge",
+      tone: "critical",
+    });
+    expect(overdueCorrective.rows[0]?.rowTone).toBe("critical");
   });
 
   it("builds labor law list with employee link and effective status tone", () => {
@@ -538,6 +592,7 @@ describe("hr workforce compliance list surfaces", () => {
         hasNextPage: false,
       },
       canWrite: true,
+      canViewSensitive: true,
     });
 
     expect(hrComplianceWorkEligibilitySurfaceKey).toBe(
@@ -577,6 +632,7 @@ describe("hr workforce compliance list surfaces", () => {
         hasNextPage: false,
       },
       canWrite: true,
+      canViewSensitive: true,
     });
 
     expect(hrComplianceWorkAuthDocumentsSurfaceKey).toBe(
@@ -633,6 +689,7 @@ describe("hr workforce compliance list surfaces", () => {
         hasNextPage: false,
       },
       canWrite: true,
+      canViewSensitive: true,
     });
 
     expect(configuration.rows[0]?.cells.status).toBe("Missing");
@@ -669,6 +726,7 @@ describe("hr workforce compliance list surfaces", () => {
         hasNextPage: false,
       },
       canWrite: true,
+      canViewSensitive: true,
     });
 
     expect(configuration.rows[0]?.cells.status).toBe("Missing");
@@ -702,6 +760,7 @@ describe("hr workforce compliance list surfaces", () => {
         hasNextPage: false,
       },
       canWrite: true,
+      canViewSensitive: true,
     });
 
     expect(configuration.rows[0]?.cells.status).toBe("Expiring");
@@ -734,6 +793,7 @@ describe("hr workforce compliance list surfaces", () => {
         hasNextPage: false,
       },
       canWrite: true,
+      canViewSensitive: true,
     });
 
     expect(configuration.rows[0]?.cells.status).toBe("Expired");
@@ -769,6 +829,7 @@ describe("hr workforce compliance list surfaces", () => {
         hasNextPage: false,
       },
       canWrite: true,
+      canViewSensitive: true,
     });
 
     expect(configuration.rows[0]?.cells.status).toBe("Verified");
@@ -795,6 +856,7 @@ describe("hr workforce compliance list surfaces", () => {
         hasNextPage: false,
       },
       canWrite: true,
+      canViewSensitive: true,
     });
 
     expect(configuration.rows[0]?.trailingAction?.state).toBe("hidden");

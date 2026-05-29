@@ -145,6 +145,17 @@ export const hrComplianceEvidenceSubmissionStateEnum = pgEnum(
   ["draft", "submitted", "acknowledged"],
 );
 
+export const hrComplianceEvidenceRecordKindEnum = pgEnum(
+  "hr_compliance_evidence_record_kind",
+  [
+    "filing",
+    "employee_requirement",
+    "work_auth_document",
+    "work_eligibility",
+    "exception",
+  ],
+);
+
 export const hrLeaveTypeEnum = pgEnum("hr_leave_type", [
   "annual",
   "sick",
@@ -701,6 +712,9 @@ export const hrComplianceExceptions = pgTable(
       .notNull()
       .default("open"),
     correctiveActionDescription: text("corrective_action_description"),
+    correctiveActionOwnerEmployeeId: text(
+      "corrective_action_owner_employee_id",
+    ).references(() => hrEmployees.id, { onDelete: "set null" }),
     correctiveActionDueDate: timestamp("corrective_action_due_date", {
       withTimezone: true,
     }),
@@ -719,6 +733,10 @@ export const hrComplianceExceptions = pgTable(
     index("hr_compliance_exceptions_org_employee_idx").on(
       table.organizationId,
       table.employeeId,
+    ),
+    index("hr_compliance_exceptions_org_corrective_owner_idx").on(
+      table.organizationId,
+      table.correctiveActionOwnerEmployeeId,
     ),
     index("hr_compliance_exceptions_org_area_idx").on(
       table.organizationId,
@@ -863,6 +881,56 @@ export const hrComplianceWorkAuthorizationDocuments = pgTable(
     index("hr_compliance_work_auth_docs_org_type_idx").on(
       table.organizationId,
       table.documentType,
+    ),
+  ],
+);
+
+export const hrComplianceEvidenceLinks = pgTable(
+  "hr_compliance_evidence_links",
+  {
+    id: text("id").primaryKey(),
+    organizationId: organizationReference(),
+    recordKind: hrComplianceEvidenceRecordKindEnum("record_kind").notNull(),
+    recordId: text("record_id").notNull(),
+    /** Snapshot label for list surfaces — set at link time from the source record. */
+    recordLabel: text("record_label").notNull(),
+    employeeId: text("employee_id").references(() => hrEmployees.id, {
+      onDelete: "set null",
+    }),
+    employeeDocumentId: text("employee_document_id")
+      .notNull()
+      .references(() => hrEmployeeDocuments.id, { onDelete: "cascade" }),
+    submissionState: hrComplianceEvidenceSubmissionStateEnum("submission_state")
+      .notNull()
+      .default("draft"),
+    notes: text("notes"),
+    submittedAt: timestamp("submitted_at", { withTimezone: true }),
+    acknowledgedAt: timestamp("acknowledged_at", { withTimezone: true }),
+    ...timestampColumns,
+  },
+  (table) => [
+    uniqueIndex("hr_compliance_evidence_links_org_record_doc_uidx").on(
+      table.organizationId,
+      table.recordKind,
+      table.recordId,
+      table.employeeDocumentId,
+    ),
+    index("hr_compliance_evidence_links_org_record_idx").on(
+      table.organizationId,
+      table.recordKind,
+      table.recordId,
+    ),
+    index("hr_compliance_evidence_links_org_employee_idx").on(
+      table.organizationId,
+      table.employeeId,
+    ),
+    index("hr_compliance_evidence_links_org_document_idx").on(
+      table.organizationId,
+      table.employeeDocumentId,
+    ),
+    index("hr_compliance_evidence_links_org_state_idx").on(
+      table.organizationId,
+      table.submissionState,
     ),
   ],
 );

@@ -6,6 +6,9 @@ import {
   type ExecutionContext,
 } from "@afenda/kernel/execution";
 
+import { HR_COMPLIANCE_SENSITIVE_READ_CAPABILITY } from "../data/hr.workforce.compliance-sensitive-access.shared";
+import { HrComplianceSensitiveAccessError } from "../data/hr.workforce.compliance-org-scope.shared";
+
 export type HrComplianceExecutionGuard = {
   context: ExecutionContext;
   session: { id: string };
@@ -16,6 +19,7 @@ export type HrComplianceExecutionGuard = {
     role: ExecutionContext["role"];
     capabilities: readonly AppCapability[];
   };
+  canViewSensitive: boolean;
   hasCapability(capability: AppCapability): boolean;
 };
 
@@ -32,6 +36,10 @@ function toHrComplianceExecutionGuard(
       role: context.role,
       capabilities: context.capabilities,
     },
+    canViewSensitive: hasExecutionPermission(
+      context,
+      HR_COMPLIANCE_SENSITIVE_READ_CAPABILITY,
+    ),
     hasCapability(capability: AppCapability) {
       return hasExecutionPermission(context, capability);
     },
@@ -48,4 +56,13 @@ export async function requireHrComplianceWrite() {
   const context = await requireExecutionContext();
   requireExecutionPermission(context, "hr.compliance.write");
   return toHrComplianceExecutionGuard(context);
+}
+
+/** HRM-CMP-024 — sensitive register mutations require write plus sensitive read. */
+export async function requireHrComplianceSensitiveWrite() {
+  const guard = await requireHrComplianceWrite();
+  if (!guard.canViewSensitive) {
+    throw new HrComplianceSensitiveAccessError();
+  }
+  return guard;
 }

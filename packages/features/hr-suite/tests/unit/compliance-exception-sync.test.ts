@@ -192,6 +192,7 @@ describe("HRM-CMP-017 compliance exception gap classification", () => {
       resolutionNote: null,
       resolvedAt: null,
       correctiveActionDescription: null,
+      correctiveActionOwnerEmployeeId: null,
       correctiveActionDueDate: null,
     });
   });

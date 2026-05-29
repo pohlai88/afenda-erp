@@ -107,6 +107,7 @@ export function deriveWorkAuthEffectiveStatus(input: {
   documentNumber?: string | null;
   expiresAt: Date | null;
   now: Date;
+  hasLinkedEvidenceDocument?: boolean;
 }): string {
   const status = normalizeWorkAuthDocumentStatus({
     status: input.status as
@@ -116,6 +117,7 @@ export function deriveWorkAuthEffectiveStatus(input: {
       | "rejected"
       | "waived",
     documentNumber: input.documentNumber,
+    hasLinkedEvidenceDocument: input.hasLinkedEvidenceDocument,
   });
 
   if (status === "missing" || status === "rejected" || status === "waived") {

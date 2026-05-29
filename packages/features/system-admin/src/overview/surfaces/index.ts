@@ -1,11 +1,13 @@
 import {
-  buildSystemAdminOverviewStatGrid,
+  buildSystemAdminOverviewGovernanceStatGrid,
+  buildSystemAdminOverviewIdentityStatGrid,
   systemAdminOverviewStatSurfaceKey,
 } from "../surfaces/system-admin.overview-stat.surface";
 import type { SystemAdminOverviewSnapshot } from "../contracts";
 
 export {
-  buildSystemAdminOverviewStatGrid,
+  buildSystemAdminOverviewGovernanceStatGrid,
+  buildSystemAdminOverviewIdentityStatGrid,
   systemAdminOverviewStatSurfaceKey,
 };
 
@@ -14,8 +16,14 @@ export function buildSystemAdminOverviewStatGroups(input: {
 }) {
   return [
     {
-      groupKey: "overview",
-      configuration: buildSystemAdminOverviewStatGrid(input),
+      groupKey: "identity",
+      label: "Identity",
+      configuration: buildSystemAdminOverviewIdentityStatGrid(input),
+    },
+    {
+      groupKey: "governance",
+      label: "Governance",
+      configuration: buildSystemAdminOverviewGovernanceStatGrid(input),
     },
   ] as const;
 }

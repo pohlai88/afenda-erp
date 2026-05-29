@@ -1,3 +1,7 @@
+import { buildComplianceStatusUpdateAuditMetadata } from "./hr.workforce.compliance.audit-trail.shared";
+
+export { buildComplianceStatusUpdateAuditMetadata } from "./hr.workforce.compliance.audit-trail.shared";
+
 export function resolveCertificationExpiresAtMutationInput(
   formData: FormData,
   certificationExpiresAt: Date | null,
@@ -18,13 +22,14 @@ export function buildRequirementStatusAuditMetadata(input: {
   status: string;
   certificationExpiresAt?: Date | null;
   includeCertificationExpiry?: boolean;
+  reviewNotes?: string | null;
+  includeReviewNotes?: boolean;
 }) {
-  const metadata: Record<string, unknown> = { status: input.status };
-
-  if (input.includeCertificationExpiry) {
-    metadata.certificationExpiresAt =
-      input.certificationExpiresAt?.toISOString() ?? null;
-  }
-
-  return metadata;
+  return buildComplianceStatusUpdateAuditMetadata({
+    status: input.status,
+    reviewNotes: input.reviewNotes,
+    includeReviewNotes: input.includeReviewNotes,
+    certificationExpiresAt: input.certificationExpiresAt,
+    includeCertificationExpiry: input.includeCertificationExpiry,
+  });
 }

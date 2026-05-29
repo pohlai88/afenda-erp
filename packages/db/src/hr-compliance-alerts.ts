@@ -1,5 +1,6 @@
 import { and, eq, inArray, isNotNull, isNull, notInArray, or } from "drizzle-orm";
 import { runWithOrganizationContext } from "./client";
+import { buildWorkAuthLinkedEvidenceCountSelect } from "./hr-compliance-evidence-links";
 import { activeFilingObligationKindCondition } from "./hr-compliance-filings.shared";
 import { HR_COMPLIANCE_POLICY_ACKNOWLEDGEMENT_REQUIREMENT_KIND } from "./hr-compliance-policy-acknowledgement.shared";
 import { HR_COMPLIANCE_SAFETY_TRAINING_REQUIREMENT_KIND } from "./hr-compliance-safety-training.shared";
@@ -36,6 +37,7 @@ type AlertCandidateDraft = {
   requirementKind: string | null;
   employeeId: string | null;
   documentNumber?: string | null;
+  linkedEvidenceCount?: number;
   alertKind: HrComplianceAlertKind;
   severity: HrComplianceAlertSeverity;
   searchText: string;
@@ -74,6 +76,7 @@ function pushAlertCandidate(
     triggerAt: draft.triggerAt,
     requirementKind: draft.requirementKind,
     documentNumber: draft.documentNumber,
+    linkedEvidenceCount: draft.linkedEvidenceCount,
     now,
   });
 
@@ -218,6 +221,9 @@ export async function listHrComplianceAlertsWindow(input: {
           status: hrComplianceWorkAuthorizationDocuments.status,
           documentNumber: hrComplianceWorkAuthorizationDocuments.documentNumber,
           expiresAt: hrComplianceWorkAuthorizationDocuments.expiresAt,
+          linkedEvidenceCount: buildWorkAuthLinkedEvidenceCountSelect(
+            input.organizationId,
+          ),
         })
         .from(hrComplianceWorkAuthorizationDocuments)
         .innerJoin(
@@ -246,6 +252,9 @@ export async function listHrComplianceAlertsWindow(input: {
           documentType: hrComplianceWorkAuthorizationDocuments.documentType,
           status: hrComplianceWorkAuthorizationDocuments.status,
           documentNumber: hrComplianceWorkAuthorizationDocuments.documentNumber,
+          linkedEvidenceCount: buildWorkAuthLinkedEvidenceCountSelect(
+            input.organizationId,
+          ),
         })
         .from(hrComplianceWorkAuthorizationDocuments)
         .innerJoin(
@@ -398,6 +407,7 @@ export async function listHrComplianceAlertsWindow(input: {
           requirementKind: null,
           employeeId: row.employeeId,
           documentNumber: row.documentNumber,
+          linkedEvidenceCount: Number(row.linkedEvidenceCount ?? 0),
           searchText: `${title} ${subjectLabel} ${row.documentType} renewal expiry`,
         },
         now,
@@ -441,6 +451,7 @@ export async function listHrComplianceAlertsWindow(input: {
           requirementKind: null,
           employeeId: row.employeeId,
           documentNumber: row.documentNumber,
+          linkedEvidenceCount: Number(row.linkedEvidenceCount ?? 0),
           searchText: `${title} ${subjectLabel} ${row.documentType} missing`,
         },
         now,
@@ -512,6 +523,9 @@ export async function listHrComplianceAlertsWindow(input: {
       employeeId: entry.employeeId,
       ...(entry.documentNumber !== undefined
         ? { documentNumber: entry.documentNumber }
+        : undefined),
+      ...(entry.linkedEvidenceCount !== undefined
+        ? { linkedEvidenceCount: entry.linkedEvidenceCount }
         : undefined),
     }));
 

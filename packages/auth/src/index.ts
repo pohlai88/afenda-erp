@@ -34,6 +34,7 @@ export const appCapabilities = [
   "hr.offboarding.write",
   "hr.compliance.read",
   "hr.compliance.write",
+  "hr.compliance.sensitive.read",
   "hr.leave.read",
   "hr.leave.write",
   "hr.onboarding.read",

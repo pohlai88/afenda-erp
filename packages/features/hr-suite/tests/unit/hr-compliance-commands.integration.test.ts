@@ -3,13 +3,16 @@ import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
   archiveHrComplianceObligation,
+  archiveHrEmployeeDocument,
   assignHrComplianceCorrectiveAction,
   createHrComplianceException,
   listHrComplianceAlertsWindow,
   listHrComplianceExceptionsWindow,
+  listHrComplianceEvidenceLinksWindow,
   listHrComplianceFilingsWindow,
   listHrComplianceRegulatoryCalendarWindow,
   listHrComplianceObligationsWindow,
+  listHrEmployeeDirectoryWindow,
   listHrEmployeeLaborLawRequirementsWindow,
   listHrEmployeePolicyAcknowledgementsWindow,
   listHrEmployeeSafetyTrainingRequirementsWindow,
@@ -19,6 +22,9 @@ import {
   resolveHrComplianceException,
   ensureHrWorkAuthorizationDocuments,
   ensureHrWorkEligibilityTracking,
+  linkHrComplianceEvidence,
+  buildComplianceExceptionSourceReferenceId,
+  HR_COMPLIANCE_EXCEPTION_AUTO_RESOLVED_NOTE,
   syncHrComplianceFilings,
   syncHrComplianceExceptions,
   syncHrEmployeeLaborLawRequirements,
@@ -34,6 +40,9 @@ import {
   updateHrWorkAuthorizationDocument,
   updateHrWorkEligibilityStatus,
   upsertHrComplianceObligation,
+  registerHrEmployeeDocument,
+  unlinkHrComplianceEvidence,
+  updateHrComplianceEvidenceSubmissionState,
   waiveHrComplianceException,
 } from "@afenda/db";
 import { describe, expect, it } from "vitest";
@@ -54,6 +63,18 @@ const integrationEnabled = Boolean(
 describe.skipIf(!integrationEnabled)("hr compliance commands integration", () => {
   const organizationId = process.env.HR_SEED_TEST_ORG_ID ?? "org_afenda_demo";
   const obligationCode = `INT-CMP-${Date.now()}`;
+
+  async function loadIntegrationOwnerEmployeeId() {
+    const directory = await listHrEmployeeDirectoryWindow({
+      organizationId,
+      limit: 25,
+    });
+    const ownerEmployeeId = directory.rows.find(
+      (row) => row.employmentStatus === "active",
+    )?.id;
+    expect(ownerEmployeeId).toBeTruthy();
+    return ownerEmployeeId as string;
+  }
 
   it(
     "upserts obligation, archives it, and manages exceptions",
@@ -85,6 +106,30 @@ describe.skipIf(!integrationEnabled)("hr compliance commands integration", () =>
     });
     expect(created.exceptionId).toBeTruthy();
 
+    const ownerEmployeeId = await loadIntegrationOwnerEmployeeId();
+
+    await expect(
+      createHrComplianceException({
+        organizationId,
+        title: "Incomplete corrective pair",
+        complianceArea: "integration",
+        itemType: "gap",
+        correctiveActionOwnerEmployeeId: ownerEmployeeId,
+      }),
+    ).rejects.toMatchObject({
+      code: "corrective_action_assignment_incomplete",
+    });
+
+    await expect(
+      updateHrComplianceCorrectiveActionProgress({
+        organizationId,
+        exceptionId: created.exceptionId,
+        progressNote: "Should fail before assignment",
+      }),
+    ).rejects.toMatchObject({
+      code: "corrective_action_not_assigned",
+    });
+
     const createdWithCorrective = await createHrComplianceException({
       organizationId,
       title: "Integration exception with corrective at create",
@@ -92,6 +137,7 @@ describe.skipIf(!integrationEnabled)("hr compliance commands integration", () =>
       itemType: "gap",
       severity: "high",
       correctiveActionDescription: "Initial corrective plan",
+      correctiveActionOwnerEmployeeId: ownerEmployeeId,
       correctiveActionDueDate: new Date("2026-07-01T00:00:00.000Z"),
     });
     const withCorrectiveRows = await listHrComplianceExceptionsWindow({
@@ -115,6 +161,7 @@ describe.skipIf(!integrationEnabled)("hr compliance commands integration", () =>
       organizationId,
       exceptionId: created.exceptionId,
       correctiveActionDescription: "Complete training",
+      correctiveActionOwnerEmployeeId: ownerEmployeeId,
       correctiveActionDueDate: new Date("2026-06-01T00:00:00.000Z"),
     });
     expect(assigned.exceptionId).toBe(created.exceptionId);
@@ -371,6 +418,127 @@ describe.skipIf(!integrationEnabled)("hr compliance commands integration", () =>
   );
 
   it(
+    "auto-resolves and reopens filing-linked exceptions when overdue posture returns (HRM-CMP-017)",
+    async () => {
+      const filingCode = `INT-EXC-${Date.now()}`;
+      const pastDeadline = new Date("2020-03-01T00:00:00.000Z");
+      const upserted = await upsertHrComplianceObligation({
+        organizationId,
+        code: filingCode,
+        title: "Overdue filing exception cycle",
+        complianceArea: "filing",
+        requirementKind: "filing",
+        dueDate: pastDeadline,
+      });
+
+      await syncHrComplianceFilings({ organizationId });
+
+      const filings = await listHrComplianceFilingsWindow({
+        organizationId,
+        search: filingCode,
+        limit: 5,
+      });
+      const filingId = filings.rows[0]?.id;
+      expect(filingId).toBeTruthy();
+
+      const sourceReferenceId = buildComplianceExceptionSourceReferenceId({
+        sourceKind: "filing",
+        sourceId: filingId as string,
+        gapKind: "overdue",
+      });
+
+      const materialized = await syncHrComplianceExceptions({ organizationId });
+      expect(materialized.createdCount).toBeGreaterThanOrEqual(1);
+
+      const openAfterMaterialize = await listHrComplianceExceptionsWindow({
+        organizationId,
+        search: filingCode,
+        openOnly: true,
+        limit: 10,
+      });
+      const exceptionId = openAfterMaterialize.rows[0]?.id;
+      expect(exceptionId).toBeTruthy();
+      expect(openAfterMaterialize.rows[0]?.gapKind).toBe("overdue");
+
+      const ownerEmployeeId = await loadIntegrationOwnerEmployeeId();
+
+      await assignHrComplianceCorrectiveAction({
+        organizationId,
+        exceptionId: exceptionId as string,
+        correctiveActionDescription: "File statutory return",
+        correctiveActionOwnerEmployeeId: ownerEmployeeId,
+        correctiveActionDueDate: new Date("2026-08-01T00:00:00.000Z"),
+      });
+
+      const inProgress = await listHrComplianceExceptionsWindow({
+        organizationId,
+        search: filingCode,
+        openOnly: true,
+        limit: 5,
+      });
+      expect(inProgress.rows[0]?.status).toBe("in_progress");
+      expect(inProgress.rows[0]?.correctiveActionOwnerEmployeeId).toBe(
+        ownerEmployeeId,
+      );
+      expect(inProgress.rows[0]?.correctiveActionDueDate).toBeTruthy();
+
+      await updateHrComplianceFiling({
+        organizationId,
+        filingId: filingId as string,
+        status: "submitted",
+        reviewNotes: "cleared overdue for exception auto-resolve",
+      });
+
+      const autoResolved = await syncHrComplianceExceptions({ organizationId });
+      expect(autoResolved.resolvedCount).toBeGreaterThanOrEqual(1);
+
+      const openAfterResolve = await listHrComplianceExceptionsWindow({
+        organizationId,
+        search: filingCode,
+        openOnly: true,
+        limit: 5,
+      });
+      expect(
+        openAfterResolve.rows.some((row) => row.id === exceptionId),
+      ).toBe(false);
+
+      await updateHrComplianceFiling({
+        organizationId,
+        filingId: filingId as string,
+        status: "pending",
+        filingDeadline: pastDeadline,
+        reviewNotes: "restored overdue posture",
+      });
+
+      const reopened = await syncHrComplianceExceptions({ organizationId });
+      expect(reopened.reopenedCount).toBeGreaterThanOrEqual(1);
+
+      const openAfterReopen = await listHrComplianceExceptionsWindow({
+        organizationId,
+        search: filingCode,
+        openOnly: true,
+        limit: 5,
+      });
+      const reopenedRow = openAfterReopen.rows.find((row) => row.id === exceptionId);
+      expect(reopenedRow?.status).toBe("open");
+      expect(reopenedRow?.gapKind).toBe("overdue");
+      expect(reopenedRow?.correctiveActionOwnerEmployeeId).toBeNull();
+      expect(reopenedRow?.correctiveActionDueDate).toBeNull();
+
+      expect(sourceReferenceId).toContain(filingId as string);
+      expect(HR_COMPLIANCE_EXCEPTION_AUTO_RESOLVED_NOTE).toContain("Auto-resolved");
+
+      await archiveHrComplianceObligation({
+        organizationId,
+        obligationId: upserted.obligationId,
+      });
+      await syncHrComplianceFilings({ organizationId });
+      await syncHrComplianceExceptions({ organizationId });
+    },
+    45_000,
+  );
+
+  it(
     "derives overdue filings and corrective actions into the compliance alerts window",
     async () => {
       const filingCode = `INT-ALR-${Date.now()}`;
@@ -402,6 +570,7 @@ describe.skipIf(!integrationEnabled)("hr compliance commands integration", () =>
       expect(filingAlert?.sourceKind).toBe("filing");
 
       const exceptionTitle = `INT-ALR-CA-${Date.now()}`;
+      const alertOwnerEmployeeId = await loadIntegrationOwnerEmployeeId();
       const created = await createHrComplianceException({
         organizationId,
         title: exceptionTitle,
@@ -409,6 +578,7 @@ describe.skipIf(!integrationEnabled)("hr compliance commands integration", () =>
         itemType: "gap",
         severity: "high",
         correctiveActionDescription: "Resolve integration gap",
+        correctiveActionOwnerEmployeeId: alertOwnerEmployeeId,
         correctiveActionDueDate: new Date("2020-01-01T00:00:00.000Z"),
       });
 
@@ -675,6 +845,181 @@ describe.skipIf(!integrationEnabled)("hr compliance commands integration", () =>
       expect(
         missingRow,
       ).toBeTruthy();
+    },
+    30_000,
+  );
+
+  it(
+    "links, updates, and unlinks compliance evidence documents (HRM-CMP-020)",
+    async () => {
+      const employeeId = await loadIntegrationOwnerEmployeeId();
+
+      await ensureHrWorkAuthorizationDocuments({ organizationId });
+      const workAuthWindow = await listHrWorkAuthorizationDocumentsWindow({
+        organizationId,
+        limit: 10,
+      });
+      const workAuthRow = workAuthWindow.rows.find(
+        (row) => row.employeeId === employeeId,
+      );
+      expect(workAuthRow).toBeTruthy();
+
+      const { documentId } = await registerHrEmployeeDocument({
+        organizationId,
+        employeeId,
+        documentType: "work_permit_scan",
+        title: "Integration work permit scan",
+        blobUrl: "https://example.test/work-permit.pdf",
+        mimeType: "application/pdf",
+        sizeBytes: 4096,
+      });
+
+      const existingLinks = await listHrComplianceEvidenceLinksWindow({
+        organizationId,
+        recordKind: "work_auth_document",
+        recordId: workAuthRow!.id,
+        limit: 100,
+      });
+      for (const row of existingLinks.rows) {
+        await unlinkHrComplianceEvidence({
+          organizationId,
+          evidenceLinkId: row.id,
+        });
+      }
+
+      const linked = await linkHrComplianceEvidence({
+        organizationId,
+        recordKind: "work_auth_document",
+        recordId: workAuthRow!.id,
+        employeeDocumentId: documentId,
+        notes: "integration evidence link",
+      });
+      expect(linked.evidenceLinkId).toBeTruthy();
+
+      await expect(
+        linkHrComplianceEvidence({
+          organizationId,
+          recordKind: "work_auth_document",
+          recordId: workAuthRow!.id,
+          employeeDocumentId: documentId,
+        }),
+      ).rejects.toMatchObject({
+        code: "evidence_link_already_exists",
+      });
+
+      const window = await listHrComplianceEvidenceLinksWindow({
+        organizationId,
+        recordKind: "work_auth_document",
+        recordId: workAuthRow!.id,
+        limit: 10,
+      });
+      const linkedRow = window.rows.find(
+        (row) => row.employeeDocumentId === documentId,
+      );
+      expect(linkedRow).toBeTruthy();
+      expect(linkedRow?.employeeDocumentId).toBe(documentId);
+      expect(linkedRow?.submissionState).toBe("draft");
+
+      const updated = await updateHrComplianceEvidenceSubmissionState({
+        organizationId,
+        evidenceLinkId: linked.evidenceLinkId,
+        submissionState: "submitted",
+      });
+      expect(updated.evidenceLinkId).toBe(linked.evidenceLinkId);
+
+      const submittedWindow = await listHrComplianceEvidenceLinksWindow({
+        organizationId,
+        submissionState: "submitted",
+        limit: 10,
+      });
+      expect(
+        submittedWindow.rows.some((row) => row.id === linked.evidenceLinkId),
+      ).toBe(true);
+
+      const unlinked = await unlinkHrComplianceEvidence({
+        organizationId,
+        evidenceLinkId: linked.evidenceLinkId,
+      });
+      expect(unlinked.evidenceLinkId).toBe(linked.evidenceLinkId);
+
+      const afterUnlink = await listHrComplianceEvidenceLinksWindow({
+        organizationId,
+        recordKind: "work_auth_document",
+        recordId: workAuthRow!.id,
+        limit: 10,
+      });
+      expect(
+        afterUnlink.rows.some((row) => row.employeeDocumentId === documentId),
+      ).toBe(false);
+    },
+    30_000,
+  );
+
+  it(
+    "excludes archived employee documents from evidence windows and work-auth linkedEvidenceCount (HRM-CMP-020)",
+    async () => {
+      const employeeId = await loadIntegrationOwnerEmployeeId();
+
+      await ensureHrWorkAuthorizationDocuments({ organizationId });
+      const workAuthWindow = await listHrWorkAuthorizationDocumentsWindow({
+        organizationId,
+        limit: 10,
+      });
+      const workAuthRow = workAuthWindow.rows.find(
+        (row) => row.employeeId === employeeId,
+      );
+      expect(workAuthRow).toBeTruthy();
+
+      const { documentId } = await registerHrEmployeeDocument({
+        organizationId,
+        employeeId,
+        documentType: "work_permit_scan",
+        title: "Archive filter work permit scan",
+        blobUrl: "https://example.test/archive-filter.pdf",
+        mimeType: "application/pdf",
+        sizeBytes: 2048,
+      });
+
+      const linked = await linkHrComplianceEvidence({
+        organizationId,
+        recordKind: "work_auth_document",
+        recordId: workAuthRow!.id,
+        employeeDocumentId: documentId,
+      });
+
+      const beforeArchive = await listHrWorkAuthorizationDocumentsWindow({
+        organizationId,
+        limit: 10,
+      });
+      const rowBefore = beforeArchive.rows.find((row) => row.id === workAuthRow!.id);
+      expect(rowBefore?.linkedEvidenceCount).toBeGreaterThan(0);
+
+      await archiveHrEmployeeDocument({
+        organizationId,
+        documentId,
+      });
+
+      const listAfterArchive = await listHrComplianceEvidenceLinksWindow({
+        organizationId,
+        recordKind: "work_auth_document",
+        recordId: workAuthRow!.id,
+        limit: 10,
+      });
+      expect(
+        listAfterArchive.rows.some((row) => row.id === linked.evidenceLinkId),
+      ).toBe(false);
+
+      const workAuthAfter = await listHrWorkAuthorizationDocumentsWindow({
+        organizationId,
+        limit: 10,
+      });
+      const rowAfter = workAuthAfter.rows.find((row) => row.id === workAuthRow!.id);
+      expect(rowAfter?.linkedEvidenceCount).toBe(0);
+
+      await unlinkHrComplianceEvidence({
+        organizationId,
+        evidenceLinkId: linked.evidenceLinkId,
+      });
     },
     30_000,
   );

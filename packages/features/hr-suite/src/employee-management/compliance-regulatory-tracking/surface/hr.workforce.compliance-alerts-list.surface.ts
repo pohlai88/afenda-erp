@@ -3,9 +3,14 @@ import type { HrComplianceAlertWindow } from "@afenda/db";
 
 import { hrEmployeeDetailRoutePath } from "../contracts/hr.workforce.compliance-route.contract";
 import {
+  deriveEffectiveWorkAuthDocumentStatus,
+  type HrmComplianceWorkAuthDocumentStatus,
+} from "../data/hr.workforce.compliance-work-auth-documents.shared";
+import {
   deriveRegulatoryCalendarEffectiveSourceStatus,
   deriveRegulatoryCalendarPosture,
 } from "../data/hr.workforce.compliance-regulatory-calendar.shared";
+import { maskComplianceSensitiveStoredValue } from "../data/hr.workforce.compliance-sensitive-access.shared";
 import {
   formatComplianceAlertKindLabel,
   formatComplianceAlertSeverityLabel,
@@ -41,8 +46,9 @@ function mapAlertSourceKindToCalendarEntryKind(
 export function buildHrComplianceAlertsListSurface(input: {
   window: HrComplianceAlertWindow;
   searchValue?: string;
+  canViewSensitive?: boolean;
 }): ListSurfaceRendererConfigurationResolvedInput {
-  const { window, searchValue } = input;
+  const { window, searchValue, canViewSensitive = false } = input;
   const copy = hrComplianceUiCopy.alerts;
 
   return buildComplianceOperationalListSurface({
@@ -109,9 +115,18 @@ export function buildHrComplianceAlertsListSurface(input: {
     ],
     rows: window.rows.map((row) => {
       const calendarEntryKind = mapAlertSourceKindToCalendarEntryKind(row.sourceKind);
+      const redactedDocumentNumber = maskComplianceSensitiveStoredValue(
+        row.documentNumber,
+        canViewSensitive,
+      );
       const effectiveSourceStatus =
         row.sourceKind === "work_auth_missing"
-          ? "missing"
+          ? deriveEffectiveWorkAuthDocumentStatus({
+              status: row.sourceStatus as HrmComplianceWorkAuthDocumentStatus,
+              documentNumber: redactedDocumentNumber || null,
+              expiresAt: null,
+              hasLinkedEvidenceDocument: (row.linkedEvidenceCount ?? 0) > 0,
+            })
           : row.triggerAt === null
             ? row.sourceStatus
             : deriveRegulatoryCalendarEffectiveSourceStatus({
@@ -119,7 +134,8 @@ export function buildHrComplianceAlertsListSurface(input: {
                 sourceStatus: row.sourceStatus,
                 deadlineAt: row.triggerAt,
                 requirementKind: row.requirementKind,
-                documentNumber: row.documentNumber,
+                documentNumber: redactedDocumentNumber || null,
+                linkedEvidenceCount: row.linkedEvidenceCount,
               });
       const posture =
         row.triggerAt !== null

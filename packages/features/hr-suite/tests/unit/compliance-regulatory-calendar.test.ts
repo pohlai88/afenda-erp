@@ -99,6 +99,18 @@ describe("hr compliance regulatory calendar (HRM-CMP-010)", () => {
         now,
       }),
     ).toBe("missing");
+
+    expect(
+      deriveRegulatoryCalendarEffectiveSourceStatus({
+        entryKind: "work_auth_renewal",
+        sourceStatus: "pending_verification",
+        deadlineAt: pastDeadline,
+        documentNumber: null,
+        linkedEvidenceCount: 1,
+        requirementKind: null,
+        now,
+      }),
+    ).toBe("expired");
   });
 
   it("formats entry kind labels for the calendar grid", () => {
@@ -232,5 +244,71 @@ describe("hr compliance regulatory calendar (HRM-CMP-010)", () => {
       kind: "badge",
       tone: "default",
     });
+  });
+
+  it("derives work auth renewal status without document number when sensitive read is denied", () => {
+    const now = new Date("2026-05-30T12:00:00.000Z");
+    const configuration = buildHrComplianceRegulatoryCalendarListSurface({
+      now,
+      window: {
+        rows: [
+          {
+            id: "work_auth:doc_1",
+            entryKind: "work_auth_renewal",
+            deadlineAt: new Date("2028-06-01T00:00:00.000Z"),
+            title: "Work authorization renewal",
+            subjectLabel: "E-1001 · Alex Operator",
+            complianceArea: "work_authorization",
+            sourceStatus: "pending_verification",
+            requirementKind: null,
+            employeeId: "emp_1",
+            documentNumber: "P-123456",
+            linkedEvidenceCount: 0,
+          },
+        ],
+        pageSize: 25,
+        totalCount: 1,
+        hasNextPage: false,
+        mergeTruncated: false,
+      },
+      canViewSensitive: false,
+    });
+
+    expect(configuration.rows?.[0]?.cells?.effectiveSourceStatusValue).toBe(
+      "missing",
+    );
+  });
+
+  it("uses document number for work auth renewal status when sensitive read is granted", () => {
+    const now = new Date("2026-05-30T12:00:00.000Z");
+    const configuration = buildHrComplianceRegulatoryCalendarListSurface({
+      now,
+      window: {
+        rows: [
+          {
+            id: "work_auth:doc_1",
+            entryKind: "work_auth_renewal",
+            deadlineAt: new Date("2028-06-01T00:00:00.000Z"),
+            title: "Work authorization renewal",
+            subjectLabel: "E-1001 · Alex Operator",
+            complianceArea: "work_authorization",
+            sourceStatus: "pending_verification",
+            requirementKind: null,
+            employeeId: "emp_1",
+            documentNumber: "P-123456",
+            linkedEvidenceCount: 0,
+          },
+        ],
+        pageSize: 25,
+        totalCount: 1,
+        hasNextPage: false,
+        mergeTruncated: false,
+      },
+      canViewSensitive: true,
+    });
+
+    expect(configuration.rows?.[0]?.cells?.effectiveSourceStatusValue).toBe(
+      "pending_verification",
+    );
   });
 });

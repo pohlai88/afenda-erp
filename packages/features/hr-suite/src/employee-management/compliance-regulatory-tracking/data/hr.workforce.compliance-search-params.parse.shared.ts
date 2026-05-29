@@ -1,27 +1,41 @@
-import { hrComplianceRegulatoryCalendarSearchParam } from "../surface/hr.workforce.compliance-regulatory-calendar-list.surface";
-import { hrComplianceAlertsSearchParam } from "../surface/hr.workforce.compliance-alerts-list.surface";
-import { hrComplianceFilingSearchParam } from "../surface/hr.workforce.compliance-filings-list.surface";
-import { hrComplianceExceptionSearchParam } from "../surface/hr.workforce.compliance-exceptions-list.surface";
-import { hrComplianceLaborLawSearchParam } from "../surface/hr.workforce.compliance-labor-law-requirements-list.surface";
-import { hrComplianceObligationSearchParam } from "../surface/hr.workforce.compliance-obligations-list.surface";
-import { hrCompliancePolicyAcknowledgementSearchParam } from "../surface/hr.workforce.compliance-policy-acknowledgements-list.surface";
-import { hrComplianceSafetyTrainingSearchParam } from "../surface/hr.workforce.compliance-safety-training-requirements-list.surface";
-import { hrComplianceWorkAuthDocumentSearchParam } from "../surface/hr.workforce.compliance-work-auth-documents-list.surface";
-import { hrComplianceWorkEligibilitySearchParam } from "../surface/hr.workforce.compliance-work-eligibility-list.surface";
-import { hrComplianceWorkplaceSafetySearchParam } from "../surface/hr.workforce.compliance-workplace-safety-list.surface";
-
-export {
+import {
+  HR_COMPLIANCE_LIST_SEARCH_PARAM_MODEL_FIELDS,
+  HR_COMPLIANCE_LIST_SEARCH_PARAMS_BY_KEY,
+  HR_COMPLIANCE_LIST_SURFACE_KEYS,
+  hrComplianceAlertsSearchParam,
   hrComplianceExceptionSearchParam,
   hrComplianceFilingSearchParam,
-  hrComplianceRegulatoryCalendarSearchParam,
-  hrComplianceAlertsSearchParam,
   hrComplianceLaborLawSearchParam,
+  hrComplianceStatutorySearchParam,
   hrComplianceObligationSearchParam,
   hrCompliancePolicyAcknowledgementSearchParam,
+  hrComplianceRegulatoryCalendarSearchParam,
   hrComplianceSafetyTrainingSearchParam,
   hrComplianceWorkAuthDocumentSearchParam,
   hrComplianceWorkEligibilitySearchParam,
   hrComplianceWorkplaceSafetySearchParam,
+  hrComplianceEvidenceLinksSearchParam,
+  hrComplianceAuditTrailSearchParam,
+  hrComplianceReviewQueueSearchParam,
+} from "../surface/hr.workforce.compliance-surface-metadata.shared";
+
+export {
+  HR_COMPLIANCE_LIST_SEARCH_PARAMS_BY_KEY,
+  hrComplianceAlertsSearchParam,
+  hrComplianceExceptionSearchParam,
+  hrComplianceFilingSearchParam,
+  hrComplianceLaborLawSearchParam,
+  hrComplianceStatutorySearchParam,
+  hrComplianceObligationSearchParam,
+  hrCompliancePolicyAcknowledgementSearchParam,
+  hrComplianceRegulatoryCalendarSearchParam,
+  hrComplianceSafetyTrainingSearchParam,
+  hrComplianceWorkAuthDocumentSearchParam,
+  hrComplianceWorkEligibilitySearchParam,
+  hrComplianceWorkplaceSafetySearchParam,
+  hrComplianceEvidenceLinksSearchParam,
+  hrComplianceAuditTrailSearchParam,
+  hrComplianceReviewQueueSearchParam,
 };
 
 function readSearchParam(
@@ -43,6 +57,7 @@ export type HrComplianceSearchParams = {
   obligationSearch?: string;
   exceptionSearch?: string;
   laborLawSearch?: string;
+  statutorySearch?: string;
   policyAcknowledgementSearch?: string;
   safetyTrainingSearch?: string;
   workplaceSafetySearch?: string;
@@ -51,6 +66,9 @@ export type HrComplianceSearchParams = {
   filingSearch?: string;
   regulatoryCalendarSearch?: string;
   alertsSearch?: string;
+  evidenceLinksSearch?: string;
+  auditTrailSearch?: string;
+  reviewQueueSearch?: string;
 };
 
 export function parseHrComplianceSearchParams(
@@ -63,49 +81,31 @@ export function parseHrComplianceSearchParams(
   const legacySearch =
     readSearchParam(searchParams, "complianceSearch") ??
     readSearchParam(searchParams, "search");
-  const obligationSearch =
-    readSearchParam(searchParams, hrComplianceObligationSearchParam) ??
-    legacySearch;
-  const exceptionSearch =
-    readSearchParam(searchParams, hrComplianceExceptionSearchParam) ??
-    legacySearch;
-  const laborLawSearch =
-    readSearchParam(searchParams, hrComplianceLaborLawSearchParam) ??
-    legacySearch;
-  const policyAcknowledgementSearch =
-    readSearchParam(searchParams, hrCompliancePolicyAcknowledgementSearchParam) ??
-    legacySearch;
-  const safetyTrainingSearch =
-    readSearchParam(searchParams, hrComplianceSafetyTrainingSearchParam) ??
-    legacySearch;
-  const workplaceSafetySearch =
-    readSearchParam(searchParams, hrComplianceWorkplaceSafetySearchParam) ??
-    legacySearch;
-  const workEligibilitySearch =
-    readSearchParam(searchParams, hrComplianceWorkEligibilitySearchParam) ??
-    legacySearch;
-  const workAuthDocumentSearch =
-    readSearchParam(searchParams, hrComplianceWorkAuthDocumentSearchParam) ??
-    legacySearch;
-  const filingSearch =
-    readSearchParam(searchParams, hrComplianceFilingSearchParam) ?? legacySearch;
-  const regulatoryCalendarSearch =
-    readSearchParam(searchParams, hrComplianceRegulatoryCalendarSearchParam) ??
-    legacySearch;
-  const alertsSearch =
-    readSearchParam(searchParams, hrComplianceAlertsSearchParam) ?? legacySearch;
 
+  const parsed: HrComplianceSearchParams = {};
+
+  for (const surfaceKey of HR_COMPLIANCE_LIST_SURFACE_KEYS) {
+    const paramKey = HR_COMPLIANCE_LIST_SEARCH_PARAMS_BY_KEY[surfaceKey];
+    const modelField =
+      HR_COMPLIANCE_LIST_SEARCH_PARAM_MODEL_FIELDS[paramKey] as keyof HrComplianceSearchParams;
+    parsed[modelField] =
+      readSearchParam(searchParams, paramKey) ?? legacySearch;
+  }
+
+  return parsed;
+}
+
+/** Registry-driven bridge from App Router searchParams to the compliance page model (ARCH-006). */
+export function toHrCompliancePageModelInput(input: {
+  organizationId: string;
+  canWrite: boolean;
+  canViewSensitive: boolean;
+  searchParams?: Record<string, string | string[] | undefined>;
+}) {
   return {
-    obligationSearch,
-    exceptionSearch,
-    laborLawSearch,
-    policyAcknowledgementSearch,
-    safetyTrainingSearch,
-    workplaceSafetySearch,
-    workEligibilitySearch,
-    workAuthDocumentSearch,
-    filingSearch,
-    regulatoryCalendarSearch,
-    alertsSearch,
+    organizationId: input.organizationId,
+    canWrite: input.canWrite,
+    canViewSensitive: input.canViewSensitive,
+    ...parseHrComplianceSearchParams(input.searchParams),
   };
 }

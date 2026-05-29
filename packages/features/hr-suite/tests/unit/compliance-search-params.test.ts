@@ -13,6 +13,7 @@ describe("parseHrComplianceSearchParams", () => {
         complianceObligationSearch: " policy ",
         complianceExceptionSearch: " visa ",
         complianceLaborLawSearch: " overtime ",
+        complianceStatutorySearch: " epf ",
         compliancePolicyAcknowledgementSearch: " handbook ",
         complianceSafetyTrainingSearch: " forklift ",
         complianceWorkplaceSafetySearch: " induction ",
@@ -21,11 +22,15 @@ describe("parseHrComplianceSearchParams", () => {
         complianceFilingSearch: " epf ",
         complianceRegulatoryCalendarSearch: " renewal ",
         complianceAlertsSearch: " overdue ",
+        complianceReviewQueueSearch: " filing ",
+        complianceEvidenceLinksSearch: " permit scan ",
+        complianceAuditTrailSearch: " filing update ",
       }),
     ).toEqual({
       obligationSearch: "policy",
       exceptionSearch: "visa",
       laborLawSearch: "overtime",
+      statutorySearch: "epf",
       policyAcknowledgementSearch: "handbook",
       safetyTrainingSearch: "forklift",
       workplaceSafetySearch: "induction",
@@ -34,6 +39,9 @@ describe("parseHrComplianceSearchParams", () => {
       filingSearch: "epf",
       regulatoryCalendarSearch: "renewal",
       alertsSearch: "overdue",
+      reviewQueueSearch: "filing",
+      evidenceLinksSearch: "permit scan",
+      auditTrailSearch: "filing update",
     });
   });
 
@@ -46,6 +54,7 @@ describe("parseHrComplianceSearchParams", () => {
       obligationSearch: "shared",
       exceptionSearch: "shared",
       laborLawSearch: "shared",
+      statutorySearch: "shared",
       policyAcknowledgementSearch: "shared",
       safetyTrainingSearch: "shared",
       workplaceSafetySearch: "shared",
@@ -54,6 +63,9 @@ describe("parseHrComplianceSearchParams", () => {
       filingSearch: "shared",
       regulatoryCalendarSearch: "shared",
       alertsSearch: "shared",
+      reviewQueueSearch: "shared",
+      evidenceLinksSearch: "shared",
+      auditTrailSearch: "shared",
     });
   });
 
@@ -66,6 +78,7 @@ describe("parseHrComplianceSearchParams", () => {
       obligationSearch: "global",
       exceptionSearch: "global",
       laborLawSearch: "global",
+      statutorySearch: "global",
       policyAcknowledgementSearch: "global",
       safetyTrainingSearch: "global",
       workplaceSafetySearch: "global",
@@ -74,6 +87,9 @@ describe("parseHrComplianceSearchParams", () => {
       filingSearch: "global",
       regulatoryCalendarSearch: "global",
       alertsSearch: "global",
+      reviewQueueSearch: "global",
+      evidenceLinksSearch: "global",
+      auditTrailSearch: "global",
     });
   });
 
@@ -87,6 +103,7 @@ describe("parseHrComplianceSearchParams", () => {
       obligationSearch: "legacy",
       exceptionSearch: "legacy",
       laborLawSearch: "legacy",
+      statutorySearch: "legacy",
       policyAcknowledgementSearch: "legacy",
       safetyTrainingSearch: "legacy",
       workplaceSafetySearch: "legacy",
@@ -95,6 +112,9 @@ describe("parseHrComplianceSearchParams", () => {
       filingSearch: "legacy",
       regulatoryCalendarSearch: "legacy",
       alertsSearch: "legacy",
+      reviewQueueSearch: "legacy",
+      evidenceLinksSearch: "legacy",
+      auditTrailSearch: "legacy",
     });
   });
 
@@ -108,6 +128,7 @@ describe("parseHrComplianceSearchParams", () => {
       obligationSearch: "obligation-only",
       exceptionSearch: "legacy",
       laborLawSearch: "legacy",
+      statutorySearch: "legacy",
       policyAcknowledgementSearch: "legacy",
       safetyTrainingSearch: "legacy",
       workplaceSafetySearch: "legacy",
@@ -116,6 +137,9 @@ describe("parseHrComplianceSearchParams", () => {
       filingSearch: "legacy",
       regulatoryCalendarSearch: "legacy",
       alertsSearch: "legacy",
+      reviewQueueSearch: "legacy",
+      evidenceLinksSearch: "legacy",
+      auditTrailSearch: "legacy",
     });
   });
 });

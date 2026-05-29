@@ -17,6 +17,11 @@ import {
   updateHrEmployeeSafetyTrainingRequirementFormSchema,
 } from "../../src/employee-management/compliance-regulatory-tracking/schemas/hr.workforce.compliance-safety-training.schema";
 import { parseUpdateHrEmployeePolicyAcknowledgementForm } from "../../src/employee-management/compliance-regulatory-tracking/schemas/hr.workforce.compliance-policy-acknowledgement.schema";
+import {
+  assignHrComplianceCorrectiveActionFormSchema,
+  createHrComplianceExceptionFormSchema,
+  updateHrComplianceCorrectiveActionProgressFormSchema,
+} from "../../src/employee-management/compliance-regulatory-tracking/schemas/hr.workforce.compliance-exception.schema";
 
 describe("hrComplianceFormDateTimeInput", () => {
   it("accepts ISO datetime strings", () => {
@@ -209,5 +214,64 @@ describe("parseUpdateHrEmployeePolicyAcknowledgementForm", () => {
     if (parsed.success) {
       expect(parsed.data.reviewNotes).toBeNull();
     }
+  });
+});
+
+describe("createHrComplianceExceptionFormSchema", () => {
+  it("accepts manual create without corrective assignment", () => {
+    const parsed = createHrComplianceExceptionFormSchema.safeParse({
+      title: "Manual gap",
+      complianceArea: "safety",
+      itemType: "gap",
+    });
+
+    expect(parsed.success).toBe(true);
+  });
+
+  it("accepts paired corrective owner and due date at create", () => {
+    const parsed = createHrComplianceExceptionFormSchema.safeParse({
+      title: "Manual gap with corrective",
+      complianceArea: "safety",
+      itemType: "gap",
+      correctiveActionOwnerEmployeeId: "emp_owner",
+      correctiveActionDueDate: "2026-06-15T08:30",
+    });
+
+    expect(parsed.success).toBe(true);
+  });
+
+  it("rejects partial corrective owner/due pair at create", () => {
+    const parsed = createHrComplianceExceptionFormSchema.safeParse({
+      title: "Manual gap",
+      complianceArea: "safety",
+      itemType: "gap",
+      correctiveActionOwnerEmployeeId: "emp_owner",
+    });
+
+    expect(parsed.success).toBe(false);
+  });
+});
+
+describe("assignHrComplianceCorrectiveActionFormSchema", () => {
+  it("requires description, owner, and due date", () => {
+    const parsed = assignHrComplianceCorrectiveActionFormSchema.safeParse({
+      exceptionId: "exc_1",
+      correctiveActionDescription: "Complete training",
+      correctiveActionOwnerEmployeeId: "emp_owner",
+      correctiveActionDueDate: "2026-06-15T08:30",
+    });
+
+    expect(parsed.success).toBe(true);
+  });
+});
+
+describe("updateHrComplianceCorrectiveActionProgressFormSchema", () => {
+  it("requires a progress note", () => {
+    const parsed = updateHrComplianceCorrectiveActionProgressFormSchema.safeParse({
+      exceptionId: "exc_1",
+      progressNote: "Scheduled follow-up",
+    });
+
+    expect(parsed.success).toBe(true);
   });
 });

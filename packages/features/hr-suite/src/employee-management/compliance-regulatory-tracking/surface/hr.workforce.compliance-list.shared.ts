@@ -1,4 +1,15 @@
-import type { HrComplianceRegulatoryCalendarEntryKind, HrComplianceAlertKind, HrComplianceAlertSeverity, HrComplianceAlertSourceKind } from "@afenda/db";
+import type {
+  HrComplianceEvidenceSubmissionState,
+  HrComplianceRegulatoryCalendarEntryKind,
+  HrComplianceAlertKind,
+  HrComplianceAlertSeverity,
+  HrComplianceAlertSourceKind,
+} from "@afenda/db";
+
+import {
+  deriveRegulatoryCalendarPosture,
+  type HrmComplianceRegulatoryCalendarPosture,
+} from "../data/hr.workforce.compliance-regulatory-calendar.shared";
 
 import type { HrmComplianceFilingEffectiveStatus } from "../data/hr.workforce.compliance-filing.shared";
 import type { HrmComplianceRequirementStatus } from "../data/hr.workforce.compliance-status.shared";
@@ -206,6 +217,8 @@ export function resolveComplianceExceptionRowTone(input: {
   severity: string;
   status: string;
   gapKind?: string | null;
+  correctiveActionDueDate?: Date | null;
+  now?: Date;
 }): ComplianceListRowTone {
   const gapTone = resolveComplianceExceptionGapBadgeTone(input.gapKind);
   const normalizedSeverity = input.severity.toLowerCase();
@@ -213,11 +226,19 @@ export function resolveComplianceExceptionRowTone(input: {
     COMPLIANCE_EXCEPTION_SEVERITY_ROW_TONE[normalizedSeverity] ?? "default";
   const statusTone =
     COMPLIANCE_EXCEPTION_STATUS_ROW_TONE[input.status] ?? "default";
+  const correctiveOverdue =
+    input.status === "in_progress" &&
+    input.correctiveActionDueDate != null &&
+    deriveRegulatoryCalendarPosture({
+      deadlineAt: input.correctiveActionDueDate,
+      now: input.now,
+    }) === "overdue";
 
   if (
     gapTone === "critical" ||
     severityTone === "critical" ||
-    statusTone === "critical"
+    statusTone === "critical" ||
+    correctiveOverdue
   ) {
     return "critical";
   }
@@ -252,6 +273,33 @@ export function resolveComplianceExceptionSeverityBadgeTone(
 
 export function resolveComplianceExceptionStatusBadgeTone(status: string): BadgeTone {
   return COMPLIANCE_EXCEPTION_STATUS_BADGE_TONE[status] ?? "default";
+}
+
+export function deriveCorrectiveActionDuePosture(input: {
+  status: string;
+  correctiveActionDueDate: Date | null | undefined;
+  now?: Date;
+}): HrmComplianceRegulatoryCalendarPosture | null {
+  if (input.status !== "in_progress" || input.correctiveActionDueDate == null) {
+    return null;
+  }
+
+  return deriveRegulatoryCalendarPosture({
+    deadlineAt: input.correctiveActionDueDate,
+    now: input.now,
+  });
+}
+
+export function resolveCorrectiveActionDueBadgeTone(
+  posture: HrmComplianceRegulatoryCalendarPosture | null,
+): BadgeTone {
+  if (posture === "overdue") {
+    return "critical";
+  }
+  if (posture === "due_today") {
+    return "attention";
+  }
+  return "default";
 }
 
 const REGULATORY_CALENDAR_ENTRY_KIND_BADGE_TONE: Record<
@@ -447,8 +495,9 @@ export function resolveFilingListRowTone(
 export function resolveWorkAuthDocumentListTrailingAction(
   canWrite: boolean,
   effectiveStatus: HrmComplianceWorkAuthDocumentEffectiveStatus,
+  canViewSensitive = false,
 ) {
-  if (!canWrite) {
+  if (!canWrite || !canViewSensitive) {
     return undefined;
   }
 
@@ -462,8 +511,9 @@ export function resolveWorkAuthDocumentListTrailingAction(
 export function resolveWorkEligibilityListTrailingAction(
   canWrite: boolean,
   effectiveStatus: HrmComplianceWorkEligibilityStatus,
+  canViewSensitive = false,
 ) {
-  if (!canWrite) {
+  if (!canWrite || !canViewSensitive) {
     return undefined;
   }
 
@@ -504,6 +554,10 @@ export function resolveCertificationTrackedListTrailingAction(canWrite: boolean)
     : undefined;
 }
 
+/** HRM-CMP-003 — shares HRM-CMP-015 posture badge mapping with labor law. */
+export const resolveStatutoryRequirementListBadgeTone =
+  resolveLaborLawRequirementListBadgeTone;
+
 /** Labor law lists hide trailing updates once a requirement is compliant. */
 export function resolveLaborLawRequirementListTrailingAction(
   canWrite: boolean,
@@ -518,6 +572,10 @@ export function resolveLaborLawRequirementListTrailingAction(
     allowed: true,
   });
 }
+
+/** HRM-CMP-003 — statutory employment lists hide trailing updates once compliant. */
+export const resolveStatutoryRequirementListTrailingAction =
+  resolveLaborLawRequirementListTrailingAction;
 
 /** HRM-CMP-008 — policy acknowledgments hide trailing updates once acknowledged or waived. */
 export function resolvePolicyAcknowledgementListTrailingAction(
@@ -546,6 +604,54 @@ export function resolveFilingListTrailingAction(
 
   return resolveListSurfaceRowTrailingAction({
     visible: effectiveStatus !== "confirmed" && effectiveStatus !== "waived",
+    allowed: true,
+  });
+}
+
+const EVIDENCE_LINK_SUBMISSION_BADGE_TONE: Record<
+  HrComplianceEvidenceSubmissionState,
+  BadgeTone
+> = {
+  draft: "attention",
+  submitted: "default",
+  acknowledged: "default",
+};
+
+const EVIDENCE_LINK_SUBMISSION_ROW_TONE: Record<
+  HrComplianceEvidenceSubmissionState,
+  ComplianceListRowTone
+> = {
+  draft: "attention",
+  submitted: "default",
+  acknowledged: "default",
+};
+
+/** HRM-CMP-020 — evidence submission state badge tone for register scanability. */
+export function resolveEvidenceLinkListBadgeTone(
+  submissionState: HrComplianceEvidenceSubmissionState,
+): BadgeTone {
+  return EVIDENCE_LINK_SUBMISSION_BADGE_TONE[submissionState];
+}
+
+/** HRM-CMP-020 — evidence link row tone aligned with submission workflow posture. */
+export function resolveEvidenceLinkListRowTone(
+  submissionState: HrComplianceEvidenceSubmissionState,
+): ComplianceListRowTone {
+  return EVIDENCE_LINK_SUBMISSION_ROW_TONE[submissionState];
+}
+
+/** HRM-CMP-020 — evidence links expose trailing update/unlink when write and row scope allow. */
+export function resolveEvidenceLinkListTrailingAction(
+  canWrite: boolean,
+  isSensitiveRow = false,
+  canViewSensitive = false,
+) {
+  if (!canWrite || (isSensitiveRow && !canViewSensitive)) {
+    return undefined;
+  }
+
+  return resolveListSurfaceRowTrailingAction({
+    visible: true,
     allowed: true,
   });
 }
