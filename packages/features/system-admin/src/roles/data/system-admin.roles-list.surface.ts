@@ -7,6 +7,7 @@ import {
   linkCell,
 } from "../../overview/surfaces/system-admin.control-list.shared";
 import type { SystemAdminRoleRow } from "../contracts";
+import { systemAdminRolesUiCopy } from "../surface/system-admin.roles-ui.copy.shared";
 
 export const systemAdminRolesSurfaceKey = "system-admin.roles.list";
 
@@ -14,9 +15,11 @@ export function buildRolesListSurface(input: {
   roles: readonly SystemAdminRoleRow[];
   searchValue?: string;
 }): ListSurfaceRendererConfigurationResolvedInput {
+  const listCopy = systemAdminRolesUiCopy.list;
+
   return buildLinkedControlListSurface({
     key: systemAdminRolesSurfaceKey,
-    title: "Role catalog",
+    title: listCopy.title,
     object: "roles",
     columns: [
       {
@@ -59,7 +62,9 @@ export function buildRolesListSurface(input: {
         status: catalogStatusBadge(role.status),
       },
     })),
-    emptyTitle: "No roles are configured.",
+    emptyTitle: listCopy.emptyTitle,
+    emptyDescription: listCopy.emptyDescription,
+    searchPlaceholder: listCopy.searchPlaceholder,
     searchValue: input.searchValue,
   });
 }

@@ -14,7 +14,7 @@ import {
 } from "../../tenant-execution/contracts/system-admin.action-result.contract";
 import { systemAdminRoutePaths } from "../../overview/contracts/system-admin.route-paths.contract";
 import { requireSystemAdminPoliciesManage } from "../policies/system-admin.policy-rules.policy.server";
-import { dispatchSystemAdminWebhook } from "../../integrations";
+import { dispatchSystemAdminWebhook } from "../../integrations/server";
 import {
   systemAdminPolicyRuleAuditActionsByMode,
   systemAdminPolicyRuleWebhookEvents,

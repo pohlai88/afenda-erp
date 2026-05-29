@@ -147,7 +147,19 @@ export const systemAdminWebhookEvents = [
   {
     value: "system-admin.audit.export",
     label: "Audit evidence exported",
-    description: "Administrative audit evidence was exported to CSV.",
+    description:
+      "Administrative audit evidence was exported (CSV, JSON, Excel, or PDF).",
+  },
+  {
+    value: "system-admin.audit.review",
+    label: "Audit retention reviewed",
+    description:
+      "Retention policy or legal-hold posture was updated in the audit viewer.",
+  },
+  {
+    value: "system-admin.security.view",
+    label: "Security posture reviewed",
+    description: "An operator reviewed organization security posture.",
   },
   {
     value: "system-admin.security.updated",
@@ -178,6 +190,41 @@ export const systemAdminWebhookEvents = [
     value: "system-admin.security.session_policy.update",
     label: "Session policy updated",
     description: "Session max age or idle timeout changed.",
+  },
+  {
+    value: "system-admin.integrations.view",
+    label: "Integrations reviewed",
+    description: "An operator reviewed external connectivity posture.",
+  },
+  {
+    value: "system-admin.integration.credentials.create",
+    label: "API credential created",
+    description: "A new API credential was issued (secret shown once).",
+  },
+  {
+    value: "system-admin.integration.credentials.revoke",
+    label: "API credential revoked",
+    description: "An API credential was revoked.",
+  },
+  {
+    value: "system-admin.integration.webhook.create",
+    label: "Webhook registered",
+    description: "An outbound webhook endpoint was registered.",
+  },
+  {
+    value: "system-admin.integration.enable",
+    label: "Webhook enabled",
+    description: "An outbound webhook endpoint was enabled.",
+  },
+  {
+    value: "system-admin.integration.disable",
+    label: "Webhook disabled",
+    description: "An outbound webhook endpoint was disabled.",
+  },
+  {
+    value: "system-admin.integration.sso.update",
+    label: "SSO connection updated",
+    description: "Staged SSO metadata was updated.",
   },
   {
     value: "system-admin.organization.updated",

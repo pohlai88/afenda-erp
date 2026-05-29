@@ -5,6 +5,9 @@ import {
 } from "../../tenant-execution/data/system-admin.execution-settings.repository.server";
 import { resolveSystemAdminListSearch } from "../../overview/contracts/system-admin.list-search.shared";
 import { buildSystemAdminCapabilityCoverageRows } from "./system-admin.capabilities.coverage.server";
+import { buildSystemAdminCapabilityRoleMatrix } from "./system-admin.capabilities-role-matrix.server";
+import type { OrganizationRole } from "@afenda/auth";
+import { organizationRoles } from "@afenda/auth";
 
 export async function buildSystemAdminCapabilitiesPageModel(input: {
   organizationId: string;
@@ -14,6 +17,13 @@ export async function buildSystemAdminCapabilitiesPageModel(input: {
     input.searchParams,
     "capabilities",
   );
+  const matrixRoleRaw = input.searchParams?.matrixRole;
+  const matrixRole =
+    typeof matrixRoleRaw === "string" &&
+    (organizationRoles as readonly string[]).includes(matrixRoleRaw)
+      ? (matrixRoleRaw as OrganizationRole)
+      : undefined;
+
   const [moduleSettings, capabilitySettings] = await Promise.all([
     listTenantModuleSettings({
       organizationId: input.organizationId,
@@ -32,9 +42,16 @@ export async function buildSystemAdminCapabilitiesPageModel(input: {
     value: capability.key,
     label: capability.label,
   }));
+  const roleMatrix = await buildSystemAdminCapabilityRoleMatrix({
+    organizationId: input.organizationId,
+    moduleSettings,
+    capabilitySettings,
+    roleFilter: matrixRole,
+  });
 
   return {
     searchValue,
+    matrixRole,
     capabilities: capabilities.map((capability) => ({
       id: capability.id,
       capability: capability.capability,
@@ -54,5 +71,6 @@ export async function buildSystemAdminCapabilitiesPageModel(input: {
           : "None",
     })),
     capabilityOptions,
+    roleMatrix,
   };
 }

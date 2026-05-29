@@ -8,6 +8,7 @@ import {
   riskLevelBadge,
 } from "../../overview/surfaces/system-admin.control-list.shared";
 import type { SystemAdminPermissionListRow } from "../contracts";
+import { systemAdminPermissionsUiCopy } from "./system-admin.permissions-ui.copy.shared";
 
 export const systemAdminPermissionsSurfaceKey =
   "system-admin.permissions.list";
@@ -17,9 +18,11 @@ export function buildPermissionsListSurface(input: {
   searchValue?: string;
   coverageFilter?: string;
 }): ListSurfaceRendererConfigurationResolvedInput {
+  const catalogCopy = systemAdminPermissionsUiCopy.catalog;
+
   return buildLinkedControlListSurface({
     key: systemAdminPermissionsSurfaceKey,
-    title: "Permission catalog",
+    title: catalogCopy.title,
     object: "permissions",
     columns: [
       {
@@ -73,7 +76,9 @@ export function buildPermissionsListSurface(input: {
         riskLevel: riskLevelBadge(permission.riskLevel),
       },
     })),
-    emptyTitle: "No permissions match the current filters.",
+    emptyTitle: catalogCopy.emptyTitle,
+    emptyDescription: catalogCopy.emptyDescription,
+    searchPlaceholder: catalogCopy.searchPlaceholder,
     searchValue: input.searchValue,
     filters: [
       {

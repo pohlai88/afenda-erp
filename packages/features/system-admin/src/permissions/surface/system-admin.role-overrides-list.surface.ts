@@ -8,6 +8,7 @@ import {
   buildSystemAdminStaticPagination,
 } from "../../overview/surfaces/system-admin.list-surface.shared";
 import type { SystemAdminRoleOverrideListRow } from "../contracts";
+import { systemAdminUsersUiCopy } from "../../users/surface/system-admin.users-ui.copy.shared";
 
 export const systemAdminRoleOverridesSurfaceKey =
   "system-admin.role-overrides.list";
@@ -30,6 +31,8 @@ const OVERRIDE_COLUMNS = [
 export function buildRoleOverridesListSurface(input: {
   overrides: readonly SystemAdminRoleOverrideListRow[];
 }): ListSurfaceRendererConfigurationResolvedInput {
+  const copy = systemAdminUsersUiCopy.identity.overridesList;
+
   return buildGovernedListSurface({
     __schemaVersion: GOVERNED_METADATA_SCHEMA_VERSION,
     dataNature: "table",
@@ -37,7 +40,7 @@ export function buildRoleOverridesListSurface(input: {
     presentation: {
       toolbar: buildSystemAdminListToolbar({
         scope: "roleOverrides",
-        searchPlaceholder: "Search role overrides",
+        searchPlaceholder: copy.searchPlaceholder,
         sortColumn: "permissionKey",
         filters: [
           {
@@ -59,12 +62,13 @@ export function buildRoleOverridesListSurface(input: {
     },
     pagination: buildSystemAdminStaticPagination(input.overrides.length),
     surface: {
-      header: { title: "Role permission overrides" },
+      header: { title: copy.surfaceHeaderTitle },
       columnsId: "system-admin-role-overrides",
       rowKey: "permissionKey",
       empty: {
         variant: "muted",
-        title: "No tenant-specific overrides configured.",
+        title: copy.emptyTitle,
+        description: copy.emptyDescription,
       },
     },
     columns: OVERRIDE_COLUMNS,

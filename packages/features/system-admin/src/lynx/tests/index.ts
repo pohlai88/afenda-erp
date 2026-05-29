@@ -1,0 +1,2 @@
+/** @afenda-bucket tests */
+export {};

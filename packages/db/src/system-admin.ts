@@ -21,6 +21,7 @@ import {
   tenantCapabilitySettings,
   tenantModuleSettings,
   tenantPolicySettings,
+  tenantRoleCatalog,
   tenantRoleOverrides,
   tenantSecuritySettings,
   tenantSettings,
@@ -535,6 +536,98 @@ export async function upsertRoleOverride(input: {
         role: input.role,
         permissionKey: input.permissionKey,
         enabled: input.enabled,
+      },
+    });
+  });
+}
+
+export type TenantRoleCatalogRow = {
+  organizationId: string;
+  role: PermissionRole;
+  displayName: string | null;
+  description: string | null;
+  deprecated: boolean;
+};
+
+export async function listTenantRoleCatalog(input: {
+  organizationId: string;
+}): Promise<TenantRoleCatalogRow[]> {
+  return runWithOrganizationContext(input.organizationId, async (db) => {
+    const rows = await db
+      .select({
+        organizationId: tenantRoleCatalog.organizationId,
+        role: tenantRoleCatalog.role,
+        displayName: tenantRoleCatalog.displayName,
+        description: tenantRoleCatalog.description,
+        deprecated: tenantRoleCatalog.deprecated,
+      })
+      .from(tenantRoleCatalog)
+      .where(eq(tenantRoleCatalog.organizationId, input.organizationId))
+      .orderBy(asc(tenantRoleCatalog.role));
+
+    return rows;
+  });
+}
+
+export async function upsertTenantRoleCatalogEntry(input: {
+  organizationId: string;
+  role: PermissionRole;
+  displayName?: string | null;
+  description?: string | null;
+  deprecated?: boolean;
+  actorAuthUserId: string;
+}) {
+  return runWithOrganizationContext(input.organizationId, async (db) => {
+    const existing = await db
+      .select()
+      .from(tenantRoleCatalog)
+      .where(
+        and(
+          eq(tenantRoleCatalog.organizationId, input.organizationId),
+          eq(tenantRoleCatalog.role, input.role),
+        ),
+      )
+      .limit(1);
+
+    const previous = existing[0];
+
+    await db
+      .insert(tenantRoleCatalog)
+      .values({
+        organizationId: input.organizationId,
+        role: input.role,
+        displayName: input.displayName ?? null,
+        description: input.description ?? null,
+        deprecated: input.deprecated ?? false,
+      })
+      .onConflictDoUpdate({
+        target: [tenantRoleCatalog.organizationId, tenantRoleCatalog.role],
+        set: {
+          ...(input.displayName !== undefined
+            ? { displayName: input.displayName }
+            : {}),
+          ...(input.description !== undefined
+            ? { description: input.description }
+            : {}),
+          ...(input.deprecated !== undefined
+            ? { deprecated: input.deprecated }
+            : {}),
+          updatedAt: new Date(),
+        },
+      });
+
+    await createAuditLog({
+      organizationId: input.organizationId,
+      actorAuthUserId: input.actorAuthUserId,
+      entityType: "organization",
+      entityId: input.organizationId,
+      action: "tenant.role.changed",
+      summary: `Role catalog updated for ${input.role}.`,
+      metadata: {
+        role: input.role,
+        displayName: input.displayName ?? previous?.displayName ?? null,
+        description: input.description ?? previous?.description ?? null,
+        deprecated: input.deprecated ?? previous?.deprecated ?? false,
       },
     });
   });

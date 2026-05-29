@@ -2,6 +2,12 @@ import { z } from "zod";
 
 export const diagnosticSeveritySchema = z.enum(["info", "warning", "blocked"]);
 
+export const governanceHealthVerdictSchema = z.enum([
+  "healthy",
+  "warning",
+  "blocked",
+]);
+
 export const systemAdminDiagnosticCategorySchema = z.enum([
   "permission_coverage",
   "capability_status",
@@ -11,6 +17,7 @@ export const systemAdminDiagnosticCategorySchema = z.enum([
   "audit_coverage",
   "security_posture",
   "role_coverage",
+  "integration_health",
 ]);
 
 export const systemAdminDiagnosticTargetTypeSchema = z.enum([
@@ -22,6 +29,7 @@ export const systemAdminDiagnosticTargetTypeSchema = z.enum([
   "audit_action",
   "role",
   "security_setting",
+  "integration",
 ]);
 
 export const systemAdminDiagnosticIssueSchema = z.object({
@@ -37,6 +45,7 @@ export const systemAdminDiagnosticIssueSchema = z.object({
 });
 
 export const systemAdminDiagnosticsSummarySchema = z.object({
+  verdict: governanceHealthVerdictSchema,
   blockedCount: z.number().int().nonnegative(),
   warningCount: z.number().int().nonnegative(),
   infoCount: z.number().int().nonnegative(),

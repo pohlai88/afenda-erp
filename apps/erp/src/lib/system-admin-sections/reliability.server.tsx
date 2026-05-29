@@ -1,64 +1,113 @@
 import {
   buildCronHealthListSurface,
+  buildSystemAdminReliabilityBlockedIssuesListSurface,
+  buildSystemAdminReliabilityInfoIssuesListSurface,
+  buildSystemAdminReliabilityOperationalLinksListSurface,
+  buildSystemAdminReliabilityWarningIssuesListSurface,
   systemAdminCronSurfaceKey,
+  systemAdminReliabilityOperationalLinksSurfaceKey,
+  systemAdminReliabilitySurfaceKey,
+  systemAdminReliabilityUiCopy,
 } from "@afenda/feature-system-admin/metadata";
 import {
-  getCronHealthSurfaceRows,
+  getSystemAdminReliabilityPageModel,
   requireSystemAdminReliabilityRead,
+  SystemAdminReliabilityAccessDenied,
+  SystemAdminReliabilitySummaryPanel,
 } from "@afenda/feature-system-admin/server";
 import { GovernedPatternCListSection } from "@afenda/governed-surface/server";
 import { SectionPanel } from "@afenda/ui";
 import type { Metadata } from "next";
-import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Reliability — System admin",
-  description: "Cron routes, workflow sweeps, and observability drain posture.",
+  description: systemAdminReliabilityUiCopy.page.description,
 };
 
 export default async function SystemAdminReliabilityPage() {
-  await requireSystemAdminReliabilityRead();
+  let organization: Awaited<
+    ReturnType<typeof requireSystemAdminReliabilityRead>
+  >["organization"];
 
-  const cronRows = await getCronHealthSurfaceRows();
-  const cronSurface = buildCronHealthListSurface({ rows: cronRows });
+  try {
+    ({ organization } = await requireSystemAdminReliabilityRead());
+  } catch {
+    return <SystemAdminReliabilityAccessDenied />;
+  }
+
+  const pageModel = await getSystemAdminReliabilityPageModel({
+    organizationId: organization.id,
+  });
+
+  const copy = systemAdminReliabilityUiCopy;
 
   return (
     <div className="flex flex-col gap-surface-2xl">
       <SectionPanel
         headingLevel={1}
-        title="Reliability"
-        description="Scheduled jobs and operational drain endpoints for this deployment."
+        title={copy.page.title}
+        description={copy.page.description}
       />
 
+      <SystemAdminReliabilitySummaryPanel summary={pageModel.summary} />
+
       <GovernedPatternCListSection
-        title="Cron routes"
-        description="Configured in vercel.json. Each route validates CRON_SECRET."
-        surfaceKey={systemAdminCronSurfaceKey}
-        listConfiguration={cronSurface}
+        title={copy.operationalLinks.title}
+        description={copy.operationalLinks.description}
+        surfaceKey={systemAdminReliabilityOperationalLinksSurfaceKey}
+        listConfiguration={buildSystemAdminReliabilityOperationalLinksListSurface({
+          rows: pageModel.operationalLinks,
+        })}
         parentAccessAllowed
         layout="embedded"
       />
 
-      <SectionPanel
-        title="Workflow sweeps"
-        description="Durable workflow recovery runs through Lynx."
-      >
-        <Link
-          href="/lynx/workflows"
-          className="type-body font-medium text-foreground underline-offset-4 hover:underline"
-        >
-          Open workflow sessions
-        </Link>
-      </SectionPanel>
+      {pageModel.issuesBySeverity.blocked.length > 0 ? (
+        <GovernedPatternCListSection
+          title={copy.issues.blockedTitle}
+          surfaceKey={`${systemAdminReliabilitySurfaceKey}:blocked`}
+          listConfiguration={buildSystemAdminReliabilityBlockedIssuesListSurface({
+            issues: pageModel.issuesBySeverity.blocked,
+          })}
+          parentAccessAllowed
+          layout="embedded"
+        />
+      ) : null}
 
-      <SectionPanel
-        title="Observability drain"
-        description="Log drain handler for centralized observability export."
-      >
-        <p className="type-muted">
-          Route: <code className="text-foreground">/api/observability/drain</code>
-        </p>
-      </SectionPanel>
+      {pageModel.issuesBySeverity.warning.length > 0 ? (
+        <GovernedPatternCListSection
+          title={copy.issues.warningTitle}
+          surfaceKey={`${systemAdminReliabilitySurfaceKey}:warning`}
+          listConfiguration={buildSystemAdminReliabilityWarningIssuesListSurface({
+            issues: pageModel.issuesBySeverity.warning,
+          })}
+          parentAccessAllowed
+          layout="embedded"
+        />
+      ) : null}
+
+      {pageModel.issuesBySeverity.info.length > 0 ? (
+        <GovernedPatternCListSection
+          title={copy.issues.infoTitle}
+          surfaceKey={`${systemAdminReliabilitySurfaceKey}:info`}
+          listConfiguration={buildSystemAdminReliabilityInfoIssuesListSurface({
+            issues: pageModel.issuesBySeverity.info,
+          })}
+          parentAccessAllowed
+          layout="embedded"
+        />
+      ) : null}
+
+      <GovernedPatternCListSection
+        title={copy.cron.title}
+        description={copy.cron.description}
+        surfaceKey={systemAdminCronSurfaceKey}
+        listConfiguration={buildCronHealthListSurface({
+          rows: pageModel.cronRows,
+        })}
+        parentAccessAllowed
+        layout="embedded"
+      />
     </div>
   );
 }

@@ -29,6 +29,7 @@ Search tip: every document has a stable **`ARCH-###`** ID and a matching
 | **ARCH-011 (supplement)** | [011-system-admin-permissions-architecture.md](011-system-admin-permissions-architecture.md) | Permissions control domain — catalog, grouping, coverage |
 | **ARCH-011 (supplement)** | [011-system-admin-modules-architecture.md](011-system-admin-modules-architecture.md) | Modules control domain — enablement, readiness, rollout |
 | **ARCH-011 (supplement)** | [011-system-admin-capabilities-architecture.md](011-system-admin-capabilities-architecture.md) | Capabilities control domain — coverage, readiness, availability |
+| **ARCH-011 (supplement)** | [011-system-admin-competitive-scorecard.md](011-system-admin-competitive-scorecard.md) | Competitive benchmark and gap scorecard for System Admin |
 | **ARCH-012** | [012-execution-kernel-architecture.md](012-execution-kernel-architecture.md)               | Execution authority, enforcement contracts, and System Admin co-link           |
 
 ## Document Hierarchy

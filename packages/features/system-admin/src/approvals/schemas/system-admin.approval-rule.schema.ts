@@ -38,7 +38,7 @@ const delegateRoleKeysSchema = z
   .string()
   .max(500)
   .optional()
-  .transform((value) => {
+  .transform((value, context) => {
     if (!value?.trim()) {
       return [] as (typeof organizationRoles)[number][];
     }
@@ -47,8 +47,17 @@ const delegateRoleKeysSchema = z
       .split(",")
       .map((role) => role.trim())
       .filter(Boolean);
+    const parsed = z.array(z.enum(organizationRoles)).safeParse(roles);
 
-    return z.array(z.enum(organizationRoles)).parse(roles);
+    if (!parsed.success) {
+      context.addIssue({
+        code: "custom",
+        message: "Delegation roles must use valid organization roles.",
+      });
+      return z.NEVER;
+    }
+
+    return parsed.data;
   });
 
 const approvalRuleCoreSchema = z.object({

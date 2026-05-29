@@ -3,6 +3,7 @@ export const systemAdminSecurityWebhookEvents = [
 ] as const;
 
 export const systemAdminSecurityAuditActions = {
+  view: "system-admin.security.view",
   update: "system-admin.security.update",
   domainAdd: "system-admin.security.domain.add",
   domainRemove: "system-admin.security.domain.remove",

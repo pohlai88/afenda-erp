@@ -21,15 +21,14 @@ vi.mock(
   },
 );
 
-vi.mock("@afenda/db", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("@afenda/db")>();
-  return {
-    ...actual,
+vi.mock(
+  "../../src/tenant-execution/data/system-admin.execution-settings.repository.server",
+  () => ({
     listTenantApprovalSettings: vi.fn(async () => []),
     upsertTenantApprovalSettings: (...args: unknown[]) =>
       mockUpsertApproval(...args),
-  };
-});
+  }),
+);
 
 vi.mock("@afenda/kernel/execution", () => ({
   writeExecutionAuditEvent: (...args: unknown[]) => mockWriteAudit(...args),
@@ -132,6 +131,50 @@ describe("system admin approvals", () => {
     expect(mockUpsertApproval).not.toHaveBeenCalled();
   });
 
+  it("rejects duplicate approval keys on create", async () => {
+    const { listTenantApprovalSettings } = await import(
+      "../../src/tenant-execution/data/system-admin.execution-settings.repository.server"
+    );
+    vi.mocked(listTenantApprovalSettings).mockResolvedValueOnce([
+      {
+        id: "approval_existing",
+        organizationId: "org_1",
+        approvalKey: "purchasing.po.approval",
+        label: "Existing rule",
+        enabled: true,
+        approverRole: "finance-manager",
+        escalationMinutes: null,
+        configuration: {
+          moduleKey: "purchasing",
+          action: "purchasing.purchase-order.create",
+          targetType: "erp-record",
+          approvalMode: "parallel",
+          approverRoleKeys: ["finance-manager"],
+          minApprovals: 1,
+          status: "active",
+        },
+      },
+    ]);
+
+    const formData = new FormData();
+    formData.set("mode", "create");
+    formData.set("approvalKey", "purchasing.po.approval");
+    formData.set("name", "Duplicate PO");
+    formData.set("moduleKey", "purchasing");
+    formData.set("action", "purchasing.purchase-order.create");
+    formData.set("targetType", "erp-record");
+    formData.set("approvalMode", "parallel");
+    formData.set("approverRoleKeys", "finance-manager");
+    formData.set("minApprovals", "1");
+    formData.set("status", "active");
+    formData.set("enabled", "true");
+
+    const result = await updateSystemAdminApprovalRuleAction(undefined, formData);
+
+    expect(result.ok).toBe(false);
+    expect(mockUpsertApproval).not.toHaveBeenCalled();
+  });
+
   it("rejects min approvals greater than approver roles", async () => {
     const formData = new FormData();
     formData.set("mode", "create");
@@ -150,6 +193,49 @@ describe("system admin approvals", () => {
 
     expect(result.ok).toBe(false);
     expect(mockUpsertApproval).not.toHaveBeenCalled();
+  });
+
+  it("toggles approval rule enabled state", async () => {
+    const { listTenantApprovalSettings } = await import(
+      "../../src/tenant-execution/data/system-admin.execution-settings.repository.server"
+    );
+    vi.mocked(listTenantApprovalSettings).mockResolvedValueOnce([
+      {
+        id: "approval_1",
+        organizationId: "org_1",
+        approvalKey: "finance.payment",
+        label: "Payment release",
+        enabled: true,
+        approverRole: "finance-manager",
+        escalationMinutes: null,
+        configuration: {
+          moduleKey: "finance",
+          action: "finance.documents.write",
+          targetType: "erp-record",
+          approvalMode: "parallel",
+          approverRoleKeys: ["finance-manager"],
+          minApprovals: 1,
+          status: "active",
+        },
+      },
+    ]);
+
+    const { setSystemAdminApprovalRuleEnabledAction } = await import(
+      "../../src/approvals/actions/system-admin.approval-rules.actions.server"
+    );
+
+    const result = await setSystemAdminApprovalRuleEnabledAction({
+      approvalKey: "finance.payment",
+      enabled: false,
+    });
+
+    expect(result.ok).toBe(true);
+    expect(mockUpsertApproval).toHaveBeenCalledWith(
+      expect.objectContaining({
+        approvalKey: "finance.payment",
+        enabled: false,
+      }),
+    );
   });
 
   it("writes audit events when approval rules change", async () => {

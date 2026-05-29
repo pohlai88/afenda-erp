@@ -1,5 +1,7 @@
 export type DiagnosticSeverity = "info" | "warning" | "blocked";
 
+export type GovernanceHealthVerdict = "healthy" | "warning" | "blocked";
+
 export type SystemAdminDiagnosticCategory =
   | "permission_coverage"
   | "capability_status"
@@ -8,7 +10,8 @@ export type SystemAdminDiagnosticCategory =
   | "approval_drift"
   | "audit_coverage"
   | "security_posture"
-  | "role_coverage";
+  | "role_coverage"
+  | "integration_health";
 
 export type SystemAdminDiagnosticTargetType =
   | "permission"
@@ -18,7 +21,8 @@ export type SystemAdminDiagnosticTargetType =
   | "approval_rule"
   | "audit_action"
   | "role"
-  | "security_setting";
+  | "security_setting"
+  | "integration";
 
 export type SystemAdminDiagnosticIssue = {
   id: string;
@@ -33,6 +37,7 @@ export type SystemAdminDiagnosticIssue = {
 };
 
 export type SystemAdminDiagnosticsSummary = {
+  verdict: GovernanceHealthVerdict;
   blockedCount: number;
   warningCount: number;
   infoCount: number;

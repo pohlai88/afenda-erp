@@ -1,8 +1,8 @@
-export * from "./actions";
-export * from "./components";
+/**
+ * Environment-neutral door — system-admin/permissions
+ * Buckets: actions, components, contracts, data, events, policies, schemas, surface, tests
+ */
+export * from "./metadata";
+export * from "./client";
 export * from "./contracts";
-export * from "./data";
-export * from "./events";
-export * from "./policies";
 export * from "./schemas";
-export * from "./surface";

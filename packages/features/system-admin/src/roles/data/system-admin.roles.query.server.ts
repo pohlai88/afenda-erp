@@ -1,5 +1,6 @@
 import {
   assignTenantMembershipRole,
+  listTenantRoleCatalog,
   removeTenantMembershipRole,
 } from "@afenda/db";
 import { listTenantMembers } from "../../users/data/system-admin.identity.repository.server";
@@ -9,24 +10,55 @@ import {
   type SystemAdminRoleRow,
 } from "../contracts";
 
+function mergeRoleCatalog(
+  role: (typeof systemAdminSeedRoles)[number],
+  catalogByRole: Map<
+    OrganizationRole,
+    Awaited<ReturnType<typeof listTenantRoleCatalog>>[number]
+  >,
+) {
+  const catalogEntry = catalogByRole.get(role.key);
+
+  return {
+    ...role,
+    name: catalogEntry?.displayName?.trim() || role.name,
+    description: catalogEntry?.description?.trim() || role.description,
+    status: catalogEntry?.deprecated ? ("deprecated" as const) : role.status,
+  };
+}
+
 export async function listSystemAdminRoles(input: {
   organizationId: string;
 }): Promise<SystemAdminRoleRow[]> {
-  const roleRows = await listTenantMembers({
-    organizationId: input.organizationId,
-    limit: 200,
-  });
+  const [roleRows, catalogRows] = await Promise.all([
+    listTenantMembers({
+      organizationId: input.organizationId,
+      limit: 200,
+    }),
+    listTenantRoleCatalog({ organizationId: input.organizationId }),
+  ]);
 
-  return systemAdminSeedRoles.map((role) => ({
-    ...role,
-    assignedMembers: roleRows.filter(
-      (row) => row.role === role.key && row.status === "active",
-    ).length,
-  }));
+  const catalogByRole = new Map(
+    catalogRows.map((entry) => [entry.role, entry]),
+  );
+
+  return systemAdminSeedRoles.map((role) => {
+    const merged = mergeRoleCatalog(role, catalogByRole);
+
+    return {
+      ...merged,
+      assignedMembers: roleRows.filter(
+        (row) => row.role === merged.key && row.status === "active",
+      ).length,
+    };
+  });
 }
 
-function assertRoleIsAssignable(role: OrganizationRole) {
-  const roleDefinition = systemAdminSeedRoles.find((item) => item.key === role);
+function assertRoleIsAssignable(
+  role: OrganizationRole,
+  roles: readonly SystemAdminRoleRow[],
+) {
+  const roleDefinition = roles.find((item) => item.key === role);
 
   if (!roleDefinition) {
     throw new Error("Role is not available in the System Admin role catalog.");
@@ -43,7 +75,10 @@ export async function assignRoleToMembership(input: {
   membershipId: string;
   role: OrganizationRole;
 }) {
-  assertRoleIsAssignable(input.role);
+  const roles = await listSystemAdminRoles({
+    organizationId: input.organizationId,
+  });
+  assertRoleIsAssignable(input.role, roles);
   await assignTenantMembershipRole({
     organizationId: input.organizationId,
     membershipId: input.membershipId,

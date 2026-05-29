@@ -40,7 +40,24 @@ export type SystemAdminApprovalRuleListRow = {
   minApprovals: number;
   escalation: string;
   status: SystemAdminApprovalRuleStatus;
+  enabled: boolean;
   readinessVerdict: ApprovalReadinessVerdict;
+};
+
+export type SystemAdminApprovalRuleEditorDefaults = {
+  mode: "update";
+  approvalRuleId: string;
+  name: string;
+  moduleKey: string;
+  action: string;
+  targetType: string;
+  approvalMode: SystemAdminApprovalMode;
+  approverRoleKeys: string;
+  delegateToRoleKeys: string;
+  minApprovals: number;
+  escalationAfterHours?: number;
+  status: SystemAdminApprovalRuleStatus;
+  enabled: boolean;
 };
 
 export type SystemAdminApproverRoleOption = {

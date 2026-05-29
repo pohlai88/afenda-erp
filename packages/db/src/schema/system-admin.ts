@@ -227,6 +227,27 @@ export const tenantRoleOverrides = pgTable(
   ],
 );
 
+export const tenantRoleCatalog = pgTable(
+  "tenant_role_catalog",
+  {
+    organizationId: organizationIdColumn()
+      .notNull()
+      .references(() => organizations.id, { onDelete: "cascade" }),
+    role: organizationRoleEnum("role").notNull(),
+    displayName: text("display_name"),
+    description: text("description"),
+    deprecated: boolean("deprecated").notNull().default(false),
+    ...timestampColumns,
+  },
+  (table) => [
+    primaryKey({
+      columns: [table.organizationId, table.role],
+      name: "tenant_role_catalog_pk",
+    }),
+    index("tenant_role_catalog_org_idx").on(table.organizationId),
+  ],
+);
+
 export const organizationInvitations = pgTable(
   "organization_invitations",
   {

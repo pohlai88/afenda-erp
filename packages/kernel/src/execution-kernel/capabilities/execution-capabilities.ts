@@ -56,6 +56,7 @@ const routeByCapability: Partial<Record<AppCapability, `/${string}`>> = {
   "system-admin.settings.read": "/system-admin/organization",
   "system-admin.settings.write": "/system-admin/organization",
   "system-admin.audit.read": "/system-admin/audit",
+  "system-admin.audit.review": "/system-admin/audit",
   "system-admin.audit.export": "/system-admin/audit",
   "system-admin.security.read": "/system-admin/security",
   "system-admin.security.manage": "/system-admin/security",
@@ -67,6 +68,8 @@ const routeByCapability: Partial<Record<AppCapability, `/${string}`>> = {
   "system-admin.lynx.approve": "/system-admin/lynx",
   "system-admin.reliability.read": "/system-admin/reliability",
   "system-admin.billing.read": "/system-admin/billing",
+  "system-admin.billing.manage": "/system-admin/billing",
+  "system-admin.billing.export": "/system-admin/billing",
   "system-admin.diagnostics.read": "/system-admin/diagnostics",
 };
 

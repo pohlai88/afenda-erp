@@ -247,6 +247,10 @@ export function requireSystemAdminAuditExport() {
   return requireSystemAdminCapability("system-admin.audit.export");
 }
 
+export function requireSystemAdminAuditReview() {
+  return requireSystemAdminCapability("system-admin.audit.review");
+}
+
 export function requireSystemAdminIdentityWrite() {
   return requireSystemAdminAnyCapability([
     "system-admin.users.manage",
@@ -258,7 +262,10 @@ export function requireSystemAdminIdentityWrite() {
 }
 
 export function requireSystemAdminIntegrationsWrite() {
-  return requireSystemAdminCapability("system-admin.integrations.write");
+  return requireSystemAdminAnyCapability([
+    "system-admin.integrations.write",
+    "system-admin.settings.write",
+  ]);
 }
 
 export {
@@ -267,7 +274,10 @@ export {
 } from "../../lynx/policies/system-admin.lynx.policy.server";
 
 export function requireSystemAdminIntegrationsRead() {
-  return requireSystemAdminCapability("system-admin.integrations.read");
+  return requireSystemAdminAnyCapability([
+    "system-admin.integrations.read",
+    "system-admin.settings.read",
+  ]);
 }
 
 export function requireSystemAdminReliabilityRead() {

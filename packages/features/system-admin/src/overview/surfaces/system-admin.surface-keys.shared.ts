@@ -1,45 +1,66 @@
-import { systemAdminAuditViewerSurfaceKey } from "../../audit-viewer/data/system-admin.audit.surface";
-import { systemAdminRetentionSurfaceKey } from "../../audit-viewer/data/system-admin.retention.surface";
-import { systemAdminSecuritySurfaceKey } from "../../security/data/system-admin.security.surface";
+import { systemAdminAuditViewerSurfaceKey } from "../../audit-viewer/surface/system-admin.audit-list.surface";
+import { systemAdminRetentionSurfaceKey } from "../../audit-viewer/surface/system-admin.retention-list.surface";
+import {
+  systemAdminSecurityRecentChangesSurfaceKey,
+  systemAdminSecuritySurfaceKey,
+} from "../../security/surface";
 import { systemAdminUsersSurfaceKey } from "../../users/surface/system-admin.users-list.surface";
 import { systemAdminMembersSurfaceKey } from "../../memberships/surface/system-admin.memberships-list.surface";
 import { systemAdminRoleOverridesSurfaceKey } from "../../permissions/surface/system-admin.role-overrides-list.surface";
 import {
   systemAdminApiCredentialsSurfaceKey,
+  systemAdminIntegrationsGovernanceSurfaceKey,
+  systemAdminIntegrationsRecentChangesSurfaceKey,
   systemAdminSsoSurfaceKey,
   systemAdminWebhookDeliveriesSurfaceKey,
   systemAdminWebhooksSurfaceKey,
-} from "../../integrations/data/system-admin.integrations-list.surface";
+} from "../../integrations/surface";
 import {
   systemAdminAiApprovalsSurfaceKey,
-  systemAdminAiSandboxesSurfaceKey,
   systemAdminAiEntitlementsSurfaceKey,
+  systemAdminAiSandboxesSurfaceKey,
   systemAdminAiUsageSurfaceKey,
-} from "../../lynx/data/system-admin.lynx.surface";
-import { systemAdminGatewaySpendSurfaceKey } from "../../lynx/data/system-admin.gateway-spend.surface";
-import { systemAdminBillingSurfaceKey } from "../../billing/data/system-admin.billing.surface";
-import { systemAdminCronSurfaceKey } from "../../reliability/data/system-admin.cron-health.surface";
-import { systemAdminCapabilitiesSurfaceKey } from "../../capabilities/data/system-admin.capabilities-list.surface";
-import { systemAdminModulesSurfaceKey } from "../../modules/data/system-admin.modules-list.surface";
-import { systemAdminOrganizationSurfaceKey } from "../../organization/data/system-admin.organization-list.surface";
+  systemAdminGatewaySpendSurfaceKey,
+} from "../../lynx/surface";
+import {
+  systemAdminBillingContactsSurfaceKey,
+  systemAdminBillingEntitlementsSurfaceKey,
+  systemAdminBillingGovernanceSurfaceKey,
+  systemAdminBillingInvoicesSurfaceKey,
+  systemAdminBillingPaymentsSurfaceKey,
+  systemAdminBillingSurfaceKey,
+  systemAdminBillingSubscriptionSurfaceKey,
+  systemAdminBillingUsageSurfaceKey,
+} from "../../billing/surface";
+import { systemAdminCronSurfaceKey } from "../../reliability/surface";
+import {
+  systemAdminReliabilityOperationalLinksSurfaceKey,
+  systemAdminReliabilitySurfaceKey,
+} from "../../reliability/surface";
+import { systemAdminCapabilitiesSurfaceKey } from "../../capabilities/surface";
+import { systemAdminModulesSurfaceKey } from "../../modules/surface";
+import { systemAdminOrganizationSurfaceKey } from "../../organization/surface";
 import { systemAdminPermissionsSurfaceKey } from "../../permissions/surface/system-admin.permissions-list.surface";
-import { systemAdminRolesSurfaceKey } from "../../roles/data/system-admin.roles-list.surface";
+import { systemAdminRolesSurfaceKey } from "../../roles/surface";
 import {
   systemAdminDiagnosticsModuleCoverageSurfaceKey,
   systemAdminDiagnosticsRecentChangesSurfaceKey,
   systemAdminDiagnosticsSurfaceKey,
-} from "../../diagnostics/data/system-admin.diagnostics.surface";
-import { systemAdminApprovalsSurfaceKey } from "../../approvals/surface/system-admin.approvals-list.surface";
-import { systemAdminPoliciesSurfaceKey } from "../../policies/data/system-admin.policy-rules.surface";
+} from "../../diagnostics/surface";
+import { systemAdminApprovalsSurfaceKey } from "../../approvals/surface";
+import { systemAdminPoliciesSurfaceKey } from "../../policies/surface";
 
 export {
   systemAdminAuditViewerSurfaceKey,
   systemAdminRetentionSurfaceKey,
+  systemAdminSecurityRecentChangesSurfaceKey,
   systemAdminSecuritySurfaceKey,
   systemAdminUsersSurfaceKey,
   systemAdminMembersSurfaceKey,
   systemAdminRoleOverridesSurfaceKey,
   systemAdminApiCredentialsSurfaceKey,
+  systemAdminIntegrationsGovernanceSurfaceKey,
+  systemAdminIntegrationsRecentChangesSurfaceKey,
   systemAdminSsoSurfaceKey,
   systemAdminWebhookDeliveriesSurfaceKey,
   systemAdminWebhooksSurfaceKey,
@@ -49,6 +70,8 @@ export {
   systemAdminAiUsageSurfaceKey,
   systemAdminGatewaySpendSurfaceKey,
   systemAdminCronSurfaceKey,
+  systemAdminReliabilitySurfaceKey,
+  systemAdminReliabilityOperationalLinksSurfaceKey,
   systemAdminBillingSurfaceKey,
   systemAdminModulesSurfaceKey,
   systemAdminCapabilitiesSurfaceKey,
@@ -67,10 +90,13 @@ export function getSystemAdminSurfaceKeys() {
     auditViewer: systemAdminAuditViewerSurfaceKey,
     retention: systemAdminRetentionSurfaceKey,
     security: systemAdminSecuritySurfaceKey,
+    securityRecentChanges: systemAdminSecurityRecentChangesSurfaceKey,
     members: systemAdminMembersSurfaceKey,
     users: systemAdminUsersSurfaceKey,
     roleOverrides: systemAdminRoleOverridesSurfaceKey,
     apiCredentials: systemAdminApiCredentialsSurfaceKey,
+    integrationsGovernance: systemAdminIntegrationsGovernanceSurfaceKey,
+    integrationsRecentChanges: systemAdminIntegrationsRecentChangesSurfaceKey,
     webhooks: systemAdminWebhooksSurfaceKey,
     webhookDeliveries: systemAdminWebhookDeliveriesSurfaceKey,
     sso: systemAdminSsoSurfaceKey,
@@ -80,7 +106,16 @@ export function getSystemAdminSurfaceKeys() {
     aiEntitlements: systemAdminAiEntitlementsSurfaceKey,
     gatewaySpend: systemAdminGatewaySpendSurfaceKey,
     cron: systemAdminCronSurfaceKey,
+    reliability: systemAdminReliabilitySurfaceKey,
+    reliabilityOperationalLinks: systemAdminReliabilityOperationalLinksSurfaceKey,
     billing: systemAdminBillingSurfaceKey,
+    billingGovernance: systemAdminBillingGovernanceSurfaceKey,
+    billingSubscription: systemAdminBillingSubscriptionSurfaceKey,
+    billingUsage: systemAdminBillingUsageSurfaceKey,
+    billingEntitlements: systemAdminBillingEntitlementsSurfaceKey,
+    billingInvoices: systemAdminBillingInvoicesSurfaceKey,
+    billingPayments: systemAdminBillingPaymentsSurfaceKey,
+    billingContacts: systemAdminBillingContactsSurfaceKey,
     modules: systemAdminModulesSurfaceKey,
     capabilities: systemAdminCapabilitiesSurfaceKey,
     permissions: systemAdminPermissionsSurfaceKey,

@@ -1,9 +1,6 @@
 "use server";
 
-import {
-  listTenantApprovalSettings,
-  upsertTenantApprovalSettings,
-} from "@afenda/db";
+import { upsertTenantApprovalSettings } from "../../tenant-execution/data/system-admin.execution-settings.repository.server";
 import { writeExecutionAuditEvent } from "@afenda/kernel/execution";
 import { revalidatePath } from "next/cache";
 import {
@@ -13,7 +10,7 @@ import {
   zodActionFailure,
 } from "../../tenant-execution/contracts/system-admin.action-result.contract";
 import { systemAdminRoutePaths } from "../../overview/contracts/system-admin.route-paths.contract";
-import { dispatchSystemAdminWebhook } from "../../integrations";
+import { dispatchSystemAdminWebhook } from "../../integrations/server";
 import {
   assertApprovalRuleChangeAllowed,
   requireSystemAdminApprovalsManage,
@@ -22,6 +19,7 @@ import {
   mapTenantApprovalSettingToRule,
   serializeApprovalRuleConfiguration,
 } from "../data/system-admin.approval-rules.mapper";
+import { findTenantApprovalSetting } from "../data/system-admin.approval-rules.query.server";
 import {
   systemAdminApprovalRuleAuditActionsByMode,
   systemAdminApprovalRuleWebhookEvents,
@@ -87,11 +85,22 @@ export async function updateSystemAdminApprovalRuleAction(
       ? parsed.data.approvalKey
       : parsed.data.approvalRuleId;
 
-  const existingSettings = await listTenantApprovalSettings({
+  const previous = await findTenantApprovalSetting({
     organizationId: organization.id,
-    limit: 200,
+    approvalKey,
   });
-  const previous = existingSettings.find((row) => row.approvalKey === approvalKey);
+
+  if (parsed.data.mode === "create" && previous) {
+    return systemAdminActionFailure(
+      "An approval rule with this key already exists for this organization.",
+    );
+  }
+
+  if (parsed.data.mode === "update" && !previous) {
+    return systemAdminActionFailure(
+      "Approval rule was not found for this organization.",
+    );
+  }
   const previousRule = previous
     ? mapTenantApprovalSettingToRule(previous)
     : undefined;
@@ -188,9 +197,90 @@ export async function updateSystemAdminApprovalRuleAction(
   return systemAdminActionSuccess(undefined);
 }
 
-export async function updateSystemAdminApprovalAction(
-  previous: SystemAdminActionResult | undefined,
-  formData: FormData,
-): Promise<SystemAdminActionResult> {
-  return updateSystemAdminApprovalRuleAction(previous, formData);
+export async function setSystemAdminApprovalRuleEnabledAction(input: {
+  approvalKey: string;
+  enabled: boolean;
+}): Promise<SystemAdminActionResult> {
+  const { context, organization, session } =
+    await requireSystemAdminApprovalsManage();
+
+  const previous = await findTenantApprovalSetting({
+    organizationId: organization.id,
+    approvalKey: input.approvalKey,
+  });
+
+  if (!previous) {
+    return systemAdminActionFailure(
+      "Approval rule was not found for this organization.",
+    );
+  }
+
+  const configuration =
+    previous.configuration &&
+    typeof previous.configuration === "object" &&
+    !Array.isArray(previous.configuration)
+      ? (previous.configuration as Record<string, unknown>)
+      : {};
+
+  const configuredStatus =
+    typeof configuration.status === "string" ? configuration.status : "active";
+  const nextStatus = input.enabled ? configuredStatus : "disabled";
+
+  if (
+    input.enabled &&
+    (configuredStatus === "deprecated" || nextStatus === "deprecated")
+  ) {
+    return systemAdminActionFailure(
+      "Deprecated approval rules cannot be enabled for new assignments.",
+    );
+  }
+
+  await upsertTenantApprovalSettings({
+    organizationId: organization.id,
+    actorAuthUserId: session.id,
+    approvalKey: input.approvalKey,
+    label: previous.label,
+    enabled: input.enabled,
+    approverRole: previous.approverRole,
+    escalationMinutes: previous.escalationMinutes,
+    configuration: {
+      ...configuration,
+      status: nextStatus,
+    },
+  });
+
+  await writeExecutionAuditEvent({
+    organizationId: organization.id,
+    actorId: context.userId,
+    actorType: context.actorType,
+    action: input.enabled
+      ? systemAdminApprovalRuleAuditActionsByMode.update
+      : systemAdminApprovalRuleAuditActionsByMode.disable,
+    targetType: "approval_rule",
+    targetId: input.approvalKey,
+    metadata: {
+      previous: {
+        enabled: previous.enabled,
+        status: configuredStatus,
+      },
+      next: {
+        enabled: input.enabled,
+        status: nextStatus,
+      },
+    },
+  });
+
+  await dispatchSystemAdminWebhook({
+    organizationId: organization.id,
+    userId: session.id,
+    eventType: systemAdminApprovalRuleWebhookEvents[0],
+    payload: {
+      approvalKey: input.approvalKey,
+      enabled: input.enabled,
+      status: nextStatus,
+    },
+  });
+
+  revalidateApprovals();
+  return systemAdminActionSuccess(undefined);
 }

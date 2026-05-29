@@ -37,9 +37,18 @@ export const systemAdminControlLinks = {
   },
   approvals: (query?: string) =>
     systemAdminListHref(systemAdminRoutePaths.approvals, "approvals", query),
+  approval: (approvalKey: string, query?: string) => {
+    const params = new URLSearchParams();
+    params.set("approvalsKey", approvalKey);
+    if (query) {
+      params.set("approvalsQ", query);
+    }
+    return `${systemAdminRoutePaths.approvals}?${params.toString()}`;
+  },
   audit: (query?: string) =>
     systemAdminListHref(systemAdminRoutePaths.audit, "audit", query),
   security: () => systemAdminRoutePaths.security,
+  integrations: () => systemAdminRoutePaths.integrations,
   organization: () => systemAdminRoutePaths.organization,
   roles: () => systemAdminRoutePaths.roles,
   users: () => systemAdminRoutePaths.users,

@@ -1,10 +1,23 @@
-import { writeExecutionAuditEvent } from "@afenda/kernel/execution";
-import { systemAdminAuditActions } from "../contracts/system-admin.audit-actions.contract";
-import { parseSystemAdminAuditSearchParams } from "./parse-audit-search-params";
+import type { SystemAdminRetentionPolicyListRow } from "../contracts";
+import { parseSystemAdminAuditSearchParams } from "./system-admin.audit-search-params.parse.shared";
+import { listRetentionPolicies } from "./system-admin.audit.repository.server";
+import { listSystemAdminAuditCoverageGaps } from "./system-admin.audit-coverage.query.server";
+import { recordSystemAdminAuditViewerViewEvent } from "./system-admin.audit-view-event.server";
 import {
   getSystemAdminAuditEventDetail,
   searchSystemAdminAuditEvents,
 } from "./system-admin.audit.query.server";
+
+function mapRetentionPolicyRow(
+  policy: Awaited<ReturnType<typeof listRetentionPolicies>>[number],
+): SystemAdminRetentionPolicyListRow {
+  return {
+    id: policy.entityType,
+    entityType: policy.entityType,
+    retentionDays: String(policy.retentionDays),
+    legalHold: policy.legalHold ? "On hold" : "Standard",
+  };
+}
 
 export async function buildSystemAdminAuditPageModel(input: {
   organizationId: string;
@@ -13,31 +26,20 @@ export async function buildSystemAdminAuditPageModel(input: {
   searchParams?: Record<string, string | string[] | undefined>;
 }) {
   const params = parseSystemAdminAuditSearchParams(input.searchParams);
-  const window = await searchSystemAdminAuditEvents({
-    organizationId: input.organizationId,
-    params,
-  });
 
-  if (!params.auditId) {
-    await writeExecutionAuditEvent({
+  const [window, retentionRows, coverageGaps] = await Promise.all([
+    searchSystemAdminAuditEvents({
       organizationId: input.organizationId,
-      actorId: input.actorId,
-      actorType: input.actorType,
-      action: systemAdminAuditActions.view,
-      targetType: "organization",
-      targetId: input.organizationId,
-      metadata: {
-        filters: {
-          auditQ: params.auditQ ?? null,
-          auditActor: params.auditActor ?? null,
-          auditAction: params.auditAction ?? null,
-          auditTargetType: params.auditTargetType ?? null,
-          auditModule: params.auditModule ?? null,
-        },
-        resultCount: window.rows.length,
-      },
-    });
-  }
+      params,
+    }),
+    listRetentionPolicies({
+      organizationId: input.organizationId,
+      limit: 50,
+    }),
+    listSystemAdminAuditCoverageGaps({
+      organizationId: input.organizationId,
+    }),
+  ]);
 
   const selected =
     params.auditId && params.auditId.length > 0
@@ -46,6 +48,15 @@ export async function buildSystemAdminAuditPageModel(input: {
           auditLogId: params.auditId,
         })
       : null;
+
+  await recordSystemAdminAuditViewerViewEvent({
+    organizationId: input.organizationId,
+    actorId: input.actorId,
+    actorType: input.actorType,
+    params,
+    selected,
+    resultCount: window.rows.length,
+  });
 
   return {
     params,
@@ -56,5 +67,7 @@ export async function buildSystemAdminAuditPageModel(input: {
     hasNextPage: window.hasNextPage,
     page: window.page,
     selected,
+    retentionPolicies: retentionRows.map(mapRetentionPolicyRow),
+    coverageGaps,
   };
 }

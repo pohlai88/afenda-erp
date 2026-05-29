@@ -1,6 +1,8 @@
+import { systemAdminUsersUiCopy } from "@afenda/feature-system-admin/metadata";
 import {
   listRoleOverridesForOrganization,
   requireSystemAdminUsersRead,
+  SystemAdminIdentityAccessDenied,
   SystemAdminIdentityHub,
 } from "@afenda/feature-system-admin/server";
 import { hasExecutionPermission } from "@afenda/kernel/execution";
@@ -8,12 +10,23 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Identity — System admin",
-  description:
-    "Tenant role overrides and cross-links to user lifecycle, membership, and permission surfaces.",
+  description: systemAdminUsersUiCopy.identity.page.description,
 };
 
 export default async function SystemAdminIdentityPage() {
-  const { context, organization } = await requireSystemAdminUsersRead();
+  let organization: Awaited<
+    ReturnType<typeof requireSystemAdminUsersRead>
+  >["organization"];
+  let context: Awaited<
+    ReturnType<typeof requireSystemAdminUsersRead>
+  >["context"];
+
+  try {
+    ({ context, organization } = await requireSystemAdminUsersRead());
+  } catch {
+    return <SystemAdminIdentityAccessDenied />;
+  }
+
   const canManageUsers = hasExecutionPermission(context, "system-admin.users.manage");
   const canWriteOverrides =
     hasExecutionPermission(context, "system-admin.identity.write") ||

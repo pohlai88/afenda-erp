@@ -1,26 +1,28 @@
 import {
   buildPoliciesListSurface,
   systemAdminPoliciesSurfaceKey,
+  systemAdminPoliciesUiCopy,
 } from "@afenda/feature-system-admin/metadata";
 import {
   buildSystemAdminPoliciesPageModel,
   requireSystemAdminPoliciesRead,
+  SystemAdminPoliciesAccessDenied,
+  SystemAdminPolicyDetailPanel,
   updateSystemAdminPolicyRuleAction,
 } from "@afenda/feature-system-admin/server";
 import {
   SystemAdminPolicyRuleEditor,
   SystemAdminPolicyTrailingCell,
 } from "@afenda/feature-system-admin/client";
-import { SystemAdminPolicyDetailPanel } from "@afenda/feature-system-admin/server";
+import { systemAdminControlLinks } from "@afenda/feature-system-admin";
 import { GovernedPatternCListSection } from "@afenda/governed-surface/server";
 import { hasExecutionPermission } from "@afenda/kernel/execution";
 import { SectionPanel } from "@afenda/ui";
-import { systemAdminControlLinks } from "@afenda/feature-system-admin/server";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Policies — System admin",
-  description: "Tenant lock and execution policy rules evaluated by the execution kernel.",
+  description: systemAdminPoliciesUiCopy.page.description,
 };
 
 export default async function SystemAdminPoliciesPage({
@@ -29,7 +31,19 @@ export default async function SystemAdminPoliciesPage({
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
-  const { context, organization } = await requireSystemAdminPoliciesRead();
+
+  let organization: Awaited<
+    ReturnType<typeof requireSystemAdminPoliciesRead>
+  >["organization"];
+  let context: Awaited<
+    ReturnType<typeof requireSystemAdminPoliciesRead>
+  >["context"];
+
+  try {
+    ({ organization, context } = await requireSystemAdminPoliciesRead());
+  } catch {
+    return <SystemAdminPoliciesAccessDenied />;
+  }
   const canMutate = hasExecutionPermission(
     context,
     "system-admin.policies.manage",
@@ -51,8 +65,8 @@ export default async function SystemAdminPoliciesPage({
     <div className="flex flex-col gap-surface-2xl">
       <SectionPanel
         headingLevel={1}
-        title="Policies"
-        description="Configure lock, deny, warn, and approval-required rules. The execution kernel evaluates active rules by priority during protected mutations."
+        title={systemAdminPoliciesUiCopy.page.title}
+        description={systemAdminPoliciesUiCopy.page.description}
       />
 
       {policyDetail ? (
@@ -63,7 +77,7 @@ export default async function SystemAdminPoliciesPage({
       ) : null}
 
       <GovernedPatternCListSection
-        title="Policy rules"
+        title={systemAdminPoliciesUiCopy.list.title}
         surfaceKey={systemAdminPoliciesSurfaceKey}
         listConfiguration={buildPoliciesListSurface({
           policies,
@@ -82,10 +96,10 @@ export default async function SystemAdminPoliciesPage({
         <SectionPanel
           title={
             selectedPolicyKey
-              ? "Update selected policy rule"
-              : "Create or update policy rule"
+              ? systemAdminPoliciesUiCopy.editor.updateTitle
+              : systemAdminPoliciesUiCopy.editor.createTitle
           }
-          description="Rules are organization-scoped, audited, and applied before workflow runtime."
+          description={systemAdminPoliciesUiCopy.editor.description}
         >
           <SystemAdminPolicyRuleEditor
             updatePolicyRuleAction={updateSystemAdminPolicyRuleAction}

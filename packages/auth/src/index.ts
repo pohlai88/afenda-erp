@@ -61,6 +61,7 @@ export const appCapabilities = [
   "system-admin.settings.read",
   "system-admin.settings.write",
   "system-admin.audit.read",
+  "system-admin.audit.review",
   "system-admin.audit.export",
   "system-admin.security.read",
   "system-admin.security.manage",
@@ -72,6 +73,8 @@ export const appCapabilities = [
   "system-admin.lynx.approve",
   "system-admin.reliability.read",
   "system-admin.billing.read",
+  "system-admin.billing.manage",
+  "system-admin.billing.export",
   "system-admin.diagnostics.read",
 ] as const;
 

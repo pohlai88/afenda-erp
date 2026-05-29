@@ -13,7 +13,7 @@ import {
 } from "../../tenant-execution/contracts/system-admin.action-result.contract";
 import type { InviteMemberActionData } from "../../memberships/contracts/system-admin.memberships-action-dtos.contract";
 import { requireSystemAdminIdentityWrite } from "../../overview/policies/system-admin.capability.policy.server";
-import { dispatchSystemAdminWebhook } from "../../integrations";
+import { dispatchSystemAdminWebhook } from "../../integrations/server";
 import { systemAdminIdentityInvitationWebhookEvents } from "../events/system-admin.identity-invitations.event";
 import { systemAdminInviteMemberActionSchema } from "../../memberships/schemas/system-admin.memberships-action.schema";
 import {

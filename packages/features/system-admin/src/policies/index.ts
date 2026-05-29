@@ -1,12 +1,8 @@
-export * from "./actions";
-export * from "./components";
+/**
+ * Environment-neutral door — system-admin/policies
+ * Buckets: actions, components, contracts, data, events, policies, schemas, surface, tests
+ */
+export * from "./metadata";
+export * from "./client";
 export * from "./contracts";
-export * from "./data";
-export * from "./events";
-export * from "./policies";
 export * from "./schemas";
-export {
-  updateSystemAdminPolicyAction,
-  updateSystemAdminPolicyRuleAction,
-} from "./actions/system-admin.policy-rules.actions.server";
-export { listTenantPolicySettings as listSystemAdminPolicies } from "../tenant-execution/data/system-admin.execution-settings.repository.server";

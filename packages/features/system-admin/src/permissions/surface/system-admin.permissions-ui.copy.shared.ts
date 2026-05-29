@@ -6,6 +6,10 @@ export const systemAdminPermissionsUiCopy = {
   },
   catalog: {
     title: "Permission catalog",
+    searchPlaceholder: "Search permissions by key, module, or label",
+    emptyTitle: "No permissions match the current filters.",
+    emptyDescription:
+      "Clear search and coverage filters, or reconcile the execution capability catalog.",
   },
   overrides: {
     title: "Role permission overrides",

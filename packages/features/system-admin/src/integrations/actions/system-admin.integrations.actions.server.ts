@@ -7,8 +7,13 @@ import {
   setWebhookEnabled,
   upsertSsoConnection,
 } from "@afenda/db";
+import {
+  writeExecutionAuditEvent,
+  type ExecutionActorType,
+} from "@afenda/kernel/execution";
 import { logServerEvent } from "@afenda/observability";
 import { revalidatePath } from "next/cache";
+import { systemAdminRoutePaths } from "../../overview/contracts/system-admin.route-paths.contract";
 import {
   assertSystemAdminFormActionResult,
   systemAdminActionFailure,
@@ -33,8 +38,20 @@ import {
   systemAdminSsoConnectionActionSchema,
   systemAdminWebhookActionSchema,
 } from "../schemas/system-admin.integrations-action.schema";
-import { dispatchSystemAdminWebhook } from "../../integrations";
-import { systemAdminIntegrationsWebhookEvents } from "../events/system-admin.integrations.event";
+import {
+  systemAdminIntegrationsAuditActions,
+  systemAdminIntegrationsWebhookEvents,
+} from "../events/system-admin.integrations.event";
+import { dispatchSystemAdminWebhook } from "../events/system-admin.webhook-dispatch.event";
+
+const [
+  apiCredentialCreatedWebhookEvent,
+  apiCredentialRevokedWebhookEvent,
+  webhookCreatedWebhookEvent,
+  webhookEnabledWebhookEvent,
+  webhookDisabledWebhookEvent,
+  ssoUpdatedWebhookEvent,
+] = systemAdminIntegrationsWebhookEvents;
 
 function splitCatalogValues(value: string) {
   return value
@@ -63,10 +80,30 @@ function logIntegrationMutation(input: {
   );
 }
 
+async function writeIntegrationAudit(input: {
+  organizationId: string;
+  actorId: string;
+  actorType: ExecutionActorType;
+  action: string;
+  targetId: string;
+  metadata?: Record<string, unknown>;
+}) {
+  await writeExecutionAuditEvent({
+    organizationId: input.organizationId,
+    actorId: input.actorId,
+    actorType: input.actorType,
+    action: input.action,
+    targetType: "organization_integrations",
+    targetId: input.targetId,
+    metadata: input.metadata,
+  });
+}
+
 export async function createApiCredentialAction(
   formData: FormData,
 ): Promise<SystemAdminActionResult<CreateApiCredentialActionData>> {
-  const { session, organization } = await requireSystemAdminIntegrationsWrite();
+  const { session, organization, context } =
+    await requireSystemAdminIntegrationsWrite();
 
   const parsed = systemAdminApiCredentialActionSchema.safeParse({
     label: formData.get("label"),
@@ -112,15 +149,23 @@ export async function createApiCredentialAction(
   await dispatchSystemAdminWebhook({
     organizationId: organization.id,
     userId: session.id,
-    eventType: systemAdminIntegrationsWebhookEvents[0],
+    eventType: apiCredentialCreatedWebhookEvent,
     payload: {
       credentialId: result.id,
       keyPrefix: result.keyPrefix,
       scopes,
     },
   });
+  await writeIntegrationAudit({
+    organizationId: organization.id,
+    actorId: context.userId,
+    actorType: context.actorType,
+    action: systemAdminIntegrationsAuditActions.apiCredentialCreate,
+    targetId: result.id,
+    metadata: { keyPrefix: result.keyPrefix, scopes },
+  });
 
-  revalidatePath("/system-admin/integrations");
+  revalidatePath(systemAdminRoutePaths.integrations);
   return systemAdminActionSuccess(result);
 }
 
@@ -134,7 +179,8 @@ export async function createApiCredentialFormAction(
 export async function revokeApiCredentialAction(
   credentialId: string,
 ): Promise<SystemAdminActionResult> {
-  const { session, organization } = await requireSystemAdminIntegrationsWrite();
+  const { session, organization, context } =
+    await requireSystemAdminIntegrationsWrite();
 
   if (!credentialId.trim()) {
     return systemAdminActionFailure("Credential id is required.", {
@@ -174,11 +220,18 @@ export async function revokeApiCredentialAction(
   await dispatchSystemAdminWebhook({
     organizationId: organization.id,
     userId: session.id,
-    eventType: systemAdminIntegrationsWebhookEvents[1],
+    eventType: apiCredentialRevokedWebhookEvent,
     payload: { credentialId },
   });
+  await writeIntegrationAudit({
+    organizationId: organization.id,
+    actorId: context.userId,
+    actorType: context.actorType,
+    action: systemAdminIntegrationsAuditActions.apiCredentialRevoke,
+    targetId: credentialId,
+  });
 
-  revalidatePath("/system-admin/integrations");
+  revalidatePath(systemAdminRoutePaths.integrations);
   return systemAdminActionSuccess(undefined);
 }
 
@@ -191,7 +244,8 @@ export async function revokeApiCredentialForm(formData: FormData) {
 export async function createWebhookAction(
   formData: FormData,
 ): Promise<SystemAdminActionResult<CreateWebhookActionData>> {
-  const { session, organization } = await requireSystemAdminIntegrationsWrite();
+  const { session, organization, context } =
+    await requireSystemAdminIntegrationsWrite();
 
   const parsed = systemAdminWebhookActionSchema.safeParse({
     label: formData.get("label"),
@@ -241,15 +295,23 @@ export async function createWebhookAction(
   await dispatchSystemAdminWebhook({
     organizationId: organization.id,
     userId: session.id,
-    eventType: systemAdminIntegrationsWebhookEvents[2],
+    eventType: webhookCreatedWebhookEvent,
     payload: {
       webhookId: result.id,
       url: parsed.data.url,
       eventFilters,
     },
   });
+  await writeIntegrationAudit({
+    organizationId: organization.id,
+    actorId: context.userId,
+    actorType: context.actorType,
+    action: systemAdminIntegrationsAuditActions.webhookCreate,
+    targetId: result.id,
+    metadata: { url: parsed.data.url, eventFilters },
+  });
 
-  revalidatePath("/system-admin/integrations");
+  revalidatePath(systemAdminRoutePaths.integrations);
   return systemAdminActionSuccess(result);
 }
 
@@ -264,7 +326,8 @@ export async function setWebhookEnabledAction(input: {
   webhookId: string;
   enabled: boolean;
 }): Promise<SystemAdminActionResult> {
-  const { session, organization } = await requireSystemAdminIntegrationsWrite();
+  const { session, organization, context } =
+    await requireSystemAdminIntegrationsWrite();
 
   const webhookId = input.webhookId.trim();
   if (!webhookId) {
@@ -307,19 +370,30 @@ export async function setWebhookEnabledAction(input: {
     organizationId: organization.id,
     userId: session.id,
     eventType: input.enabled
-      ? "tenant.webhook.enabled"
-      : "tenant.webhook.disabled",
+      ? webhookEnabledWebhookEvent
+      : webhookDisabledWebhookEvent,
     payload: { webhookId, enabled: input.enabled },
   });
+  await writeIntegrationAudit({
+    organizationId: organization.id,
+    actorId: context.userId,
+    actorType: context.actorType,
+    action: input.enabled
+      ? systemAdminIntegrationsAuditActions.webhookEnable
+      : systemAdminIntegrationsAuditActions.webhookDisable,
+    targetId: webhookId,
+    metadata: { enabled: input.enabled },
+  });
 
-  revalidatePath("/system-admin/integrations");
+  revalidatePath(systemAdminRoutePaths.integrations);
   return systemAdminActionSuccess(undefined);
 }
 
 export async function upsertSsoConnectionAction(
   formData: FormData,
 ): Promise<SystemAdminActionResult> {
-  const { session, organization } = await requireSystemAdminIntegrationsWrite();
+  const { session, organization, context } =
+    await requireSystemAdminIntegrationsWrite();
 
   const parsed = systemAdminSsoConnectionActionSchema.safeParse({
     provider: formData.get("provider"),
@@ -351,18 +425,30 @@ export async function upsertSsoConnectionAction(
       activation: "staged",
     },
   });
+
   await dispatchSystemAdminWebhook({
     organizationId: organization.id,
     userId: session.id,
-    eventType: systemAdminIntegrationsWebhookEvents[5],
+    eventType: ssoUpdatedWebhookEvent,
     payload: {
       provider: parsed.data.provider,
       enabled: parsed.data.enabled,
       activation: "staged",
     },
   });
+  await writeIntegrationAudit({
+    organizationId: organization.id,
+    actorId: context.userId,
+    actorType: context.actorType,
+    action: systemAdminIntegrationsAuditActions.ssoUpdate,
+    targetId: parsed.data.provider,
+    metadata: {
+      provider: parsed.data.provider,
+      enabled: parsed.data.enabled,
+    },
+  });
 
-  revalidatePath("/system-admin/integrations");
+  revalidatePath(systemAdminRoutePaths.integrations);
   return systemAdminActionSuccess(undefined);
 }
 
@@ -378,6 +464,13 @@ export async function revokeApiCredentialFormAction(
 
 export const createWebhookForm =
   toSystemAdminVoidFormAction(createWebhookAction);
+
+export async function upsertSsoConnectionFormAction(
+  _previous: SystemAdminActionResult | undefined,
+  formData: FormData,
+) {
+  return upsertSsoConnectionAction(formData);
+}
 
 export const upsertSsoConnectionForm = toSystemAdminVoidFormAction(
   upsertSsoConnectionAction,

@@ -20,13 +20,13 @@ export function WebhookTrailingCell({ row }: GovernedListTrailingCellProps) {
   const [result, setResult] = useState<SystemAdminActionResult>();
   const [isPending, startTransition] = useTransition();
   const trailingAction = row.trailingAction;
-  const status = String(row.cells["status"] ?? "");
-  const nextEnabled = status !== "enabled";
 
   if (!isListSurfaceTrailingActionRenderable(trailingAction)) {
     return null;
   }
 
+  const nextEnabled =
+    trailingAction.descriptor?.id === "system-admin.webhook.enable";
   const disabled = trailingAction.state === "disabled" || isPending;
 
   return (
@@ -53,7 +53,7 @@ export function WebhookTrailingCell({ row }: GovernedListTrailingCellProps) {
           ) : (
             <BanIcon data-icon="inline-start" />
           )}
-          {nextEnabled ? "Enable" : "Disable"}
+          {trailingAction.descriptor?.label ?? (nextEnabled ? "Enable" : "Disable")}
         </Button>
         <ActionFormErrors result={result} />
       </div>
@@ -89,7 +89,7 @@ export function ApiCredentialTrailingCell({
           }
         >
           <BanIcon data-icon="inline-start" />
-          Revoke
+          {trailingAction.descriptor?.label ?? "Revoke"}
         </Button>
         <ActionFormErrors result={result} />
       </div>

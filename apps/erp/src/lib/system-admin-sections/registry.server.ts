@@ -1,4 +1,4 @@
-import { systemAdminRoutePaths } from "@afenda/feature-system-admin/server";
+import { systemAdminRoutePaths } from "@afenda/feature-system-admin";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import type { ComponentType } from "react";

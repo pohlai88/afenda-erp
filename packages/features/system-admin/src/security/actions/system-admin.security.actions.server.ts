@@ -13,7 +13,7 @@ import {
   zodActionFailure,
 } from "../../tenant-execution/contracts/system-admin.action-result.contract";
 import { systemAdminRoutePaths } from "../../overview/contracts/system-admin.route-paths.contract";
-import { dispatchSystemAdminWebhook } from "../../integrations";
+import { dispatchSystemAdminWebhook } from "../../integrations/server";
 import { requireSystemAdminSecurityManage } from "../policies/system-admin.security.policy.server";
 import {
   assertSecuritySettingsDowngradeGuard,
@@ -25,7 +25,7 @@ import {
   mapParsedSecurityInputToOrganizationSettings,
 } from "../data/system-admin.security.query.server";
 import { mapOrganizationSecurityToTenantPatch } from "../data/system-admin.security.mapper";
-import { redactAuditMetadata } from "../../audit-viewer/data/redact-audit-metadata";
+import { redactAuditMetadata } from "../../audit-viewer/data/system-admin.audit-metadata.redact.shared";
 import {
   systemAdminSecurityAuditActions,
   systemAdminSecurityWebhookEvents,

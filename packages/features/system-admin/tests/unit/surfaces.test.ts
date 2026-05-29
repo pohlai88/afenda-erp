@@ -4,15 +4,16 @@ import { buildMembersListSurface } from "../../src/memberships/surface/system-ad
 import {
   buildApiCredentialsListSurface,
   buildWebhooksListSurface,
-} from "../../src/integrations/data/system-admin.integrations-list.surface";
+} from "../../src/integrations/surface/system-admin.integrations-list.surface";
 import { buildCapabilitiesListSurface } from "../../src/capabilities/data/system-admin.capabilities-list.surface";
 import { buildModulesListSurface } from "../../src/modules/data/system-admin.modules-list.surface";
 import { buildOrganizationDefaultsListSurface } from "../../src/organization/data/system-admin.organization-list.surface";
 import { buildPermissionsListSurface } from "../../src/permissions/surface/system-admin.permissions-list.surface";
 import { buildRolesListSurface } from "../../src/roles/data/system-admin.roles-list.surface";
-import { buildSystemAdminDiagnosticsIssuesListSurface } from "../../src/diagnostics/data/system-admin.diagnostics.surface";
-import { buildSystemAdminAuditViewerListSurface } from "../../src/audit-viewer/data/system-admin.audit.surface";
-import { buildSystemAdminSecuritySettingsListSurface } from "../../src/security/data/system-admin.security.surface";
+import { buildSystemAdminDiagnosticsIssuesListSurface } from "../../src/diagnostics/surface";
+import { buildSystemAdminAuditViewerListSurface } from "../../src/audit-viewer/surface/system-admin.audit-list.surface";
+import { buildSystemAdminSecuritySettingsListSurface } from "../../src/security/surface/system-admin.security-list.surface";
+import { evaluateSecurityReadiness } from "../../src/security/data/system-admin.security.readiness.server";
 import { buildApprovalsListSurface } from "../../src/approvals/surface/system-admin.approvals-list.surface";
 import { buildPoliciesListSurface } from "../../src/policies/data/system-admin.policy-rules.surface";
 import {
@@ -146,10 +147,12 @@ describe("system admin governed surfaces", () => {
     expect(usage.success).toBe(true);
     expect(sandboxes.success).toBe(true);
     if (usage.success && sandboxes.success) {
-      expect(usage.data.surface.header?.title).toBe("Machine usage ledger");
+      expect(usage.data.surface.header?.title).toBe("Lynx usage ledger");
+      expect(usage.data.surface.empty.description).toBeTruthy();
       expect(sandboxes.data.surface.header?.title).toBe(
         "Lynx action sandboxes",
       );
+      expect(sandboxes.data.surface.empty.description).toBeTruthy();
     }
   });
 
@@ -356,6 +359,89 @@ describe("system admin governed surfaces", () => {
     }
   });
 
+  it("parses the approvals governed list surface with trailing actions", () => {
+    const parsed = parseListSurfaceRendererConfiguration(
+      buildApprovalsListSurface({
+        canMutate: true,
+        approvals: [
+          {
+            id: "approval_1",
+            key: "finance.payment",
+            name: "Payment release",
+            moduleKey: "finance",
+            action: "finance.documents.write",
+            targetType: "erp-record",
+            approvalMode: "parallel",
+            approverRoles: "finance-manager",
+            minApprovals: 1,
+            escalation: "Not configured",
+            status: "active",
+            enabled: true,
+            readinessVerdict: "ready",
+          },
+        ],
+      }),
+    );
+
+    expect(parsed.success).toBe(true);
+    if (parsed.success) {
+      expect(parsed.data.requiresErpPermission).toEqual({
+        module: "system-admin",
+        object: "approvals",
+        function: "read",
+      });
+      expect(parsed.data.presentation?.toolbar?.search?.param).toBe("approvalsQ");
+      expect(parsed.data.rows[0]?.trailingAction?.state).toBe("ready");
+      expect(parsed.data.rows[0]?.trailingAction?.descriptor?.label).toBe(
+        "Disable",
+      );
+      expect(parsed.data.rows[0]?.rowHref).toContain("approvalsKey=finance.payment");
+    }
+  });
+
+  it("parses the security posture governed list surface with ERP permission metadata", () => {
+    const parsed = parseListSurfaceRendererConfiguration(
+      buildSystemAdminSecuritySettingsListSurface({
+        security: {
+          organizationId: "org_1",
+          requireMfaForAdmins: true,
+          allowedEmailDomains: ["example.com"],
+          sessionMaxAgeMinutes: 720,
+          idleTimeoutMinutes: 30,
+          requireSensitiveActionConfirmation: true,
+          restrictInvitesToAllowedDomains: true,
+          adminLockoutProtectionEnabled: true,
+          updatedByUserId: "user_1",
+          updatedAt: new Date("2026-01-01T00:00:00.000Z"),
+        },
+        readiness: evaluateSecurityReadiness({
+          organizationId: "org_1",
+          requireMfaForAdmins: true,
+          allowedEmailDomains: ["example.com"],
+          sessionMaxAgeMinutes: 720,
+          idleTimeoutMinutes: 30,
+          requireSensitiveActionConfirmation: true,
+          restrictInvitesToAllowedDomains: true,
+          adminLockoutProtectionEnabled: true,
+          updatedByUserId: "user_1",
+          updatedAt: new Date("2026-01-01T00:00:00.000Z"),
+        }),
+      }),
+    );
+
+    expect(parsed.success).toBe(true);
+    if (parsed.success) {
+      expect(parsed.data.requiresErpPermission).toEqual({
+        module: "system-admin",
+        object: "security",
+        function: "read",
+      });
+      expect(parsed.data.dataNature).toBe("table");
+      expect(parsed.data.rows.some((row) => row.id === "mfa")).toBe(true);
+      expect(parsed.data.rows.some((row) => row.id === "readiness")).toBe(true);
+    }
+  });
+
   it("parses granular domain control surfaces", () => {
     const surfaces = [
       buildPermissionsListSurface({ permissions: [] }),
@@ -363,8 +449,11 @@ describe("system admin governed surfaces", () => {
       buildModulesListSurface({ modules: [] }),
       buildCapabilitiesListSurface({ capabilities: [] }),
       buildPoliciesListSurface({ policies: [] }),
-      buildApprovalsListSurface({ approvals: [] }),
-      buildSystemAdminSecuritySettingsListSurface({ security: null }),
+      buildApprovalsListSurface({ approvals: [], canMutate: true }),
+      buildSystemAdminSecuritySettingsListSurface({
+        security: null,
+        readiness: evaluateSecurityReadiness(null),
+      }),
       buildOrganizationDefaultsListSurface({
         settings: null,
         organizationName: "Afenda",

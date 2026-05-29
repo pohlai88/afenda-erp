@@ -35,9 +35,7 @@ export function RoleOverrideForm({
 }: {
   setRoleOverrideAction: SetRoleOverrideAction;
 }) {
-  const [permissionKey, setPermissionKey] = useState(
-    "system-admin.audit.read",
-  );
+  const [permissionKey, setPermissionKey] = useState("system-admin.audit.read");
   const [enabled, setEnabled] = useState(true);
   const [confirmHighRisk, setConfirmHighRisk] = useState(false);
   const [state, formAction, pending] = useActionState<

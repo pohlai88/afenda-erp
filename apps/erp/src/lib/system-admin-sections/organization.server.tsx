@@ -1,10 +1,12 @@
 import {
   buildOrganizationDefaultsListSurface,
   systemAdminOrganizationSurfaceKey,
+  systemAdminOrganizationUiCopy,
 } from "@afenda/feature-system-admin/metadata";
 import {
   buildSystemAdminOrganizationPageModel,
   requireSystemAdminOrganizationRead,
+  SystemAdminOrganizationAccessDenied,
   updateSystemAdminOrganizationDefaultsAction,
 } from "@afenda/feature-system-admin/server";
 import { SystemAdminOrganizationDefaultsForm } from "@afenda/feature-system-admin/client";
@@ -13,12 +15,21 @@ import { SectionPanel } from "@afenda/ui";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Organization - System admin",
-  description: "Organization profile, locale, calendar, numbering, and data-handling defaults.",
+  title: "Organization — System admin",
+  description: systemAdminOrganizationUiCopy.page.description,
 };
 
 export default async function SystemAdminOrganizationPage() {
-  const { organization } = await requireSystemAdminOrganizationRead();
+  let organization: Awaited<
+    ReturnType<typeof requireSystemAdminOrganizationRead>
+  >["organization"];
+
+  try {
+    ({ organization } = await requireSystemAdminOrganizationRead());
+  } catch {
+    return <SystemAdminOrganizationAccessDenied />;
+  }
+
   const canMutate =
     organization.capabilities.includes("system-admin.organization.manage") ||
     organization.capabilities.includes("system-admin.settings.write");
@@ -28,16 +39,18 @@ export default async function SystemAdminOrganizationPage() {
     organizationSlug: organization.slug,
   });
 
+  const copy = systemAdminOrganizationUiCopy;
+
   return (
     <div className="flex flex-col gap-surface-2xl">
       <SectionPanel
         headingLevel={1}
-        title="Organization"
-        description="Operational organization defaults used by ERP modules, document controls, and tenant data-handling policy."
+        title={copy.page.title}
+        description={copy.page.description}
       />
 
       <GovernedPatternCListSection
-        title="Organization defaults"
+        title={copy.list.title}
         surfaceKey={systemAdminOrganizationSurfaceKey}
         listConfiguration={buildOrganizationDefaultsListSurface({
           settings: pageModel.settings,
@@ -49,8 +62,8 @@ export default async function SystemAdminOrganizationPage() {
 
       {canMutate ? (
         <SectionPanel
-          title="Update organization defaults"
-          description="Changes are audited as system-admin.organization.update and apply tenant-wide operational, document, and data-handling settings."
+          title={copy.form.title}
+          description={copy.form.description}
         >
           <SystemAdminOrganizationDefaultsForm
             defaults={pageModel.formDefaults}

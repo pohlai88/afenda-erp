@@ -22,7 +22,10 @@
     "AI_GATEWAY_API_KEY",
     "VERCEL_OIDC_TOKEN",
     "VERCEL_ENV",
-    "VERCEL_BLOB_CALLBACK_URL"
+    "VERCEL_BLOB_CALLBACK_URL",
+    "STRIPE_SECRET_KEY",
+    "STRIPE_WEBHOOK_SECRET",
+    "STRIPE_PRICE_ID"
   ],
   "tasks": {
     "build": {

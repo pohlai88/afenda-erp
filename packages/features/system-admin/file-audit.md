@@ -17,11 +17,13 @@ Each vertical owns `actions/`, `policies/`, `events/` (where applicable), `data/
 - `overview/`, `users/`, `memberships/`, `roles/`, `permissions/`, `modules/`, `capabilities/`
 - `policies/` (policy-rules vertical; module-wide capability gates live in `overview/policies/`)
 - `approvals/`, `audit-viewer/`, `security/`, `organization/`, `diagnostics/`
-- `integrations/`, `lynx/`, `billing/`, `reliability/`, `tenant-execution/`
+- `integrations/`, `lynx/`, `billing/`, `reliability/`, `tenant-execution/` (cross-cutting bridge — `contracts/`, `data/`, `policies/` only; no route)
 
 ## Data access
 
-Persistence adapters live in each vertical’s `data/` folder (e.g. `users/data/system-admin.identity.repository.server.ts`, `tenant-execution/data/system-admin.execution-settings.repository.server.ts`). There is no shared `src/data/` barrel.
+Persistence adapters live in each vertical’s `data/` folder (e.g. `users/data/system-admin.identity.repository.server.ts`, `tenant-execution/data/system-admin.execution-settings.repository.server.ts` for org execution settings shared across policies/approvals/modules). There is no shared `src/data/` barrel.
+
+`tenant-execution/policies/` registers kernel evaluators and loads org execution rules; see `tenant-execution/tenant-execution-architecture.md`.
 
 ## Components
 

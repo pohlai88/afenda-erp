@@ -1,6 +1,8 @@
-export { getCronHealthSurfaceRows } from "./data/system-admin.cron-health.query.server";
-export {
-  buildCronHealthListSurface,
-  systemAdminCronSurfaceKey,
-  type CronHealthSurfaceRow,
-} from "./data/system-admin.cron-health.surface";
+/**
+ * Environment-neutral door — system-admin/reliability
+ * Buckets: actions, components, contracts, data, events, policies, schemas, surface, tests
+ */
+export * from "./metadata";
+export * from "./client";
+export * from "./contracts";
+export * from "./schemas";

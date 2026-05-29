@@ -9,36 +9,27 @@ import {
   type SystemAdminActionResult,
   zodActionFailure,
 } from "../../tenant-execution/contracts/system-admin.action-result.contract";
-import { dispatchSystemAdminWebhook } from "../../integrations";
+import { dispatchSystemAdminWebhook } from "../../integrations/server";
 import {
   requireSystemAdminAuditExport,
-  requireSystemAdminAuditRead,
+  requireSystemAdminAuditReview,
 } from "../policies/system-admin.audit-viewer.policy.server";
 import { systemAdminRetentionPolicyActionSchema } from "../schemas/system-admin.retention-action.schema";
+import { systemAdminAuditExportFormatSchema } from "../schemas/system-admin.audit-export.schema";
 import {
   systemAdminAuditViewerAuditActions,
   systemAdminAuditViewerWebhookEvents,
 } from "../events/system-admin.audit-viewer.event";
-import {
-  mapTenantAuditLogToRow,
-  parseAuditFilterDate,
-} from "../data/system-admin.audit.query.server";
-import { parseSystemAdminAuditSearchParams } from "../data/parse-audit-search-params";
-import { redactAuditMetadata } from "../data/redact-audit-metadata";
+import { parseAuditFilterDate } from "../data/system-admin.audit.query.server";
+import { parseSystemAdminAuditSearchParams } from "../data/system-admin.audit-search-params.parse.shared";
+import { buildAuditExportBody } from "../data/system-admin.audit-export.build.server";
+import type { SystemAdminAuditExportPayload } from "../contracts/system-admin.audit-export.contract";
 
 const EXPORT_ROW_LIMIT = 5_000;
 
-function escapeCsvCell(value: string) {
-  if (/[",\n]/.test(value)) {
-    return `"${value.replace(/"/g, '""')}"`;
-  }
-
-  return value;
-}
-
 export async function exportSystemAdminAuditLogsAction(
   formData: FormData,
-): Promise<SystemAdminActionResult<{ csv: string; rowCount: number }>> {
+): Promise<SystemAdminActionResult<SystemAdminAuditExportPayload>> {
   const { context, organization, session } =
     await requireSystemAdminAuditExport();
 
@@ -47,14 +38,23 @@ export async function exportSystemAdminAuditLogsAction(
     return typeof value === "string" && value.length > 0 ? value : undefined;
   };
 
+  const formatParsed = systemAdminAuditExportFormatSchema.safeParse(
+    readOptional("format") ?? "csv",
+  );
+  if (!formatParsed.success) {
+    return zodActionFailure(formatParsed.error);
+  }
+
   const params = parseSystemAdminAuditSearchParams({
     auditQ: readOptional("auditQ"),
     auditActor: readOptional("auditActor"),
     auditAction: readOptional("auditAction"),
     auditTargetType: readOptional("auditTargetType"),
+    auditTargetId: readOptional("auditTargetId"),
     auditModule: readOptional("auditModule"),
     auditFrom: readOptional("auditFrom"),
     auditTo: readOptional("auditTo"),
+    auditSort: readOptional("auditSort"),
   });
 
   const { rows } = await searchTenantAuditLogs({
@@ -65,43 +65,21 @@ export async function exportSystemAdminAuditLogsAction(
       actorAuthUserId: params.auditActor,
       action: params.auditAction,
       entityType: params.auditTargetType,
+      entityId: params.auditTargetId,
       moduleKey: params.auditModule,
       query: params.auditQ,
       createdAfter: parseAuditFilterDate(params.auditFrom),
       createdBefore: parseAuditFilterDate(params.auditTo),
+      sortDirection: params.auditSort ?? "desc",
     },
   });
 
-  const mapped = rows.map(mapTenantAuditLogToRow);
-  const header = [
-    "time",
-    "actor",
-    "action",
-    "target",
-    "module",
-    "result",
-    "summary",
-    "metadata",
-  ];
-  const lines = mapped.map((row) =>
-    [
-      row.occurredAt,
-      row.actorId,
-      row.action,
-      row.target,
-      row.moduleKey,
-      row.result,
-      row.summary,
-      JSON.stringify(
-        redactAuditMetadata(
-          rows.find((entry) => entry.id === row.id)?.metadata ?? {},
-        ),
-      ),
-    ]
-      .map((cell) => escapeCsvCell(String(cell)))
-      .join(","),
+  const exportBody = await Promise.resolve(
+    buildAuditExportBody({
+      format: formatParsed.data,
+      rows,
+    }),
   );
-  const csv = [header.join(","), ...lines].join("\n");
 
   await writeExecutionAuditEvent({
     organizationId: organization.id,
@@ -111,7 +89,8 @@ export async function exportSystemAdminAuditLogsAction(
     targetType: "organization",
     targetId: organization.id,
     metadata: {
-      rowCount: mapped.length,
+      rowCount: rows.length,
+      format: formatParsed.data,
       filters: params,
     },
   });
@@ -125,18 +104,25 @@ export async function exportSystemAdminAuditLogsAction(
       module: "system-admin",
       operation: "audit.export",
     },
-    { rowCount: mapped.length },
+    { rowCount: rows.length, format: formatParsed.data },
   );
 
   revalidatePath("/system-admin/audit");
-  return systemAdminActionSuccess({ csv, rowCount: mapped.length });
+  return systemAdminActionSuccess({
+    format: formatParsed.data,
+    content: exportBody.content,
+    rowCount: rows.length,
+    mimeType: exportBody.mimeType,
+    fileExtension: exportBody.fileExtension,
+    encoding: exportBody.encoding,
+  });
 }
 
 export async function upsertSystemAdminRetentionPolicyAction(
   _previous: SystemAdminActionResult | undefined,
   formData: FormData,
 ): Promise<SystemAdminActionResult> {
-  const { session, organization } = await requireSystemAdminAuditExport();
+  const { session, organization, context } = await requireSystemAdminAuditReview();
 
   const parsed = systemAdminRetentionPolicyActionSchema.safeParse({
     entityType: formData.get("entityType"),
@@ -153,6 +139,21 @@ export async function upsertSystemAdminRetentionPolicyAction(
     retentionDays: parsed.data.retentionDays,
     legalHold: parsed.data.legalHold,
     actorAuthUserId: session.id,
+  });
+
+  await writeExecutionAuditEvent({
+    organizationId: organization.id,
+    actorId: context.userId,
+    actorType: context.actorType,
+    action: systemAdminAuditViewerAuditActions.review,
+    targetType: "organization",
+    targetId: organization.id,
+    metadata: {
+      operation: "retention.update",
+      entityType: parsed.data.entityType,
+      retentionDays: parsed.data.retentionDays,
+      legalHold: parsed.data.legalHold,
+    },
   });
 
   logServerEvent(
@@ -182,11 +183,4 @@ export async function upsertSystemAdminRetentionPolicyAction(
 
   revalidatePath("/system-admin/audit");
   return systemAdminActionSuccess(undefined);
-}
-
-export async function recordSystemAdminAuditViewerAccess(input: {
-  organizationId: string;
-}) {
-  await requireSystemAdminAuditRead();
-  return input.organizationId;
 }

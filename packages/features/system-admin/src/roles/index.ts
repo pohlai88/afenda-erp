@@ -1,18 +1,8 @@
-export * from "./actions";
-export { SystemAdminRolesAccessDenied } from "./components";
+/**
+ * Environment-neutral door — system-admin/roles
+ * Buckets: actions, components, contracts, data, events, policies, schemas, surface, tests
+ */
+export * from "./metadata";
+export * from "./client";
 export * from "./contracts";
-export * from "./data";
-export * from "./events";
-export * from "./policies";
 export * from "./schemas";
-export {
-  assignSystemAdminRole,
-  removeSystemAdminRoleAssignmentForm,
-} from "./actions/system-admin.roles.actions.server";
-export {
-  setRoleOverride,
-  setRoleOverrideAction,
-  setRoleOverride as updateSystemAdminRoleOverride,
-  setRoleOverrideAction as updateSystemAdminRoleOverrideAction,
-} from "../permissions/actions/system-admin.permission-bundle.actions.server";
-export { listRoleOverridesForOrganization } from "../users/data/system-admin.identity.repository.server";

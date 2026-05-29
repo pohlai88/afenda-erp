@@ -6,7 +6,10 @@ export const systemAdminModulesUiCopy = {
   },
   listSurface: {
     title: "Module readiness",
+    searchPlaceholder: "Search modules by name or category",
     emptyTitle: "No modules are registered.",
+    emptyDescription:
+      "Module catalog entries appear when execution capabilities are registered for this deployment.",
   },
   settingsPanel: {
     title: "Update module settings",

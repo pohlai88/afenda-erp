@@ -11,6 +11,7 @@ import {
   moduleReadinessVerdictBadge,
 } from "../../overview/surfaces/system-admin.control-list.shared";
 import type { SystemAdminPolicyRuleListRow } from "../contracts/system-admin.policy-rule.contract";
+import { systemAdminPoliciesUiCopy } from "../surface/system-admin.policies-ui.copy.shared";
 import { resolveSystemAdminPolicyRowTrailingAction } from "../surface/system-admin.policy-rules-list-trailing.shared";
 
 export const systemAdminPoliciesSurfaceKey = "system-admin.policies.list";
@@ -42,7 +43,7 @@ export function buildPoliciesListSurface(input: {
   const canMutate = input.canMutate ?? false;
   return buildLinkedControlListSurface({
     key: systemAdminPoliciesSurfaceKey,
-    title: "Policy rules",
+    title: systemAdminPoliciesUiCopy.list.title,
     object: "policies",
     columns: [
       { id: "name", header: "Policy", priority: "primary", pin: "start", cellKind: { kind: "link" } },
@@ -83,7 +84,9 @@ export function buildPoliciesListSurface(input: {
         readinessVerdict: moduleReadinessVerdictBadge(policy.readinessVerdict),
       },
     })),
-    emptyTitle: "No policy rules are configured for this organization.",
+    emptyTitle: systemAdminPoliciesUiCopy.list.emptyTitle,
+    emptyDescription: systemAdminPoliciesUiCopy.list.emptyDescription,
+    searchPlaceholder: systemAdminPoliciesUiCopy.list.searchPlaceholder,
     searchValue: input.searchValue,
   });
 }

@@ -1,9 +1,7 @@
-export * from "./contracts/system-admin.action-result.contract";
-export { loadTenantExecutionRulesForOrganization } from "./tenant-execution-rules.loader.server";
-export { ensureTenantExecutionPoliciesRegistered } from "./register-tenant-execution-policies.server";
-export {
-  listTenantApprovalSettings,
-  listTenantCapabilitySettings,
-  listTenantModuleSettings,
-  listTenantPolicySettings,
-} from "./data/system-admin.execution-settings.repository.server";
+/**
+ * Environment-neutral door — system-admin/tenant-execution
+ * Buckets: actions, components, contracts, data, events, policies, schemas, surface, tests
+ */
+export * from "./metadata";
+export * from "./client";
+export * from "./contracts";

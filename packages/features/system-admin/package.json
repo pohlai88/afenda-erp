@@ -28,15 +28,18 @@
   "dependencies": {
     "@afenda/ai": "workspace:*",
     "@afenda/auth": "workspace:*",
+    "@afenda/billing": "workspace:*",
     "@afenda/db": "workspace:*",
-    "@afenda/kernel": "workspace:*",
     "@afenda/feature-knowledge": "workspace:*",
     "@afenda/feature-lynx": "workspace:*",
     "@afenda/governed-surface": "workspace:*",
+    "@afenda/kernel": "workspace:*",
     "@afenda/observability": "workspace:*",
     "@afenda/ui": "workspace:*",
     "@afenda/workflows": "workspace:*",
     "lucide-react": "^1.16.0",
+    "pdf-lib": "^1.17.1",
+    "xlsx": "^0.18.5",
     "zod": "catalog:"
   },
   "scripts": {

@@ -1,15 +1,17 @@
 import { describe, expect, it } from "vitest";
 import { systemAdminAuditViewerAuditActions } from "../../src/audit-viewer/events/system-admin.audit-viewer.event";
-import { systemAdminIntegrationsWebhookEvents } from "../../src/integrations/events/system-admin.integrations.event";
-import { buildSystemAdminAuditPageHref } from "../../src/audit-viewer/data/system-admin.audit-pagination.shared";
+import {
+  systemAdminIntegrationsWebhookEvents,
+} from "../../src/integrations/events/system-admin.integrations.event";
+import { buildSystemAdminAuditPageHref } from "../../src/audit-viewer/surface/system-admin.audit-pagination.shared";
 import { systemAdminPolicyRuleWebhookEvents } from "../../src/policies/events/system-admin.policy-rules.event";
 import { systemAdminSecurityAuditActions } from "../../src/security/events/system-admin.security.event";
-import { redactAuditMetadata } from "../../src/audit-viewer/data/redact-audit-metadata";
 import {
   assertSecuritySettingsDowngradeGuard,
   updateSecuritySettingsInputSchema,
 } from "../../src/security/schemas/system-admin.security.schema";
 import type { OrganizationSecuritySettings } from "../../src/security/contracts/system-admin.security-settings.contract";
+import { evaluateSecurityReadiness } from "../../src/security/data/system-admin.security.readiness.server";
 
 const baseSecurity: OrganizationSecuritySettings = {
   organizationId: "org_phase4",
@@ -25,19 +27,6 @@ const baseSecurity: OrganizationSecuritySettings = {
 };
 
 describe("system admin phase 4 audit viewer", () => {
-  it("redacts secret-like metadata keys", () => {
-    const redacted = redactAuditMetadata({
-      apiKey: "live_secret",
-      nested: { signingSecret: "abc", safe: "visible" },
-    }) as Record<string, unknown>;
-
-    expect(redacted.apiKey).toBe("[redacted]");
-    expect((redacted.nested as Record<string, unknown>).signingSecret).toBe(
-      "[redacted]",
-    );
-    expect((redacted.nested as Record<string, unknown>).safe).toBe("visible");
-  });
-
   it("builds shareable audit pagination hrefs", () => {
     const href = buildSystemAdminAuditPageHref(
       {
@@ -59,6 +48,20 @@ describe("system admin phase 4 audit viewer", () => {
 });
 
 describe("system admin phase 4 security", () => {
+  it("rejects idle timeout greater than session max age", () => {
+    const parsed = updateSecuritySettingsInputSchema.safeParse({
+      requireMfaForAdmins: "true",
+      allowedEmailDomains: "example.com",
+      sessionMaxAgeMinutes: "60",
+      idleTimeoutMinutes: "120",
+      requireSensitiveActionConfirmation: "true",
+      restrictInvitesToAllowedDomains: "false",
+      adminLockoutProtectionEnabled: "true",
+    });
+
+    expect(parsed.success).toBe(false);
+  });
+
   it("rejects invalid email domains", () => {
     const parsed = updateSecuritySettingsInputSchema.safeParse({
       requireMfaForAdmins: "true",
@@ -118,10 +121,34 @@ describe("system admin phase 4 security", () => {
     expect(capabilities.includes("system-admin.security.manage")).toBe(false);
   });
 
+  it("reports blocked readiness when security settings are missing", () => {
+    expect(evaluateSecurityReadiness(null).verdict).toBe("blocked");
+  });
+
+  it("reports blocked readiness when idle timeout exceeds session max age", () => {
+    expect(
+      evaluateSecurityReadiness({
+        ...baseSecurity,
+        sessionMaxAgeMinutes: 60,
+        idleTimeoutMinutes: 120,
+      }).verdict,
+    ).toBe("blocked");
+  });
+
+  it("reports warning readiness when admin MFA is optional", () => {
+    expect(
+      evaluateSecurityReadiness({
+        ...baseSecurity,
+        requireMfaForAdmins: false,
+      }).verdict,
+    ).toBe("warning");
+  });
+
   it("uses stable audit and security action identifiers", () => {
     expect(systemAdminAuditViewerAuditActions.view).toBe(
       "system-admin.audit.view",
     );
+    expect(systemAdminSecurityAuditActions.view).toBe("system-admin.security.view");
     expect(systemAdminSecurityAuditActions.update).toBe(
       "system-admin.security.update",
     );

@@ -16,6 +16,7 @@
   "dependencies": {
     "@afenda/ai": "workspace:*",
     "@afenda/auth": "workspace:*",
+    "@afenda/billing": "workspace:*",
     "@afenda/db": "workspace:*",
     "@afenda/kernel": "workspace:*",
     "@afenda/feature-approvals": "workspace:*",

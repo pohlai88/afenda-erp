@@ -50,6 +50,20 @@
       "when": 1779985842567,
       "tag": "0006_good_tomorrow_man",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1780021250559,
+      "tag": "0007_bored_madame_masque",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1780024008225,
+      "tag": "0008_ambiguous_stephen_strange",
+      "breakpoints": true
     }
   ]
 }

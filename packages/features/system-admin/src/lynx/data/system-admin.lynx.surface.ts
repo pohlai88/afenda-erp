@@ -9,6 +9,7 @@ import {
   buildSystemAdminListToolbar,
   buildSystemAdminStaticPagination,
 } from "../../overview/surfaces/system-admin.list-surface.shared";
+import { systemAdminLynxUiCopy } from "../surface/system-admin.lynx-ui.copy.shared";
 
 const MACHINE_LAYER_APPROVE_REQUIRED_REASON =
   "Requires system-admin.lynx.approve.";
@@ -156,43 +157,44 @@ export function buildSystemAdminAiUsageListSurface(input: {
   const rows = input.events;
 
   return buildGovernedListSurface({
-    __schemaVersion: GOVERNED_METADATA_SCHEMA_VERSION,
-    dataNature: "table",
-    presentationProfile: "erp-operational-table",
-    presentation: {
-      toolbar: buildMachineToolbar({
-        scope: "machineUsage",
-        searchPlaceholder: "Search machine usage",
-        sortColumn: "feature",
-        statusParam: "machineUsageStatus",
-      }),
-    },
-    requiresErpPermission: {
-      module: "system-admin",
-      object: "machine-usage",
-      function: "read",
-    },
-    pagination: buildSystemAdminStaticPagination(rows.length),
-    surface: {
-      header: { title: "Machine usage ledger" },
-      columnsId: "system-admin-machine-usage",
-      rowKey: "id",
-      empty: {
-        variant: "muted",
-        title: "No machine usage events recorded yet.",
+      __schemaVersion: GOVERNED_METADATA_SCHEMA_VERSION,
+      dataNature: "table",
+      presentationProfile: "erp-operational-table",
+      presentation: {
+        toolbar: buildMachineToolbar({
+          scope: "machineUsage",
+          searchPlaceholder: systemAdminLynxUiCopy.usage.searchPlaceholder,
+          sortColumn: "feature",
+          statusParam: "machineUsageStatus",
+        }),
       },
-    },
-    columns: AI_USAGE_COLUMNS,
-    rows: rows.map((event) => ({
-      id: event.id,
-      cells: {
-        feature: event.feature,
-        model: event.model,
-        status: event.status,
-        totalTokens: event.totalTokens,
-        latency: event.latency,
+      requiresErpPermission: {
+        module: "system-admin",
+        object: "machine-usage",
+        function: "read",
       },
-    })),
+      pagination: buildSystemAdminStaticPagination(rows.length),
+      surface: {
+        header: { title: systemAdminLynxUiCopy.usage.title },
+        columnsId: "system-admin-machine-usage",
+        rowKey: "id",
+        empty: {
+          variant: "muted",
+          title: systemAdminLynxUiCopy.usage.emptyTitle,
+          description: systemAdminLynxUiCopy.usage.emptyDescription,
+        },
+      },
+      columns: AI_USAGE_COLUMNS,
+      rows: rows.map((event) => ({
+        id: event.id,
+        cells: {
+          feature: event.feature,
+          model: event.model,
+          status: event.status,
+          totalTokens: event.totalTokens,
+          latency: event.latency,
+        },
+      })),
   });
 }
 
@@ -202,32 +204,33 @@ export function buildSystemAdminAiApprovalsListSurface(input: {
   const rows = input.proposals;
 
   return buildGovernedListSurface({
-    __schemaVersion: GOVERNED_METADATA_SCHEMA_VERSION,
-    dataNature: "table",
-    presentationProfile: "erp-operational-table",
-    presentation: {
-      toolbar: buildMachineToolbar({
-        scope: "machineApprovals",
-        searchPlaceholder: "Search machine approvals",
-        sortColumn: "proposedAction",
-        statusParam: "machineApprovalsStatus",
-      }),
-    },
-    requiresErpPermission: {
-      module: "system-admin",
-      object: "machine-approvals",
-      function: "read",
-    },
-    pagination: buildSystemAdminStaticPagination(rows.length),
-    surface: {
-      header: { title: "Machine approval proposals" },
-      columnsId: "system-admin-machine-approvals",
-      rowKey: "id",
-      empty: {
-        variant: "muted",
-        title: "No machine approval proposals recorded yet.",
+      __schemaVersion: GOVERNED_METADATA_SCHEMA_VERSION,
+      dataNature: "table",
+      presentationProfile: "erp-operational-table",
+      presentation: {
+        toolbar: buildMachineToolbar({
+          scope: "machineApprovals",
+          searchPlaceholder: systemAdminLynxUiCopy.approvals.searchPlaceholder,
+          sortColumn: "proposedAction",
+          statusParam: "machineApprovalsStatus",
+        }),
       },
-    },
+      requiresErpPermission: {
+        module: "system-admin",
+        object: "machine-approvals",
+        function: "read",
+      },
+      pagination: buildSystemAdminStaticPagination(rows.length),
+      surface: {
+        header: { title: systemAdminLynxUiCopy.approvals.title },
+        columnsId: "system-admin-machine-approvals",
+        rowKey: "id",
+        empty: {
+          variant: "muted",
+          title: systemAdminLynxUiCopy.approvals.emptyTitle,
+          description: systemAdminLynxUiCopy.approvals.emptyDescription,
+        },
+      },
     columns: AI_APPROVALS_COLUMNS,
     rows: rows.map((proposal) => ({
       id: proposal.id,
@@ -254,32 +257,33 @@ export function buildSystemAdminAiSandboxesListSurface(input: {
   const canMutate = input.canMutate ?? false;
 
   return buildGovernedListSurface({
-    __schemaVersion: GOVERNED_METADATA_SCHEMA_VERSION,
-    dataNature: "table",
-    presentationProfile: "erp-operational-table",
-    presentation: {
-      toolbar: buildMachineToolbar({
-        scope: "machineSandboxes",
-        searchPlaceholder: "Search Lynx action sandboxes",
-        sortColumn: "created",
-        statusParam: "machineSandboxesStatus",
-      }),
-    },
-    requiresErpPermission: {
-      module: "system-admin",
-      object: "machine-sandboxes",
-      function: "read",
-    },
-    pagination: buildSystemAdminStaticPagination(rows.length),
-    surface: {
-      header: { title: "Lynx action sandboxes" },
-      columnsId: "system-admin-machine-sandboxes",
-      rowKey: "id",
-      empty: {
-        variant: "muted",
-        title: "No Lynx action sandboxes recorded yet.",
+      __schemaVersion: GOVERNED_METADATA_SCHEMA_VERSION,
+      dataNature: "table",
+      presentationProfile: "erp-operational-table",
+      presentation: {
+        toolbar: buildMachineToolbar({
+          scope: "machineSandboxes",
+          searchPlaceholder: systemAdminLynxUiCopy.sandboxes.searchPlaceholder,
+          sortColumn: "created",
+          statusParam: "machineSandboxesStatus",
+        }),
       },
-    },
+      requiresErpPermission: {
+        module: "system-admin",
+        object: "machine-sandboxes",
+        function: "read",
+      },
+      pagination: buildSystemAdminStaticPagination(rows.length),
+      surface: {
+        header: { title: systemAdminLynxUiCopy.sandboxes.title },
+        columnsId: "system-admin-machine-sandboxes",
+        rowKey: "id",
+        empty: {
+          variant: "muted",
+          title: systemAdminLynxUiCopy.sandboxes.emptyTitle,
+          description: systemAdminLynxUiCopy.sandboxes.emptyDescription,
+        },
+      },
     columns: AI_SANDBOXES_COLUMNS,
     rows: rows.map((sandbox) => ({
       id: sandbox.id,
@@ -321,38 +325,39 @@ export function buildSystemAdminAiEntitlementsListSurface(input: {
   const canMutate = input.canMutate ?? false;
 
   return buildGovernedListSurface({
-    __schemaVersion: GOVERNED_METADATA_SCHEMA_VERSION,
-    dataNature: "table",
-    presentationProfile: "erp-operational-table",
-    presentation: {
-      toolbar: buildMachineToolbar({
-        scope: "machineEntitlements",
-        searchPlaceholder: "Search machine feature entitlements",
-        sortColumn: "feature",
-        statusParam: "machineEntitlementsStatus",
-        statusOptions: [
-          { label: "Enabled", value: "enabled" },
-          { label: "Disabled", value: "disabled" },
-        ],
-      }),
-    },
-    requiresErpPermission: {
-      module: "system-admin",
-      object: "machine-entitlements",
-      function: "read",
-    },
-    pagination: buildSystemAdminStaticPagination(rows.length),
-    surface: {
-      header: { title: "Machine feature entitlements" },
-      columnsId: "system-admin-machine-entitlements",
-      rowKey: "id",
-      empty: {
-        variant: "muted",
-        title: "No machine feature entitlement rows found.",
+      __schemaVersion: GOVERNED_METADATA_SCHEMA_VERSION,
+      dataNature: "table",
+      presentationProfile: "erp-operational-table",
+      presentation: {
+        toolbar: buildMachineToolbar({
+          scope: "machineEntitlements",
+          searchPlaceholder: systemAdminLynxUiCopy.entitlements.searchPlaceholder,
+          sortColumn: "feature",
+          statusParam: "machineEntitlementsStatus",
+          statusOptions: [
+            { label: "Enabled", value: "enabled" },
+            { label: "Disabled", value: "disabled" },
+          ],
+        }),
       },
-    },
-    columns: AI_ENTITLEMENTS_COLUMNS,
-    rows: rows.map((entitlement) => ({
+      requiresErpPermission: {
+        module: "system-admin",
+        object: "machine-entitlements",
+        function: "read",
+      },
+      pagination: buildSystemAdminStaticPagination(rows.length),
+      surface: {
+        header: { title: systemAdminLynxUiCopy.entitlements.title },
+        columnsId: "system-admin-machine-entitlements",
+        rowKey: "id",
+        empty: {
+          variant: "muted",
+          title: systemAdminLynxUiCopy.entitlements.emptyTitle,
+          description: systemAdminLynxUiCopy.entitlements.emptyDescription,
+        },
+      },
+      columns: AI_ENTITLEMENTS_COLUMNS,
+      rows: rows.map((entitlement) => ({
       id: entitlement.id,
       cells: {
         feature: formatAiFeatureLabel(entitlement.feature),
@@ -377,6 +382,6 @@ export function buildSystemAdminAiEntitlementsListSurface(input: {
           intent: "default",
         },
       }),
-    })),
+      })),
   });
 }

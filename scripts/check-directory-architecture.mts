@@ -63,6 +63,13 @@ const packageArchitectureRules: Record<string, PackageArchitectureRule> = {
     requiresPackageBuild: true,
     turboBuildOutputs: ["dist/**"],
   },
+  "@afenda/billing": {
+    category: "runtime-library",
+    workspaceRoot: "packages",
+    requiresCompiledDistExports: true,
+    requiresPackageBuild: true,
+    turboBuildOutputs: ["dist/**"],
+  },
   "@afenda/config": {
     category: "config",
     workspaceRoot: "packages",

@@ -3,14 +3,34 @@
 import { Button } from "@afenda/ui";
 import { useTransition } from "react";
 import type { SystemAdminActionResult } from "../../tenant-execution/contracts/system-admin.action-result.contract";
-import { exportSystemAdminAuditLogsAction } from "../actions/system-admin.audit.actions.server";
+import type { SystemAdminAuditExportPayload } from "../contracts/system-admin.audit-export.contract";
+import type { SystemAdminAuditExportFormat } from "../schemas/system-admin.audit-export.schema";
+import { systemAdminAuditUiCopy } from "../surface/system-admin.audit-ui.copy.shared";
+
+export type { SystemAdminAuditExportPayload };
+
+export type ExportSystemAdminAuditLogsAction = (
+  formData: FormData,
+) => Promise<SystemAdminActionResult<SystemAdminAuditExportPayload>>;
+
+const FORMAT_LABEL: Record<SystemAdminAuditExportFormat, keyof typeof systemAdminAuditUiCopy.export> = {
+  csv: "csvLabel",
+  json: "jsonLabel",
+  xlsx: "csvLabel",
+  pdf: "csvLabel",
+};
 
 export function SystemAdminAuditExportButton({
+  format,
+  exportAuditLogsAction,
   filterFields,
 }: {
+  format: SystemAdminAuditExportFormat;
+  exportAuditLogsAction: ExportSystemAdminAuditLogsAction;
   filterFields: Record<string, string>;
 }) {
   const [pending, startTransition] = useTransition();
+  const labelKey = FORMAT_LABEL[format];
 
   return (
     <Button
@@ -20,15 +40,14 @@ export function SystemAdminAuditExportButton({
       onClick={() => {
         startTransition(async () => {
           const formData = new FormData();
+          formData.set("format", format);
           for (const [key, value] of Object.entries(filterFields)) {
             if (value) {
               formData.set(key, value);
             }
           }
 
-          const result = (await exportSystemAdminAuditLogsAction(
-            formData,
-          )) as SystemAdminActionResult<{ csv: string; rowCount: number }>;
+          const result = await exportAuditLogsAction(formData);
 
           if (!result.ok) {
             console.error(result.error);
@@ -39,19 +58,21 @@ export function SystemAdminAuditExportButton({
             return;
           }
 
-          const blob = new Blob([result.data.csv], {
-            type: "text/csv;charset=utf-8",
+          const blob = new Blob([result.data.content], {
+            type: result.data.mimeType,
           });
           const url = URL.createObjectURL(blob);
           const anchor = document.createElement("a");
           anchor.href = url;
-          anchor.download = `system-admin-audit-${new Date().toISOString().slice(0, 10)}.csv`;
+          anchor.download = `system-admin-audit-${new Date().toISOString().slice(0, 10)}.${result.data.fileExtension}`;
           anchor.click();
           URL.revokeObjectURL(url);
         });
       }}
     >
-      {pending ? "Exporting…" : "Export evidence (CSV)"}
+      {pending
+        ? systemAdminAuditUiCopy.export.pendingLabel
+        : systemAdminAuditUiCopy.export[labelKey]}
     </Button>
   );
 }

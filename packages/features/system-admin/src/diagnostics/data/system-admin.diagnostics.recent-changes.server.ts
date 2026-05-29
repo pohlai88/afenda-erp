@@ -2,7 +2,7 @@ import { searchTenantAuditLogs } from "@afenda/db";
 import { formatErpDateTime } from "@afenda/kernel";
 import { systemAdminWebhookEvents } from "../../integrations/contracts/system-admin.integrations-catalog.contract";
 import type { SystemAdminDiagnosticsRecentChangeRow } from "../contracts/system-admin.diagnostics-coverage.contract";
-import { buildSystemAdminAuditEventDetailHref } from "../../audit-viewer/data/system-admin.audit-pagination.shared";
+import { buildSystemAdminAuditEventDetailHref } from "../../audit-viewer/surface/system-admin.audit-pagination.shared";
 
 const CONFIGURATION_AUDIT_ACTION_EXCLUDED = new Set([
   "system-admin.audit.view",
@@ -14,8 +14,14 @@ const CONFIGURATION_AUDIT_ACTION_PREFIXES = [
   "system-admin.capability-settings",
   "system-admin.policy",
   "system-admin.approval",
+  "system-admin.audit",
   "system-admin.security",
+  "system-admin.integration",
+  "system-admin.integrations",
   "system-admin.organization",
+  "tenant.api-credential",
+  "tenant.webhook",
+  "tenant.sso",
   "tenant.role-override",
   "tenant.settings",
 ] as const;

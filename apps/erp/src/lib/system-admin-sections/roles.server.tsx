@@ -1,14 +1,21 @@
 import {
   buildRolesListSurface,
   systemAdminRolesSurfaceKey,
+  systemAdminRolesUiCopy,
 } from "@afenda/feature-system-admin/metadata";
 import {
   assignSystemAdminRole,
   buildSystemAdminRolesPageModel,
+  deprecateSystemAdminRoleForm,
+  reactivateSystemAdminRoleForm,
   requireSystemAdminRolesRead,
   SystemAdminRolesAccessDenied,
+  updateSystemAdminRoleForm,
 } from "@afenda/feature-system-admin/server";
-import { SystemAdminAssignRoleDialog } from "@afenda/feature-system-admin/client";
+import {
+  SystemAdminAssignRoleDialog,
+  SystemAdminRoleCatalogEditor,
+} from "@afenda/feature-system-admin/client";
 import { GovernedPatternCListSection } from "@afenda/governed-surface/server";
 import { hasExecutionPermission } from "@afenda/kernel/execution";
 import { SectionPanel } from "@afenda/ui";
@@ -16,7 +23,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Roles — System admin",
-  description: "Role catalog, permission bundles, and membership assignment evidence.",
+  description: systemAdminRolesUiCopy.page.description,
 };
 
 export default async function SystemAdminRolesPage({
@@ -50,12 +57,12 @@ export default async function SystemAdminRolesPage({
     <div className="flex flex-col gap-surface-2xl">
       <SectionPanel
         headingLevel={1}
-        title="Roles"
-        description="Seeded authority bundles with effective permission counts. Assignments are membership-scoped and enforced by the execution kernel."
+        title={systemAdminRolesUiCopy.page.title}
+        description={systemAdminRolesUiCopy.page.description}
       />
 
       <GovernedPatternCListSection
-        title="Role catalog"
+        title={systemAdminRolesUiCopy.list.title}
         surfaceKey={systemAdminRolesSurfaceKey}
         listConfiguration={buildRolesListSurface({ roles, searchValue })}
         parentAccessAllowed
@@ -63,12 +70,25 @@ export default async function SystemAdminRolesPage({
       />
 
       {canMutate ? (
-        <SectionPanel
-          title="Assign role"
-          description="Updates the membership primary role. Deprecated catalog roles cannot be assigned."
-        >
-          <SystemAdminAssignRoleDialog assignRoleAction={assignSystemAdminRole} />
-        </SectionPanel>
+        <>
+          <SectionPanel
+            title="Role catalog"
+            description="Edit tenant-facing role labels and deprecate seeded roles. Custom role keys still require platform enum extension."
+          >
+            <SystemAdminRoleCatalogEditor
+              updateRoleAction={updateSystemAdminRoleForm}
+              deprecateRoleAction={deprecateSystemAdminRoleForm}
+              reactivateRoleAction={reactivateSystemAdminRoleForm}
+            />
+          </SectionPanel>
+
+          <SectionPanel
+            title="Assign role"
+            description="Updates the membership primary role. Deprecated catalog roles cannot be assigned."
+          >
+            <SystemAdminAssignRoleDialog assignRoleAction={assignSystemAdminRole} />
+          </SectionPanel>
+        </>
       ) : null}
     </div>
   );

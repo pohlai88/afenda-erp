@@ -3,6 +3,8 @@ import { organizationRoles } from "@afenda/auth";
 import { listTenantApprovalSettings } from "../../tenant-execution/data/system-admin.execution-settings.repository.server";
 import { mapTenantApprovalSettingToListRow } from "./system-admin.approval-rules.mapper";
 
+export const SYSTEM_ADMIN_APPROVAL_RULES_QUERY_LIMIT = 200;
+
 export function buildSystemAdminApprovalRuleRows(input: {
   settings: readonly TenantApprovalSettingRow[];
 }) {
@@ -16,13 +18,26 @@ export async function listSystemAdminApprovals(input: {
 }) {
   const settings = await listTenantApprovalSettings({
     organizationId: input.organizationId,
-    limit: input.limit ?? 200,
+    limit: input.limit ?? SYSTEM_ADMIN_APPROVAL_RULES_QUERY_LIMIT,
   });
 
   return buildSystemAdminApprovalRuleRows({ settings });
 }
 
 export const listSystemAdminApprovalRules = listSystemAdminApprovals;
+
+export async function findTenantApprovalSetting(input: {
+  organizationId: string;
+  approvalKey: string;
+  limit?: number;
+}) {
+  const settings = await listTenantApprovalSettings({
+    organizationId: input.organizationId,
+    limit: input.limit ?? SYSTEM_ADMIN_APPROVAL_RULES_QUERY_LIMIT,
+  });
+
+  return settings.find((row) => row.approvalKey === input.approvalKey);
+}
 
 export function buildSystemAdminApproverRoleOptions() {
   return organizationRoles.map((role) => ({

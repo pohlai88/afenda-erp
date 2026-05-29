@@ -135,6 +135,7 @@ export function mapTenantApprovalSettingToListRow(
       ? `${rule.escalationAfterHours} hours`
       : "Not configured",
     status: rule.status,
+    enabled: rule.enabled,
     readinessVerdict: evaluateApprovalRuleReadiness(rule),
   };
 }

@@ -15,23 +15,43 @@ import { evaluateCapabilityCoverage } from "../../capabilities/data/system-admin
 import type { OrganizationSecuritySettings } from "../../security/contracts/system-admin.security-settings.contract";
 import { mapTenantApprovalSettingToRule } from "../../approvals/data/system-admin.approval-rules.mapper";
 import { mapTenantPolicySettingToRule } from "../../policies/data/system-admin.policy-rules.mapper";
+import type { IntegrationReadinessReport } from "../../integrations/contracts/system-admin.integrations-readiness.contract";
+import { resolveSystemAdminDiagnosticTargetHref } from "../contracts/system-admin.diagnostics-links.shared";
 import type { SystemAdminDiagnosticIssue } from "../contracts/system-admin.diagnostic-issue.contract";
 import { sortDiagnosticIssues } from "./system-admin.diagnostics.verdict.server";
-import { resolveSystemAdminDiagnosticTargetHref } from "./system-admin.diagnostics.links.server";
 
 function issueId(parts: string[]) {
   return parts.join(":");
 }
 
-function withHref(issue: Omit<SystemAdminDiagnosticIssue, "targetHref">): SystemAdminDiagnosticIssue {
+function withHref(
+  issue: Omit<SystemAdminDiagnosticIssue, "targetHref">,
+): SystemAdminDiagnosticIssue {
   return {
     ...issue,
     targetHref: resolveSystemAdminDiagnosticTargetHref({
-      category: issue.category,
       targetType: issue.targetType,
       targetId: issue.targetId,
     }),
   };
+}
+
+export function collectIntegrationDiagnosticIssues(
+  readiness: IntegrationReadinessReport,
+): SystemAdminDiagnosticIssue[] {
+  return readiness.issues.map((entry) =>
+    withHref({
+      id: issueId(["integration_health", entry.id]),
+      category: "integration_health",
+      severity: entry.id.startsWith("blocked:") ? "blocked" : "warning",
+      title: entry.title,
+      description: entry.description,
+      targetType: "integration",
+      targetId: "integrations",
+      recommendedAction:
+        "Review integrations connectivity, webhook health, and credential rotation in System Admin integrations.",
+    }),
+  );
 }
 
 function resolveCapabilityForAction(action: string) {

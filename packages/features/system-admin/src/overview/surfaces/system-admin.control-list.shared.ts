@@ -12,7 +12,6 @@ import {
   buildSystemAdminListToolbar,
   buildSystemAdminStaticPagination,
 } from "./system-admin.list-surface.shared";
-
 type BasicRow = {
   id: string;
   [key: string]: string;
@@ -40,6 +39,8 @@ export function buildControlListSurface(input: {
   }>;
   rows: readonly BasicRow[];
   emptyTitle: string;
+  emptyDescription?: string;
+  searchPlaceholder?: string;
   searchValue?: string;
   filters?: readonly ListSurfaceToolbarFilter[];
 }): ListSurfaceRendererConfigurationResolvedInput {
@@ -60,37 +61,46 @@ export function buildLinkedControlListSurface(input: {
   columns: ReadonlyArray<ListColumn>;
   rows: readonly LinkedControlRow[];
   emptyTitle: string;
+  emptyDescription?: string;
+  searchPlaceholder?: string;
   searchValue?: string;
   filters?: readonly ListSurfaceToolbarFilter[];
 }): ListSurfaceRendererConfigurationResolvedInput {
   return buildGovernedListSurface({
-    __schemaVersion: GOVERNED_METADATA_SCHEMA_VERSION,
-    dataNature: "table",
-    presentationProfile: "erp-operational-table",
-    presentation: {
-      toolbar: buildSystemAdminListToolbar({
-        scope: input.object,
-        searchPlaceholder: `Search ${input.object}`,
-        sortColumn: input.columns[0]?.id ?? "id",
-        searchValue: input.searchValue,
-        filters: input.filters,
-      }),
-    },
-    requiresErpPermission: {
-      module: "system-admin",
-      object: input.object,
-      function: "read",
-    },
-    pagination: buildSystemAdminStaticPagination(input.rows.length),
-    surface: {
-      header: { title: input.title },
-      columnsId: input.key,
-      rowKey: "id",
-      empty: { variant: "muted", title: input.emptyTitle },
-    },
-    columns: [...input.columns],
-    rows: [...input.rows],
-  });
+      __schemaVersion: GOVERNED_METADATA_SCHEMA_VERSION,
+      dataNature: "table",
+      presentationProfile: "erp-operational-table",
+      presentation: {
+        toolbar: buildSystemAdminListToolbar({
+          scope: input.object,
+          searchPlaceholder:
+            input.searchPlaceholder ?? `Search ${input.object}`,
+          sortColumn: input.columns[0]?.id ?? "id",
+          searchValue: input.searchValue,
+          filters: input.filters,
+        }),
+      },
+      requiresErpPermission: {
+        module: "system-admin",
+        object: input.object,
+        function: "read",
+      },
+      pagination: buildSystemAdminStaticPagination(input.rows.length),
+      surface: {
+        header: { title: input.title },
+        columnsId: input.key,
+        rowKey: "id",
+        empty: {
+          variant: "muted",
+          title: input.emptyTitle,
+          ...(input.emptyDescription
+            ? { description: input.emptyDescription }
+            : {}),
+        },
+      },
+      columns: [...input.columns],
+      rows: [...input.rows],
+    });
 }
 
 export function linkCell(

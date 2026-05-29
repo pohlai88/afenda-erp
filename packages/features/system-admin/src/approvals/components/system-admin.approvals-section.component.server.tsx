@@ -8,9 +8,11 @@ import type {
 import {
   buildApprovalsListSurface,
   systemAdminApprovalsSurfaceKey,
-} from "../surface/system-admin.approvals-list.surface";
-import { systemAdminApprovalsUiCopy } from "../surface/system-admin.approvals-ui.copy.shared";
+  systemAdminApprovalsUiCopy,
+} from "../surface";
 import { SystemAdminApprovalRuleEditor } from "./system-admin.approval-rule-editor.component.client";
+import { SystemAdminApprovalTrailingCell } from "./system-admin.approvals-trailing-cells.component.client";
+import type { SystemAdminApprovalRuleEditorDefaults } from "../contracts";
 
 type UpdateApprovalRuleAction = (
   state: SystemAdminActionResult | undefined,
@@ -23,12 +25,16 @@ export function SystemAdminApprovalsSection({
   canMutate,
   approverRoleOptions,
   updateApprovalRuleAction,
+  selectedApprovalKey,
+  editorDefaults,
 }: {
   approvals: readonly SystemAdminApprovalRuleListRow[];
   searchValue?: string;
   canMutate: boolean;
   approverRoleOptions: readonly SystemAdminApproverRoleOption[];
   updateApprovalRuleAction: UpdateApprovalRuleAction;
+  selectedApprovalKey?: string;
+  editorDefaults?: SystemAdminApprovalRuleEditorDefaults;
 }) {
   const copy = systemAdminApprovalsUiCopy;
 
@@ -43,19 +49,33 @@ export function SystemAdminApprovalsSection({
       <GovernedPatternCListSection
         title={copy.list.title}
         surfaceKey={systemAdminApprovalsSurfaceKey}
-        listConfiguration={buildApprovalsListSurface({ approvals, searchValue })}
+        listConfiguration={buildApprovalsListSurface({
+          approvals,
+          searchValue,
+          canMutate,
+        })}
         parentAccessAllowed
         layout="embedded"
+        trailingColumn={{
+          header: copy.list.actionsHeader,
+          Cell: SystemAdminApprovalTrailingCell,
+          context: { surfaceKey: systemAdminApprovalsSurfaceKey },
+        }}
       />
 
       {canMutate ? (
         <SectionPanel
-          title={copy.editor.title}
+          title={
+            selectedApprovalKey
+              ? copy.editor.updateTitle
+              : copy.editor.title
+          }
           description={copy.editor.description}
         >
           <SystemAdminApprovalRuleEditor
             updateApprovalRuleAction={updateApprovalRuleAction}
             approverRoleOptions={approverRoleOptions}
+            editorDefaults={editorDefaults}
           />
         </SectionPanel>
       ) : null}

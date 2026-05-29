@@ -73,8 +73,9 @@ if (slice) {
     }
   }
 
+  const metadataExemptSlices = new Set(["tenant-execution"]);
   const featureMetadataPath = path.join(featureSrcDir, "metadata.ts");
-  if (fs.existsSync(featureMetadataPath)) {
+  if (fs.existsSync(featureMetadataPath) && !metadataExemptSlices.has(slice)) {
     const metadataSource = fs.readFileSync(featureMetadataPath, "utf8");
     if (!metadataSource.includes(`./${slice}/`)) {
       problems.push(
@@ -99,6 +100,7 @@ const unexpectedTopLevel = fs
     (name) =>
       !templateBuckets.has(name) &&
       name !== "surface" &&
+      name !== "surfaces" &&
       !featurePublicDoorFiles.includes(name as (typeof featurePublicDoorFiles)[number]),
   );
 

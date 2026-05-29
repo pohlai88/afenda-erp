@@ -1,4 +1,16 @@
-import { and, count, desc, eq, gte, ilike, inArray, lte, max, or } from "drizzle-orm";
+import {
+  and,
+  asc,
+  count,
+  desc,
+  eq,
+  gte,
+  ilike,
+  inArray,
+  lte,
+  max,
+  or,
+} from "drizzle-orm";
 import {
   getDb,
   runWithOrganizationContext,
@@ -97,9 +109,11 @@ export type TenantAuditLogSearchFilters = {
   action?: string;
   moduleKey?: string;
   entityType?: AuditEntityType;
+  entityId?: string;
   query?: string;
   createdAfter?: Date;
   createdBefore?: Date;
+  sortDirection?: "asc" | "desc";
 };
 
 function buildAuditLogSearchWhere(
@@ -122,6 +136,10 @@ function buildAuditLogSearchWhere(
 
   if (filters?.entityType) {
     clauses.push(eq(auditLogs.entityType, filters.entityType));
+  }
+
+  if (filters?.entityId) {
+    clauses.push(eq(auditLogs.entityId, filters.entityId));
   }
 
   if (filters?.createdAfter) {
@@ -191,7 +209,11 @@ export async function searchTenantAuditLogs(input: {
         })
         .from(auditLogs)
         .where(where)
-        .orderBy(desc(auditLogs.createdAt))
+        .orderBy(
+          input.filters?.sortDirection === "asc"
+            ? asc(auditLogs.createdAt)
+            : desc(auditLogs.createdAt),
+        )
         .limit(input.limit)
         .offset(input.offset),
       db

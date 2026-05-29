@@ -18,6 +18,27 @@ export function resolveSystemAdminListSearch(
   return undefined;
 }
 
+export function resolveSystemAdminApprovalDetailKey(
+  searchParams:
+    | Record<string, string | string[] | undefined>
+    | undefined,
+) {
+  const value = searchParams?.approvalsKey;
+
+  if (typeof value === "string" && value.trim().length > 0) {
+    return value.trim();
+  }
+
+  if (Array.isArray(value)) {
+    const first = value[0];
+    return typeof first === "string" && first.trim().length > 0
+      ? first.trim()
+      : undefined;
+  }
+
+  return undefined;
+}
+
 export function resolveSystemAdminPolicyDetailKey(
   searchParams:
     | Record<string, string | string[] | undefined>

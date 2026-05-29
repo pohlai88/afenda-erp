@@ -1,6 +1,9 @@
 import {
   buildCapabilitiesListSurface,
+  buildCapabilityRoleMatrixListSurface,
   systemAdminCapabilitiesSurfaceKey,
+  systemAdminCapabilityRoleMatrixSurfaceKey,
+  systemAdminCapabilitiesUiCopy,
 } from "@afenda/feature-system-admin/metadata";
 import {
   SystemAdminCapabilitySettingsDialog,
@@ -9,6 +12,7 @@ import {
 import {
   buildSystemAdminCapabilitiesPageModel,
   requireSystemAdminCapabilitiesRead,
+  SystemAdminCapabilitiesAccessDenied,
   updateSystemAdminCapabilitySettingsAction,
 } from "@afenda/feature-system-admin/server";
 import { GovernedPatternCListSection } from "@afenda/governed-surface/server";
@@ -18,7 +22,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Capabilities — System admin",
-  description: "Execution capability metadata and route coverage.",
+  description: systemAdminCapabilitiesUiCopy.page.description,
 };
 
 export default async function SystemAdminCapabilitiesPage({
@@ -27,12 +31,24 @@ export default async function SystemAdminCapabilitiesPage({
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
-  const { context, organization } = await requireSystemAdminCapabilitiesRead();
+
+  let organization: Awaited<
+    ReturnType<typeof requireSystemAdminCapabilitiesRead>
+  >["organization"];
+  let context: Awaited<
+    ReturnType<typeof requireSystemAdminCapabilitiesRead>
+  >["context"];
+
+  try {
+    ({ organization, context } = await requireSystemAdminCapabilitiesRead());
+  } catch {
+    return <SystemAdminCapabilitiesAccessDenied />;
+  }
   const canMutate = hasExecutionPermission(
     context,
     "system-admin.capabilities.manage",
   );
-  const { searchValue, capabilities, capabilityOptions } =
+  const { searchValue, capabilities, capabilityOptions, roleMatrix, matrixRole } =
     await buildSystemAdminCapabilitiesPageModel({
       organizationId: organization.id,
       searchParams: resolvedSearchParams,
@@ -42,12 +58,12 @@ export default async function SystemAdminCapabilitiesPage({
     <div className="flex flex-col gap-surface-2xl">
       <SectionPanel
         headingLevel={1}
-        title="Capabilities"
-        description="Capability metadata comes from the execution kernel. Coverage verdicts flag missing permissions, routes, audit mappings, and org-level availability."
+        title={systemAdminCapabilitiesUiCopy.page.title}
+        description={systemAdminCapabilitiesUiCopy.page.description}
       />
 
       <GovernedPatternCListSection
-        title="Execution capabilities"
+        title={systemAdminCapabilitiesUiCopy.list.title}
         surfaceKey={systemAdminCapabilitiesSurfaceKey}
         listConfiguration={buildCapabilitiesListSurface({
           searchValue,
@@ -62,10 +78,21 @@ export default async function SystemAdminCapabilitiesPage({
         }}
       />
 
+      <GovernedPatternCListSection
+        title={systemAdminCapabilitiesUiCopy.roleMatrix.title}
+        surfaceKey={systemAdminCapabilityRoleMatrixSurfaceKey}
+        listConfiguration={buildCapabilityRoleMatrixListSurface({
+          rows: roleMatrix,
+          roleFilter: matrixRole,
+        })}
+        parentAccessAllowed
+        layout="embedded"
+      />
+
       {canMutate ? (
         <SectionPanel
-          title="Update capability availability"
-          description="Org-level capability availability is stored in tenant capability settings and audited."
+          title={systemAdminCapabilitiesUiCopy.settings.title}
+          description={systemAdminCapabilitiesUiCopy.settings.description}
         >
           <SystemAdminCapabilitySettingsDialog
             updateCapabilitySettingsAction={

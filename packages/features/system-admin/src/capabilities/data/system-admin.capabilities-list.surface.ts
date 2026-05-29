@@ -7,6 +7,7 @@ import {
   moduleReadinessVerdictBadge,
 } from "../../overview/surfaces/system-admin.control-list.shared";
 import type { SystemAdminCapabilityAvailability } from "../contracts";
+import { systemAdminCapabilitiesUiCopy } from "../surface/system-admin.capabilities-ui.copy.shared";
 import { resolveSystemAdminCapabilityRowTrailingAction } from "../surface/system-admin.capabilities-list-trailing.shared";
 
 export const systemAdminCapabilitiesSurfaceKey =
@@ -35,7 +36,7 @@ export function buildCapabilitiesListSurface(input: {
 
   return buildLinkedControlListSurface({
     key: systemAdminCapabilitiesSurfaceKey,
-    title: "Execution capabilities",
+    title: systemAdminCapabilitiesUiCopy.list.title,
     object: "capabilities",
     columns: [
       {
@@ -106,7 +107,9 @@ export function buildCapabilitiesListSurface(input: {
         }),
       };
     }),
-    emptyTitle: "No execution capabilities are registered.",
+    emptyTitle: systemAdminCapabilitiesUiCopy.list.emptyTitle,
+    emptyDescription: systemAdminCapabilitiesUiCopy.list.emptyDescription,
+    searchPlaceholder: systemAdminCapabilitiesUiCopy.list.searchPlaceholder,
     searchValue: input.searchValue,
   });
 }

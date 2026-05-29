@@ -1,5 +1,8 @@
-export { getBillingPostureSnapshot } from "./data/system-admin.billing-posture.query.server";
-export {
-  buildBillingPostureListSurface,
-  systemAdminBillingSurfaceKey,
-} from "./data/system-admin.billing.surface";
+/**
+ * Environment-neutral door — system-admin/billing
+ * Buckets: actions, components, contracts, data, events, policies, schemas, surface, tests
+ */
+export * from "./metadata";
+export * from "./client";
+export * from "./contracts";
+export * from "./schemas";

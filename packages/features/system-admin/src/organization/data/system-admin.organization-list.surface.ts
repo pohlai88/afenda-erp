@@ -1,6 +1,7 @@
 import type { ListSurfaceRendererConfigurationResolvedInput } from "@afenda/governed-surface";
 import type { TenantSettingsSnapshot } from "@afenda/db";
 import { buildControlListSurface } from "../../overview/surfaces/system-admin.control-list.shared";
+import { systemAdminOrganizationUiCopy } from "../surface/system-admin.organization-ui.copy.shared";
 
 export const systemAdminOrganizationSurfaceKey =
   "system-admin.organization.list";
@@ -13,7 +14,7 @@ export function buildOrganizationDefaultsListSurface(input: {
 
   return buildControlListSurface({
     key: systemAdminOrganizationSurfaceKey,
-    title: "Organization defaults",
+    title: systemAdminOrganizationUiCopy.list.title,
     object: "organization",
     columns: [
       { id: "setting", header: "Setting", priority: "primary", pin: "start" },
@@ -50,6 +51,8 @@ export function buildOrganizationDefaultsListSurface(input: {
         value: settings?.zdrEnabled ? "Enabled" : "Disabled",
       },
     ],
-    emptyTitle: "Organization defaults are not initialized.",
+    emptyTitle: systemAdminOrganizationUiCopy.list.emptyTitle,
+    emptyDescription: systemAdminOrganizationUiCopy.list.emptyDescription,
+    searchPlaceholder: systemAdminOrganizationUiCopy.list.searchPlaceholder,
   });
 }

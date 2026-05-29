@@ -40,6 +40,7 @@ vi.mock("@afenda/db", async (importOriginal) => {
     ...actual,
     assignTenantMembershipRole: (...args: unknown[]) =>
       mockAssignTenantMembershipRole(...args),
+    listTenantRoleCatalog: vi.fn(async () => []),
   };
 });
 
@@ -49,6 +50,10 @@ vi.mock("@afenda/kernel/execution", () => ({
 
 vi.mock("next/cache", () => ({
   revalidatePath: vi.fn(),
+}));
+
+vi.mock("../../src/integrations/server", () => ({
+  dispatchSystemAdminWebhook: vi.fn(async () => undefined),
 }));
 
 const guardContext = {

@@ -5,7 +5,10 @@ import { Button, Field, FieldGroup, FieldLabel, Input, NativeSelect } from "@afe
 import { GitPullRequestIcon } from "lucide-react";
 import { useActionState } from "react";
 import type { SystemAdminActionResult } from "../../tenant-execution/contracts/system-admin.action-result.contract";
-import type { SystemAdminApproverRoleOption } from "../contracts";
+import type {
+  SystemAdminApprovalRuleEditorDefaults,
+  SystemAdminApproverRoleOption,
+} from "../contracts";
 
 type ApprovalRuleAction = (
   state: SystemAdminActionResult | undefined,
@@ -15,10 +18,13 @@ type ApprovalRuleAction = (
 export function SystemAdminApprovalRuleEditor({
   updateApprovalRuleAction,
   approverRoleOptions,
+  editorDefaults,
 }: {
   updateApprovalRuleAction: ApprovalRuleAction;
   approverRoleOptions: readonly SystemAdminApproverRoleOption[];
+  editorDefaults?: SystemAdminApprovalRuleEditorDefaults;
 }) {
+  const mode = editorDefaults?.mode ?? "create";
   const [state, formAction, pending] = useActionState<
     SystemAdminActionResult | undefined,
     FormData
@@ -27,42 +33,63 @@ export function SystemAdminApprovalRuleEditor({
   return (
     <form action={formAction} className="@container">
       <FieldGroup className="grid gap-surface-md @md:grid-cols-2">
-        <input type="hidden" name="mode" value="create" />
-        <Field className="@md:col-span-2">
-          <FieldLabel>Approval key</FieldLabel>
-          <Input
-            name="approvalKey"
-            placeholder="purchasing.po.high-value"
-            required
+        <input type="hidden" name="mode" value={mode} />
+        {mode === "update" ? (
+          <input
+            type="hidden"
+            name="approvalRuleId"
+            value={editorDefaults?.approvalRuleId}
           />
-        </Field>
+        ) : (
+          <Field className="@md:col-span-2">
+            <FieldLabel>Approval key</FieldLabel>
+            <Input
+              name="approvalKey"
+              placeholder="purchasing.po.high-value"
+              required
+            />
+          </Field>
+        )}
         <Field className="@md:col-span-2">
           <FieldLabel>Display name</FieldLabel>
           <Input
             name="name"
             placeholder="Purchase order above threshold"
+            defaultValue={editorDefaults?.name}
             required
           />
         </Field>
         <Field>
           <FieldLabel>Module</FieldLabel>
-          <Input name="moduleKey" placeholder="purchasing" defaultValue="*" />
+          <Input
+            name="moduleKey"
+            placeholder="purchasing"
+            defaultValue={editorDefaults?.moduleKey ?? "*"}
+          />
         </Field>
         <Field>
           <FieldLabel>Action</FieldLabel>
           <Input
             name="action"
             placeholder="purchasing.purchase-order.create"
+            defaultValue={editorDefaults?.action}
             required
           />
         </Field>
         <Field>
           <FieldLabel>Target type</FieldLabel>
-          <Input name="targetType" defaultValue="erp-record" required />
+          <Input
+            name="targetType"
+            defaultValue={editorDefaults?.targetType ?? "erp-record"}
+            required
+          />
         </Field>
         <Field>
           <FieldLabel>Approval mode</FieldLabel>
-          <NativeSelect name="approvalMode" defaultValue="parallel">
+          <NativeSelect
+            name="approvalMode"
+            defaultValue={editorDefaults?.approvalMode ?? "parallel"}
+          >
             <option value="sequential">Sequential</option>
             <option value="parallel">Parallel</option>
           </NativeSelect>
@@ -72,7 +99,11 @@ export function SystemAdminApprovalRuleEditor({
           <Input
             name="approverRoleKeys"
             placeholder="finance-manager,owner"
-            defaultValue={approverRoleOptions[0]?.value ?? "admin"}
+            defaultValue={
+              editorDefaults?.approverRoleKeys ??
+              approverRoleOptions[0]?.value ??
+              "admin"
+            }
             required
           />
         </Field>
@@ -81,11 +112,18 @@ export function SystemAdminApprovalRuleEditor({
           <Input
             name="delegateToRoleKeys"
             placeholder="operations-manager"
+            defaultValue={editorDefaults?.delegateToRoleKeys}
           />
         </Field>
         <Field>
           <FieldLabel>Minimum approvals</FieldLabel>
-          <Input name="minApprovals" type="number" min={1} max={10} defaultValue={1} />
+          <Input
+            name="minApprovals"
+            type="number"
+            min={1}
+            max={10}
+            defaultValue={editorDefaults?.minApprovals ?? 1}
+          />
         </Field>
         <Field>
           <FieldLabel>Escalation (hours)</FieldLabel>
@@ -95,11 +133,15 @@ export function SystemAdminApprovalRuleEditor({
             min={1}
             max={720}
             placeholder="24"
+            defaultValue={editorDefaults?.escalationAfterHours}
           />
         </Field>
         <Field>
           <FieldLabel>Status</FieldLabel>
-          <NativeSelect name="status" defaultValue="active">
+          <NativeSelect
+            name="status"
+            defaultValue={editorDefaults?.status ?? "active"}
+          >
             <option value="active">Active</option>
             <option value="disabled">Disabled</option>
             <option value="deprecated">Deprecated</option>
@@ -107,7 +149,10 @@ export function SystemAdminApprovalRuleEditor({
         </Field>
         <Field>
           <FieldLabel>Enabled</FieldLabel>
-          <NativeSelect name="enabled" defaultValue="true">
+          <NativeSelect
+            name="enabled"
+            defaultValue={editorDefaults?.enabled === false ? "false" : "true"}
+          >
             <option value="true">Enabled</option>
             <option value="false">Disabled</option>
           </NativeSelect>
@@ -121,7 +166,7 @@ export function SystemAdminApprovalRuleEditor({
         <div className="flex items-end @md:col-span-2">
           <Button type="submit" disabled={pending}>
             <GitPullRequestIcon data-icon="inline-start" />
-            Save approval rule
+            {mode === "update" ? "Update approval rule" : "Save approval rule"}
           </Button>
         </div>
         <div className="@md:col-span-2">

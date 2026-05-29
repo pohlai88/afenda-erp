@@ -38,13 +38,18 @@ export default async function SystemAdminApprovalsPage({
     hasExecutionPermission(context, "system-admin.approvals.manage") ||
     hasExecutionPermission(context, "system-admin.settings.write");
 
-  const { searchValue, approvals, approverRoleOptions } =
-    await buildSystemAdminApprovalsPageModel({
-      organizationId: organization.id,
-      actorId: context.userId,
-      actorType: context.actorType,
-      searchParams: resolvedSearchParams,
-    });
+  const {
+    searchValue,
+    approvals,
+    approverRoleOptions,
+    selectedApprovalKey,
+    editorDefaults,
+  } = await buildSystemAdminApprovalsPageModel({
+    organizationId: organization.id,
+    actorId: context.userId,
+    actorType: context.actorType,
+    searchParams: resolvedSearchParams,
+  });
 
   return (
     <SystemAdminApprovalsSection
@@ -53,6 +58,8 @@ export default async function SystemAdminApprovalsPage({
       canMutate={canMutate}
       approverRoleOptions={approverRoleOptions}
       updateApprovalRuleAction={updateSystemAdminApprovalRuleAction}
+      selectedApprovalKey={selectedApprovalKey}
+      editorDefaults={editorDefaults}
     />
   );
 }

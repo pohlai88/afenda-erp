@@ -9,33 +9,17 @@ import {
   buildRoleOverridesListSurface,
   systemAdminRoleOverridesSurfaceKey,
 } from "../../permissions/surface/system-admin.role-overrides-list.surface";
-import { InviteMemberForm } from "../../client";
+import { InviteMemberForm } from "../../memberships/client";
 import type { RoleOverrideRow } from "@afenda/db";
 import { systemAdminRoutePaths } from "../../overview/contracts/system-admin.route-paths.contract";
+import { systemAdminUsersUiCopy } from "../surface/system-admin.users-ui.copy.shared";
 import { inviteMemberAction } from "../actions/system-admin.identity-invitations.actions.server";
 
-const identityDomainLinks = [
-  {
-    href: systemAdminRoutePaths.users,
-    title: "Users",
-    description:
-      "Invite users, resend invitations, suspend or remove access, and inspect effective permissions.",
-  },
-  {
-    href: systemAdminRoutePaths.memberships,
-    title: "Memberships",
-    description: "Review membership status and role assignment coverage.",
-  },
-  {
-    href: systemAdminRoutePaths.roles,
-    title: "Roles",
-    description: "Browse the tenant role catalog and assignment posture.",
-  },
-  {
-    href: systemAdminRoutePaths.permissions,
-    title: "Permissions",
-    description: "Inspect the declared permission catalog and role coverage.",
-  },
+const identityDomainLinkHrefs = [
+  systemAdminRoutePaths.users,
+  systemAdminRoutePaths.memberships,
+  systemAdminRoutePaths.roles,
+  systemAdminRoutePaths.permissions,
 ] as const;
 
 export function SystemAdminIdentityHub({
@@ -48,19 +32,35 @@ export function SystemAdminIdentityHub({
   canInviteViaIdentity: boolean;
 }) {
   const overridesSurface = buildRoleOverridesListSurface({ overrides });
+  const copy = systemAdminUsersUiCopy.identity;
+  if (identityDomainLinkHrefs.length !== copy.domainLinks.length) {
+    throw new Error(
+      "system-admin identity domain link hrefs out of sync with metadata copy",
+    );
+  }
+  const identityDomainLinks = copy.domainLinks.map((link, index) => {
+    const href = identityDomainLinkHrefs[index];
+    if (href === undefined) {
+      throw new Error(
+        `system-admin identity domain link missing href for "${link.title}"`,
+      );
+    }
+
+    return { ...link, href };
+  });
 
   return (
     <div className="@container flex flex-col gap-surface-lg">
       <SectionPanel
         headingLevel={1}
-        title="Identity & access"
-        description="Tenant role overrides and navigation to user lifecycle surfaces. Invite, suspend, and remove users on the Users surface — not here."
+        title={copy.page.title}
+        description={copy.page.description}
       />
 
       {canInviteViaIdentity ? (
         <SectionPanel
-          title="Invite member (identity policy)"
-          description="Uses system-admin.identity.write. For the full user lifecycle (resend, suspend, inspect access), use the Users surface."
+          title={copy.inviteSection.title}
+          description={copy.inviteSection.description}
         >
           <InviteMemberForm inviteMemberAction={inviteMemberAction} />
         </SectionPanel>
@@ -83,8 +83,8 @@ export function SystemAdminIdentityHub({
       </div>
 
       <GovernedPatternCListSection
-        title="Role overrides"
-        description="Overrides apply on top of the static role catalog when the session is refreshed."
+        title={copy.overridesList.title}
+        description={copy.overridesList.description}
         surfaceKey={systemAdminRoleOverridesSurfaceKey}
         listConfiguration={overridesSurface}
         parentAccessAllowed
@@ -92,7 +92,7 @@ export function SystemAdminIdentityHub({
       />
 
       {canWriteOverrides ? (
-        <SectionPanel title="Set role override">
+        <SectionPanel title={copy.overrideForm.title}>
           <RoleOverrideForm setRoleOverrideAction={setRoleOverrideAction} />
         </SectionPanel>
       ) : null}

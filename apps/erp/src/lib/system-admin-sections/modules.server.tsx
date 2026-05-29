@@ -20,7 +20,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Modules — System admin",
-  description: "Module visibility and readiness configuration.",
+  description: systemAdminModulesUiCopy.page.description,
 };
 
 export default async function SystemAdminModulesPage({

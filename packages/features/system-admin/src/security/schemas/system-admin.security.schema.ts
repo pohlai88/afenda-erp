@@ -16,25 +16,35 @@ const booleanFormSchema = z
   .enum(["true", "false"])
   .transform((value) => value === "true");
 
-export const updateSecuritySettingsInputSchema = z.object({
-  requireMfaForAdmins: booleanFormSchema,
-  allowedEmailDomains: z
-    .string()
-    .max(2000)
-    .transform((value) =>
-      value
-        .split(",")
-        .map((domain) => domain.trim().toLowerCase())
-        .filter(Boolean),
-    )
-    .pipe(z.array(emailDomainSchema).max(25)),
-  sessionMaxAgeMinutes: z.coerce.number().int().min(15).max(43_200),
-  idleTimeoutMinutes: z.coerce.number().int().min(5).max(1440),
-  requireSensitiveActionConfirmation: booleanFormSchema,
-  restrictInvitesToAllowedDomains: booleanFormSchema,
-  adminLockoutProtectionEnabled: booleanFormSchema,
-  confirmDisableLockoutProtection: booleanFormSchema.optional(),
-});
+export const updateSecuritySettingsInputSchema = z
+  .object({
+    requireMfaForAdmins: booleanFormSchema,
+    allowedEmailDomains: z
+      .string()
+      .max(2000)
+      .transform((value) =>
+        value
+          .split(",")
+          .map((domain) => domain.trim().toLowerCase())
+          .filter(Boolean),
+      )
+      .pipe(z.array(emailDomainSchema).max(25)),
+    sessionMaxAgeMinutes: z.coerce.number().int().min(15).max(43_200),
+    idleTimeoutMinutes: z.coerce.number().int().min(5).max(1440),
+    requireSensitiveActionConfirmation: booleanFormSchema,
+    restrictInvitesToAllowedDomains: booleanFormSchema,
+    adminLockoutProtectionEnabled: booleanFormSchema,
+    confirmDisableLockoutProtection: booleanFormSchema.optional(),
+  })
+  .superRefine((value, context) => {
+    if (value.idleTimeoutMinutes > value.sessionMaxAgeMinutes) {
+      context.addIssue({
+        code: "custom",
+        path: ["idleTimeoutMinutes"],
+        message: "Idle timeout cannot exceed session max age.",
+      });
+    }
+  });
 
 export type UpdateSecuritySettingsInput = z.infer<
   typeof updateSecuritySettingsInputSchema

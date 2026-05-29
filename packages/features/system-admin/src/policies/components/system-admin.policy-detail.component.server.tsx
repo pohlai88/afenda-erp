@@ -1,5 +1,6 @@
 import { systemAdminControlLinks } from "../../overview/contracts/system-admin.control-links.contract";
 import type { SystemAdminPolicyRuleDetail } from "../contracts/system-admin.policy-rule.contract";
+import { systemAdminPoliciesUiCopy } from "../surface/system-admin.policies-ui.copy.shared";
 import { Button } from "@afenda/ui";
 import { Card, CardContent, CardHeader, CardTitle } from "@afenda/ui";
 import Link from "next/link";
@@ -11,22 +12,25 @@ export function SystemAdminPolicyDetailPanel({
   detail: SystemAdminPolicyRuleDetail;
   backHref: string;
 }) {
+  const copy = systemAdminPoliciesUiCopy.detail;
+  const fields = copy.fields;
+
   return (
     <Card data-testid={`system-admin-policy-detail:${detail.policyKey}`}>
       <CardHeader className="flex flex-row items-center justify-between gap-surface-md">
         <CardTitle>{detail.name}</CardTitle>
         <Button variant="outline" size="sm" asChild>
-          <Link href={backHref}>Back to catalog</Link>
+          <Link href={backHref}>{copy.backLabel}</Link>
         </Button>
       </CardHeader>
       <CardContent className="@container flex flex-col gap-surface-md type-body">
         <dl className="grid gap-2 @sm:grid-cols-2">
           <div>
-            <dt className="text-muted-foreground">Policy key</dt>
+            <dt className="type-muted">{fields.policyKey}</dt>
             <dd className="type-mono-cell">{detail.policyKey}</dd>
           </div>
           <div>
-            <dt className="text-muted-foreground">Module</dt>
+            <dt className="type-muted">{fields.module}</dt>
             <dd>
               <Link
                 href={systemAdminControlLinks.modules(detail.moduleKey)}
@@ -37,31 +41,31 @@ export function SystemAdminPolicyDetailPanel({
             </dd>
           </div>
           <div>
-            <dt className="text-muted-foreground">Effect</dt>
+            <dt className="type-muted">{fields.effect}</dt>
             <dd>{detail.effect}</dd>
           </div>
           <div>
-            <dt className="text-muted-foreground">Status</dt>
+            <dt className="type-muted">{fields.status}</dt>
             <dd>{detail.status}</dd>
           </div>
           <div>
-            <dt className="text-muted-foreground">Priority</dt>
+            <dt className="type-muted">{fields.priority}</dt>
             <dd>{detail.priority}</dd>
           </div>
           <div>
-            <dt className="text-muted-foreground">Readiness</dt>
+            <dt className="type-muted">{fields.readiness}</dt>
             <dd>{detail.readinessVerdict}</dd>
           </div>
           <div>
-            <dt className="text-muted-foreground">Coverage</dt>
+            <dt className="type-muted">{fields.coverage}</dt>
             <dd>{detail.coverageSummary}</dd>
           </div>
           <div className="@sm:col-span-2">
-            <dt className="text-muted-foreground">Action</dt>
+            <dt className="type-muted">{fields.action}</dt>
             <dd className="type-mono-cell">{detail.action}</dd>
           </div>
           <div className="@sm:col-span-2">
-            <dt className="text-muted-foreground">Capability</dt>
+            <dt className="type-muted">{fields.capability}</dt>
             <dd>
               {detail.capabilityKey ? (
                 <Link
@@ -71,13 +75,13 @@ export function SystemAdminPolicyDetailPanel({
                   {detail.capabilityLabel ?? detail.capabilityKey}
                 </Link>
               ) : (
-                "No registered execution capability"
+                copy.noCapability
               )}
             </dd>
           </div>
           {detail.requiredPermission ? (
             <div className="@sm:col-span-2">
-              <dt className="text-muted-foreground">Required permission</dt>
+              <dt className="type-muted">{fields.requiredPermission}</dt>
               <dd>
                 <Link
                   href={systemAdminControlLinks.permissions(
@@ -92,7 +96,7 @@ export function SystemAdminPolicyDetailPanel({
           ) : null}
           {detail.relatedApprovalKeys.length > 0 ? (
             <div className="@sm:col-span-2">
-              <dt className="text-muted-foreground">Related approval rules</dt>
+              <dt className="type-muted">{fields.relatedApprovals}</dt>
               <dd className="flex flex-col gap-1">
                 {detail.relatedApprovalKeys.map((approvalKey) => (
                   <Link
@@ -108,14 +112,14 @@ export function SystemAdminPolicyDetailPanel({
           ) : null}
         </dl>
         <div>
-          <p className="mb-2 text-muted-foreground">Policy condition</p>
+          <p className="mb-2 type-muted">{copy.conditionTitle}</p>
           <pre className="max-h-96 overflow-auto rounded-control border border-border bg-muted/30 p-3 type-mono-cell">
             {detail.conditionJson}
           </pre>
         </div>
         <div>
           <Button variant="outline" size="sm" asChild>
-            <Link href={detail.auditHref}>View policy audit history</Link>
+            <Link href={detail.auditHref}>{copy.auditHistoryLabel}</Link>
           </Button>
         </div>
       </CardContent>

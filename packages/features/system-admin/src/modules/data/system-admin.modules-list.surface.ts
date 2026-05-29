@@ -33,9 +33,11 @@ export function buildModulesListSurface(input: {
 }): ListSurfaceRendererConfigurationResolvedInput {
   const canMutate = input.canMutate ?? false;
 
+  const listCopy = systemAdminModulesUiCopy.listSurface;
+
   return buildLinkedControlListSurface({
     key: systemAdminModulesSurfaceKey,
-    title: "Module readiness",
+    title: listCopy.title,
     object: "modules",
     columns: [
       {
@@ -91,7 +93,9 @@ export function buildModulesListSurface(input: {
         lifecycleStatus: module.status,
       }),
     })),
-    emptyTitle: systemAdminModulesUiCopy.listSurface.emptyTitle,
+    emptyTitle: listCopy.emptyTitle,
+    emptyDescription: listCopy.emptyDescription,
+    searchPlaceholder: listCopy.searchPlaceholder,
     searchValue: input.searchValue,
   });
 }

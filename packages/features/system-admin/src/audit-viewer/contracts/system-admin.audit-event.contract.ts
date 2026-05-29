@@ -19,4 +19,6 @@ export type SystemAdminAuditEventDetail = {
   moduleKey: string;
   summary: string;
   metadata: Record<string, unknown>;
+  /** Chronological evidence for the same target (oldest first). */
+  timeline: readonly SystemAdminAuditEventRow[];
 };

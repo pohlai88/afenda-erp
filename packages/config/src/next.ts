@@ -7,6 +7,7 @@ import type { NextConfig } from "next";
 export const afendaTranspilePackages = [
   "@afenda/ai",
   "@afenda/auth",
+  "@afenda/billing",
   "@afenda/config",
   "@afenda/db",
   "@afenda/kernel",

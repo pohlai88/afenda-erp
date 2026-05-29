@@ -7,6 +7,7 @@ import {
   buildSystemAdminListToolbar,
   buildSystemAdminStaticPagination,
 } from "../../overview/surfaces/system-admin.list-surface.shared";
+import { systemAdminLynxUiCopy } from "../surface/system-admin.lynx-ui.copy.shared";
 
 export const systemAdminGatewaySpendSurfaceKey =
   "system-admin.gateway-spend.list";
@@ -33,6 +34,18 @@ export function buildGatewaySpendListSurface(input: {
     totalTokens: string;
   }>;
 }): ListSurfaceRendererConfigurationResolvedInput {
+  const spendCopy = systemAdminLynxUiCopy.gatewaySpend;
+  const emptyTitle = input.available
+    ? spendCopy.emptyTitleAvailable
+    : input.authenticationFailed
+      ? spendCopy.emptyTitleAuthFailed
+      : spendCopy.emptyTitleUnconfigured;
+  const emptyDescription = input.available
+    ? spendCopy.emptyDescriptionAvailable
+    : input.authenticationFailed
+      ? spendCopy.emptyDescriptionAuthFailed
+      : spendCopy.emptyDescriptionUnconfigured;
+
   return buildGovernedListSurface({
     __schemaVersion: GOVERNED_METADATA_SCHEMA_VERSION,
     dataNature: "table",
@@ -40,7 +53,7 @@ export function buildGatewaySpendListSurface(input: {
     presentation: {
       toolbar: buildSystemAdminListToolbar({
         scope: "gatewaySpend",
-        searchPlaceholder: "Search gateway spend",
+        searchPlaceholder: spendCopy.searchPlaceholder,
         sortColumn: "totalCost",
         sortOptions: [
           {
@@ -65,16 +78,13 @@ export function buildGatewaySpendListSurface(input: {
     },
     pagination: buildSystemAdminStaticPagination(input.entries.length),
     surface: {
-      header: { title: "AI Gateway spend" },
+      header: { title: spendCopy.title },
       columnsId: "system-admin-gateway-spend",
       rowKey: "model",
       empty: {
         variant: "muted",
-        title: input.available
-          ? "No gateway spend entries for this period."
-          : input.authenticationFailed
-            ? "Gateway API key was rejected. Update AI_GATEWAY_API_KEY from the Vercel AI Gateway console."
-            : "Gateway billing credentials are not configured for this environment.",
+        title: emptyTitle,
+        description: emptyDescription,
       },
     },
     columns: SPEND_COLUMNS,

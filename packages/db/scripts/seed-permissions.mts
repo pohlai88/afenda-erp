@@ -236,6 +236,13 @@ const permissionCatalog = [
     description: "Browse tenant audit events and governance trails.",
   },
   {
+    key: "system-admin.audit.review",
+    module: "system-admin",
+    label: "Review audit evidence",
+    description:
+      "Investigate audit timelines, retention posture, and coverage gaps.",
+  },
+  {
     key: "system-admin.audit.export",
     module: "system-admin",
     label: "Export audit log",
@@ -300,6 +307,18 @@ const permissionCatalog = [
     module: "system-admin",
     label: "Read billing",
     description: "View marketplace usage and billing posture.",
+  },
+  {
+    key: "system-admin.billing.manage",
+    module: "system-admin",
+    label: "Manage billing",
+    description: "Update billing contacts and commercial metadata.",
+  },
+  {
+    key: "system-admin.billing.export",
+    module: "system-admin",
+    label: "Export billing",
+    description: "Export billing summary for audit and finance review.",
   },
   {
     key: "system-admin.diagnostics.read",

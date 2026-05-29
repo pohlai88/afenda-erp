@@ -1,55 +1,73 @@
+import { systemAdminBillingUiCopy } from "@afenda/feature-system-admin/metadata";
 import {
-  buildBillingPostureListSurface,
-  systemAdminBillingSurfaceKey,
-} from "@afenda/feature-system-admin/metadata";
-import {
-  getBillingPostureSnapshot,
+  buildSystemAdminBillingPageModel,
+  exportSystemAdminBillingSummaryAction,
   requireSystemAdminBillingRead,
+  startStripeBillingPortalAction,
+  startStripeCheckoutWithPlanAction,
+  SystemAdminBillingAccessDenied,
+  SystemAdminBillingSection,
+  updateSystemAdminBillingContactsAction,
 } from "@afenda/feature-system-admin/server";
-import { GovernedPatternCListSection } from "@afenda/governed-surface/server";
-import { SectionPanel } from "@afenda/ui";
+import { hasExecutionPermission } from "@afenda/kernel/execution";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Billing — System admin",
-  description: "Tenant usage counters and marketplace billing links.",
+  description: systemAdminBillingUiCopy.page.description,
 };
 
-export default async function SystemAdminBillingPage() {
-  const { organization } = await requireSystemAdminBillingRead();
+function resolveCheckoutStatus(
+  searchParams: Record<string, string | string[] | undefined> | undefined,
+) {
+  const raw = searchParams?.checkout;
+  const value = Array.isArray(raw) ? raw[0] : raw;
+  if (value === "success" || value === "cancelled") {
+    return value;
+  }
 
-  const snapshot = await getBillingPostureSnapshot({
-    organizationId: organization.id,
-  });
+  return undefined;
+}
 
-  const billingSurface = buildBillingPostureListSurface(snapshot);
+export default async function SystemAdminBillingPage({
+  searchParams,
+}: {
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  try {
+    const resolvedSearchParams = searchParams ? await searchParams : undefined;
+    const { organization, context } = await requireSystemAdminBillingRead();
+    const canManageStripe = hasExecutionPermission(
+      context,
+      "system-admin.billing.manage",
+    );
+    const canManageContacts = canManageStripe;
+    const canExport = hasExecutionPermission(
+      context,
+      "system-admin.billing.export",
+    );
 
-  return (
-    <div className="flex flex-col gap-surface-2xl">
-      <SectionPanel
-        headingLevel={1}
-        title="Billing posture"
-        description="Usage signals for this tenant. Marketplace billing is managed in Vercel."
+    const pageModel = await buildSystemAdminBillingPageModel({
+      organizationId: organization.id,
+      organizationSlug: organization.slug,
+      actorId: context.userId,
+      actorType: context.actorType,
+      checkoutStatus: resolveCheckoutStatus(resolvedSearchParams),
+    });
+
+    return (
+      <SystemAdminBillingSection
+        {...pageModel}
+        canManageContacts={canManageContacts}
+        canManageStripe={canManageStripe}
+        canExport={canExport}
+        updateBillingContactsAction={updateSystemAdminBillingContactsAction}
+        exportBillingSummaryAction={exportSystemAdminBillingSummaryAction}
+        startStripeCheckoutWithPlanAction={startStripeCheckoutWithPlanAction}
+        startStripeBillingPortalAction={startStripeBillingPortalAction}
       />
-
-      <GovernedPatternCListSection
-        title="Usage summary"
-        surfaceKey={systemAdminBillingSurfaceKey}
-        listConfiguration={billingSurface}
-        parentAccessAllowed
-        layout="embedded"
-      />
-
-      <SectionPanel
-        title="Vercel Marketplace"
-        description="Provision databases, auth, and integrations from the linked Vercel project."
-      >
-        <p className="type-muted">
-          Open your Vercel project → Settings → Integrations to manage marketplace
-          resources and billing for this deployment. AI Gateway custom reporting
-          requires a valid API key from the AI Gateway console (Pro or Enterprise).
-        </p>
-      </SectionPanel>
-    </div>
-  );
+    );
+  } catch {
+    return <SystemAdminBillingAccessDenied />;
+  }
 }

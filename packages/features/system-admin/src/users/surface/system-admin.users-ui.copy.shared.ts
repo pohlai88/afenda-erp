@@ -29,6 +29,55 @@ export const systemAdminUsersUiCopy = {
     description:
       "You need the system-admin.users.read capability to view organization users.",
   },
+  identity: {
+    page: {
+      title: "Identity & access",
+      description:
+        "Tenant role overrides and navigation to user lifecycle surfaces. Invite, suspend, and remove users on the Users surface — not here.",
+    },
+    accessDenied: {
+      title: "Access denied",
+      description:
+        "You need the system-admin.users.read capability to view identity and access controls for this organization.",
+    },
+    inviteSection: {
+      title: "Invite member (identity policy)",
+      description:
+        "Uses system-admin.identity.write. For the full user lifecycle (resend, suspend, inspect access), use the Users surface.",
+    },
+    overridesList: {
+      title: "Role overrides",
+      description:
+        "Overrides apply on top of the static role catalog when the session is refreshed.",
+      surfaceHeaderTitle: "Role permission overrides",
+      searchPlaceholder: "Search overrides by role or permission key",
+      emptyTitle: "No tenant-specific overrides configured.",
+      emptyDescription:
+        "Use the form below to grant or deny a permission for a role when you have identity.write.",
+    },
+    overrideForm: {
+      title: "Set role override",
+    },
+    domainLinks: [
+      {
+        title: "Users",
+        description:
+          "Invite users, resend invitations, suspend or remove access, and inspect effective permissions.",
+      },
+      {
+        title: "Memberships",
+        description: "Review membership status and role assignment coverage.",
+      },
+      {
+        title: "Roles",
+        description: "Browse the tenant role catalog and assignment posture.",
+      },
+      {
+        title: "Permissions",
+        description: "Inspect the declared permission catalog and role coverage.",
+      },
+    ] as const,
+  },
   invite: {
     emailLabel: "Email",
     roleLabel: "Initial role",

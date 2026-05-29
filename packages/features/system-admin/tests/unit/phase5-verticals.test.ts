@@ -17,8 +17,11 @@ import {
   buildSystemAdminDiagnosticsIssuesListSurface,
   buildSystemAdminDiagnosticsModuleCoverageListSurface,
   buildSystemAdminDiagnosticsRecentChangesListSurface,
-} from "../../src/diagnostics/data/system-admin.diagnostics.surface";
-import { summarizeDiagnosticIssues } from "../../src/diagnostics/data/system-admin.diagnostics.verdict.server";
+} from "../../src/diagnostics/surface";
+import {
+  collectIntegrationDiagnosticIssues,
+  summarizeDiagnosticIssues,
+} from "../../src/diagnostics/data";
 import type { OrganizationSecuritySettings } from "../../src/security/contracts/system-admin.security-settings.contract";
 import { parseListSurfaceRendererConfiguration } from "@afenda/governed-surface/schemas";
 
@@ -241,7 +244,47 @@ describe("system admin phase 5 diagnostic checks", () => {
   it("healthy configuration returns empty issue list", () => {
     const summary = summarizeDiagnosticIssues([]);
     expect(summary.isHealthy).toBe(true);
+    expect(summary.verdict).toBe("healthy");
     expect(summary.totalCount).toBe(0);
+  });
+
+  it("builds audit coverage diagnostics deep link", async () => {
+    const { systemAdminAuditCoverageDiagnosticsHref } = await import(
+      "../../src/diagnostics/contracts/system-admin.diagnostics-links.shared"
+    );
+
+    expect(systemAdminAuditCoverageDiagnosticsHref).toBe(
+      "/system-admin/diagnostics?diagnosticsCategory=audit_coverage",
+    );
+  });
+
+  it("parses diagnostics category search params", async () => {
+    const { parseSystemAdminDiagnosticsSearchParams } = await import(
+      "../../src/diagnostics/data/system-admin.diagnostics-search-params.parse.shared"
+    );
+
+    expect(
+      parseSystemAdminDiagnosticsSearchParams({
+        diagnosticsCategory: "audit_coverage",
+      }).diagnosticsCategory,
+    ).toBe("audit_coverage");
+  });
+
+  it("integration readiness issues map to integration_health diagnostics", () => {
+    const issues = collectIntegrationDiagnosticIssues({
+      verdict: "blocked",
+      issues: [
+        {
+          id: "blocked:webhook-health",
+          title: "Webhook health is critically degraded",
+          description: "Multiple consecutive failures indicate the endpoint is unhealthy.",
+        },
+      ],
+    });
+
+    expect(issues[0]?.category).toBe("integration_health");
+    expect(issues[0]?.severity).toBe("blocked");
+    expect(issues[0]?.targetHref).toBe("/system-admin/integrations");
   });
 
   it("security posture warnings surface when admin MFA is disabled", () => {

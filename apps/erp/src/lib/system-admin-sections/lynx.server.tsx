@@ -23,6 +23,7 @@ import {
   systemAdminAiSandboxesSurfaceKey,
   systemAdminAiUsageSurfaceKey,
   systemAdminGatewaySpendSurfaceKey,
+  systemAdminLynxUiCopy,
 } from "@afenda/feature-system-admin/metadata";
 import {
   getAiApprovalsSummary,
@@ -32,6 +33,7 @@ import {
   getTenantAiSpendEntries,
   LynxOutcomeMonitorSection,
   requireSystemAdminLynxRead,
+  SystemAdminLynxAccessDenied,
   updateLynxOutcomeMonitorSettingAction,
 } from "@afenda/feature-system-admin/server";
 import { GovernedPatternCListSection } from "@afenda/governed-surface/server";
@@ -41,12 +43,21 @@ import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Lynx — System admin",
-  description:
-    "Lynx usage, approvals, sandboxes, and gateway spend for this tenant.",
+  description: systemAdminLynxUiCopy.page.metadataDescription,
 };
 
 export default async function SystemAdminLynxPage() {
-  const { organization } = await requireSystemAdminLynxRead();
+  let organization: Awaited<
+    ReturnType<typeof requireSystemAdminLynxRead>
+  >["organization"];
+
+  try {
+    ({ organization } = await requireSystemAdminLynxRead());
+  } catch {
+    return <SystemAdminLynxAccessDenied />;
+  }
+
+  const copy = systemAdminLynxUiCopy;
   const canApprove = organization.capabilities.includes(
     "system-admin.lynx.approve",
   );
@@ -89,21 +100,21 @@ export default async function SystemAdminLynxPage() {
     <div className="flex flex-col gap-surface-2xl">
       <SectionPanel
         headingLevel={1}
-        title="Lynx operations"
-        description="Org-scoped Lynx governance for the active tenant."
+        title={copy.page.title}
+        description={copy.page.description}
         aside={
           <Link
             href="/knowledge"
             className="type-body font-medium text-foreground underline-offset-4 hover:underline"
           >
-            Knowledge admin
+            {copy.page.knowledgeAdminLinkLabel}
           </Link>
         }
       />
 
       <GovernedPatternCListSection
-        title="Lynx usage ledger"
-        description="Recent model calls, token totals, and latency for this tenant."
+        title={copy.usage.title}
+        description={copy.usage.description}
         surfaceKey={systemAdminAiUsageSurfaceKey}
         listConfiguration={buildSystemAdminAiUsageListSurface({
           events: usageRows,
@@ -113,13 +124,13 @@ export default async function SystemAdminLynxPage() {
       />
 
       <GovernedPatternCListSection
-        title="Gateway spend"
+        title={copy.gatewaySpend.title}
         description={
           spendReport.authenticationFailed
-            ? "Gateway API key was rejected. Refresh AI_GATEWAY_API_KEY from the Vercel AI Gateway console."
+            ? copy.gatewaySpend.descriptionAuthFailed
             : spendReport.available
-              ? "Month-to-date AI Gateway spend when billing credentials are configured."
-              : "Tenant-scoped usage totals derived from the Lynx usage ledger."
+              ? copy.gatewaySpend.descriptionAvailable
+              : copy.gatewaySpend.descriptionFallback
         }
         surfaceKey={systemAdminGatewaySpendSurfaceKey}
         listConfiguration={buildGatewaySpendListSurface({
@@ -132,8 +143,8 @@ export default async function SystemAdminLynxPage() {
       />
 
       <GovernedPatternCListSection
-        title="Lynx feature entitlements"
-        description="Per-tenant enable/disable controls for Lynx features."
+        title={copy.entitlements.title}
+        description={copy.entitlements.description}
         surfaceKey={systemAdminAiEntitlementsSurfaceKey}
         listConfiguration={buildSystemAdminAiEntitlementsListSurface({
           entitlements,
@@ -148,8 +159,8 @@ export default async function SystemAdminLynxPage() {
       />
 
       <GovernedPatternCListSection
-        title="Approval proposals"
-        description="Human-approved Lynx proposals recorded for audit and replay."
+        title={copy.approvals.title}
+        description={copy.approvals.description}
         surfaceKey={systemAdminAiApprovalsSurfaceKey}
         listConfiguration={buildSystemAdminAiApprovalsListSurface({
           proposals: approvalRows,
@@ -160,8 +171,8 @@ export default async function SystemAdminLynxPage() {
 
       <div id="lynx-sandboxes-list">
         <GovernedPatternCListSection
-          title="Lynx action sandboxes"
-          description="Approve, reject, or discard pending Lynx proposals."
+          title={copy.sandboxes.title}
+          description={copy.sandboxes.description}
           surfaceKey={systemAdminAiSandboxesSurfaceKey}
           listConfiguration={buildSystemAdminAiSandboxesListSurface({
             sandboxes: sandboxRows,
@@ -177,8 +188,8 @@ export default async function SystemAdminLynxPage() {
       </div>
 
       <GovernedPatternCListSection
-        title="Lynx eval runs"
-        description="Recall@K, MRR, and evidence overlap from the knowledge substrate."
+        title={copy.evalRuns.title}
+        description={copy.evalRuns.description}
         surfaceKey={knowledgeSurfaceKeys.evalRuns}
         listConfiguration={buildLynxEvalRunListSurface({
           rows: evalRuns.map((run) => ({
@@ -234,14 +245,14 @@ export default async function SystemAdminLynxPage() {
       />
 
       <SectionPanel
-        title="Lynx product surfaces"
-        description="Outcome monitors and workflow sessions are available in Lynx."
+        title={copy.productSurfaces.title}
+        description={copy.productSurfaces.description}
       >
         <Link
           href="/lynx/runs"
           className="type-body font-medium text-foreground underline-offset-4 hover:underline"
         >
-          Open Lynx runs
+          {copy.productSurfaces.runsLinkLabel}
         </Link>
       </SectionPanel>
     </div>

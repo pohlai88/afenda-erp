@@ -1,5 +1,8 @@
 export type {
+  ApprovalReadinessVerdict,
+  SystemAdminApprovalMode,
   SystemAdminApprovalRule,
+  SystemAdminApprovalRuleEditorDefaults,
   SystemAdminApprovalRuleListRow,
   SystemAdminApprovalRuleStatus,
   SystemAdminApproverRoleOption,
