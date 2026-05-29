@@ -1,5 +1,4 @@
 import {
-  resolveListSurfaceRowTrailingAction,
   type ListSurfaceRendererConfigurationResolvedInput,
 } from "@afenda/governed-surface";
 import type { HrWorkEligibilityWindow } from "@afenda/db";
@@ -13,7 +12,10 @@ import {
   formatComplianceEmployeeListCell,
   formatComplianceListEnumCell,
   resolveWorkEligibilityListBadgeTone,
+  resolveWorkEligibilityListRowTone,
+  resolveWorkEligibilityListTrailingAction,
 } from "./hr.workforce.compliance-list.shared";
+import { hrComplianceWorkEligibilityColumnsId } from "./hr.workforce.compliance-surface-columns.shared";
 import { hrComplianceUiCopy } from "./hr.workforce.compliance-ui.copy.shared";
 
 export const hrComplianceWorkEligibilitySurfaceKey =
@@ -41,7 +43,7 @@ export function buildHrComplianceWorkEligibilityListSurface(input: {
     window,
     surface: {
       headerTitle: copy.surfaceHeaderTitle,
-      columnsId: "hr.workforce.compliance.work-eligibility",
+      columnsId: hrComplianceWorkEligibilityColumnsId,
       emptyTitle: copy.emptyTitle,
       emptyDescription: copy.emptyDescription,
     },
@@ -72,7 +74,7 @@ export function buildHrComplianceWorkEligibilityListSurface(input: {
         id: row.id,
         rowHref: hrEmployeeDetailRoutePath(row.employeeId),
         linkColumnId: "employee",
-        rowTone: resolveWorkEligibilityListBadgeTone(effectiveStatus),
+        rowTone: resolveWorkEligibilityListRowTone(effectiveStatus),
         cells: {
           employee: formatComplianceEmployeeListCell({
             employeeNumber: row.employeeNumber,
@@ -80,9 +82,12 @@ export function buildHrComplianceWorkEligibilityListSurface(input: {
           }),
           status: formatComplianceListEnumCell(effectiveStatus),
           statusValue: row.status,
+          trailingStatusValue: row.status,
+          effectiveStatusValue: effectiveStatus,
           verifiedAt: row.verifiedAt?.toISOString() ?? "",
           expiresAt: row.expiresAt?.toISOString() ?? "",
           expiresAtInput: formatComplianceDateTimeLocalInput(row.expiresAt),
+          reviewNotesValue: row.reviewNotes ?? "",
         },
         cellKinds: {
           status: {
@@ -90,14 +95,10 @@ export function buildHrComplianceWorkEligibilityListSurface(input: {
             tone: resolveWorkEligibilityListBadgeTone(effectiveStatus),
           },
         },
-        trailingAction: canWrite
-          ? resolveListSurfaceRowTrailingAction({
-              visible:
-                effectiveStatus !== "eligible" &&
-                effectiveStatus !== "not_applicable",
-              allowed: true,
-            })
-          : undefined,
+        trailingAction: resolveWorkEligibilityListTrailingAction(
+          canWrite,
+          effectiveStatus,
+        ),
       };
     }),
   });

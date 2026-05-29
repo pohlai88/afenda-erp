@@ -1,15 +1,18 @@
 import { z } from "zod";
 
 import { HRM_COMPLIANCE_WORK_ELIGIBILITY_STATUSES } from "../data/hr.workforce.compliance-work-eligibility.shared";
-import { hrComplianceFormDateTimeInput } from "./hr.workforce.compliance-form.shared";
-
-const uuid = z.string().uuid();
+import {
+  hrComplianceEntityIdSchema,
+  hrComplianceFormNullableDateTimeInput,
+  hrComplianceFormNullableReviewNotesInput,
+  readComplianceFormTextField,
+} from "./hr.workforce.compliance-form.shared";
 
 export const updateHrWorkEligibilityFormSchema = z.object({
-  workEligibilityId: uuid,
+  workEligibilityId: hrComplianceEntityIdSchema,
   status: z.enum(HRM_COMPLIANCE_WORK_ELIGIBILITY_STATUSES),
-  expiresAt: hrComplianceFormDateTimeInput.optional(),
-  reviewNotes: z.string().trim().max(2000).optional(),
+  expiresAt: hrComplianceFormNullableDateTimeInput,
+  reviewNotes: hrComplianceFormNullableReviewNotesInput,
 });
 
 export type UpdateHrWorkEligibilityFormInput = z.infer<
@@ -17,3 +20,12 @@ export type UpdateHrWorkEligibilityFormInput = z.infer<
 >;
 
 export const ensureHrWorkEligibilityTrackingFormSchema = z.object({});
+
+export function parseUpdateHrWorkEligibilityForm(formData: FormData) {
+  return updateHrWorkEligibilityFormSchema.safeParse({
+    workEligibilityId: readComplianceFormTextField(formData, "workEligibilityId"),
+    status: readComplianceFormTextField(formData, "status"),
+    expiresAt: readComplianceFormTextField(formData, "expiresAt"),
+    reviewNotes: readComplianceFormTextField(formData, "reviewNotes"),
+  });
+}

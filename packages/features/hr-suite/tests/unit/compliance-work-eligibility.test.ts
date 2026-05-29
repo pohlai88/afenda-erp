@@ -64,6 +64,16 @@ describe("HRM-CMP-004 work eligibility status", () => {
     expect(verifiedAt).toBeInstanceOf(Date);
   });
 
+  it("preserves existing verifiedAt when authorized status is unchanged", () => {
+    const existing = new Date("2026-01-01T00:00:00.000Z");
+    expect(
+      resolveWorkEligibilityVerifiedAt({
+        status: "eligible",
+        existingVerifiedAt: existing,
+      }),
+    ).toEqual(existing);
+  });
+
   it("preserves explicit verifiedAt overrides", () => {
     const explicit = new Date("2026-01-01T00:00:00.000Z");
     expect(

@@ -122,6 +122,16 @@ export const hrComplianceWorkEligibilityStatusEnum = pgEnum(
   ],
 );
 
+export const hrComplianceWorkAuthDocumentTypeEnum = pgEnum(
+  "hr_compliance_work_auth_document_type",
+  ["work_permit", "visa", "passport", "right_to_work"],
+);
+
+export const hrComplianceWorkAuthDocumentStatusEnum = pgEnum(
+  "hr_compliance_work_auth_document_status",
+  ["missing", "pending_verification", "verified", "rejected", "waived"],
+);
+
 export const hrComplianceFilingStatusEnum = pgEnum("hr_compliance_filing_status", [
   "pending",
   "submitted",
@@ -696,6 +706,9 @@ export const hrComplianceExceptions = pgTable(
     }),
     resolutionNote: text("resolution_note"),
     resolvedAt: timestamp("resolved_at", { withTimezone: true }),
+    /** Idempotent key for auto-materialized exceptions (HRM-CMP-017). */
+    sourceReferenceId: text("source_reference_id"),
+    gapKind: text("gap_kind"),
     ...timestampColumns,
   },
   (table) => [
@@ -711,6 +724,10 @@ export const hrComplianceExceptions = pgTable(
       table.organizationId,
       table.complianceArea,
       table.status,
+    ),
+    uniqueIndex("hr_compliance_exceptions_org_source_ref_uidx").on(
+      table.organizationId,
+      table.sourceReferenceId,
     ),
   ],
 );
@@ -779,6 +796,73 @@ export const hrComplianceWorkEligibility = pgTable(
     index("hr_compliance_work_eligibility_org_employee_idx").on(
       table.organizationId,
       table.employeeId,
+    ),
+  ],
+);
+
+export const hrComplianceFilings = pgTable(
+  "hr_compliance_filings",
+  {
+    id: text("id").primaryKey(),
+    organizationId: organizationReference(),
+    obligationId: text("obligation_id")
+      .notNull()
+      .references(() => hrComplianceObligations.id, { onDelete: "cascade" }),
+    status: hrComplianceFilingStatusEnum("status").notNull().default("pending"),
+    filingDeadline: timestamp("filing_deadline", { withTimezone: true }),
+    submittedAt: timestamp("submitted_at", { withTimezone: true }),
+    confirmedAt: timestamp("confirmed_at", { withTimezone: true }),
+    reviewNotes: text("review_notes"),
+    ...timestampColumns,
+  },
+  (table) => [
+    uniqueIndex("hr_compliance_filings_org_obl_uidx").on(
+      table.organizationId,
+      table.obligationId,
+    ),
+    index("hr_compliance_filings_org_status_idx").on(
+      table.organizationId,
+      table.status,
+    ),
+  ],
+);
+
+export const hrComplianceWorkAuthorizationDocuments = pgTable(
+  "hr_compliance_work_authorization_documents",
+  {
+    id: text("id").primaryKey(),
+    organizationId: organizationReference(),
+    employeeId: text("employee_id")
+      .notNull()
+      .references(() => hrEmployees.id, { onDelete: "cascade" }),
+    documentType: hrComplianceWorkAuthDocumentTypeEnum("document_type").notNull(),
+    status: hrComplianceWorkAuthDocumentStatusEnum("status")
+      .notNull()
+      .default("missing"),
+    documentNumber: text("document_number"),
+    issuedAt: timestamp("issued_at", { withTimezone: true }),
+    expiresAt: timestamp("expires_at", { withTimezone: true }),
+    verifiedAt: timestamp("verified_at", { withTimezone: true }),
+    reviewNotes: text("review_notes"),
+    ...timestampColumns,
+  },
+  (table) => [
+    uniqueIndex("hr_compliance_work_auth_docs_org_emp_type_uidx").on(
+      table.organizationId,
+      table.employeeId,
+      table.documentType,
+    ),
+    index("hr_compliance_work_auth_docs_org_status_idx").on(
+      table.organizationId,
+      table.status,
+    ),
+    index("hr_compliance_work_auth_docs_org_employee_idx").on(
+      table.organizationId,
+      table.employeeId,
+    ),
+    index("hr_compliance_work_auth_docs_org_type_idx").on(
+      table.organizationId,
+      table.documentType,
     ),
   ],
 );

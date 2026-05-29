@@ -5,9 +5,8 @@ import {
   HRM_COMPLIANCE_OBLIGATION_KINDS,
   HRM_COMPLIANCE_OBLIGATION_STATUSES,
 } from "../data/hr.workforce.compliance-obligation.shared";
-import { hrComplianceFormDateTimeInput } from "./hr.workforce.compliance-form.shared";
+import { hrComplianceFormDateTimeInput, hrComplianceEntityIdSchema } from "./hr.workforce.compliance-form.shared";
 
-const uuid = z.string().uuid();
 const nullableText = z.string().trim().min(1).max(200).optional();
 
 export const upsertHrComplianceObligationFormSchema = z.object({
@@ -18,7 +17,7 @@ export const upsertHrComplianceObligationFormSchema = z.object({
   requirementKind: z.enum(HRM_COMPLIANCE_OBLIGATION_KINDS),
   countryCode: z.string().trim().length(2).toUpperCase().optional(),
   legalEntityCode: nullableText,
-  departmentId: uuid.optional(),
+  departmentId: hrComplianceEntityIdSchema.optional(),
   workLocationCode: nullableText,
   employmentType: nullableText,
   workerCategory: nullableText,
@@ -30,7 +29,7 @@ export type UpsertHrComplianceObligationFormInput = z.infer<
 >;
 
 export const archiveHrComplianceObligationFormSchema = z.object({
-  obligationId: uuid,
+  obligationId: hrComplianceEntityIdSchema,
   status: z.enum(HRM_COMPLIANCE_OBLIGATION_STATUSES).default("archived"),
 });
 

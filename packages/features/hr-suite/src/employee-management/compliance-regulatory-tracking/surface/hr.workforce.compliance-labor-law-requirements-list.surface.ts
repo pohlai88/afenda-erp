@@ -1,5 +1,4 @@
 import {
-  resolveListSurfaceRowTrailingAction,
   type ListSurfaceRendererConfigurationResolvedInput,
 } from "@afenda/governed-surface";
 import type { HrEmployeeLaborLawRequirementWindow } from "@afenda/db";
@@ -7,6 +6,7 @@ import type { HrEmployeeLaborLawRequirementWindow } from "@afenda/db";
 import { hrEmployeeDetailRoutePath } from "../contracts/hr.workforce.compliance-route.contract";
 import {
   deriveEffectiveLaborLawRequirementStatus,
+  normalizeRequirementStatusForTrailingSelect,
 } from "../data/hr.workforce.compliance-status.shared";
 import {
   buildComplianceListSearchToolbar,
@@ -14,7 +14,10 @@ import {
   formatComplianceEmployeeListCell,
   formatComplianceListEnumCell,
   resolveLaborLawRequirementListBadgeTone,
+  resolveLaborLawRequirementListTrailingAction,
+  resolveRequirementListRowTone,
 } from "./hr.workforce.compliance-list.shared";
+import { hrComplianceLaborLawRequirementsColumnsId } from "./hr.workforce.compliance-surface-columns.shared";
 import { hrComplianceUiCopy } from "./hr.workforce.compliance-ui.copy.shared";
 
 export const hrComplianceLaborLawRequirementsSurfaceKey =
@@ -41,7 +44,7 @@ export function buildHrComplianceLaborLawRequirementsListSurface(input: {
     window,
     surface: {
       headerTitle: copy.surfaceHeaderTitle,
-      columnsId: "hr.workforce.compliance.labor-law-requirements",
+      columnsId: hrComplianceLaborLawRequirementsColumnsId,
       emptyTitle: copy.emptyTitle,
       emptyDescription: copy.emptyDescription,
     },
@@ -83,7 +86,7 @@ export function buildHrComplianceLaborLawRequirementsListSurface(input: {
         id: row.id,
         rowHref: hrEmployeeDetailRoutePath(row.employeeId),
         linkColumnId: "employee",
-        rowTone: resolveLaborLawRequirementListBadgeTone(effectiveStatus),
+        rowTone: resolveRequirementListRowTone(effectiveStatus),
         cells: {
           employee: formatComplianceEmployeeListCell({
             employeeNumber: row.employeeNumber,
@@ -92,8 +95,14 @@ export function buildHrComplianceLaborLawRequirementsListSurface(input: {
           requirement: `${row.obligationCode} · ${row.obligationTitle}`,
           area: formatComplianceListEnumCell(row.complianceArea),
           status: formatComplianceListEnumCell(effectiveStatus),
+          statusValue: row.status,
+          trailingStatusValue: normalizeRequirementStatusForTrailingSelect(
+            row.status,
+          ),
+          effectiveStatusValue: effectiveStatus,
           dueDate: row.dueDate?.toISOString() ?? "",
           completedAt: row.completedAt?.toISOString() ?? "",
+          reviewNotesValue: row.reviewNotes ?? "",
         },
         cellKinds: {
           status: {
@@ -101,12 +110,10 @@ export function buildHrComplianceLaborLawRequirementsListSurface(input: {
             tone: resolveLaborLawRequirementListBadgeTone(effectiveStatus),
           },
         },
-        trailingAction: canWrite
-          ? resolveListSurfaceRowTrailingAction({
-              visible: effectiveStatus !== "compliant",
-              allowed: true,
-            })
-          : undefined,
+        trailingAction: resolveLaborLawRequirementListTrailingAction(
+          canWrite,
+          effectiveStatus,
+        ),
       };
     }),
   });

@@ -1,3 +1,7 @@
+import { deriveWorkEligibilityEffectiveStatus } from "@afenda/db";
+
+import { toEnumMember } from "./hr.workforce.compliance-enum-guard.shared";
+
 /** HRM-CMP-004 work eligibility posture statuses. */
 export const HRM_COMPLIANCE_WORK_ELIGIBILITY_STATUSES = [
   "not_applicable",
@@ -11,12 +15,6 @@ export const HRM_COMPLIANCE_WORK_ELIGIBILITY_STATUSES = [
 export type HrmComplianceWorkEligibilityStatus =
   (typeof HRM_COMPLIANCE_WORK_ELIGIBILITY_STATUSES)[number];
 
-const TERMINAL_WORK_ELIGIBILITY_STATUSES = new Set<HrmComplianceWorkEligibilityStatus>([
-  "not_applicable",
-  "ineligible",
-  "expired",
-]);
-
 export { resolveWorkEligibilityVerifiedAt } from "@afenda/db";
 
 export function deriveEffectiveWorkEligibilityStatus(input: {
@@ -24,16 +22,13 @@ export function deriveEffectiveWorkEligibilityStatus(input: {
   expiresAt: Date | null | undefined;
   now?: Date;
 }): HrmComplianceWorkEligibilityStatus {
-  const now = input.now ?? new Date();
-  const expiresAt = input.expiresAt ?? null;
-
-  if (TERMINAL_WORK_ELIGIBILITY_STATUSES.has(input.status)) {
-    return input.status;
-  }
-
-  if (expiresAt && expiresAt.getTime() < now.getTime()) {
-    return "expired";
-  }
-
-  return input.status;
+  return toEnumMember(
+    deriveWorkEligibilityEffectiveStatus({
+      status: input.status,
+      expiresAt: input.expiresAt ?? null,
+      now: input.now ?? new Date(),
+    }),
+    HRM_COMPLIANCE_WORK_ELIGIBILITY_STATUSES,
+    "work eligibility status",
+  );
 }

@@ -1,4 +1,4 @@
-import { and, count, desc, eq, ilike, inArray, isNull, or } from "drizzle-orm";
+import { and, count, desc, eq, inArray, isNull } from "drizzle-orm";
 import { runWithOrganizationContext, type AfendaTransaction } from "./client";
 import { createEntityId } from "./ids";
 import { appliesComplianceObligationToEmployee } from "./hr-compliance-scope.shared";
@@ -7,7 +7,12 @@ import {
   buildEmployeeObligationTrackingKey,
 } from "./hr-compliance-labor-law.shared";
 import { buildPaginatedWindow, formatHrEmployeeDisplayName } from "./hr-compliance.shared";
-import { clampPageSize } from "./hr-compliance.internal";
+import {
+  activeEmployeeFilters,
+  appendEmployeeRequirementWindowSearchCondition,
+  clampPageSize,
+  normalizeStoredRequirementStatusForMutation,
+} from "./hr-compliance.internal";
 import { HrComplianceCommandError } from "./hr-compliance.types";
 import type { HrEmployeeLaborLawRequirementWindow } from "./hr-compliance.types";
 import {
@@ -217,26 +222,24 @@ export async function listHrEmployeeLaborLawRequirementsWindow(input: {
       eq(hrComplianceEmployeeRequirements.organizationId, input.organizationId),
       activeLaborLawObligationKindCondition,
       eq(hrComplianceObligations.status, "active"),
+      activeEmployeeFilters(input.organizationId),
     ];
 
     if (input.status) {
       conditions.push(eq(hrComplianceEmployeeRequirements.status, input.status));
     }
 
-    const trimmedSearch = input.search?.trim();
-    if (trimmedSearch) {
-      const pattern = `%${trimmedSearch}%`;
-      conditions.push(
-        or(
-          ilike(hrEmployees.employeeNumber, pattern),
-          ilike(hrEmployees.legalName, pattern),
-          ilike(hrEmployees.preferredName, pattern),
-          ilike(hrComplianceObligations.code, pattern),
-          ilike(hrComplianceObligations.title, pattern),
-          ilike(hrComplianceObligations.complianceArea, pattern),
-        )!,
-      );
-    }
+    appendEmployeeRequirementWindowSearchCondition(conditions, {
+      search: input.search,
+      employeeNumber: hrEmployees.employeeNumber,
+      legalName: hrEmployees.legalName,
+      preferredName: hrEmployees.preferredName,
+      obligationCode: hrComplianceObligations.code,
+      obligationTitle: hrComplianceObligations.title,
+      complianceArea: hrComplianceObligations.complianceArea,
+      requirementStatus: hrComplianceEmployeeRequirements.status,
+      requirementDueDate: hrComplianceEmployeeRequirements.dueDate,
+    });
 
     const whereClause = and(...conditions);
 
@@ -354,12 +357,13 @@ export async function updateHrEmployeeLaborLawRequirementStatusInTx(
     throw new HrComplianceCommandError("requirement_not_found");
   }
 
-  const completedAt = input.status === "compliant" ? new Date() : null;
+  const storedStatus = normalizeStoredRequirementStatusForMutation(input.status);
+  const completedAt = storedStatus === "compliant" ? new Date() : null;
 
   await db
     .update(hrComplianceEmployeeRequirements)
     .set({
-      status: input.status,
+      status: storedStatus,
       reviewNotes: input.reviewNotes?.trim() || null,
       completedAt,
     })

@@ -180,6 +180,8 @@ export async function updateHrWorkEligibilityStatusInTx(
   const [record] = await db
     .select({
       id: hrComplianceWorkEligibility.id,
+      status: hrComplianceWorkEligibility.status,
+      verifiedAt: hrComplianceWorkEligibility.verifiedAt,
     })
     .from(hrComplianceWorkEligibility)
     .innerJoin(
@@ -202,6 +204,7 @@ export async function updateHrWorkEligibilityStatusInTx(
   const verifiedAt = resolveWorkEligibilityVerifiedAt({
     status: input.status,
     verifiedAt: input.verifiedAt,
+    existingVerifiedAt: record.verifiedAt,
   });
 
   await db

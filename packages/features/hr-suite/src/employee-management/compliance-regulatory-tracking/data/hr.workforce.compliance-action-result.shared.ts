@@ -5,16 +5,16 @@ import { HrComplianceOrganizationScopeError } from "./hr.workforce.compliance-or
 
 const COMPLIANCE_GENERIC_FAILURE_MESSAGE = "Compliance action failed.";
 
-const COMPLIANCE_COMMAND_ERROR_MESSAGES: Record<
-  HrComplianceCommandError["code"],
-  string
-> = {
+const COMPLIANCE_COMMAND_ERROR_MESSAGES = {
   obligation_not_found: "Compliance obligation was not found.",
   exception_not_found: "Compliance exception was not found.",
   exception_not_open: "This compliance exception is already closed.",
-  requirement_not_found: "Labor law requirement tracking row was not found.",
+  requirement_not_found: "Compliance requirement tracking row was not found.",
   work_eligibility_not_found: "Work eligibility tracking row was not found.",
-};
+  work_auth_document_not_found: "Work authorization document row was not found.",
+  filing_not_found: "Mandatory filing row was not found.",
+  invalid_exception_gap_kind: "Compliance exception gap kind is invalid.",
+} satisfies Record<HrComplianceCommandError["code"], string>;
 
 export function toComplianceActionFailure(error: unknown): ActionResult {
   if (error instanceof HrComplianceCommandError) {

@@ -32,10 +32,22 @@ export const hrAttendanceUiCopy = {
 };
 
 export {
+  getHrComplianceListSurfaceKeys,
+  HR_COMPLIANCE_LIST_SURFACE_COLUMNS_BY_KEY,
+  HR_COMPLIANCE_LIST_SURFACE_KEYS,
   hrComplianceExceptionsSurfaceKey,
+  hrComplianceFilingsSurfaceKey,
   hrComplianceLaborLawRequirementsSurfaceKey,
   hrComplianceObligationsSurfaceKey,
+  hrCompliancePolicyAcknowledgementsSurfaceKey,
+  hrComplianceRegulatoryCalendarSurfaceKey,
+  hrComplianceAlertsSurfaceKey,
+  hrComplianceSafetyTrainingRequirementsSurfaceKey,
+  hrComplianceWorkAuthDocumentsSurfaceKey,
+  hrComplianceWorkEligibilitySurfaceKey,
+  hrComplianceWorkplaceSafetyRequirementsSurfaceKey,
   hrComplianceUiCopy,
+  type HrComplianceListSurfaceKey,
 } from "./employee-management/compliance-regulatory-tracking/metadata";
 
 export {
@@ -46,17 +58,46 @@ export {
 export {
   resolveHrModuleNavItems,
   type HrModuleNavItem,
-} from "./navigation/hr-module-nav.contract";
+} from "./contracts/hr-module-nav.contract";
 
 export {
   hrComplianceExceptionSearchParam,
 } from "./employee-management/compliance-regulatory-tracking/surface/hr.workforce.compliance-exceptions-list.surface";
 export {
+  hrComplianceFilingSearchParam,
+} from "./employee-management/compliance-regulatory-tracking/surface/hr.workforce.compliance-filings-list.surface";
+export {
   hrComplianceLaborLawSearchParam,
 } from "./employee-management/compliance-regulatory-tracking/surface/hr.workforce.compliance-labor-law-requirements-list.surface";
 export {
+  hrCompliancePolicyAcknowledgementSearchParam,
+} from "./employee-management/compliance-regulatory-tracking/surface/hr.workforce.compliance-policy-acknowledgements-list.surface";
+export {
+  hrComplianceSafetyTrainingSearchParam,
+} from "./employee-management/compliance-regulatory-tracking/surface/hr.workforce.compliance-safety-training-requirements-list.surface";
+export {
+  hrComplianceWorkplaceSafetySearchParam,
+} from "./employee-management/compliance-regulatory-tracking/surface/hr.workforce.compliance-workplace-safety-list.surface";
+export {
+  hrComplianceWorkAuthDocumentSearchParam,
+} from "./employee-management/compliance-regulatory-tracking/surface/hr.workforce.compliance-work-auth-documents-list.surface";
+export {
+  hrComplianceWorkEligibilitySearchParam,
+} from "./employee-management/compliance-regulatory-tracking/surface/hr.workforce.compliance-work-eligibility-list.surface";
+export {
   hrComplianceObligationSearchParam,
 } from "./employee-management/compliance-regulatory-tracking/surface/hr.workforce.compliance-obligations-list.surface";
+export {
+  hrComplianceRegulatoryCalendarSearchParam,
+} from "./employee-management/compliance-regulatory-tracking/surface/hr.workforce.compliance-regulatory-calendar-list.surface";
+export {
+  hrComplianceAlertsSearchParam,
+} from "./employee-management/compliance-regulatory-tracking/surface/hr.workforce.compliance-alerts-list.surface";
+
+export {
+  parseHrComplianceSearchParams,
+  type HrComplianceSearchParams,
+} from "./employee-management/compliance-regulatory-tracking/data/hr.workforce.compliance-search-params.parse.shared";
 
 export const hrDocumentsUiCopy = {
   page: {

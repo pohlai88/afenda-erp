@@ -6,31 +6,7 @@ import { SectionPanel } from "@afenda/ui";
  * Public server door for feature packages.
  * Re-export from actions/, data/, events/, policies/.
  */
-export * from "./metadata";
-
-export {
-  HrComplianceAccessDenied,
-  HrComplianceAccessDeniedPanel,
-  HrComplianceOrganizationScopeError,
-  HrComplianceSection,
-  HrComplianceWorkbenchSection,
-  archiveHrComplianceObligationAction,
-  assignHrComplianceCorrectiveActionAction,
-  buildHrCompliancePageModel,
-  createHrComplianceExceptionAction,
-  ensureHrWorkEligibilityTrackingAction,
-  loadComplianceFormOptions,
-  parseHrComplianceSearchParams,
-  requireHrComplianceRead,
-  requireHrComplianceWrite,
-  resolveHrComplianceExceptionAction,
-  syncHrEmployeeLaborLawRequirementsAction,
-  updateHrComplianceCorrectiveActionProgressAction,
-  updateHrEmployeeLaborLawRequirementAction,
-  updateHrWorkEligibilityAction,
-  upsertHrComplianceObligationAction,
-  waiveHrComplianceExceptionAction,
-} from "./employee-management/compliance-regulatory-tracking/server";
+export * from "./employee-management/compliance-regulatory-tracking/server";
 
 export { requireHrRead } from "./policies/hr-module-access.policy.server";
 

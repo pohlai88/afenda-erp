@@ -13,13 +13,27 @@ describe("parseHrComplianceSearchParams", () => {
         complianceObligationSearch: " policy ",
         complianceExceptionSearch: " visa ",
         complianceLaborLawSearch: " overtime ",
+        compliancePolicyAcknowledgementSearch: " handbook ",
+        complianceSafetyTrainingSearch: " forklift ",
+        complianceWorkplaceSafetySearch: " induction ",
         complianceWorkEligibilitySearch: " permit ",
+        complianceWorkAuthDocumentSearch: " passport ",
+        complianceFilingSearch: " epf ",
+        complianceRegulatoryCalendarSearch: " renewal ",
+        complianceAlertsSearch: " overdue ",
       }),
     ).toEqual({
       obligationSearch: "policy",
       exceptionSearch: "visa",
       laborLawSearch: "overtime",
+      policyAcknowledgementSearch: "handbook",
+      safetyTrainingSearch: "forklift",
+      workplaceSafetySearch: "induction",
       workEligibilitySearch: "permit",
+      workAuthDocumentSearch: "passport",
+      filingSearch: "epf",
+      regulatoryCalendarSearch: "renewal",
+      alertsSearch: "overdue",
     });
   });
 
@@ -32,7 +46,55 @@ describe("parseHrComplianceSearchParams", () => {
       obligationSearch: "shared",
       exceptionSearch: "shared",
       laborLawSearch: "shared",
+      policyAcknowledgementSearch: "shared",
+      safetyTrainingSearch: "shared",
+      workplaceSafetySearch: "shared",
       workEligibilitySearch: "shared",
+      workAuthDocumentSearch: "shared",
+      filingSearch: "shared",
+      regulatoryCalendarSearch: "shared",
+      alertsSearch: "shared",
+    });
+  });
+
+  it("falls back to shared search param when list-specific params are omitted", () => {
+    expect(
+      parseHrComplianceSearchParams({
+        search: " global ",
+      }),
+    ).toEqual({
+      obligationSearch: "global",
+      exceptionSearch: "global",
+      laborLawSearch: "global",
+      policyAcknowledgementSearch: "global",
+      safetyTrainingSearch: "global",
+      workplaceSafetySearch: "global",
+      workEligibilitySearch: "global",
+      workAuthDocumentSearch: "global",
+      filingSearch: "global",
+      regulatoryCalendarSearch: "global",
+      alertsSearch: "global",
+    });
+  });
+
+  it("prefers complianceSearch over shared search", () => {
+    expect(
+      parseHrComplianceSearchParams({
+        search: "generic",
+        complianceSearch: "legacy",
+      }),
+    ).toEqual({
+      obligationSearch: "legacy",
+      exceptionSearch: "legacy",
+      laborLawSearch: "legacy",
+      policyAcknowledgementSearch: "legacy",
+      safetyTrainingSearch: "legacy",
+      workplaceSafetySearch: "legacy",
+      workEligibilitySearch: "legacy",
+      workAuthDocumentSearch: "legacy",
+      filingSearch: "legacy",
+      regulatoryCalendarSearch: "legacy",
+      alertsSearch: "legacy",
     });
   });
 
@@ -46,7 +108,14 @@ describe("parseHrComplianceSearchParams", () => {
       obligationSearch: "obligation-only",
       exceptionSearch: "legacy",
       laborLawSearch: "legacy",
+      policyAcknowledgementSearch: "legacy",
+      safetyTrainingSearch: "legacy",
+      workplaceSafetySearch: "legacy",
       workEligibilitySearch: "legacy",
+      workAuthDocumentSearch: "legacy",
+      filingSearch: "legacy",
+      regulatoryCalendarSearch: "legacy",
+      alertsSearch: "legacy",
     });
   });
 });

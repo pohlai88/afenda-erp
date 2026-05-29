@@ -1,8 +1,13 @@
 import { and, count, desc, eq, ilike, inArray, or } from "drizzle-orm";
 import { runWithOrganizationContext, type AfendaTransaction } from "./client";
 import { createEntityId } from "./ids";
+import {
+  HR_COMPLIANCE_EXCEPTION_GAP_KINDS,
+  type HrComplianceExceptionGapKind,
+} from "./hr-compliance-exception-sync.shared";
 import { buildPaginatedWindow, formatHrEmployeeDisplayName } from "./hr-compliance.shared";
 import { clampPageSize, loadComplianceExceptionForMutation } from "./hr-compliance.internal";
+import { HrComplianceCommandError } from "./hr-compliance.types";
 import type { HrComplianceExceptionWindow } from "./hr-compliance.types";
 import { hrComplianceExceptions, hrEmployees } from "./schema/hr";
 
@@ -38,6 +43,7 @@ export async function listHrComplianceExceptionsWindow(input: {
           ilike(hrComplianceExceptions.title, pattern),
           ilike(hrComplianceExceptions.complianceArea, pattern),
           ilike(hrComplianceExceptions.itemType, pattern),
+          ilike(hrComplianceExceptions.gapKind, pattern),
           ilike(hrEmployees.employeeNumber, pattern),
           ilike(hrEmployees.legalName, pattern),
         )!,
@@ -64,6 +70,7 @@ export async function listHrComplianceExceptionsWindow(input: {
         preferredName: hrEmployees.preferredName,
         complianceArea: hrComplianceExceptions.complianceArea,
         itemType: hrComplianceExceptions.itemType,
+        gapKind: hrComplianceExceptions.gapKind,
         title: hrComplianceExceptions.title,
         severity: hrComplianceExceptions.severity,
         status: hrComplianceExceptions.status,
@@ -95,6 +102,7 @@ export async function listHrComplianceExceptionsWindow(input: {
           : null,
         complianceArea: row.complianceArea,
         itemType: row.itemType,
+        gapKind: row.gapKind,
         title: row.title,
         severity: row.severity,
         status: row.status,
@@ -119,8 +127,20 @@ export async function createHrComplianceExceptionInTx(
     employeeId?: string | null;
     correctiveActionDescription?: string | null;
     correctiveActionDueDate?: Date | null;
+    sourceReferenceId?: string | null;
+    gapKind?: string | null;
   },
 ): Promise<{ exceptionId: string }> {
+  const gapKind = input.gapKind?.trim() || null;
+  if (
+    gapKind &&
+    !HR_COMPLIANCE_EXCEPTION_GAP_KINDS.includes(
+      gapKind as HrComplianceExceptionGapKind,
+    )
+  ) {
+    throw new HrComplianceCommandError("invalid_exception_gap_kind");
+  }
+
   const exceptionId = createEntityId("hr_cmp_exc");
   const hasCorrectiveAction =
     Boolean(input.correctiveActionDescription?.trim()) ||
@@ -138,6 +158,8 @@ export async function createHrComplianceExceptionInTx(
     correctiveActionDescription:
       input.correctiveActionDescription?.trim() || null,
     correctiveActionDueDate: input.correctiveActionDueDate ?? null,
+    sourceReferenceId: input.sourceReferenceId?.trim() || null,
+    gapKind,
   });
 
   return { exceptionId };
@@ -152,6 +174,8 @@ export async function createHrComplianceException(input: {
   employeeId?: string | null;
   correctiveActionDescription?: string | null;
   correctiveActionDueDate?: Date | null;
+  sourceReferenceId?: string | null;
+  gapKind?: string | null;
 }): Promise<{ exceptionId: string }> {
   return runWithOrganizationContext(input.organizationId, (db) =>
     createHrComplianceExceptionInTx(db, input),

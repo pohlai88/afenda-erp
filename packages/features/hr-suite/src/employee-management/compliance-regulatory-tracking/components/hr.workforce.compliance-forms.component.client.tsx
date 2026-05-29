@@ -10,8 +10,13 @@ import { Input } from "@afenda/ui/input";
 
 import {
   createHrComplianceExceptionAction,
+  ensureHrWorkAuthorizationDocumentsAction,
   ensureHrWorkEligibilityTrackingAction,
   syncHrEmployeeLaborLawRequirementsAction,
+  syncHrEmployeePolicyAcknowledgementsAction,
+  syncHrComplianceFilingsAction,
+  syncHrEmployeeSafetyTrainingRequirementsAction,
+  syncHrEmployeeWorkplaceSafetyRequirementsAction,
   upsertHrComplianceObligationAction,
 } from "../actions/hr.workforce.compliance.actions.server";
 import { HRM_COMPLIANCE_OBLIGATION_KINDS } from "../data/hr.workforce.compliance-obligation.shared";
@@ -261,12 +266,67 @@ export function HrComplianceLaborLawSyncForm() {
   );
 }
 
+export function HrCompliancePolicyAcknowledgementSyncForm() {
+  const copy = hrComplianceUiCopy.policyAcknowledgement;
+
+  return (
+    <ComplianceNoFieldActionForm
+      action={syncHrEmployeePolicyAcknowledgementsAction}
+      submitLabel={copy.syncActionLabel}
+    />
+  );
+}
+
+export function HrComplianceFilingSyncForm() {
+  const copy = hrComplianceUiCopy.filing;
+
+  return (
+    <ComplianceNoFieldActionForm
+      action={syncHrComplianceFilingsAction}
+      submitLabel={copy.syncActionLabel}
+    />
+  );
+}
+
+export function HrComplianceWorkplaceSafetySyncForm() {
+  const copy = hrComplianceUiCopy.workplaceSafety;
+
+  return (
+    <ComplianceNoFieldActionForm
+      action={syncHrEmployeeWorkplaceSafetyRequirementsAction}
+      submitLabel={copy.syncActionLabel}
+    />
+  );
+}
+
+export function HrComplianceSafetyTrainingSyncForm() {
+  const copy = hrComplianceUiCopy.safetyTraining;
+
+  return (
+    <ComplianceNoFieldActionForm
+      action={syncHrEmployeeSafetyTrainingRequirementsAction}
+      submitLabel={copy.syncActionLabel}
+    />
+  );
+}
+
 export function HrComplianceWorkEligibilityEnsureForm() {
   const copy = hrComplianceUiCopy.workEligibility;
 
   return (
     <ComplianceNoFieldActionForm
       action={ensureHrWorkEligibilityTrackingAction}
+      submitLabel={copy.ensureActionLabel}
+    />
+  );
+}
+
+export function HrComplianceWorkAuthDocumentsEnsureForm() {
+  const copy = hrComplianceUiCopy.workAuthDocuments;
+
+  return (
+    <ComplianceNoFieldActionForm
+      action={ensureHrWorkAuthorizationDocumentsAction}
       submitLabel={copy.ensureActionLabel}
     />
   );

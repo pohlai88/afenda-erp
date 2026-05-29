@@ -5,14 +5,18 @@ import {
 import type { HrComplianceExceptionWindow } from "@afenda/db";
 
 import { hrEmployeeDetailRoutePath } from "../contracts/hr.workforce.compliance-route.contract";
+import { formatComplianceDateTimeLocalInput } from "../schemas/hr.workforce.compliance-form.shared";
 import {
   buildComplianceListSearchToolbar,
   buildComplianceOperationalListSurface,
   formatComplianceEmployeeListCell,
   formatComplianceListEnumCell,
+  resolveComplianceExceptionGapBadgeTone,
   resolveComplianceExceptionRowTone,
   resolveComplianceExceptionSeverityBadgeTone,
+  resolveComplianceExceptionStatusBadgeTone,
 } from "./hr.workforce.compliance-list.shared";
+import { hrComplianceExceptionsColumnsId } from "./hr.workforce.compliance-surface-columns.shared";
 import { hrComplianceUiCopy } from "./hr.workforce.compliance-ui.copy.shared";
 
 export const hrComplianceExceptionsSurfaceKey =
@@ -39,7 +43,7 @@ export function buildHrComplianceExceptionsListSurface(input: {
     window,
     surface: {
       headerTitle: copy.surfaceHeaderTitle,
-      columnsId: "hr.workforce.compliance.exceptions",
+      columnsId: hrComplianceExceptionsColumnsId,
       emptyTitle: copy.emptyTitle,
       emptyDescription: copy.emptyDescription,
     },
@@ -58,6 +62,11 @@ export function buildHrComplianceExceptionsListSurface(input: {
         id: "area",
         header: copy.colArea,
         cellKind: { kind: "badge", tone: "default" },
+      },
+      {
+        id: "gap",
+        header: copy.colGap,
+        cellKind: { kind: "badge", tone: "attention" },
       },
       {
         id: "severity",
@@ -81,6 +90,7 @@ export function buildHrComplianceExceptionsListSurface(input: {
         rowTone: resolveComplianceExceptionRowTone({
           severity: row.severity,
           status: row.status,
+          gapKind: row.gapKind,
         }),
         rowHref: employeeHref,
         linkColumnId: employeeHref ? "title" : undefined,
@@ -92,14 +102,31 @@ export function buildHrComplianceExceptionsListSurface(input: {
             style: "name-first",
           }),
           area: formatComplianceListEnumCell(row.complianceArea),
+          gap: row.gapKind
+            ? formatComplianceListEnumCell(row.gapKind)
+            : formatComplianceListEnumCell(row.itemType),
+          gapKindValue: row.gapKind ?? "",
+          itemTypeValue: row.itemType,
           severity: formatComplianceListEnumCell(row.severity),
           status: formatComplianceListEnumCell(row.status),
+          statusValue: row.status,
           dueDate: row.correctiveActionDueDate?.toISOString() ?? "",
+          correctiveActionDueDateInput: formatComplianceDateTimeLocalInput(
+            row.correctiveActionDueDate,
+          ),
         },
         cellKinds: {
+          gap: {
+            kind: "badge",
+            tone: resolveComplianceExceptionGapBadgeTone(row.gapKind),
+          },
           severity: {
             kind: "badge",
             tone: resolveComplianceExceptionSeverityBadgeTone(row.severity),
+          },
+          status: {
+            kind: "badge",
+            tone: resolveComplianceExceptionStatusBadgeTone(row.status),
           },
         },
         trailingAction: canWrite

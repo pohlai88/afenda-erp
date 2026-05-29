@@ -144,15 +144,16 @@ export function SystemAdminAuditPageSkeleton() {
 export function HrCompliancePageSkeleton() {
   return (
     <div
-      className="flex flex-col gap-surface-2xl"
+      className="@container flex flex-col gap-surface-2xl"
       aria-busy="true"
       aria-label="Loading HR compliance"
     >
       <Skeleton className="h-20 w-full max-w-2xl rounded-panel" />
-      <SystemAdminListSectionPlaceholder />
-      <SystemAdminListSectionPlaceholder />
-      <SystemAdminListSectionPlaceholder />
-      <SystemAdminListSectionPlaceholder />
+      {Array.from({ length: 10 }, (_, index) => (
+        <SystemAdminListSectionPlaceholder
+          key={`hr-compliance-list-${index}`}
+        />
+      ))}
     </div>
   );
 }

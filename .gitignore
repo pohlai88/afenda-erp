@@ -13,6 +13,10 @@ dist
 !.env.example
 !.env.config.example
 
+# Legacy local HRM migration copies (excluded from pnpm architecture:check)
+packages/features/hrm - Copy/
+packages/features/hrm-copy/
+
 # Test & CI outputs (never commit)
 /.artifacts/
 /test-results/

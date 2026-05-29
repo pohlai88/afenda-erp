@@ -13,6 +13,11 @@ import { toComplianceActionFailure } from "../data/hr.workforce.compliance-actio
 const COMPLIANCE_REVALIDATE_PATH = hrComplianceRoutePaths.compliance;
 
 export { toComplianceActionFailure } from "../data/hr.workforce.compliance-action-result.shared";
+export {
+  buildRequirementStatusAuditMetadata,
+  resolveCertificationExpiresAtMutationInput,
+  resolveFilingDeadlineMutationInput,
+} from "../data/hr.workforce.compliance-mutation.shared";
 
 export type ComplianceMutationAudit = {
   organizationId: string;

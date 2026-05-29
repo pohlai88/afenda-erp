@@ -70,12 +70,22 @@ function resolveTrailingFieldDefaultValue(
   if (field.kind === "select") {
     if (field.defaultFromCell) {
       const cellValue = row.cells[field.defaultFromCell];
-      return cellValue === undefined ? field.defaultValue : String(cellValue);
+      if (cellValue === undefined || cellValue === "") {
+        return field.defaultValue;
+      }
+      return String(cellValue);
     }
     return field.defaultValue;
   }
 
   if (field.kind === "datetime-local") {
+    if (field.defaultFromCell) {
+      const cellValue = row.cells[field.defaultFromCell];
+      return cellValue === undefined ? undefined : String(cellValue);
+    }
+  }
+
+  if (field.kind === "text") {
     if (field.defaultFromCell) {
       const cellValue = row.cells[field.defaultFromCell];
       return cellValue === undefined ? undefined : String(cellValue);
@@ -142,6 +152,7 @@ export function ComplianceTrailingActionFields({
               name={field.name}
               required={field.required}
               placeholder={field.placeholder}
+              defaultValue={resolveTrailingFieldDefaultValue(row, field) ?? ""}
             />
           </Field>
         );

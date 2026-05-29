@@ -4,12 +4,26 @@ import {
   archiveHrComplianceObligationInTx,
   assignHrComplianceCorrectiveActionInTx,
   createHrComplianceExceptionInTx,
+  ensureHrWorkAuthorizationDocumentsInTx,
   ensureHrWorkEligibilityTrackingInTx,
+  HR_COMPLIANCE_FILING_REQUIREMENT_KIND,
   HR_COMPLIANCE_LABOR_LAW_REQUIREMENT_KIND,
+  HR_COMPLIANCE_POLICY_ACKNOWLEDGEMENT_REQUIREMENT_KIND,
+  HR_COMPLIANCE_WORKPLACE_SAFETY_REQUIREMENT_KIND,
+  isSafetyTrainingRequirementKind,
   resolveHrComplianceExceptionInTx,
   syncHrEmployeeLaborLawRequirementsInTx,
+  syncHrEmployeePolicyAcknowledgementsInTx,
+  syncHrComplianceFilingsInTx,
+  syncHrEmployeeSafetyTrainingRequirementsInTx,
+  syncHrEmployeeWorkplaceSafetyRequirementsInTx,
   updateHrComplianceCorrectiveActionProgressInTx,
   updateHrEmployeeLaborLawRequirementStatusInTx,
+  updateHrEmployeePolicyAcknowledgementStatusInTx,
+  updateHrComplianceFilingInTx,
+  updateHrEmployeeSafetyTrainingRequirementStatusInTx,
+  updateHrEmployeeWorkplaceSafetyRequirementStatusInTx,
+  updateHrWorkAuthorizationDocumentInTx,
   updateHrWorkEligibilityStatusInTx,
   upsertHrComplianceObligationInTx,
   waiveHrComplianceExceptionInTx,
@@ -29,10 +43,41 @@ import {
   archiveHrComplianceObligationFormSchema,
   upsertHrComplianceObligationFormSchema,
 } from "../schemas/hr.workforce.compliance-obligation.schema";
-import { updateHrEmployeeLaborLawRequirementFormSchema, syncHrEmployeeLaborLawRequirementsFormSchema } from "../schemas/hr.workforce.compliance-labor-law.schema";
-import { updateHrWorkEligibilityFormSchema, ensureHrWorkEligibilityTrackingFormSchema } from "../schemas/hr.workforce.compliance-work-eligibility.schema";
+import {
+  parseUpdateHrComplianceFilingForm,
+  syncHrComplianceFilingsFormSchema,
+} from "../schemas/hr.workforce.compliance-filing.schema";
+import {
+  parseUpdateHrEmployeeLaborLawRequirementForm,
+  syncHrEmployeeLaborLawRequirementsFormSchema,
+} from "../schemas/hr.workforce.compliance-labor-law.schema";
+import {
+  parseUpdateHrEmployeePolicyAcknowledgementForm,
+  syncHrEmployeePolicyAcknowledgementsFormSchema,
+} from "../schemas/hr.workforce.compliance-policy-acknowledgement.schema";
+import {
+  parseUpdateHrEmployeeSafetyTrainingRequirementForm,
+  syncHrEmployeeSafetyTrainingRequirementsFormSchema,
+} from "../schemas/hr.workforce.compliance-safety-training.schema";
+import {
+  parseUpdateHrEmployeeWorkplaceSafetyRequirementForm,
+  syncHrEmployeeWorkplaceSafetyRequirementsFormSchema,
+} from "../schemas/hr.workforce.compliance-workplace-safety.schema";
+import {
+  ensureHrWorkEligibilityTrackingFormSchema,
+  parseUpdateHrWorkEligibilityForm,
+} from "../schemas/hr.workforce.compliance-work-eligibility.schema";
+import {
+  ensureHrWorkAuthorizationDocumentsFormSchema,
+  parseUpdateHrWorkAuthorizationDocumentForm,
+} from "../schemas/hr.workforce.compliance-work-auth-documents.schema";
 import { readOptionalComplianceFormField } from "../schemas/hr.workforce.compliance-form.shared";
-import { finalizeComplianceMutation } from "./hr.workforce.compliance-action.shared.server";
+import {
+  buildRequirementStatusAuditMetadata,
+  finalizeComplianceMutation,
+  resolveCertificationExpiresAtMutationInput,
+  resolveFilingDeadlineMutationInput,
+} from "./hr.workforce.compliance.mutation.shared.server";
 
 export async function upsertHrComplianceObligationAction(
   _previous: ActionResult | undefined,
@@ -81,6 +126,35 @@ export async function upsertHrComplianceObligationAction(
       });
     }
 
+    if (
+      parsed.data.requirementKind ===
+      HR_COMPLIANCE_POLICY_ACKNOWLEDGEMENT_REQUIREMENT_KIND
+    ) {
+      await syncHrEmployeePolicyAcknowledgementsInTx(db, {
+        organizationId: organization.id,
+      });
+    }
+
+    if (parsed.data.requirementKind === HR_COMPLIANCE_FILING_REQUIREMENT_KIND) {
+      await syncHrComplianceFilingsInTx(db, {
+        organizationId: organization.id,
+      });
+    }
+
+    if (
+      parsed.data.requirementKind === HR_COMPLIANCE_WORKPLACE_SAFETY_REQUIREMENT_KIND
+    ) {
+      await syncHrEmployeeWorkplaceSafetyRequirementsInTx(db, {
+        organizationId: organization.id,
+      });
+    }
+
+    if (isSafetyTrainingRequirementKind(parsed.data.requirementKind)) {
+      await syncHrEmployeeSafetyTrainingRequirementsInTx(db, {
+        organizationId: organization.id,
+      });
+    }
+
     return {
       organizationId: organization.id,
       actorId: session.id,
@@ -117,6 +191,24 @@ export async function archiveHrComplianceObligationAction(
       organizationId: organization.id,
       obligationId: parsed.data.obligationId,
     });
+
+    await Promise.all([
+      syncHrComplianceFilingsInTx(db, {
+        organizationId: organization.id,
+      }),
+      syncHrEmployeePolicyAcknowledgementsInTx(db, {
+        organizationId: organization.id,
+      }),
+      syncHrEmployeeLaborLawRequirementsInTx(db, {
+        organizationId: organization.id,
+      }),
+      syncHrEmployeeWorkplaceSafetyRequirementsInTx(db, {
+        organizationId: organization.id,
+      }),
+      syncHrEmployeeSafetyTrainingRequirementsInTx(db, {
+        organizationId: organization.id,
+      }),
+    ]);
 
     return {
       organizationId: organization.id,
@@ -336,11 +428,7 @@ export async function updateHrEmployeeLaborLawRequirementAction(
   formData: FormData,
 ): Promise<ActionResult> {
   const { session, organization } = await requireHrComplianceWrite();
-  const parsed = updateHrEmployeeLaborLawRequirementFormSchema.safeParse({
-    requirementId: readOptionalComplianceFormField(formData, "requirementId"),
-    status: readOptionalComplianceFormField(formData, "status"),
-    reviewNotes: readOptionalComplianceFormField(formData, "reviewNotes"),
-  });
+  const parsed = parseUpdateHrEmployeeLaborLawRequirementForm(formData);
 
   if (!parsed.success) {
     return zodActionFailure(parsed.error);
@@ -351,7 +439,7 @@ export async function updateHrEmployeeLaborLawRequirementAction(
       organizationId: organization.id,
       requirementId: parsed.data.requirementId,
       status: parsed.data.status,
-      reviewNotes: parsed.data.reviewNotes ?? null,
+      reviewNotes: parsed.data.reviewNotes,
     });
 
     return {
@@ -360,6 +448,191 @@ export async function updateHrEmployeeLaborLawRequirementAction(
       action: hrWorkforceComplianceAuditActions.laborLaw.statusUpdated,
       targetId: result.requirementId,
       metadata: { status: parsed.data.status },
+    };
+  });
+}
+
+export async function syncHrEmployeePolicyAcknowledgementsAction(
+  _previous: ActionResult | undefined,
+  _formData: FormData,
+): Promise<ActionResult> {
+  const { session, organization } = await requireHrComplianceWrite();
+  const parsed = syncHrEmployeePolicyAcknowledgementsFormSchema.safeParse({});
+
+  if (!parsed.success) {
+    return zodActionFailure(parsed.error);
+  }
+
+  return finalizeComplianceMutation(organization.id, async (db) => {
+    const result = await syncHrEmployeePolicyAcknowledgementsInTx(db, {
+      organizationId: organization.id,
+    });
+
+    return {
+      organizationId: organization.id,
+      actorId: session.id,
+      action: hrWorkforceComplianceAuditActions.policyAcknowledgement.synced,
+      targetId: organization.id,
+      metadata: result,
+    };
+  });
+}
+
+export async function updateHrEmployeePolicyAcknowledgementAction(
+  _previous: ActionResult | undefined,
+  formData: FormData,
+): Promise<ActionResult> {
+  const { session, organization } = await requireHrComplianceWrite();
+  const parsed = parseUpdateHrEmployeePolicyAcknowledgementForm(formData);
+
+  if (!parsed.success) {
+    return zodActionFailure(parsed.error);
+  }
+
+  return finalizeComplianceMutation(organization.id, async (db) => {
+    const result = await updateHrEmployeePolicyAcknowledgementStatusInTx(db, {
+      organizationId: organization.id,
+      requirementId: parsed.data.requirementId,
+      status: parsed.data.status,
+      reviewNotes: parsed.data.reviewNotes,
+    });
+
+    return {
+      organizationId: organization.id,
+      actorId: session.id,
+      action: hrWorkforceComplianceAuditActions.policyAcknowledgement.statusUpdated,
+      targetId: result.requirementId,
+      metadata: { status: parsed.data.status },
+    };
+  });
+}
+
+export async function syncHrEmployeeWorkplaceSafetyRequirementsAction(
+  _previous: ActionResult | undefined,
+  _formData: FormData,
+): Promise<ActionResult> {
+  const { session, organization } = await requireHrComplianceWrite();
+  const parsed = syncHrEmployeeWorkplaceSafetyRequirementsFormSchema.safeParse({});
+
+  if (!parsed.success) {
+    return zodActionFailure(parsed.error);
+  }
+
+  return finalizeComplianceMutation(organization.id, async (db) => {
+    const result = await syncHrEmployeeWorkplaceSafetyRequirementsInTx(db, {
+      organizationId: organization.id,
+    });
+
+    return {
+      organizationId: organization.id,
+      actorId: session.id,
+      action: hrWorkforceComplianceAuditActions.workplaceSafety.synced,
+      targetId: organization.id,
+      metadata: result,
+    };
+  });
+}
+
+export async function updateHrEmployeeWorkplaceSafetyRequirementAction(
+  _previous: ActionResult | undefined,
+  formData: FormData,
+): Promise<ActionResult> {
+  const { session, organization } = await requireHrComplianceWrite();
+  const parsed = parseUpdateHrEmployeeWorkplaceSafetyRequirementForm(formData);
+
+  if (!parsed.success) {
+    return zodActionFailure(parsed.error);
+  }
+
+  return finalizeComplianceMutation(organization.id, async (db) => {
+    const certificationExpiresAt = resolveCertificationExpiresAtMutationInput(
+      formData,
+      parsed.data.certificationExpiresAt,
+    );
+
+    const result = await updateHrEmployeeWorkplaceSafetyRequirementStatusInTx(db, {
+      organizationId: organization.id,
+      requirementId: parsed.data.requirementId,
+      status: parsed.data.status,
+      reviewNotes: parsed.data.reviewNotes,
+      ...(certificationExpiresAt !== undefined ? { certificationExpiresAt } : {}),
+    });
+
+    return {
+      organizationId: organization.id,
+      actorId: session.id,
+      action: hrWorkforceComplianceAuditActions.workplaceSafety.statusUpdated,
+      targetId: result.requirementId,
+      metadata: buildRequirementStatusAuditMetadata({
+        status: parsed.data.status,
+        certificationExpiresAt: parsed.data.certificationExpiresAt,
+        includeCertificationExpiry: formData.has("certificationExpiresAt"),
+      }),
+    };
+  });
+}
+
+export async function syncHrEmployeeSafetyTrainingRequirementsAction(
+  _previous: ActionResult | undefined,
+  _formData: FormData,
+): Promise<ActionResult> {
+  const { session, organization } = await requireHrComplianceWrite();
+  const parsed = syncHrEmployeeSafetyTrainingRequirementsFormSchema.safeParse({});
+
+  if (!parsed.success) {
+    return zodActionFailure(parsed.error);
+  }
+
+  return finalizeComplianceMutation(organization.id, async (db) => {
+    const result = await syncHrEmployeeSafetyTrainingRequirementsInTx(db, {
+      organizationId: organization.id,
+    });
+
+    return {
+      organizationId: organization.id,
+      actorId: session.id,
+      action: hrWorkforceComplianceAuditActions.safetyTraining.synced,
+      targetId: organization.id,
+      metadata: result,
+    };
+  });
+}
+
+export async function updateHrEmployeeSafetyTrainingRequirementAction(
+  _previous: ActionResult | undefined,
+  formData: FormData,
+): Promise<ActionResult> {
+  const { session, organization } = await requireHrComplianceWrite();
+  const parsed = parseUpdateHrEmployeeSafetyTrainingRequirementForm(formData);
+
+  if (!parsed.success) {
+    return zodActionFailure(parsed.error);
+  }
+
+  return finalizeComplianceMutation(organization.id, async (db) => {
+    const certificationExpiresAt = resolveCertificationExpiresAtMutationInput(
+      formData,
+      parsed.data.certificationExpiresAt,
+    );
+
+    const result = await updateHrEmployeeSafetyTrainingRequirementStatusInTx(db, {
+      organizationId: organization.id,
+      requirementId: parsed.data.requirementId,
+      status: parsed.data.status,
+      reviewNotes: parsed.data.reviewNotes,
+      ...(certificationExpiresAt !== undefined ? { certificationExpiresAt } : {}),
+    });
+
+    return {
+      organizationId: organization.id,
+      actorId: session.id,
+      action: hrWorkforceComplianceAuditActions.safetyTraining.statusUpdated,
+      targetId: result.requirementId,
+      metadata: buildRequirementStatusAuditMetadata({
+        status: parsed.data.status,
+        certificationExpiresAt: parsed.data.certificationExpiresAt,
+        includeCertificationExpiry: formData.has("certificationExpiresAt"),
+      }),
     };
   });
 }
@@ -395,12 +668,7 @@ export async function updateHrWorkEligibilityAction(
   formData: FormData,
 ): Promise<ActionResult> {
   const { session, organization } = await requireHrComplianceWrite();
-  const parsed = updateHrWorkEligibilityFormSchema.safeParse({
-    workEligibilityId: readOptionalComplianceFormField(formData, "workEligibilityId"),
-    status: readOptionalComplianceFormField(formData, "status"),
-    expiresAt: readOptionalComplianceFormField(formData, "expiresAt"),
-    reviewNotes: readOptionalComplianceFormField(formData, "reviewNotes"),
-  });
+  const parsed = parseUpdateHrWorkEligibilityForm(formData);
 
   if (!parsed.success) {
     return zodActionFailure(parsed.error);
@@ -411,8 +679,8 @@ export async function updateHrWorkEligibilityAction(
       organizationId: organization.id,
       workEligibilityId: parsed.data.workEligibilityId,
       status: parsed.data.status,
-      expiresAt: parsed.data.expiresAt ?? null,
-      reviewNotes: parsed.data.reviewNotes ?? null,
+      expiresAt: parsed.data.expiresAt,
+      reviewNotes: parsed.data.reviewNotes,
     });
 
     return {
@@ -421,6 +689,130 @@ export async function updateHrWorkEligibilityAction(
       action: hrWorkforceComplianceAuditActions.workEligibility.statusUpdated,
       targetId: result.workEligibilityId,
       metadata: { status: parsed.data.status },
+    };
+  });
+}
+
+export async function ensureHrWorkAuthorizationDocumentsAction(
+  _previous: ActionResult | undefined,
+  _formData: FormData,
+): Promise<ActionResult> {
+  const { session, organization } = await requireHrComplianceWrite();
+  const parsed = ensureHrWorkAuthorizationDocumentsFormSchema.safeParse({});
+
+  if (!parsed.success) {
+    return zodActionFailure(parsed.error);
+  }
+
+  return finalizeComplianceMutation(organization.id, async (db) => {
+    const result = await ensureHrWorkAuthorizationDocumentsInTx(db, {
+      organizationId: organization.id,
+    });
+
+    return {
+      organizationId: organization.id,
+      actorId: session.id,
+      action: hrWorkforceComplianceAuditActions.workAuthDocuments.ensured,
+      targetId: organization.id,
+      metadata: result,
+    };
+  });
+}
+
+export async function updateHrWorkAuthorizationDocumentAction(
+  _previous: ActionResult | undefined,
+  formData: FormData,
+): Promise<ActionResult> {
+  const { session, organization } = await requireHrComplianceWrite();
+  const parsed = parseUpdateHrWorkAuthorizationDocumentForm(formData);
+
+  if (!parsed.success) {
+    return zodActionFailure(parsed.error);
+  }
+
+  return finalizeComplianceMutation(organization.id, async (db) => {
+    const result = await updateHrWorkAuthorizationDocumentInTx(db, {
+      organizationId: organization.id,
+      workAuthDocumentId: parsed.data.workAuthDocumentId,
+      status: parsed.data.status,
+      documentNumber: parsed.data.documentNumber,
+      issuedAt: parsed.data.issuedAt,
+      expiresAt: parsed.data.expiresAt,
+      reviewNotes: parsed.data.reviewNotes,
+    });
+
+    return {
+      organizationId: organization.id,
+      actorId: session.id,
+      action: hrWorkforceComplianceAuditActions.workAuthDocuments.statusUpdated,
+      targetId: result.workAuthDocumentId,
+      metadata: { status: result.status },
+    };
+  });
+}
+
+export async function syncHrComplianceFilingsAction(
+  _previous: ActionResult | undefined,
+  _formData: FormData,
+): Promise<ActionResult> {
+  const { session, organization } = await requireHrComplianceWrite();
+  const parsed = syncHrComplianceFilingsFormSchema.safeParse({});
+
+  if (!parsed.success) {
+    return zodActionFailure(parsed.error);
+  }
+
+  return finalizeComplianceMutation(organization.id, async (db) => {
+    const result = await syncHrComplianceFilingsInTx(db, {
+      organizationId: organization.id,
+    });
+
+    return {
+      organizationId: organization.id,
+      actorId: session.id,
+      action: hrWorkforceComplianceAuditActions.filing.synced,
+      targetId: organization.id,
+      metadata: result,
+    };
+  });
+}
+
+export async function updateHrComplianceFilingAction(
+  _previous: ActionResult | undefined,
+  formData: FormData,
+): Promise<ActionResult> {
+  const { session, organization } = await requireHrComplianceWrite();
+  const parsed = parseUpdateHrComplianceFilingForm(formData);
+
+  if (!parsed.success) {
+    return zodActionFailure(parsed.error);
+  }
+
+  return finalizeComplianceMutation(organization.id, async (db) => {
+    const filingDeadline = resolveFilingDeadlineMutationInput(
+      formData,
+      parsed.data.filingDeadline,
+    );
+
+    const result = await updateHrComplianceFilingInTx(db, {
+      organizationId: organization.id,
+      filingId: parsed.data.filingId,
+      status: parsed.data.status,
+      reviewNotes: parsed.data.reviewNotes,
+      ...(filingDeadline !== undefined ? { filingDeadline } : {}),
+    });
+
+    return {
+      organizationId: organization.id,
+      actorId: session.id,
+      action: hrWorkforceComplianceAuditActions.filing.statusUpdated,
+      targetId: result.filingId,
+      metadata: {
+        status: parsed.data.status,
+        ...(filingDeadline !== undefined
+          ? { filingDeadline: filingDeadline?.toISOString() ?? null }
+          : {}),
+      },
     };
   });
 }

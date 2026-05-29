@@ -33,7 +33,7 @@ const REQUIRED_BUCKETS = [
 ] as const;
 
 const IMPLEMENTATION_FILE =
-  /^hr\.[a-z0-9]+(?:\.[a-z0-9-]+)*\.[a-z0-9-]+\.(?:actions\.server|policy\.server|page-model\.server|surface|shared|schema|contract|event|component\.(?:client|server))\.tsx?$/;
+  /^hr\.[a-z0-9]+(?:\.[a-z0-9-]+)*\.[a-z0-9-]+\.(?:actions\.server|policy\.server|page-model\.server|shared\.server|surface|shared|schema|contract|event|component\.(?:client|server))\.tsx?$/;
 
 const problems: string[] = [];
 

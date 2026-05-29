@@ -162,6 +162,27 @@
       "when": 1780069097409,
       "tag": "0022_panoramic_roughhouse",
       "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1780071134101,
+      "tag": "0023_fancy_ted_forrester",
+      "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1780074850671,
+      "tag": "0024_smiling_grey_gargoyle",
+      "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1780077489173,
+      "tag": "0025_bright_rattler",
+      "breakpoints": true
     }
   ]
 }
