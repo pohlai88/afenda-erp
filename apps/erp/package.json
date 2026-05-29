@@ -23,6 +23,7 @@
     "@afenda/feature-crm": "workspace:*",
     "@afenda/feature-dashboard": "workspace:*",
     "@afenda/feature-finance": "workspace:*",
+    "@afenda/feature-hr-suite": "workspace:*",
     "@afenda/feature-inventory": "workspace:*",
     "@afenda/feature-knowledge": "workspace:*",
     "@afenda/feature-lynx": "workspace:*",

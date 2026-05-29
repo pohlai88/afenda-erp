@@ -366,7 +366,7 @@ Feature packages own **business behavior**. `@afenda/db` owns **physical schema*
 apps/erp/src/app/              # route entrypoints, layouts, handlers
 
 packages/
-  features/<moduleId>/         # @afenda/feature-*
+  features/<moduleId>/         # @afenda/feature-* (e.g. hr-suite → moduleId hr)
   kernel/                      # contracts + execution-kernel/
   db/
   governed-surface/

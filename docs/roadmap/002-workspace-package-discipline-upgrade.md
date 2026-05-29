@@ -14,7 +14,7 @@ tracks rollout.
 | Doctrine  | ARCH-008, ADR-001, architecture index, and agent guide reference the package discipline         |
 | Guards    | `pnpm architecture:check` enforces feature export doors, no nested feature workspaces, imports |
 | Inventory | Current workspace packages are classified and synced with `apps/erp` transpilation             |
-| Migration | HRM uses `@afenda/feature-hr` with internal category folders before considering more packages   |
+| Migration | HRM uses `@afenda/feature-hr-suite` with internal category folders before considering more packages   |
 
 ## Acceptance Criteria
 
@@ -25,7 +25,7 @@ tracks rollout.
 - Feature package clients cannot import server-only packages.
 - Architecture docs explain why package boundaries are not Vercel deployment
   boundaries.
-- HRM migration work has a clear first target: `@afenda/feature-hr`.
+- HRM migration work has a clear first target: `@afenda/feature-hr-suite`.
 
 ## Open Follow-up
 

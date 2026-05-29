@@ -6,7 +6,7 @@ import {
 } from "@/lib/module-feature-metadata";
 
 describe("module feature metadata resolver", () => {
-  it("resolves HR metadata through kernel generic module metadata", () => {
+  it("resolves HR metadata through @afenda/feature-hr-suite/metadata", () => {
     const metadata = getModuleFeatureMetadata("hr");
     const kernelHr = createModuleFeatureMetadata("hr");
 

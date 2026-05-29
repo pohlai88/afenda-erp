@@ -16,6 +16,7 @@ export const afendaTranspilePackages = [
   "@afenda/feature-crm",
   "@afenda/feature-dashboard",
   "@afenda/feature-finance",
+  "@afenda/feature-hr-suite",
   "@afenda/feature-knowledge",
   "@afenda/feature-lynx",
   "@afenda/feature-inventory",

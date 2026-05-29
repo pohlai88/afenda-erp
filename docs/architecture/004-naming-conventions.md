@@ -40,7 +40,7 @@ deployment unless an ADR explicitly adds a second project.
 | ---------------- | ---------------------------- | ---------------------- | -------------------- |
 | App              | `@afenda/<app>`              | `apps/erp`             | `@afenda/erp`        |
 | Platform library | `@afenda/<package>`          | `packages/kernel`      | `@afenda/kernel`     |
-| Feature module   | `@afenda/feature-<moduleId>` | `packages/features/hr` | `@afenda/feature-hr` |
+| Feature module   | `@afenda/feature-<moduleId>` | `packages/features/hr-suite` | `@afenda/feature-hr-suite` |
 
 Rules:
 
@@ -69,7 +69,7 @@ permissions, and database promotion use the same slug.
 | `sales`        | `/sales`                    | `packages/features/sales`        | `@afenda/feature-sales`        |
 | `purchasing`   | `/purchasing`               | `packages/features/purchasing`   | `@afenda/feature-purchasing`   |
 | `inventory`    | `/inventory`                | `packages/features/inventory`    | `@afenda/feature-inventory`    |
-| `hr`           | `/hr`                       | `packages/features/hr`           | `@afenda/feature-hr`           |
+| `hr`           | `/hr`                       | `packages/features/hr-suite`           | `@afenda/feature-hr-suite`           |
 | `crm`          | `/crm`                      | `packages/features/crm`          | `@afenda/feature-crm`          |
 | `approvals`    | `/approvals`                | `packages/features/approvals`    | `@afenda/feature-approvals`    |
 | `reports`      | `/reports`                  | `packages/features/reports`      | `@afenda/feature-reports`      |

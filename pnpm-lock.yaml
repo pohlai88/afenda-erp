@@ -108,6 +108,9 @@ importers:
       '@afenda/feature-finance':
         specifier: workspace:*
         version: link:../../packages/features/finance
+      '@afenda/feature-hr-suite':
+        specifier: workspace:*
+        version: link:../../packages/features/hr-suite
       '@afenda/feature-inventory':
         specifier: workspace:*
         version: link:../../packages/features/inventory
@@ -420,6 +423,22 @@ importers:
       '@afenda/kernel':
         specifier: workspace:*
         version: link:../../kernel
+    devDependencies:
+      '@afenda/config':
+        specifier: workspace:*
+        version: link:../../config
+
+  packages/features/hr-suite:
+    dependencies:
+      '@afenda/governed-surface':
+        specifier: workspace:*
+        version: link:../../governed-surface
+      '@afenda/kernel':
+        specifier: workspace:*
+        version: link:../../kernel
+      '@afenda/ui':
+        specifier: workspace:*
+        version: link:../../ui
     devDependencies:
       '@afenda/config':
         specifier: workspace:*

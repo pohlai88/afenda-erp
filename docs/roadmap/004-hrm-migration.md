@@ -2,7 +2,7 @@
 
 **Tracking ID:** `TRACK-004` · **File:** `004-hrm-migration.md` · **Status:** Active workforce migration · **Owner:** Architecture / HR · **Related:** **ARCH-002**, **ARCH-005**, **ARCH-006**, **ARCH-008**
 
-This track grows `@afenda/feature-hr` into full ERP HR capability using the
+This track grows `@afenda/feature-hr-suite` into full ERP HR capability using the
 current Afenda architecture (governed UI, ARCH-008 export doors, schema in
 `@afenda/db`).
 
@@ -14,10 +14,15 @@ claiming completion before parity is proven.
 
 ## Current State
 
-**Package removed (2026-05-29):** `packages/features/hr` and archived `packages/features/hrm - Copy` were deleted from the repo. `/hr` routes use kernel generic workspace metadata (`createModuleFeatureMetadata("hr")` in `apps/erp`). Rescaffold `@afenda/feature-hr` when starting the next TRACK-004 slice.
+**Scaffold reset (2026-05-28–29):** Legacy `@afenda/feature-hr` and `packages/features/hrm`
+were removed. `@afenda/feature-hr-suite` (`packages/features/hr-suite`, moduleId `hr`)
+now owns ARCH-008 export doors; metadata delegates to `createModuleFeatureMetadata("hr")`.
+Server doors export compatibility stubs until TRACK-004 slices land. App `hr-sections`
+adapters were removed; `/hr` uses the generic module workspace via kernel + feature metadata.
 
 - **Legacy input:** `packages/features/hrm` removed (2026-05-28); do not restore;
-- **Target package:** `packages/features/hr` (not present until rescaffolded) — see **ARCH-010**;
+- **Target package:** `packages/features/hr-suite` — see **ARCH-010**; no `schema/hr`
+  or production server queries until Slice 1 is accepted;
 - **Database:** migration `0030_revert_hr_migration_tables` drops tables from the
   withdrawn `0027` / `0029` attempt; run `pnpm db:migrate` on environments that
   applied those migrations;
@@ -25,7 +30,7 @@ claiming completion before parity is proven.
   scaffold phase).
 
 Do not restore the deleted `packages/features/hrm` tree. New HR work lands only in
-`packages/features/hr` with schema in `packages/db` per ARCH-005.
+`packages/features/hr-suite` with schema in `packages/db` per ARCH-005.
 
 ## Audit Baseline
 
