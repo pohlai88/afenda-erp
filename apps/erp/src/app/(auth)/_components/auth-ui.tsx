@@ -28,12 +28,12 @@ export function AuthField({
       <Label htmlFor={id}>{label}</Label>
       {children}
       {hint ? (
-        <p className="text-xs leading-5 text-muted-foreground" id={hintId}>
+        <p className="type-caption leading-5 text-muted-foreground" id={hintId}>
           {hint}
         </p>
       ) : null}
       {error ? (
-        <p className="text-xs text-destructive" id={errorId} role="alert">
+        <p className="type-caption text-critical" id={errorId} role="alert">
           {error}
         </p>
       ) : null}
@@ -87,7 +87,7 @@ export function AuthDivider({ label = "or" }: { label?: string }) {
         <Separator className="w-full" />
       </div>
       <div className="relative flex justify-center">
-        <span className="bg-card px-3 text-xs uppercase tracking-wide text-muted-foreground">
+        <span className="bg-card px-3 type-caption uppercase tracking-wide text-muted-foreground">
           {label}
         </span>
       </div>

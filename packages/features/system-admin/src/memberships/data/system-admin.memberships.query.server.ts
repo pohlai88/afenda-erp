@@ -1,7 +1,5 @@
-import {
-  listTenantMembers,
-  updateTenantMembershipStatus,
-} from "@afenda/db";
+import { updateTenantMembershipStatus } from "@afenda/db";
+import { listTenantMembers } from "../../users/data/system-admin.identity.repository.server";
 import type {
   SystemAdminMembershipRow,
   SystemAdminMembershipStatus,

@@ -41,7 +41,7 @@ describe("Lynx chat formatting", () => {
 
   it("allows only internal anchors, internal routes, and https links", () => {
     expect(isSafeLynxHref("#evidence-1")).toBe(true);
-    expect(isSafeLynxHref("/solution-console")).toBe(true);
+    expect(isSafeLynxHref("/lynx")).toBe(true);
     expect(isSafeLynxHref("https://example.com")).toBe(true);
     expect(isSafeLynxHref("http://example.com")).toBe(false);
     expect(isSafeLynxHref("javascript:alert(1)")).toBe(false);

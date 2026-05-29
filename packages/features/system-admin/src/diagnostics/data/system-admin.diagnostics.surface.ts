@@ -1,9 +1,11 @@
 import type { ListSurfaceRendererConfigurationResolvedInput } from "@afenda/governed-surface";
-import { systemAdminDiagnosticsSurfaceKey } from "../../surfaces/system-admin.control.surface";
 import {
   buildLinkedControlListSurface,
   linkCell,
-} from "../../surfaces/system-admin.control.surface";
+} from "../../overview/surfaces/system-admin.control-list.shared";
+
+export const systemAdminDiagnosticsSurfaceKey =
+  "system-admin.diagnostics.list";
 import type { SystemAdminDiagnosticIssue } from "../contracts/system-admin.diagnostic-issue.contract";
 import type {
   SystemAdminDiagnosticsModuleCoverageRow,

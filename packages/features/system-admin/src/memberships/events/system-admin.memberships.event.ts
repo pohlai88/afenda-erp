@@ -1,4 +1,6 @@
-export const systemAdminMembershipAuditActions = [
-  "system-admin.membership.update",
-  "system-admin.membership.remove",
+export const systemAdminMembershipWebhookEvents = [
+  "tenant.role.changed",
 ] as const;
+
+export type SystemAdminMembershipWebhookEvent =
+  (typeof systemAdminMembershipWebhookEvents)[number];

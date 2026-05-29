@@ -1,6 +1,7 @@
 import { GovernedDetailTabs } from "../../components/governed-detail-tabs";
 import { GovernedEmpty } from "../../client";
 import { parseGovernedDetailTabsData } from "../../schemas/detail-tabs.schema";
+import { governedParseErrorCopy } from "../../i18n/governed-renderer-copy.shared";
 
 import type { GovernedComponentRendererDiagnostics } from "../registry";
 
@@ -17,15 +18,13 @@ export function DetailTabsRenderer({
   const parsed = parseGovernedDetailTabsData(configuration);
 
   if (!parsed.success) {
+    const copy = governedParseErrorCopy(diagnostics, "detailTabs");
     return (
       <GovernedEmpty
         model={{
           variant: "error",
-          title: "Section unavailable",
-          description:
-            diagnostics === "operator"
-              ? "The detail tabs configuration failed validation."
-              : "This section could not be loaded safely.",
+          title: copy.title,
+          description: copy.description,
         }}
       />
     );

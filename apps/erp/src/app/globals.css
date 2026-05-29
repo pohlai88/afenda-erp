@@ -2,6 +2,9 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
+@source "../../../../packages/ui/src/**/*.{tsx,ts}";
+@source "../../../../packages/governed-surface/src/**/*.{tsx,ts}";
+@source "../../../../packages/features/*/src/**/*.{tsx,ts}";
 @source "../../../../packages/features/lynx/node_modules/streamdown/dist/*.js";
 
 @custom-variant dark (&:where(.dark, .dark *));
@@ -141,10 +144,12 @@
   --color-scrim: var(--scrim);
   --color-muted: var(--muted);
   --color-line: var(--line);
-  --font-sans: "Geist", "Geist Fallback", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "Geist Mono", "Geist Mono Fallback", ui-monospace, monospace;
-  --font-heading:
-    "Geist", "Geist Fallback", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-geist-sans), "Geist", "Geist Fallback", ui-sans-serif,
+    system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), "Geist Mono", "Geist Mono Fallback",
+    ui-monospace, monospace;
+  --font-heading: var(--font-geist-sans), "Geist", "Geist Fallback", ui-sans-serif,
+    system-ui, sans-serif;
   --text-display: 3.5rem;
   --text-hero: 2.75rem;
   --text-title-1: 2.25rem;
@@ -580,6 +585,11 @@ a {
   @apply text-body leading-body;
 }
 
+/* Secondary copy — not the muted surface fill token used by `bg-muted`. */
+@utility text-muted {
+  @apply text-muted-foreground;
+}
+
 @utility type-muted {
   @apply text-body leading-body text-muted-foreground;
 }
@@ -590,6 +600,14 @@ a {
 
 @utility type-label {
   @apply text-micro leading-caption font-semibold tracking-label text-muted-foreground uppercase;
+}
+
+@utility type-table-header {
+  @apply text-caption leading-caption font-medium text-muted-foreground;
+}
+
+@utility type-section-label {
+  @apply text-body-sm leading-control font-semibold tracking-label text-muted-foreground uppercase;
 }
 
 @utility type-control {
@@ -633,7 +651,8 @@ a {
 }
 
 @utility table-shell {
-  @apply overflow-hidden rounded-panel border border-border bg-card;
+  /* Single clip + horizontal scroll boundary — avoids nested scrollports breaking radius. */
+  @apply overflow-x-auto overflow-y-hidden overscroll-x-contain rounded-panel border border-border bg-card;
 }
 
 @utility table-header-row {

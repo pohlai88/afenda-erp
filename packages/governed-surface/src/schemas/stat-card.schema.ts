@@ -74,7 +74,7 @@ const statCardConfigurationCoreSchema =
   governedMetadataSchemaVersionSchema.extend({
     dataNature: statCardDataNatureSchema.default("kpi"),
     density: statCardDensitySchema.default("comfortable"),
-    stats: z.array(statCardItemSchema).min(1).max(6),
+    stats: z.array(statCardItemSchema).max(6),
     chrome: governedSurfaceChromeSchema.optional(),
   });
 

@@ -1,16 +1,15 @@
 import { describe, expect, it } from "vitest";
 import { parseListSurfaceRendererConfiguration } from "@afenda/governed-surface/schemas";
-import { buildMembersListSurface } from "../../src/surfaces/system-admin.identity.surface";
+import { buildMembersListSurface } from "../../src/memberships/surface/system-admin.memberships-list.surface";
 import {
   buildApiCredentialsListSurface,
   buildWebhooksListSurface,
-} from "../../src/surfaces/system-admin.integrations.surface";
-import {
-  buildCapabilitiesListSurface,
-  buildModulesListSurface,
-  buildOrganizationDefaultsListSurface,
-  buildPermissionsListSurface,
-} from "../../src/surfaces/system-admin.control.surface";
+} from "../../src/integrations/data/system-admin.integrations-list.surface";
+import { buildCapabilitiesListSurface } from "../../src/capabilities/data/system-admin.capabilities-list.surface";
+import { buildModulesListSurface } from "../../src/modules/data/system-admin.modules-list.surface";
+import { buildOrganizationDefaultsListSurface } from "../../src/organization/data/system-admin.organization-list.surface";
+import { buildPermissionsListSurface } from "../../src/permissions/surface/system-admin.permissions-list.surface";
+import { buildRolesListSurface } from "../../src/roles/data/system-admin.roles-list.surface";
 import { buildSystemAdminDiagnosticsIssuesListSurface } from "../../src/diagnostics/data/system-admin.diagnostics.surface";
 import { buildSystemAdminAuditViewerListSurface } from "../../src/audit-viewer/data/system-admin.audit.surface";
 import { buildSystemAdminSecuritySettingsListSurface } from "../../src/security/data/system-admin.security.surface";
@@ -19,18 +18,36 @@ import { buildPoliciesListSurface } from "../../src/policies/data/system-admin.p
 import {
   buildSystemAdminAiSandboxesListSurface,
   buildSystemAdminAiUsageListSurface,
-} from "../../src/surfaces/system-admin.machine-layer.surface";
+} from "../../src/lynx/data/system-admin.lynx.surface";
+import { buildUsersListSurface } from "../../src/users/surface/system-admin.users-list.surface";
+import { systemAdminUsersGalleryRows } from "../../src/users/surface/system-admin.users-gallery.fixtures.shared";
 
 describe("system admin governed surfaces", () => {
   it("normalizes empty pagination to schema-safe server windows", () => {
     const parsed = parseListSurfaceRendererConfiguration(
-      buildMembersListSurface({ members: [] }),
+      buildMembersListSurface({ memberships: [] }),
     );
 
     expect(parsed.success).toBe(true);
     if (parsed.success) {
       expect(parsed.data.pagination?.pageSize).toBe(1);
       expect(parsed.data.presentation?.toolbar?.search?.param).toBe("membersQ");
+    }
+  });
+
+  it("parses the memberships governed list surface with ERP permission metadata", () => {
+    const parsed = parseListSurfaceRendererConfiguration(
+      buildMembersListSurface({ memberships: [], canMutate: true }),
+    );
+
+    expect(parsed.success).toBe(true);
+    if (parsed.success) {
+      expect(parsed.data.requiresErpPermission).toEqual({
+        module: "system-admin",
+        object: "members",
+        function: "read",
+      });
+      expect(parsed.data.surface.rowKey).toBe("membershipId");
     }
   });
 
@@ -115,7 +132,7 @@ describe("system admin governed surfaces", () => {
     }
   });
 
-  it("uses machine-layer labels on admin machine surfaces", () => {
+  it("uses Lynx labels on admin machine surfaces", () => {
     const usage = parseListSurfaceRendererConfiguration(
       buildSystemAdminAiUsageListSurface({ events: [] }),
     );
@@ -136,9 +153,213 @@ describe("system admin governed surfaces", () => {
     }
   });
 
+  it("parses the users governed list surface with ERP permission metadata", () => {
+    const parsed = parseListSurfaceRendererConfiguration(
+      buildUsersListSurface({
+        users: systemAdminUsersGalleryRows,
+        canMutate: true,
+      }),
+    );
+
+    expect(parsed.success).toBe(true);
+    if (parsed.success) {
+      expect(parsed.data.requiresErpPermission).toEqual({
+        module: "system-admin",
+        object: "users",
+        function: "read",
+      });
+      expect(parsed.data.presentation?.toolbar?.search?.param).toBe("usersQ");
+      expect(parsed.data.columns.some((column) => column.id === "roles")).toBe(
+        true,
+      );
+    }
+  });
+
+  it("parses the permissions governed list surface with coverage metadata", () => {
+    const parsed = parseListSurfaceRendererConfiguration(
+      buildPermissionsListSurface({
+        searchValue: "audit",
+        permissions: [
+          {
+            id: "system-admin.audit.read",
+            permission: "system-admin.audit.read",
+            module: "system-admin",
+            group: "Read",
+            label: "Audit Read",
+            description: "Catalog permission system-admin.audit.read.",
+            capabilityCount: "2",
+            roleCount: "1",
+            status: "active",
+            coverageVerdict: "covered",
+            riskLevel: "low",
+          },
+          {
+            id: "system-admin.permissions.manage",
+            permission: "system-admin.permissions.manage",
+            module: "system-admin",
+            group: "Configure",
+            label: "Permissions Manage",
+            description: "Catalog permission system-admin.permissions.manage.",
+            capabilityCount: "1",
+            roleCount: "3",
+            status: "active",
+            coverageVerdict: "overprivileged",
+            riskLevel: "critical",
+          },
+        ],
+      }),
+    );
+
+    expect(parsed.success).toBe(true);
+    if (parsed.success) {
+      expect(parsed.data.requiresErpPermission).toEqual({
+        module: "system-admin",
+        object: "permissions",
+        function: "read",
+      });
+      expect(parsed.data.presentation?.toolbar?.search?.param).toBe(
+        "permissionsQ",
+      );
+      expect(parsed.data.columns.map((column) => column.id)).toEqual([
+        "permission",
+        "module",
+        "group",
+        "capabilityCount",
+        "roleCount",
+        "coverageVerdict",
+        "status",
+        "riskLevel",
+        "label",
+        "description",
+      ]);
+      expect(parsed.data.presentation?.toolbar?.filters?.[0]?.param).toBe(
+        "permissionsStatus",
+      );
+    }
+  });
+
+  it("parses the roles governed list surface with ERP permission metadata", () => {
+    const parsed = parseListSurfaceRendererConfiguration(
+      buildRolesListSurface({
+        roles: [
+          {
+            id: "admin",
+            key: "admin",
+            name: "Admin",
+            description: "Organization administrator",
+            status: "active",
+            assignedMembers: 2,
+            permissionCount: 18,
+          },
+        ],
+      }),
+    );
+
+    expect(parsed.success).toBe(true);
+    if (parsed.success) {
+      expect(parsed.data.requiresErpPermission).toEqual({
+        module: "system-admin",
+        object: "roles",
+        function: "read",
+      });
+      expect(parsed.data.columns.map((column) => column.id)).toEqual([
+        "name",
+        "key",
+        "status",
+        "permissions",
+        "assignedMembers",
+        "description",
+      ]);
+      expect(parsed.data.presentation?.toolbar?.search?.param).toBe("rolesQ");
+    }
+  });
+
+  it("parses the modules governed list surface with rollout metadata", () => {
+    const parsed = parseListSurfaceRendererConfiguration(
+      buildModulesListSurface({
+        searchValue: "finance",
+        canMutate: true,
+        modules: [
+          {
+            id: "finance",
+            module: "Finance",
+            category: "finance",
+            status: "active",
+            availability: "enabled",
+            visibility: "visible",
+            capabilities: "12",
+            permissions: "finance.view",
+            policies: "3",
+            readinessVerdict: "ready",
+            lastChanged: "2026-05-29",
+          },
+        ],
+      }),
+    );
+
+    expect(parsed.success).toBe(true);
+    if (parsed.success) {
+      expect(parsed.data.requiresErpPermission).toEqual({
+        module: "system-admin",
+        object: "modules",
+        function: "read",
+      });
+      expect(parsed.data.presentation?.toolbar?.search?.param).toBe("modulesQ");
+      expect(parsed.data.columns.map((column) => column.id)).toEqual([
+        "module",
+        "category",
+        "status",
+        "availability",
+        "visibility",
+        "capabilities",
+        "permissions",
+        "policies",
+        "readinessVerdict",
+        "lastChanged",
+      ]);
+      expect(parsed.data.rows[0]?.trailingAction?.state).toBe("ready");
+      expect(parsed.data.rows[0]?.trailingAction?.descriptor?.label).toBe(
+        "Disable",
+      );
+    }
+  });
+
+  it("parses the capabilities governed list surface with readiness metadata", () => {
+    const parsed = parseListSurfaceRendererConfiguration(
+      buildCapabilitiesListSurface({
+        canMutate: true,
+        capabilities: [
+          {
+            id: "finance.view",
+            capability: "finance.view",
+            module: "finance",
+            route: "/finance",
+            requiredPermission: "finance.view",
+            availability: "enabled",
+            readinessVerdict: "ready",
+            coverageVerdict: "covered",
+            accessCoverage: "Catalog",
+            auditCoverage: "Declared",
+            docsCoverage: "Declared",
+            issues: "None",
+          },
+        ],
+      }),
+    );
+
+    expect(parsed.success).toBe(true);
+    if (parsed.success) {
+      expect(parsed.data.presentation?.toolbar?.search?.param).toBe(
+        "capabilitiesQ",
+      );
+      expect(parsed.data.rows[0]?.trailingAction?.state).toBe("ready");
+    }
+  });
+
   it("parses granular domain control surfaces", () => {
     const surfaces = [
       buildPermissionsListSurface({ permissions: [] }),
+      buildRolesListSurface({ roles: [] }),
       buildModulesListSurface({ modules: [] }),
       buildCapabilitiesListSurface({ capabilities: [] }),
       buildPoliciesListSurface({ policies: [] }),

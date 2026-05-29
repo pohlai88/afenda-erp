@@ -1,51 +1,35 @@
-import { Fragment, type ReactNode } from "react";
-import { ui, uiRadius, uiStatusToneClasses, type UiStatusTone } from "./design-system";
-import { cn } from "./utils";
+import { Fragment, type ElementType, type ReactNode } from "react";
+import type { VariantProps } from "class-variance-authority";
 
-type ShellFrameProps = {
-  sidebar: ReactNode;
-  header: ReactNode;
-  children: ReactNode;
-};
+import { Badge, badgeVariants } from "./badge";
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "./card";
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyTitle,
+} from "./empty";
 
 export type Tone = "neutral" | "positive" | "warning";
 
-const statusToneMap: Record<Tone, UiStatusTone> = {
-  neutral: "neutral",
+const toneToBadgeVariant: Record<
+  Tone,
+  NonNullable<VariantProps<typeof badgeVariants>["variant"]>
+> = {
+  neutral: "outline",
   positive: "success",
   warning: "warning",
 };
 
-export function ShellFrame({ sidebar, header, children }: ShellFrameProps) {
-  return (
-    <div className="min-h-screen bg-background text-foreground">
-      <div className="mx-auto grid min-h-screen max-w-[1680px] grid-cols-1 gap-0 lg:grid-cols-[304px_minmax(0,1fr)]">
-        <aside className="border-b border-line bg-surface-strong p-5 lg:border-r lg:border-b-0">
-          {sidebar}
-        </aside>
-        <div className="flex min-h-screen flex-col">
-          <header className="border-b border-line bg-surface-strong px-6 py-4">
-            {header}
-          </header>
-          <main className="flex-1 px-4 py-5 sm:px-6 lg:px-8">{children}</main>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 export function StatusBadge({ label, tone }: { label: string; tone: Tone }) {
-  return (
-    <span
-      className={cn(
-        "inline-flex border border-transparent px-2 py-1 text-xs font-medium",
-        ui.radius.chip,
-        uiStatusToneClasses[statusToneMap[tone]],
-      )}
-    >
-      {label}
-    </span>
-  );
+  return <Badge variant={toneToBadgeVariant[tone]}>{label}</Badge>;
 }
 
 export function SectionPanel({
@@ -63,28 +47,40 @@ export function SectionPanel({
   headingLevel?: 1 | 2 | 3;
   children?: ReactNode;
 }) {
-  const HeadingTag =
+  const HeadingTag: ElementType =
     headingLevel === 1 ? "h1" : headingLevel === 3 ? "h3" : "h2";
 
   return (
-    <section className="border-t border-line pt-6">
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-        <div className="max-w-3xl">
-          {eyebrow ? (
-            <div className="text-xs uppercase tracking-wide text-muted">
-              {eyebrow}
+    <section className="border-t border-border pt-surface-2xl">
+      <Card className="gap-surface-lg border-0 bg-transparent py-0 shadow-none ring-0">
+        <CardHeader className="px-0">
+          <div className="flex flex-col gap-surface-lg lg:flex-row lg:items-start lg:justify-between">
+            <div className="max-w-3xl">
+              {eyebrow ? (
+                <p className="text-xs uppercase tracking-wide text-muted-foreground">
+                  {eyebrow}
+                </p>
+              ) : null}
+              <HeadingTag className="mt-2 text-2xl font-semibold text-foreground">
+                {title}
+              </HeadingTag>
+              {description ? (
+                <CardDescription className="mt-3 text-sm leading-7">
+                  {description}
+                </CardDescription>
+              ) : null}
             </div>
-          ) : null}
-          <HeadingTag className="mt-2 text-2xl font-semibold text-foreground">
-            {title}
-          </HeadingTag>
-          {description ? (
-            <p className="mt-3 text-sm leading-7 text-muted">{description}</p>
-          ) : null}
-        </div>
-        {aside ? <div className="shrink-0">{aside}</div> : null}
-      </div>
-      {children ? <div className="mt-6">{children}</div> : null}
+            {aside ? (
+              <CardAction className="col-start-auto row-start-auto self-start">
+                {aside}
+              </CardAction>
+            ) : null}
+          </div>
+        </CardHeader>
+        {children ? (
+          <CardContent className="px-0 pt-0">{children}</CardContent>
+        ) : null}
+      </Card>
     </section>
   );
 }
@@ -99,25 +95,27 @@ export function BulletColumns({
   }[];
 }) {
   return (
-    <div className="grid gap-4 xl:grid-cols-2">
+    <div className="grid gap-surface-lg xl:grid-cols-2">
       {items.map((item) => (
-        <article
-          key={item.title}
-          className={cn(ui.radius.panel, "border border-line bg-card p-5")}
-        >
-          <h3 className="text-base font-semibold text-foreground">
-            {item.title}
-          </h3>
-          <p className="mt-2 text-sm leading-7 text-muted">{item.summary}</p>
-          <ul className="mt-4 flex flex-col gap-2 text-sm leading-6 text-muted-foreground">
-            {item.bullets.map((bullet) => (
-              <li key={bullet} className="flex gap-2">
-                <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-sm bg-muted-foreground/60" />
-                <span>{bullet}</span>
-              </li>
-            ))}
-          </ul>
-        </article>
+        <Card key={item.title} size="sm">
+          <CardHeader>
+            <CardTitle>{item.title}</CardTitle>
+            <CardDescription className="leading-7">{item.summary}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ul className="flex flex-col gap-2 text-sm leading-6 text-muted-foreground">
+              {item.bullets.map((bullet) => (
+                <li key={bullet} className="flex gap-2">
+                  <span
+                    aria-hidden
+                    className="mt-2 size-1.5 shrink-0 rounded-sm bg-muted-foreground/60"
+                  />
+                  <span>{bullet}</span>
+                </li>
+              ))}
+            </ul>
+          </CardContent>
+        </Card>
       ))}
     </div>
   );
@@ -132,17 +130,17 @@ export type IndicatorItem = {
 
 function IndicatorCard({ indicator }: { indicator: IndicatorItem }) {
   return (
-    <div className={cn(uiRadius.panel, "border border-line bg-card p-4")}>
-      <div className="flex items-center justify-between gap-3">
-        <div className="text-sm font-semibold text-foreground">
-          {indicator.label}
-        </div>
-        <StatusBadge label={indicator.value} tone={indicator.tone} />
-      </div>
-      <div className="mt-2 text-sm leading-6 text-muted">
-        {indicator.detail}
-      </div>
-    </div>
+    <Card size="sm">
+      <CardHeader className="grid-cols-[1fr_auto]">
+        <CardTitle className="text-sm">{indicator.label}</CardTitle>
+        <CardAction>
+          <StatusBadge label={indicator.value} tone={indicator.tone} />
+        </CardAction>
+      </CardHeader>
+      <CardContent className="pt-0">
+        <CardDescription className="leading-6">{indicator.detail}</CardDescription>
+      </CardContent>
+    </Card>
   );
 }
 
@@ -159,14 +157,9 @@ export function ObservabilityIndicatorList({
         <IndicatorCard key={indicator.label} indicator={indicator} />
       ))}
       {footer ? (
-        <div
-          className={cn(
-            ui.radius.panel,
-            "border border-dashed border-line bg-card px-4 py-3 text-sm text-muted",
-          )}
-        >
-          {footer}
-        </div>
+        <Card className="border-dashed bg-card">
+          <CardContent className="text-sm text-muted-foreground">{footer}</CardContent>
+        </Card>
       ) : null}
     </div>
   );
@@ -180,6 +173,58 @@ export type ModuleLinkItem = {
   statusLabel: string;
   statusTone: Tone;
 };
+
+function ModuleLinkCard({
+  module,
+  renderLink,
+}: {
+  module: ModuleLinkItem;
+  renderLink?: (input: {
+    module: ModuleLinkItem;
+    className: string;
+    children: ReactNode;
+  }) => ReactNode;
+}) {
+  const card = (
+    <Card
+      className="transition-colors hover:border-border hover:bg-muted/50"
+      size="sm"
+    >
+      <CardHeader className="grid-cols-[1fr_auto]">
+        <CardTitle className="text-sm">{module.label}</CardTitle>
+        <CardAction>
+          <StatusBadge label={module.statusLabel} tone={module.statusTone} />
+        </CardAction>
+      </CardHeader>
+      <CardContent className="pt-0">
+        <CardDescription className="leading-6">{module.summary}</CardDescription>
+      </CardContent>
+    </Card>
+  );
+
+  if (renderLink) {
+    return (
+      <Fragment key={module.id}>
+        {renderLink({
+          module,
+          className:
+            "block rounded-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+          children: card,
+        })}
+      </Fragment>
+    );
+  }
+
+  return (
+    <a
+      key={module.id}
+      className="block rounded-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      href={module.href}
+    >
+      {card}
+    </a>
+  );
+}
 
 export function ModuleLinkGrid({
   modules,
@@ -196,53 +241,22 @@ export function ModuleLinkGrid({
 }) {
   if (modules.length === 0) {
     return (
-      <div
-        className={cn(
-          ui.radius.panel,
-          "border border-dashed border-line bg-card p-4 text-sm leading-6 text-muted",
-        )}
-      >
-        {emptyMessage}
-      </div>
+      <Empty className="border border-dashed p-6">
+        <EmptyHeader>
+          <EmptyTitle>No modules available</EmptyTitle>
+          <EmptyDescription>{emptyMessage}</EmptyDescription>
+        </EmptyHeader>
+      </Empty>
     );
   }
 
   return (
     <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-      {modules.map((module) => {
-        const className =
-          "rounded-xl border border-line bg-card p-4 transition hover:border-border hover:bg-muted/50";
-        const children = (
-          <>
-            <div className="flex items-center justify-between gap-3">
-              <div className="text-sm font-semibold text-foreground">
-                {module.label}
-              </div>
-              <StatusBadge
-                label={module.statusLabel}
-                tone={module.statusTone}
-              />
-            </div>
-            <div className="mt-2 text-sm leading-6 text-muted">
-              {module.summary}
-            </div>
-          </>
-        );
-
-        if (renderLink) {
-          return (
-            <Fragment key={module.id}>
-              {renderLink({ module, className, children })}
-            </Fragment>
-          );
-        }
-
-        return (
-          <a key={module.id} className={className} href={module.href}>
-            {children}
-          </a>
-        );
-      })}
+      {modules.map((module) => (
+        <ModuleLinkCard key={module.id} module={module} renderLink={renderLink} />
+      ))}
     </div>
   );
 }
+
+export { ShellFrame } from "./shell-frame.client";

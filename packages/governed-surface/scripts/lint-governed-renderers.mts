@@ -1,4 +1,4 @@
-import { readdirSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -37,6 +37,59 @@ if (missingFiles.length > 0 || orphanFiles.length > 0) {
   process.exit(1);
 }
 
+const BANNED_IMPORT_PREFIXES = [
+  "@afenda/feature-",
+  "@afenda/db",
+  "@afenda/auth/server",
+  "@afenda/ai",
+  "@afenda/workflows",
+  "apps/erp",
+];
+
+const BANNED_IMPORT_PATTERNS = [
+  /@afenda\/governed-surface\/src/,
+  /@afenda\/ui\/src/,
+  /\/dist\//,
+  /\/internal\//,
+];
+
+const IMPORT_RE =
+  /^\s*import\s+(?:type\s+)?(?:[\w*{}\s,]+\s+from\s+)?["']([^"']+)["']/gm;
+
+const importErrors: string[] = [];
+const allRendererTsx = readdirSync(renderersDir).filter((file) =>
+  file.endsWith(".tsx"),
+);
+
+for (const file of allRendererTsx) {
+  const content = readFileSync(join(renderersDir, file), "utf8");
+  let match: RegExpExecArray | null;
+  IMPORT_RE.lastIndex = 0;
+  while ((match = IMPORT_RE.exec(content)) !== null) {
+    const specifier = match[1] ?? "";
+    for (const prefix of BANNED_IMPORT_PREFIXES) {
+      if (specifier.startsWith(prefix)) {
+        importErrors.push(
+          `${file}: banned import "${specifier}" (prefix ${prefix})`,
+        );
+      }
+    }
+    for (const pattern of BANNED_IMPORT_PATTERNS) {
+      if (pattern.test(specifier)) {
+        importErrors.push(`${file}: banned deep import "${specifier}"`);
+      }
+    }
+  }
+}
+
+if (importErrors.length > 0) {
+  console.error("Governed renderer import allowlist violations:");
+  for (const message of importErrors) {
+    console.error(`  ✗ ${message}`);
+  }
+  process.exit(1);
+}
+
 console.log(
-  `Governed renderer parity OK (${registryRendererIds.size} registry entries).`,
+  `Governed renderer parity OK (${registryRendererIds.size} registry entries, import allowlist clean).`,
 );

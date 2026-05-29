@@ -204,7 +204,7 @@ governed surface.
 | Approvals | approval chain configuration, escalation timing, delegation | Approval execution may live in workflows or feature modules. |
 | Audit viewer | audit search, filtering, export, event detail, evidence timeline | Audit writing belongs to the kernel. |
 | Security | session policy settings, MFA posture, trusted domains, sensitive-action confirmation | Auth implementation remains `@afenda/auth`. |
-| Organization | organization profile, locale, timezone, calendar defaults, numbering defaults | Organization defaults are shared runtime inputs. |
+| Organization | organization profile, locale, timezone, calendar defaults, numbering defaults, data region, ZDR | Organization defaults are shared runtime inputs. |
 | Integrations | integration enablement, credential posture, webhooks, external connection status | Secret hashing and dispatch runtime remain service concerns. |
 | Diagnostics | health checks, config drift indicators, permission warnings, inactive module warnings, audit coverage warnings | Diagnostics are control evidence, not runtime enforcement. |
 
@@ -216,10 +216,10 @@ The current repository already exposes these surfaces:
 | ------- | ----- | ------------- |
 | Hub | `/system-admin` | tenant admin summary and navigation |
 | Identity | `/system-admin/identity` | members, invitations, role changes, tenant role overrides |
-| Settings | `/system-admin/settings` | locale, timezone, currency, fiscal year, branding, data region, ZDR |
+| Organization | `/system-admin/organization` | locale, timezone, currency, fiscal year, numbering, data region, ZDR |
 | Audit | `/system-admin/audit` | audit logs, retention policy, export boundary |
 | Integrations | `/system-admin/integrations` | API credentials, webhooks, delivery rows, SSO configuration |
-| Machine layer | `/system-admin/machine-layer` | Lynx usage, approval sandboxes, monitor actions, spend posture |
+| Lynx | `/system-admin/lynx` | Lynx usage, approval sandboxes, monitor actions, spend posture |
 | Reliability | `/system-admin/reliability` | cron-route visibility |
 | Billing | `/system-admin/billing` | tenant usage and marketplace posture |
 
@@ -452,7 +452,7 @@ and target doctrine.
 | Permissions and capabilities | Capability catalog exists; role overrides can be stored. | Permission coverage, capability review, and module access controls become first-class admin domains linked to **ARCH-012** capability contracts. |
 | Policies and approvals | Partial configuration surfaces exist today. | Policy and approval law become explicit configuration domains consumed by the kernel at runtime. |
 | Audit | Audit logs and export boundaries exist. | Audit viewer becomes a full evidence-review surface while the kernel remains the only audit-writing authority. |
-| Security and organization settings | Tenant settings and admin controls already exist. | Security posture, locale defaults, numbering defaults, and organization controls stay package-owned and kernel-readable. |
+| Security and organization | Security posture and organization defaults already exist. | Security controls and organization defaults (locale, numbering, data region, ZDR) stay package-owned and kernel-readable. |
 | Diagnostics | Some admin summary signals exist today. | Drift, inactive capabilities, missing audit coverage, and permission warnings become explicit diagnostics surfaces. |
 
 ## Verification Gates
@@ -467,12 +467,18 @@ Run the narrowest gate that covers the change.
 | Governed metadata or renderer changes | `pnpm lint:governed-renderers` |
 | Command/query changes | `pnpm test` with focused package tests where available |
 | `/system-admin/*` route flows | Route tests or `pnpm test:e2e` when behavior changes |
-| Auth, audit, security, webhook, billing, or machine-layer approval changes | `pnpm security:review` |
+| Auth, audit, security, webhook, billing, or Lynx approval changes | `pnpm security:review` |
 
 ## Related Documents
 
 | Document | Use |
 | -------- | --- |
+| [011-system-admin-users-architecture.md](011-system-admin-users-architecture.md) | Users control domain supplement |
+| [011-system-admin-memberships-architecture.md](011-system-admin-memberships-architecture.md) | Memberships control domain supplement |
+| [011-system-admin-roles-architecture.md](011-system-admin-roles-architecture.md) | Roles control domain supplement |
+| [011-system-admin-permissions-architecture.md](011-system-admin-permissions-architecture.md) | Permissions control domain supplement |
+| [011-system-admin-modules-architecture.md](011-system-admin-modules-architecture.md) | Modules control domain supplement |
+| [011-system-admin-capabilities-architecture.md](011-system-admin-capabilities-architecture.md) | Capabilities control domain supplement |
 | [ARCH-001 · System Architecture](001-system-architecture.md) | Runtime, auth, tenancy, routing, deployment, cron, observability |
 | [ARCH-002 · ERP Kernel Package Architecture](002-erp-kernel-package-architecture.md) | Feature package boundaries, imports, extraction, single-app model |
 | [ARCH-005 · Database Scale Architecture](005-database-scale-architecture.md) | Schema ownership, table promotion, tenant isolation |

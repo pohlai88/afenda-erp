@@ -1,31 +1,43 @@
 "use server";
 
+import {
+  getTenantMembershipById,
+  resendOrganizationInvitation,
+  revokeOrganizationInvitation,
+} from "@afenda/db";
+import { writeExecutionAuditEvent } from "@afenda/kernel/execution";
+import { revalidatePath } from "next/cache";
 import { updateMembershipStatus } from "../../memberships/data";
 import {
   systemAdminActionFailure,
   systemAdminActionSuccess,
   type SystemAdminActionResult,
   zodActionFailure,
-} from "../../contracts";
+} from "../../tenant-execution/contracts/system-admin.action-result.contract";
 import {
   assertSystemAdminUserCanBeInvited,
   createSystemAdminUserInvitation,
+  inspectSystemAdminUserAccess,
 } from "../data";
+import { requireSystemAdminUsersManage, requireSystemAdminUsersRead } from "../policies";
 import {
-  requireSystemAdminUsersManage,
-} from "../policies";
-import {
+  systemAdminCancelInvitationInputSchema,
+  systemAdminInspectUserAccessInputSchema,
   systemAdminInviteUserInputSchema,
+  systemAdminResendInvitationInputSchema,
   systemAdminUserStatusInputSchema,
 } from "../schemas";
-import type { SystemAdminInviteUserResult } from "../contracts";
-import { writeExecutionAuditEvent } from "@afenda/kernel/execution";
-import { revalidatePath } from "next/cache";
+import type {
+  SystemAdminInviteUserResult,
+  SystemAdminResendInvitationResult,
+  SystemAdminUserAccessInspection,
+} from "../contracts";
 
 function revalidateSystemAdminUsers() {
   revalidatePath("/system-admin");
   revalidatePath("/system-admin/users");
   revalidatePath("/system-admin/memberships");
+  revalidatePath("/system-admin/identity");
 }
 
 export async function inviteSystemAdminUser(
@@ -60,11 +72,11 @@ export async function inviteSystemAdminUser(
       actorId: context.userId,
       actorType: context.actorType,
       action: "system-admin.user.invite",
-      targetType: "membership",
+      targetType: "user_invitation",
       targetId: result.invitationId,
       metadata: {
         email: parsed.data.email,
-        role: parsed.data.role,
+        roleIds: [parsed.data.role],
       },
     });
 
@@ -79,13 +91,39 @@ export async function inviteSystemAdminUser(
 
 async function updateSystemAdminUserStatus(input: {
   membershipId: string;
-  status: "active" | "suspended";
+  status: "active" | "suspended" | "removed";
 }) {
-  const { context, organization } = await requireSystemAdminUsersManage();
+  const { context, organization, session } = await requireSystemAdminUsersManage();
   const parsed = systemAdminUserStatusInputSchema.safeParse(input);
 
   if (!parsed.success) {
     return zodActionFailure(parsed.error);
+  }
+
+  const membership = await getTenantMembershipById({
+    organizationId: organization.id,
+    membershipId: parsed.data.membershipId,
+  });
+
+  if (!membership) {
+    return systemAdminActionFailure("Organization membership was not found.");
+  }
+
+  if (
+    membership.authUserId === session.id &&
+    parsed.data.status !== "active"
+  ) {
+    return systemAdminActionFailure(
+      "You cannot suspend or remove your own membership from the Users surface.",
+    );
+  }
+
+  if (parsed.data.status === "active") {
+    if (membership.status === "removed") {
+      return systemAdminActionFailure(
+        "Removed users cannot be reactivated from the Users surface.",
+      );
+    }
   }
 
   try {
@@ -96,14 +134,18 @@ async function updateSystemAdminUserStatus(input: {
       status: parsed.data.status,
     });
 
+    const auditAction =
+      parsed.data.status === "suspended"
+        ? "system-admin.user.suspend"
+        : parsed.data.status === "removed"
+          ? "system-admin.user.remove"
+          : "system-admin.user.reactivate";
+
     await writeExecutionAuditEvent({
       organizationId: organization.id,
       actorId: context.userId,
       actorType: context.actorType,
-      action:
-        parsed.data.status === "suspended"
-          ? "system-admin.user.suspend"
-          : "system-admin.user.reactivate",
+      action: auditAction,
       targetType: "membership",
       targetId: parsed.data.membershipId,
       metadata: { status: parsed.data.status },
@@ -126,10 +168,102 @@ export async function reactivateSystemAdminUser(membershipId: string) {
   return updateSystemAdminUserStatus({ membershipId, status: "active" });
 }
 
-export async function suspendSystemAdminUserForm(formData: FormData) {
-  return await suspendSystemAdminUser(String(formData.get("membershipId") ?? ""));
+export async function removeSystemAdminUser(membershipId: string) {
+  return updateSystemAdminUserStatus({ membershipId, status: "removed" });
 }
 
-export async function reactivateSystemAdminUserForm(formData: FormData) {
-  return await reactivateSystemAdminUser(String(formData.get("membershipId") ?? ""));
+export async function resendSystemAdminInvitation(
+  invitationId: string,
+): Promise<SystemAdminActionResult<SystemAdminResendInvitationResult>> {
+  const { context, organization, session } = await requireSystemAdminUsersManage();
+  const parsed = systemAdminResendInvitationInputSchema.safeParse({ invitationId });
+
+  if (!parsed.success) {
+    return zodActionFailure(parsed.error);
+  }
+
+  try {
+    const result = await resendOrganizationInvitation({
+      organizationId: organization.id,
+      invitationId: parsed.data.invitationId,
+      actorAuthUserId: session.id,
+    });
+
+    await writeExecutionAuditEvent({
+      organizationId: organization.id,
+      actorId: context.userId,
+      actorType: context.actorType,
+      action: "system-admin.user.invitation_resend",
+      targetType: "user_invitation",
+      targetId: result.invitationId,
+      metadata: { invitationId: result.invitationId },
+    });
+
+    revalidateSystemAdminUsers();
+    return systemAdminActionSuccess(result);
+  } catch (error) {
+    return systemAdminActionFailure(
+      error instanceof Error ? error.message : "Invitation resend failed.",
+    );
+  }
+}
+
+export async function cancelSystemAdminInvitation(
+  invitationId: string,
+): Promise<SystemAdminActionResult> {
+  const { context, organization, session } = await requireSystemAdminUsersManage();
+  const parsed = systemAdminCancelInvitationInputSchema.safeParse({ invitationId });
+
+  if (!parsed.success) {
+    return zodActionFailure(parsed.error);
+  }
+
+  try {
+    await revokeOrganizationInvitation({
+      organizationId: organization.id,
+      invitationId: parsed.data.invitationId,
+      actorAuthUserId: session.id,
+    });
+
+    await writeExecutionAuditEvent({
+      organizationId: organization.id,
+      actorId: context.userId,
+      actorType: context.actorType,
+      action: "system-admin.user.invitation_cancel",
+      targetType: "user_invitation",
+      targetId: parsed.data.invitationId,
+      metadata: { invitationId: parsed.data.invitationId },
+    });
+
+    revalidateSystemAdminUsers();
+    return systemAdminActionSuccess(undefined);
+  } catch (error) {
+    return systemAdminActionFailure(
+      error instanceof Error ? error.message : "Invitation cancel failed.",
+    );
+  }
+}
+
+export async function inspectSystemAdminUserAccessAction(
+  membershipId: string,
+): Promise<SystemAdminActionResult<SystemAdminUserAccessInspection>> {
+  const { organization } = await requireSystemAdminUsersRead();
+  const parsed = systemAdminInspectUserAccessInputSchema.safeParse({ membershipId });
+
+  if (!parsed.success) {
+    return zodActionFailure(parsed.error);
+  }
+
+  try {
+    const inspection = await inspectSystemAdminUserAccess({
+      organizationId: organization.id,
+      membershipId: parsed.data.membershipId,
+    });
+
+    return systemAdminActionSuccess(inspection);
+  } catch (error) {
+    return systemAdminActionFailure(
+      error instanceof Error ? error.message : "Access inspection failed.",
+    );
+  }
 }

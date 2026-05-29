@@ -1,7 +1,7 @@
 import {
   ensureTenantSecuritySettings,
   getTenantSecuritySettings,
-} from "../../data/repositories/system-admin.tenant-security.repository.server";
+} from "./system-admin.tenant-security.repository.server";
 import { mapTenantSecurityToOrganizationSettings } from "./system-admin.security.mapper";
 import type { OrganizationSecuritySettings } from "../contracts/system-admin.security-settings.contract";
 

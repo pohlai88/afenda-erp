@@ -173,7 +173,7 @@ export async function POST(request: Request): Promise<Response> {
     const { session, organization } = auth;
 
     assertCapabilityAllowed({
-      capability: "system-admin.machine-layer.read",
+      capability: "system-admin.lynx.read",
       capabilities: organization.capabilities,
     });
     const isLynxOperatorEnabled = await isAiFeatureEnabledForOrganization({

@@ -1,0 +1,68 @@
+---
+description: System Admin control module — routes, feature package, execution kernel boundary
+globs: "packages/features/system-admin/**/*,apps/erp/src/lib/system-admin-sections/**/*,apps/erp/src/lib/system-admin-route.shared.ts,apps/erp/src/app/(workspace)/[moduleId]/[...section]/**/*"
+alwaysApply: false
+---
+
+# System Admin (`@afenda/feature-system-admin`)
+
+**ARCH-011** (control plane) · **ARCH-012** (execution enforcement) · **ARCH-006**/**ARCH-007** (governed UI).
+
+System Admin configures the law; Execution Kernel enforces it. Do not import `@afenda/feature-system-admin` from `@afenda/kernel`.
+
+## Route shape (as-built)
+
+| Layer | Location | Role |
+| ----- | -------- | ---- |
+| App Router | `(workspace)/[moduleId]/[...section]/page.tsx` | Thin entry when `moduleId === system-admin` |
+| Section registry | `apps/erp/src/lib/system-admin-sections/registry.server.ts` | Slug → lazy `*.server.tsx` adapter |
+| Manifest | `manifest.shared.ts` | Slug → `featureArea` under feature package |
+| Feature | `packages/features/system-admin/src/<area>/` | Actions, data, policies, surfaces, components |
+
+URL: `/system-admin/<section>` (route group omitted). Do not add `apps/erp/src/app/(workspace)/system-admin/` siblings — sections use the catch-all.
+
+## Adapter pattern
+
+Each `*.server.tsx` in `system-admin-sections/` is a thin adapter:
+
+- Resolve org/session and execution context via `@afenda/kernel/server` or feature policies.
+- Import UI copy + client islands from `@afenda/feature-system-admin/client`.
+- Import loaders, actions, surface builders from `@afenda/feature-system-admin/server`.
+- Compose `GovernedPatternCListSection` / Pattern A chrome from `@afenda/governed-surface/server`.
+
+No business rules or Drizzle queries in adapters — keep them in the feature package.
+
+## Feature package layout
+
+Vertical buckets under `src/`: `users`, `memberships`, `roles`, `permissions`, `modules`, `capabilities`, `policies`, `approvals`, `audit-viewer`, `organization`, `security`, `integrations`, `diagnostics`, `lynx`, etc.
+
+Each bucket: `actions/`, `data/`, `policies/`, `schemas/`, `contracts/`, `components/`, `surface/` as needed. Package-level `components/`, `overview/` for shared control-list helpers.
+
+Export doors only: `.`, `./client`, `./server`, `./metadata` — never deep imports from app or other packages.
+
+## Permissions & audit
+
+- Guard reads and mutations with `requireExecutionPermission` (or feature policy wrappers).
+- Capability keys: `system-admin.<domain>.read|manage|…` — keep keys when folding routes (`/raf`); do not delete capability fallbacks without user direction.
+- Every mutation writes structured audit via execution audit helpers; use domain-specific audit actions from contracts.
+
+## Governed surfaces
+
+- Pattern C lists: server window + `build*ListSurface` → `GovernedPatternCListSection`.
+- Trailing actions: serializable `Cell` from client registry — never `trailingColumn.render`.
+- Batch independent page loads with `Promise.all`.
+
+## Architecture docs
+
+- Canonical doctrine: `docs/architecture/011-system-admin-*.md` and `011-system-admin-enterprise-architecture.md`.
+- Package vertical supplements: `packages/features/system-admin/src/<area>/*-architecture.md` link to parent ARCH-011 supplements — **do not delete**; update in place when as-built changes.
+- Do not duplicate full doctrine in package docs; link to `docs/architecture/` and record as-built deltas only.
+
+## Verification
+
+```bash
+pnpm typecheck
+pnpm architecture:check
+pnpm test --filter=@afenda/feature-system-admin
+pnpm lint:governed-renderers   # when list surfaces / renderers change
+```

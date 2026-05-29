@@ -52,7 +52,7 @@ Lynx is the ERP machine layer — every machine-assisted modality routes through
 1. **Tenancy** — Derive `organizationId` from server session/context (`@afenda/auth`, `@afenda/db` tenancy helpers). Never trust client-supplied org IDs.
 2. **Authorization** — `src/proxy.ts` refreshes Neon Auth sessions; **re-check capabilities** in Server Components, Server Actions, and Route Handlers before reads or mutations.
 3. **One app, one deploy** — Single Vercel project from repo root (`vercel.json` → `pnpm turbo build --filter=@afenda/erp`). No per-module Vercel projects. Linking is **deferred** until ARCH-001 stabilization gate passes.
-4. **Module routes** — Core modules use `(app)/[moduleId]/…` only. Do not add per-module route folders unless the URL tree genuinely differs.
+4. **Module routes** — Core modules use `(workspace)/[moduleId]/…` only. Route composition lives in `apps/erp/src/workspace-routes/`; App Router files stay thin. Do not add per-module route folders unless the URL tree genuinely differs.
 5. **Package discipline** — Feature packages stay flat at workspace level (`packages/features/<moduleId>`). Use nested internal folders for categories; do not create nested feature workspaces without updating ARCH-008 and the guard script.
    - Feature scaffold follows `packages/_template-definition`. Run `pnpm scaffold:feature <moduleId>`. Avoid catch-all folders (`_shared`, `common`, `lib`, `utils`, `helpers`, `misc`).
    - Feature server-only markers live at `src/server.ts` via `import "@afenda/kernel/server";`. Do not import `server-only` or `@afenda/kernel/server` from deep feature implementation files; local Vitest package tests import deep files without needing server-only stubs.
@@ -77,13 +77,17 @@ Do not extend generic `erp_module_records` for posting-grade, inventory-grade, o
 ```txt
 src/app/
   (auth)/sign-in, sign-up, …
-  (app)/layout.tsx
-  (app)/dashboard/
-  (app)/solution-console/
-  (app)/[moduleId]/page.tsx
-  (app)/[moduleId]/records/[recordId]/page.tsx
+  (workspace)/layout.tsx          # ShellFrame + streaming sidebar/header Suspense
+  (workspace)/loading.tsx         # Page-level fallback (layout stays mounted)
+  (workspace)/dashboard/
+  (workspace)/lynx/
+  (workspace)/[moduleId]/page.tsx
+  (workspace)/[moduleId]/records/[recordId]/page.tsx
+src/workspace-routes/             # Governed composition (*.server.tsx) — outside app/
   api/ai/*, api/lynx/*, api/uploads, api/cron/*, api/observability/drain
 ```
+
+Next.js layout discipline: route group `(workspace)` opts authenticated routes into the ERP shell without changing URLs; keep `app/` thin (pages only); stream tenant chrome via sibling `<Suspense>` in `layout.tsx`, not a single blocking `await` in the layout.
 
 Server Actions: internal mutations. Route Handlers: webhooks, uploads, AI streams, cron, public APIs.
 

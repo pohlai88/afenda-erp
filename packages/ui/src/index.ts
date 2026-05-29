@@ -50,6 +50,7 @@ export * from "./spinner";
 export * from "./switch";
 export * from "./table";
 export * from "./tabs";
+export * from "./theme-provider";
 export * from "./textarea";
 export * from "./toggle-group";
 export * from "./toggle";

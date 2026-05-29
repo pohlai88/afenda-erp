@@ -12,6 +12,7 @@ export type SystemAdminRoleDefinition = {
 
 export type SystemAdminRoleRow = SystemAdminRoleDefinition & {
   assignedMembers: number;
+  permissionCount?: number;
 };
 
 export const systemAdminSeedRoles = [
@@ -34,6 +35,14 @@ export const systemAdminSeedRoles = [
     key: "finance-manager",
     name: "Manager",
     description: "Can manage operational teams and assigned module work.",
+    status: "active",
+  },
+  {
+    id: "operations-manager",
+    key: "operations-manager",
+    name: "Operations Manager",
+    description:
+      "Can manage operational workflows across sales, purchasing, inventory, and CRM.",
     status: "active",
   },
   {

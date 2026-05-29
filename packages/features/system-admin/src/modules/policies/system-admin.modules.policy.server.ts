@@ -1,6 +1,4 @@
-import {
+export {
   requireSystemAdminModulesManage,
   requireSystemAdminModulesRead,
-} from "../../policies";
-
-export { requireSystemAdminModulesManage, requireSystemAdminModulesRead };
+} from "../../overview/policies/system-admin.capability.policy.server";

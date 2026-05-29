@@ -15,11 +15,5 @@ export {
   type SystemAdminOrganizationAuditAction,
   type SystemAdminOrganizationWebhookEvent,
 } from "./events/system-admin.organization.event";
-export { updateSystemAdminOrganizationDefaultsAction } from "../actions/system-admin.control.actions.server";
-export { updateSystemAdminOrganizationDefaultsAction as updateSystemAdminOrganizationSettings } from "../actions/system-admin.control.actions.server";
-export {
-  ensureTenantSettings as ensureSystemAdminOrganizationSettings,
-  getOrganizationProfile as getSystemAdminOrganizationProfile,
-  getTenantSettings as getSystemAdminOrganizationSettings,
-} from "../data/repositories/system-admin.tenant-settings.repository.server";
-export { systemAdminOrganizationSurfaceKey } from "../surfaces/system-admin.control.surface";
+export { updateSystemAdminOrganizationDefaultsAction } from "./actions/system-admin.organization-defaults.actions.server";
+export { systemAdminOrganizationSurfaceKey } from "./data/system-admin.organization-list.surface";

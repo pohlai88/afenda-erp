@@ -1,7 +1,13 @@
 export {
   requireSystemAdminAuditExport,
   requireSystemAdminAuditRead,
-} from "../policies";
+} from "./policies/system-admin.audit-viewer.policy.server";
+export {
+  systemAdminAuditViewerAuditActions,
+  systemAdminAuditViewerWebhookEvents,
+  type SystemAdminAuditViewerAuditAction,
+  type SystemAdminAuditViewerWebhookEvent,
+} from "./events/system-admin.audit-viewer.event";
 export type {
   SystemAdminAuditEventDetail,
   SystemAdminAuditEventRow,
@@ -33,4 +39,5 @@ export {
   systemAdminAuditSearchParamsSchema,
   type SystemAdminAuditSearchParams,
 } from "./schemas/system-admin.audit-filter.schema";
-export { listRetentionPolicies as listSystemAdminRetentionPolicies } from "../data/repositories/system-admin.audit.repository.server";
+export { systemAdminRetentionPolicyActionSchema } from "./schemas/system-admin.retention-action.schema";
+export { listRetentionPolicies as listSystemAdminRetentionPolicies } from "./data/system-admin.audit.repository.server";

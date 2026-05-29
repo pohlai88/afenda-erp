@@ -20,7 +20,7 @@ This checklist governs Lynx enterprise operation on Vercel.
   management console: every run must expose status, model, route, workflow,
   replayable events, tool calls, evidence references, validation, approval or
   sandbox links, and operator feedback.
-- Keep `/solution-console/runs` as the run management console for cross-run
+- Use `/lynx/runs` as the run management console for cross-run
   analytics, route/status/workflow/model/tool/date filters, and CSV audit
   export. The export route must derive tenant context from auth/session and
   return `Cache-Control: no-store` because it contains tenant-scoped audit data.

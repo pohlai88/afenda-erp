@@ -4,8 +4,11 @@ import { useState } from "react";
 
 import { Button } from "@afenda/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@afenda/ui/card";
+import { FieldGroup } from "@afenda/ui/field";
 import { Label } from "@afenda/ui/label";
 import { Textarea } from "@afenda/ui/textarea";
+import { GovernedEmpty } from "../../client";
+import { governedRendererCopy } from "../../i18n/governed-renderer-copy.shared";
 import type {
   GovernedScorecardFormConfiguration,
   ScorecardCriterion,
@@ -27,6 +30,23 @@ export function ScorecardFormSurface({
     Object.fromEntries(form.criteria.map((c) => [c.id, 0])),
   );
 
+  if (form.criteria.length === 0) {
+    return (
+      <section
+        aria-label={form.title}
+        className={DATA_NATURE_CLASS[form.dataNature]}
+      >
+        <GovernedEmpty
+          model={{
+            variant: "muted",
+            title: governedRendererCopy.empty.scorecardForm.title,
+            description: governedRendererCopy.empty.scorecardForm.description,
+          }}
+        />
+      </section>
+    );
+  }
+
   return (
     <section
       aria-label={form.title}
@@ -39,19 +59,21 @@ export function ScorecardFormSurface({
         <CardContent
           className={cn("flex flex-col", densityGapClass(form.chrome?.density))}
         >
-          <ul className="flex flex-col gap-surface-lg">
-            {form.criteria.map((criterion) => (
-              <li key={criterion.id}>
-                <CriterionRow
-                  criterion={criterion}
-                  value={scores[criterion.id] ?? 0}
-                  onSelect={(score) =>
-                    setScores((prev) => ({ ...prev, [criterion.id]: score }))
-                  }
-                />
-              </li>
-            ))}
-          </ul>
+          <FieldGroup className="gap-surface-lg">
+            <ul className="flex flex-col gap-surface-lg">
+              {form.criteria.map((criterion) => (
+                <li key={criterion.id}>
+                  <CriterionRow
+                    criterion={criterion}
+                    value={scores[criterion.id] ?? 0}
+                    onSelect={(score) =>
+                      setScores((prev) => ({ ...prev, [criterion.id]: score }))
+                    }
+                  />
+                </li>
+              ))}
+            </ul>
+          </FieldGroup>
           {form.notesFieldId ? (
             <div className="flex flex-col gap-1.5">
               <Label htmlFor={form.notesFieldId}>Notes</Label>

@@ -1,12 +1,12 @@
 import type {
   ListSurfaceRendererConfigurationResolvedInput,
 } from "@afenda/governed-surface/schemas";
-import { systemAdminControlLinks } from "../../contracts/system-admin.control-links.contract";
+import { systemAdminControlLinks } from "../../overview/contracts/system-admin.control-links.contract";
 import {
   buildLinkedControlListSurface,
   catalogStatusBadge,
   linkCell,
-} from "../../surfaces/system-admin.control.surface";
+} from "../../overview/surfaces/system-admin.control-list.shared";
 import type { SystemAdminApprovalRuleListRow } from "../contracts/system-admin.approval-rule.contract";
 
 export const systemAdminApprovalsSurfaceKey = "system-admin.approvals.list";

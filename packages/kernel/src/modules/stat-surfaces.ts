@@ -37,14 +37,8 @@ export function buildModuleWorkspaceStatGrid(input: {
       label: metric.label,
       value: metric.value,
       tone: toStatCardTone(metric.tone),
-      // Map detail text to comparison label for contextual info display
-      comparison: metric.detail
-        ? {
-            priorValue: metric.value,
-            label: metric.detail,
-            direction: "flat" as const,
-          }
-        : undefined,
+      delta: metric.detail || undefined,
+      animateValue: false,
     })),
   });
 }
@@ -99,31 +93,8 @@ export function buildDashboardKpiStatGrid(input: {
       label: metric.label,
       value: metric.value,
       tone: toStatCardTone(metric.tone),
-      comparison: metric.detail
-        ? {
-            priorValue: metric.value,
-            label: metric.detail,
-            direction: "flat" as const,
-          }
-        : undefined,
-    })),
-  });
-}
-
-/**
- * Builds the solution console capability stat grid.
- */
-export function buildSolutionConsoleStatGrid(input: {
-  metrics: readonly ResolvedMetric[];
-}): StatCardConfigurationResolvedInput {
-  return buildGovernedStatGrid({
-    __schemaVersion: GOVERNED_METADATA_SCHEMA_VERSION,
-    dataNature: "snapshot-summary",
-    presentationProfile: "erp-executive-summary",
-    stats: input.metrics.map((metric) => ({
-      label: metric.label,
-      value: metric.value,
-      tone: toStatCardTone(metric.tone),
+      delta: metric.detail || undefined,
+      animateValue: false,
     })),
   });
 }
@@ -190,4 +161,3 @@ export function buildDashboardWorkflowSummaryStatGrid(input: {
 export const dashboardStatSurfaceKey = "dashboard-kpi-stats";
 export const dashboardWorkflowSummaryStatSurfaceKey =
   "dashboard-workflow-summary-stats";
-export const solutionConsoleStatSurfaceKey = "solution-console-exec-stats";

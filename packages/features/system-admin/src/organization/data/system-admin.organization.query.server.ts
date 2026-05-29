@@ -2,7 +2,7 @@ import {
   ensureTenantSettings,
   getOrganizationProfile,
   getTenantSettings,
-} from "../../data/repositories/system-admin.tenant-settings.repository.server";
+} from "./system-admin.tenant-settings.repository.server";
 import type {
   SystemAdminOrganizationDefaults,
   SystemAdminOrganizationPageModel,
@@ -18,6 +18,8 @@ function toOrganizationDefaults(
     fiscalYearStartMonth: settings?.fiscalYearStartMonth ?? 1,
     documentPrefix: String(settings?.documentPrefixes.default ?? "AFD"),
     numberingPrefix: String(settings?.numbering.defaultPrefix ?? "AFD"),
+    dataRegion: settings?.dataRegion ?? "us-east-1",
+    zdrEnabled: settings?.zdrEnabled ?? false,
   };
 }
 

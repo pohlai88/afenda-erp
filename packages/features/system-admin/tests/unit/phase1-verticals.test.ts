@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 import {
   systemAdminInviteUserInputSchema,
   systemAdminUserStatusInputSchema,
@@ -34,6 +34,12 @@ describe("system admin phase 1 vertical contracts", () => {
       }).success,
     ).toBe(true);
     expect(
+      systemAdminUserStatusInputSchema.safeParse({
+        membershipId: "member_1",
+        status: "removed",
+      }).success,
+    ).toBe(true);
+    expect(
       systemAdminAssignRoleInputSchema.safeParse({
         membershipId: "member_1",
         role: "owner",
@@ -52,6 +58,7 @@ describe("system admin phase 1 vertical contracts", () => {
       "owner",
       "admin",
       "finance-manager",
+      "operations-manager",
       "staff",
       "viewer",
     ]);
@@ -61,27 +68,3 @@ describe("system admin phase 1 vertical contracts", () => {
   });
 });
 
-describe("system admin phase 1 duplicate invite guard", () => {
-  it("is covered by the users data contract", async () => {
-    const db = await import("@afenda/db");
-    const spyMembers = vi
-      .spyOn(db, "hasTenantMemberWithEmail")
-      .mockResolvedValueOnce(true);
-    const spyInvitations = vi
-      .spyOn(db, "hasOrganizationInvitationWithEmail")
-      .mockResolvedValueOnce(false);
-    const { assertSystemAdminUserCanBeInvited } = await import(
-      "../../src/users/data"
-    );
-
-    await expect(
-      assertSystemAdminUserCanBeInvited({
-        organizationId: "org_1",
-        email: "ADMIN@example.com",
-      }),
-    ).rejects.toThrow("already invited or active");
-
-    spyMembers.mockRestore();
-    spyInvitations.mockRestore();
-  });
-});

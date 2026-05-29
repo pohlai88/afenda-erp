@@ -255,9 +255,17 @@ function checkDocumentationNaming(filePath: string) {
 
   const isArchitectureDoc =
     lowerFileName.includes("architecture") || fileName === "ARCHITECTURE.md";
-  if (isArchitectureDoc && !rel.startsWith("docs/architecture/")) {
+  const isFeatureVerticalArchitectureDoc =
+    /^packages\/features\/[^/]+\/src\/[^/]+\/[^/]*architecture[^/]*\.md$/.test(
+      rel.replace(/\\/g, "/"),
+    );
+  if (
+    isArchitectureDoc &&
+    !rel.startsWith("docs/architecture/") &&
+    !isFeatureVerticalArchitectureDoc
+  ) {
     problems.push(
-      `Architecture docs must live under docs/architecture/: ${rel}`,
+      `Architecture docs must live under docs/architecture/ or a feature vertical bucket: ${rel}`,
     );
   }
 
@@ -740,15 +748,6 @@ function checkAppRouteFileWhitelist() {
   }
 
   const transitionAllowList = new Set([
-    "apps/erp/src/app/(app)/app-sidebar.tsx",
-    "apps/erp/src/app/(app)/dashboard-route.tsx",
-    "apps/erp/src/app/(app)/document-extraction-form.tsx",
-    "apps/erp/src/app/(app)/document-upload-form.tsx",
-    "apps/erp/src/app/(app)/erp-assistant-panel.tsx",
-    "apps/erp/src/app/(app)/module-screen.tsx",
-    "apps/erp/src/app/(app)/solution-console/lynx-operator-panel.tsx",
-    "apps/erp/src/app/(app)/solution-console/solution-console-route.tsx",
-    "apps/erp/src/app/(app)/knowledge/lynx-truth-panel.tsx",
     "apps/erp/src/app/app-analytics.tsx",
     "apps/erp/src/app/onboarding/onboarding-form.tsx",
   ]);

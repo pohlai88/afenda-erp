@@ -65,15 +65,10 @@ export {
   buildDocumentRegistryListSurface,
   buildModuleRecordListSurface,
   buildModuleWorkItemListSurface,
-  buildOperationalSkillsListSurface,
-  buildRecoveryPlaybookListSurface,
   buildSavedViewsListSurface,
-  buildSolutionConsoleAiUsageListSurface,
-  buildSolutionConsoleEvidenceListSurface,
   dashboardHardeningChecklistSurfaceKey,
   getDashboardListSurfaceKeys,
   getModuleListSurfaceKeys,
-  getSolutionConsoleListSurfaceKeys,
 } from "./modules/list-surfaces";
 export {
   buildDashboardKpiStatGrid,
@@ -81,12 +76,10 @@ export {
   buildModuleScreenOverviewStatGrid,
   buildModuleWorkspaceCountStatGrid,
   buildModuleWorkspaceStatGrid,
-  buildSolutionConsoleStatGrid,
   dashboardStatSurfaceKey,
   dashboardWorkflowSummaryStatSurfaceKey,
   getModuleOverviewStatSurfaceKey,
   getModuleStatSurfaceKey,
-  solutionConsoleStatSurfaceKey,
   type ResolvedMetric,
 } from "./modules/stat-surfaces";
 export {
@@ -153,18 +146,9 @@ export {
   dashboardRouteSections,
   formatModuleObservabilityFooter,
   getAppShellSkeletonNavItemIds,
-  getNavigationExtensionHeroCopy,
-  getSolutionConsoleSection,
-  getSolutionConsoleUxCards,
   moduleScreenDetailListLabels,
   moduleScreenMetrics,
   moduleScreenSections,
-  solutionConsoleAgentCopy,
-  solutionConsoleHeroFallback,
-  solutionConsoleMetrics,
-  solutionConsolePageMetadata,
-  solutionConsoleSections,
-  solutionConsoleUxCards,
   erpAssistantPanelCopy,
   documentWorkflowCopy,
   routeErrorCopy,
@@ -209,7 +193,19 @@ export {
   solutionToolModuleBindings,
   solutionWorkflowIds,
 } from "./modules/solution-playbooks";
-export { erpModules, moduleByHref, moduleById } from "./modules/definitions";
+import {
+  erpModules,
+  getErpModuleById,
+  moduleByHref,
+  moduleById,
+} from "./modules/definitions";
+
+export {
+  erpModules,
+  getErpModuleById,
+  moduleByHref,
+  moduleById,
+};
 export {
   applyTenantModuleAvailability,
   type TenantModuleAvailabilitySetting,
@@ -232,7 +228,6 @@ export {
 } from "./modules/workflow-metadata";
 export { getResolvedWorkflowAutomationRuns } from "./shared/workflow-resolution";
 import type { ErpModuleDefinition, ModuleMetric } from "./shared/module-types";
-import { erpModules, moduleByHref, moduleById } from "./modules/definitions";
 
 export type ModuleWorkspaceRecord = {
   id: string;
@@ -377,10 +372,6 @@ export const roleOperatingPosture = {
     description: string;
   }
 >;
-
-export function getErpModuleById(moduleId: ModuleId) {
-  return moduleById.get(moduleId) ?? null;
-}
 
 export function getErpModuleByHref(href: string) {
   return moduleByHref.get(href) ?? null;

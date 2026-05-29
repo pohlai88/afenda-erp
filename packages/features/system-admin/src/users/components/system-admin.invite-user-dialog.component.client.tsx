@@ -1,15 +1,19 @@
 "use client";
 
 import { ActionFormErrors } from "@afenda/governed-surface/client";
-import { Button } from "@afenda/ui/button";
-import { Input } from "@afenda/ui/input";
-import { NativeSelect } from "@afenda/ui/native-select";
+import { SystemAdminOneTimeSecretPanel } from "../../overview/components/system-admin.one-time-secret.component.client";
+import {
+  systemAdminEmailRoleActionFormFooterClass,
+  systemAdminEmailRoleActionFormGridClass,
+  systemAdminInlineFormMaxWidthClass,
+} from "../../overview/surfaces/system-admin.form-layout.shared";
+import { Button, Field, FieldGroup, FieldLabel, Input, NativeSelect } from "@afenda/ui";
 import { SendIcon } from "lucide-react";
 import { useActionState } from "react";
-import type { SystemAdminActionResult } from "../../contracts";
+import type { SystemAdminActionResult } from "../../tenant-execution/contracts/system-admin.action-result.contract";
 import type { SystemAdminInviteUserResult } from "../contracts";
 import { systemAdminSeedRoles } from "../../roles/contracts";
-import { SystemAdminOneTimeSecretPanel } from "../../components/system-admin.one-time-secret.component.client";
+import { systemAdminUsersUiCopy } from "../surface/system-admin.users-ui.copy.shared";
 
 type InviteAction = (
   state: SystemAdminActionResult<SystemAdminInviteUserResult> | undefined,
@@ -21,42 +25,44 @@ export function SystemAdminInviteUserDialog({
 }: {
   inviteAction: InviteAction;
 }) {
+  const copy = systemAdminUsersUiCopy.invite;
   const [state, formAction, pending] = useActionState<
     SystemAdminActionResult<SystemAdminInviteUserResult> | undefined,
     FormData
   >(inviteAction, undefined);
 
   return (
-    <form action={formAction} className="grid gap-4 md:grid-cols-[1fr_180px_auto]">
-      <label className="flex min-w-0 flex-col gap-1 text-sm">
-        <span className="text-muted-foreground">Email</span>
-        <Input name="email" type="email" required />
-      </label>
-      <label className="flex min-w-0 flex-col gap-1 text-sm">
-        <span className="text-muted-foreground">Initial role</span>
-        <NativeSelect name="role" defaultValue="staff">
-          {systemAdminSeedRoles.map((role) => (
-            <option key={role.key} value={role.key}>
-              {role.name}
-            </option>
-          ))}
-        </NativeSelect>
-      </label>
-      <div className="flex items-end">
-        <Button type="submit" disabled={pending}>
-          <SendIcon data-icon="inline-start" />
-          Invite
-        </Button>
-      </div>
-      <div className="md:col-span-3">
-        <ActionFormErrors result={state} />
-        {state?.ok && state.data ? (
-          <SystemAdminOneTimeSecretPanel
-            title="One-time invitation token"
-            secret={state.data.token}
-          />
-        ) : null}
-      </div>
+    <form action={formAction} className={systemAdminInlineFormMaxWidthClass}>
+      <FieldGroup className={systemAdminEmailRoleActionFormGridClass}>
+        <Field>
+          <FieldLabel>{copy.emailLabel}</FieldLabel>
+          <Input name="email" type="email" required autoComplete="email" />
+        </Field>
+        <Field>
+          <FieldLabel>{copy.roleLabel}</FieldLabel>
+          <NativeSelect name="role" defaultValue="staff">
+            {systemAdminSeedRoles
+              .filter((role) => role.status === "active")
+              .map((role) => (
+                <option key={role.key} value={role.key}>
+                  {role.name}
+                </option>
+              ))}
+          </NativeSelect>
+        </Field>
+        <div className="flex items-end">
+          <Button type="submit" disabled={pending}>
+            <SendIcon data-icon="inline-start" />
+            {copy.submitLabel}
+          </Button>
+        </div>
+        <div className={systemAdminEmailRoleActionFormFooterClass}>
+          <ActionFormErrors result={state} />
+          {state?.ok && state.data ? (
+            <SystemAdminOneTimeSecretPanel secret={state.data.token} />
+          ) : null}
+        </div>
+      </FieldGroup>
     </form>
   );
 }

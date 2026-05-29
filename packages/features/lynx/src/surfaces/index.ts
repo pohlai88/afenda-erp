@@ -1,3 +1,4 @@
+export * from "./lynx.console.surface";
 export * from "./lynx.readiness.surface";
 export * from "./lynx.run-management.surface";
 export * from "./lynx.run-detail.surface";

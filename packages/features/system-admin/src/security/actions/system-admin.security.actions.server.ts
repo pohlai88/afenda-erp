@@ -11,9 +11,9 @@ import {
   systemAdminActionSuccess,
   type SystemAdminActionResult,
   zodActionFailure,
-} from "../../contracts";
-import { systemAdminRoutePaths } from "../../contracts/system-admin.route-paths.contract";
-import { dispatchSystemAdminWebhook } from "../../events";
+} from "../../tenant-execution/contracts/system-admin.action-result.contract";
+import { systemAdminRoutePaths } from "../../overview/contracts/system-admin.route-paths.contract";
+import { dispatchSystemAdminWebhook } from "../../integrations";
 import { requireSystemAdminSecurityManage } from "../policies/system-admin.security.policy.server";
 import {
   assertSecuritySettingsDowngradeGuard,

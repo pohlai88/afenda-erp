@@ -20,6 +20,8 @@ import {
   KanbanColumnPanel,
   resolveKanbanColumns,
 } from "./kanban-board-presentation";
+import { GovernedEmpty } from "../../client";
+import { governedRendererCopy } from "../../i18n/governed-renderer-copy.shared";
 
 export {
   groupCardsByColumn,
@@ -45,6 +47,25 @@ export function KanbanBoardView({
   const cardsByColumn = groupCardsByColumn(board.cards);
 
   const boardDom = resolveKanbanBoardDomProps(surfaceKey);
+
+  if (columns.length === 0) {
+    return (
+      <section
+        aria-label={board.copy.boardAriaLabel}
+        className={KANBAN_DATA_NATURE_CLASS[board.dataNature]}
+        {...boardDom}
+        data-interaction-mode={board.interactionMode}
+      >
+        <GovernedEmpty
+          model={{
+            variant: "muted",
+            title: governedRendererCopy.empty.kanbanBoard.title,
+            description: governedRendererCopy.empty.kanbanBoard.description,
+          }}
+        />
+      </section>
+    );
+  }
 
   return (
     <section

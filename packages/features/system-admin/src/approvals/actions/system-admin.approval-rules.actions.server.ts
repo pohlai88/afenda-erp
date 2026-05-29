@@ -10,10 +10,10 @@ import {
   systemAdminActionSuccess,
   type SystemAdminActionResult,
   zodActionFailure,
-} from "../../contracts";
-import { systemAdminRoutePaths } from "../../contracts/system-admin.route-paths.contract";
-import { dispatchSystemAdminWebhook } from "../../events";
-import { requireSystemAdminApprovalsManage } from "../../policies/system-admin.capability.policy.server";
+} from "../../tenant-execution/contracts/system-admin.action-result.contract";
+import { systemAdminRoutePaths } from "../../overview/contracts/system-admin.route-paths.contract";
+import { dispatchSystemAdminWebhook } from "../../integrations";
+import { requireSystemAdminApprovalsManage } from "../../overview/policies/system-admin.capability.policy.server";
 import { serializeApprovalRuleConfiguration } from "../data/system-admin.approval-rules.mapper";
 import { systemAdminApprovalRuleActionSchema } from "../schemas/system-admin.approval-rule.schema";
 

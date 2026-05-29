@@ -363,18 +363,18 @@ export function LynxSources({
 
   return (
     <details
-      className="rounded-lg border border-border bg-background/60"
+      className="rounded-section border border-border bg-background/60"
       open={sources.length <= 3}
     >
       <summary className="flex cursor-pointer items-center justify-between gap-3 px-3 py-2">
-        <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+        <div className="type-label">
           {title}
         </div>
         <Badge variant="outline">{sources.length}</Badge>
       </summary>
       <div className="flex flex-col gap-2 border-t border-border p-3">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <div className="text-xs leading-5 text-muted-foreground">
+          <div className="type-caption">
             {sources.length} source{sources.length === 1 ? "" : "s"} tied to
             this response.
           </div>
@@ -462,9 +462,9 @@ function LynxQualityGate({ data }: { data: unknown }) {
   const precision = `${Math.round(payload.gate.citationPrecision * 100)}%`;
 
   return (
-    <section className="@container rounded-lg border border-border bg-background/60 p-3">
+    <section className="@container rounded-section border border-border bg-background/60 p-3">
       <div className="mb-3 flex items-center justify-between gap-3">
-        <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+        <div className="type-label">
           Evidence quality
         </div>
         <Badge variant={qualityVariant(payload.gate.status)}>
@@ -491,7 +491,7 @@ function LynxQualityGate({ data }: { data: unknown }) {
                   <Badge variant={qualityVariant(claim.status)}>
                     {claim.status}
                   </Badge>
-                  <p className="line-clamp-2 text-sm leading-6 text-muted-foreground">
+                  <p className="line-clamp-2 type-muted">
                     {claim.claim.text || claim.reason}
                   </p>
                 </CardContent>
@@ -543,7 +543,7 @@ export function LynxConversation({ children }: { children: ReactNode }) {
     <div className="relative">
       <div
         aria-live="polite"
-        className="flex max-h-[520px] flex-col gap-4 overflow-y-auto px-4 py-4"
+        className="flex max-h-[520px] flex-col gap-surface-lg overflow-y-auto px-surface-lg py-surface-lg" // audit-ds: ignore no-arbitrary-value — conversation scroll viewport height contract
         onScroll={handleScroll}
         ref={viewportRef}
         role="log"
@@ -553,7 +553,7 @@ export function LynxConversation({ children }: { children: ReactNode }) {
       {!isAtLatest ? (
         <Button
           aria-label="Scroll to latest Lynx response"
-          className="absolute bottom-3 right-3 shadow-sm"
+          className="absolute bottom-3 right-3 shadow-elevation-1"
           onClick={() => scrollToLatest()}
           size="sm"
           type="button"
@@ -651,7 +651,7 @@ export function LynxMessageResponse({
 
   return (
     <Streamdown
-      className="text-sm leading-6"
+      className="type-body"
       components={lynxMarkdownComponents}
       controls={{
         code: {
@@ -847,14 +847,14 @@ export function LynxRunSteps({ steps }: { steps: readonly LynxRunStep[] }) {
   }
 
   return (
-    <section className="rounded-lg border border-border bg-background/60 p-3">
-      <div className="mb-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+    <section className="rounded-section border border-border bg-background/60 p-3">
+      <div className="mb-2 type-label">
         Run steps
       </div>
       <ol className="flex flex-col gap-2">
         {steps.map((step) => (
           <li
-            className="flex items-center justify-between gap-3 text-sm"
+            className="flex items-center justify-between gap-3 type-body"
             key={step.id}
           >
             <span className="font-medium text-foreground">{step.label}</span>
@@ -886,7 +886,7 @@ export function LynxMessage({
     <article
       className={`border border-border shadow-none ${
         isUser ? "bg-muted/40" : "bg-card"
-      } rounded-lg p-4`}
+      } rounded-section p-4`}
     >
       <div className="mb-3">
         <Badge variant={isUser ? "secondary" : "outline"}>

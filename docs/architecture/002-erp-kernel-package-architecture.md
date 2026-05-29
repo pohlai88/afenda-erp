@@ -126,8 +126,8 @@ route adapters remain the active wiring path until extraction moves logic into
 | Concern                            | Current owner                                                                                                          |
 | ---------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
 | Module workspace routes            | `apps/erp/src/app/(app)/[moduleId]/` → `module-screen.tsx`                                                             |
-| Dashboard / solution-console lists | `dashboard-route.tsx`, `solution-console-route.tsx`                                                                    |
-| Governed list configuration        | `packages/kernel/src/modules/list-surfaces.ts` (`buildModule*ListSurface`, `buildDashboard*`, `buildSolutionConsole*`) |
+| Dashboard / Lynx console lists | `dashboard-route.tsx`, `lynx-console-route.tsx`                                                                    |
+| Governed list configuration        | `packages/kernel/src/modules/list-surfaces.ts` (`buildModule*ListSurface`, `buildDashboard*`) and `@afenda/feature-lynx/metadata` for Lynx console surfaces |
 | Governed rendering                 | `@afenda/governed-surface/server` (`GovernedPatternCListSection`)                                                      |
 | Shared ERP records / work items    | `packages/db` (`erp_module_records`, `erp_work_items`, …) via `@afenda/kernel`                                         |
 | Module registry and capabilities   | `packages/kernel`, `@afenda/config/module-ids`                                                                         |
@@ -157,7 +157,7 @@ schema, cross-module workflow state, or module-specific query logic.
 apps/erp/src/app/(app)/
   [moduleId]/page.tsx          # → module-screen.tsx
   dashboard/                   # → dashboard-route.tsx
-  solution-console/            # → solution-console-route.tsx
+  lynx/                        # → lynx-console-route.tsx
   api/                         # AI, uploads, cron, observability drain
 ```
 

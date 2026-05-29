@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { resolveRepoRootFile } from "../../src/data/system-admin.repo-root-file.repository.server";
+import { resolveRepoRootFile } from "../../src/reliability/data/system-admin.repo-root-file.repository.server";
 
 describe("resolveRepoRootFile", () => {
   it("locates vercel.json from the monorepo root", async () => {

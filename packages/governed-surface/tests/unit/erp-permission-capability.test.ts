@@ -33,7 +33,7 @@ describe("resolveErpCapabilityForPermission", () => {
     ).toBe("hr.documents.write");
   });
 
-  it("returns null for predict when module has no machine-layer capability", () => {
+  it("returns null for predict when module has no lynx capability", () => {
     expect(
       resolveErpCapabilityForPermission({
         module: "sales",
@@ -43,13 +43,13 @@ describe("resolveErpCapabilityForPermission", () => {
     ).toBeNull();
   });
 
-  it("maps predict on system-admin to machine-layer.read", () => {
+  it("maps predict on system-admin to lynx.read", () => {
     expect(
       resolveErpCapabilityForPermission({
         module: "system-admin",
-        object: "machine-layer",
+        object: "lynx",
         function: "predict",
       }),
-    ).toBe("system-admin.machine-layer.read");
+    ).toBe("system-admin.lynx.read");
   });
 });

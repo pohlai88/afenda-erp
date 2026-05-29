@@ -3,7 +3,7 @@ import {
   GOVERNED_METADATA_SCHEMA_VERSION,
   type ListSurfaceRendererConfigurationResolvedInput,
 } from "@afenda/governed-surface";
-import { buildSystemAdminListToolbar } from "../../surfaces/system-admin.list-surface.shared";
+import { buildSystemAdminListToolbar } from "../../overview/surfaces/system-admin.list-surface.shared";
 import type { SystemAdminAuditEventRow } from "../contracts/system-admin.audit-event.contract";
 import type { SystemAdminAuditSearchParams } from "../schemas/system-admin.audit-filter.schema";
 import {

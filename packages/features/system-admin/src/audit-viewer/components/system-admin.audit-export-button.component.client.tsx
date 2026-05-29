@@ -2,7 +2,7 @@
 
 import { Button } from "@afenda/ui";
 import { useTransition } from "react";
-import type { SystemAdminActionResult } from "../../contracts";
+import type { SystemAdminActionResult } from "../../tenant-execution/contracts/system-admin.action-result.contract";
 import { exportSystemAdminAuditLogsAction } from "../actions/system-admin.audit.actions.server";
 
 export function SystemAdminAuditExportButton({

@@ -9,6 +9,51 @@ const WRITE_TOOLS = new Set(["Write", "StrReplace"]);
 /** @type {Array<{ test: (p: string) => boolean; hint: string }>} */
 const ROUTES = [
   {
+    test: (p) => p.startsWith("apps/erp/src/workspace-routes/"),
+    hint: [
+      "**workspace-routes** — rule `afenda-erp-app`.",
+      "Route composition outside `src/app/`; keep App Router pages thin.",
+      "Doctrine: **ARCH-001** §shell/streaming. Before done: `pnpm typecheck`; route changes → `pnpm test:e2e`.",
+    ].join(" "),
+  },
+  {
+    test: (p) =>
+      p.startsWith("apps/erp/src/lib/system-admin-sections/") ||
+      p === "apps/erp/src/lib/system-admin-route.shared.ts",
+    hint: [
+      "**system-admin adapter** — rule `afenda-system-admin`.",
+      "Thin slug adapters only; behavior in `@afenda/feature-system-admin`.",
+      "Doctrine: **ARCH-011**, **ARCH-012**. Before done: `pnpm test --filter=@afenda/feature-system-admin`.",
+    ].join(" "),
+  },
+  {
+    test: (p) => p.startsWith("packages/features/system-admin/"),
+    hint: [
+      "**@afenda/feature-system-admin** — rule `afenda-system-admin`.",
+      "Doctrine: **ARCH-011** (+ vertical `*-architecture.md` supplement).",
+      "Do not delete `*architecture*` docs — update in place.",
+      "Before done: `pnpm architecture:check`; surfaces → `pnpm lint:governed-renderers`.",
+    ].join(" "),
+  },
+  {
+    test: (p) =>
+      p.startsWith("packages/features/knowledge/") ||
+      p.startsWith("packages/features/lynx/") ||
+      p.startsWith("apps/erp/src/app/api/lynx/"),
+    hint: [
+      "**Lynx / Knowledge** — rule `afenda-lynx-knowledge`.",
+      "Doctrine: **ARCH-009**. Substrate vs product split; banned AI-assistant vocabulary.",
+    ].join(" "),
+  },
+  {
+    test: (p) => p.startsWith("packages/kernel/src/execution-kernel/"),
+    hint: [
+      "**Execution Kernel** — rule `afenda-core`.",
+      "Doctrine: **ARCH-012**. Must not import `@afenda/feature-system-admin`.",
+      "Boundary with **ARCH-011**: kernel enforces; system-admin configures.",
+    ].join(" "),
+  },
+  {
     test: (p) => p.startsWith("apps/erp/"),
     hint: [
       "**apps/erp** — rule `@afenda-erp-app` / `afenda-erp-app`.",
@@ -77,8 +122,16 @@ const ROUTES = [
   {
     test: (p) => p.startsWith("docs/architecture/"),
     hint: [
-      "**architecture doc** — keep `ARCH-###` IDs aligned with filenames.",
-      "Conflict order: ARCH-002 → ARCH-001; update conflicting docs in the same PR.",
+      "**architecture doc** — rule `afenda-architecture-docs`.",
+      "Keep `ARCH-###` IDs aligned with filenames; do not delete — edit and cross-link.",
+      "Conflict order: ARCH-002 → ARCH-001; ARCH-011 ↔ ARCH-012 for admin vs execution.",
+    ].join(" "),
+  },
+  {
+    test: (p) => /architecture[^/]*\.md$/i.test(p),
+    hint: [
+      "**architecture supplement** — rule `afenda-architecture-docs`.",
+      "Package vertical docs link to `docs/architecture/` — preserve file; update as-built section only.",
     ].join(" "),
   },
   {

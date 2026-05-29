@@ -164,7 +164,7 @@ apps/erp/src/app/
   (app)/
     layout.tsx
     dashboard/
-    solution-console/
+    lynx/
     [moduleId]/
       page.tsx
       records/[recordId]/page.tsx
@@ -207,7 +207,7 @@ Afenda ERP v1 targets SME core ERP modules:
 | CRM          | Leads, accounts, contacts, activities                 | `features/crm`, `db`                        |
 | Approvals    | Approval rules, tasks, escalations, comments          | `features/approvals`, `workflows`, `db`     |
 | Reports      | Operational reports, exports, saved views             | `features/reports`, `observability`, `db`   |
-| System admin | Tenant settings, users, roles, audit log              | `features/system-admin`, `auth`, `db`       |
+| System admin | Organization defaults, users, roles, audit log        | `features/system-admin`, `auth`, `db`       |
 
 Business rules live in feature packages once a module becomes real; they do not
 live in React route components. `packages/kernel` remains the cross-module
@@ -781,7 +781,7 @@ catalog.
 
 Current status: module workspaces use dynamic `(app)/[moduleId]/` routes and
 metadata-driven list surfaces via `GovernedPatternCListSection` in
-`module-screen.tsx`, `dashboard-route.tsx`, and `solution-console-route.tsx`
+`module-screen.tsx`, `dashboard-route.tsx`, and `lynx-console-route.tsx`
 (kernel builders in `packages/kernel/src/modules/list-surfaces.ts`).
 `packages/kernel` resolves serialized module workspaces from tenant-scoped
 database records, saved views, workflow items, and document registry rows, with
@@ -822,7 +822,7 @@ by tenant. Local development requires `AI_GATEWAY_API_KEY` (or
 `VERCEL_OIDC_TOKEN` from `vercel env pull` when testing OIDC flows) before model
 calls execute; Vercel deployments use OIDC automatically when AI Gateway is
 enabled.
-The `/solution-console` route and `/api/lynx/operator` handler extend the
+The `/lynx` route and `/api/lynx/operator` handler extend the
 machine layer (Lynx Operator) for problem-first ERP recovery. The first flagship
 workflow is negative P&L recovery: Lynx gathers module evidence, diagnoses
 likely root causes, drafts recovery playbooks, and requires human approval

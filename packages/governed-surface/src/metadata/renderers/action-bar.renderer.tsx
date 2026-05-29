@@ -3,6 +3,7 @@ import {
   GOVERNED_ACTION_BAR_CONFIGURATION_SCHEMA_ID,
   parseGovernedActionBarConfiguration,
 } from "../../schemas/action-bar.schema";
+import { governedParseErrorCopy } from "../../i18n/governed-renderer-copy.shared";
 import { densityGapClass } from "../../schemas/surface-chrome.classes";
 import { cn } from "@afenda/ui/utils";
 import { Button } from "@afenda/ui/button";
@@ -22,15 +23,17 @@ export function ActionBarRenderer({
   const parsed = parseGovernedActionBarConfiguration(configuration);
 
   if (!parsed.success) {
+    const copy = governedParseErrorCopy(
+      diagnostics,
+      "actionBar",
+      `${GOVERNED_ACTION_BAR_CONFIGURATION_SCHEMA_ID} failed validation.`,
+    );
     return (
       <GovernedEmpty
         model={{
           variant: "error",
-          title: "Actions unavailable",
-          description:
-            diagnostics === "operator"
-              ? `${GOVERNED_ACTION_BAR_CONFIGURATION_SCHEMA_ID} failed validation.`
-              : "This action bar could not be loaded safely.",
+          title: copy.title,
+          description: copy.description,
         }}
       />
     );

@@ -1,6 +1,6 @@
 import {
   requireSystemAdminRolesManage,
   requireSystemAdminRolesRead,
-} from "../../policies";
+} from "../../overview/policies/system-admin.capability.policy.server";
 
 export { requireSystemAdminRolesManage, requireSystemAdminRolesRead };

@@ -5,14 +5,14 @@ import {
   type StatCardDensity,
   type StatCardItem,
 } from "../../schemas/stat-card.schema";
+import {
+  governedParseErrorCopy,
+  governedRendererCopy,
+} from "../../i18n/governed-renderer-copy.shared";
+import { GOVERNED_STAT_GRID_CLASS } from "../../stat-card-layout.shared";
 
 import type { GovernedComponentRendererDiagnostics } from "../registry";
 import { StatCardBody } from "./stat-card-body.client";
-
-const GRID_DENSITY_CLASS: Record<StatCardDensity, string> = {
-  comfortable: "grid grid-cols-1 gap-3 @sm:grid-cols-2 @2xl:grid-cols-4",
-  compact: "grid grid-cols-1 gap-2 @sm:grid-cols-2 @2xl:grid-cols-4",
-};
 
 export type StatCardRendererProps = {
   configuration: unknown;
@@ -26,15 +26,13 @@ export function StatCardRenderer({
   const parsed = parseStatCardConfiguration(configuration);
 
   if (!parsed.success) {
+    const copy = governedParseErrorCopy(diagnostics, "statCard");
     return (
       <GovernedEmpty
         model={{
           variant: "error",
-          title: "Card unavailable",
-          description:
-            diagnostics === "operator"
-              ? "The stat card configuration failed validation."
-              : "This card could not be loaded safely.",
+          title: copy.title,
+          description: copy.description,
         }}
       />
     );
@@ -42,9 +40,21 @@ export function StatCardRenderer({
 
   const { stats, density } = parsed.data;
 
+  if (stats.length === 0) {
+    return (
+      <GovernedEmpty
+        model={{
+          variant: "muted",
+          title: governedRendererCopy.empty.statCard.title,
+          description: governedRendererCopy.empty.statCard.description,
+        }}
+      />
+    );
+  }
+
   return (
     <section aria-label="Statistics" className="@container">
-      <div className={GRID_DENSITY_CLASS[density]}>
+      <div className={GOVERNED_STAT_GRID_CLASS[density]}>
         {stats.map((stat) => (
           <StatTile
             key={stat.label}
@@ -65,7 +75,7 @@ function StatTile({
   density: StatCardDensity;
 }) {
   return (
-    <Card className="@container/tile overflow-hidden">
+    <Card className="@container/tile overflow-hidden border-border shadow-elevation-1 transition-shadow hover:shadow-elevation-2">
       <CardContent className="p-0">
         <StatCardBody stat={stat} density={density} />
       </CardContent>

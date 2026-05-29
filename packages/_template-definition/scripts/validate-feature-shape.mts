@@ -122,17 +122,7 @@ function validateAppPath(relativePath: string) {
     return;
   }
 
-  const transitionAllowList = new Set([
-    "apps/erp/src/app/(app)/app-sidebar.tsx",
-    "apps/erp/src/app/(app)/dashboard-route.tsx",
-    "apps/erp/src/app/(app)/document-extraction-form.tsx",
-    "apps/erp/src/app/(app)/document-upload-form.tsx",
-    "apps/erp/src/app/(app)/erp-assistant-panel.tsx",
-    "apps/erp/src/app/(app)/module-screen.tsx",
-    "apps/erp/src/app/(app)/solution-console/lynx-operator-panel.tsx",
-    "apps/erp/src/app/(app)/solution-console/solution-console-route.tsx",
-    "apps/erp/src/app/(app)/knowledge/lynx-truth-panel.tsx",
-  ]);
+  const transitionAllowList = new Set<string>();
 
   const fileName = path.basename(relativePath);
   if (

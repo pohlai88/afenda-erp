@@ -1,3 +1,13 @@
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { createVitestConfig } from "@afenda/config/vitest";
 
-export default createVitestConfig("@afenda/feature-system-admin");
+const packageRoot = path.dirname(fileURLToPath(import.meta.url));
+
+export default createVitestConfig("@afenda/feature-system-admin", {
+  resolve: {
+    alias: {
+      "server-only": path.join(packageRoot, "tests/stubs/server-only.ts"),
+    },
+  },
+});

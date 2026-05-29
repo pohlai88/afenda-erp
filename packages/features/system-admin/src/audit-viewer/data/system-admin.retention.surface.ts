@@ -6,7 +6,7 @@ import {
 import {
   buildSystemAdminListToolbar,
   buildSystemAdminStaticPagination,
-} from "../../surfaces/system-admin.list-surface.shared";
+} from "../../overview/surfaces/system-admin.list-surface.shared";
 
 export const systemAdminRetentionSurfaceKey = "system-admin.retention.list";
 

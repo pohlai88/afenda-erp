@@ -27,6 +27,24 @@ test.describe("Metadata renderer gallery @visual", () => {
     await expect(page).toHaveURL(/\/dashboard/, { timeout: 15_000 });
   });
 
+  test("renderer gallery empty and forbidden fixtures are visible", async ({
+    page,
+  }) => {
+    await page.goto("/playground/metadata-renderer-gallery");
+    await page.waitForLoadState("networkidle");
+
+    await expect(page.getByText("No metrics configured.")).toBeVisible({
+      timeout: 10_000,
+    });
+    await expect(page.getByText("No approval steps recorded.")).toBeVisible();
+    await expect(
+      page.getByText("No workflow columns configured."),
+    ).toBeVisible();
+    await expect(
+      page.getByText("You do not have access to this surface"),
+    ).toBeVisible();
+  });
+
   test("renderer gallery renders without regressions @visual", async ({
     page,
   }) => {

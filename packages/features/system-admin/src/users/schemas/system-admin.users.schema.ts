@@ -8,7 +8,19 @@ export const systemAdminInviteUserInputSchema = z.object({
 
 export const systemAdminUserStatusInputSchema = z.object({
   membershipId: z.string().min(1),
-  status: z.enum(["suspended", "active"]),
+  status: z.enum(["active", "suspended", "removed"]),
+});
+
+export const systemAdminResendInvitationInputSchema = z.object({
+  invitationId: z.string().min(1),
+});
+
+export const systemAdminCancelInvitationInputSchema = z.object({
+  invitationId: z.string().min(1),
+});
+
+export const systemAdminInspectUserAccessInputSchema = z.object({
+  membershipId: z.string().min(1),
 });
 
 export type SystemAdminInviteUserInput = z.infer<
@@ -16,4 +28,10 @@ export type SystemAdminInviteUserInput = z.infer<
 >;
 export type SystemAdminUserStatusInput = z.infer<
   typeof systemAdminUserStatusInputSchema
+>;
+export type SystemAdminResendInvitationInput = z.infer<
+  typeof systemAdminResendInvitationInputSchema
+>;
+export type SystemAdminInspectUserAccessInput = z.infer<
+  typeof systemAdminInspectUserAccessInputSchema
 >;

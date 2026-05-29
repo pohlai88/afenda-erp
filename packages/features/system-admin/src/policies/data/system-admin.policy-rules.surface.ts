@@ -3,12 +3,12 @@ import type {
   ListSurfaceRow,
 } from "@afenda/governed-surface/schemas";
 import type { ExecutionPolicyEffect } from "@afenda/kernel/execution-tenant-policy";
-import { systemAdminControlLinks } from "../../contracts/system-admin.control-links.contract";
+import { systemAdminControlLinks } from "../../overview/contracts/system-admin.control-links.contract";
 import {
   buildLinkedControlListSurface,
   catalogStatusBadge,
   linkCell,
-} from "../../surfaces/system-admin.control.surface";
+} from "../../overview/surfaces/system-admin.control-list.shared";
 import type { SystemAdminPolicyRuleListRow } from "../contracts/system-admin.policy-rule.contract";
 
 export const systemAdminPoliciesSurfaceKey = "system-admin.policies.list";

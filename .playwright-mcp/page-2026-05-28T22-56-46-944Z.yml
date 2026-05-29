@@ -1,0 +1,488 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - generic [ref=e7]:
+      - generic [ref=e8]:
+        - generic [ref=e9]:
+          - generic [ref=e10]: A
+          - generic [ref=e11]:
+            - generic [ref=e12]: Afenda
+            - generic [ref=e13]: Operational workspace
+        - generic [ref=e14]:
+          - generic [ref=e16]:
+            - paragraph [ref=e17]: Active tenant
+            - generic [ref=e18]:
+              - generic [ref=e20]: AO
+              - generic [ref=e21]:
+                - generic [ref=e22]: Afenda Operations
+                - paragraph [ref=e23]: afenda-operations
+          - generic [ref=e24]:
+            - generic [ref=e26]: Tenant owner
+            - paragraph [ref=e27]: Coordinates cross-module execution and governance outcomes.
+            - generic [ref=e28]:
+              - generic [ref=e29]:
+                - term [ref=e30]: Routes
+                - definition [ref=e31]: "11"
+              - generic [ref=e32]:
+                - term [ref=e33]: Access
+                - definition [ref=e34]: Scoped
+      - generic [ref=e35]:
+        - generic [ref=e36]: Navigation
+        - list [ref=e38]:
+          - listitem [ref=e39]:
+            - link "Dashboard KPIs, approvals, alerts, and cross-functional operating signals." [ref=e40] [cursor=pointer]:
+              - /url: /dashboard
+              - generic [ref=e41]:
+                - generic [ref=e42]: Dashboard
+                - generic [ref=e43]: KPIs, approvals, alerts, and cross-functional operating signals.
+            - generic: Operational
+          - listitem [ref=e44]:
+            - link "Finance General ledger, receivables, payables, and close controls." [ref=e45] [cursor=pointer]:
+              - /url: /finance
+              - generic [ref=e46]:
+                - generic [ref=e47]: Finance
+                - generic [ref=e48]: General ledger, receivables, payables, and close controls.
+            - generic: Control buildout
+          - listitem [ref=e49]:
+            - link "Sales Quotes, orders, invoicing triggers, and customer commitments." [ref=e50] [cursor=pointer]:
+              - /url: /sales
+              - generic [ref=e51]:
+                - generic [ref=e52]: Sales
+                - generic [ref=e53]: Quotes, orders, invoicing triggers, and customer commitments.
+            - generic: Workflow ready
+          - listitem [ref=e54]:
+            - link "Purchasing Supplier relationships, POs, receipts, and spend controls." [ref=e55] [cursor=pointer]:
+              - /url: /purchasing
+              - generic [ref=e56]:
+                - generic [ref=e57]: Purchasing
+                - generic [ref=e58]: Supplier relationships, POs, receipts, and spend controls.
+            - generic: Workflow ready
+          - listitem [ref=e59]:
+            - link "Inventory Stock health, locations, replenishment, and movement exceptions." [ref=e60] [cursor=pointer]:
+              - /url: /inventory
+              - generic [ref=e61]:
+                - generic [ref=e62]: Inventory
+                - generic [ref=e63]: Stock health, locations, replenishment, and movement exceptions.
+            - generic: Operational
+          - listitem [ref=e64]:
+            - link "HR People operations, records, leave, and workforce exceptions." [ref=e65] [cursor=pointer]:
+              - /url: /hr
+              - generic [ref=e66]:
+                - generic [ref=e67]: HR
+                - generic [ref=e68]: People operations, records, leave, and workforce exceptions.
+            - generic: Records foundation
+          - listitem [ref=e69]:
+            - link "CRM Accounts, contacts, leads, pipeline activity, and relationship risk." [ref=e70] [cursor=pointer]:
+              - /url: /crm
+              - generic [ref=e71]:
+                - generic [ref=e72]: CRM
+                - generic [ref=e73]: Accounts, contacts, leads, pipeline activity, and relationship risk.
+            - generic: Workflow ready
+          - listitem [ref=e74]:
+            - link "Approvals Approval queues, escalations, SLA pressure, and decision trails." [ref=e75] [cursor=pointer]:
+              - /url: /approvals
+              - generic [ref=e76]:
+                - generic [ref=e77]: Approvals
+                - generic [ref=e78]: Approval queues, escalations, SLA pressure, and decision trails.
+            - generic: Control route
+          - listitem [ref=e79]:
+            - link "Reports Saved views, exports, snapshots, and operational insight delivery." [ref=e80] [cursor=pointer]:
+              - /url: /reports
+              - generic [ref=e81]:
+                - generic [ref=e82]: Reports
+                - generic [ref=e83]: Saved views, exports, snapshots, and operational insight delivery.
+            - generic: Insight surface
+          - listitem [ref=e84]:
+            - link "System admin Users, roles, settings, audit access, and tenant-level controls." [ref=e85] [cursor=pointer]:
+              - /url: /system-admin
+              - generic [ref=e86]:
+                - generic [ref=e87]: System admin
+                - generic [ref=e88]: Users, roles, settings, audit access, and tenant-level controls.
+            - generic: Governance route
+          - listitem [ref=e89]:
+            - link "Lynx Console Diagnose business problems and draft approved recovery actions." [ref=e90] [cursor=pointer]:
+              - /url: /lynx
+              - generic [ref=e91]:
+                - generic [ref=e92]: Lynx Console
+                - generic [ref=e93]: Diagnose business problems and draft approved recovery actions.
+            - generic: Lynx native
+    - main [ref=e94]:
+      - generic [ref=e98]:
+        - generic [ref=e99]:
+          - generic [ref=e102]: Workspace
+          - heading "Afenda Operations" [level=1] [ref=e103]
+          - paragraph [ref=e104]:
+            - generic [ref=e105]: afenda-operations
+            - generic [ref=e106]: ·
+            - generic [ref=e107]: 11 active routes
+        - generic [ref=e108]:
+          - generic [ref=e110]: DO
+          - generic [ref=e111]:
+            - generic [ref=e112]: Demo Operator
+            - generic [ref=e113]: owner@afenda.local
+          - button "Sign out" [ref=e115]
+      - generic [ref=e117]:
+        - generic [ref=e119]:
+          - generic [ref=e121]:
+            - generic [ref=e122]:
+              - paragraph [ref=e123]: Operations Platform
+              - heading "Afenda Operations workspace" [level=1] [ref=e124]
+              - generic [ref=e125]: Coordinates cross-module execution and governance outcomes.
+            - generic [ref=e127]:
+              - generic [ref=e128]: Operational
+              - generic [ref=e129]: afenda-operations
+          - region "Statistics" [ref=e135]:
+            - generic [ref=e136]:
+              - generic [ref=e139]:
+                - generic [ref=e141]: Accessible modules
+                - img "10" [ref=e144]:
+                  - generic [ref=e146]:
+                    - generic [ref=e147]: "1"
+                    - generic [ref=e148]: "0"
+                - generic [ref=e149]: Routes available under the current role and organization context.
+              - generic [ref=e152]:
+                - generic [ref=e154]: Workspace views
+                - img "3" [ref=e157]:
+                  - generic [ref=e160]: "3"
+                - generic [ref=e161]: Saved views resolved from module metadata.
+              - generic [ref=e164]:
+                - generic [ref=e166]: Workflow items
+                - img "0" [ref=e169]:
+                  - generic [ref=e172]: "0"
+                - generic [ref=e173]: 7 operational modules and 3 watchlist modules are in scope.
+        - region "Statistics" [ref=e178]:
+          - generic [ref=e179]:
+            - generic [ref=e182]:
+              - generic [ref=e184]: Open approvals
+              - img "14" [ref=e187]:
+                - generic [ref=e189]:
+                  - generic [ref=e190]: "1"
+                  - generic [ref=e191]: "4"
+              - generic [ref=e192]: Purchasing and finance actions due in the next 24 hours.
+            - generic [ref=e195]:
+              - generic [ref=e197]: Exceptions
+              - img "3" [ref=e200]:
+                - generic [ref=e203]: "3"
+              - generic [ref=e204]: Stock variance, invoice hold, and payroll validation mismatch.
+            - generic [ref=e207]:
+              - generic [ref=e209]: Healthy modules
+              - img "79" [ref=e212]:
+                - generic [ref=e214]:
+                  - generic [ref=e215]: "7"
+                  - generic [ref=e216]: "9"
+              - generic [ref=e217]: Core routes are within the current service budget.
+        - generic [ref=e218]:
+          - generic [ref=e222]:
+            - generic [ref=e223]:
+              - generic [ref=e224]:
+                - generic [ref=e225]: Status
+                - generic [ref=e226]:
+                  - combobox "Status" [ref=e227]:
+                    - option "All" [selected]
+                    - option "Pending"
+                    - option "In review"
+                    - option "Escalated"
+                    - option "Scheduled"
+                    - option "Completed"
+                  - img
+              - generic [ref=e228]:
+                - generic [ref=e229]: Priority
+                - generic [ref=e230]:
+                  - combobox "Priority" [ref=e231]:
+                    - option "All" [selected]
+                    - option "High"
+                    - option "Medium"
+                    - option "Low"
+                  - img
+              - generic [ref=e232]:
+                - generic [ref=e233]: Sort
+                - generic [ref=e234]:
+                  - combobox "Sort" [ref=e235]:
+                    - option "Default" [selected]
+                    - option "Due soonest"
+                    - option "Priority"
+                    - option "Recently updated"
+                  - img
+              - button "Comfortable" [ref=e236]
+              - button "Columns" [ref=e238]:
+                - img
+                - text: Columns
+            - generic [ref=e240]: No active queue items
+            - status [ref=e242]: 0 rows · page size 1
+          - generic [ref=e244]:
+            - generic [ref=e247]:
+              - heading "Automation and telemetry" [level=2] [ref=e248]
+              - generic [ref=e249]: Runtime health and scheduled background execution.
+            - generic [ref=e251]:
+              - generic [ref=e252]:
+                - generic [ref=e253]:
+                  - generic [ref=e254]:
+                    - generic [ref=e255]: Route render budget
+                    - generic [ref=e257]: Sub-250ms
+                  - generic [ref=e259]: Current dynamic routes remain inside the initial server budget.
+                - generic [ref=e260]:
+                  - generic [ref=e261]:
+                    - generic [ref=e262]: Analytics scope
+                    - generic [ref=e264]: App routes only
+                  - generic [ref=e266]: Authentication screens remain excluded from page analytics.
+                - generic [ref=e267]:
+                  - generic [ref=e268]:
+                    - generic [ref=e269]: Trace backlog
+                    - generic [ref=e271]: 02 modules
+                  - generic [ref=e273]: HR and admin still need richer mutation instrumentation.
+              - region "Statistics" [ref=e278]:
+                - generic [ref=e279]:
+                  - generic [ref=e282]:
+                    - generic [ref=e284]: Queue depth
+                    - img "0" [ref=e287]:
+                      - generic [ref=e290]: "0"
+                  - generic [ref=e293]:
+                    - generic [ref=e295]: Escalations
+                    - img "0" [ref=e298]:
+                      - generic [ref=e301]: "0"
+                  - generic [ref=e304]:
+                    - generic [ref=e306]: High priority
+                    - img "0" [ref=e309]:
+                      - generic [ref=e312]: "0"
+              - generic [ref=e316]:
+                - generic [ref=e317]:
+                  - button "Comfortable" [ref=e318]
+                  - button "Columns" [ref=e320]:
+                    - img
+                    - text: Columns
+                - table [ref=e323]:
+                  - rowgroup [ref=e324]:
+                    - row "Automation Schedule Status Detail" [ref=e325]:
+                      - columnheader "Automation" [ref=e326]:
+                        - generic [ref=e327]: Automation
+                      - columnheader "Schedule" [ref=e328]:
+                        - generic [ref=e329]: Schedule
+                      - columnheader "Status" [ref=e330]:
+                        - generic [ref=e331]: Status
+                      - columnheader "Detail" [ref=e332]:
+                        - generic [ref=e333]: Detail
+                  - rowgroup [ref=e334]:
+                    - row "Approval SLA sweep Daily 00:00 UTC (Vercel cron) healthy Escalation scan completed without backlog drift." [ref=e335]:
+                      - cell "Approval SLA sweep" [ref=e336]
+                      - cell "Daily 00:00 UTC (Vercel cron)" [ref=e337]
+                      - cell "healthy" [ref=e338]:
+                        - generic [ref=e339]: healthy
+                      - cell "Escalation scan completed without backlog drift." [ref=e340]
+                    - row "Supplier reminder dispatch Daily 01:00 UTC (Vercel cron) watch One reminder batch exceeded the target send window." [ref=e341]:
+                      - cell "Supplier reminder dispatch" [ref=e342]
+                      - cell "Daily 01:00 UTC (Vercel cron)" [ref=e343]
+                      - cell "watch" [ref=e344]:
+                        - generic [ref=e345]: watch
+                      - cell "One reminder batch exceeded the target send window." [ref=e346]
+                    - row "Report freshness sync Daily 02:00 UTC (Vercel cron) healthy All summary projections refreshed on schedule." [ref=e347]:
+                      - cell "Report freshness sync" [ref=e348]
+                      - cell "Daily 02:00 UTC (Vercel cron)" [ref=e349]
+                      - cell "healthy" [ref=e350]:
+                        - generic [ref=e351]: healthy
+                      - cell "All summary projections refreshed on schedule." [ref=e352]
+                - status [ref=e354]: 3 rows · page size 3
+        - generic [ref=e356]:
+          - generic [ref=e359]:
+            - heading "Lynx review" [level=2] [ref=e360]
+            - generic [ref=e361]: Gateway-backed chat for workflow review, document extraction guidance, and human-approved approval proposals.
+          - generic [ref=e364]:
+            - generic [ref=e365]:
+              - generic [ref=e366]: Lynx workspace
+              - generic [ref=e367]: Gateway-backed guidance with approved tool execution.
+            - generic [ref=e369]:
+              - button "Summarize workflow queue" [ref=e370]
+              - button "Review approval risk" [ref=e371]
+              - button "Guide extraction review" [ref=e372]
+              - button "Assess module pressure" [ref=e373]
+            - generic [ref=e375]: Ask about summarize workflow queue, review approval risk, guide extraction review, assess module pressure, or describe the next operational action you need.
+            - generic [ref=e376]:
+              - generic [ref=e377]:
+                - generic [ref=e378]: Ask the ERP assistant
+                - textbox "Ask the ERP assistant" [ref=e379]:
+                  - /placeholder: Ask for a workflow summary or draft an approval proposal...
+              - generic [ref=e380]:
+                - generic [ref=e381]: ready
+                - button "Send" [ref=e382]
+        - generic [ref=e384]:
+          - generic [ref=e387]:
+            - heading "Production hardening" [level=2] [ref=e388]
+            - generic [ref=e389]: Operational controls for telemetry, scheduled work, security posture, and tenant defense in depth.
+          - generic [ref=e391]:
+            - region "Hardening status" [ref=e394]:
+              - generic [ref=e395]:
+                - generic [ref=e397]: Hardening status
+                - generic [ref=e402]:
+                  - generic [ref=e405]: Checklist items
+                  - application [ref=e407]:
+                    - generic [ref=e418]:
+                      - generic [ref=e419]:
+                        - generic [ref=e421]: Reviewed
+                        - generic [ref=e423]: Pending
+                      - generic [ref=e424]:
+                        - generic [ref=e426]: "0"
+                        - generic [ref=e428]: "2"
+                        - generic [ref=e430]: "4"
+                        - generic [ref=e432]: "6"
+                        - generic [ref=e434]: "8"
+            - generic [ref=e438]:
+              - generic [ref=e439]:
+                - button "Comfortable" [ref=e440]
+                - button "Columns" [ref=e442]:
+                  - img
+                  - text: Columns
+              - table [ref=e445]:
+                - rowgroup [ref=e446]:
+                  - row "Area Status Detail" [ref=e447]:
+                    - columnheader "Area" [ref=e448]:
+                      - generic [ref=e449]: Area
+                    - columnheader "Status" [ref=e450]:
+                      - generic [ref=e451]: Status
+                    - columnheader "Detail" [ref=e452]:
+                      - generic [ref=e453]: Detail
+                - rowgroup [ref=e454]:
+                  - row "Analytics ready Vercel Analytics filters auth screens and records app route traffic." [ref=e455]:
+                    - cell "Analytics" [ref=e456]
+                    - cell "ready" [ref=e457]:
+                      - generic [ref=e458]: ready
+                    - cell "Vercel Analytics filters auth screens and records app route traffic." [ref=e459]
+                  - row "Speed Insights ready Core Web Vitals are collected from the root app layout." [ref=e460]:
+                    - cell "Speed Insights" [ref=e461]
+                    - cell "ready" [ref=e462]:
+                      - generic [ref=e463]: ready
+                    - cell "Core Web Vitals are collected from the root app layout." [ref=e464]
+                  - row "Structured logs configured API routes emit JSON logs with request IDs, duration, status, and module." [ref=e465]:
+                    - cell "Structured logs" [ref=e466]
+                    - cell "configured" [ref=e467]:
+                      - generic [ref=e468]: configured
+                    - cell "API routes emit JSON logs with request IDs, duration, status, and module." [ref=e469]
+                  - row "Log drains configured Signed drain payloads can be accepted at /api/observability/drain." [ref=e470]:
+                    - cell "Log drains" [ref=e471]
+                    - cell "configured" [ref=e472]:
+                      - generic [ref=e473]: configured
+                    - cell "Signed drain payloads can be accepted at /api/observability/drain." [ref=e474]
+                  - row "Cron jobs configured Reminder, sync, and housekeeping routes require CRON_SECRET." [ref=e475]:
+                    - cell "Cron jobs" [ref=e476]
+                    - cell "configured" [ref=e477]:
+                      - generic [ref=e478]: configured
+                    - cell "Reminder, sync, and housekeeping routes require CRON_SECRET." [ref=e479]
+                  - row "RLS configured Tenant tables enforce organization-scoped policies via request-local DB GUC context." [ref=e480]:
+                    - cell "RLS" [ref=e481]
+                    - cell "configured" [ref=e482]:
+                      - generic [ref=e483]: configured
+                    - cell "Tenant tables enforce organization-scoped policies via request-local DB GUC context." [ref=e484]
+              - status [ref=e486]: 6 rows · page size 6
+        - generic [ref=e490]:
+          - generic [ref=e491]:
+            - button "Comfortable" [ref=e492]
+            - button "Columns" [ref=e494]:
+              - img
+              - text: Columns
+          - table [ref=e497]:
+            - rowgroup [ref=e498]:
+              - row "View name Description Visibility" [ref=e499]:
+                - columnheader "View name" [ref=e500]:
+                  - generic [ref=e501]: View name
+                - columnheader "Description" [ref=e502]:
+                  - generic [ref=e503]: Description
+                - columnheader "Visibility" [ref=e504]:
+                  - generic [ref=e505]: Visibility
+            - rowgroup [ref=e506]:
+              - row "Workspace summary Default dashboard workspace view. team" [ref=e507]:
+                - cell "Workspace summary" [ref=e508]
+                - cell "Default dashboard workspace view." [ref=e509]
+                - cell "team" [ref=e510]:
+                  - generic [ref=e511]: team
+              - row "Approval pressure Default dashboard workspace view. team" [ref=e512]:
+                - cell "Approval pressure" [ref=e513]
+                - cell "Default dashboard workspace view." [ref=e514]
+                - cell "team" [ref=e515]:
+                  - generic [ref=e516]: team
+              - row "Performance health Default dashboard workspace view. team" [ref=e517]:
+                - cell "Performance health" [ref=e518]
+                - cell "Default dashboard workspace view." [ref=e519]
+                - cell "team" [ref=e520]:
+                  - generic [ref=e521]: team
+          - status [ref=e523]: 3 rows · page size 3
+        - generic [ref=e525]:
+          - generic [ref=e528]:
+            - heading "Module surfaces" [level=2] [ref=e529]
+            - generic [ref=e530]: The live navigation model is derived from role capabilities and shared module metadata.
+          - generic [ref=e532]:
+            - link "Dashboard Operational The executive workspace combines approval pressure, operating health, and module readiness into one route." [ref=e533] [cursor=pointer]:
+              - /url: /dashboard
+              - generic [ref=e534]:
+                - generic [ref=e535]:
+                  - generic [ref=e536]: Dashboard
+                  - generic [ref=e538]: Operational
+                - generic [ref=e540]: The executive workspace combines approval pressure, operating health, and module readiness into one route.
+            - link "Finance Control buildout Finance is organized around close readiness, aging pressure, and high-risk exceptions." [ref=e541] [cursor=pointer]:
+              - /url: /finance
+              - generic [ref=e542]:
+                - generic [ref=e543]:
+                  - generic [ref=e544]: Finance
+                  - generic [ref=e546]: Control buildout
+                - generic [ref=e548]: Finance is organized around close readiness, aging pressure, and high-risk exceptions.
+            - link "Sales Workflow ready Sales tracks commitment flow from quote acceptance through invoice handoff." [ref=e549] [cursor=pointer]:
+              - /url: /sales
+              - generic [ref=e550]:
+                - generic [ref=e551]:
+                  - generic [ref=e552]: Sales
+                  - generic [ref=e554]: Workflow ready
+                - generic [ref=e556]: Sales tracks commitment flow from quote acceptance through invoice handoff.
+            - link "Purchasing Workflow ready Purchasing centers on order release readiness, receiving exceptions, and supplier holds." [ref=e557] [cursor=pointer]:
+              - /url: /purchasing
+              - generic [ref=e558]:
+                - generic [ref=e559]:
+                  - generic [ref=e560]: Purchasing
+                  - generic [ref=e562]: Workflow ready
+                - generic [ref=e564]: Purchasing centers on order release readiness, receiving exceptions, and supplier holds.
+            - link "Inventory Operational Inventory prioritizes stock exposure, replenishment timing, and movement integrity." [ref=e565] [cursor=pointer]:
+              - /url: /inventory
+              - generic [ref=e566]:
+                - generic [ref=e567]:
+                  - generic [ref=e568]: Inventory
+                  - generic [ref=e570]: Operational
+                - generic [ref=e572]: Inventory prioritizes stock exposure, replenishment timing, and movement integrity.
+            - link "HR Records foundation HR organizes workforce changes, leave pressure, and records that require administrative review." [ref=e573] [cursor=pointer]:
+              - /url: /hr
+              - generic [ref=e574]:
+                - generic [ref=e575]:
+                  - generic [ref=e576]: HR
+                  - generic [ref=e578]: Records foundation
+                - generic [ref=e580]: HR organizes workforce changes, leave pressure, and records that require administrative review.
+            - link "CRM Workflow ready CRM focuses on account health, stalled opportunities, and relationship continuity." [ref=e581] [cursor=pointer]:
+              - /url: /crm
+              - generic [ref=e582]:
+                - generic [ref=e583]:
+                  - generic [ref=e584]: CRM
+                  - generic [ref=e586]: Workflow ready
+                - generic [ref=e588]: CRM focuses on account health, stalled opportunities, and relationship continuity.
+            - link "Approvals Control route Approvals is the control route for time-bound decisions across finance, purchasing, HR, and operations." [ref=e589] [cursor=pointer]:
+              - /url: /approvals
+              - generic [ref=e590]:
+                - generic [ref=e591]:
+                  - generic [ref=e592]: Approvals
+                  - generic [ref=e594]: Control route
+                - generic [ref=e596]: Approvals is the control route for time-bound decisions across finance, purchasing, HR, and operations.
+            - link "Reports Insight surface Reports provides operational and executive output surfaces built from tenant-safe summaries." [ref=e597] [cursor=pointer]:
+              - /url: /reports
+              - generic [ref=e598]:
+                - generic [ref=e599]:
+                  - generic [ref=e600]: Reports
+                  - generic [ref=e602]: Insight surface
+                - generic [ref=e604]: Reports provides operational and executive output surfaces built from tenant-safe summaries.
+            - link "System admin Governance route System admin is the tenant governance surface for identity, role assignment, and platform controls." [ref=e605] [cursor=pointer]:
+              - /url: /system-admin
+              - generic [ref=e606]:
+                - generic [ref=e607]:
+                  - generic [ref=e608]: System admin
+                  - generic [ref=e610]: Governance route
+                - generic [ref=e612]: System admin is the tenant governance surface for identity, role assignment, and platform controls.
+  - complementary "Developer sign-in" [ref=e613]:
+    - group [ref=e614]:
+      - generic "Developer sign-in Demo access" [ref=e615] [cursor=pointer]:
+        - generic [ref=e616]: Developer sign-in
+        - generic [ref=e617]: Demo access
+  - button "Open Next.js Dev Tools" [ref=e623] [cursor=pointer]:
+    - img [ref=e624]
+  - alert [ref=e627]
+  - generic [ref=e628]: "0"

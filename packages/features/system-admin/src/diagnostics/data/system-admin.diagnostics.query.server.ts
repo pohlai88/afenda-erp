@@ -1,10 +1,10 @@
-import { listRoleOverridesForOrganization } from "../../data/repositories/system-admin.identity.repository.server";
+import { listRoleOverridesForOrganization } from "../../users/data/system-admin.identity.repository.server";
 import {
   listTenantApprovalSettings,
   listTenantCapabilitySettings,
   listTenantModuleSettings,
   listTenantPolicySettings,
-} from "../../data/repositories/system-admin.execution-settings.repository.server";
+} from "../../tenant-execution/data/system-admin.execution-settings.repository.server";
 import { getSystemAdminOrganizationSecuritySettings } from "../../security/data/system-admin.security.query.server";
 import type {
   SystemAdminDiagnosticIssue,

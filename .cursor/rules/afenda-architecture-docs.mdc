@@ -1,0 +1,39 @@
+---
+description: Protect architecture doctrine files — canonical location and no deletion
+alwaysApply: true
+---
+
+# Architecture documentation
+
+Canonical index: `docs/architecture/README.md` (`ARCH-001`–`ARCH-012`).
+
+## Do not delete
+
+Never delete files whose path or name contains **`architecture`** (case-insensitive), including:
+
+- `docs/architecture/**/*.md`
+- `packages/features/*/src/**/*architecture*.md` (vertical supplements, e.g. `users-architecture.md`)
+
+When consolidating doctrine, **update and link** — do not remove. Fold duplicate *behavior* into code; keep architecture docs as the authority trail.
+
+If the user explicitly requests deletion of a specific architecture file in the current turn, confirm the path and update `docs/architecture/README.md` / cross-links in the same change.
+
+## Where docs live
+
+| Kind | Location |
+| ---- | -------- |
+| Canonical doctrine | `docs/architecture/ARCH-###-*.md` |
+| Feature vertical supplement | `packages/features/<module>/src/<area>/*-architecture.md` — links to parent ARCH doc |
+| Agent routing (not doctrine) | `.cursor/hooks/afenda-architecture-routing.md` |
+
+Do not create root-level `*-architecture.md` files outside `docs/architecture/`.
+
+## Conflict order
+
+**ARCH-002** (feature packages) → **ARCH-001** (runtime) → update the other doc in the same PR.
+
+System Admin: **ARCH-011** + **ARCH-012** move together when control vs execution boundary changes.
+
+## Hooks
+
+`.cursor/hooks/guard-architecture-docs.mjs` blocks agent `Delete` on architecture paths unless the user explicitly overrides in the current task.

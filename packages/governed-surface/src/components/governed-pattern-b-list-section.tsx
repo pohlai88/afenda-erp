@@ -23,6 +23,7 @@ import {
 } from "./governed-surface-section-card";
 import {
   renderGovernedPatternSectionShell,
+  type GovernedPatternSectionDensity,
   type GovernedPatternSectionLayout,
 } from "./governed-pattern-section-shell.shared";
 
@@ -34,6 +35,7 @@ export type GovernedPatternBListSectionProps = {
   listConfiguration: ListSurfaceRendererConfigurationInput;
   surfaceKey: string;
   layout?: GovernedPatternBListSectionLayout;
+  density?: GovernedPatternSectionDensity;
   loadError?: EmptyState;
   parentAccessAllowed?: boolean;
   resolveConfiguredPermission?: boolean;
@@ -55,6 +57,7 @@ export async function GovernedPatternBListSection({
   listConfiguration,
   surfaceKey,
   layout = "card",
+  density = "comfortable",
   loadError,
   parentAccessAllowed = true,
   resolveConfiguredPermission = true,
@@ -74,6 +77,7 @@ export async function GovernedPatternBListSection({
 
   const shellInput = {
     layout,
+    density,
     className,
     sectionTestId,
     sectionDomId,

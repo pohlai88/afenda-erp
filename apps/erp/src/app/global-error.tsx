@@ -9,19 +9,20 @@ export default function GlobalError({
 }) {
   return (
     <html lang="en">
+      {/* audit-ds: ignore no-arbitrary-value — global-error renders outside app theme shell */}
       <body className="min-h-full bg-[#f6f7f9] font-sans text-[#131922] antialiased">
-        <main className="flex min-h-screen items-center justify-center px-6 py-16">
-          <div className="w-full max-w-lg rounded-2xl border border-black/10 bg-white p-8 shadow-sm">
-            <div className="text-xs uppercase tracking-wide text-slate-500">
+        <main className="flex min-h-screen items-center justify-center px-surface-2xl py-16">
+          <div className="w-full max-w-lg rounded-panel border border-black/10 bg-white p-8 shadow-elevation-1">
+            <div className="type-caption uppercase tracking-wide text-slate-500">
               Afenda ERP
             </div>
-            <h1 className="mt-3 text-2xl font-semibold">Application error</h1>
-            <p className="mt-3 text-sm leading-6 text-slate-600">
+            <h1 className="mt-3 type-section-title font-semibold">Application error</h1>
+            <p className="mt-3 type-body leading-6 text-slate-600">
               A critical error prevented the app shell from rendering.
               {error.digest ? ` Reference: ${error.digest}.` : null}
             </p>
             <button
-              className="mt-6 inline-flex rounded-lg border border-black/10 bg-slate-50 px-4 py-2 text-sm font-medium transition hover:bg-slate-100"
+              className="mt-surface-2xl inline-flex rounded-section border border-black/10 bg-slate-50 px-surface-lg py-2 type-body font-medium transition hover:bg-slate-100"
               onClick={reset}
               type="button"
             >

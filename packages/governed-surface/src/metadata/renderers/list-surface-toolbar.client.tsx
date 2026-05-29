@@ -137,7 +137,7 @@ export function ListSurfaceToolbarClient({
 
   return (
     <div
-      className="mb-density-comfortable flex flex-wrap items-center justify-end gap-2"
+      className="flex flex-wrap items-center justify-end gap-2 shrink-0"
       data-testid="governed-list-toolbar"
     >
       {selectedCount > 0 ? (

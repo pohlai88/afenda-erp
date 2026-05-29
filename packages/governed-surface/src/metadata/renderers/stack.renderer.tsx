@@ -1,38 +1,14 @@
-import type { ReactNode } from "react";
-
 import { GovernedEmpty } from "../../client";
-import {
-  parseGovernedComponentData,
-  type GovernedComponent,
-} from "../../schemas/component.schema";
 import { parseGovernedStackConfiguration } from "../../schemas/stack.schema";
 import {
   densityGapClass,
   elevatedChromeFrameClass,
 } from "../../schemas/surface-chrome.classes";
+import { governedSurfaceParseErrorCopy } from "../../i18n/governed-renderer-copy.shared";
 import { cn } from "@afenda/ui/utils";
 
-import { GovernedComponentTree } from "../governed-component-tree";
+import { renderGovernedChildTree } from "../render-governed-child-tree.shared";
 import type { GovernedComponentRendererDiagnostics } from "../registry";
-
-function renderChildren(
-  children: unknown[],
-  diagnostics: GovernedComponentRendererDiagnostics,
-): ReactNode {
-  return children.map((child, index) => {
-    const parsed = parseGovernedComponentData(child);
-    if (!parsed.success) {
-      return null;
-    }
-    return (
-      <GovernedComponentTree
-        key={`${parsed.data.type}-${index}`}
-        component={parsed.data as GovernedComponent}
-        diagnostics={diagnostics}
-      />
-    );
-  });
-}
 
 /**
  * governed:stack — flex layout for nested governed children.
@@ -47,15 +23,16 @@ export function StackRenderer({
   const parsed = parseGovernedStackConfiguration(configuration);
 
   if (!parsed.success) {
+    const copy = governedSurfaceParseErrorCopy(
+      diagnostics,
+      "The stack configuration failed validation.",
+    );
     return (
       <GovernedEmpty
         model={{
           variant: "error",
-          title: "Section unavailable",
-          description:
-            diagnostics === "operator"
-              ? "The stack configuration failed validation."
-              : "This section could not be loaded safely.",
+          title: copy.title,
+          description: copy.description,
         }}
       />
     );
@@ -86,7 +63,7 @@ export function StackRenderer({
         elevatedChromeFrameClass(chrome?.elevation, chrome?.surface),
       )}
     >
-      {renderChildren(children, diagnostics)}
+      {renderGovernedChildTree(children, diagnostics)}
     </div>
   );
 }

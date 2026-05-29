@@ -29,7 +29,6 @@
     "@afenda/feature-purchasing": "workspace:*",
     "@afenda/feature-reports": "workspace:*",
     "@afenda/feature-sales": "workspace:*",
-    "@afenda/feature-solution-console": "workspace:*",
     "@afenda/feature-system-admin": "workspace:*",
     "@afenda/governed-surface": "workspace:*",
     "@afenda/observability": "workspace:*",

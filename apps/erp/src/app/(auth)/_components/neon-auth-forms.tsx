@@ -132,13 +132,13 @@ export function NeonAuthForm({
 
   return (
     <div>
-      <h2 className="text-2xl font-semibold text-foreground">{labels.title}</h2>
-      <p className="mt-3 text-sm leading-6 text-muted-foreground">
+      <h2 className="type-section-title font-semibold text-foreground">{labels.title}</h2>
+      <p className="mt-3 type-body leading-6 text-muted-foreground">
         {labels.description}
       </p>
 
       {showGoogleOAuth ? (
-        <div className="mt-8 flex flex-col gap-5">
+        <div className="mt-surface-3xl flex flex-col gap-5">
           <AuthSecondaryButton
             disabled={pending}
             onClick={handleGoogleSignIn}
@@ -155,7 +155,7 @@ export function NeonAuthForm({
         action={handleSubmit}
         aria-busy={pending}
         className={
-          showGoogleOAuth ? "flex flex-col gap-5" : "mt-8 flex flex-col gap-5"
+          showGoogleOAuth ? "flex flex-col gap-5" : "mt-surface-3xl flex flex-col gap-5"
         }
       >
         {mode === "sign-up" ? (
@@ -214,7 +214,7 @@ export function NeonAuthForm({
         </AuthPrimaryButton>
       </form>
 
-      <p className="mt-6 text-center text-sm text-muted-foreground">
+      <p className="mt-surface-2xl text-center type-muted">
         {labels.alternatePrompt}{" "}
         <AuthInlineLink href={labels.alternateHref}>
           {labels.alternateLabel}

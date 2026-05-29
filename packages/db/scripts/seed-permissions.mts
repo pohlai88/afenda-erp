@@ -271,15 +271,15 @@ const permissionCatalog = [
     description: "Rotate API keys, register webhooks, and update SSO config.",
   },
   {
-    key: "system-admin.machine-layer.read",
+    key: "system-admin.lynx.read",
     module: "system-admin",
-    label: "Read machine layer ops",
+    label: "Read Lynx governance",
     description: "View AI usage, approvals, sandboxes, and Lynx eval state.",
   },
   {
-    key: "system-admin.machine-layer.approve",
+    key: "system-admin.lynx.approve",
     module: "system-admin",
-    label: "Approve machine actions",
+    label: "Approve Lynx actions",
     description: "Approve or reject AI action sandboxes and proposals.",
   },
   {

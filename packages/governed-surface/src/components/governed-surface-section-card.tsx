@@ -11,6 +11,8 @@ import {
 import { cn } from "@afenda/ui/utils";
 
 import type { EmptyState } from "../schemas/list-surface.schema";
+import { densityGapClass } from "../schemas/surface-chrome.classes";
+import type { GovernedPatternSectionDensity } from "./governed-pattern-section-shell.shared";
 import { GovernedEmpty } from "./governed-empty";
 
 /** Section body contract — one Card shell, one state path (ADR-0026 Pattern C recipe). */
@@ -25,6 +27,7 @@ export type GovernedSurfaceSectionCardProps = {
   description?: string;
   body: GovernedSurfaceSectionCardBody;
   headerAction?: ReactNode;
+  density?: GovernedPatternSectionDensity;
   className?: string;
   contentClassName?: string;
 };
@@ -34,12 +37,13 @@ export function GovernedSurfaceSectionCard({
   description,
   body,
   headerAction,
+  density = "comfortable",
   className,
   contentClassName,
 }: GovernedSurfaceSectionCardProps) {
   return (
     <Card
-      size="sm"
+      size={density === "compact" ? "sm" : "default"}
       className={cn("mt-surface-2xl border-solid border-border", className)}
     >
       <CardHeader>
@@ -49,7 +53,9 @@ export function GovernedSurfaceSectionCard({
         {description ? <CardDescription>{description}</CardDescription> : null}
         {headerAction ? <CardAction>{headerAction}</CardAction> : null}
       </CardHeader>
-      <CardContent className={contentClassName}>
+      <CardContent
+        className={cn(densityGapClass(density), contentClassName)}
+      >
         {body.state === "forbidden" || body.state === "invalid" ? (
           <GovernedEmpty model={body.model} />
         ) : (

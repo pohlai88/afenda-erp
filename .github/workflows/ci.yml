@@ -42,12 +42,23 @@ jobs:
       - name: Lint governed renderers
         run: pnpm lint:governed-renderers
 
+      - name: Lint governed renderer contracts
+        run: pnpm lint:governed-renderer-contracts
+
       - name: Audit governed design-system tokens
         run: pnpm audit:governed-design-tokens --strict
 
-      - name: Audit consumer design tokens (advisory)
-        run: pnpm audit:governed-design-tokens --scope=all
-        continue-on-error: true
+      - name: Audit consumer design tokens
+        run: pnpm audit:governed-design-tokens --scope=all --strict
+
+      - name: Audit shadcn composition
+        run: pnpm audit:shadcn-composition --strict
+
+      - name: Audit streaming skeleton parity
+        run: pnpm audit:skeleton-parity
+
+      - name: Audit list surface chrome
+        run: pnpm audit:list-surface-chrome
 
       - name: Unit tests
         run: pnpm test

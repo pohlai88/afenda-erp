@@ -4,44 +4,55 @@
 
 | Door | Owns |
 | ---- | ---- |
-| `./metadata` | List surface builders, `surfaceKey` constants, `getSystemAdminSurfaceKeys`, module metadata helpers |
-| `./server` | Page models, policies, actions, queries, server components, Lynx monitor surface builder |
+| `./metadata` | List surface builders, `surfaceKey` constants, `getSystemAdminSurfaceKeys` |
+| `./server` | Page models, policies, actions, queries, server components |
 | `./client` | Client forms, trailing cells, nav, serializable catalogs |
 
-Pattern C ERP routes import list configuration from **`/metadata`** and authority from **`/server`**.
+Pattern C routes: list config from **`/metadata`**, authority from **`/server`**.
 
 ## Domain verticals
 
-- `overview/`, `users/`, `memberships/`, `roles/`, `permissions/`, `modules/`, `capabilities/`
-- `policies/` (policy-rules vertical + root capability gates in `system-admin.capability.policy.server.ts`)
-- `approvals/`, `audit-viewer/`, `security/`, `organization/`, `diagnostics/`, `execution/`
+Each vertical owns `actions/`, `policies/`, `events/` (where applicable), `data/` (including governed list surface builders), `contracts/`, `schemas/` (Zod action and filter schemas). Cross-vertical list toolbar helpers live in `overview/surfaces/`.
 
-Vertical `index.ts` files export page models, actions, and policies — not list builders (those live on `/metadata`).
+- `overview/`, `users/`, `memberships/`, `roles/`, `permissions/`, `modules/`, `capabilities/`
+- `policies/` (policy-rules vertical; module-wide capability gates live in `overview/policies/`)
+- `approvals/`, `audit-viewer/`, `security/`, `organization/`, `diagnostics/`
+- `integrations/`, `lynx/`, `billing/`, `reliability/`, `tenant-execution/`
 
 ## Data access
 
-Domain repositories under `data/repositories/`:
+Persistence adapters live in each vertical’s `data/` folder (e.g. `users/data/system-admin.identity.repository.server.ts`, `tenant-execution/data/system-admin.execution-settings.repository.server.ts`). There is no shared `src/data/` barrel.
 
-- `tenant-settings`, `tenant-security`, `identity`, `integrations`, `execution-settings`, `audit`, `machine-layer`
+## Components
 
-`data/system-admin.data-access.repository.server.ts` remains a compat re-export barrel for `data/index.ts` only.
+Client and server UI live in each vertical’s `components/` folder. `./client` re-exports governed forms, trailing cells, and nav from those buckets. There is no shared `src/components/` barrel.
 
-## Compatibility buckets
+## Contracts
 
-- `actions/`, `data/`, `schemas/`, `surfaces/`, `components/`, `contracts/`, `events/` — implementation homes; routes use export doors.
-- `/system-admin/identity` and `/system-admin/settings` — compatibility routes.
-- Hub route: `apps/erp/.../system-admin/(index)/page.tsx` with route-level `loading.tsx`.
+Types, catalogs, route paths, and action envelopes live in each vertical’s `contracts/` folder (for example `tenant-execution/contracts` for `SystemAdminActionResult`, `overview/contracts` for nav paths, `integrations/contracts` for API scopes and webhooks). There is no shared `src/contracts/` barrel.
 
-## Removed shims (cleanup pass)
+## Schemas
 
-- `surfaces/system-admin.audit.surface.ts` — retention/audit keys import from `audit-viewer/data/` directly.
-- `systemAdminAuditLogSurfaceKey` / `getSystemAdminSurfaceKeys().auditLog`.
-- Duplicate list-builder exports on `/server` and vertical indexes.
-- `SystemAdminAuditExportButton` on `audit-viewer` server index (client door only).
-- `buildDiagnosticsListSurface` alias on control surface.
+Zod parsers for form actions and list filters live in each vertical’s `schemas/` folder (for example `modules/schemas` for module settings, `integrations/schemas` for API credentials and webhooks). There is no shared `src/schemas/` barrel.
 
-## Follow-up
+## Surfaces
 
-- Point remaining callers at domain repos; delete compat data-access barrel.
-- Full `integrations/` and `audit-viewer/` policy/event vertical parity.
-- Collapse root `actions/` shims into vertical action modules.
+Governed list surface builders and `surfaceKey` constants live in each vertical’s `data/*` surface modules (for example `modules/data/system-admin.modules-list.surface.ts`). Shared toolbar/pagination helpers and the surface-key registry are in `overview/surfaces/`. There is no shared `src/surfaces/` barrel.
+
+## Cross-cutting (`overview/`)
+
+- `overview/policies/system-admin.capability.policy.server.ts` — module-wide execution capability gates
+- `overview/contracts/system-admin.{control-links,list-search,list-filter}.shared.ts` — list navigation and search helpers
+- `integrations/events/system-admin.webhook-dispatch.event.ts` — tenant webhook dispatch (exported from `integrations/`)
+
+## Removed
+
+- `src/events/` root bucket (webhook dispatch → `integrations/events/`; vertical events stay in each vertical)
+- `src/surfaces/` root bucket (relocated into domain verticals and `overview/surfaces/`)
+- `src/schemas/` root bucket (relocated into domain verticals)
+- `src/contracts/` root bucket (relocated into domain verticals)
+- `src/components/` root bucket (UI relocated into domain verticals)
+- `src/data/` root bucket (repositories and queries relocated into domain verticals)
+- `src/actions/` root shim bucket
+- `data/system-admin.data-access.repository.server.ts`
+- `data/system-admin.hub-governance.query.server.ts` (unused; overview owns hub snapshot)

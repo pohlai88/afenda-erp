@@ -1,5 +1,7 @@
 /**
- * Public index door for feature packages.
- * Re-export shared contracts safe on both client and server.
+ * @afenda/feature-<moduleId>
+ *
+ * Environment-neutral shared exports. Keep server-only graphs out of client bundles.
+ * Server: `./server` · Client: `./client` · Metadata: `./metadata`
  */
-export {};
+export * from "./metadata";

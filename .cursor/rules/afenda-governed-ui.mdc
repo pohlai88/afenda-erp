@@ -40,7 +40,7 @@ Execution order: Runtime → Query → Builder → Resolver → Zod parse → Re
 ## Renderer kernel rules
 
 - One shipped renderer per id under `src/metadata/renderers/`.
-- Respect `pnpm lint:governed-renderers` import allowlist on `renderers/**`.
+- Respect `pnpm lint:governed-renderers` (registry parity + import allowlist) on `renderers/**`.
 - Invalid metadata must fail parse before render; safe production fallbacks only.
 
 ## Tests

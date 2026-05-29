@@ -2,6 +2,7 @@
 
 import {
   Fragment,
+  useEffect,
   useMemo,
   useRef,
   useState,
@@ -53,9 +54,22 @@ import type { GovernedListTrailingCellContext } from "../../schemas/list-trailin
 import type { uiDensity } from "@afenda/ui/design-system";
 import { cn } from "@afenda/ui/utils";
 
+import {
+  resolveListSurfaceColumnVisualClass,
+  resolveListSurfaceColumnVisualStyle,
+  resolveListSurfaceTableMinWidthPx,
+} from "./list-surface-table-layout.shared";
 import { buildListSurfaceColumnDefs } from "./list-surface-tanstack.shared";
 import { ListSurfaceCell } from "./list-surface-cell.client";
 import { ListSurfaceToolbarClient } from "./list-surface-toolbar.client";
+import {
+  LIST_SURFACE_CARD_CHROME_CLASS,
+  LIST_SURFACE_CHROME_GROUP_CLASS,
+  LIST_SURFACE_FOOTER_ROW_CLASS,
+  LIST_SURFACE_TABLE_VIEWPORT_CLASS,
+  LIST_SURFACE_TOOLBAR_ROW_CLASS,
+  listSurfaceChromeXClass,
+} from "./list-surface-chrome.shared";
 
 const ROW_TONE_CLASS: Record<ListSurfaceRowTone, string> = {
   default: "",
@@ -84,21 +98,20 @@ function alignClass(align: ListColumn["align"]): string {
   }
 }
 
-function columnVisualClass(column: ListColumn | undefined): string {
+function listSurfaceColumnClass(
+  columnId: string,
+  column: ListColumn | undefined,
+): string {
   return cn(
-    alignClass(column?.align),
-    column?.wrap && "whitespace-normal",
-    column?.clip && "max-w-[16rem] truncate", // audit-ds: ignore no-arbitrary-value — clip column max-width contract
-    column?.pin === "start" && "sticky left-0 z-raised bg-card",
-    column?.pin === "end" && "sticky right-0 z-raised bg-card",
+    resolveListSurfaceColumnVisualClass(columnId, column, alignClass(column?.align)),
   );
 }
 
-function columnVisualStyle(column: ListColumn | undefined): CSSProperties {
-  return {
-    minWidth: column?.minWidth,
-    maxWidth: column?.maxWidth,
-  };
+function listSurfaceColumnStyle(
+  columnId: string,
+  column: ListColumn | undefined,
+): CSSProperties {
+  return resolveListSurfaceColumnVisualStyle(columnId, column);
 }
 
 function DecisionLedgerPanel({
@@ -110,7 +123,8 @@ function DecisionLedgerPanel({
 }) {
   const riskTone = ledger.riskTone ?? "default";
   return (
-    <div className="surface-inset flex flex-col gap-2 rounded-section type-body">
+    <Card className="surface-inset border-0 shadow-none">
+      <CardContent className="flex flex-col gap-2 p-0 type-body">
       <div className="flex flex-wrap items-center gap-2">
         <ClipboardList className="size-4 text-muted-foreground" aria-hidden />
         <span className="type-body font-medium">{label}</span>
@@ -163,7 +177,8 @@ function DecisionLedgerPanel({
           Open evidence
         </Link>
       ) : null}
-    </div>
+      </CardContent>
+    </Card>
   );
 }
 
@@ -184,6 +199,8 @@ export type ListSurfaceTableClientProps = {
   rows: readonly ListSurfaceRow[];
   surfaceKey?: string;
   columnsId?: string;
+  /** Accessible name for the data table (typically the list surface title). */
+  tableLabel?: string;
   dataNature?: ListSurfaceRendererDataNature;
   presentationVariant?: string;
   empty?: EmptyState;
@@ -216,6 +233,7 @@ export function ListSurfaceTableClient({
   rows,
   surfaceKey,
   columnsId,
+  tableLabel,
   dataNature,
   presentationVariant,
   empty,
@@ -244,6 +262,52 @@ export function ListSurfaceTableClient({
   const [expandedLedgerRowIds, setExpandedLedgerRowIds] = useState<Set<string>>(
     new Set(),
   );
+  const chromeXClass = listSurfaceChromeXClass(density);
+
+  useEffect(() => {
+    if (presentationVariant !== "table-only" || rows.length === 0) {
+      return;
+    }
+
+    const outer = scrollRef.current?.closest("[data-testid]");
+    const shell = outer?.querySelector('[class*="group/list-chrome"]');
+    if (!(outer instanceof HTMLElement) || !(shell instanceof HTMLElement)) {
+      return;
+    }
+
+    const outerStyle = getComputedStyle(outer);
+    const shellStyle = getComputedStyle(shell);
+
+    // #region agent log
+    fetch("http://127.0.0.1:7922/ingest/b7d5f191-1853-4442-9c5d-aeba930a6ba2", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Debug-Session-Id": "98eee7",
+      },
+      body: JSON.stringify({
+        sessionId: "98eee7",
+        runId: "table-chrome-post-fix-v2",
+        hypothesisId: "H2-nested-scroll-clip",
+        location: "list-surface-table.client.tsx:chrome-verify",
+        message: "List table chrome layer metrics",
+        data: {
+          surfaceKey: surfaceKey ?? null,
+          outerBoxShadow: outerStyle.boxShadow,
+          outerBorderRadius: outerStyle.borderRadius,
+          shellBoxShadow: shellStyle.boxShadow,
+          shellBorderRadius: shellStyle.borderRadius,
+          shellOverflowX: shellStyle.overflowX,
+          shellOverflowY: shellStyle.overflowY,
+          viewportOverflowX: scrollRef.current
+            ? getComputedStyle(scrollRef.current).overflowX
+            : null,
+        },
+        timestamp: Date.now(),
+      }),
+    }).catch(() => {});
+    // #endregion
+  }, [presentationVariant, rows.length, surfaceKey]);
 
   const visibleColumns = useMemo(
     () => columns.filter((column) => !hiddenColumns.has(column.id)),
@@ -381,6 +445,12 @@ export function ListSurfaceTableClient({
     (trailingColumn ? 1 : 0) +
     (showSelection ? 1 : 0) +
     (showDecisionLedger ? 1 : 0);
+  const tableMinWidthPx = resolveListSurfaceTableMinWidthPx({
+    columns: visibleColumns,
+    hasTrailingColumn: Boolean(trailingColumn),
+    hasSelection: showSelection,
+    hasDecisionLedger: showDecisionLedger,
+  });
 
   const navigateToRow = (row: ListSurfaceRow) => {
     if (row.rowHref) {
@@ -425,21 +495,43 @@ export function ListSurfaceTableClient({
   };
 
   const shell = (
-    <div className="flex flex-col gap-2">
-      <ListSurfaceToolbarClient
-        toolbar={toolbar}
-        density={density}
-        onDensityChange={toolbar?.densityToggle ? setDensity : undefined}
-        columnIds={columns.map((column) => column.id)}
-        hiddenColumnIds={hiddenColumns}
-        onToggleColumn={toggleColumn}
-        exportFormId={exportFormId}
-        exportTriggerElementId={
-          exportTriggerElementId ?? toolbar?.export?.triggerElementId
-        }
-        selectedCount={selectedRowIds.size}
-        selectionLabel={selection?.bulkScopeLabel ?? selection?.label}
-      />
+    <div
+      className={cn(
+        LIST_SURFACE_CHROME_GROUP_CLASS,
+        presentationVariant === "table-only"
+          ? LIST_SURFACE_CARD_CHROME_CLASS
+          : undefined,
+      )}
+      data-density={density}
+    >
+      {toolbar || tableLabel ? (
+        <div
+          className={cn(
+            LIST_SURFACE_TOOLBAR_ROW_CLASS,
+            chromeXClass,
+          )}
+        >
+          {tableLabel ? (
+            <p className="type-label font-medium text-foreground">{tableLabel}</p>
+          ) : (
+            <span aria-hidden className="min-w-0 shrink-0" />
+          )}
+          <ListSurfaceToolbarClient
+            toolbar={toolbar}
+            density={density}
+            onDensityChange={toolbar?.densityToggle ? setDensity : undefined}
+            columnIds={columns.map((column) => column.id)}
+            hiddenColumnIds={hiddenColumns}
+            onToggleColumn={toggleColumn}
+            exportFormId={exportFormId}
+            exportTriggerElementId={
+              exportTriggerElementId ?? toolbar?.export?.triggerElementId
+            }
+            selectedCount={selectedRowIds.size}
+            selectionLabel={selection?.bulkScopeLabel ?? selection?.label}
+          />
+        </div>
+      ) : null}
       {rows.length === 0 && empty ? (
         <GovernedEmpty model={empty} />
       ) : (
@@ -452,9 +544,10 @@ export function ListSurfaceTableClient({
                   <Card
                     key={source.id}
                     className={cn(
-                      "shadow-none",
+                      "border-border shadow-elevation-1",
                       ROW_TONE_CLASS[tone],
-                      source.rowHref && "cursor-pointer hover:bg-muted/40",
+                      source.rowHref &&
+                        "cursor-pointer transition-colors hover:bg-muted/40 hover:shadow-elevation-2",
                     )}
                     data-testid={
                       surfaceKey
@@ -519,15 +612,23 @@ export function ListSurfaceTableClient({
             <div
               ref={scrollRef}
               className={cn(
+                LIST_SURFACE_TABLE_VIEWPORT_CLASS,
                 tableVisibilityClass,
-                useVirtual && "max-h-[32rem] overflow-auto", // audit-ds: ignore no-arbitrary-value — virtual scroll viewport height contract
+                useVirtual && "max-h-[32rem] overflow-y-auto", // audit-ds: ignore no-arbitrary-value — virtual scroll viewport height contract
                 stickyHeader && "relative",
               )}
             >
-              <Table density={density}>
+              <Table
+                density={density}
+                containerClassName="overflow-visible"
+                aria-label={tableLabel ?? "Data table"}
+                className="w-max min-w-full text-left type-body"
+                style={{ minWidth: tableMinWidthPx }}
+              >
                 <TableHeader
                   className={cn(
-                    stickyHeader && "sticky top-0 z-raised bg-card shadow-elevation-1",
+                    stickyHeader &&
+                      "sticky top-0 z-raised border-b border-border bg-card",
                   )}
                 >
                   {table.getHeaderGroups().map((headerGroup) => (
@@ -554,8 +655,14 @@ export function ListSurfaceTableClient({
                         return (
                           <TableHead
                             key={header.id}
-                            className={columnVisualClass(column)}
-                            style={columnVisualStyle(column)}
+                            className={listSurfaceColumnClass(
+                              header.column.id,
+                              column,
+                            )}
+                            style={listSurfaceColumnStyle(
+                              header.column.id,
+                              column,
+                            )}
                             aria-sort={
                               canSort && header.column.getIsSorted()
                                 ? header.column.getIsSorted() === "asc"
@@ -566,16 +673,18 @@ export function ListSurfaceTableClient({
                           >
                             {header.isPlaceholder ? null : canSort ? (
                               <div className="inline-flex items-center gap-1">
-                                <button
+                                <Button
                                   type="button"
-                                  className="type-label inline-flex items-center gap-1 font-medium hover:text-foreground"
+                                  variant="ghost"
+                                  size="sm"
+                                  className="type-label inline-flex h-auto items-center gap-1 px-1 py-0 font-medium hover:text-foreground"
                                   onClick={header.column.getToggleSortingHandler()}
                                 >
                                   {flexRender(
                                     header.column.columnDef.header,
                                     header.getContext(),
                                   )}
-                                </button>
+                                </Button>
                                 {column?.headerAction ? (
                                   <Button
                                     type="button"
@@ -736,8 +845,14 @@ export function ListSurfaceTableClient({
                             return (
                               <TableCell
                                 key={cell.id}
-                                className={columnVisualClass(column)}
-                                style={columnVisualStyle(column)}
+                                className={listSurfaceColumnClass(
+                                  cell.column.id,
+                                  column,
+                                )}
+                                style={listSurfaceColumnStyle(
+                                  cell.column.id,
+                                  column,
+                                )}
                                 data-trailing-action-state={
                                   cell.column.id === "__trailing"
                                     ? source.trailingAction?.state
@@ -807,8 +922,8 @@ export function ListSurfaceTableClient({
                           {visibleColumns.map((column) => (
                             <TableCell
                               key={column.id}
-                              className={columnVisualClass(column)}
-                              style={columnVisualStyle(column)}
+                              className={listSurfaceColumnClass(column.id, column)}
+                              style={listSurfaceColumnStyle(column.id, column)}
                             >
                               {column.id === visibleColumns[0]?.id ? (
                                 <span className="type-body font-medium">
@@ -832,7 +947,12 @@ export function ListSurfaceTableClient({
         </>
       )}
       {pagination ? (
-        <div className="flex flex-wrap items-center justify-between gap-2 type-caption">
+        <div
+          className={cn(
+            LIST_SURFACE_FOOTER_ROW_CLASS,
+            chromeXClass,
+          )}
+        >
           <p role="status">
             {pagination.totalCount != null
               ? `${pagination.totalCount} rows`
@@ -869,7 +989,10 @@ export function ListSurfaceTableClient({
 
   return (
     <div
-      className={cn("af-material-opaque @container min-w-0 rounded-section")}
+      className={cn(
+        "@container min-w-0",
+        presentationVariant !== "table-only" && "af-material-opaque rounded-section",
+      )}
       data-testid={listTestId}
       {...governedDataAttrs}
     >

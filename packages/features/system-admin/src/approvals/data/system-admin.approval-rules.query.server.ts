@@ -1,8 +1,8 @@
 import type { TenantApprovalSettingRow } from "@afenda/db";
 import { organizationRoles } from "@afenda/auth";
-import { listTenantApprovalSettings } from "../../data/repositories/system-admin.execution-settings.repository.server";
-import { filterSystemAdminListRows } from "../../contracts/system-admin.list-filter.shared";
-import { resolveSystemAdminListSearch } from "../../contracts/system-admin.list-search.shared";
+import { listTenantApprovalSettings } from "../../tenant-execution/data/system-admin.execution-settings.repository.server";
+import { filterSystemAdminListRows } from "../../overview/contracts/system-admin.list-filter.shared";
+import { resolveSystemAdminListSearch } from "../../overview/contracts/system-admin.list-search.shared";
 import { mapTenantApprovalSettingToListRow } from "./system-admin.approval-rules.mapper";
 
 export function buildSystemAdminApprovalRuleRows(input: {

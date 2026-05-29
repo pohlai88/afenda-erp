@@ -47,6 +47,7 @@
   },
   "devDependencies": {
     "@afenda/config": "workspace:*",
+    "server-only": "^0.0.1",
     "vitest": "catalog:"
   }
 }

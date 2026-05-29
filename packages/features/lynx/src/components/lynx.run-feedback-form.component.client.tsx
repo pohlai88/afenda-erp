@@ -29,10 +29,10 @@ export function LynxRunFeedbackForm({
   >(recordFeedbackAction, undefined);
 
   return (
-    <form action={formAction} className="@container flex flex-col gap-4">
+    <form action={formAction} className="@container flex flex-col gap-surface-lg">
       <input name="runId" type="hidden" value={runId} />
       <div className="grid gap-3 @sm:grid-cols-2">
-        <label className="grid gap-2 text-sm font-medium text-foreground">
+        <label className="grid gap-2 type-control font-medium text-foreground">
           Rating
           <NativeSelect
             className="w-full"
@@ -43,7 +43,7 @@ export function LynxRunFeedbackForm({
             <NativeSelectOption value="negative">Negative</NativeSelectOption>
           </NativeSelect>
         </label>
-        <label className="grid gap-2 text-sm font-medium text-foreground">
+        <label className="grid gap-2 type-control font-medium text-foreground">
           Category
           <NativeSelect
             className="w-full"
@@ -63,7 +63,7 @@ export function LynxRunFeedbackForm({
           </NativeSelect>
         </label>
       </div>
-      <label className="grid gap-2 text-sm font-medium text-foreground">
+      <label className="grid gap-2 type-control font-medium text-foreground">
         Note
         <Textarea
           maxLength={1000}

@@ -26,8 +26,7 @@ export type GovernedKanbanFooterSectionProps = {
   contentClassName?: string;
 };
 
-const TITLED_HEADING_CLASS =
-  "mb-3 text-sm font-semibold tracking-wide text-muted-foreground uppercase"; // audit-ds: ignore no-raw-typography — section heading uses text-sm scale (larger than type-label text-micro); no type-section-label token exists yet
+const TITLED_HEADING_CLASS = "type-section-label mb-3";
 
 /**
  * RSC section shell for Pattern K kanban boards (`footer-actions` or `drag-reorder`).

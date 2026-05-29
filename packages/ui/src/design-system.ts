@@ -251,6 +251,8 @@ export const uiTypography = {
   muted: "type-muted",
   caption: "type-caption",
   label: "type-label",
+  tableHeader: "type-table-header",
+  sectionLabel: "type-section-label",
   control: "type-control",
   monoCell: "type-mono-cell",
 } as const;

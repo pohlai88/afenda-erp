@@ -11,6 +11,8 @@ export type SystemAdminOrganizationDefaults = {
   fiscalYearStartMonth: number;
   documentPrefix: string;
   numberingPrefix: string;
+  dataRegion: string;
+  zdrEnabled: boolean;
 };
 
 export type SystemAdminOrganizationPageModel = {

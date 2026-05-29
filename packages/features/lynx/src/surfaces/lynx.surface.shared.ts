@@ -20,7 +20,7 @@ import type {
 } from "../contracts/lynx.readiness.contract";
 
 const LYNX_MONITOR_CONFIGURE_APPROVE_REASON =
-  "Requires system-admin.machine-layer.approve.";
+  "Requires system-admin.lynx.approve.";
 
 export const lynxOutcomeMonitorControlSurfaceKey =
   "system-admin.lynx-outcome-monitors.list";
@@ -547,7 +547,7 @@ export function buildLynxModuleReadinessListSurface(input: {
     dataNature: "table",
     presentationProfile: "erp-operational-table",
     requiresErpPermission: {
-      module: "solution-console",
+      module: "lynx",
       object: "lynx-readiness",
       function: "read",
     },
@@ -591,7 +591,7 @@ export function buildLynxEnterpriseControlsListSurface(input: {
     dataNature: "table",
     presentationProfile: "erp-operational-table",
     requiresErpPermission: {
-      module: "solution-console",
+      module: "lynx",
       object: "lynx-controls",
       function: "read",
     },
@@ -633,7 +633,7 @@ export function buildLynxToolAvailabilityListSurface(input: {
     dataNature: "table",
     presentationProfile: "erp-operational-table",
     requiresErpPermission: {
-      module: "solution-console",
+      module: "lynx",
       object: "lynx-tools",
       function: "read",
     },
@@ -674,7 +674,7 @@ export function buildLynxActivityLedgerListSurface(input: {
     dataNature: "table",
     presentationProfile: "erp-operational-table",
     requiresErpPermission: {
-      module: "solution-console",
+      module: "lynx",
       object: "lynx-run-ledger",
       function: "read",
     },
@@ -943,7 +943,7 @@ function buildLynxTableSurface(input: {
     dataNature: "table",
     presentationProfile: "erp-operational-table",
     requiresErpPermission: {
-      module: "solution-console",
+      module: "lynx",
       object: input.columnsId,
       function: "read",
     },
@@ -1084,7 +1084,7 @@ export function buildLynxRunManagementListSurface(input: {
     dataNature: "table",
     presentationProfile: "erp-operational-table",
     requiresErpPermission: {
-      module: "solution-console",
+      module: "lynx",
       object: "lynx-runs",
       function: "read",
     },
@@ -1240,7 +1240,7 @@ export function buildLynxWorkflowSessionListSurface(input: {
     dataNature: "table",
     presentationProfile: "erp-operational-table",
     requiresErpPermission: {
-      module: "solution-console",
+      module: "lynx",
       object: "lynx-workflow-sessions",
       function: "read",
     },
@@ -1436,7 +1436,7 @@ export function buildLynxWorkflowLinkedRunListSurface(input: {
     dataNature: "table",
     presentationProfile: "erp-operational-table",
     requiresErpPermission: {
-      module: "solution-console",
+      module: "lynx",
       object: "lynx-workflow-runs",
       function: "read",
     },
@@ -1490,7 +1490,7 @@ export function buildLynxClaimValidationListSurface(input: {
     dataNature: "table",
     presentationProfile: "erp-operational-table",
     requiresErpPermission: {
-      module: "solution-console",
+      module: "lynx",
       object: "lynx-claim-validation",
       function: "read",
     },
@@ -1532,7 +1532,7 @@ export function buildLynxFailedEvalCaseListSurface(input: {
     dataNature: "table",
     presentationProfile: "erp-operational-table",
     requiresErpPermission: {
-      module: "solution-console",
+      module: "lynx",
       object: "lynx-quality-failures",
       function: "read",
     },
@@ -1577,7 +1577,7 @@ export function buildLynxRunEventTimelineListSurface(input: {
     dataNature: "table",
     presentationProfile: "erp-operational-table",
     requiresErpPermission: {
-      module: "solution-console",
+      module: "lynx",
       object: "lynx-run-events",
       function: "read",
     },
@@ -1623,7 +1623,7 @@ export function buildLynxRunFeedbackListSurface(input: {
     dataNature: "table",
     presentationProfile: "erp-operational-table",
     requiresErpPermission: {
-      module: "solution-console",
+      module: "lynx",
       object: "lynx-run-feedback",
       function: "read",
     },

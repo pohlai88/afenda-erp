@@ -32,15 +32,15 @@ describe("domain modules", () => {
   it("exposes navigation extensions from metadata", () => {
     const extensions = getNavigationExtensions(["dashboard.view"]);
 
-    expect(extensions.map((item) => item.id)).toEqual(["solution-console"]);
+    expect(extensions.map((item) => item.id)).toEqual(["lynx"]);
   });
 
   it("resolves navigation extension metadata by id", async () => {
     const { getNavigationExtensionById } =
       await import("../../src/shell/navigation-extensions");
-    const extension = getNavigationExtensionById("solution-console");
+    const extension = getNavigationExtensionById("lynx");
 
-    expect(extension?.href).toBe("/solution-console");
+    expect(extension?.href).toBe("/lynx");
     expect(extension?.label).toBe("Lynx Console");
   });
 });

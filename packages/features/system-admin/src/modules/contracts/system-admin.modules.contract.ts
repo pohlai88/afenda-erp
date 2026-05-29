@@ -1,4 +1,6 @@
 import type { SystemAdminReadiness } from "@afenda/db";
+import type { SystemAdminModuleCategory } from "./system-admin.module-category.contract";
+import type { SystemAdminModuleReadinessVerdict } from "./system-admin.modules-readiness.shared";
 
 export type SystemAdminModuleStatus =
   | "active"
@@ -6,14 +8,20 @@ export type SystemAdminModuleStatus =
   | "preview"
   | "deprecated";
 
+export type SystemAdminModuleAvailability = "enabled" | "disabled" | "preview";
+
 export type SystemAdminModuleCatalogRow = {
   id: string;
   module: string;
+  category: SystemAdminModuleCategory;
   status: SystemAdminModuleStatus;
+  availability: SystemAdminModuleAvailability;
+  visibility: "visible" | "hidden";
   capabilities: string;
-  enabledRoles: string;
+  permissions: string;
+  policies: string;
+  readinessVerdict: SystemAdminModuleReadinessVerdict;
   readiness: SystemAdminReadiness;
-  permission: string;
   lastChanged: string;
   href: string;
 };

@@ -24,7 +24,7 @@ export {
 export {
   ensureTenantSecuritySettings as ensureSystemAdminSecuritySettings,
   getTenantSecuritySettings as getTenantSecuritySettingsSnapshot,
-} from "../data/repositories/system-admin.tenant-security.repository.server";
+} from "./data/system-admin.tenant-security.repository.server";
 export {
   systemAdminSecurityWebhookEvents,
   type SystemAdminSecurityWebhookEvent,

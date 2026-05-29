@@ -1,6 +1,6 @@
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { insertAuditLog } from "./audit";
-import { runWithBootstrapContext } from "./client";
+import { getDb, runWithBootstrapContext } from "./client";
 import { seedCoreErpModuleData } from "./erp";
 import { createEntityId } from "./ids";
 import { organizationMemberships, organizations, userProfiles } from "./schema";
@@ -166,4 +166,106 @@ export async function bootstrapOrganizationForUser(input: {
   );
 
   return organizationId;
+}
+
+export async function ensureDevDemoTenant(input: {
+  authUserId: string;
+  email: string;
+  name: string;
+  organizationId: string;
+  organizationName: string;
+  organizationSlug: string;
+  membershipId: string;
+}) {
+  await upsertUserProfile({
+    authUserId: input.authUserId,
+    email: input.email,
+    name: input.name,
+  });
+
+  const db = getDb();
+  const existingOrganization = await db.query.organizations.findFirst({
+    where: eq(organizations.id, input.organizationId),
+    columns: { id: true },
+  });
+
+  if (existingOrganization) {
+    const existingMembership = await db.query.organizationMemberships.findFirst({
+      where: and(
+        eq(organizationMemberships.organizationId, input.organizationId),
+        eq(organizationMemberships.authUserId, input.authUserId),
+      ),
+      columns: { id: true },
+    });
+
+    if (!existingMembership) {
+      await runWithBootstrapContext(
+        input.authUserId,
+        input.organizationId,
+        async (tx) => {
+          await tx.insert(organizationMemberships).values({
+            id: input.membershipId,
+            organizationId: input.organizationId,
+            authUserId: input.authUserId,
+            role: "owner",
+          });
+        },
+      );
+    }
+
+    await setDefaultOrganizationForUser({
+      authUserId: input.authUserId,
+      organizationId: input.organizationId,
+    });
+
+    return input.organizationId;
+  }
+
+  await runWithBootstrapContext(
+    input.authUserId,
+    input.organizationId,
+    async (tx) => {
+      await tx.insert(organizations).values({
+        id: input.organizationId,
+        name: input.organizationName,
+        slug: input.organizationSlug,
+        ownerAuthUserId: input.authUserId,
+      });
+
+      await tx.insert(organizationMemberships).values({
+        id: input.membershipId,
+        organizationId: input.organizationId,
+        authUserId: input.authUserId,
+        role: "owner",
+      });
+
+      await tx
+        .update(userProfiles)
+        .set({
+          defaultOrganizationId: input.organizationId,
+          updatedAt: new Date(),
+        })
+        .where(eq(userProfiles.authUserId, input.authUserId));
+
+      await insertAuditLog(tx, {
+        organizationId: input.organizationId,
+        actorAuthUserId: input.authUserId,
+        entityType: "organization",
+        entityId: input.organizationId,
+        action: "organization.bootstrap",
+        summary: "Created developer demo tenant workspace.",
+        metadata: {
+          slug: input.organizationSlug,
+          source: "dev-demo-bootstrap",
+        },
+      });
+    },
+  );
+
+  await seedCoreErpModuleData({
+    organizationId: input.organizationId,
+    actorAuthUserId: input.authUserId,
+  });
+
+  return input.organizationId;
 }

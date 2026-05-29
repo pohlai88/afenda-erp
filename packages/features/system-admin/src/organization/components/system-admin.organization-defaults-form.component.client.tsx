@@ -1,11 +1,18 @@
 "use client";
 
 import { ActionFormErrors } from "@afenda/governed-surface/client";
-import { Button } from "@afenda/ui/button";
-import { Input } from "@afenda/ui/input";
+import {
+  Button,
+  Field,
+  FieldGroup,
+  FieldLabel,
+  Input,
+  NativeSelect,
+  NativeSelectOption,
+} from "@afenda/ui";
 import { useActionState } from "react";
 
-import type { SystemAdminActionResult } from "../../contracts";
+import type { SystemAdminActionResult } from "../../tenant-execution/contracts/system-admin.action-result.contract";
 
 type UpdateOrganizationDefaultsAction = (
   state: SystemAdminActionResult | undefined,
@@ -19,6 +26,8 @@ export type OrganizationDefaultsFormDefaults = {
   fiscalYearStartMonth: number;
   documentPrefix: string;
   numberingPrefix: string;
+  dataRegion: string;
+  zdrEnabled: boolean;
 };
 
 export function SystemAdminOrganizationDefaultsForm({
@@ -34,67 +43,84 @@ export function SystemAdminOrganizationDefaultsForm({
   >(updateOrganizationDefaultsAction, undefined);
 
   return (
-    <form action={formAction} className="grid max-w-xl gap-4 sm:grid-cols-2">
-      <label className="flex flex-col gap-1 type-control">
-        <span className="text-muted-foreground">Timezone</span>
-        <Input name="timezone" defaultValue={defaults.timezone} required />
-      </label>
-      <label className="flex flex-col gap-1 type-control">
-        <span className="text-muted-foreground">Locale</span>
-        <Input name="locale" defaultValue={defaults.locale} required />
-      </label>
-      <label className="flex flex-col gap-1 type-control">
-        <span className="text-muted-foreground">Currency (3-letter code)</span>
-        <Input
-          name="currency"
-          defaultValue={defaults.currency}
-          maxLength={3}
-          minLength={3}
-          required
-        />
-      </label>
-      <label className="flex flex-col gap-1 type-control">
-        <span className="text-muted-foreground">Fiscal year start month</span>
-        <Input
-          name="fiscalYearStartMonth"
-          type="number"
-          min={1}
-          max={12}
-          defaultValue={defaults.fiscalYearStartMonth}
-          required
-        />
-      </label>
-      <label className="flex flex-col gap-1 type-control">
-        <span className="text-muted-foreground">Document prefix</span>
-        <Input
-          name="documentPrefix"
-          defaultValue={defaults.documentPrefix}
-          maxLength={16}
-          required
-        />
-      </label>
-      <label className="flex flex-col gap-1 type-control">
-        <span className="text-muted-foreground">Numbering prefix</span>
-        <Input
-          name="numberingPrefix"
-          defaultValue={defaults.numberingPrefix}
-          maxLength={16}
-          required
-        />
-      </label>
-      <div className="flex flex-col gap-3 sm:col-span-2">
-        <ActionFormErrors result={state} />
-        {state?.ok ? (
-          <p className="type-muted" role="status">
-            Organization defaults saved.
-          </p>
-        ) : null}
-        <div className="flex items-end">
-          <Button disabled={pending} type="submit">
-            {pending ? "Saving…" : "Save organization defaults"}
-          </Button>
+    <form action={formAction} className="@container max-w-xl">
+      <FieldGroup className="grid gap-surface-md @sm:grid-cols-2">
+        <Field>
+          <FieldLabel>Timezone</FieldLabel>
+          <Input name="timezone" defaultValue={defaults.timezone} required />
+        </Field>
+        <Field>
+          <FieldLabel>Locale</FieldLabel>
+          <Input name="locale" defaultValue={defaults.locale} required />
+        </Field>
+        <Field>
+          <FieldLabel>Currency (3-letter code)</FieldLabel>
+          <Input
+            name="currency"
+            defaultValue={defaults.currency}
+            maxLength={3}
+            minLength={3}
+            required
+          />
+        </Field>
+        <Field>
+          <FieldLabel>Fiscal year start month</FieldLabel>
+          <Input
+            name="fiscalYearStartMonth"
+            type="number"
+            min={1}
+            max={12}
+            defaultValue={defaults.fiscalYearStartMonth}
+            required
+          />
+        </Field>
+        <Field>
+          <FieldLabel>Document prefix</FieldLabel>
+          <Input
+            name="documentPrefix"
+            defaultValue={defaults.documentPrefix}
+            maxLength={16}
+            required
+          />
+        </Field>
+        <Field>
+          <FieldLabel>Numbering prefix</FieldLabel>
+          <Input
+            name="numberingPrefix"
+            defaultValue={defaults.numberingPrefix}
+            maxLength={16}
+            required
+          />
+        </Field>
+        <Field>
+          <FieldLabel>Data region</FieldLabel>
+          <Input name="dataRegion" defaultValue={defaults.dataRegion} required />
+        </Field>
+        <Field>
+          <FieldLabel>Zero data retention</FieldLabel>
+          <NativeSelect
+            className="w-full"
+            name="zdrEnabled"
+            defaultValue={defaults.zdrEnabled ? "true" : "false"}
+          >
+            <NativeSelectOption value="false">Disabled</NativeSelectOption>
+            <NativeSelectOption value="true">Enabled</NativeSelectOption>
+          </NativeSelect>
+        </Field>
+        <div className="flex flex-col gap-3 @sm:col-span-2">
+          <ActionFormErrors result={state} />
+          {state?.ok ? (
+            <p className="type-muted" role="status">
+              Organization defaults saved.
+            </p>
+          ) : null}
+          <div className="flex items-end">
+            <Button disabled={pending} type="submit">
+              {pending ? "Saving…" : "Save organization defaults"}
+            </Button>
+          </div>
         </div>
-      </div>
+      </FieldGroup>
     </form>
   );
 }

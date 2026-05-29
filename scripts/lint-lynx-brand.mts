@@ -6,7 +6,8 @@
  * Phase B of the Lynx brand ladder — allowlists non-flipped surfaces.
  *
  * Flipped surfaces (Phase B):
- *   - apps/erp/src/app/(app)/solution-console/**
+ *   - apps/erp/src/app/(workspace)/lynx/**
+ *   - apps/erp/src/workspace-routes/lynx-console-route.tsx
  *   - packages/kernel/src/shell/navigation-extensions.ts
  *   - packages/kernel/src/shell/route-copy-metadata.ts
  *   - packages/ai/src/prompts/ai.system-prompt.ts         (getSolutionProviderSystemPrompt)
@@ -24,8 +25,8 @@ import { fileURLToPath } from "node:url";
 const ROOT = join(fileURLToPath(import.meta.url), "../../");
 
 const FLIPPED_PATHS = [
-  "apps/erp/src/app/(app)/solution-console",
-  "apps/erp/src/app/(app)/solution-console/lynx-operator-panel.tsx",
+  "apps/erp/src/app/(workspace)/lynx",
+  "apps/erp/src/workspace-routes/lynx-console-route.tsx",
   "packages/kernel/src/shell/navigation-extensions.ts",
   "packages/kernel/src/shell/route-copy-metadata.ts",
   "packages/ai/src/prompts/ai.system-prompt.ts",

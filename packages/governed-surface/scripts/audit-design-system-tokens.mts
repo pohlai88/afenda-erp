@@ -372,9 +372,13 @@ function printReport(
       `\nRun with --strict to exit 1 on the ${errorCount} error${errorCount === 1 ? "" : "s"}.`,
     );
   }
-  if (scope !== "governed") {
+  if (scope !== "governed" && !strict) {
     console.log(
-      "\n(Advisory scan — non-governed scopes are informational and do not gate CI.)",
+      "\n(Advisory scan — run with --strict to gate CI on consumer scopes.)",
+    );
+  } else if (scope !== "governed" && strict) {
+    console.log(
+      "\n--strict mode: consumer scopes exit 1 on error- and warning-level violations.",
     );
   }
 }
@@ -416,9 +420,18 @@ function main(): void {
 
   printReport(allViolations, repoRoot, strict, scope);
 
-  // --strict only gates on errors in the governed-surface scope
   const errorCount = allViolations.filter((v) => v.severity === "error").length;
-  if (strict && scope === "governed" && errorCount > 0) {
+  const warnCount = allViolations.filter((v) => v.severity === "warning").length;
+
+  if (!strict) {
+    return;
+  }
+
+  if (scope === "governed" && errorCount > 0) {
+    process.exit(1);
+  }
+
+  if (scope !== "governed" && (errorCount > 0 || warnCount > 0)) {
     process.exit(1);
   }
 }

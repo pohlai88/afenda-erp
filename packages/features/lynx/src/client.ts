@@ -21,3 +21,10 @@ export * from "./contracts/lynx.readiness.contract";
 export * from "./contracts/lynx.run-feedback.contract";
 export * from "./contracts/lynx.truth.contract";
 export * from "./components";
+export {
+  getLynxConsoleUxCards,
+  lynxConsoleAgentCopy,
+  lynxConsolePageMetadata,
+  lynxConsoleSections,
+  lynxConsoleUxCards,
+} from "./shell/lynx-console-copy.shared";

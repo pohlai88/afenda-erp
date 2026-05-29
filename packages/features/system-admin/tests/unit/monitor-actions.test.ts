@@ -13,7 +13,7 @@ const mocks = vi.hoisted(() => ({
     membershipId: "member_1",
     locale: "en-MY",
     actorType: "user",
-    capabilities: ["system-admin.machine-layer.approve"],
+    capabilities: ["system-admin.lynx.approve"],
     role: "admin",
     sessionSource: "dev",
   })),
@@ -50,7 +50,7 @@ vi.mock("next/cache", () => ({
   revalidatePath: mocks.revalidatePath,
 }));
 
-import { updateLynxOutcomeMonitorSettingAction } from "../../src/actions/system-admin.lynx-outcome-monitor.actions.server";
+import { updateLynxOutcomeMonitorSettingAction } from "../../src/lynx/actions/system-admin.lynx-outcome-monitor.actions.server";
 
 function monitorForm(overrides: Record<string, string> = {}) {
   const formData = new FormData();

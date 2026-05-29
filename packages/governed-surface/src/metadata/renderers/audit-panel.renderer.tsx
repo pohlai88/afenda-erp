@@ -1,6 +1,7 @@
 import { GovernedAuditPanel } from "../../components/governed-audit-panel";
 import { GovernedEmpty } from "../../client";
 import { parseAuditPanelData } from "../../schemas/audit-panel.schema";
+import { governedParseErrorCopy } from "../../i18n/governed-renderer-copy.shared";
 
 import type { GovernedComponentRendererDiagnostics } from "../registry";
 
@@ -17,15 +18,13 @@ export function AuditPanelRenderer({
   const parsed = parseAuditPanelData(configuration);
 
   if (!parsed.success) {
+    const copy = governedParseErrorCopy(diagnostics, "auditPanel");
     return (
       <GovernedEmpty
         model={{
           variant: "error",
-          title: "Audit panel unavailable",
-          description:
-            diagnostics === "operator"
-              ? "The audit panel configuration failed validation."
-              : "This audit panel could not be loaded safely.",
+          title: copy.title,
+          description: copy.description,
         }}
       />
     );

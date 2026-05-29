@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { systemAdminAuditActions } from "../../src/audit-viewer/contracts/system-admin.audit-actions.contract";
+import { systemAdminAuditViewerAuditActions } from "../../src/audit-viewer/events/system-admin.audit-viewer.event";
+import { systemAdminIntegrationsWebhookEvents } from "../../src/integrations/events/system-admin.integrations.event";
 import { buildSystemAdminAuditPageHref } from "../../src/audit-viewer/data/system-admin.audit-pagination.shared";
 import { systemAdminPolicyRuleWebhookEvents } from "../../src/policies/events/system-admin.policy-rules.event";
 import { systemAdminSecurityAuditActions } from "../../src/security/events/system-admin.security.event";
@@ -118,10 +119,15 @@ describe("system admin phase 4 security", () => {
   });
 
   it("uses stable audit and security action identifiers", () => {
-    expect(systemAdminAuditActions.view).toBe("system-admin.audit.view");
+    expect(systemAdminAuditViewerAuditActions.view).toBe(
+      "system-admin.audit.view",
+    );
     expect(systemAdminSecurityAuditActions.update).toBe(
       "system-admin.security.update",
     );
     expect(systemAdminPolicyRuleWebhookEvents[0]).toBe("system-admin.policy.updated");
+    expect(systemAdminIntegrationsWebhookEvents[0]).toBe(
+      "tenant.api-credential.created",
+    );
   });
 });

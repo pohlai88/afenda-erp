@@ -4,6 +4,7 @@ import {
   parseListSurfaceRendererConfiguration,
   type ListSurfaceRendererConfiguration,
 } from "../../schemas/list-surface-renderer.schema";
+import { governedParseErrorCopy } from "../../i18n/governed-renderer-copy.shared";
 
 import type { GovernedComponentRendererDiagnostics } from "../registry";
 import type { ListSurfaceTableClientProps } from "./list-surface-table.client";
@@ -22,15 +23,13 @@ export function ListSurfaceRenderer({
 }: ListSurfaceRendererProps) {
   const parsed = parseListSurfaceRendererConfiguration(configuration);
   if (!parsed.success) {
+    const copy = governedParseErrorCopy(diagnostics, "listSurface");
     return (
       <GovernedEmpty
         model={{
           variant: "error",
-          title: "Section unavailable",
-          description:
-            diagnostics === "operator"
-              ? "The list surface configuration failed validation."
-              : "This section could not be loaded safely.",
+          title: copy.title,
+          description: copy.description,
         }}
       />
     );
@@ -46,6 +45,7 @@ export function ListSurfaceRenderer({
     rows,
     surfaceKey: surface.columnsId,
     columnsId: surface.columnsId,
+    tableLabel: surface.header.title,
     dataNature: config.dataNature,
     presentationVariant: resolvedVariant,
     empty: surface.empty,

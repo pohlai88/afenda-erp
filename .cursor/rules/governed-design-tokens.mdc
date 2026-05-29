@@ -8,7 +8,7 @@ alwaysApply: false
 
 Single source of truth for token usage in `@afenda/governed-surface` and consumer packages.
 **Authoritative TypeScript definition:** `packages/ui/src/design-system.ts` — `uiTypography`, `uiRadius`, `uiZIndex`, `uiStatusToneClasses`, `uiRiskToneClasses`, `uiSurfaceElevation`.
-**Enforcement script:** `pnpm audit:governed-design-tokens --strict` (gates CI; exits 1 on error-level violations).
+**Enforcement script:** `pnpm audit:governed-design-tokens --strict` (gates CI for governed-surface errors; consumer scopes with `--scope=all --strict` gate errors and warnings).
 **Suppression syntax:** add a same-line comment `// audit-ds: ignore <rule-id> — <reason>`.
 
 ---
@@ -135,7 +135,8 @@ Exception: top-level page layout components (e.g. `GovernedSurface`) that are al
 |---|---|---|
 | Build gate | `@afenda/governed-surface` `pnpm build` (runs `audit:design-tokens` first) | Any `error`-level violation in `governed-surface` |
 | CI / local | `pnpm audit:governed-design-tokens --strict` | Same as build gate |
-| Advisory scan | `pnpm audit:governed-design-tokens --scope=all` | Never fails (informational) |
+| Advisory scan | `pnpm audit:governed-design-tokens --scope=all --strict` | Errors and warnings in features/app |
+| Composition | `pnpm audit:shadcn-composition --strict` | space-y, raw button, form FieldGroup |
 | Renderer parity | `pnpm lint:governed-renderers` | Registry/contract mismatch |
 | Architecture | `pnpm architecture:check` | Package boundary violation |
 

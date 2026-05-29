@@ -1,0 +1,114 @@
+ÔÇó turbo 2.9.14
+
+   ÔÇó Packages in scope: @afenda/ai, @afenda/auth, @afenda/config, @afenda/db, @afenda/erp, @afenda/feature-approvals, @afenda/feature-crm, @afenda/feature-dashboard, @afenda/feature-finance, @afenda/feature-hr, @afenda/feature-inventory, @afenda/feature-knowledge, @afenda/feature-lynx, @afenda/feature-purchasing, @afenda/feature-reports, @afenda/feature-sales, @afenda/feature-system-admin, @afenda/governed-surface, @afenda/kernel, @afenda/observability, @afenda/ui, @afenda/workflows
+   ÔÇó Running build in 22 packages
+   ÔÇó Remote caching disabled
+
+@afenda/config:build: cache hit, replaying logs 1d6d49d36d82ebf0
+@afenda/config:build: 
+@afenda/config:build: > @afenda/config@0.1.0 build C:\JackProject\afenda-erp\packages\config
+@afenda/config:build: > tsc -p tsconfig.build.json
+@afenda/config:build: 
+@afenda/ui:build: cache miss, executing 377dae9c1cde8876
+@afenda/observability:build: cache hit, replaying logs 04aa9897a320544b
+@afenda/observability:build: 
+@afenda/observability:build: > @afenda/observability@0.1.0 build C:\JackProject\afenda-erp\packages\observability
+@afenda/observability:build: > tsc -p tsconfig.build.json
+@afenda/observability:build: 
+@afenda/db:build: cache hit, replaying logs 8db05b63ee655a6b
+@afenda/db:build: 
+@afenda/db:build: > @afenda/db@0.1.0 build C:\JackProject\afenda-erp\packages\db
+@afenda/db:build: > tsc -p tsconfig.build.json
+@afenda/db:build: 
+@afenda/auth:build: cache hit, replaying logs 52281059de89ef46
+@afenda/auth:build: 
+@afenda/auth:build: > @afenda/auth@0.1.0 build C:\JackProject\afenda-erp\packages\auth
+@afenda/auth:build: > tsc -p tsconfig.build.json
+@afenda/auth:build: 
+@afenda/ui:build: 
+@afenda/ui:build: > @afenda/ui@0.1.0 build C:\JackProject\afenda-erp\packages\ui
+@afenda/ui:build: > tsc -p tsconfig.build.json
+@afenda/ui:build: 
+@afenda/governed-surface:build: cache miss, executing f5be0f545a6903c7
+@afenda/governed-surface:build: 
+@afenda/governed-surface:build: > @afenda/governed-surface@0.1.0 prebuild C:\JackProject\afenda-erp\packages\governed-surface
+@afenda/governed-surface:build: > pnpm audit:design-tokens
+@afenda/governed-surface:build: 
+@afenda/governed-surface:build: 
+@afenda/governed-surface:build: > @afenda/governed-surface@0.1.0 audit:design-tokens C:\JackProject\afenda-erp\packages\governed-surface
+@afenda/governed-surface:build: > pnpm -w audit:governed-design-tokens --strict
+@afenda/governed-surface:build: 
+@afenda/governed-surface:build: 
+@afenda/governed-surface:build: > afenda-erp@ audit:governed-design-tokens C:\JackProject\afenda-erp
+@afenda/governed-surface:build: > tsx packages/governed-surface/scripts/audit-design-system-tokens.mts "--strict"
+@afenda/governed-surface:build: 
+@afenda/governed-surface:build: Design-system token audit  [scope: governed-surface]
+@afenda/governed-surface:build: ==================================================
+@afenda/governed-surface:build: 
+@afenda/governed-surface:build: packages/governed-surface/src/components/governed-audit-panel.tsx
+@afenda/governed-surface:build:   [warning]  packages/governed-surface/src/components/governed-audit-panel.tsx:72:22   min-w-[720px]                   ÔåÆ  Use a uiSurfaceInset / uiTypography / uiZIndex token, or suppress:  // audit-ds: ignore no-arbitrary-value ÔÇö <reason>  [no-arbitrary-value]
+@afenda/governed-surface:build: 
+@afenda/governed-surface:build: Summary
+@afenda/governed-surface:build: -------
+@afenda/governed-surface:build:   [warning]  no-arbitrary-value              1 violation  in 1 file
+@afenda/governed-surface:build: 
+@afenda/governed-surface:build: Total: 1 violation in 1 file (0 errors, 1 warning, 0 info)
+@afenda/governed-surface:build: 
+@afenda/governed-surface:build: > @afenda/governed-surface@0.1.0 build C:\JackProject\afenda-erp\packages\governed-surface
+@afenda/governed-surface:build: > tsc -p tsconfig.build.json
+@afenda/governed-surface:build: 
+@afenda/kernel:build: cache miss, executing 7d54172023c2a07f
+@afenda/kernel:build: 
+@afenda/kernel:build: > @afenda/kernel@0.1.0 build C:\JackProject\afenda-erp\packages\kernel
+@afenda/kernel:build: > tsc -p tsconfig.build.json
+@afenda/kernel:build: 
+@afenda/feature-approvals:build: cache miss, executing 69cf5eb87ee0ab1e
+@afenda/feature-hr:build: cache miss, executing a9791f82a083a60b
+@afenda/feature-crm:build: cache miss, executing a2c5df0d07aeac35
+@afenda/feature-finance:build: cache miss, executing 7a6f2ab717871ced
+@afenda/feature-sales:build: cache miss, executing 6eb6764ac8f1845b
+@afenda/feature-purchasing:build: cache miss, executing 2d4d1b9a4ab5ac1b
+@afenda/feature-inventory:build: cache miss, executing dc5fcade86641adf
+@afenda/feature-dashboard:build: cache miss, executing c7df98e8c526e5c8
+@afenda/ai:build: cache miss, executing b3e5740e406a21c0
+@afenda/feature-reports:build: cache miss, executing 2a82cefda575c8c9
+@afenda/feature-hr:build: 
+@afenda/feature-hr:build: > @afenda/feature-hr@0.1.0 build C:\JackProject\afenda-erp\packages\features\hr
+@afenda/feature-hr:build: > tsc -p tsconfig.build.json
+@afenda/feature-hr:build: 
+@afenda/feature-finance:build: 
+@afenda/feature-finance:build: > @afenda/feature-finance@0.1.0 build C:\JackProject\afenda-erp\packages\features\finance
+@afenda/feature-finance:build: > tsc -p tsconfig.build.json
+@afenda/feature-finance:build: 
+@afenda/feature-purchasing:build: 
+@afenda/feature-purchasing:build: > @afenda/feature-purchasing@0.1.0 build C:\JackProject\afenda-erp\packages\features\purchasing
+@afenda/feature-purchasing:build: > tsc -p tsconfig.build.json
+@afenda/feature-purchasing:build: 
+@afenda/ai:build: 
+@afenda/ai:build: > @afenda/ai@0.1.0 build C:\JackProject\afenda-erp\packages\ai
+@afenda/ai:build: > tsc -p tsconfig.build.json
+@afenda/ai:build: 
+@afenda/feature-inventory:build: 
+@afenda/feature-inventory:build: > @afenda/feature-inventory@0.1.0 build C:\JackProject\afenda-erp\packages\features\inventory
+@afenda/feature-inventory:build: > tsc -p tsconfig.build.json
+@afenda/feature-inventory:build: 
+@afenda/feature-dashboard:build: 
+@afenda/feature-dashboard:build: > @afenda/feature-dashboard@0.1.0 build C:\JackProject\afenda-erp\packages\features\dashboard
+@afenda/feature-dashboard:build: > tsc -p tsconfig.build.json
+@afenda/feature-dashboard:build: 
+@afenda/feature-approvals:build: 
+@afenda/feature-approvals:build: > @afenda/feature-approvals@0.1.0 build C:\JackProject\afenda-erp\packages\features\approvals
+@afenda/feature-approvals:build: > tsc -p tsconfig.build.json
+@afenda/feature-approvals:build: 
+@afenda/feature-reports:build: 
+@afenda/feature-reports:build: > @afenda/feature-reports@0.1.0 build C:\JackProject\afenda-erp\packages\features\reports
+@afenda/feature-reports:build: > tsc -p tsconfig.build.json
+@afenda/feature-reports:build: 
+@afenda/feature-sales:build: 
+@afenda/feature-sales:build: > @afenda/feature-sales@0.1.0 build C:\JackProject\afenda-erp\packages\features\sales
+@afenda/feature-sales:build: > tsc -p tsconfig.build.json
+@afenda/feature-sales:build: 
+@afenda/feature-crm:build: 
+@afenda/feature-crm:build: > @afenda/feature-crm@0.1.0 build C:\JackProject\afenda-erp\packages\features\crm
+@afenda/feature-crm:build: > tsc -p tsconfig.build.json
+@afenda/feature-crm:build: 

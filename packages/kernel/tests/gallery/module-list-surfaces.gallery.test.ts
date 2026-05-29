@@ -18,8 +18,6 @@ import {
   buildDocumentRegistryListSurface,
   buildModuleRecordListSurface,
   buildModuleWorkItemListSurface,
-  buildOperationalSkillsListSurface,
-  buildRecoveryPlaybookListSurface,
   buildSavedViewsListSurface,
 } from "../../src/modules/list-surfaces";
 import {
@@ -217,22 +215,10 @@ describe("auxiliary list surface gallery fixtures", () => {
       buildDashboardAutomationListSurface({ runs: [] }),
     ],
     [
-      "recovery playbooks — ready",
-      buildRecoveryPlaybookListSurface({
-        playbooks: [{ id: "p1", label: "Debtor escalation", problem: "90d overdue", diagnosis: "No trigger", action: "Escalate", risk: "high" }],
-      }),
-    ],
-    [
       "document registry — ready",
       buildDocumentRegistryListSurface({
         documents: [{ id: "d1", title: "Invoice Q1", contentType: "PDF", size: "120 KB", access: "internal" }],
         moduleId: "finance",
-      }),
-    ],
-    [
-      "operational skills — ready",
-      buildOperationalSkillsListSurface({
-        skills: [{ id: "s1", label: "Reconciliation", moduleId: "finance", description: "Month-end assist.", approvalPolicy: "human-required" }],
       }),
     ],
   ])("parses %s", (_name, surface) => {

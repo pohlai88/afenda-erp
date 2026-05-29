@@ -87,13 +87,13 @@ export function ForgotPasswordForm() {
 
   return (
     <div>
-      <h2 className="text-2xl font-semibold text-foreground">{copy.title}</h2>
-      <p className="mt-3 text-sm leading-6 text-muted-foreground">
+      <h2 className="type-section-title font-semibold text-foreground">{copy.title}</h2>
+      <p className="mt-3 type-body leading-6 text-muted-foreground">
         {step === "request" ? copy.requestDescription : copy.resetDescription}
       </p>
 
       {step === "request" ? (
-        <form action={handleRequestCode} className="mt-8 flex flex-col gap-5">
+        <form action={handleRequestCode} className="mt-surface-3xl flex flex-col gap-5">
           <AuthField id="reset-email" label={copy.fields.email}>
             <AuthInput
               autoComplete="email"
@@ -115,7 +115,7 @@ export function ForgotPasswordForm() {
           </AuthPrimaryButton>
         </form>
       ) : (
-        <form action={handleResetPassword} className="mt-8 flex flex-col gap-5">
+        <form action={handleResetPassword} className="mt-surface-3xl flex flex-col gap-5">
           <AuthField id="reset-email-readonly" label={copy.fields.email}>
             <AuthInput
               id="reset-email-readonly"
@@ -172,7 +172,7 @@ export function ForgotPasswordForm() {
         </form>
       )}
 
-      <p className="mt-6 text-center text-sm text-muted-foreground">
+      <p className="mt-surface-2xl text-center type-muted">
         {copy.footerPrompt}{" "}
         <AuthInlineLink href="/sign-in">{copy.footerAction}</AuthInlineLink>
       </p>

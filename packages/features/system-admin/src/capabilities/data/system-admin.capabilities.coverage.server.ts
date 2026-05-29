@@ -7,20 +7,50 @@ import type { ExecutionCapability } from "@afenda/kernel/execution-capabilities"
 import { listExecutionCapabilities } from "@afenda/kernel/execution-capabilities";
 import type {
   CapabilityCoverageVerdict,
+  SystemAdminCapabilityAvailability,
   SystemAdminCapabilityCoverageRow,
+  SystemAdminCapabilityReadinessVerdict,
 } from "../contracts";
-
-const SENSITIVE_CAPABILITY_SUFFIXES = [
-  ".manage",
-  ".write",
-  ".export",
-  ".approve",
-] as const;
+import { isCriticalExecutionCapability } from "../contracts/system-admin.capability-safety.contract";
 
 function isSensitiveCapability(capability: ExecutionCapability) {
-  return SENSITIVE_CAPABILITY_SUFFIXES.some((suffix) =>
-    capability.requiredPermission.endsWith(suffix),
-  );
+  return isCriticalExecutionCapability(capability);
+}
+
+function resolveOrgAvailability(
+  capabilityKey: string,
+  settingsByCapability: Map<string, TenantCapabilitySettingRow>,
+): SystemAdminCapabilityAvailability {
+  return settingsByCapability.get(capabilityKey)?.availability ?? "enabled";
+}
+
+export function resolveSystemAdminCapabilityReadinessVerdict(input: {
+  coverageVerdict: CapabilityCoverageVerdict;
+  availability: SystemAdminCapabilityAvailability;
+  issues: readonly string[];
+}): SystemAdminCapabilityReadinessVerdict {
+  if (
+    input.coverageVerdict === "disabled" ||
+    input.coverageVerdict === "missing_permission" ||
+    input.availability === "disabled" ||
+    input.issues.some(
+      (issue) =>
+        issue.includes("Parent module is disabled") ||
+        issue.includes("missing a required permission"),
+    )
+  ) {
+    return "blocked";
+  }
+
+  if (
+    input.coverageVerdict !== "covered" ||
+    input.availability === "preview" ||
+    input.issues.length > 0
+  ) {
+    return "warning";
+  }
+
+  return "ready";
 }
 
 function moduleIsDisabled(
@@ -140,9 +170,16 @@ export function buildSystemAdminCapabilityCoverageRows(input?: {
       moduleSettings: input?.moduleSettings,
       capabilitySettings: input?.capabilitySettings,
     });
-    const orgAvailability = input?.capabilitySettings?.find(
-      (setting) => setting.capabilityKey === capability.key,
-    )?.availability;
+    const settingsByCapability = new Map(
+      (input?.capabilitySettings ?? []).map((setting) => [
+        setting.capabilityKey,
+        setting,
+      ]),
+    );
+    const availability = resolveOrgAvailability(
+      capability.key,
+      settingsByCapability,
+    );
 
     return {
       id: capability.key,
@@ -151,13 +188,18 @@ export function buildSystemAdminCapabilityCoverageRows(input?: {
       route: capability.route ?? "Not routed",
       routeHref: capability.route,
       requiredPermission: capability.requiredPermission,
-      status: orgAvailability ?? capability.status,
+      availability,
       accessCoverage: appCapabilities.includes(capability.requiredPermission)
         ? "Catalog"
         : "Missing",
       auditCoverage: capability.auditArea ? "Declared" : "Missing",
       docsCoverage: capability.description ? "Declared" : "Missing",
-      verdict,
+      coverageVerdict: verdict,
+      readinessVerdict: resolveSystemAdminCapabilityReadinessVerdict({
+        coverageVerdict: verdict,
+        availability,
+        issues,
+      }),
       issues,
     };
   });

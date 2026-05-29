@@ -1,0 +1,61 @@
+- generic [ref=e1]:
+  - main [ref=e2]:
+    - generic [ref=e3]:
+      - generic [ref=e4]:
+        - generic [ref=e5]: Afenda ERP
+        - heading "Tenant-aware ERP access with full-stack organization context." [level=1] [ref=e6]
+        - paragraph [ref=e7]: Authentication, tenant membership, and protected routing share one server-side model. Operators sign in through branch-aware Neon Auth and continue into a scoped workspace.
+        - generic [ref=e8]:
+          - generic [ref=e9]:
+            - generic [ref=e10]: This step
+            - generic [ref=e11]: Sign in
+            - paragraph [ref=e12]: Sign in with email, Google, or your development session.
+          - list [ref=e13]:
+            - listitem [ref=e14]: Branch-aware Neon Auth with tenant-scoped sessions
+            - listitem [ref=e15]: Organization onboarding before module access
+            - listitem [ref=e16]: Role capabilities enforced on every protected route
+      - generic [ref=e21]:
+        - heading "Sign in to your workspace" [level=2] [ref=e22]
+        - paragraph [ref=e23]: Use your operator credentials for this tenant workspace.
+        - generic [ref=e24]:
+          - button "Continue with Google" [ref=e25]:
+            - img [ref=e26]
+            - text: Continue with Google
+          - generic [ref=e34]: or
+        - generic [ref=e35]:
+          - generic [ref=e36]:
+            - generic [ref=e37]: Email
+            - textbox "Email" [ref=e38]
+          - generic [ref=e39]:
+            - generic [ref=e40]: Password
+            - textbox "Password" [ref=e41]
+          - link "Forgot password?" [ref=e43] [cursor=pointer]:
+            - /url: /forgot-password
+          - button "Sign in" [ref=e44]
+        - paragraph [ref=e45]:
+          - text: Need an account?
+          - link "Create account" [ref=e46] [cursor=pointer]:
+            - /url: /sign-up
+  - complementary "Developer sign-in" [ref=e47]:
+    - group [ref=e48]:
+      - generic "Developer sign-in Demo access" [active] [ref=e49] [cursor=pointer]:
+        - generic [ref=e50]: Developer sign-in
+        - generic [ref=e51]: Demo access
+      - generic [ref=e53]:
+        - generic [ref=e54]: Development access
+        - heading "Enter the workspace" [level=2] [ref=e55]
+        - paragraph [ref=e56]: Neon Auth is disabled in this environment. Use the demo operator session to explore module routes locally.
+        - generic [ref=e57]:
+          - generic [ref=e58]:
+            - generic [ref=e59]: Name
+            - textbox "Name" [ref=e60]: Demo Operator
+          - generic [ref=e61]:
+            - generic [ref=e62]: Email
+            - textbox "Email" [ref=e63]: owner@afenda.local
+          - generic [ref=e64]:
+            - generic [ref=e65]: Organization
+            - textbox "Organization" [ref=e66]: Afenda Operations
+          - button "Continue here" [ref=e67]
+  - button "Open Next.js Dev Tools" [ref=e73] [cursor=pointer]:
+    - img [ref=e74]
+  - alert [ref=e77]

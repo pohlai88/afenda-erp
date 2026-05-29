@@ -14,6 +14,7 @@ import {
 import { cn } from "@afenda/ui/utils";
 
 import type { AuditPanelModel } from "../schemas/audit-panel.schema";
+import { governedRendererCopy } from "../i18n/governed-renderer-copy.shared";
 import { GovernedEmpty } from "./governed-empty";
 
 export type GovernedAuditPanelProps = {
@@ -42,16 +43,17 @@ export function GovernedAuditPanel({ model }: GovernedAuditPanelProps) {
       <GovernedEmpty
         model={{
           variant: "muted",
-          title: "No audit rows.",
-          description: model.headerDescription,
+          title: governedRendererCopy.empty.auditPanel.title,
+          description:
+            model.headerDescription ??
+            governedRendererCopy.empty.auditPanel.description,
         }}
       />
     );
   }
 
   const tableDensity = model.density === "compact" ? "compact" : "comfortable";
-  // audit-ds: ignore no-raw-typography — column header; no non-uppercase header-cell token exists yet
-  const headerCellClass = "text-xs font-medium";
+  const headerCellClass = "type-table-header";
 
   return (
     <div className="flex flex-col gap-3">
@@ -64,7 +66,11 @@ export function GovernedAuditPanel({ model }: GovernedAuditPanelProps) {
       {/* audit-ds: ignore no-arbitrary-value — scroll viewport height contract */}
       <div className="max-h-[28rem] overflow-auto rounded-section border">
         {/* audit-ds: ignore no-arbitrary-value — table minimum scroll width */}
-        <Table density={tableDensity} className="min-w-[720px] text-left type-control">
+        <Table
+          density={tableDensity}
+          aria-label={model.headerTitle}
+          className="min-w-[720px] text-left type-control"
+        >
           <TableHeader className="sticky top-0 z-raised bg-card shadow-elevation-1">
             <TableRow>
               <TableHead className={headerCellClass}>When</TableHead>

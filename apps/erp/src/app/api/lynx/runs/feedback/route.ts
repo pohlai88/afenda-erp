@@ -24,7 +24,7 @@ export async function POST(request: Request): Promise<Response> {
 
     const { session, organization } = auth;
     assertCapabilityAllowed({
-      capability: "system-admin.machine-layer.read",
+      capability: "system-admin.lynx.read",
       capabilities: organization.capabilities,
     });
 
@@ -69,8 +69,8 @@ export async function POST(request: Request): Promise<Response> {
       },
     });
 
-    revalidatePath(`/solution-console/runs/${parsed.data.runId}`);
-    revalidatePath("/solution-console/runs");
+    revalidatePath(`/lynx/runs/${parsed.data.runId}`);
+    revalidatePath("/lynx/runs");
 
     logServerEvent(
       "info",

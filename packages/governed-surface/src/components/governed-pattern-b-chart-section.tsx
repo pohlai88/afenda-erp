@@ -13,6 +13,7 @@ import {
 import { type GovernedSurfaceSectionCardBody } from "./governed-surface-section-card";
 import {
   renderGovernedPatternSectionShell,
+  type GovernedPatternSectionDensity,
   type GovernedPatternSectionLayout,
 } from "./governed-pattern-section-shell.shared";
 
@@ -24,6 +25,7 @@ export type GovernedPatternBChartSectionProps = {
   surfaceKey: string;
   chartConfiguration: GovernedChartConfigurationInput;
   layout?: GovernedPatternBChartSectionLayout;
+  density?: GovernedPatternSectionDensity;
   loadError?: EmptyState;
   forbidden?: EmptyState;
   invalid?: EmptyState;
@@ -44,6 +46,7 @@ export async function GovernedPatternBChartSection({
   surfaceKey,
   chartConfiguration,
   layout = "card",
+  density = "comfortable",
   loadError,
   forbidden,
   invalid,
@@ -58,6 +61,7 @@ export async function GovernedPatternBChartSection({
 
   const shellInput = {
     layout,
+    density,
     className,
     sectionTestId,
     headerSlot,

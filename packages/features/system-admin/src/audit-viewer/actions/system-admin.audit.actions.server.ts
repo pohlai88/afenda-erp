@@ -8,14 +8,17 @@ import {
   systemAdminActionSuccess,
   type SystemAdminActionResult,
   zodActionFailure,
-} from "../../contracts";
-import { dispatchSystemAdminWebhook } from "../../events";
+} from "../../tenant-execution/contracts/system-admin.action-result.contract";
+import { dispatchSystemAdminWebhook } from "../../integrations";
 import {
   requireSystemAdminAuditExport,
   requireSystemAdminAuditRead,
-} from "../../policies";
-import { systemAdminRetentionPolicyActionSchema } from "../../schemas";
-import { systemAdminAuditActions } from "../contracts/system-admin.audit-actions.contract";
+} from "../policies/system-admin.audit-viewer.policy.server";
+import { systemAdminRetentionPolicyActionSchema } from "../schemas/system-admin.retention-action.schema";
+import {
+  systemAdminAuditViewerAuditActions,
+  systemAdminAuditViewerWebhookEvents,
+} from "../events/system-admin.audit-viewer.event";
 import {
   mapTenantAuditLogToRow,
   parseAuditFilterDate,
@@ -104,7 +107,7 @@ export async function exportSystemAdminAuditLogsAction(
     organizationId: organization.id,
     actorId: context.userId,
     actorType: context.actorType,
-    action: systemAdminAuditActions.export,
+    action: systemAdminAuditViewerAuditActions.export,
     targetType: "organization",
     targetId: organization.id,
     metadata: {
@@ -169,7 +172,7 @@ export async function upsertSystemAdminRetentionPolicyAction(
   await dispatchSystemAdminWebhook({
     organizationId: organization.id,
     userId: session.id,
-    eventType: "tenant.retention.updated",
+    eventType: systemAdminAuditViewerWebhookEvents[0],
     payload: {
       entityType: parsed.data.entityType,
       retentionDays: parsed.data.retentionDays,

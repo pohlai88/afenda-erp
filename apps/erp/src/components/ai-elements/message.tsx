@@ -34,7 +34,7 @@ function isToolPart(part: unknown): part is ToolPart {
 
 export function MessageResponse({ children }: { children: string }) {
   return (
-    <div className="flex flex-col gap-2 text-sm leading-6">
+    <div className="flex flex-col gap-2 type-body leading-6">
       {children.split(/\n{2,}/).map((paragraph, index) => (
         <p key={`${index}-${paragraph.slice(0, 24)}`}>{paragraph}</p>
       ))}
@@ -53,13 +53,13 @@ export function Message({
 }) {
   return (
     <div
-      className={`rounded-lg border p-4 ${
+      className={`rounded-section border p-4 ${
         message.role === "user"
           ? "border-line bg-surface-strong"
           : "border-line bg-surface"
       }`}
     >
-      <div className="mb-3 text-xs uppercase tracking-wide text-muted">
+      <div className="mb-3 type-caption uppercase tracking-wide text-muted">
         {message.role}
       </div>
       <div className="flex flex-col gap-3">

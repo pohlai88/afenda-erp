@@ -64,7 +64,7 @@ test.describe("Afenda ERP smoke", () => {
     ).toBeVisible();
   });
 
-  test("loads solution console after dev sign-in", async ({ page }) => {
+  test("loads Lynx after dev sign-in", async ({ page }) => {
     await page.goto("/sign-in");
     const devSignInButton = page.getByRole("button", {
       name: "Continue to dashboard",
@@ -76,8 +76,8 @@ test.describe("Afenda ERP smoke", () => {
 
     await devSignInButton.click();
     await expect(page).toHaveURL(/\/dashboard/);
-    await page.goto("/solution-console");
-    await expect(page).toHaveURL(/\/solution-console/);
+    await page.goto("/lynx");
+    await expect(page).toHaveURL(/\/lynx/);
     await expect(page.getByText("Recovery playbook catalog")).toBeVisible();
     await expect(
       page.getByRole("row").filter({ hasText: "Negative P&L" }).first(),

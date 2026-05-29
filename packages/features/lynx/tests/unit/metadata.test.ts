@@ -130,13 +130,13 @@ describe("Lynx metadata builders", () => {
           status: "completed",
           moduleId: "lynx",
           createdAt: "2026-05-28 10:00",
-          href: "/solution-console/runs/run_1",
+          href: "/lynx/runs/run_1",
         },
       ],
     });
 
     expect(surface.rows[0]?.cells.status).toBe("completed");
-    expect(surface.rows[0]?.rowHref).toBe("/solution-console/runs/run_1");
+    expect(surface.rows[0]?.rowHref).toBe("/lynx/runs/run_1");
     expect(surface.surface.rowKey).toBe("id");
   });
 
@@ -225,7 +225,7 @@ describe("Lynx metadata builders", () => {
           unsupportedClaims: "2",
           latency: "900 ms",
           startedAt: "2026-05-28 10:00",
-          href: "/solution-console/runs/run_1",
+          href: "/lynx/runs/run_1",
         },
       ],
     });
@@ -320,7 +320,7 @@ describe("Lynx metadata builders", () => {
     });
     expect(readOnlyControls.rows[0]?.trailingAction?.state).toBe("disabled");
     expect(readOnlyControls.rows[0]?.trailingAction?.disabledReason).toContain(
-      "machine-layer.approve",
+      "lynx.approve",
     );
     const spend = buildLynxSpendAnalyticsListSurface({
       rows: [
@@ -381,14 +381,14 @@ describe("Lynx metadata builders", () => {
           unsupportedClaims: "1",
           citationPrecision: "50%",
           reason: "1 unsupported claim.",
-          href: "/solution-console/runs/run_1",
+          href: "/lynx/runs/run_1",
         },
       ],
     });
 
     expect(claims.rows[0]?.cells.status).toBe("supported");
     expect(failures.rows[0]?.rowTone).toBe("critical");
-    expect(failures.rows[0]?.rowHref).toBe("/solution-console/runs/run_1");
+    expect(failures.rows[0]?.rowHref).toBe("/lynx/runs/run_1");
   });
 
   it("builds governed workflow session surfaces", () => {
@@ -413,7 +413,7 @@ describe("Lynx metadata builders", () => {
           qualityGate: "passed",
           nextRecommendedStep: "Resume after review.",
           updatedAt: "2026-05-28 10:00",
-          href: "/solution-console/workflows/session_1",
+          href: "/lynx/workflows/session_1",
         },
       ],
     });
@@ -441,13 +441,13 @@ describe("Lynx metadata builders", () => {
           unsupportedClaims: "0",
           latency: "900 ms",
           startedAt: "2026-05-28 10:00",
-          href: "/solution-console/runs/run_1",
+          href: "/lynx/runs/run_1",
         },
       ],
     });
 
     expect(sessions.rows[0]?.rowHref).toBe(
-      "/solution-console/workflows/session_1",
+      "/lynx/workflows/session_1",
     );
     expect(sessions.rows[0]?.rowTone).toBe("attention");
     expect(sessions.rows[0]?.cells.origin).toBe("proactive-outcome-sweep");

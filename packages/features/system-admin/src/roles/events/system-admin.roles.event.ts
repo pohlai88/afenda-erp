@@ -1,4 +1,4 @@
-export const systemAdminRoleAuditActions = [
-  "system-admin.role-assignment.create",
-  "system-admin.role-assignment.remove",
-] as const;
+export {
+  systemAdminPermissionBundleWebhookEvents as systemAdminRoleOverrideWebhookEvents,
+  type SystemAdminPermissionBundleWebhookEvent as SystemAdminRoleOverrideWebhookEvent,
+} from "../../permissions/events/system-admin.permissions.event";

@@ -1,5 +1,5 @@
-import { systemAdminControlLinks } from "../../contracts/system-admin.control-links.contract";
-import { systemAdminRoutePaths } from "../../contracts/system-admin.route-paths.contract";
+import { systemAdminControlLinks } from "../../overview/contracts/system-admin.control-links.contract";
+import { systemAdminRoutePaths } from "../../overview/contracts/system-admin.route-paths.contract";
 import type {
   SystemAdminDiagnosticCategory,
   SystemAdminDiagnosticTargetType,

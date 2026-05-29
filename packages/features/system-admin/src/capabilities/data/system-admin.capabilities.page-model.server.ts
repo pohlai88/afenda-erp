@@ -2,8 +2,8 @@ import { listExecutionCapabilities } from "@afenda/kernel/execution-capabilities
 import {
   listTenantCapabilitySettings,
   listTenantModuleSettings,
-} from "../../data/repositories/system-admin.execution-settings.repository.server";
-import { resolveSystemAdminListSearch } from "../../contracts/system-admin.list-search.shared";
+} from "../../tenant-execution/data/system-admin.execution-settings.repository.server";
+import { resolveSystemAdminListSearch } from "../../overview/contracts/system-admin.list-search.shared";
 import { buildSystemAdminCapabilityCoverageRows } from "./system-admin.capabilities.coverage.server";
 
 export async function buildSystemAdminCapabilitiesPageModel(input: {
@@ -42,11 +42,12 @@ export async function buildSystemAdminCapabilitiesPageModel(input: {
       route: capability.route,
       routeHref: capability.routeHref,
       requiredPermission: capability.requiredPermission,
-      status: capability.status,
+      availability: capability.availability,
       accessCoverage: capability.accessCoverage,
       auditCoverage: capability.auditCoverage,
       docsCoverage: capability.docsCoverage,
-      verdict: capability.verdict,
+      coverageVerdict: capability.coverageVerdict,
+      readinessVerdict: capability.readinessVerdict,
       issues:
         capability.issues.length > 0
           ? capability.issues.join("; ")

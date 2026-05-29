@@ -47,8 +47,7 @@ function RevisionsTable({ rows }: { rows: GovernedRevisionEntry[] }) {
     );
   }
 
-  // audit-ds: ignore no-raw-typography — column header; no non-uppercase header-cell token exists yet
-  const headerCellClass = "text-xs font-medium";
+  const headerCellClass = "type-table-header";
 
   return (
     <div className="rounded-section border">

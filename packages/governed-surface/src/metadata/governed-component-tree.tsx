@@ -7,6 +7,7 @@ import {
   type GovernedComponent,
 } from "../client";
 
+import { governedDispatchErrorCopy } from "../i18n/governed-renderer-copy.shared";
 import { extractGovernedConfigurationDataNature } from "../governed-configuration.shared";
 import { emitGovernedTelemetry } from "./governed-telemetry.shared";
 import { renderGovernedRendererById } from "./governed-renderer-dispatch";
@@ -53,15 +54,17 @@ export function GovernedComponentTree({
       surfaceKey,
       validation: "parse_failed",
     });
+    const copy = governedDispatchErrorCopy(
+      diagnostics,
+      "parseFailed",
+      "The governed component payload failed validation.",
+    );
     return (
       <GovernedEmpty
         model={{
           variant: "error",
-          title: "Section unavailable",
-          description:
-            diagnostics === "operator"
-              ? "The governed component payload failed validation."
-              : "This section could not be loaded safely.",
+          title: copy.title,
+          description: copy.description,
         }}
       />
     );
@@ -82,15 +85,17 @@ export function GovernedComponentTree({
       surfaceKey,
       validation: "unregistered",
     });
+    const copy = governedDispatchErrorCopy(
+      diagnostics,
+      "unregistered",
+      `No renderer registered for type "${data.type}".`,
+    );
     return (
       <GovernedEmpty
         model={{
           variant: "muted",
-          title: "Section unavailable",
-          description:
-            diagnostics === "operator"
-              ? `No renderer registered for type "${data.type}".`
-              : "This section is not available in the current surface.",
+          title: copy.title,
+          description: copy.description,
         }}
       />
     );
@@ -121,15 +126,17 @@ export function GovernedComponentTree({
         surfaceKey,
         validation: "nature_mismatch",
       });
+      const copy = governedDispatchErrorCopy(
+        diagnostics,
+        "natureMismatch",
+        `Renderer "${rendererId}" requires dataNature (accepted: ${contract.acceptedNatures.join(", ")}) but none was provided.`,
+      );
       return (
         <GovernedEmpty
           model={{
             variant: "error",
-            title: "Section unavailable",
-            description:
-              diagnostics === "operator"
-                ? `Renderer "${rendererId}" requires dataNature (accepted: ${contract.acceptedNatures.join(", ")}) but none was provided.`
-                : "This section is not available in the current surface.",
+            title: copy.title,
+            description: copy.description,
           }}
         />
       );
@@ -152,15 +159,17 @@ export function GovernedComponentTree({
         surfaceKey,
         validation: "nature_mismatch",
       });
+      const copy = governedDispatchErrorCopy(
+        diagnostics,
+        "natureMismatch",
+        `Renderer "${rendererId}" does not accept dataNature "${dataNature}". Accepted: ${contract.acceptedNatures.join(", ")}.`,
+      );
       return (
         <GovernedEmpty
           model={{
             variant: "error",
-            title: "Section unavailable",
-            description:
-              diagnostics === "operator"
-                ? `Renderer "${rendererId}" does not accept dataNature "${dataNature}". Accepted: ${contract.acceptedNatures.join(", ")}.`
-                : "This section is not available in the current surface.",
+            title: copy.title,
+            description: copy.description,
           }}
         />
       );

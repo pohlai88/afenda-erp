@@ -1,7 +1,7 @@
 import type { TenantPolicySettingRow } from "@afenda/db";
-import { listTenantPolicySettings } from "../../data/repositories/system-admin.execution-settings.repository.server";
-import { filterSystemAdminListRows } from "../../contracts/system-admin.list-filter.shared";
-import { resolveSystemAdminListSearch } from "../../contracts/system-admin.list-search.shared";
+import { listTenantPolicySettings } from "../../tenant-execution/data/system-admin.execution-settings.repository.server";
+import { filterSystemAdminListRows } from "../../overview/contracts/system-admin.list-filter.shared";
+import { resolveSystemAdminListSearch } from "../../overview/contracts/system-admin.list-search.shared";
 import { mapTenantPolicySettingToListRow } from "./system-admin.policy-rules.mapper";
 
 export function buildSystemAdminPolicyRuleRows(input: {

@@ -1,6 +1,6 @@
 import { searchTenantAuditLogs } from "@afenda/db";
 import { formatErpDateTime } from "@afenda/kernel";
-import { systemAdminWebhookEvents } from "../../contracts/system-admin.catalog.contract";
+import { systemAdminWebhookEvents } from "../../integrations/contracts/system-admin.integrations-catalog.contract";
 import type { SystemAdminDiagnosticsRecentChangeRow } from "../contracts/system-admin.diagnostics-coverage.contract";
 import { buildSystemAdminAuditEventDetailHref } from "../../audit-viewer/data/system-admin.audit-pagination.shared";
 

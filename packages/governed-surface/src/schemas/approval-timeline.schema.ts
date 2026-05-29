@@ -53,7 +53,7 @@ export const governedApprovalTimelineConfigurationSchema = z
     dataNature: approvalTimelineDataNatureSchema,
     title: z.string().trim().min(1).optional(),
     density: z.enum(["compact", "comfortable"]).optional(),
-    steps: z.array(approvalTimelineStepSchema).min(1),
+    steps: z.array(approvalTimelineStepSchema),
     chrome: governedSurfaceChromeSchema.optional(),
   })
   .strict()

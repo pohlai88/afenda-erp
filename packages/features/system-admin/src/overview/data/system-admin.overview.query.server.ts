@@ -1,5 +1,6 @@
-import { listAuditLogsForOrganization, listOrganizationInvitations } from "@afenda/db";
-import { loadTenantExecutionRulesForOrganization } from "../../execution/tenant-execution-rules.loader.server";
+import { listAuditLogsForOrganization } from "@afenda/db";
+import { listOrganizationInvitations } from "../../users/data/system-admin.identity.repository.server";
+import { loadTenantExecutionRulesForOrganization } from "../../tenant-execution/tenant-execution-rules.loader.server";
 import { listSystemAdminMemberships } from "../../memberships/data";
 import { listSystemAdminRoles } from "../../roles/data";
 import { listSystemAdminUsers } from "../../users/data";

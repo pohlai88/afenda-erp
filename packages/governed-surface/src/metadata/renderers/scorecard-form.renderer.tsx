@@ -3,6 +3,7 @@ import {
   GOVERNED_SCORECARD_FORM_SCHEMA_ID,
   parseGovernedScorecardFormConfiguration,
 } from "../../schemas/scorecard-form.schema";
+import { governedParseErrorCopy } from "../../i18n/governed-renderer-copy.shared";
 
 import type { GovernedComponentRendererDiagnostics } from "../registry";
 
@@ -18,15 +19,17 @@ export function ScorecardFormRenderer({
   const parsed = parseGovernedScorecardFormConfiguration(configuration);
 
   if (!parsed.success) {
+    const copy = governedParseErrorCopy(
+      diagnostics,
+      "scorecardForm",
+      `${GOVERNED_SCORECARD_FORM_SCHEMA_ID} failed validation.`,
+    );
     return (
       <GovernedEmpty
         model={{
           variant: "error",
-          title: "Scorecard unavailable",
-          description:
-            diagnostics === "operator"
-              ? `${GOVERNED_SCORECARD_FORM_SCHEMA_ID} failed validation.`
-              : "This scorecard could not be loaded safely.",
+          title: copy.title,
+          description: copy.description,
         }}
       />
     );

@@ -43,11 +43,19 @@ function copyTemplatePath(sourcePath: string, targetPath: string) {
   return true;
 }
 
-function copyTemplateDoor(name: string, featureSrcDir: string) {
+function copyTemplateDoor(name: string, featureSrcDir: string, featureName: string) {
   const sourcePath = path.join(templateDir, name);
   const targetPath = path.join(featureSrcDir, name);
 
   if (copyTemplatePath(sourcePath, targetPath)) {
+    if (name === "metadata.ts") {
+      const metadataContents = fs.readFileSync(targetPath, "utf8");
+      fs.writeFileSync(
+        targetPath,
+        metadataContents.replaceAll("__MODULE_ID__", featureName),
+        "utf8",
+      );
+    }
     return;
   }
 
@@ -136,7 +144,7 @@ function main() {
   ensureDir(featureSrcDir);
 
   for (const door of featurePublicDoorFiles) {
-    copyTemplateDoor(door, featureSrcDir);
+    copyTemplateDoor(door, featureSrcDir, featureName);
   }
 
   for (const bucket of readTemplateBuckets(root)) {

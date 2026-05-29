@@ -1,8 +1,14 @@
+import type { ModuleId } from "@afenda/config/module-ids";
 import {
   getModuleObservabilityIndicators,
   type ModuleObservabilityIndicator,
-} from "@afenda/kernel";
-import type { ModuleId } from "@afenda/kernel";
+} from "./module-indicators";
+
+export {
+  getModuleObservabilityIndicators,
+  type ModuleObservabilityIndicator,
+  type ModuleTone,
+} from "./module-indicators";
 
 export const telemetry = {
   serviceName: "afenda-erp",

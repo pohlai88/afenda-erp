@@ -88,6 +88,11 @@ appropriate root bucket with a precise subject prefix. The scaffold creates the
 default bucket set up front; empty starter buckets may be removed after the
 package audit once the real implementation has settled into named buckets.
 
+Architecture doctrine (`*-architecture.md`, `ARCHITECTURE.md`) belongs under
+`docs/architecture/` only — not inside feature package buckets. Package-local
+implementation notes may use other `.md` names when they are not architecture
+doctrine.
+
 Additional buckets are on demand. Add one only when a repeated responsibility
 does not fit an existing bucket, name it by responsibility rather than location,
 and update this template plus `pnpm architecture:check` expectations in the same
@@ -282,8 +287,16 @@ import { postJournal } from "@afenda/feature-finance/server";
 ```bash
 pnpm scaffold:feature <moduleId>
 pnpm scaffold:vertical <feature> <vertical>
+pnpm validate:feature-entry --feature <moduleId> [--slice <vertical>]
 pnpm architecture:check
 ```
+
+`validate:feature-entry` checks that a feature package (or a vertical slice such as
+`memberships`) still exposes the template bucket barrels and `index.ts` entry files
+expected after scaffold.
+
+`scaffold:feature` copies public doors from this template into `packages/features/<moduleId>/src/`.
+The metadata door uses a `__MODULE_ID__` placeholder replaced with the scaffolded module id.
 
 The root `pnpm` command aliases delegate to `packages/_template-definition/scripts`.
 

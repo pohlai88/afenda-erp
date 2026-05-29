@@ -18,7 +18,7 @@ export default function ForgotPasswordPage() {
           description={shellCopy.suspenseDescription}
           title={shellCopy.title}
         >
-          <div className="h-40 rounded-lg bg-muted" />
+          <div className="h-40 rounded-section bg-muted" />
         </AuthShell>
       }
     >

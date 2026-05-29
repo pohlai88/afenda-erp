@@ -1,5 +1,5 @@
 import type { ListSurfaceRendererConfigurationResolvedInput } from "@afenda/governed-surface";
-import { buildControlListSurface } from "../../surfaces/system-admin.control.surface";
+import { buildControlListSurface } from "../../overview/surfaces/system-admin.control-list.shared";
 import type { OrganizationSecuritySettings } from "../contracts/system-admin.security-settings.contract";
 
 export const systemAdminSecuritySurfaceKey = "system-admin.security.list";

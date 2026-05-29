@@ -105,6 +105,11 @@ export {
 } from "./profiles/governed-presentation-profiles";
 
 export {
+  GOVERNED_STAT_GRID_CLASS,
+  GOVERNED_STAT_TILE_SKELETON_CLASS,
+} from "./stat-card-layout.shared";
+
+export {
   resolveGovernedChartPresentation,
   resolveGovernedListPresentation,
   resolveGovernedStatPresentation,

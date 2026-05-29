@@ -1,0 +1,16 @@
+[   44184ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/_next/static/chunks/06-__next_dist_0e2k50v._.js:2971
+[   44466ms] [LOG] [HMR] connected @ http://localhost:3000/_next/static/chunks/06-__next_dist_0e2k50v._.js:2971
+[   44632ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_RESET @ http://localhost:3000/approvals:0
+[   46931ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:3000/_next/static/chunks/_0st7t2t._.js:0
+[   46962ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:3000/_next/static/chunks/apps_erp_src_app_(workspace)_error_tsx_08t0g7_._.js:0
+[   46967ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:3000/_next/static/chunks/0p91_lucide-react_dist_esm_icons_03phbfj._.js:0
+[   47017ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:3000/_next/static/chunks/apps_erp_src_app_error_tsx_0yowf8o._.js:0
+[   47029ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:3000/_next/static/chunks/06-__next_dist_0mt8zrg._.js:0
+[   47069ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:3000/_next/static/chunks/packages_features_system-admin_src_0hio4vv._.js:0
+[   48078ms] [ERROR] WebSocket connection to 'ws://localhost:3000/_next/webpack-hmr?id=_NfF_sV_GkTW2jSik83yw' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://localhost:3000/_next/static/chunks/06-__next_dist_client_0k4bhvq._.js:13362
+[   49265ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:3000/_next/static/chunks/apps_erp_src_app_(workspace)_%5BmoduleId%5D_layout_tsx_08t0g7_._.js:0
+[   49357ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:3000/_next/static/chunks/_05edrx9._.js:0
+[   49359ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:3000/_next/static/chunks/0rgj_zod_v3_0~-vz7_._.js:0
+[   49415ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:3000/_next/static/chunks/0w5l_%40ai-sdk_gateway_dist_index_mjs_0ht__ah._.js:0
+[   49421ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:3000/_next/static/chunks/0h45_ai_dist_index_mjs_0y6wu9e._.js:0
+[   49464ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:3000/_next/static/chunks/0fiz_swr_dist_0-re-q8._.js:0

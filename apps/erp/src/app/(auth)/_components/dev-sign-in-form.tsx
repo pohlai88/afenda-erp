@@ -14,8 +14,8 @@ export function DevSignInForm({
     <div>
       <div
         className={cn(
-          "text-sm text-muted-foreground",
-          compact && "text-xs uppercase tracking-wide",
+          "type-muted",
+          compact && "type-caption uppercase tracking-wide",
         )}
       >
         {devSignInCopy.eyebrow}
@@ -23,22 +23,22 @@ export function DevSignInForm({
       <h2
         className={cn(
           "mt-2 font-semibold text-foreground",
-          compact ? "text-lg" : "text-2xl",
+          compact ? "type-card-title" : "type-section-title",
         )}
       >
         {devSignInCopy.title}
       </h2>
       <p
         className={cn(
-          "mt-3 text-sm leading-6 text-muted-foreground",
-          compact && "text-xs leading-5",
+          "mt-3 type-body leading-6 text-muted-foreground",
+          compact && "type-caption leading-5",
         )}
       >
         {devSignInCopy.description}
       </p>
       <form
         action={signInAction}
-        className={cn("flex flex-col", compact ? "mt-5 gap-3" : "mt-8 gap-5")}
+        className={cn("flex flex-col", compact ? "mt-5 gap-3" : "mt-surface-3xl gap-5")}
       >
         <AuthField id="dev-name" label={devSignInCopy.fields.name}>
           <AuthInput

@@ -7,15 +7,22 @@ import type { uiDensity } from "./design-system";
 
 function Table({
   className,
+  containerClassName,
   density = "comfortable",
   ...props
-}: React.ComponentProps<"table"> & { density?: keyof typeof uiDensity }) {
+}: React.ComponentProps<"table"> & {
+  density?: keyof typeof uiDensity;
+  containerClassName?: string;
+}) {
   return (
     <div
       data-slot="table-container"
       data-density={density}
       tabIndex={0}
-      className="group/table-container relative w-full overflow-x-auto"
+      className={cn(
+        "group/table-container relative w-full overflow-x-auto",
+        containerClassName,
+      )}
     >
       <table
         data-slot="table"

@@ -3,8 +3,8 @@ import type { NavigationExtension } from "../shared/module-types";
 
 export const navigationExtensions = [
   {
-    id: "solution-console",
-    href: "/solution-console",
+    id: "lynx",
+    href: "/lynx",
     label: "Lynx Console",
     description:
       "Diagnose business problems and draft approved recovery actions.",

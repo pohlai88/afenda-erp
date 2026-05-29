@@ -11,6 +11,10 @@ import {
   type ApprovalTimelineDataNature,
   type ApprovalTimelineStepStatus,
 } from "../../schemas/approval-timeline.schema";
+import {
+  governedParseErrorCopy,
+  governedRendererCopy,
+} from "../../i18n/governed-renderer-copy.shared";
 import { cn } from "@afenda/ui/utils";
 
 import type { GovernedComponentRendererDiagnostics } from "../registry";
@@ -84,21 +88,31 @@ export function ApprovalTimelineRenderer({
   const parsed = parseGovernedApprovalTimelineConfiguration(configuration);
 
   if (!parsed.success) {
+    const copy = governedParseErrorCopy(diagnostics, "approvalTimeline");
     return (
       <GovernedEmpty
         model={{
           variant: "error",
-          title: "Timeline unavailable",
-          description:
-            diagnostics === "operator"
-              ? "The approval timeline configuration failed validation."
-              : "This timeline could not be loaded safely.",
+          title: copy.title,
+          description: copy.description,
         }}
       />
     );
   }
 
   const { dataNature, density, title, steps } = parsed.data;
+
+  if (steps.length === 0) {
+    return (
+      <GovernedEmpty
+        model={{
+          variant: "muted",
+          title: governedRendererCopy.empty.approvalTimeline.title,
+          description: governedRendererCopy.empty.approvalTimeline.description,
+        }}
+      />
+    );
+  }
   const listGapClass = density === "compact" ? "gap-2" : "gap-3";
   const itemPaddingClass = density === "compact" ? "pb-2" : "pb-3";
 

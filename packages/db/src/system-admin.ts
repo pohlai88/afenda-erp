@@ -81,6 +81,7 @@ export type TenantModuleSettingRow = {
   visible: boolean;
   readiness: SystemAdminReadiness;
   configuration: Record<string, unknown>;
+  updatedAt: Date;
 };
 
 export type TenantPolicySettingRow = {
@@ -642,6 +643,7 @@ export async function listTenantModuleSettings(input: {
         visible: tenantModuleSettings.visible,
         readiness: tenantModuleSettings.readiness,
         configuration: tenantModuleSettings.configuration,
+        updatedAt: tenantModuleSettings.updatedAt,
       })
       .from(tenantModuleSettings)
       .where(eq(tenantModuleSettings.organizationId, input.organizationId))
@@ -1058,6 +1060,90 @@ export async function createOrganizationInvitation(input: {
   });
 
   return { invitationId, token };
+}
+
+export async function getOrganizationInvitationById(input: {
+  organizationId: string;
+  invitationId: string;
+}) {
+  return runWithOrganizationContext(input.organizationId, async (db) => {
+    const [invitation] = await db
+      .select({
+        id: organizationInvitations.id,
+        email: organizationInvitations.email,
+        role: organizationInvitations.role,
+        status: organizationInvitations.status,
+      })
+      .from(organizationInvitations)
+      .where(
+        and(
+          eq(organizationInvitations.id, input.invitationId),
+          eq(organizationInvitations.organizationId, input.organizationId),
+        ),
+      )
+      .limit(1);
+
+    return invitation ?? null;
+  });
+}
+
+export async function resendOrganizationInvitation(input: {
+  organizationId: string;
+  invitationId: string;
+  actorAuthUserId: string;
+  expiresInDays?: number;
+}) {
+  const invitation = await getOrganizationInvitationById({
+    organizationId: input.organizationId,
+    invitationId: input.invitationId,
+  });
+
+  if (!invitation) {
+    throw new Error("Organization invitation was not found for this tenant.");
+  }
+
+  if (invitation.status !== "pending") {
+    throw new Error("Only pending invitations can be resent.");
+  }
+
+  const token = randomBytes(32).toString("hex");
+  const tokenHash = hashSecret(token);
+  const expiresAt = new Date();
+  expiresAt.setDate(expiresAt.getDate() + (input.expiresInDays ?? 7));
+
+  await runWithOrganizationContext(input.organizationId, async (db) => {
+    const [updated] = await db
+      .update(organizationInvitations)
+      .set({
+        tokenHash,
+        expiresAt,
+        updatedAt: new Date(),
+      })
+      .where(
+        and(
+          eq(organizationInvitations.id, input.invitationId),
+          eq(organizationInvitations.organizationId, input.organizationId),
+          eq(organizationInvitations.status, "pending"),
+        ),
+      )
+      .returning({ id: organizationInvitations.id });
+
+    if (!updated) {
+      throw new Error("Pending organization invitation was not found for this tenant.");
+    }
+
+    await createAuditLog({
+      organizationId: input.organizationId,
+      actorAuthUserId: input.actorAuthUserId,
+      entityType: "membership",
+      entityId: input.invitationId,
+      action: "tenant.invitation.resent",
+      summary: `Invitation resent to ${invitation.email}.`,
+      metadata: { invitationId: input.invitationId, email: invitation.email },
+    });
+  });
+
+  return { invitationId: input.invitationId, token };
 }
 
 export async function revokeOrganizationInvitation(input: {

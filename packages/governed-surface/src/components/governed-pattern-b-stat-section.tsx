@@ -16,6 +16,7 @@ import {
 } from "./governed-surface-section-card";
 import {
   renderGovernedPatternSectionShell,
+  type GovernedPatternSectionDensity,
   type GovernedPatternSectionLayout,
 } from "./governed-pattern-section-shell.shared";
 
@@ -34,7 +35,9 @@ export type GovernedPatternBStatSectionProps = {
   description?: string;
   surfaceKey: string;
   statGroups: ReadonlyArray<GovernedPatternBStatGroup>;
+  /** `embedded` — parent owns section chrome; body only. Default `card`. */
   layout?: GovernedPatternBStatSectionLayout;
+  density?: GovernedPatternSectionDensity;
   loadError?: EmptyState;
   forbidden?: EmptyState;
   invalid?: EmptyState;
@@ -55,6 +58,7 @@ export async function GovernedPatternBStatSection({
   surfaceKey,
   statGroups,
   layout = "card",
+  density = "comfortable",
   loadError,
   forbidden,
   invalid,
@@ -69,6 +73,7 @@ export async function GovernedPatternBStatSection({
 
   const shellInput = {
     layout,
+    density,
     className,
     sectionTestId,
     headerSlot,

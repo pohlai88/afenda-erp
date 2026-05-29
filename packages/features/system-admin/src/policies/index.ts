@@ -1,4 +1,4 @@
-export * from "./system-admin.capability.policy.server";
+export * from "../overview/policies/system-admin.capability.policy.server";
 export type {
   SystemAdminPolicyRule,
   SystemAdminPolicyRuleListRow,
@@ -17,7 +17,7 @@ export {
   updateSystemAdminPolicyAction,
   updateSystemAdminPolicyRuleAction,
 } from "./actions/system-admin.policy-rules.actions.server";
-export { listTenantPolicySettings as listSystemAdminPolicies } from "../data/repositories/system-admin.execution-settings.repository.server";
+export { listTenantPolicySettings as listSystemAdminPolicies } from "../tenant-execution/data/system-admin.execution-settings.repository.server";
 export {
   requireSystemAdminPoliciesManage,
   requireSystemAdminPoliciesRead,

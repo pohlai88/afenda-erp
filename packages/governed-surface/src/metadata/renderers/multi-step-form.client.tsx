@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Button } from "@afenda/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@afenda/ui/card";
 import { Checkbox } from "@afenda/ui/checkbox";
+import { FieldGroup } from "@afenda/ui/field";
 import { Input } from "@afenda/ui/input";
 import { Label } from "@afenda/ui/label";
 import {
@@ -15,7 +16,8 @@ import {
   SelectValue,
 } from "@afenda/ui/select";
 import { Textarea } from "@afenda/ui/textarea";
-import { resolveFormFieldRuleState, type FormRuleValues } from "../../client";
+import { resolveFormFieldRuleState, type FormRuleValues, GovernedEmpty } from "../../client";
+import { governedRendererCopy } from "../../i18n/governed-renderer-copy.shared";
 import type {
   GovernedFormField,
   GovernedMultiStepFormConfiguration,
@@ -52,6 +54,23 @@ export function MultiStepFormSurface({
   const step = form.steps[stepIndex];
   const isFirst = stepIndex === 0;
   const isLast = stepIndex === form.steps.length - 1;
+
+  if (form.steps.length === 0) {
+    return (
+      <section
+        aria-label="Multi-step form"
+        className={DATA_NATURE_CLASS[form.dataNature]}
+      >
+        <GovernedEmpty
+          model={{
+            variant: "muted",
+            title: governedRendererCopy.empty.multiStepForm.title,
+            description: governedRendererCopy.empty.multiStepForm.description,
+          }}
+        />
+      </section>
+    );
+  }
 
   if (!step) {
     return null;
@@ -95,9 +114,8 @@ export function MultiStepFormSurface({
               </li>
             ))}
           </ol>
-          <div
+          <FieldGroup
             className={cn(
-              "flex flex-col",
               densityGapClass(form.chrome?.density),
             )}
           >
@@ -109,7 +127,7 @@ export function MultiStepFormSurface({
                 onValueChange={setFieldValue}
               />
             ))}
-          </div>
+          </FieldGroup>
           <div className="flex flex-wrap gap-2 border-t border-border/60 pt-3">
             <Button
               type="button"

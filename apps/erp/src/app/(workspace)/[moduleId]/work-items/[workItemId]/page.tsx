@@ -1,0 +1,34 @@
+import { loadModuleWorkItemDetailContext } from "@/workspace-routes/workspace-route-cache";
+import { WorkItemDetailRoutePage } from "@/workspace-routes/work-item-detail-route";
+import type { WorkspaceRouteInstant } from "@/workspace-routes/workspace-route-instant";
+import type { Metadata } from "next";
+
+export const unstable_instant = {
+  prefetch: "static",
+} as const satisfies WorkspaceRouteInstant;
+
+type WorkItemDetailPageProps = {
+  params: Promise<{
+    moduleId: string;
+    workItemId: string;
+  }>;
+};
+
+export async function generateMetadata(
+  props: WorkItemDetailPageProps,
+): Promise<Metadata> {
+  const { moduleId, workItemId } = await props.params;
+  const { moduleDefinition, workItem } = await loadModuleWorkItemDetailContext(
+    moduleId,
+    workItemId,
+  );
+
+  return {
+    title: `${workItem.subject} | ${moduleDefinition.label}`,
+    description: `${workItem.status} ${workItem.priority} work item`,
+  };
+}
+
+export default function WorkItemDetailPage(props: WorkItemDetailPageProps) {
+  return <WorkItemDetailRoutePage params={props.params} />;
+}

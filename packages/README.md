@@ -36,7 +36,6 @@ such as Lynx and Knowledge.
 | `@afenda/ai`                       | Agent/runtime layer | Specialist agents, governed tools, AI Gateway options, model policy, guardrails, sandbox primitives, AI schemas          | Lynx UI, Knowledge retrieval tables, product routes        |
 | `@afenda/feature-knowledge`        | Retrieval substrate | source adapters, chunking, embeddings, pgvector retrieval, eval data, knowledge settings                                 | Lynx brand, operator prompts, cross-product agent behavior |
 | `@afenda/feature-lynx`             | Product/brand layer | Lynx contracts, Truth Retrieval, Decision Operator, run/workflow/readiness surfaces, composition of Knowledge + AI tools | generic AI gateway primitives, Knowledge storage ownership |
-| `@afenda/feature-solution-console` | Transitional shell  | temporary Solution Console metadata compatibility                                                                        | new Lynx behavior, new AI agents, new substrate logic      |
 
 ## Import Direction
 
@@ -83,7 +82,6 @@ Disallowed:
 - `ai.gpt.agent.server.ts`
 - `ai.claude.agent.server.ts`
 - `ai.lynx.agent.server.ts`
-- `ai.solution-console.agent.server.ts`
 - route-shaped agent names such as `ai.chat.agent.server.ts`
 
 The route or product chooses the specialist and tool pack. The model is selected
@@ -112,11 +110,8 @@ Do not merge:
 
 Allowed cleanup:
 
-- Move Solution Console surfaces that describe Lynx runs, workflows, readiness,
-  and operator state into `@afenda/feature-lynx`.
-- Keep `/solution-console` routes as compatibility URLs until product routing is
-  renamed.
-- Retire `@afenda/feature-solution-console` after no app route imports it.
+- Lynx product surfaces, console metadata, and `/lynx` routes live in
+  `@afenda/feature-lynx`. Legacy `/solution-console` URLs redirect to `/lynx`.
 
 ## Next Refactor Audit
 
@@ -127,9 +122,6 @@ Current observations:
   implementation in `src/data/`.
 - `@afenda/feature-lynx` now follows the feature template with contracts,
   metadata surfaces, data queries, tools, and workflows in explicit buckets.
-- `@afenda/feature-solution-console` is mostly a compatibility shell; its
-  metadata door re-exports kernel builders and should not grow.
-
 ### Knowledge
 
 Current shape is mostly correct: it is a server-heavy substrate with chunking,
@@ -161,20 +153,3 @@ Refactor next:
 5. Keep Lynx tools governed and replayable through run events.
 
 Do not move Lynx product code into AI.
-
-### Solution Console
-
-Current shape is a transitional shell. It mostly re-exports kernel metadata while
-the real Lynx surfaces already live in `@afenda/feature-lynx`.
-
-Refactor next:
-
-1. Move remaining Solution Console metadata builders into
-   `@afenda/feature-lynx/metadata` or a route-local compatibility adapter.
-2. Update app routes to import Lynx surfaces directly.
-3. Keep the `/solution-console` URL as a compatibility route until product
-   routing changes.
-4. Remove `@afenda/feature-solution-console` from app dependencies after imports
-   reach zero.
-
-Do not add new AI agents or Lynx behavior to this package.

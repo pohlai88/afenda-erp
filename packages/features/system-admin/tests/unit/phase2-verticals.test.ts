@@ -4,18 +4,16 @@ import {
   evaluateCapabilityCoverage,
 } from "../../src/capabilities/data";
 import { SYSTEM_ADMIN_PROTECTED_MODULE_KEY } from "../../src/modules/contracts";
-import { buildSystemAdminModuleCatalogRows } from "../../src/modules/data";
-import { buildSystemAdminPermissionCatalogRows } from "../../src/permissions/data";
-import {
-  systemAdminCapabilitySettingsActionSchema,
-  systemAdminModuleSettingsActionSchema,
-} from "../../src/schemas/system-admin.control-action.schema";
+import { buildSystemAdminModuleCatalogRows } from "../../src/modules/data/system-admin.modules.query.server";
+import { buildSystemAdminPermissionCatalogRows } from "../../src/permissions/data/system-admin.permissions.query.server";
+import { systemAdminCapabilitySettingsActionSchema } from "../../src/capabilities/schemas/system-admin.capability-settings.schema";
+import { systemAdminModuleSettingsActionSchema } from "../../src/modules/schemas/system-admin.module-settings.schema";
+import { getErpModuleById } from "@afenda/kernel/module-definitions";
 import {
   applyTenantCapabilityAvailability,
-  applyTenantModuleAvailability,
   applyTenantNavigationAvailability,
-} from "@afenda/kernel";
-import { getErpModuleById } from "@afenda/kernel";
+} from "@afenda/kernel/tenant-availability";
+import { applyTenantModuleAvailability } from "@afenda/kernel/tenant-module-availability";
 
 describe("system admin phase 2 permission catalog", () => {
   it("flags permissions without execution capabilities as orphan", () => {
@@ -126,13 +124,17 @@ describe("system admin phase 2 module availability", () => {
           visible: true,
           readiness: "deprecated",
           configuration: {},
+          updatedAt: new Date("2026-05-01T00:00:00.000Z"),
         },
       ],
     });
 
     const finance = rows.find((row) => row.id === "finance");
     expect(finance?.status).toBe("disabled");
+    expect(finance?.availability).toBe("disabled");
+    expect(finance?.readinessVerdict).toBe("warning");
     expect(finance?.readiness).toBe("deprecated");
+    expect(finance?.category).toBe("finance");
   });
 });
 
@@ -177,7 +179,7 @@ describe("system admin phase 2 capability navigation", () => {
 describe("system admin phase 2 nav visibility", () => {
   it("filters system admin nav items by effective capabilities", async () => {
     const { resolveSystemAdminNavItems } = await import(
-      "../../src/contracts/system-admin.nav.contract"
+      "../../src/overview/contracts/system-admin.nav.contract"
     );
 
     const items = resolveSystemAdminNavItems([

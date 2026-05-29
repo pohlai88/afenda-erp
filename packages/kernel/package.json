@@ -36,6 +36,24 @@
       "development": "./src/execution-kernel/policy/tenant-execution-rules.ts",
       "import": "./src/execution-kernel/policy/tenant-execution-rules.ts",
       "default": "./dist/execution-kernel/policy/tenant-execution-rules.js"
+    },
+    "./module-definitions": {
+      "types": "./src/modules/definitions.ts",
+      "development": "./src/modules/definitions.ts",
+      "import": "./src/modules/definitions.ts",
+      "default": "./dist/modules/definitions.js"
+    },
+    "./tenant-availability": {
+      "types": "./src/modules/tenant-availability.ts",
+      "development": "./src/modules/tenant-availability.ts",
+      "import": "./src/modules/tenant-availability.ts",
+      "default": "./dist/modules/tenant-availability.js"
+    },
+    "./tenant-module-availability": {
+      "types": "./src/modules/tenant-module-availability.ts",
+      "development": "./src/modules/tenant-module-availability.ts",
+      "import": "./src/modules/tenant-module-availability.ts",
+      "default": "./dist/modules/tenant-module-availability.js"
     }
   },
   "dependencies": {
@@ -43,6 +61,7 @@
     "@afenda/config": "workspace:*",
     "@afenda/db": "workspace:*",
     "@afenda/governed-surface": "workspace:*",
+    "@afenda/observability": "workspace:*",
     "server-only": "^0.0.1",
     "zod": "catalog:"
   },

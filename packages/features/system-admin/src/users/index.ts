@@ -1,11 +1,20 @@
 export * from "./actions";
-export { SystemAdminUsersTable } from "./components/system-admin.users-table.component.server";
+export {
+  SystemAdminUsersSection,
+  SystemAdminUsersAccessDenied,
+  SystemAdminIdentityHub,
+} from "./components";
 export * from "./contracts";
 export * from "./data";
 export * from "./events";
 export * from "./policies";
 export * from "./schemas";
-export { revokeInvitation as revokeSystemAdminInvitation } from "../actions/system-admin.identity.actions.server";
+export { systemAdminUsersUiCopy } from "./surface/system-admin.users-ui.copy.shared";
 export {
-  listOrganizationInvitations as listSystemAdminInvitations,
-} from "../data/repositories/system-admin.identity.repository.server";
+  inviteMemberAction,
+  revokeInvitation as revokeSystemAdminInvitation,
+} from "./actions/system-admin.identity-invitations.actions.server";
+export {
+  listOrganizationInvitations,
+  listTenantMembers,
+} from "./data/system-admin.identity.repository.server";

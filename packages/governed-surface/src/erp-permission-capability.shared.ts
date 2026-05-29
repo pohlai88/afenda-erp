@@ -51,9 +51,9 @@ export function resolveErpCapabilityForPermission(
       return documentReadCapability(module);
     }
     case "predict": {
-      const machineLayerRead = `${module}.machine-layer.read`;
-      if (isAppCapability(machineLayerRead)) {
-        return machineLayerRead;
+      const lynxRead = `${module}.lynx.read`;
+      if (isAppCapability(lynxRead)) {
+        return lynxRead;
       }
       return null;
     }

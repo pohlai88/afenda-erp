@@ -1,4 +1,5 @@
 import { appRootMetadataCopy } from "@afenda/kernel";
+import { AfendaThemeProvider } from "@afenda/ui";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { AppAnalytics } from "./app-analytics";
@@ -30,10 +31,11 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} h-full`}
     >
       <body className="min-h-full font-sans antialiased">
-        {children}
+        <AfendaThemeProvider>{children}</AfendaThemeProvider>
         <AppAnalytics />
       </body>
     </html>

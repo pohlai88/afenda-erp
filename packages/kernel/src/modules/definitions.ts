@@ -623,12 +623,12 @@ const modules = [
         tone: "positive",
       },
     ],
-    defaultViews: ["Role control", "Tenant settings", "Audit access"],
+    defaultViews: ["Role control", "Organization", "Audit access"],
     actions: [
       { label: "Identity & access", href: "/system-admin/identity" },
-      { label: "Tenant settings", href: "/system-admin/settings" },
+      { label: "Organization", href: "/system-admin/organization" },
       { label: "Audit log", href: "/system-admin/audit" },
-      { label: "Machine layer ops", href: "/system-admin/machine-layer" },
+      { label: "Lynx governance", href: "/system-admin/lynx" },
     ],
     focusAreas: [
       {
@@ -669,3 +669,7 @@ export const moduleById = new Map<ModuleId, ErpModuleDefinition>(
 export const moduleByHref = new Map<string, ErpModuleDefinition>(
   erpModules.map((module) => [module.href, module]),
 );
+
+export function getErpModuleById(moduleId: ModuleId) {
+  return moduleById.get(moduleId) ?? null;
+}

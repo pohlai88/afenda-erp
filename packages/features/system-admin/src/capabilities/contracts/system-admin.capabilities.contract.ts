@@ -6,6 +6,13 @@ export type CapabilityCoverageVerdict =
   | "missing_docs"
   | "disabled";
 
+export type SystemAdminCapabilityAvailability = "enabled" | "disabled" | "preview";
+
+export type SystemAdminCapabilityReadinessVerdict =
+  | "ready"
+  | "warning"
+  | "blocked";
+
 export type SystemAdminCapabilityCoverageRow = {
   id: string;
   capability: string;
@@ -13,10 +20,11 @@ export type SystemAdminCapabilityCoverageRow = {
   route: string;
   routeHref?: string;
   requiredPermission: string;
-  status: string;
+  availability: SystemAdminCapabilityAvailability;
   accessCoverage: string;
   auditCoverage: string;
   docsCoverage: string;
-  verdict: CapabilityCoverageVerdict;
+  coverageVerdict: CapabilityCoverageVerdict;
+  readinessVerdict: SystemAdminCapabilityReadinessVerdict;
   issues: readonly string[];
 };

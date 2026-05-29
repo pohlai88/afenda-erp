@@ -17,6 +17,7 @@ import {
   type ChartAction,
   type ChartDataNature,
 } from "../../schemas/chart.schema";
+import { governedParseErrorCopy } from "../../i18n/governed-renderer-copy.shared";
 
 import type { GovernedComponentRendererDiagnostics } from "../registry";
 import { ChartRendererBody } from "./chart-renderer-body.client";
@@ -66,15 +67,13 @@ export function ChartRenderer({
   const parsed = parseGovernedChartConfiguration(configuration);
 
   if (!parsed.success) {
+    const copy = governedParseErrorCopy(diagnostics, "chart");
     return (
       <GovernedEmpty
         model={{
           variant: "error",
-          title: "Chart unavailable",
-          description:
-            diagnostics === "operator"
-              ? "The chart configuration failed validation."
-              : "This chart could not be loaded safely.",
+          title: copy.title,
+          description: copy.description,
         }}
       />
     );

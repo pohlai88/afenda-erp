@@ -3,10 +3,12 @@
 import { Button, Card, CardContent } from "@afenda/ui";
 import {
   getRecoveryPlaybookDefinitions,
-  getSolutionConsoleUxCards,
-  solutionConsoleAgentCopy,
   type RecoveryPlaybookIconKey,
 } from "@afenda/kernel";
+import {
+  getLynxConsoleUxCards,
+  lynxConsoleAgentCopy,
+} from "../shell/lynx-console-copy.shared";
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
 import {
@@ -32,7 +34,7 @@ import {
 import { LynxEmptyState, LynxPanel } from "./lynx.panel.component.client";
 
 const recoveryPlaybooks = getRecoveryPlaybookDefinitions();
-const solutionConsoleUxCards = getSolutionConsoleUxCards();
+const lynxConsoleUxCards = getLynxConsoleUxCards();
 
 const recoveryPlaybookIcons = {
   "trending-down": TrendingDown,
@@ -44,7 +46,7 @@ const recoveryPlaybookIcons = {
   shield: Shield,
 } as const satisfies Record<RecoveryPlaybookIconKey, LucideIcon>;
 
-const solutionConsoleUxCardIcons = {
+const lynxConsoleUxCardIcons = {
   "alert-triangle": AlertTriangle,
   "badge-check": BadgeCheck,
   send: Send,
@@ -105,7 +107,7 @@ export function LynxOperatorPanel({
 
   return (
     <LynxPanel
-      description={solutionConsoleAgentCopy.description}
+      description={lynxConsoleAgentCopy.description}
       icon={
         <img
           src="/icons/lynx/lynx-operator.svg"
@@ -115,7 +117,7 @@ export function LynxOperatorPanel({
           aria-hidden
         />
       }
-      title={solutionConsoleAgentCopy.title}
+      title={lynxConsoleAgentCopy.title}
     >
       <div className="border-b border-border p-4">
         <div className="grid gap-2 @sm:grid-cols-2">
@@ -137,7 +139,7 @@ export function LynxOperatorPanel({
                   className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground"
                   aria-hidden
                 />
-                <span className="text-sm font-medium leading-5 text-foreground">
+                <span className="type-body font-medium text-foreground">
                   {playbook.label}
                 </span>
               </Button>
@@ -147,10 +149,10 @@ export function LynxOperatorPanel({
       </div>
 
       <div className="grid gap-3 border-b border-border p-4 @md:grid-cols-3">
-        {solutionConsoleUxCards.map((card) => {
+        {lynxConsoleUxCards.map((card) => {
           const Icon =
-            solutionConsoleUxCardIcons[
-              card.iconKey as keyof typeof solutionConsoleUxCardIcons
+            lynxConsoleUxCardIcons[
+              card.iconKey as keyof typeof lynxConsoleUxCardIcons
             ] ?? AlertTriangle;
 
           return (
@@ -160,7 +162,7 @@ export function LynxOperatorPanel({
               size="sm"
             >
               <CardContent className="flex flex-col gap-2">
-                <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
+                <div className="flex items-center gap-2 type-body font-semibold text-foreground">
                   <Icon
                     className={`h-4 w-4 ${
                       card.iconKey === "alert-triangle"
@@ -173,7 +175,7 @@ export function LynxOperatorPanel({
                   />
                   {card.title}
                 </div>
-                <div className="text-sm leading-6 text-muted-foreground">
+                <div className="type-muted">
                   {card.description}
                 </div>
               </CardContent>
@@ -202,7 +204,7 @@ export function LynxOperatorPanel({
               addToolApprovalResponse({
                 id: approvalId,
                 approved: false,
-                reason: solutionConsoleAgentCopy.toolRejectReason,
+                reason: lynxConsoleAgentCopy.toolRejectReason,
               })
             }
           />
@@ -212,7 +214,7 @@ export function LynxOperatorPanel({
         disabled={isBusy}
         onSubmit={handleSubmit}
         onValueChange={setInput}
-        placeholder={solutionConsoleAgentCopy.inputPlaceholder}
+        placeholder={lynxConsoleAgentCopy.inputPlaceholder}
         status={status}
         value={input}
       />

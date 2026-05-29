@@ -1,0 +1,6 @@
+[    4385ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/_next/static/chunks/06-__next_dist_0e2k50v._.js:2971
+[    4598ms] [LOG] [HMR] connected @ http://localhost:3000/_next/static/chunks/06-__next_dist_0e2k50v._.js:2971
+[    5340ms] [LOG] %c[Vercel Speed Insights]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit @ http://localhost:3000/_next/static/chunks/06-__next_dist_0e2k50v._.js:2971
+[    5346ms] [LOG] %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit @ http://localhost:3000/_next/static/chunks/06-__next_dist_0e2k50v._.js:2971
+[    5347ms] [LOG] %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {route: /sign-in, path: /sign-in} @ http://localhost:3000/_next/static/chunks/06-__next_dist_0e2k50v._.js:2971
+[    5348ms] [LOG] %c[Vercel Web Analytics]%c Page view would be ignored by `beforeSend` because null was returned. color: rgb(120, 120, 120) color: inherit {type: pageview, url: http://localhost:3000/sign-in, payload: undefined} @ http://localhost:3000/_next/static/chunks/06-__next_dist_0e2k50v._.js:2971

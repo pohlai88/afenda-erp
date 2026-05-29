@@ -79,7 +79,7 @@ export function StatCardBody({ stat, density }: StatCardBodyProps) {
           <Icon className="size-4 shrink-0 text-muted-foreground" aria-hidden />
         ) : null}
       </div>
-      <span className="type-card-title tabular-nums text-foreground">
+      <span className="type-card-title tabular-nums tracking-tight text-foreground">
         {numericValue !== null &&
         stat.animateValue !== false &&
         !reduceMotion ? (
@@ -129,7 +129,7 @@ export function StatCardBody({ stat, density }: StatCardBodyProps) {
 
   const contentClass = cn(
     "flex flex-col",
-    density === "compact" ? "gap-0.5 p-3" : "gap-1 p-4",
+    density === "compact" ? "gap-1 p-3" : "gap-1.5 p-4",
     showAccent && "border-l-4",
     showAccent && ACCENT_RAIL_CLASS[stat.tone],
   );

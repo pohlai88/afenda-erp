@@ -1,16 +1,21 @@
 export type {
   CapabilityCoverageVerdict,
+  SystemAdminCapabilityAvailability,
   SystemAdminCapabilityCoverageRow,
+  SystemAdminCapabilityReadinessVerdict,
 } from "./contracts";
 export {
   buildSystemAdminCapabilityCoverageRows,
   evaluateCapabilityCoverage,
+  resolveSystemAdminCapabilityReadinessVerdict,
 } from "./data";
 export { buildSystemAdminCapabilitiesPageModel } from "./data/system-admin.capabilities.page-model.server";
 export {
-  updateSystemAdminCapabilitySettingsAction as updateSystemAdminCapabilitySettings,
-} from "../actions/system-admin.control.actions.server";
-export { listTenantCapabilitySettings as listSystemAdminCapabilitySettings } from "../data/repositories/system-admin.execution-settings.repository.server";
+  setSystemAdminCapabilityAvailabilityAction,
+  updateSystemAdminCapabilitySettingsAction,
+} from "./actions/system-admin.capability-settings.actions.server";
+export { resolveSystemAdminCapabilityAuditAction } from "./events/system-admin.capabilities.event";
+export { listTenantCapabilitySettings as listSystemAdminCapabilitySettings } from "../tenant-execution/data/system-admin.execution-settings.repository.server";
 export {
   requireSystemAdminCapabilitiesManage,
   requireSystemAdminCapabilitiesRead,

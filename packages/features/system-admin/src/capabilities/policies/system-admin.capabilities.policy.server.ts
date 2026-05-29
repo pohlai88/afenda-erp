@@ -1,9 +1,4 @@
-import {
-  requireSystemAdminCapabilitiesManage,
-  requireSystemAdminCapabilitiesRead,
-} from "../../policies";
-
 export {
   requireSystemAdminCapabilitiesManage,
   requireSystemAdminCapabilitiesRead,
-};
+} from "../../overview/policies/system-admin.capability.policy.server";

@@ -38,7 +38,7 @@ Duplicate MCP files under `AppData\Roaming\Cursor\...` and `AppData\Roaming\.cur
 | Layer   | Location                            | Role                                          |
 | ------- | ----------------------------------- | --------------------------------------------- |
 | Rules   | `.cursor/rules/*.mdc`               | Always-on + path-scoped doctrine              |
-| Hooks   | `.cursor/hooks.json`                | Session routing, DDL guard, post-edit ARCH hints |
+| Hooks   | `.cursor/hooks.json`                | Session routing, DDL guard, architecture-doc guard, post-edit ARCH hints |
 | Index   | `.cursorignore`                     | Exclude artifacts and lockfile noise          |
 | Stack   | `.agents/stack-context.md`          | Pinned versions + Context7 library hints      |
 | VS Code | `.vscode/settings.json`, `mcp.json` | Editor + MCP for VS Code (parallel to Cursor) |
@@ -54,5 +54,7 @@ Duplicate MCP files under `AppData\Roaming\Cursor\...` and `AppData\Roaming\.cur
 See rule `afenda-external-context` for Context7 vs ARCH doc priority.
 
 **Database hooks:** `guard-database-ddl.mjs` blocks agent edits to `packages/db/drizzle/*.sql`, `psql` DDL, and prompts before Neon `run_sql` DDL — use `src/schema` → `pnpm db:generate` → `pnpm db:migrate` (rule `afenda-database-migrations`).
+
+**Architecture doc hook:** `guard-architecture-docs.mjs` blocks agent `Delete` on paths containing `architecture` (rule `afenda-architecture-docs`).
 
 Vercel linking is deferred — [`docs/development/vercel-link.md`](../docs/development/vercel-link.md).

@@ -24,7 +24,7 @@ export default function SignInPage() {
           description={shellCopy.suspenseDescription}
           title={shellCopy.title}
         >
-          <div className="h-56 rounded-lg bg-muted" />
+          <div className="h-56 rounded-section bg-muted" />
         </AuthShell>
       }
     >
@@ -50,7 +50,7 @@ async function SignInPageInner() {
       ) : devCookieAuthEnabled ? (
         <DevSignInForm />
       ) : (
-        <div className="rounded-lg border border-line bg-surface px-4 py-3 text-sm leading-6 text-muted">
+        <div className="rounded-section border border-line bg-surface px-surface-lg py-3 type-body leading-6 text-muted">
           {signInEnvironmentCopy.disabledMessage}
         </div>
       )}

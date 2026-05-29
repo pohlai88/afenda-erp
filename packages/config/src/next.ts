@@ -22,7 +22,6 @@ export const afendaTranspilePackages = [
   "@afenda/feature-purchasing",
   "@afenda/feature-reports",
   "@afenda/feature-sales",
-  "@afenda/feature-solution-console",
   "@afenda/governed-surface",
   "@afenda/observability",
   "@afenda/ui",

@@ -23,7 +23,7 @@ Metadata may describe fields, columns, row links, filters, sort choices, present
 - `@afenda/kernel` owns module definitions, record type definitions, query normalization, workspace shaping, and surface builders as a shared contract layer. Module-bound builder wrappers live in `@afenda/feature-*` packages under `packages/features/*`; routes may still call kernel builders during the compatibility window.
 - `@afenda/db` owns persisted ERP records, work items, saved views, documents, query windows, Drizzle schema, and RLS context helpers.
 - `@afenda/ui` provides accessible layout primitives (`SectionPanel`, `StatusBadge`, `ModuleLinkGrid`, …) and remains metadata-unaware. Tabular ERP data renders through governed list/stat/chart sections — not ERP shell grid composites.
-- Dashboard, module workspace, and solution-console surfaces render through `GovernedPatternBStatSection`, `GovernedPatternCListSection`, and related governed sections.
+- Dashboard, module workspace, and Lynx console surfaces render through `GovernedPatternBStatSection`, `GovernedPatternCListSection`, and related governed sections.
 - Stats, workflow summaries, module overview metadata, and hardening checklists use `buildGovernedStatGrid` / `buildGovernedListSurface` kernel builders.
 - `RecordTypeDefinition` is the app-facing contract for record list columns, default profile, default filters, default sort, route templates, toolbar metadata, extension validation, and record permissions.
 - Server windows expose `pageSize`, `totalCount`, `hasNextPage`, and opaque cursor metadata. Route-level list state uses server-normalized URL params.

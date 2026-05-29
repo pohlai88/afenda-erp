@@ -1,7 +1,39 @@
 import { writeExecutionAuditEvent } from "@afenda/kernel/execution";
-import { listRoleOverridesForOrganization } from "../../data/repositories/system-admin.identity.repository.server";
-import { resolveSystemAdminListSearch } from "../../contracts/system-admin.list-search.shared";
-import { listSystemAdminPermissionCatalog } from "./system-admin.permissions.query.server";
+import { filterSystemAdminListRows } from "../../overview/contracts/system-admin.list-filter.shared";
+import {
+  resolveSystemAdminListSearch,
+  resolveSystemAdminListStatusFilter,
+} from "../../overview/contracts/system-admin.list-search.shared";
+import { listRoleOverridesForOrganization } from "../../users/data/system-admin.identity.repository.server";
+import { buildSystemAdminPermissionCatalogRows } from "./system-admin.permissions.query.server";
+
+function mapPermissionCatalogRow(permission: {
+  id: string;
+  permission: string;
+  module: string;
+  group: string;
+  label: string;
+  description: string;
+  capabilityCount: number;
+  roleCount: number;
+  status: string;
+  coverageVerdict: string;
+  riskLevel: string;
+}) {
+  return {
+    id: permission.id,
+    permission: permission.permission,
+    module: permission.module,
+    group: permission.group,
+    label: permission.label,
+    description: permission.description,
+    capabilityCount: String(permission.capabilityCount),
+    roleCount: String(permission.roleCount),
+    status: permission.status,
+    coverageVerdict: permission.coverageVerdict,
+    riskLevel: permission.riskLevel,
+  };
+}
 
 export async function buildSystemAdminPermissionsPageModel(input: {
   organizationId: string;
@@ -13,14 +45,33 @@ export async function buildSystemAdminPermissionsPageModel(input: {
     input.searchParams,
     "permissions",
   );
+  const coverageFilter = resolveSystemAdminListStatusFilter(
+    input.searchParams,
+    "permissions",
+  );
+
   const roleOverrides = await listRoleOverridesForOrganization({
     organizationId: input.organizationId,
     limit: 500,
   });
-  const permissions = await listSystemAdminPermissionCatalog({
-    organizationId: input.organizationId,
-    roleOverrides,
-  });
+  const catalogRows = buildSystemAdminPermissionCatalogRows({ roleOverrides });
+
+  const filteredRows = filterSystemAdminListRows(
+    catalogRows.map(mapPermissionCatalogRow),
+    searchValue,
+    [
+      "permission",
+      "module",
+      "group",
+      "label",
+      "description",
+      "coverageVerdict",
+      "status",
+      "riskLevel",
+    ],
+  ).filter((row) =>
+    coverageFilter ? row.coverageVerdict === coverageFilter : true,
+  );
 
   await writeExecutionAuditEvent({
     organizationId: input.organizationId,
@@ -30,22 +81,18 @@ export async function buildSystemAdminPermissionsPageModel(input: {
     targetType: "organization",
     targetId: input.organizationId,
     metadata: {
-      permissionCount: permissions.length,
+      permissionCount: filteredRows.length,
       search: searchValue ?? null,
+      coverageFilter: coverageFilter ?? null,
     },
   });
 
   return {
     searchValue,
-    permissions: permissions.map((permission) => ({
-      id: permission.id,
-      permission: permission.permission,
-      module: permission.module,
-      label: permission.label,
-      capabilityCount: String(permission.capabilityCount),
-      roleCount: String(permission.roleCount),
-      status: permission.status,
-      riskLevel: permission.riskLevel,
-    })),
+    coverageFilter,
+    permissions: filteredRows,
+    missingPermissionCount: catalogRows.filter((row) => row.status === "missing")
+      .length,
+    roleOverrides,
   };
 }

@@ -1,4 +1,4 @@
-import { and, count, desc, eq, gte, ilike, lte, or } from "drizzle-orm";
+import { and, count, desc, eq, gte, ilike, inArray, lte, max, or } from "drizzle-orm";
 import {
   getDb,
   runWithOrganizationContext,
@@ -202,6 +202,41 @@ export async function searchTenantAuditLogs(input: {
     ]);
 
     return { rows, totalCount: total };
+  });
+}
+
+export async function listActorLastActivityAt(input: {
+  organizationId: string;
+  actorAuthUserIds: readonly string[];
+}) {
+  if (input.actorAuthUserIds.length === 0) {
+    return new Map<string, Date>();
+  }
+
+  return runWithOrganizationContext(input.organizationId, async (db) => {
+    const rows = await db
+      .select({
+        actorAuthUserId: auditLogs.actorAuthUserId,
+        lastActiveAt: max(auditLogs.createdAt),
+      })
+      .from(auditLogs)
+      .where(
+        and(
+          eq(auditLogs.organizationId, input.organizationId),
+          inArray(auditLogs.actorAuthUserId, [...input.actorAuthUserIds]),
+        ),
+      )
+      .groupBy(auditLogs.actorAuthUserId);
+
+    const activityByActor = new Map<string, Date>();
+
+    for (const row of rows) {
+      if (row.lastActiveAt) {
+        activityByActor.set(row.actorAuthUserId, row.lastActiveAt);
+      }
+    }
+
+    return activityByActor;
   });
 }
 

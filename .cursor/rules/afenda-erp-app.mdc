@@ -18,8 +18,10 @@ When working on `apps/erp` (routes, RSC, handlers, caching, or Next.js APIs), ca
 
 ## Route ownership
 
-- Dynamic module workspace: `(app)/[moduleId]/` — do not add `finance/`, `sales/`, etc. as sibling route folders unless the URL tree is genuinely different.
-- Dashboard and solution-console are dedicated routes, not `[moduleId]`.
+- Authenticated shell: route group `(workspace)/` (Next.js route groups — omitted from URL). `layout.tsx` renders `ShellFrame` immediately; sidebar/header load in parallel `<Suspense>` boundaries (`workspace-routes/*.server.tsx`).
+- Dynamic module workspace: `(workspace)/[moduleId]/` — thin `page.tsx` only; compose governed surfaces from `@/workspace-routes/*`. Do not add `finance/`, `sales/`, etc. as sibling route folders unless the URL tree is genuinely different.
+- Do not put non-route TSX under `src/app/` — use `src/workspace-routes/` (matches Next.js “store project files outside of app”).
+- Dashboard and Lynx (`/lynx`) are dedicated routes, not `[moduleId]`.
 - `src/proxy.ts` is the Next.js 16 traffic/session helper — not the sole auth boundary.
 
 ## Server vs client

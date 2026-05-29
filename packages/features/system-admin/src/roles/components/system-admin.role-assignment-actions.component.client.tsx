@@ -1,9 +1,11 @@
 "use client";
 
-import { Button } from "@afenda/ui/button";
+import { ActionFormErrors } from "@afenda/governed-surface/client";
 import { useState, useTransition } from "react";
 import type { OrganizationRole } from "@afenda/auth";
-import type { SystemAdminActionResult } from "../../contracts";
+import { SystemAdminDestructiveConfirmButton } from "../../overview/components/system-admin.destructive-confirm-button.component.client";
+import type { SystemAdminActionResult } from "../../tenant-execution/contracts/system-admin.action-result.contract";
+import { systemAdminMembershipTrailingConfirms } from "../../memberships/surface/system-admin.memberships-trailing-confirm.client.shared";
 
 type RoleRemovalAction = (
   payload: FormData,
@@ -13,23 +15,21 @@ export function SystemAdminRoleAssignmentActions({
   membershipId,
   role,
   removeRoleAction,
+  disabled,
 }: {
   membershipId: string;
   role: OrganizationRole;
   removeRoleAction: RoleRemovalAction;
+  disabled?: boolean;
 }) {
-  const [pending, startTransition] = useTransition();
   const [result, setResult] = useState<SystemAdminActionResult>();
+  const [isPending, startTransition] = useTransition();
 
   if (role === "viewer") {
-    return <span className="text-xs text-muted-foreground">Base role</span>;
+    return <span className="type-caption">Base role</span>;
   }
 
-  function submit() {
-    if (!window.confirm("Remove this role assignment and demote to viewer?")) {
-      return;
-    }
-
+  function removeRole() {
     const payload = new FormData();
     payload.set("membershipId", membershipId);
     payload.set("role", role);
@@ -39,21 +39,16 @@ export function SystemAdminRoleAssignmentActions({
   }
 
   return (
-    <div className="flex flex-col items-start gap-1">
-      <Button
-        type="button"
-        size="sm"
-        variant="destructive"
-        disabled={pending}
-        onClick={submit}
+    <div className="flex flex-col items-start gap-2">
+      <SystemAdminDestructiveConfirmButton
+        confirm={systemAdminMembershipTrailingConfirms.removeRole}
+        disabled={disabled || isPending}
+        variant="outline"
+        onConfirm={removeRole}
       >
         Remove role
-      </Button>
-      {result?.ok === false ? (
-        <span className="max-w-56 text-xs text-destructive">
-          {result.error}
-        </span>
-      ) : null}
+      </SystemAdminDestructiveConfirmButton>
+      <ActionFormErrors result={result} />
     </div>
   );
 }

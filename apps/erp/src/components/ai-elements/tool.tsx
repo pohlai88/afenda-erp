@@ -78,7 +78,7 @@ function ToolHeader({
 }) {
   return (
     <div className="flex items-center justify-between gap-3">
-      <div className="text-sm font-semibold text-foreground">{label}</div>
+      <div className="type-body font-semibold text-foreground">{label}</div>
       {value ? <StatusBadge label={value} tone={tone} /> : null}
     </div>
   );
@@ -92,9 +92,9 @@ function MiniMetric({
   value: string | number;
 }) {
   return (
-    <div className="rounded-lg border border-line bg-surface-strong px-3 py-2">
-      <div className="text-xs uppercase tracking-wide text-muted">{label}</div>
-      <div className="mt-1 text-sm font-semibold text-foreground">{value}</div>
+    <div className="rounded-section border border-line bg-surface-strong px-3 py-2">
+      <div className="type-caption uppercase tracking-wide text-muted">{label}</div>
+      <div className="mt-1 type-body font-semibold text-foreground">{value}</div>
     </div>
   );
 }
@@ -112,13 +112,13 @@ function ConfidenceCard({ value }: { value: unknown }) {
   }
 
   return (
-    <div className="rounded-lg border border-line bg-surface-strong p-3">
+    <div className="rounded-section border border-line bg-surface-strong p-3">
       <ToolHeader
         label="Confidence"
         tone={getToneForStatus(level)}
         value={`${overall}% ${level}`}
       />
-      <div className="mt-3 grid gap-2 sm:grid-cols-3">
+      <div className="@container mt-3 grid gap-2 @sm:grid-cols-3">
         <MiniMetric label="Data" value={getNumber(value.dataQuality) ?? "-"} />
         <MiniMetric
           label="Grounding"
@@ -130,7 +130,7 @@ function ConfidenceCard({ value }: { value: unknown }) {
         />
       </div>
       {typeof value.explanation === "string" ? (
-        <div className="mt-3 text-sm leading-6 text-muted">
+        <div className="mt-3 type-body leading-6 text-muted">
           {value.explanation}
         </div>
       ) : null}
@@ -150,8 +150,8 @@ function EvidenceList({ value }: { value: unknown }) {
   }
 
   return (
-    <div className="space-y-2">
-      <div className="text-xs uppercase tracking-wide text-muted">Evidence</div>
+    <div className="flex flex-col gap-2">
+      <div className="type-caption uppercase tracking-wide text-muted">Evidence</div>
       {evidence.map((item, index) => {
         const label =
           getString(item.label) ?? getString(item.sourceId) ?? "Source";
@@ -159,27 +159,27 @@ function EvidenceList({ value }: { value: unknown }) {
 
         return (
           <div
-            className="rounded-lg border border-line bg-surface-strong px-3 py-2"
+            className="rounded-section border border-line bg-surface-strong px-3 py-2"
             key={`${getString(item.recordId) ?? getString(item.sourceId) ?? index}-${index}`}
           >
             <div className="flex items-center justify-between gap-3">
               {href ? (
                 <Link
-                  className="text-sm font-medium text-foreground underline-offset-2 hover:underline"
+                  className="type-body font-medium text-foreground underline-offset-2 hover:underline"
                   href={href}
                 >
                   {label}
                 </Link>
               ) : (
-                <div className="text-sm font-medium text-foreground">
+                <div className="type-body font-medium text-foreground">
                   {label}
                 </div>
               )}
-              <div className="text-xs text-muted">
+              <div className="type-caption text-muted">
                 {getString(item.moduleId) ?? "module"}
               </div>
             </div>
-            <div className="mt-1 text-sm leading-6 text-muted">
+            <div className="mt-1 type-body leading-6 text-muted">
               {getString(item.signal) ??
                 getString(item.recordId) ??
                 "Evidence source"}
@@ -212,7 +212,7 @@ function SandboxCard({ value }: { value: unknown }) {
   const sandboxId = getString(value.id);
 
   return (
-    <div className="rounded-lg border border-line bg-surface-strong p-3">
+    <div className="rounded-section border border-line bg-surface-strong p-3">
       <ToolHeader
         label={title}
         tone={getToneForStatus(status)}
@@ -220,23 +220,23 @@ function SandboxCard({ value }: { value: unknown }) {
       />
       {sandboxId ? (
         <Link
-          className="mt-1 inline-flex items-center rounded bg-muted/30 px-2 py-0.5 font-mono text-xs text-muted underline-offset-2 hover:underline"
+          className="mt-1 inline-flex items-center rounded bg-muted/30 px-2 py-0.5 font-mono type-caption text-muted underline-offset-2 hover:underline"
           href={`/system-admin#ai-sandboxes-${sandboxId}`}
         >
           sandbox: {sandboxId}
         </Link>
       ) : null}
-      <div className="mt-2 text-sm leading-6 text-muted">
+      <div className="mt-2 type-body leading-6 text-muted">
         {getString(diff.summary) ?? "Action preview"}
       </div>
-      <div className="mt-3 grid gap-2 sm:grid-cols-4">
+      <div className="@container mt-3 grid gap-2 @sm:grid-cols-4">
         <MiniMetric label="Creates" value={getNumber(diff.creates) ?? 0} />
         <MiniMetric label="Updates" value={getNumber(diff.updates) ?? 0} />
         <MiniMetric label="Deletes" value={getNumber(diff.deletes) ?? 0} />
         <MiniMetric label="Risk" value={getString(risk.riskLevel) ?? "-"} />
       </div>
       {requiredHumanChecks.length > 0 ? (
-        <ul className="mt-3 space-y-1 text-sm leading-6 text-muted">
+        <ul className="flex flex-col mt-3  type-body leading-6 text-muted gap-1">
           {requiredHumanChecks.slice(0, 4).map((check) => (
             <li key={check}>{check}</li>
           ))}
@@ -259,10 +259,10 @@ function DiagnosisCards({ value }: { value: unknown }) {
   }
 
   return (
-    <div className="space-y-3">
+    <div className="flex flex-col gap-3">
       {diagnoses.slice(0, 6).map((diagnosis, index) => (
         <div
-          className="rounded-lg border border-line bg-surface-strong p-3"
+          className="rounded-section border border-line bg-surface-strong p-3"
           key={`${getString(diagnosis.id) ?? index}-${index}`}
         >
           <ToolHeader
@@ -270,7 +270,7 @@ function DiagnosisCards({ value }: { value: unknown }) {
             tone={getToneForRisk(diagnosis.severity)}
             value={getString(diagnosis.severity)}
           />
-          <div className="mt-2 text-sm leading-6 text-muted">
+          <div className="mt-2 type-body leading-6 text-muted">
             {getString(diagnosis.explanation) ?? "No explanation supplied."}
           </div>
           <div className="mt-3">
@@ -291,13 +291,13 @@ function RecoveryPlanCard({ value }: { value: unknown }) {
   }
 
   return (
-    <div className="space-y-3">
-      <div className="rounded-lg border border-line bg-surface-strong p-3">
+    <div className="flex flex-col gap-3">
+      <div className="rounded-section border border-line bg-surface-strong p-3">
         <ToolHeader
           label={getString(value.title) ?? "Recovery playbook"}
           value={getString(value.workflowId)}
         />
-        <div className="mt-2 text-sm leading-6 text-muted">
+        <div className="mt-2 type-body leading-6 text-muted">
           {getString(value.summary) ?? "Recovery plan generated."}
         </div>
       </div>
@@ -306,7 +306,7 @@ function RecoveryPlanCard({ value }: { value: unknown }) {
         .slice(0, 6)
         .map((action, index) => (
           <div
-            className="rounded-lg border border-line bg-surface-strong p-3"
+            className="rounded-section border border-line bg-surface-strong p-3"
             key={`${getString(action.id) ?? index}-${index}`}
           >
             <ToolHeader
@@ -314,7 +314,7 @@ function RecoveryPlanCard({ value }: { value: unknown }) {
               tone={getToneForRisk(action.riskLevel)}
               value={getString(action.priority)}
             />
-            <div className="mt-2 text-sm leading-6 text-muted">
+            <div className="mt-2 type-body leading-6 text-muted">
               {getString(action.expectedImpact) ??
                 "No expected impact supplied."}
             </div>
@@ -343,8 +343,8 @@ function ApprovalOutputCard({ value }: { value: unknown }) {
   }
 
   return (
-    <div className="space-y-3">
-      <div className="rounded-lg border border-line bg-surface-strong p-3">
+    <div className="flex flex-col gap-3">
+      <div className="rounded-section border border-line bg-surface-strong p-3">
         <ToolHeader
           label={
             getString(value.title) ??
@@ -354,12 +354,12 @@ function ApprovalOutputCard({ value }: { value: unknown }) {
           tone={getToneForStatus(approvalState)}
           value={approvalState}
         />
-        <div className="mt-2 text-sm leading-6 text-muted">
+        <div className="mt-2 type-body leading-6 text-muted">
           Proposal {getString(value.proposalId) ?? "pending"} for{" "}
           {getString(value.moduleId) ?? "module"}.
           {getString(value.sandboxId) ? (
             <Link
-              className="ml-2 inline-flex items-center rounded bg-muted/30 px-2 py-0.5 font-mono text-xs underline-offset-2 hover:underline"
+              className="ml-2 inline-flex items-center rounded bg-muted/30 px-2 py-0.5 font-mono type-caption underline-offset-2 hover:underline"
               href={`/system-admin#ai-sandboxes-${getString(value.sandboxId)}`}
             >
               {getString(value.sandboxId)}
@@ -392,14 +392,14 @@ function ErpReadToolOutputCard({ value }: { value: unknown }) {
     : [];
 
   return (
-    <div className="space-y-3">
-      <div className="rounded-lg border border-line bg-surface-strong p-3">
+    <div className="flex flex-col gap-3">
+      <div className="rounded-section border border-line bg-surface-strong p-3">
         <ToolHeader
           label={getString(value.summary) ?? "ERP-native read inspection"}
           tone={getToneForStatus(value.readinessStatus)}
           value={getString(value.readinessStatus)}
         />
-        <div className="mt-3 grid gap-2 sm:grid-cols-3">
+        <div className="@container mt-3 grid gap-2 @sm:grid-cols-3">
           <MiniMetric label="Modules" value={modules.length} />
           <MiniMetric label="Signals" value={signals.length} />
           <MiniMetric label="Evidence" value={evidence.length} />
@@ -407,10 +407,10 @@ function ErpReadToolOutputCard({ value }: { value: unknown }) {
       </div>
 
       {modules.length > 0 ? (
-        <div className="grid gap-2 sm:grid-cols-2">
+        <div className="@container grid gap-2 @sm:grid-cols-2">
           {modules.slice(0, 4).map((module, index) => (
             <div
-              className="rounded-lg border border-line bg-surface-strong p-3"
+              className="rounded-section border border-line bg-surface-strong p-3"
               key={`${getString(module.moduleId) ?? index}-${index}`}
             >
               <ToolHeader
@@ -419,7 +419,7 @@ function ErpReadToolOutputCard({ value }: { value: unknown }) {
                 value={getString(module.readinessStatus)}
               />
               {isRecord(module.stats) ? (
-                <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                <div className="@container mt-3 grid gap-2 @sm:grid-cols-2">
                   <MiniMetric
                     label="Records"
                     value={getNumber(module.stats.recordCount) ?? 0}
@@ -444,13 +444,13 @@ function ErpReadToolOutputCard({ value }: { value: unknown }) {
       ) : null}
 
       {signals.length > 0 ? (
-        <div className="space-y-2">
-          <div className="text-xs uppercase tracking-wide text-muted">
+        <div className="flex flex-col gap-2">
+          <div className="type-caption uppercase tracking-wide text-muted">
             Signals
           </div>
           {signals.slice(0, 6).map((signal, index) => (
             <div
-              className="rounded-lg border border-line bg-surface-strong px-3 py-2"
+              className="rounded-section border border-line bg-surface-strong px-3 py-2"
               key={`${getString(signal.id) ?? index}-${index}`}
             >
               <ToolHeader
@@ -458,7 +458,7 @@ function ErpReadToolOutputCard({ value }: { value: unknown }) {
                 tone={getToneForStatus(signal.status)}
                 value={getString(signal.value) ?? getString(signal.status)}
               />
-              <div className="mt-1 text-sm leading-6 text-muted">
+              <div className="mt-1 type-body leading-6 text-muted">
                 {getString(signal.detail) ?? "No detail supplied."}
               </div>
             </div>
@@ -469,13 +469,13 @@ function ErpReadToolOutputCard({ value }: { value: unknown }) {
       <EvidenceList value={evidence} />
 
       {missingData.length > 0 || safeNextActions.length > 0 ? (
-        <div className="grid gap-3 md:grid-cols-2">
+        <div className="@container grid gap-3 @md:grid-cols-2">
           {missingData.length > 0 ? (
-            <div className="rounded-lg border border-line bg-surface-strong p-3">
-              <div className="text-xs uppercase tracking-wide text-muted">
+            <div className="rounded-section border border-line bg-surface-strong p-3">
+              <div className="type-caption uppercase tracking-wide text-muted">
                 Missing data
               </div>
-              <ul className="mt-2 space-y-1 text-sm leading-6 text-muted">
+              <ul className="flex flex-col mt-2  type-body leading-6 text-muted gap-1">
                 {missingData.slice(0, 5).map((item) => (
                   <li key={item}>{item}</li>
                 ))}
@@ -483,11 +483,11 @@ function ErpReadToolOutputCard({ value }: { value: unknown }) {
             </div>
           ) : null}
           {safeNextActions.length > 0 ? (
-            <div className="rounded-lg border border-line bg-surface-strong p-3">
-              <div className="text-xs uppercase tracking-wide text-muted">
+            <div className="rounded-section border border-line bg-surface-strong p-3">
+              <div className="type-caption uppercase tracking-wide text-muted">
                 Safe next actions
               </div>
-              <ul className="mt-2 space-y-1 text-sm leading-6 text-muted">
+              <ul className="flex flex-col mt-2  type-body leading-6 text-muted gap-1">
                 {safeNextActions.slice(0, 5).map((item) => (
                   <li key={item}>{item}</li>
                 ))}
@@ -502,7 +502,7 @@ function ErpReadToolOutputCard({ value }: { value: unknown }) {
 
 function StructuredToolOutput({ value }: { value: unknown }) {
   return (
-    <div className="space-y-3">
+    <div className="flex flex-col gap-3">
       <ErpReadToolOutputCard value={value} />
       <DiagnosisCards value={value} />
       <RecoveryPlanCard value={value} />
@@ -524,19 +524,19 @@ export function Tool({
   const displayValue = part.output ?? part.input;
 
   return (
-    <div className="rounded-lg border border-line bg-white p-3">
+    <div className="rounded-section border border-line bg-white p-3">
       <div className="flex items-center justify-between gap-3">
-        <div className="text-sm font-semibold text-foreground">
+        <div className="type-body font-semibold text-foreground">
           {part.type.replace(/^tool-/, "")}
         </div>
-        <div className="rounded-md bg-slate-100 px-2 py-1 text-xs text-muted">
+        <div className="rounded-control bg-slate-100 px-2 py-1 type-caption text-muted">
           {part.state ?? "pending"}
         </div>
       </div>
-      <div className="mt-3 space-y-3">
+      <div className="flex flex-col mt-3 gap-3">
         <StructuredToolOutput value={part.output} />
-        <details className="rounded-lg border border-line bg-surface-strong">
-          <summary className="cursor-pointer px-3 py-2 text-sm font-medium text-foreground">
+        <details className="rounded-section border border-line bg-surface-strong">
+          <summary className="cursor-pointer px-3 py-2 type-body font-medium text-foreground">
             Raw payload
           </summary>
           <div className="border-t border-line p-3">
@@ -550,14 +550,14 @@ export function Tool({
       {part.state === "approval-requested" && approvalId ? (
         <div className="mt-3 flex gap-2">
           <button
-            className="rounded-md bg-slate-950 px-3 py-2 text-sm font-medium text-white"
+            className="rounded-control bg-slate-950 px-3 py-2 type-body font-medium text-white"
             onClick={() => onApprove?.(approvalId)}
             type="button"
           >
             Approve
           </button>
           <button
-            className="rounded-md border border-line bg-surface px-3 py-2 text-sm font-medium text-slate-700"
+            className="rounded-control border border-line bg-surface px-3 py-2 type-body font-medium text-slate-700"
             onClick={() => onReject?.(approvalId)}
             type="button"
           >

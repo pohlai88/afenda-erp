@@ -15,7 +15,6 @@ import {
 import {
   dashboardRouteSections,
   moduleScreenSections,
-  solutionConsoleSections,
 } from "../shell/route-copy-metadata";
 
 type AiUsageListRow = {
@@ -98,21 +97,6 @@ const DASHBOARD_WORKFLOW_COLUMNS = [
   { id: "owner", header: "Owner" },
   { id: "status", header: "Status", cellKind: { kind: "badge" as const } },
   { id: "due", header: "Due", cellKind: { kind: "date" as const } },
-];
-
-const SOLUTION_CONSOLE_EVIDENCE_COLUMNS = [
-  {
-    id: "module",
-    header: "Module",
-    priority: "primary" as const,
-    pin: "start" as const,
-    wrap: true,
-    minWidth: 180,
-  },
-  { id: "records", header: "Records" },
-  { id: "workItems", header: "Work" },
-  { id: "documents", header: "Documents" },
-  { id: "source", header: "Source", cellKind: { kind: "badge" as const } },
 ];
 
 const DASHBOARD_AI_USAGE_COLUMNS = [
@@ -213,7 +197,7 @@ function decodeWindowOffset(cursor: string | undefined) {
 }
 
 function buildModuleListHref(input: {
-  moduleId: ModuleId | "dashboard" | "solution-console";
+  moduleId: ModuleId | "dashboard" | "lynx";
   kind: ModulePaginationKind;
   query?: ModuleWorkspaceListQuery;
   cursor?: string;
@@ -247,8 +231,8 @@ function buildModuleListHref(input: {
   const path =
     input.moduleId === "dashboard"
       ? "/dashboard"
-      : input.moduleId === "solution-console"
-        ? "/solution-console"
+      : input.moduleId === "lynx"
+        ? "/lynx"
         : `/${input.moduleId}`;
   const queryString = params.toString();
 
@@ -263,7 +247,7 @@ function buildWorkItemHref(input: {
 }
 
 function buildPaginationWithHref(input: {
-  moduleId: ModuleId | "dashboard" | "solution-console";
+  moduleId: ModuleId | "dashboard" | "lynx";
   kind: ModulePaginationKind;
   window?: ModuleListWindow;
   rowCount: number;
@@ -744,102 +728,6 @@ export function getDashboardListSurfaceKeys() {
   };
 }
 
-type SolutionConsoleEvidenceRow = {
-  moduleId: string;
-  moduleLabel: string;
-  recordCount: number;
-  workItemCount: number;
-  documentCount: number;
-  dataSource: string;
-};
-
-export function buildSolutionConsoleEvidenceListSurface(input: {
-  rows: readonly SolutionConsoleEvidenceRow[];
-}): ListSurfaceRendererConfigurationResolvedInput {
-  const rows = input.rows;
-
-  return buildGovernedListSurface({
-    __schemaVersion: GOVERNED_METADATA_SCHEMA_VERSION,
-    dataNature: "table",
-    presentationProfile: "erp-operational-table",
-    requiresErpPermission: {
-      module: "solution-console",
-      object: "evidence",
-      function: "read",
-    },
-    pagination: buildPagination(undefined, rows.length),
-    surface: {
-      header: { title: solutionConsoleSections.evidenceCoverage.title },
-      columnsId: "solution-console-evidence",
-      rowKey: "moduleId",
-      empty: {
-        variant: "muted",
-        title: "No recovery modules available",
-      },
-    },
-    columns: SOLUTION_CONSOLE_EVIDENCE_COLUMNS,
-    rows: rows.map((row) => ({
-      id: row.moduleId,
-      cells: {
-        module: row.moduleLabel,
-        records: String(row.recordCount),
-        workItems: String(row.workItemCount),
-        documents: String(row.documentCount),
-        source: row.dataSource,
-      },
-    })),
-  });
-}
-
-export function buildSolutionConsoleAiUsageListSurface(input: {
-  events: readonly AiUsageListRow[];
-}): ListSurfaceRendererConfigurationResolvedInput {
-  const rows = input.events;
-
-  return buildGovernedListSurface({
-    __schemaVersion: GOVERNED_METADATA_SCHEMA_VERSION,
-    dataNature: "table",
-    presentationProfile: "erp-operational-table",
-    requiresErpPermission: {
-      module: "solution-console",
-      object: "ai-usage",
-      function: "read",
-    },
-    pagination: buildPagination(undefined, rows.length),
-    surface: {
-      header: {
-        title: solutionConsoleSections.aiUsageLedger.title,
-      },
-      columnsId: "solution-console-ai-usage",
-      rowKey: "id",
-      empty: {
-        variant: "muted",
-        title: solutionConsoleSections.aiUsageLedger.emptyRow[0],
-      },
-    },
-    columns: DASHBOARD_AI_USAGE_COLUMNS,
-    rows: rows.map((event) => ({
-      id: event.id,
-      cells: {
-        feature: event.feature,
-        model: event.model,
-        status: event.status,
-        totalTokens: event.totalTokens,
-        latency: event.latency,
-      },
-    })),
-  });
-}
-
-export function getSolutionConsoleListSurfaceKeys() {
-  return {
-    evidence: "solution-console.evidence.list",
-    aiUsage: "solution-console.ai-usage.list",
-    playbooks: "solution-console.playbooks.list",
-    skills: "solution-console.skills.list",
-  };
-}
-
 // ─── Saved-views list ────────────────────────────────────────────────────────
 
 type SavedViewRow = {
@@ -960,74 +848,6 @@ export function buildDashboardAutomationListSurface(input: {
   });
 }
 
-// ─── Recovery-playbook list ───────────────────────────────────────────────────
-
-type RecoveryPlaybookRow = {
-  id: string;
-  label: string;
-  problem: string;
-  diagnosis: string;
-  action: string;
-  risk: string;
-};
-
-const RECOVERY_PLAYBOOK_COLUMNS = [
-  {
-    id: "label",
-    header: "Playbook",
-    priority: "primary" as const,
-    pin: "start" as const,
-    wrap: true,
-    minWidth: 200,
-  },
-  { id: "problem", header: "Problem", wrap: true },
-  {
-    id: "risk",
-    header: "Risk",
-    cellKind: { kind: "badge" as const, tone: "attention" as const },
-  },
-  { id: "diagnosis", header: "Diagnosis", wrap: true },
-  { id: "action", header: "Recommended action", wrap: true },
-];
-
-export function buildRecoveryPlaybookListSurface(input: {
-  playbooks: readonly RecoveryPlaybookRow[];
-}): ListSurfaceRendererConfigurationResolvedInput {
-  const rows = input.playbooks;
-
-  return buildGovernedListSurface({
-    __schemaVersion: GOVERNED_METADATA_SCHEMA_VERSION,
-    dataNature: "table",
-    presentationProfile: "erp-exception-table",
-    requiresErpPermission: {
-      module: "dashboard",
-      object: "recovery-playbooks",
-      function: "read",
-    },
-    pagination: buildPagination(undefined, rows.length),
-    surface: {
-      header: { title: solutionConsoleSections.playbookCatalog.title },
-      columnsId: "solution-console-playbooks",
-      rowKey: "id",
-      empty: {
-        variant: "muted",
-        title: "No recovery playbooks are defined.",
-      },
-    },
-    columns: RECOVERY_PLAYBOOK_COLUMNS,
-    rows: rows.map((playbook) => ({
-      id: playbook.id,
-      cells: {
-        label: playbook.label,
-        problem: playbook.problem,
-        risk: playbook.risk,
-        diagnosis: playbook.diagnosis,
-        action: playbook.action,
-      },
-    })),
-  });
-}
-
 // ─── Document-registry list ───────────────────────────────────────────────────
 
 type DocumentRegistryRow = {
@@ -1109,71 +929,6 @@ export function buildDocumentRegistryListSurface(input: {
           kind: "link" as const,
           href: `/api/documents/${doc.id}/download?moduleId=${input.moduleId}`,
         },
-      },
-    })),
-  });
-}
-
-// ─── Operational-skills list ──────────────────────────────────────────────────
-
-type OperationalSkillRow = {
-  id: string;
-  label: string;
-  moduleId: string;
-  description: string;
-  approvalPolicy: string;
-};
-
-const OPERATIONAL_SKILL_COLUMNS = [
-  {
-    id: "label",
-    header: "Skill",
-    priority: "primary" as const,
-    pin: "start" as const,
-    wrap: true,
-    minWidth: 200,
-  },
-  { id: "moduleId", header: "Module", cellKind: { kind: "badge" as const } },
-  {
-    id: "approvalPolicy",
-    header: "Approval policy",
-    cellKind: { kind: "badge" as const },
-  },
-  { id: "description", header: "Description", wrap: true },
-];
-
-export function buildOperationalSkillsListSurface(input: {
-  skills: readonly OperationalSkillRow[];
-}): ListSurfaceRendererConfigurationResolvedInput {
-  const rows = input.skills;
-
-  return buildGovernedListSurface({
-    __schemaVersion: GOVERNED_METADATA_SCHEMA_VERSION,
-    dataNature: "table",
-    presentationProfile: "erp-operational-table",
-    requiresErpPermission: {
-      module: "dashboard",
-      object: "skills",
-      function: "read",
-    },
-    pagination: buildPagination(undefined, rows.length),
-    surface: {
-      header: { title: solutionConsoleSections.operationalSkills.title },
-      columnsId: "solution-console-skills",
-      rowKey: "id",
-      empty: {
-        variant: "muted",
-        title: "No operational skills are available.",
-      },
-    },
-    columns: OPERATIONAL_SKILL_COLUMNS,
-    rows: rows.map((skill) => ({
-      id: skill.id,
-      cells: {
-        label: skill.label,
-        moduleId: skill.moduleId,
-        approvalPolicy: skill.approvalPolicy,
-        description: skill.description,
       },
     })),
   });

@@ -13,7 +13,7 @@ vi.mock("@afenda/auth/server", () => ({
     },
     organization: {
       id: "org_1",
-      capabilities: ["system-admin.machine-layer.read"],
+      capabilities: ["system-admin.lynx.read"],
     },
   })),
 }));
@@ -96,9 +96,9 @@ describe("Lynx live run feedback route", () => {
       }),
     );
     expect(revalidatePath).toHaveBeenCalledWith(
-      "/solution-console/runs/lynxrun_1",
+      "/lynx/runs/lynxrun_1",
     );
-    expect(revalidatePath).toHaveBeenCalledWith("/solution-console/runs");
+    expect(revalidatePath).toHaveBeenCalledWith("/lynx/runs");
   });
 
   it("rejects invalid feedback payloads", async () => {

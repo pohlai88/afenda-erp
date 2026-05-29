@@ -24,7 +24,7 @@ export default function SignUpPage() {
           description={shellCopy.suspenseDescription}
           title={shellCopy.title}
         >
-          <div className="h-56 rounded-lg bg-muted" />
+          <div className="h-56 rounded-section bg-muted" />
         </AuthShell>
       }
     >
@@ -48,13 +48,13 @@ async function SignUpPageInner() {
         <NeonAuthForm mode="sign-up" />
       ) : (
         <div>
-          <h2 className="text-2xl font-semibold text-foreground">
+          <h2 className="type-section-title font-semibold text-foreground">
             {signUpEnvironmentCopy.title}
           </h2>
-          <p className="mt-3 text-sm leading-6 text-muted-foreground">
+          <p className="mt-3 type-body leading-6 text-muted-foreground">
             {signUpEnvironmentCopy.description}
           </p>
-          <Button asChild className="mt-8">
+          <Button asChild className="mt-surface-3xl">
             <Link href="/sign-in">{signUpEnvironmentCopy.actionLabel}</Link>
           </Button>
         </div>

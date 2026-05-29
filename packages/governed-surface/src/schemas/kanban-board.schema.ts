@@ -141,7 +141,7 @@ export const governedKanbanBoardConfigurationSchema = z
     requiresErpPermission: erpPermissionRequirementSchema.optional(),
     copy: kanbanBoardCopySchema,
     workflow: kanbanWorkflowSchema.optional(),
-    columns: z.array(kanbanColumnSchema).min(1),
+    columns: z.array(kanbanColumnSchema),
     cards: z.array(kanbanCardSchema),
     columnOrder: z.array(z.string().trim().min(1)).optional(),
     /** @deprecated Prefer `copy.emptyColumn` — retained for builder migration only. */

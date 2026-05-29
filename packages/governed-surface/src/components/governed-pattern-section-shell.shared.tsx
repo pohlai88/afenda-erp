@@ -8,6 +8,16 @@ import {
 
 export type GovernedPatternSectionLayout = "card" | "embedded";
 
+/** Section spacing — maps to Card size and content gap tokens. */
+export type GovernedPatternSectionDensity = "comfortable" | "compact";
+
+/**
+ * Section shell layout:
+ * - `card` — full CardHeader with title, description, and optional headerAction.
+ * - `embedded` — parent owns chrome; inner section renders body only (no title/description).
+ */
+export type GovernedPatternSectionLayoutDoc = GovernedPatternSectionLayout;
+
 /** Renders embedded-layout section content (forbidden/invalid → GovernedEmpty). */
 export function renderGovernedSectionCardBody(
   body: GovernedSurfaceSectionCardBody,
@@ -20,6 +30,8 @@ export function renderGovernedSectionCardBody(
 
 export type RenderGovernedPatternSectionShellInput = {
   layout: GovernedPatternSectionLayout;
+  /** Maps to Card size and content gap tokens. Default `comfortable`. */
+  density?: GovernedPatternSectionDensity;
   className?: string;
   sectionTestId: string;
   sectionDomId?: string;
@@ -34,6 +46,7 @@ export type RenderGovernedPatternSectionShellInput = {
 
 export function renderGovernedPatternSectionShell({
   layout,
+  density = "comfortable",
   className,
   sectionTestId,
   sectionDomId,
@@ -70,6 +83,7 @@ export function renderGovernedPatternSectionShell({
         description={description}
         body={body}
         headerAction={headerAction}
+        density={density}
         className={cardClassName}
         contentClassName={contentClassName}
       />

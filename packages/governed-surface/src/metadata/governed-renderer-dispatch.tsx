@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 
 import { GovernedEmpty } from "../client";
+import { governedDispatchErrorCopy } from "../i18n/governed-renderer-copy.shared";
 
 import type {
   AfendaGovernedRendererId,
@@ -77,15 +78,17 @@ export function renderGovernedRendererById({
   ] as ((props: RendererProps) => ReactNode) | undefined;
 
   if (!Renderer) {
+    const copy = governedDispatchErrorCopy(
+      diagnostics,
+      "unregistered",
+      `Renderer "${rendererId}" is not yet implemented.`,
+    );
     return (
       <GovernedEmpty
         model={{
           variant: "muted",
-          title: "Section unavailable",
-          description:
-            diagnostics === "operator"
-              ? `Renderer "${rendererId}" is not yet implemented.`
-              : "This section is not available in the current surface.",
+          title: copy.title,
+          description: copy.description,
         }}
       />
     );

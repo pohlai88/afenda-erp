@@ -16,7 +16,7 @@ export {
   updateSystemAdminApprovalAction,
   updateSystemAdminApprovalRuleAction,
 } from "./actions/system-admin.approval-rules.actions.server";
-export { listTenantApprovalSettings as listSystemAdminApprovals } from "../data/repositories/system-admin.execution-settings.repository.server";
+export { listTenantApprovalSettings as listSystemAdminApprovals } from "../tenant-execution/data/system-admin.execution-settings.repository.server";
 export {
   requireSystemAdminApprovalsManage,
   requireSystemAdminApprovalsRead,

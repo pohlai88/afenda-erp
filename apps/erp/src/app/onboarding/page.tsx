@@ -21,7 +21,7 @@ export default function OnboardingPage() {
           description={shellCopy.suspenseDescription}
           title={shellCopy.title}
         >
-          <div className="h-48 rounded-lg bg-muted" />
+          <div className="h-48 rounded-section bg-muted" />
         </AuthShell>
       }
     >

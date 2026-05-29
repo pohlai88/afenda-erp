@@ -2,6 +2,7 @@ import "server-only";
 
 import {
   bootstrapOrganizationForUser,
+  ensureDevDemoTenant,
   getTenantSettings,
   getUserProfile,
   listPermissionKeysByRole,
@@ -250,8 +251,27 @@ function applyRoleOverrides(
   return [...keys];
 }
 
+async function ensureDevSessionTenant(session: UserSession) {
+  const organization = session.organizations[0];
+
+  if (!organization) {
+    return;
+  }
+
+  await ensureDevDemoTenant({
+    authUserId: session.id,
+    email: session.email,
+    name: session.name,
+    organizationId: organization.id,
+    organizationName: organization.name,
+    organizationSlug: organization.slug,
+    membershipId: organization.membershipId,
+  });
+}
+
 export async function getSession() {
   if (isDevAuthBypassEnabled()) {
+    await ensureDevSessionTenant(defaultSession);
     return defaultSession;
   }
 
@@ -260,11 +280,16 @@ export async function getSession() {
   const devSession = value ? decodeSession(value) : null;
 
   if (isDevCookieAuthEnabled() && devSession) {
+    await ensureDevSessionTenant(devSession);
     return devSession;
   }
 
   if (isNeonAuthReady()) {
     return getSessionFromNeonAuth();
+  }
+
+  if (devSession) {
+    await ensureDevSessionTenant(devSession);
   }
 
   return devSession;

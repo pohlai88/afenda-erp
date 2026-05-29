@@ -27,11 +27,11 @@ export function LynxPanel({
   title: string;
 }) {
   return (
-    <section className="@container rounded-lg border border-border bg-card text-card-foreground">
-      <div className="flex items-start justify-between gap-3 border-b border-border px-4 py-3">
+    <section className="@container rounded-section border border-border bg-card text-card-foreground">
+      <div className="flex items-start justify-between gap-3 border-b border-border px-surface-lg py-surface-md">
         <div className="min-w-0">
-          <h2 className="text-sm font-semibold text-foreground">{title}</h2>
-          <p className="mt-1 text-sm leading-6 text-muted-foreground">
+          <h2 className="type-body font-semibold text-foreground">{title}</h2>
+          <p className="mt-1 type-muted">
             {description}
           </p>
         </div>
@@ -112,15 +112,15 @@ export function LynxEvidenceCard({
   return (
     <Card id={id} size="sm" className="border border-border shadow-none">
       <CardContent className="flex flex-col gap-1">
-        <div className="flex items-start justify-between gap-3 text-sm">
+        <div className="flex items-start justify-between gap-3 type-body">
           {titleElement}
           {meta ? (
-            <span className="shrink-0 text-xs text-muted-foreground">
+            <span className="shrink-0 type-caption">
               {meta}
             </span>
           ) : null}
         </div>
-        <p className="line-clamp-3 text-sm leading-6 text-muted-foreground">
+        <p className="line-clamp-3 type-muted">
           {signal}
         </p>
       </CardContent>

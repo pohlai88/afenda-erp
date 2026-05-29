@@ -107,7 +107,7 @@ type SandboxExecutor<TInput, TOutput> = (input: {
 
 Reuse existing components — no new renderer infrastructure required.
 
-- **Solution Console** ([`(app)/solution-console`](<../../apps/erp/src/app/(app)/solution-console>)) — show sandbox id and link to the admin list on each approval-required card.
+- **Lynx Console** ([`(app)/lynx`](<../../apps/erp/src/app/(app)/lynx>)) — show sandbox id and link to the admin list on each approval-required card.
 - **Admin/reports** — governed list of `ai_action_sandboxes` per tenant with status filter. Reuse `GovernedPatternCListSection` ([ARCH-006](../architecture/006-metadata-driven-ui-architecture.md)).
 - **Module workspace** ([`module-screen.tsx`](<../../apps/erp/src/app/(app)/module-screen.tsx>)) — small "AI actions" affordance linking to sandboxes for the current `moduleId`.
 

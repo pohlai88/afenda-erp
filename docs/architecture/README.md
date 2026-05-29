@@ -23,6 +23,12 @@ Search tip: every document has a stable **`ARCH-###`** ID and a matching
 | **ARCH-009** | [009-machine-layer-doctrine.md](009-machine-layer-doctrine.md)                             | Lynx machine layer, four product layers, Knowledge substrate, brand contract   |
 | **ARCH-010** | [010-hr-feature-package-architecture.md](010-hr-feature-package-architecture.md)           | `@afenda/feature-hr` boundaries, export doors, TRACK-004 migration layout      |
 | **ARCH-011** | [011-system-admin-enterprise-architecture.md](011-system-admin-enterprise-architecture.md) | System Admin control module, control domains, package boundary, kernel linkage |
+| **ARCH-011 (supplement)** | [011-system-admin-users-architecture.md](011-system-admin-users-architecture.md) | Users control domain — invitation, lifecycle, access review |
+| **ARCH-011 (supplement)** | [011-system-admin-memberships-architecture.md](011-system-admin-memberships-architecture.md) | Memberships control domain — participation lifecycle, role coverage |
+| **ARCH-011 (supplement)** | [011-system-admin-roles-architecture.md](011-system-admin-roles-architecture.md) | Roles control domain — catalog, assignment, deprecation |
+| **ARCH-011 (supplement)** | [011-system-admin-permissions-architecture.md](011-system-admin-permissions-architecture.md) | Permissions control domain — catalog, grouping, coverage |
+| **ARCH-011 (supplement)** | [011-system-admin-modules-architecture.md](011-system-admin-modules-architecture.md) | Modules control domain — enablement, readiness, rollout |
+| **ARCH-011 (supplement)** | [011-system-admin-capabilities-architecture.md](011-system-admin-capabilities-architecture.md) | Capabilities control domain — coverage, readiness, availability |
 | **ARCH-012** | [012-execution-kernel-architecture.md](012-execution-kernel-architecture.md)               | Execution authority, enforcement contracts, and System Admin co-link           |
 
 ## Document Hierarchy
@@ -52,7 +58,7 @@ then update the other document in the same change.
 | ERP modules              | Shared contracts in `@afenda/kernel`; routes in `apps/erp`        | `@afenda/feature-*` packages under `packages/features/*`       |
 | Feature packages on disk | Scaffolded `@afenda/feature-*` packages with public export doors  | One package per mature module with module-owned services       |
 | System Admin / kernel split | Separate doctrine now exists in **ARCH-011** and **ARCH-012** | Control-plane configuration and execution enforcement stay separate |
-| Module routes            | Dynamic `(app)/[moduleId]/…`                                      | Same route shape; thinner adapters calling feature packages    |
+| Module routes            | Dynamic `(workspace)/[moduleId]/…` via `apps/erp/src/workspace-routes/` | Same route shape; thinner adapters calling feature packages    |
 | Database schema          | Flat `packages/db/src/schema/*.ts` with shared ERP tables         | Module subdirs under `schema/<moduleId>/` as modules mature    |
 | Vercel deploy            | Single repo-root project; `pnpm turbo build --filter=@afenda/erp` | Same single-app model; link + Remote Cache after stabilization |
 

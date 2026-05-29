@@ -60,6 +60,7 @@ export function GovernedPatternCListTableHost({
         presentationVariant={presentationVariant}
         columns={config.columns as readonly ListColumn[]}
         rows={config.rows as readonly ListSurfaceRow[]}
+        tableLabel={config.surface.header.title}
         empty={config.surface.empty as EmptyState | undefined}
         trailingColumn={tableTrailing}
         density={tableDensity}

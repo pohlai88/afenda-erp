@@ -25,6 +25,10 @@
       {
         "command": "node .cursor/hooks/guard-database-ddl.mjs",
         "matcher": "Write|StrReplace"
+      },
+      {
+        "command": "node .cursor/hooks/guard-architecture-docs.mjs",
+        "matcher": "Delete"
       }
     ],
     "beforeShellExecution": [

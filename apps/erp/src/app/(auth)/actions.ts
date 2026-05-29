@@ -11,6 +11,7 @@ import {
   type UserSession,
 } from "@afenda/auth";
 import { createDevSessionCookie, signOut } from "@afenda/auth/server";
+import { ensureDevDemoTenant } from "@afenda/db";
 import { isDevCookieAuthEnabled } from "@afenda/config/env";
 import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
@@ -51,6 +52,20 @@ export async function signInAction(formData: FormData) {
   }
 
   const session = createSession(formData);
+  const organization = session.organizations[0];
+
+  if (organization) {
+    await ensureDevDemoTenant({
+      authUserId: session.id,
+      email: session.email,
+      name: session.name,
+      organizationId: organization.id,
+      organizationName: organization.name,
+      organizationSlug: organization.slug,
+      membershipId: organization.membershipId,
+    });
+  }
+
   const cookieStore = await cookies();
   const requestHeaders = await headers();
   const redirectTo = resolveDevSignInRedirectPath({

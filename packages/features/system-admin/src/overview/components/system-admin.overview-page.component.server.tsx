@@ -1,10 +1,15 @@
-import { formatErpDateTime } from "@afenda/kernel";
+import {
+  buildSystemAdminOverviewStatGroups,
+  systemAdminOverviewStatSurfaceKey,
+} from "../surfaces";
+import type { SystemAdminOverviewSnapshot } from "../contracts";
+import { GovernedPatternBStatSection } from "@afenda/governed-surface/server";
 import { SectionPanel } from "@afenda/ui";
 import { ui } from "@afenda/ui/design-system";
 import { cn } from "@afenda/ui/utils";
 import Link from "next/link";
-import { systemAdminRoutePaths } from "../../contracts";
-import type { SystemAdminOverviewSnapshot } from "../contracts";
+import { formatErpDateTime } from "@afenda/kernel";
+import { systemAdminRoutePaths } from "../contracts/system-admin.route-paths.contract";
 
 const overviewLinks = [
   {
@@ -49,41 +54,22 @@ export function SystemAdminOverviewPage({
 }: {
   snapshot: SystemAdminOverviewSnapshot;
 }) {
-  const stats = [
-    { label: "Users", value: snapshot.userCount },
-    { label: "Pending invites", value: snapshot.pendingInviteCount },
-    { label: "Active memberships", value: snapshot.activeMembershipCount },
-    { label: "Roles", value: snapshot.roleCount },
-    { label: "Active policy rules", value: snapshot.activePolicyRuleCount },
-    { label: "Active approval rules", value: snapshot.activeApprovalRuleCount },
-    { label: "Recent admin changes", value: snapshot.recentAdminChangeCount },
-  ];
-
   return (
-    <div className="flex flex-col gap-6">
+    <div className="@container flex flex-col gap-surface-lg">
       <SectionPanel
         headingLevel={1}
         title="System Admin"
         description="Tenant governance hub for identity, execution policy, approvals, and audit evidence."
       >
-        <div className="grid gap-3 md:grid-cols-3 lg:grid-cols-4">
-          {stats.map((stat) => (
-            <div
-              key={stat.label}
-              className={cn(ui.radius.panel, "border border-line bg-card p-4")}
-            >
-              <div className="type-label">
-                {stat.label}
-              </div>
-              <div className="mt-2 type-section-title">
-                {stat.value}
-              </div>
-            </div>
-          ))}
-        </div>
+        <GovernedPatternBStatSection
+          title="Tenant snapshot"
+          surfaceKey={systemAdminOverviewStatSurfaceKey}
+          layout="embedded"
+          statGroups={buildSystemAdminOverviewStatGroups({ snapshot })}
+        />
       </SectionPanel>
 
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-surface-md @md:grid-cols-3">
         {overviewLinks.map((link) => (
           <Link
             key={link.href}
