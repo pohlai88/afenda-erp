@@ -149,7 +149,7 @@ export function HrCompliancePageSkeleton() {
       aria-label="Loading HR compliance"
     >
       <Skeleton className="h-20 w-full max-w-2xl rounded-panel" />
-      {Array.from({ length: 10 }, (_, index) => (
+      {Array.from({ length: 11 }, (_, index) => (
         <SystemAdminListSectionPlaceholder
           key={`hr-compliance-list-${index}`}
         />

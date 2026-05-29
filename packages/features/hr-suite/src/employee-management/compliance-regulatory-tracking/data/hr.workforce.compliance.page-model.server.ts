@@ -71,18 +71,19 @@ import {
   hrComplianceAlertsSearchParam,
 } from "../surface/hr.workforce.compliance-alerts-list.surface";
 import {
-  hrComplianceExceptionsColumnsId,
-  hrComplianceFilingsColumnsId,
-  hrComplianceLaborLawRequirementsColumnsId,
-  hrComplianceObligationsColumnsId,
-  hrCompliancePolicyAcknowledgementsColumnsId,
-  hrComplianceRegulatoryCalendarColumnsId,
-  hrComplianceAlertsColumnsId,
-  hrComplianceSafetyTrainingRequirementsColumnsId,
-  hrComplianceWorkAuthDocumentsColumnsId,
-  hrComplianceWorkEligibilityColumnsId,
-  hrComplianceWorkplaceSafetyRequirementsColumnsId,
-} from "../surface/hr.workforce.compliance-surface-columns.shared";
+  HR_COMPLIANCE_LIST_SURFACE_COLUMNS_BY_KEY,
+  hrComplianceAlertsSurfaceKey,
+  hrComplianceExceptionsSurfaceKey,
+  hrComplianceFilingsSurfaceKey,
+  hrComplianceLaborLawRequirementsSurfaceKey,
+  hrComplianceObligationsSurfaceKey,
+  hrCompliancePolicyAcknowledgementsSurfaceKey,
+  hrComplianceRegulatoryCalendarSurfaceKey,
+  hrComplianceSafetyTrainingRequirementsSurfaceKey,
+  hrComplianceWorkAuthDocumentsSurfaceKey,
+  hrComplianceWorkEligibilitySurfaceKey,
+  hrComplianceWorkplaceSafetyRequirementsSurfaceKey,
+} from "../surface/hr.workforce.compliance-surface-metadata.shared";
 import { hrComplianceUiCopy } from "../surface/hr.workforce.compliance-ui.copy.shared";
 
 export type HrCompliancePageModelInput = {
@@ -317,7 +318,10 @@ export async function buildHrCompliancePageModel(input: HrCompliancePageModelInp
           canWrite: input.canWrite,
         })
       : buildComplianceListLoadErrorPlaceholder({
-          columnsId: hrComplianceObligationsColumnsId,
+          columnsId:
+            HR_COMPLIANCE_LIST_SURFACE_COLUMNS_BY_KEY[
+              hrComplianceObligationsSurfaceKey
+            ],
           searchParam: hrComplianceObligationSearchParam,
           searchLabel: copy.obligations.searchLabel,
           searchPlaceholder: copy.obligations.searchPlaceholder,
@@ -331,7 +335,8 @@ export async function buildHrCompliancePageModel(input: HrCompliancePageModelInp
           canWrite: input.canWrite,
         })
       : buildComplianceListLoadErrorPlaceholder({
-          columnsId: hrComplianceFilingsColumnsId,
+          columnsId:
+            HR_COMPLIANCE_LIST_SURFACE_COLUMNS_BY_KEY[hrComplianceFilingsSurfaceKey],
           searchParam: hrComplianceFilingSearchParam,
           searchLabel: copy.filing.searchLabel,
           searchPlaceholder: copy.filing.searchPlaceholder,
@@ -345,7 +350,10 @@ export async function buildHrCompliancePageModel(input: HrCompliancePageModelInp
           canWrite: input.canWrite,
         })
       : buildComplianceListLoadErrorPlaceholder({
-          columnsId: hrComplianceExceptionsColumnsId,
+          columnsId:
+            HR_COMPLIANCE_LIST_SURFACE_COLUMNS_BY_KEY[
+              hrComplianceExceptionsSurfaceKey
+            ],
           searchParam: hrComplianceExceptionSearchParam,
           searchLabel: copy.exceptions.searchLabel,
           searchPlaceholder: copy.exceptions.searchPlaceholder,
@@ -359,7 +367,10 @@ export async function buildHrCompliancePageModel(input: HrCompliancePageModelInp
           canWrite: input.canWrite,
         })
       : buildComplianceListLoadErrorPlaceholder({
-          columnsId: hrComplianceLaborLawRequirementsColumnsId,
+          columnsId:
+            HR_COMPLIANCE_LIST_SURFACE_COLUMNS_BY_KEY[
+              hrComplianceLaborLawRequirementsSurfaceKey
+            ],
           searchParam: hrComplianceLaborLawSearchParam,
           searchLabel: copy.laborLaw.searchLabel,
           searchPlaceholder: copy.laborLaw.searchPlaceholder,
@@ -373,7 +384,10 @@ export async function buildHrCompliancePageModel(input: HrCompliancePageModelInp
           canWrite: input.canWrite,
         })
       : buildComplianceListLoadErrorPlaceholder({
-          columnsId: hrCompliancePolicyAcknowledgementsColumnsId,
+          columnsId:
+            HR_COMPLIANCE_LIST_SURFACE_COLUMNS_BY_KEY[
+              hrCompliancePolicyAcknowledgementsSurfaceKey
+            ],
           searchParam: hrCompliancePolicyAcknowledgementSearchParam,
           searchLabel: copy.policyAcknowledgement.searchLabel,
           searchPlaceholder: copy.policyAcknowledgement.searchPlaceholder,
@@ -387,7 +401,10 @@ export async function buildHrCompliancePageModel(input: HrCompliancePageModelInp
           canWrite: input.canWrite,
         })
       : buildComplianceListLoadErrorPlaceholder({
-          columnsId: hrComplianceSafetyTrainingRequirementsColumnsId,
+          columnsId:
+            HR_COMPLIANCE_LIST_SURFACE_COLUMNS_BY_KEY[
+              hrComplianceSafetyTrainingRequirementsSurfaceKey
+            ],
           searchParam: hrComplianceSafetyTrainingSearchParam,
           searchLabel: copy.safetyTraining.searchLabel,
           searchPlaceholder: copy.safetyTraining.searchPlaceholder,
@@ -401,7 +418,10 @@ export async function buildHrCompliancePageModel(input: HrCompliancePageModelInp
           canWrite: input.canWrite,
         })
       : buildComplianceListLoadErrorPlaceholder({
-          columnsId: hrComplianceWorkplaceSafetyRequirementsColumnsId,
+          columnsId:
+            HR_COMPLIANCE_LIST_SURFACE_COLUMNS_BY_KEY[
+              hrComplianceWorkplaceSafetyRequirementsSurfaceKey
+            ],
           searchParam: hrComplianceWorkplaceSafetySearchParam,
           searchLabel: copy.workplaceSafety.searchLabel,
           searchPlaceholder: copy.workplaceSafety.searchPlaceholder,
@@ -415,7 +435,10 @@ export async function buildHrCompliancePageModel(input: HrCompliancePageModelInp
           canWrite: input.canWrite,
         })
       : buildComplianceListLoadErrorPlaceholder({
-          columnsId: hrComplianceWorkEligibilityColumnsId,
+          columnsId:
+            HR_COMPLIANCE_LIST_SURFACE_COLUMNS_BY_KEY[
+              hrComplianceWorkEligibilitySurfaceKey
+            ],
           searchParam: hrComplianceWorkEligibilitySearchParam,
           searchLabel: copy.workEligibility.searchLabel,
           searchPlaceholder: copy.workEligibility.searchPlaceholder,
@@ -429,7 +452,10 @@ export async function buildHrCompliancePageModel(input: HrCompliancePageModelInp
           canWrite: input.canWrite,
         })
       : buildComplianceListLoadErrorPlaceholder({
-          columnsId: hrComplianceWorkAuthDocumentsColumnsId,
+          columnsId:
+            HR_COMPLIANCE_LIST_SURFACE_COLUMNS_BY_KEY[
+              hrComplianceWorkAuthDocumentsSurfaceKey
+            ],
           searchParam: hrComplianceWorkAuthDocumentSearchParam,
           searchLabel: copy.workAuthDocuments.searchLabel,
           searchPlaceholder: copy.workAuthDocuments.searchPlaceholder,
@@ -442,7 +468,10 @@ export async function buildHrCompliancePageModel(input: HrCompliancePageModelInp
           searchValue: regulatoryCalendarSearch,
         })
       : buildComplianceListLoadErrorPlaceholder({
-          columnsId: hrComplianceRegulatoryCalendarColumnsId,
+          columnsId:
+            HR_COMPLIANCE_LIST_SURFACE_COLUMNS_BY_KEY[
+              hrComplianceRegulatoryCalendarSurfaceKey
+            ],
           searchParam: hrComplianceRegulatoryCalendarSearchParam,
           searchLabel: copy.regulatoryCalendar.searchLabel,
           searchPlaceholder: copy.regulatoryCalendar.searchPlaceholder,
@@ -457,7 +486,8 @@ export async function buildHrCompliancePageModel(input: HrCompliancePageModelInp
           searchValue: alertsSearch,
         })
       : buildComplianceListLoadErrorPlaceholder({
-          columnsId: hrComplianceAlertsColumnsId,
+          columnsId:
+            HR_COMPLIANCE_LIST_SURFACE_COLUMNS_BY_KEY[hrComplianceAlertsSurfaceKey],
           searchParam: hrComplianceAlertsSearchParam,
           searchLabel: copy.alerts.searchLabel,
           searchPlaceholder: copy.alerts.searchPlaceholder,

@@ -275,6 +275,7 @@ Compliance exceptions are auto-materialized from detected obligation gaps and re
 | Sources       | Employee requirements (policy acknowledgments, safety training, workplace safety, labor law `overdue` / `non_compliant` / `expired`), filings (`overdue`), work authorization documents (`missing` / `expired` / `rejected`), work eligibility (`expired` / `ineligible`)   |
 | Idempotency   | `sourceReferenceId` format `exception:{sourceKind}:{sourceId}:{gapKind}` with org-scoped unique index; open auto exceptions refresh title/severity/employee when posture changes; cleared gaps auto-resolve with `HR_COMPLIANCE_EXCEPTION_AUTO_RESOLVED_NOTE`; recurring gaps reopen auto-resolved rows only (manual resolve/waive are not reopened) |
 | Materialization | Page load runs `runHrComplianceSourceSyncSteps` first, then `syncHrComplianceExceptions` via `runHrCompliancePageLoadSync` in `buildHrCompliancePageModel` — exception gap detection reads fresh requirement/filing/eligibility rows |
+| Verification    | Unit: `compliance-exception-sync.test.ts`, `compliance-page-model-sync.test.ts`, `compliance-exception-trailing-config.test.ts`; integration (when `DATABASE_URL` set): `hr-compliance-commands.integration.test.ts` — filing overdue auto-resolve/reopen cycle |
 | Governed UI   | Pattern C surface `hr.workforce.compliance.exceptions.list` lists open exceptions (`openOnly`); serializes `gapKind` (falls back to `itemType` for manual rows); search matches `gap_kind`; empty copy documents auto-detection plus manual create                             |
 | Mutations     | Manual `createHrComplianceExceptionAction` unchanged (no `sourceReferenceId`); corrective action / resolve / waive workflows unchanged                                                                                                                                        |
 
@@ -391,7 +392,7 @@ Employee-linked rows link to `/hr/records/[recordId]` via `rowHref` when `employ
 
 ### Governed UI (Pattern C)
 
-List surfaces use `buildGovernedListSurface` with `erp-operational-table` profile. ERP composition uses `HrComplianceWorkbenchSection` (`components/hr.workforce.compliance-section.component.server.tsx`) — **eleven** embedded `GovernedPatternCListSection` blocks (alerts and regulatory calendar are read-only — no trailing column):
+List surfaces use `buildGovernedListSurface` with `erp-operational-table` profile and `dataNature: "table"`. Every builder sets `requiresErpPermission: hr.compliance.read`, `surface.rowKey: "id"`, and a governed `columnsId` registry value (enforced by `compliance-list-eui-contract.test.ts`). ERP composition uses `HrComplianceWorkbenchSection` (`components/hr.workforce.compliance-section.component.server.tsx`) — **eleven** embedded `GovernedPatternCListSection` blocks with `layout="embedded"` (alerts and regulatory calendar are read-only — no trailing column). The workbench imports surface keys and UI copy via explicit `.shared` paths — not the surface builder barrel — to keep the RSC bundle lean.
 
 
 | Surface key                                                  | Section                                                    |
