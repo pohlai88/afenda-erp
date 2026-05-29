@@ -23,7 +23,7 @@ const ROUTES = [
     hint: [
       "**system-admin adapter** — rule `afenda-system-admin`.",
       "Thin slug adapters only; behavior in `@afenda/feature-system-admin`.",
-      "Doctrine: **ARCH-011**, **ARCH-012**. Before done: `pnpm test --filter=@afenda/feature-system-admin`.",
+      "Doctrine: **ARCH-011**, **ARCH-002** §§4–5. Drift checks run automatically (enforce-architecture-drift hook).",
     ].join(" "),
   },
   {
@@ -49,8 +49,8 @@ const ROUTES = [
     test: (p) => p.startsWith("packages/kernel/src/execution-kernel/"),
     hint: [
       "**Execution Kernel** — rule `afenda-core`.",
-      "Doctrine: **ARCH-012**. Must not import `@afenda/feature-system-admin`.",
-      "Boundary with **ARCH-011**: kernel enforces; system-admin configures.",
+      "Doctrine: **ARCH-002** §5 (execution kernel only). Must not import `@afenda/feature-*`.",
+      "preToolUse blocks bad imports; postToolUse runs kernel:check + kernel tests automatically.",
     ].join(" "),
   },
   {
@@ -108,7 +108,7 @@ const ROUTES = [
     test: (p) => p === "scripts/check-directory-architecture.mts",
     hint: [
       "**architecture guard** — update **ARCH-008** / **ARCH-003** in the same PR when changing enforcement.",
-      "Before done: `pnpm architecture:check`.",
+      "Drift: `architecture:check` runs automatically after edits (enforce-architecture-drift hook).",
     ].join(" "),
   },
   {
@@ -124,7 +124,7 @@ const ROUTES = [
     hint: [
       "**architecture doc** — rule `afenda-architecture-docs`.",
       "Keep `ARCH-###` IDs aligned with filenames; do not delete — edit and cross-link.",
-      "Conflict order: ARCH-002 → ARCH-001; ARCH-011 ↔ ARCH-012 for admin vs execution.",
+      "Conflict order: ARCH-002 → ARCH-001; ARCH-011 ↔ ARCH-002 §§3–4 for admin vs execution.",
     ].join(" "),
   },
   {

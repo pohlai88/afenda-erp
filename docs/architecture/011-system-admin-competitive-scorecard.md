@@ -6,7 +6,7 @@
 | --------- | ----- |
 | Status    | Active — living benchmark; refresh quarterly or after vertical DoD changes |
 | Authority | Competitive positioning and gap prioritization for `@afenda/feature-system-admin` |
-| Defers to | **ARCH-011** (control plane doctrine) · **ARCH-012** (execution enforcement) |
+| Defers to | **ARCH-011** (control plane doctrine) · **ARCH-002** §4 (execution enforcement) |
 | Related   | Vertical supplements under `packages/features/system-admin/src/*/*-architecture.md` |
 
 This document compares Afenda System Admin to representative **open-source** and **SaaS** admin consoles. It is not a product roadmap; use gap priority scores to inform roadmap waves in `docs/roadmap/`.
@@ -24,7 +24,7 @@ This document compares Afenda System Admin to representative **open-source** and
 | SaaS IAM | [Okta](https://help.okta.com/), [Auth0](https://auth0.com/docs), [WorkOS](https://workos.com/docs) | Directory sync, B2B identity lifecycle |
 | SaaS ERP | [NetSuite Setup](https://docs.oracle.com/en/cloud/saas/netsuite/) | ERP-grade RBAC, SoD, audit, licensing |
 
-Afenda is an **ERP-native control plane** with configure-vs-enforce split (**ARCH-011** / **ARCH-012**). Competitors are grouped by archetype; not every dimension applies equally.
+Afenda is an **ERP-native control plane** with configure-vs-enforce split (**ARCH-011** / **ARCH-002** §4). Competitors are grouped by archetype; not every dimension applies equally.
 
 ---
 
@@ -81,7 +81,7 @@ Scores below are tied to vertical DoD checklists and as-built code.
 | Operational reliability | 2.5 | 4 | 1.5 | 5 | 7.5 | Cron/repo/migration/webhook + workflow probe; queue/storage/cache still info-level |
 | Commercial / billing | 3.0 | 4 | 1.0 | 4 | 4.0 | Stripe posture; invoices/payments incomplete per billing DoD |
 | AI / machine governance (Lynx) | 4.5 | 5 | 0.5 | 4 | 2.0 | `lynx/` admin surface; ARCH-009 adjunct |
-| Architecture (control vs enforce) | 4.5 | 5 | 0.5 | 5 | 2.5 | ARCH-011/012 + `tenant-execution/` |
+| Architecture (control vs enforce) | 4.5 | 5 | 0.5 | 5 | 2.5 | ARCH-011 + ARCH-002 §4 + `tenant-execution/` |
 | **Weighted composite** | **3.48** | — | — | 100 | — | ↑ from 3.35 pre-Wave 1/3 |
 
 **Priority ranking (post Wave 1/3):**
@@ -126,7 +126,7 @@ Scores below are tied to vertical DoD checklists and as-built code.
 
 | Area | Score | vs market |
 | ---- | ----- | --------- |
-| Control vs enforce split (ARCH-011 / ARCH-012) | 4.5 | Clearer than Odoo/ERPNext monolith |
+| Control vs enforce split (ARCH-011 / ARCH-002 §4) | 4.5 | Clearer than Odoo/ERPNext monolith |
 | Module + capability + policy + approval stack | 3.5–4.0 | NetSuite direction; beats IAM-only tools |
 | Lynx governance | 4.5 | No OSS/SaaS ERP peer at same depth |
 | Governed admin UI (Pattern C) | 4.0 | Consistent metadata-driven lists |
@@ -167,4 +167,4 @@ Scores below are tied to vertical DoD checklists and as-built code.
 3. Update competitor columns quarterly or before major release notes.
 4. Link evidence to unit tests in `packages/features/system-admin/tests/unit/`.
 
-When control vs execution boundary changes, update this doc together with **ARCH-011** and **ARCH-012**.
+When control vs execution boundary changes, update this doc together with **ARCH-011** and **ARCH-002** §§3–4.

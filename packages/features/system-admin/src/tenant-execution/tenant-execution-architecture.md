@@ -1,6 +1,6 @@
 ### 9.16 Tenant execution (execution bridge)
 
-Parent: [ARCH-011 System Admin control plane](../../../../docs/architecture/011-system-admin-enterprise-architecture.md) · [ARCH-012 Execution Kernel](../../../../docs/architecture/012-execution-kernel-architecture.md).
+Parent: [ARCH-011 System Admin control plane](../../../../docs/architecture/011-system-admin-enterprise-architecture.md) · [ARCH-002 §5 Execution Kernel](../../../../docs/architecture/002-erp-kernel-package-architecture.md#5-execution-kernel).
 
 ## Definition
 
@@ -146,15 +146,15 @@ Organization-scoped rows (examples):
 
 Kernel mapper functions live in the owning vertical (`policies/data`, `approvals/data`). The loader composes those mappers; it does not embed domain rules.
 
-## Relationship to ARCH-011 / ARCH-012
+## Relationship to ARCH-011 / ARCH-002 §5
 
 | Layer | Question |
 | ----- | -------- |
 | ARCH-011 (control plane) | Who configures law? |
 | Tenant execution (this slice) | How does configured law reach the kernel? |
-| ARCH-012 (execution kernel) | What is the verdict at runtime? |
+| ARCH-002 §5 (execution kernel) | What is the verdict at runtime? |
 
-When control vs execution boundaries change, update **ARCH-011**, **ARCH-012**, and this supplement together.
+When control vs execution boundaries change, update **ARCH-011**, **ARCH-002** §§4–5, and this supplement together.
 
 ## Safety rules
 

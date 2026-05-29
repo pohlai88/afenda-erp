@@ -2,6 +2,7 @@ export * from "./access/execution-access";
 export * from "./actor/execution-actor";
 export * from "./audit/execution-audit";
 export * from "./capabilities/execution-capabilities";
+export * from "./context/execution-context-types";
 export * from "./context/execution-context";
 export * from "./errors/execution-errors";
 export * from "./execution/guarded-execution";

@@ -7,7 +7,7 @@
 | Status     | Active — aligned with `afenda-erp` repo as-built (May 2026)                                                        |
 | Authority  | Product-wide runtime, deployment, data, auth, AI, observability                                                    |
 | Supersedes | Informal root architecture draft (removed; do not add new copies)                                                  |
-| Related    | **ARCH-002** (packages) · **ARCH-005** (database) · **ARCH-006** (metadata UI) · **ARCH-008** (package discipline) · **ARCH-012** (execution authority) |
+| Related    | **ARCH-002** (platform, packages, execution §4) · **ARCH-005** (database) · **ARCH-006** (metadata UI) · **ARCH-008** (package discipline) |
 
 ## Executive Summary
 

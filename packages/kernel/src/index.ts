@@ -1,3 +1,7 @@
+/**
+ * FROZEN compat surface (ARCH-002 §3). Bugfix-only — do not add module business logic,
+ * list surfaces, or HITL here. New modules: @afenda/feature-* + @afenda/kernel/server.
+ */
 import type { AppCapability, OrganizationRole } from "@afenda/auth";
 import {
   listAiUsageEvents,

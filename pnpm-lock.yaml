@@ -108,9 +108,6 @@ importers:
       '@afenda/feature-finance':
         specifier: workspace:*
         version: link:../../packages/features/finance
-      '@afenda/feature-hr':
-        specifier: workspace:*
-        version: link:../../packages/features/hr
       '@afenda/feature-inventory':
         specifier: workspace:*
         version: link:../../packages/features/inventory
@@ -427,43 +424,6 @@ importers:
       '@afenda/config':
         specifier: workspace:*
         version: link:../../config
-
-  packages/features/hr:
-    dependencies:
-      '@afenda/auth':
-        specifier: workspace:*
-        version: link:../../auth
-      '@afenda/db':
-        specifier: workspace:*
-        version: link:../../db
-      '@afenda/governed-surface':
-        specifier: workspace:*
-        version: link:../../governed-surface
-      '@afenda/kernel':
-        specifier: workspace:*
-        version: link:../../kernel
-      '@afenda/ui':
-        specifier: workspace:*
-        version: link:../../ui
-      zod:
-        specifier: 'catalog:'
-        version: 4.4.3
-    devDependencies:
-      '@afenda/config':
-        specifier: workspace:*
-        version: link:../../config
-      dotenv:
-        specifier: ^17.4.2
-        version: 17.4.2
-      next:
-        specifier: 'catalog:'
-        version: 16.2.6(@babel/core@7.29.7)(@opentelemetry/api@1.9.1)(@playwright/test@1.60.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      server-only:
-        specifier: ^0.0.1
-        version: 0.0.1
-      vitest:
-        specifier: 'catalog:'
-        version: 3.2.4(@types/debug@4.1.13)(@types/node@24.12.4)(jiti@2.7.0)(jsdom@26.1.0)(lightningcss@1.32.0)(msw@2.14.6(@types/node@24.12.4)(typescript@5.9.3))(tsx@4.22.3)(yaml@2.9.0)
 
   packages/features/inventory:
     dependencies:

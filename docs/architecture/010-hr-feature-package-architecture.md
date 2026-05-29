@@ -4,8 +4,8 @@
 
 | Field    | Value                                                                 |
 | -------- | --------------------------------------------------------------------- |
-| Status   | Active — Slice 1 partial: employee directory at `/hr/employees`   |
-| Package  | `@afenda/feature-hr` (`packages/features/hr`, moduleId `hr`)        |
+| Status   | **Package removed (2026-05-29)** — `/hr` uses kernel generic workspace until TRACK-004 rescaffold |
+| Package  | *(none)* — former `@afenda/feature-hr` / `packages/features/hr` deleted; legacy `hrm - Copy` removed |
 | Track    | TRACK-004 (`docs/roadmap/004-hrm-migration.md`)                       |
 | Related  | **ARCH-002**, **ARCH-005**, **ARCH-008**                              |
 

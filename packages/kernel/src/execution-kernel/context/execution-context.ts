@@ -1,9 +1,4 @@
-import type {
-  AppCapability,
-  OrganizationRole,
-  OrganizationSummary,
-  UserSession,
-} from "@afenda/auth";
+import type { OrganizationSummary, UserSession } from "@afenda/auth";
 import { getActiveOrganization, getSession } from "@afenda/auth/server";
 import {
   ExecutionContextRequiredError,
@@ -14,17 +9,12 @@ import {
   type ExecutionActorType,
 } from "../actor/execution-actor";
 
-export type ExecutionContext = {
-  organizationId: string;
-  organizationSlug: string;
-  userId: string;
-  membershipId: string;
-  locale: string;
-  actorType: ExecutionActorType;
-  capabilities: readonly AppCapability[];
-  role: OrganizationRole;
-  sessionSource: UserSession["source"];
-};
+export type {
+  ExecutionAuthorityContext,
+  ExecutionContext,
+} from "./execution-context-types";
+export { toExecutionAuthorityContext } from "./execution-context-types";
+import type { ExecutionContext } from "./execution-context-types";
 
 function buildExecutionContext(input: {
   session: UserSession;

@@ -5,7 +5,7 @@ alwaysApply: true
 
 # Architecture documentation
 
-Canonical index: `docs/architecture/README.md` (`ARCH-001`–`ARCH-012`).
+Canonical index: `docs/architecture/README.md` (`ARCH-001`–`ARCH-011`; **ARCH-012** reserved).
 
 ## Do not delete
 
@@ -32,7 +32,7 @@ Do not create root-level `*-architecture.md` files outside `docs/architecture/`.
 
 **ARCH-002** (feature packages) → **ARCH-001** (runtime) → update the other doc in the same PR.
 
-System Admin: **ARCH-011** + **ARCH-012** move together when control vs execution boundary changes.
+System Admin: **ARCH-011** + **ARCH-002** §§4–5 move together when control vs execution boundary changes. Kernel legacy compat is frozen (**ARCH-002** §3).
 
 ## Hooks
 

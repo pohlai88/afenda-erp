@@ -93,6 +93,8 @@ Server Actions: internal mutations. Route Handlers: webhooks, uploads, AI stream
 
 ## Before you finish
 
+Cursor hooks run drift checks on agent edits (`enforce-architecture-drift`, `guard-kernel-boundary-imports`); fix hook failures without asking the user to run commands. CI repeats the same guards on push.
+
 ```bash
 pnpm typecheck
 pnpm architecture:check

@@ -6,7 +6,7 @@
 
 ## Definition
 
-Capabilities represent governed ERP execution entry points declared by **ARCH-012**.
+Capabilities represent governed ERP execution entry points declared by **ARCH-002 §5**.
 
 A capability answers:
 
@@ -46,7 +46,7 @@ Capabilities does not own:
 Those belong to:
 
 ```txt
-Execution Kernel (ARCH-012)
+Execution Kernel (ARCH-002 §5)
 Permissions
 Modules
 Roles

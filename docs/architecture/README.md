@@ -13,7 +13,7 @@ Search tip: every document has a stable **`ARCH-###`** ID and a matching
 | ID           | File                                                                                       | Topic                                                                          |
 | ------------ | ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------ |
 | **ARCH-001** | [001-system-architecture.md](001-system-architecture.md)                                   | Product-wide runtime, deployment, data, auth, AI, observability, testing       |
-| **ARCH-002** | [002-erp-kernel-package-architecture.md](002-erp-kernel-package-architecture.md)           | Feature-package boundaries, extraction, Vercel/Turborepo build model           |
+| **ARCH-002** | [002-erp-kernel-package-architecture.md](002-erp-kernel-package-architecture.md)           | Features-first; `@afenda/kernel` maintenance (§3); execution law (§5) |
 | **ARCH-003** | [003-directory-architecture-audit.md](003-directory-architecture-audit.md)                 | Monorepo ownership, package categories, architecture guards                    |
 | **ARCH-004** | [004-naming-conventions.md](004-naming-conventions.md)                                     | Directories, files, packages, docs, tests, components                          |
 | **ARCH-005** | [005-database-scale-architecture.md](005-database-scale-architecture.md)                   | Schema scale, promotion, migration strategy                                    |
@@ -21,7 +21,7 @@ Search tip: every document has a stable **`ARCH-###`** ID and a matching
 | **ARCH-007** | [007-governed-metadata-architecture.md](007-governed-metadata-architecture.md)             | Governed-surface renderer kernel, schemas, profiles, resolver                  |
 | **ARCH-008** | [008-workspace-package-discipline.md](008-workspace-package-discipline.md)                 | Workspace package classes, export doors, split policy, guard policy            |
 | **ARCH-009** | [009-machine-layer-doctrine.md](009-machine-layer-doctrine.md)                             | Lynx machine layer, four product layers, Knowledge substrate, brand contract   |
-| **ARCH-010** | [010-hr-feature-package-architecture.md](010-hr-feature-package-architecture.md)           | `@afenda/feature-hr` boundaries, export doors, TRACK-004 migration layout      |
+| **ARCH-010** | [010-hr-feature-package-architecture.md](010-hr-feature-package-architecture.md)           | HR package doctrine (removed 2026-05-29; TRACK-004 rescaffold target)        |
 | **ARCH-011** | [011-system-admin-enterprise-architecture.md](011-system-admin-enterprise-architecture.md) | System Admin control module, control domains, package boundary, kernel linkage |
 | **ARCH-011 (supplement)** | [011-system-admin-users-architecture.md](011-system-admin-users-architecture.md) | Users control domain — invitation, lifecycle, access review |
 | **ARCH-011 (supplement)** | [011-system-admin-memberships-architecture.md](011-system-admin-memberships-architecture.md) | Memberships control domain — participation lifecycle, role coverage |
@@ -30,7 +30,8 @@ Search tip: every document has a stable **`ARCH-###`** ID and a matching
 | **ARCH-011 (supplement)** | [011-system-admin-modules-architecture.md](011-system-admin-modules-architecture.md) | Modules control domain — enablement, readiness, rollout |
 | **ARCH-011 (supplement)** | [011-system-admin-capabilities-architecture.md](011-system-admin-capabilities-architecture.md) | Capabilities control domain — coverage, readiness, availability |
 | **ARCH-011 (supplement)** | [011-system-admin-competitive-scorecard.md](011-system-admin-competitive-scorecard.md) | Competitive benchmark and gap scorecard for System Admin |
-| **ARCH-012** | [012-execution-kernel-architecture.md](012-execution-kernel-architecture.md)               | Execution authority, enforcement contracts, and System Admin co-link           |
+
+**ARCH-012** — *reserved* (no file; future product kernel / dual posture — not `@afenda/kernel` compat).
 
 ## Document Hierarchy
 
@@ -41,7 +42,7 @@ then update the other document in the same change.
 | Authority                              | Doc ID                          |
 | -------------------------------------- | ------------------------------- |
 | System admin control plane             | **ARCH-011**                    |
-| Execution authority                    | **ARCH-012**                    |
+| Execution authority                    | **ARCH-002** §5                      |
 | Feature packages and extraction        | **ARCH-002**                    |
 | Product runtime, modules, deployment   | **ARCH-001**                    |
 | Metadata UI runtime and contracts      | **ARCH-006**                    |
@@ -58,7 +59,7 @@ then update the other document in the same change.
 | ------------------------ | ----------------------------------------------------------------- | -------------------------------------------------------------- |
 | ERP modules              | Shared contracts in `@afenda/kernel`; routes in `apps/erp`        | `@afenda/feature-*` packages under `packages/features/*`       |
 | Feature packages on disk | Scaffolded `@afenda/feature-*` packages with public export doors  | One package per mature module with module-owned services       |
-| System Admin / kernel split | Separate doctrine now exists in **ARCH-011** and **ARCH-012** | Control-plane configuration and execution enforcement stay separate |
+| System Admin / kernel split | **ARCH-011** (control) + **ARCH-002** §4–5 (enforce) | Legacy kernel frozen (§3); execution law in §5 |
 | Module routes            | Dynamic `(workspace)/[moduleId]/…` via `apps/erp/src/workspace-routes/` | Same route shape; thinner adapters calling feature packages    |
 | Database schema          | Flat `packages/db/src/schema/*.ts` with shared ERP tables         | Module subdirs under `schema/<moduleId>/` as modules mature    |
 | Vercel deploy            | Single repo-root project; `pnpm turbo build --filter=@afenda/erp` | Same single-app model; link + Remote Cache after stabilization |
@@ -77,4 +78,4 @@ then update the other document in the same change.
 | ------------ | ---------------------------------------------------------------------------------- |
 | ARCH-001–003 | Reviewed — deploy deferral, Turborepo outputs, conformance                         |
 | ARCH-004–008 | Reviewed — naming/deploy, Neon/Fluid Compute, Cache Components, governed RSC rules |
-| ARCH-009–012 | Doctrine-specific — defer to ARCH-001/002 for deploy and runtime alignment         |
+| ARCH-009–011 | Doctrine-specific — defer to ARCH-001/002 for deploy and runtime alignment         |

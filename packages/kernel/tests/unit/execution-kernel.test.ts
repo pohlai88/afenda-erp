@@ -10,7 +10,8 @@ import {
   listExecutionCapabilitiesForModule,
   resetExecutionCapabilityRegistryForTest,
 } from "../../src/execution-kernel/capabilities/execution-capabilities";
-import type { ExecutionContext } from "../../src/execution-kernel/context/execution-context";
+import type { ExecutionContext } from "../../src/execution-kernel/context/execution-context-types";
+import { toExecutionAuthorityContext } from "../../src/execution-kernel/context/execution-context-types";
 import {
   ExecutionAccessDeniedError,
   ExecutionInvalidStateError,
@@ -42,6 +43,17 @@ describe("execution kernel", () => {
   beforeEach(() => {
     resetExecutionCapabilityRegistryForTest();
     resetExecutionPolicyRegistryForTest();
+  });
+
+  it("strips session-derived fields for authority-only boundaries", () => {
+    expect(toExecutionAuthorityContext(context)).toEqual({
+      organizationId: "org_123",
+      organizationSlug: "afenda-ops",
+      userId: "user_123",
+      membershipId: "member_123",
+      locale: "en-MY",
+      actorType: "user",
+    });
   });
 
   it("exposes built-in capability routing from current module contracts", () => {

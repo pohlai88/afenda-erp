@@ -6,7 +6,7 @@
 | --------- | ----- |
 | Status    | Active — system-admin control-module doctrine with as-built compatibility |
 | Authority | System-admin module boundary, control domains, package structure, and administrative governance rules |
-| Defers to | **ARCH-002** for package boundaries · **ARCH-001** for runtime/auth/deployment · **ARCH-005** for schema ownership · **ARCH-012** for execution enforcement |
+| Defers to | **ARCH-002** for package boundaries and execution enforcement (§4) · **ARCH-001** for runtime/auth/deployment · **ARCH-005** for schema ownership |
 | Related   | **ARCH-006**/**ARCH-007** (governed UI) · **ARCH-008** (workspace discipline) · **ARCH-009** (Lynx governance) |
 
 System Admin is Afenda's administrative control module. It manages the
@@ -20,7 +20,7 @@ that the Execution Kernel enforces.
 This document is doctrine for engineers building `/system-admin/*`,
 `@afenda/feature-system-admin`, related auth and database services, and
 governed administrative surfaces. It is not a roadmap, a UI brief, or a
-substitute for the execution-kernel contract in **ARCH-012**.
+substitute for the execution-kernel contract in **ARCH-002 §5**.
 
 ## Core Principle
 
@@ -49,7 +49,7 @@ co-linked.
 | Audit | Views, filters, and exports audit evidence | Defines and writes audit events |
 | Admin UI | Owns screens, forms, tables, editors, and diagnostics | Owns no admin UI |
 
-`ARCH-011` and `ARCH-012` must move together when this boundary changes.
+`ARCH-011` and **ARCH-002** §§4–5 must move together when this boundary changes.
 
 ## What System Admin Owns
 
@@ -199,7 +199,7 @@ governed surface.
 | Roles | role creation, editing, assignment, deprecation, bundle review | Role changes must remain traceable and capability-backed. |
 | Permissions | permission catalog display, assignment, grouping, coverage review | Permissions come from declared contracts; no ad hoc keys. |
 | Modules | module enablement, visibility, readiness, access configuration | Module settings shape availability, not business execution logic. |
-| Capabilities | capability visibility, availability by role, readiness review, metadata inspection | Capability definitions come from **ARCH-012**. |
+| Capabilities | capability visibility, availability by role, readiness review, metadata inspection | Capability definitions come from **ARCH-002 §5**. |
 | Policies | policy settings, thresholds, lock rules, exception rules | Runtime evaluation belongs to the kernel. |
 | Approvals | approval chain configuration, escalation timing, delegation | Approval execution may live in workflows or feature modules. |
 | Audit viewer | audit search, filtering, export, event detail, evidence timeline | Audit writing belongs to the kernel. |
@@ -364,7 +364,7 @@ export async function assignSystemAdminRole(input: AssignRoleInput) {
 }
 ```
 
-Where possible, prefer the shared guarded wrapper from **ARCH-012** rather than
+Where possible, prefer the shared guarded wrapper from **ARCH-002 §5** rather than
 hand-assembling this flow repeatedly.
 
 ## Permission Naming Doctrine
@@ -438,7 +438,7 @@ system-admin.integration.update
 8. Role and permission changes must be traceable.
 9. Stable contracts beat scattered helpers.
 10. `ARCH-011` changes that affect enforcement boundaries require a matching
-    review of **ARCH-012**.
+    review of **ARCH-002 §5**.
 
 ## As-Built Vs Target
 
@@ -449,7 +449,7 @@ and target doctrine.
 | ---- | -------- | --------------- |
 | Module identity | `@afenda/feature-system-admin` exists as the administrative feature package. | System Admin remains a feature module and never becomes shared execution infrastructure. |
 | Identity | Members, invitations, role changes, and tenant role overrides already exist. | Users, memberships, and roles are separated into clearer package domains with traceable actions. |
-| Permissions and capabilities | Capability catalog exists; role overrides can be stored. | Permission coverage, capability review, and module access controls become first-class admin domains linked to **ARCH-012** capability contracts. |
+| Permissions and capabilities | Capability catalog exists; role overrides can be stored. | Permission coverage, capability review, and module access controls become first-class admin domains linked to **ARCH-002 §5** capability contracts. |
 | Policies and approvals | Partial configuration surfaces exist today. | Policy and approval law become explicit configuration domains consumed by the kernel at runtime. |
 | Audit | Audit logs and export boundaries exist. | Audit viewer becomes a full evidence-review surface while the kernel remains the only audit-writing authority. |
 | Security and organization | Security posture and organization defaults already exist. | Security controls and organization defaults (locale, numbering, data region, ZDR) stay package-owned and kernel-readable. |
@@ -485,4 +485,4 @@ Run the narrowest gate that covers the change.
 | [ARCH-006 · Metadata-Driven UI Architecture](006-metadata-driven-ui-architecture.md) | Server-window lists, metadata authority, runtime contracts |
 | [ARCH-007 · Governed Metadata Architecture](007-governed-metadata-architecture.md) | Renderer kernel, builders, governed-surface parity |
 | [ARCH-009 · Machine Layer Doctrine](009-machine-layer-doctrine.md) | Lynx vocabulary, machine-layer package split, governed tool envelope |
-| [ARCH-012 · Execution Kernel Architecture](012-execution-kernel-architecture.md) | Execution context, access, policy, audit, capabilities, guarded execution |
+| [ARCH-002 · ERP Platform & Kernel](002-erp-kernel-package-architecture.md) §5 | Execution context, access, policy, audit, capabilities, guarded execution |

@@ -6,7 +6,7 @@ alwaysApply: false
 
 # System Admin (`@afenda/feature-system-admin`)
 
-**ARCH-011** (control plane) · **ARCH-012** (execution enforcement) · **ARCH-006**/**ARCH-007** (governed UI).
+**ARCH-011** (control plane) · **ARCH-002** §5 (execution enforcement) · **ARCH-006**/**ARCH-007** (governed UI). Do not extend frozen kernel compat (**ARCH-002** §3).
 
 System Admin configures the law; Execution Kernel enforces it. Do not import `@afenda/feature-system-admin` from `@afenda/kernel`.
 

@@ -1,5 +1,7 @@
 # ERP Kernel Architecture
 
+> **Frozen supplement — do not extend.** Canonical policy: [**ARCH-002 §3**](../../docs/architecture/002-erp-kernel-package-architecture.md) (maintenance). Active code: **`src/execution-kernel/`** only (**ARCH-002 §5**). Do not add business logic, HITL, or dual-kernel product behavior here.
+
 ## 1. Definition
 
 The ERP Kernel is the shared execution foundation of Afenda.

@@ -1,6 +1,7 @@
 {
   "name": "@afenda/kernel",
   "version": "0.1.0",
+  "description": "Execution law (active: execution-kernel/) and frozen generic ERP compat. See ARCH-002.",
   "private": true,
   "type": "module",
   "main": "./dist/index.js",

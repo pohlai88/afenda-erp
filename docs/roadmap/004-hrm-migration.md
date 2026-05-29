@@ -14,14 +14,10 @@ claiming completion before parity is proven.
 
 ## Current State
 
-**Scaffold reset (2026-05-28):** Failed HR implementation was removed. A clean
-`@afenda/feature-hr` package exists with ARCH-008 export doors only; metadata
-delegates to `createModuleFeatureMetadata("hr")` like other core modules.
+**Package removed (2026-05-29):** `packages/features/hr` and archived `packages/features/hrm - Copy` were deleted from the repo. `/hr` routes use kernel generic workspace metadata (`createModuleFeatureMetadata("hr")` in `apps/erp`). Rescaffold `@afenda/feature-hr` when starting the next TRACK-004 slice.
 
-- **Legacy input:** `packages/features/hrm` removed (2026-05-28); re-scaffold by
-  slice into `@afenda/feature-hr` when implementing TRACK-004;
-- **Target package:** `packages/features/hr` — see `ARCHITECTURE.md`; no
-  `schema/hr` or server queries until Slice 1 is accepted;
+- **Legacy input:** `packages/features/hrm` removed (2026-05-28); do not restore;
+- **Target package:** `packages/features/hr` (not present until rescaffolded) — see **ARCH-010**;
 - **Database:** migration `0030_revert_hr_migration_tables` drops tables from the
   withdrawn `0027` / `0029` attempt; run `pnpm db:migrate` on environments that
   applied those migrations;
