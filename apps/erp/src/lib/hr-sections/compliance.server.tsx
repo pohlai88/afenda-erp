@@ -20,7 +20,7 @@ export default async function HrCompliancePage({
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
-  const { obligationSearch, exceptionSearch, laborLawSearch } =
+  const { obligationSearch, exceptionSearch, laborLawSearch, workEligibilitySearch } =
     parseHrComplianceSearchParams(resolvedSearchParams);
 
   let guard: Awaited<ReturnType<typeof requireHrComplianceRead>>;
@@ -41,6 +41,7 @@ export default async function HrCompliancePage({
       obligationSearch,
       exceptionSearch,
       laborLawSearch,
+      workEligibilitySearch,
     }),
     loadComplianceFormOptions(organization.id),
   ]);

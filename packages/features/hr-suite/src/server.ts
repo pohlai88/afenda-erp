@@ -18,6 +18,7 @@ export {
   assignHrComplianceCorrectiveActionAction,
   buildHrCompliancePageModel,
   createHrComplianceExceptionAction,
+  ensureHrWorkEligibilityTrackingAction,
   loadComplianceFormOptions,
   parseHrComplianceSearchParams,
   requireHrComplianceRead,
@@ -26,6 +27,7 @@ export {
   syncHrEmployeeLaborLawRequirementsAction,
   updateHrComplianceCorrectiveActionProgressAction,
   updateHrEmployeeLaborLawRequirementAction,
+  updateHrWorkEligibilityAction,
   upsertHrComplianceObligationAction,
   waiveHrComplianceExceptionAction,
 } from "./employee-management/compliance-regulatory-tracking/server";

@@ -1,14 +1,14 @@
 import {
-  buildGovernedListSurface,
-  GOVERNED_METADATA_SCHEMA_VERSION,
   resolveListSurfaceRowTrailingAction,
   type ListSurfaceRendererConfigurationResolvedInput,
 } from "@afenda/governed-surface";
 import type { HrComplianceExceptionWindow } from "@afenda/db";
 
-import { hrWorkforceComplianceReadPermission } from "../contracts/hr.workforce.compliance.contract";
+import { hrEmployeeDetailRoutePath } from "../contracts/hr.workforce.compliance-route.contract";
 import {
   buildComplianceListSearchToolbar,
+  buildComplianceOperationalListSurface,
+  formatComplianceEmployeeListCell,
   formatComplianceListEnumCell,
   resolveComplianceExceptionRowTone,
   resolveComplianceExceptionSeverityBadgeTone,
@@ -28,34 +28,20 @@ export function buildHrComplianceExceptionsListSurface(input: {
   const { window, searchValue, canWrite = false } = input;
   const copy = hrComplianceUiCopy.exceptions;
 
-  return buildGovernedListSurface({
-    __schemaVersion: GOVERNED_METADATA_SCHEMA_VERSION,
-    dataNature: "table",
-    presentationProfile: "erp-operational-table",
-    requiresErpPermission: hrWorkforceComplianceReadPermission,
-    presentation: {
-      primaryColumnId: "title",
-      toolbar: buildComplianceListSearchToolbar({
-        param: hrComplianceExceptionSearchParam,
-        label: copy.searchLabel,
-        placeholder: copy.searchPlaceholder,
-        value: searchValue,
-      }),
-    },
-    pagination: {
-      pageSize: window.pageSize,
-      totalCount: window.totalCount,
-      hasNextPage: window.hasNextPage,
-    },
+  return buildComplianceOperationalListSurface({
+    primaryColumnId: "title",
+    searchToolbar: buildComplianceListSearchToolbar({
+      param: hrComplianceExceptionSearchParam,
+      label: copy.searchLabel,
+      placeholder: copy.searchPlaceholder,
+      value: searchValue,
+    }),
+    window,
     surface: {
-      header: { title: copy.surfaceHeaderTitle },
+      headerTitle: copy.surfaceHeaderTitle,
       columnsId: "hr.workforce.compliance.exceptions",
-      rowKey: "id",
-      empty: {
-        variant: "muted",
-        title: copy.emptyTitle,
-        description: copy.emptyDescription,
-      },
+      emptyTitle: copy.emptyTitle,
+      emptyDescription: copy.emptyDescription,
     },
     columns: [
       {
@@ -87,7 +73,7 @@ export function buildHrComplianceExceptionsListSurface(input: {
     ],
     rows: window.rows.map((row) => {
       const employeeHref = row.employeeId
-        ? `/hr/employees/${row.employeeId}`
+        ? hrEmployeeDetailRoutePath(row.employeeId)
         : undefined;
 
       return {
@@ -100,11 +86,11 @@ export function buildHrComplianceExceptionsListSurface(input: {
         linkColumnId: employeeHref ? "title" : undefined,
         cells: {
           title: row.title,
-          employee: row.employeeDisplayName
-            ? row.employeeNumber
-              ? `${row.employeeDisplayName} · ${row.employeeNumber}`
-              : row.employeeDisplayName
-            : "—",
+          employee: formatComplianceEmployeeListCell({
+            employeeNumber: row.employeeNumber,
+            employeeDisplayName: row.employeeDisplayName,
+            style: "name-first",
+          }),
           area: formatComplianceListEnumCell(row.complianceArea),
           severity: formatComplianceListEnumCell(row.severity),
           status: formatComplianceListEnumCell(row.status),

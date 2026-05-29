@@ -10,6 +10,18 @@ export function formatComplianceEnumLabel(value: string): string {
     .join(" ");
 }
 
+/** Formats stored timestamps for HTML `datetime-local` inputs. */
+export function formatComplianceDateTimeLocalInput(
+  value: Date | null | undefined,
+): string {
+  if (!value) {
+    return "";
+  }
+
+  const pad = (part: number) => String(part).padStart(2, "0");
+  return `${value.getFullYear()}-${pad(value.getMonth() + 1)}-${pad(value.getDate())}T${pad(value.getHours())}:${pad(value.getMinutes())}`;
+}
+
 export function readOptionalComplianceFormField(
   formData: FormData,
   key: string,

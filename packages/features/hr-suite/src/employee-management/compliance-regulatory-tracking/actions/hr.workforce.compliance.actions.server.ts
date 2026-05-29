@@ -4,11 +4,13 @@ import {
   archiveHrComplianceObligationInTx,
   assignHrComplianceCorrectiveActionInTx,
   createHrComplianceExceptionInTx,
+  ensureHrWorkEligibilityTrackingInTx,
   HR_COMPLIANCE_LABOR_LAW_REQUIREMENT_KIND,
   resolveHrComplianceExceptionInTx,
   syncHrEmployeeLaborLawRequirementsInTx,
   updateHrComplianceCorrectiveActionProgressInTx,
   updateHrEmployeeLaborLawRequirementStatusInTx,
+  updateHrWorkEligibilityStatusInTx,
   upsertHrComplianceObligationInTx,
   waiveHrComplianceExceptionInTx,
 } from "@afenda/db";
@@ -27,7 +29,8 @@ import {
   archiveHrComplianceObligationFormSchema,
   upsertHrComplianceObligationFormSchema,
 } from "../schemas/hr.workforce.compliance-obligation.schema";
-import { updateHrEmployeeLaborLawRequirementFormSchema } from "../schemas/hr.workforce.compliance-labor-law.schema";
+import { updateHrEmployeeLaborLawRequirementFormSchema, syncHrEmployeeLaborLawRequirementsFormSchema } from "../schemas/hr.workforce.compliance-labor-law.schema";
+import { updateHrWorkEligibilityFormSchema, ensureHrWorkEligibilityTrackingFormSchema } from "../schemas/hr.workforce.compliance-work-eligibility.schema";
 import { readOptionalComplianceFormField } from "../schemas/hr.workforce.compliance-form.shared";
 import { finalizeComplianceMutation } from "./hr.workforce.compliance-action.shared.server";
 
@@ -307,6 +310,11 @@ export async function syncHrEmployeeLaborLawRequirementsAction(
   _formData: FormData,
 ): Promise<ActionResult> {
   const { session, organization } = await requireHrComplianceWrite();
+  const parsed = syncHrEmployeeLaborLawRequirementsFormSchema.safeParse({});
+
+  if (!parsed.success) {
+    return zodActionFailure(parsed.error);
+  }
 
   return finalizeComplianceMutation(organization.id, async (db) => {
     const result = await syncHrEmployeeLaborLawRequirementsInTx(db, {
@@ -351,6 +359,67 @@ export async function updateHrEmployeeLaborLawRequirementAction(
       actorId: session.id,
       action: hrWorkforceComplianceAuditActions.laborLaw.statusUpdated,
       targetId: result.requirementId,
+      metadata: { status: parsed.data.status },
+    };
+  });
+}
+
+export async function ensureHrWorkEligibilityTrackingAction(
+  _previous: ActionResult | undefined,
+  _formData: FormData,
+): Promise<ActionResult> {
+  const { session, organization } = await requireHrComplianceWrite();
+  const parsed = ensureHrWorkEligibilityTrackingFormSchema.safeParse({});
+
+  if (!parsed.success) {
+    return zodActionFailure(parsed.error);
+  }
+
+  return finalizeComplianceMutation(organization.id, async (db) => {
+    const result = await ensureHrWorkEligibilityTrackingInTx(db, {
+      organizationId: organization.id,
+    });
+
+    return {
+      organizationId: organization.id,
+      actorId: session.id,
+      action: hrWorkforceComplianceAuditActions.workEligibility.ensured,
+      targetId: organization.id,
+      metadata: result,
+    };
+  });
+}
+
+export async function updateHrWorkEligibilityAction(
+  _previous: ActionResult | undefined,
+  formData: FormData,
+): Promise<ActionResult> {
+  const { session, organization } = await requireHrComplianceWrite();
+  const parsed = updateHrWorkEligibilityFormSchema.safeParse({
+    workEligibilityId: readOptionalComplianceFormField(formData, "workEligibilityId"),
+    status: readOptionalComplianceFormField(formData, "status"),
+    expiresAt: readOptionalComplianceFormField(formData, "expiresAt"),
+    reviewNotes: readOptionalComplianceFormField(formData, "reviewNotes"),
+  });
+
+  if (!parsed.success) {
+    return zodActionFailure(parsed.error);
+  }
+
+  return finalizeComplianceMutation(organization.id, async (db) => {
+    const result = await updateHrWorkEligibilityStatusInTx(db, {
+      organizationId: organization.id,
+      workEligibilityId: parsed.data.workEligibilityId,
+      status: parsed.data.status,
+      expiresAt: parsed.data.expiresAt ?? null,
+      reviewNotes: parsed.data.reviewNotes ?? null,
+    });
+
+    return {
+      organizationId: organization.id,
+      actorId: session.id,
+      action: hrWorkforceComplianceAuditActions.workEligibility.statusUpdated,
+      targetId: result.workEligibilityId,
       metadata: { status: parsed.data.status },
     };
   });

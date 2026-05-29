@@ -13,6 +13,7 @@ const COMPLIANCE_COMMAND_ERROR_MESSAGES: Record<
   exception_not_found: "Compliance exception was not found.",
   exception_not_open: "This compliance exception is already closed.",
   requirement_not_found: "Labor law requirement tracking row was not found.",
+  work_eligibility_not_found: "Work eligibility tracking row was not found.",
 };
 
 export function toComplianceActionFailure(error: unknown): ActionResult {

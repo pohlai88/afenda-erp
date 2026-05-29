@@ -1,4 +1,4 @@
-export const HRM_COMPLIANCE_EXCEPTION_AREAS = [
+export const HRM_COMPLIANCE_AREAS = [
   "document",
   "work_authorization",
   "training",
@@ -12,8 +12,7 @@ export const HRM_COMPLIANCE_EXCEPTION_AREAS = [
   "other",
 ] as const;
 
-export type HrmComplianceExceptionArea =
-  (typeof HRM_COMPLIANCE_EXCEPTION_AREAS)[number];
+export type HrmComplianceArea = (typeof HRM_COMPLIANCE_AREAS)[number];
 
 export const HRM_COMPLIANCE_EXCEPTION_SEVERITIES = [
   "low",
@@ -84,18 +83,6 @@ export function deriveEffectiveLaborLawRequirementStatus(input: {
   }
 
   return input.status;
-}
-
-export function resolveLaborLawRequirementBadgeTone(
-  status: HrmComplianceRequirementStatus,
-): "default" | "attention" | "critical" {
-  if (status === "non_compliant" || status === "expired" || status === "overdue") {
-    return "critical";
-  }
-  if (status === "at_risk" || status === "pending") {
-    return "attention";
-  }
-  return "default";
 }
 
 export function worstComplianceRequirementStatus(

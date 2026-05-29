@@ -110,6 +110,18 @@ export const hrComplianceRequirementStatusEnum = pgEnum(
   ],
 );
 
+export const hrComplianceWorkEligibilityStatusEnum = pgEnum(
+  "hr_compliance_work_eligibility_status",
+  [
+    "not_applicable",
+    "pending_verification",
+    "eligible",
+    "conditional",
+    "ineligible",
+    "expired",
+  ],
+);
+
 export const hrComplianceFilingStatusEnum = pgEnum("hr_compliance_filing_status", [
   "pending",
   "submitted",
@@ -733,6 +745,38 @@ export const hrComplianceEmployeeRequirements = pgTable(
       table.status,
     ),
     index("hr_compliance_employee_requirements_org_employee_idx").on(
+      table.organizationId,
+      table.employeeId,
+    ),
+  ],
+);
+
+export const hrComplianceWorkEligibility = pgTable(
+  "hr_compliance_work_eligibility",
+  {
+    id: text("id").primaryKey(),
+    organizationId: organizationReference(),
+    employeeId: text("employee_id")
+      .notNull()
+      .references(() => hrEmployees.id, { onDelete: "cascade" }),
+    status: hrComplianceWorkEligibilityStatusEnum("status")
+      .notNull()
+      .default("pending_verification"),
+    verifiedAt: timestamp("verified_at", { withTimezone: true }),
+    expiresAt: timestamp("expires_at", { withTimezone: true }),
+    reviewNotes: text("review_notes"),
+    ...timestampColumns,
+  },
+  (table) => [
+    uniqueIndex("hr_compliance_work_eligibility_org_employee_uidx").on(
+      table.organizationId,
+      table.employeeId,
+    ),
+    index("hr_compliance_work_eligibility_org_status_idx").on(
+      table.organizationId,
+      table.status,
+    ),
+    index("hr_compliance_work_eligibility_org_employee_idx").on(
       table.organizationId,
       table.employeeId,
     ),

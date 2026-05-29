@@ -1,15 +1,13 @@
 import {
-  buildGovernedListSurface,
-  GOVERNED_METADATA_SCHEMA_VERSION,
   resolveListSurfaceRowTrailingAction,
   type ListSurfaceRendererConfigurationResolvedInput,
 } from "@afenda/governed-surface";
 import type { HrComplianceObligationWindow } from "@afenda/db";
 
-import { hrWorkforceComplianceReadPermission } from "../contracts/hr.workforce.compliance.contract";
 import { formatComplianceObligationScope } from "../data/hr.workforce.compliance-obligation.shared";
 import {
   buildComplianceListSearchToolbar,
+  buildComplianceOperationalListSurface,
   formatComplianceListEnumCell,
   resolveComplianceObligationStatusBadgeTone,
 } from "./hr.workforce.compliance-list.shared";
@@ -28,34 +26,20 @@ export function buildHrComplianceObligationsListSurface(input: {
   const { window, searchValue, canWrite = false } = input;
   const copy = hrComplianceUiCopy.obligations;
 
-  return buildGovernedListSurface({
-    __schemaVersion: GOVERNED_METADATA_SCHEMA_VERSION,
-    dataNature: "table",
-    presentationProfile: "erp-operational-table",
-    requiresErpPermission: hrWorkforceComplianceReadPermission,
-    presentation: {
-      primaryColumnId: "title",
-      toolbar: buildComplianceListSearchToolbar({
-        param: hrComplianceObligationSearchParam,
-        label: copy.searchLabel,
-        placeholder: copy.searchPlaceholder,
-        value: searchValue,
-      }),
-    },
-    pagination: {
-      pageSize: window.pageSize,
-      totalCount: window.totalCount,
-      hasNextPage: window.hasNextPage,
-    },
+  return buildComplianceOperationalListSurface({
+    primaryColumnId: "title",
+    searchToolbar: buildComplianceListSearchToolbar({
+      param: hrComplianceObligationSearchParam,
+      label: copy.searchLabel,
+      placeholder: copy.searchPlaceholder,
+      value: searchValue,
+    }),
+    window,
     surface: {
-      header: { title: copy.surfaceHeaderTitle },
+      headerTitle: copy.surfaceHeaderTitle,
       columnsId: "hr.workforce.compliance.obligations",
-      rowKey: "id",
-      empty: {
-        variant: "muted",
-        title: copy.emptyTitle,
-        description: copy.emptyDescription,
-      },
+      emptyTitle: copy.emptyTitle,
+      emptyDescription: copy.emptyDescription,
     },
     columns: [
       { id: "code", header: copy.colCode, pin: "start" },

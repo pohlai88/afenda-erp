@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 import {
-  HRM_COMPLIANCE_EXCEPTION_AREAS,
+  HRM_COMPLIANCE_AREAS,
   HRM_COMPLIANCE_EXCEPTION_SEVERITIES,
 } from "../data/hr.workforce.compliance-status.shared";
 import { hrComplianceFormDateTimeInput } from "./hr.workforce.compliance-form.shared";
@@ -10,7 +10,7 @@ const uuid = z.string().uuid();
 
 export const createHrComplianceExceptionFormSchema = z.object({
   title: z.string().trim().min(1).max(500),
-  complianceArea: z.enum(HRM_COMPLIANCE_EXCEPTION_AREAS),
+  complianceArea: z.enum(HRM_COMPLIANCE_AREAS),
   itemType: z.string().trim().min(1).max(100),
   severity: z.enum(HRM_COMPLIANCE_EXCEPTION_SEVERITIES).optional(),
   employeeId: uuid.optional(),

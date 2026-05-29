@@ -8,10 +8,13 @@ import {
   listHrComplianceExceptionsWindow,
   listHrComplianceObligationsWindow,
   listHrEmployeeLaborLawRequirementsWindow,
+  listHrWorkEligibilityWindow,
   resolveHrComplianceException,
+  ensureHrWorkEligibilityTracking,
   syncHrEmployeeLaborLawRequirements,
   updateHrComplianceCorrectiveActionProgress,
   updateHrEmployeeLaborLawRequirementStatus,
+  updateHrWorkEligibilityStatus,
   upsertHrComplianceObligation,
   waiveHrComplianceException,
 } from "@afenda/db";
@@ -174,6 +177,33 @@ describe.skipIf(!integrationEnabled)("hr compliance commands integration", () =>
       obligationId: upserted.obligationId,
     });
   },
+    30_000,
+  );
+
+  it(
+    "tracks work eligibility status for active employees",
+    async () => {
+      const ensured = await ensureHrWorkEligibilityTracking({ organizationId });
+      expect(ensured.totalTracked).toBeGreaterThanOrEqual(ensured.createdCount);
+
+      const window = await listHrWorkEligibilityWindow({
+        organizationId,
+        limit: 10,
+      });
+      expect(window.rows.length).toBeGreaterThan(0);
+
+      const workEligibilityId = window.rows[0]?.id;
+      expect(workEligibilityId).toBeTruthy();
+
+      const updated = await updateHrWorkEligibilityStatus({
+        organizationId,
+        workEligibilityId: workEligibilityId as string,
+        status: "eligible",
+        expiresAt: new Date("2027-01-01T00:00:00.000Z"),
+        reviewNotes: "integration verified",
+      });
+      expect(updated.workEligibilityId).toBe(workEligibilityId);
+    },
     30_000,
   );
 });

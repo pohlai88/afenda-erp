@@ -6,6 +6,7 @@ import {
 import { writeExecutionAuditEventInTransaction } from "@afenda/kernel/execution";
 import { revalidatePath } from "next/cache";
 
+import type { HrWorkforceComplianceAuditAction } from "../events/hr.workforce.compliance.event";
 import { hrComplianceRoutePaths } from "../contracts/hr.workforce.compliance-route.contract";
 import { toComplianceActionFailure } from "../data/hr.workforce.compliance-action-result.shared";
 
@@ -16,7 +17,7 @@ export { toComplianceActionFailure } from "../data/hr.workforce.compliance-actio
 export type ComplianceMutationAudit = {
   organizationId: string;
   actorId: string;
-  action: string;
+  action: HrWorkforceComplianceAuditAction;
   targetId: string;
   metadata?: Record<string, unknown>;
 };

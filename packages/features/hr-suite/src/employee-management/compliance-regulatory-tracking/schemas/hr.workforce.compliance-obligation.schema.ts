@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { HRM_COMPLIANCE_EXCEPTION_AREAS } from "../data/hr.workforce.compliance-status.shared";
+import { HRM_COMPLIANCE_AREAS } from "../data/hr.workforce.compliance-status.shared";
 import {
   HRM_COMPLIANCE_OBLIGATION_KINDS,
   HRM_COMPLIANCE_OBLIGATION_STATUSES,
@@ -14,7 +14,7 @@ export const upsertHrComplianceObligationFormSchema = z.object({
   code: z.string().trim().min(1).max(100),
   title: z.string().trim().min(1).max(500),
   description: z.string().trim().max(2000).optional(),
-  complianceArea: z.enum(HRM_COMPLIANCE_EXCEPTION_AREAS),
+  complianceArea: z.enum(HRM_COMPLIANCE_AREAS),
   requirementKind: z.enum(HRM_COMPLIANCE_OBLIGATION_KINDS),
   countryCode: z.string().trim().length(2).toUpperCase().optional(),
   legalEntityCode: nullableText,

@@ -10,12 +10,13 @@ import { Input } from "@afenda/ui/input";
 
 import {
   createHrComplianceExceptionAction,
+  ensureHrWorkEligibilityTrackingAction,
   syncHrEmployeeLaborLawRequirementsAction,
   upsertHrComplianceObligationAction,
 } from "../actions/hr.workforce.compliance.actions.server";
 import { HRM_COMPLIANCE_OBLIGATION_KINDS } from "../data/hr.workforce.compliance-obligation.shared";
 import {
-  HRM_COMPLIANCE_EXCEPTION_AREAS,
+  HRM_COMPLIANCE_AREAS,
   HRM_COMPLIANCE_EXCEPTION_SEVERITIES,
 } from "../data/hr.workforce.compliance-status.shared";
 import {
@@ -47,6 +48,28 @@ function ComplianceFormShell({
           </Button>
         </Field>
       </FieldGroup>
+      <ActionFormErrors result={state} />
+    </form>
+  );
+}
+
+function ComplianceNoFieldActionForm({
+  action,
+  submitLabel,
+}: {
+  action: (
+    previous: ActionResult | undefined,
+    formData: FormData,
+  ) => Promise<ActionResult>;
+  submitLabel: string;
+}) {
+  const [state, formAction, pending] = useActionState(action, undefined);
+
+  return (
+    <form action={formAction} className="flex flex-col gap-surface-md">
+      <Button type="submit" size="sm" disabled={pending}>
+        {submitLabel}
+      </Button>
       <ActionFormErrors result={state} />
     </form>
   );
@@ -87,7 +110,7 @@ export function HrComplianceObligationUpsertForm({
           name="requirementKind"
           required
           className={COMPLIANCE_NATIVE_SELECT_CLASS}
-          defaultValue="policy_acknowledgement"
+          defaultValue={HRM_COMPLIANCE_OBLIGATION_KINDS[0]}
         >
           {HRM_COMPLIANCE_OBLIGATION_KINDS.map((kind) => (
             <option key={kind} value={kind}>
@@ -105,9 +128,9 @@ export function HrComplianceObligationUpsertForm({
           name="complianceArea"
           required
           className={COMPLIANCE_NATIVE_SELECT_CLASS}
-          defaultValue="acknowledgement"
+          defaultValue={HRM_COMPLIANCE_AREAS[0]}
         >
-          {HRM_COMPLIANCE_EXCEPTION_AREAS.map((area) => (
+          {HRM_COMPLIANCE_AREAS.map((area) => (
             <option key={area} value={area}>
               {formatComplianceEnumLabel(area)}
             </option>
@@ -176,78 +199,75 @@ export function HrComplianceObligationUpsertForm({
 
 export function HrComplianceExceptionCreateForm() {
   const copy = hrComplianceUiCopy.exceptions;
-  const [state, formAction, pending] = useActionState(
-    createHrComplianceExceptionAction,
-    undefined,
-  );
+
   return (
-    <form action={formAction} className="flex flex-col gap-surface-md">
-      <FieldGroup className="grid gap-surface-md @md/field-group:grid-cols-2">
-        <Field>
-          <FieldLabel htmlFor="exception-title">{copy.formFieldTitle}</FieldLabel>
-          <Input id="exception-title" name="title" required />
-        </Field>
-        <Field>
-          <FieldLabel htmlFor="exception-type">{copy.formFieldItemType}</FieldLabel>
-          <Input id="exception-type" name="itemType" required />
-        </Field>
-        <Field>
-          <FieldLabel htmlFor="exception-area">{copy.formFieldArea}</FieldLabel>
-          <select
-            id="exception-area"
-            name="complianceArea"
-            required
-            className={COMPLIANCE_NATIVE_SELECT_CLASS}
-            defaultValue="acknowledgement"
-          >
-            {HRM_COMPLIANCE_EXCEPTION_AREAS.map((area) => (
-              <option key={area} value={area}>
-                {formatComplianceEnumLabel(area)}
-              </option>
-            ))}
-          </select>
-        </Field>
-        <Field>
-          <FieldLabel htmlFor="exception-severity">
-            {copy.formFieldSeverity}
-          </FieldLabel>
-          <select
-            id="exception-severity"
-            name="severity"
-            className={COMPLIANCE_NATIVE_SELECT_CLASS}
-            defaultValue="medium"
-          >
-            {HRM_COMPLIANCE_EXCEPTION_SEVERITIES.map((severity) => (
-              <option key={severity} value={severity}>
-                {formatComplianceEnumLabel(severity)}
-              </option>
-            ))}
-          </select>
-        </Field>
-        <Field className="@md/field-group:col-span-2">
-          <Button type="submit" size="sm" disabled={pending}>
-            {copy.formSubmitLabel}
-          </Button>
-        </Field>
-      </FieldGroup>
-      <ActionFormErrors result={state} />
-    </form>
+    <ComplianceFormShell
+      action={createHrComplianceExceptionAction}
+      submitLabel={copy.formSubmitLabel}
+    >
+      <Field>
+        <FieldLabel htmlFor="exception-title">{copy.formFieldTitle}</FieldLabel>
+        <Input id="exception-title" name="title" required />
+      </Field>
+      <Field>
+        <FieldLabel htmlFor="exception-type">{copy.formFieldItemType}</FieldLabel>
+        <Input id="exception-type" name="itemType" required />
+      </Field>
+      <Field>
+        <FieldLabel htmlFor="exception-area">{copy.formFieldArea}</FieldLabel>
+        <select
+          id="exception-area"
+          name="complianceArea"
+          required
+          className={COMPLIANCE_NATIVE_SELECT_CLASS}
+          defaultValue={HRM_COMPLIANCE_AREAS[0]}
+        >
+          {HRM_COMPLIANCE_AREAS.map((area) => (
+            <option key={area} value={area}>
+              {formatComplianceEnumLabel(area)}
+            </option>
+          ))}
+        </select>
+      </Field>
+      <Field>
+        <FieldLabel htmlFor="exception-severity">
+          {copy.formFieldSeverity}
+        </FieldLabel>
+        <select
+          id="exception-severity"
+          name="severity"
+          className={COMPLIANCE_NATIVE_SELECT_CLASS}
+          defaultValue={HRM_COMPLIANCE_EXCEPTION_SEVERITIES[1]}
+        >
+          {HRM_COMPLIANCE_EXCEPTION_SEVERITIES.map((severity) => (
+            <option key={severity} value={severity}>
+              {formatComplianceEnumLabel(severity)}
+            </option>
+          ))}
+        </select>
+      </Field>
+    </ComplianceFormShell>
   );
 }
 
 export function HrComplianceLaborLawSyncForm() {
   const copy = hrComplianceUiCopy.laborLaw;
-  const [state, formAction, pending] = useActionState(
-    syncHrEmployeeLaborLawRequirementsAction,
-    undefined,
-  );
 
   return (
-    <form action={formAction} className="flex flex-col gap-surface-md">
-      <Button type="submit" size="sm" disabled={pending}>
-        {copy.syncActionLabel}
-      </Button>
-      <ActionFormErrors result={state} />
-    </form>
+    <ComplianceNoFieldActionForm
+      action={syncHrEmployeeLaborLawRequirementsAction}
+      submitLabel={copy.syncActionLabel}
+    />
+  );
+}
+
+export function HrComplianceWorkEligibilityEnsureForm() {
+  const copy = hrComplianceUiCopy.workEligibility;
+
+  return (
+    <ComplianceNoFieldActionForm
+      action={ensureHrWorkEligibilityTrackingAction}
+      submitLabel={copy.ensureActionLabel}
+    />
   );
 }

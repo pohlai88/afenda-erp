@@ -2,38 +2,38 @@ import {
   resolveListSurfaceRowTrailingAction,
   type ListSurfaceRendererConfigurationResolvedInput,
 } from "@afenda/governed-surface";
-import type { HrEmployeeLaborLawRequirementWindow } from "@afenda/db";
+import type { HrWorkEligibilityWindow } from "@afenda/db";
 
 import { hrEmployeeDetailRoutePath } from "../contracts/hr.workforce.compliance-route.contract";
-import {
-  deriveEffectiveLaborLawRequirementStatus,
-} from "../data/hr.workforce.compliance-status.shared";
+import { deriveEffectiveWorkEligibilityStatus } from "../data/hr.workforce.compliance-work-eligibility.shared";
+import { formatComplianceDateTimeLocalInput } from "../schemas/hr.workforce.compliance-form.shared";
 import {
   buildComplianceListSearchToolbar,
   buildComplianceOperationalListSurface,
   formatComplianceEmployeeListCell,
   formatComplianceListEnumCell,
-  resolveLaborLawRequirementListBadgeTone,
+  resolveWorkEligibilityListBadgeTone,
 } from "./hr.workforce.compliance-list.shared";
 import { hrComplianceUiCopy } from "./hr.workforce.compliance-ui.copy.shared";
 
-export const hrComplianceLaborLawRequirementsSurfaceKey =
-  "hr.workforce.compliance.labor-law-requirements.list";
+export const hrComplianceWorkEligibilitySurfaceKey =
+  "hr.workforce.compliance.work-eligibility.list";
 
-export const hrComplianceLaborLawSearchParam = "complianceLaborLawSearch";
+export const hrComplianceWorkEligibilitySearchParam =
+  "complianceWorkEligibilitySearch";
 
-export function buildHrComplianceLaborLawRequirementsListSurface(input: {
-  window: HrEmployeeLaborLawRequirementWindow;
+export function buildHrComplianceWorkEligibilityListSurface(input: {
+  window: HrWorkEligibilityWindow;
   searchValue?: string;
   canWrite?: boolean;
 }): ListSurfaceRendererConfigurationResolvedInput {
   const { window, searchValue, canWrite = false } = input;
-  const copy = hrComplianceUiCopy.laborLaw;
+  const copy = hrComplianceUiCopy.workEligibility;
 
   return buildComplianceOperationalListSurface({
-    primaryColumnId: "requirement",
+    primaryColumnId: "employee",
     searchToolbar: buildComplianceListSearchToolbar({
-      param: hrComplianceLaborLawSearchParam,
+      param: hrComplianceWorkEligibilitySearchParam,
       label: copy.searchLabel,
       placeholder: copy.searchPlaceholder,
       value: searchValue,
@@ -41,7 +41,7 @@ export function buildHrComplianceLaborLawRequirementsListSurface(input: {
     window,
     surface: {
       headerTitle: copy.surfaceHeaderTitle,
-      columnsId: "hr.workforce.compliance.labor-law-requirements",
+      columnsId: "hr.workforce.compliance.work-eligibility",
       emptyTitle: copy.emptyTitle,
       emptyDescription: copy.emptyDescription,
     },
@@ -50,60 +50,51 @@ export function buildHrComplianceLaborLawRequirementsListSurface(input: {
         id: "employee",
         header: copy.colEmployee,
         pin: "start",
-        minWidth: 160,
+        minWidth: 180,
         cellKind: { kind: "link" },
-      },
-      {
-        id: "requirement",
-        header: copy.colRequirement,
-        priority: "primary",
-        wrap: true,
-        minWidth: 220,
-      },
-      {
-        id: "area",
-        header: copy.colArea,
-        cellKind: { kind: "badge", tone: "default" },
       },
       {
         id: "status",
         header: copy.colStatus,
+        priority: "primary",
         cellKind: { kind: "badge", tone: "attention" },
       },
-      { id: "dueDate", header: copy.colDue, cellKind: { kind: "date" } },
-      { id: "completedAt", header: copy.colCompleted, cellKind: { kind: "date" } },
+      { id: "verifiedAt", header: copy.colVerified, cellKind: { kind: "date" } },
+      { id: "expiresAt", header: copy.colExpires, cellKind: { kind: "date" } },
     ],
     rows: window.rows.map((row) => {
-      const effectiveStatus = deriveEffectiveLaborLawRequirementStatus({
+      const effectiveStatus = deriveEffectiveWorkEligibilityStatus({
         status: row.status,
-        dueDate: row.dueDate,
+        expiresAt: row.expiresAt,
       });
 
       return {
         id: row.id,
         rowHref: hrEmployeeDetailRoutePath(row.employeeId),
         linkColumnId: "employee",
-        rowTone: resolveLaborLawRequirementListBadgeTone(effectiveStatus),
+        rowTone: resolveWorkEligibilityListBadgeTone(effectiveStatus),
         cells: {
           employee: formatComplianceEmployeeListCell({
             employeeNumber: row.employeeNumber,
             employeeDisplayName: row.employeeDisplayName,
           }),
-          requirement: `${row.obligationCode} · ${row.obligationTitle}`,
-          area: formatComplianceListEnumCell(row.complianceArea),
           status: formatComplianceListEnumCell(effectiveStatus),
-          dueDate: row.dueDate?.toISOString() ?? "",
-          completedAt: row.completedAt?.toISOString() ?? "",
+          statusValue: row.status,
+          verifiedAt: row.verifiedAt?.toISOString() ?? "",
+          expiresAt: row.expiresAt?.toISOString() ?? "",
+          expiresAtInput: formatComplianceDateTimeLocalInput(row.expiresAt),
         },
         cellKinds: {
           status: {
             kind: "badge",
-            tone: resolveLaborLawRequirementListBadgeTone(effectiveStatus),
+            tone: resolveWorkEligibilityListBadgeTone(effectiveStatus),
           },
         },
         trailingAction: canWrite
           ? resolveListSurfaceRowTrailingAction({
-              visible: effectiveStatus !== "compliant",
+              visible:
+                effectiveStatus !== "eligible" &&
+                effectiveStatus !== "not_applicable",
               allowed: true,
             })
           : undefined,

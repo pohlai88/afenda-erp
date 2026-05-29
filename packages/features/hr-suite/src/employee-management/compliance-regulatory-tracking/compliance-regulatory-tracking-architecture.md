@@ -129,7 +129,7 @@ Compliance obligations are stored in `hr_compliance_obligations` with optional s
 | `worker_category` | Worker category |
 | `department_id` | Department (org assignment reference) |
 
-Commands live in `@afenda/db` (`hr-compliance.ts`). Feature surfaces and forms live under `packages/features/hr-suite/src/employee-management/compliance-regulatory-tracking/`. Employee applicability uses `appliesComplianceObligationToEmployee()` — every configured dimension must match; unset obligation dimensions are wildcards.
+Commands live in `@afenda/db` (`hr-compliance.ts` re-exports obligations, exceptions, labor-law, and work-eligibility modules). Feature surfaces and forms live under `packages/features/hr-suite/src/employee-management/compliance-regulatory-tracking/`. Employee applicability uses `appliesComplianceObligationToEmployee()` — every configured dimension must match; unset obligation dimensions are wildcards.
 
 Permissions: `hr.compliance.read`, `hr.compliance.write`. Route revalidation target: `/hr/compliance`.
 
@@ -147,19 +147,33 @@ Employee-level labor law tracking uses `hr_compliance_employee_requirements` joi
 
 Page load runs idempotent sync (inserts new rows, removes stale scope mismatches, updates due dates); write users can also sync manually from the workbench.
 
+## HRM-CMP-004 As-built
+
+Employee work eligibility tracking uses `hr_compliance_work_eligibility` — one row per active employee per organization.
+
+| Layer | Responsibility |
+| ----- | -------------- |
+| `@afenda/db` | `ensureHrWorkEligibilityTracking`, `listHrWorkEligibilityWindow`, `updateHrWorkEligibilityStatus` |
+| Status model | Dedicated enum (`not_applicable`, `pending_verification`, `eligible`, `conditional`, `ineligible`, `expired`); `deriveEffectiveWorkEligibilityStatus()` marks eligible/conditional rows expired when `expiresAt` is past |
+| Governed UI | Pattern C surface `hr.workforce.compliance.work-eligibility.list`, search param `complianceWorkEligibilitySearch` |
+| Mutations | `ensureHrWorkEligibilityTrackingAction`, `updateHrWorkEligibilityAction` with audit events |
+
+Page load runs idempotent ensure (creates pending rows for active employees without existing tracking; historical rows for separated staff are retained but excluded from the active-employee list window); write users can re-run ensure manually from the workbench.
+
 ### Governed UI (Pattern C)
 
-List surfaces use `buildGovernedListSurface` with `erp-operational-table` profile. ERP composition uses `HrComplianceWorkbenchSection` (`components/hr.workforce.compliance-section.component.server.tsx`) — **three** embedded `GovernedPatternCListSection` blocks:
+List surfaces use `buildGovernedListSurface` with `erp-operational-table` profile. ERP composition uses `HrComplianceWorkbenchSection` (`components/hr.workforce.compliance-section.component.server.tsx`) — **four** embedded `GovernedPatternCListSection` blocks:
 
 | Surface key | Section |
 | ----------- | ------- |
 | `hr.workforce.compliance.obligations.list` | Compliance obligations register |
 | `hr.workforce.compliance.labor-law-requirements.list` | Employee labor law requirements |
+| `hr.workforce.compliance.work-eligibility.list` | Employee work eligibility register |
 | `hr.workforce.compliance.exceptions.list` | Open exceptions |
 
-Trailing row actions use `GovernedTrailingActionSlot` via `HrComplianceObligationsTrailingCell`, `HrComplianceLaborLawRequirementsTrailingCell`, and `HrComplianceExceptionsTrailingCell` when `hr.compliance.write` is granted. Standalone row mutation forms were removed in favor of trailing cells; register/create/sync forms remain in `SectionPanel` blocks above each list.
+Trailing row actions use `GovernedTrailingActionSlot` via `HrComplianceObligationsTrailingCell`, `HrComplianceLaborLawRequirementsTrailingCell`, `HrComplianceWorkEligibilityTrailingCell`, and `HrComplianceExceptionsTrailingCell` when `hr.compliance.write` is granted. Standalone row mutation forms were removed in favor of trailing cells; register/create/sync forms remain in `SectionPanel` blocks above each list.
 
-Search params: `complianceObligationSearch`, `complianceLaborLawSearch`, `complianceExceptionSearch` (fallback: shared `search` on page model). UI copy and column labels live in `surface/hr.workforce.compliance-ui.copy.shared.ts` (metadata door).
+Search params: `complianceObligationSearch`, `complianceLaborLawSearch`, `complianceWorkEligibilitySearch`, `complianceExceptionSearch` (fallback: shared `search` on page model). UI copy and column labels live in `surface/hr.workforce.compliance-ui.copy.shared.ts` (metadata door).
 
 ### Mutations & audit (HRM-CMP-025)
 

@@ -7,17 +7,20 @@ import {
   hrComplianceExceptionsSurfaceKey,
   hrComplianceLaborLawRequirementsSurfaceKey,
   hrComplianceObligationsSurfaceKey,
+  hrComplianceWorkEligibilitySurfaceKey,
   hrComplianceUiCopy,
 } from "../surface";
 import {
   HrComplianceExceptionCreateForm,
   HrComplianceLaborLawSyncForm,
   HrComplianceObligationUpsertForm,
+  HrComplianceWorkEligibilityEnsureForm,
 } from "./hr.workforce.compliance-forms.component.client";
 import {
   HrComplianceExceptionsTrailingCell,
   HrComplianceLaborLawRequirementsTrailingCell,
   HrComplianceObligationsTrailingCell,
+  HrComplianceWorkEligibilityTrailingCell,
 } from "./hr.workforce.compliance-list-trailing.component.client";
 
 export function HrComplianceWorkbenchSection({
@@ -87,6 +90,35 @@ export function HrComplianceWorkbenchSection({
                 Cell: HrComplianceLaborLawRequirementsTrailingCell,
                 context: {
                   surfaceKey: hrComplianceLaborLawRequirementsSurfaceKey,
+                },
+              }
+            : undefined
+        }
+      />
+
+      {model.canWrite ? (
+        <SectionPanel
+          title={copy.workEligibility.ensureTitle}
+          description={copy.workEligibility.ensureDescription}
+        >
+          <HrComplianceWorkEligibilityEnsureForm />
+        </SectionPanel>
+      ) : null}
+
+      <GovernedPatternCListSection
+        title={copy.workEligibility.sectionTitle}
+        description={copy.workEligibility.sectionDescription}
+        surfaceKey={hrComplianceWorkEligibilitySurfaceKey}
+        listConfiguration={model.workEligibilityList}
+        parentAccessAllowed
+        layout="embedded"
+        trailingColumn={
+          model.canWrite
+            ? {
+                header: copy.workEligibility.colActions,
+                Cell: HrComplianceWorkEligibilityTrailingCell,
+                context: {
+                  surfaceKey: hrComplianceWorkEligibilitySurfaceKey,
                 },
               }
             : undefined

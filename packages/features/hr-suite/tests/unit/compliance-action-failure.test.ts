@@ -5,16 +5,18 @@ import { toComplianceActionFailure } from "../../src/employee-management/complia
 import { HrComplianceOrganizationScopeError } from "../../src/employee-management/compliance-regulatory-tracking/data/hr.workforce.compliance-org-scope.shared";
 
 describe("compliance action failure mapping", () => {
-  it("maps domain command errors to operator-safe messages", () => {
-    const result = toComplianceActionFailure(
-      new HrComplianceCommandError("requirement_not_found"),
-    );
+  it.each([
+    ["obligation_not_found", "Compliance obligation was not found."],
+    ["exception_not_found", "Compliance exception was not found."],
+    ["exception_not_open", "This compliance exception is already closed."],
+    ["requirement_not_found", "Labor law requirement tracking row was not found."],
+    ["work_eligibility_not_found", "Work eligibility tracking row was not found."],
+  ] as const)("maps %s to operator-safe message", (code, message) => {
+    const result = toComplianceActionFailure(new HrComplianceCommandError(code));
 
     expect(result.ok).toBe(false);
     if (!result.ok) {
-      expect(result.error).toBe(
-        "Labor law requirement tracking row was not found.",
-      );
+      expect(result.error).toBe(message);
     }
   });
 

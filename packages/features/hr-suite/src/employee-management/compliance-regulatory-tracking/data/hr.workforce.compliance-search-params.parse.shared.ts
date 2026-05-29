@@ -1,11 +1,13 @@
 import { hrComplianceExceptionSearchParam } from "../surface/hr.workforce.compliance-exceptions-list.surface";
 import { hrComplianceLaborLawSearchParam } from "../surface/hr.workforce.compliance-labor-law-requirements-list.surface";
 import { hrComplianceObligationSearchParam } from "../surface/hr.workforce.compliance-obligations-list.surface";
+import { hrComplianceWorkEligibilitySearchParam } from "../surface/hr.workforce.compliance-work-eligibility-list.surface";
 
 export {
   hrComplianceExceptionSearchParam,
   hrComplianceLaborLawSearchParam,
   hrComplianceObligationSearchParam,
+  hrComplianceWorkEligibilitySearchParam,
 };
 
 function readSearchParam(
@@ -27,6 +29,7 @@ export type HrComplianceSearchParams = {
   obligationSearch?: string;
   exceptionSearch?: string;
   laborLawSearch?: string;
+  workEligibilitySearch?: string;
 };
 
 export function parseHrComplianceSearchParams(
@@ -46,6 +49,14 @@ export function parseHrComplianceSearchParams(
   const laborLawSearch =
     readSearchParam(searchParams, hrComplianceLaborLawSearchParam) ??
     legacySearch;
+  const workEligibilitySearch =
+    readSearchParam(searchParams, hrComplianceWorkEligibilitySearchParam) ??
+    legacySearch;
 
-  return { obligationSearch, exceptionSearch, laborLawSearch };
+  return {
+    obligationSearch,
+    exceptionSearch,
+    laborLawSearch,
+    workEligibilitySearch,
+  };
 }

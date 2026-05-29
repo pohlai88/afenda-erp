@@ -5,3 +5,7 @@ export const hrComplianceRoutePaths = {
 
 export type HrComplianceRoutePath =
   (typeof hrComplianceRoutePaths)[keyof typeof hrComplianceRoutePaths];
+
+export function hrEmployeeDetailRoutePath(employeeId: string): `/hr/employees/${string}` {
+  return `/hr/employees/${employeeId}`;
+}

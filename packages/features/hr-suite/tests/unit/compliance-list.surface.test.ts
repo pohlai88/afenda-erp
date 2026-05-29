@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  buildHrComplianceWorkEligibilityListSurface,
+  hrComplianceWorkEligibilitySearchParam,
+  hrComplianceWorkEligibilitySurfaceKey,
+} from "../../src/employee-management/compliance-regulatory-tracking/surface/hr.workforce.compliance-work-eligibility-list.surface";
+import {
   buildHrComplianceLaborLawRequirementsListSurface,
   hrComplianceLaborLawRequirementsSurfaceKey,
   hrComplianceLaborLawSearchParam,
@@ -136,6 +141,40 @@ describe("hr workforce compliance list surfaces", () => {
     );
     expect(configuration.presentation?.toolbar?.search?.param).toBe(
       hrComplianceLaborLawSearchParam,
+    );
+    expect(configuration.rows[0]?.rowHref).toBe("/hr/employees/emp_1");
+    expect(configuration.rows[0]?.linkColumnId).toBe("employee");
+    expect(configuration.rows[0]?.rowTone).toBe("attention");
+    expect(configuration.rows[0]?.trailingAction?.state).toBe("ready");
+  });
+
+  it("builds work eligibility list with employee link and trailing gate", () => {
+    const configuration = buildHrComplianceWorkEligibilityListSurface({
+      window: {
+        rows: [
+          {
+            id: "we_1",
+            employeeId: "emp_1",
+            employeeNumber: "E-100",
+            employeeDisplayName: "Alex Operator",
+            status: "pending_verification",
+            verifiedAt: null,
+            expiresAt: null,
+            reviewNotes: null,
+          },
+        ],
+        pageSize: 25,
+        totalCount: 1,
+        hasNextPage: false,
+      },
+      canWrite: true,
+    });
+
+    expect(hrComplianceWorkEligibilitySurfaceKey).toBe(
+      "hr.workforce.compliance.work-eligibility.list",
+    );
+    expect(configuration.presentation?.toolbar?.search?.param).toBe(
+      hrComplianceWorkEligibilitySearchParam,
     );
     expect(configuration.rows[0]?.rowHref).toBe("/hr/employees/emp_1");
     expect(configuration.rows[0]?.linkColumnId).toBe("employee");

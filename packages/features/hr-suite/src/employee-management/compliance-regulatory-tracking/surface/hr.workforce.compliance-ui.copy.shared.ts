@@ -1,6 +1,7 @@
 export { hrComplianceExceptionsSurfaceKey } from "./hr.workforce.compliance-exceptions-list.surface";
 export { hrComplianceLaborLawRequirementsSurfaceKey } from "./hr.workforce.compliance-labor-law-requirements-list.surface";
 export { hrComplianceObligationsSurfaceKey } from "./hr.workforce.compliance-obligations-list.surface";
+export { hrComplianceWorkEligibilitySurfaceKey } from "./hr.workforce.compliance-work-eligibility-list.surface";
 
 export const hrComplianceUiCopy = {
   page: {
@@ -112,6 +113,30 @@ export const hrComplianceUiCopy = {
     syncActionLabel: "Sync requirements",
     trailingMarkCompliantLabel: "Update status",
     trailingUpdateStatusLabel: "Requirement status",
+    trailingReviewNotesPlaceholder: "Review notes",
+  },
+  workEligibility: {
+    sectionTitle: "Work eligibility",
+    sectionDescription:
+      "Track right-to-work and employment authorization status for active employees.",
+    surfaceHeaderTitle: "Employee work eligibility register",
+    emptyTitle: "No work eligibility records tracked",
+    emptyDescription:
+      "Ensure tracking rows for active employees to monitor work authorization posture.",
+    searchLabel: "Search work eligibility",
+    searchPlaceholder: "Search by employee number or name",
+    colEmployee: "Employee",
+    colStatus: "Status",
+    colVerified: "Verified",
+    colExpires: "Expires",
+    colActions: "Actions",
+    ensureTitle: "Ensure eligibility tracking",
+    ensureDescription:
+      "Create pending verification rows for active employees and remove stale rows for separated staff.",
+    ensureActionLabel: "Ensure tracking rows",
+    trailingUpdateStatusLabel: "Eligibility status",
+    trailingUpdateActionLabel: "Update status",
+    trailingExpiresPlaceholder: "Authorization expiry",
     trailingReviewNotesPlaceholder: "Review notes",
   },
 } as const;

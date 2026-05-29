@@ -152,6 +152,7 @@ export function HrCompliancePageSkeleton() {
       <SystemAdminListSectionPlaceholder />
       <SystemAdminListSectionPlaceholder />
       <SystemAdminListSectionPlaceholder />
+      <SystemAdminListSectionPlaceholder />
     </div>
   );
 }
