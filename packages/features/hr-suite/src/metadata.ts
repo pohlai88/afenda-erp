@@ -65,23 +65,43 @@ export const hrDocumentsUiCopy = {
   } satisfies HrUiCopyPage,
 };
 
-export const hrEmployeesUiCopy = {
-  page: {
-    title: "Employees",
-    description: "Employees are managed by HR Suite.",
-    addEmployeeLabel: "Add employee",
-  } satisfies HrUiCopyPage,
-  create: {
-    accessDeniedTitle: "Access restricted",
-    accessDeniedDescription: "You don’t have permission to add employees.",
-    backLabel: "Back to employees",
-  },
-  detail: {
-    notFoundTitle: "Employee unavailable",
-    notFoundDescription: "This employee record is not available.",
-    backLabel: "Back to employees",
-  },
-};
+export {
+  getHrRecordsListSurfaceKeys,
+  HR_RECORDS_LIST_SURFACE_COLUMNS_BY_KEY,
+  HR_RECORDS_LIST_SEARCH_PARAMS_BY_KEY,
+  HR_RECORDS_LIST_SEARCH_PARAM_MODEL_FIELDS,
+  HR_RECORDS_LIST_SURFACE_KEYS,
+  HR_RECORDS_WORKBENCH_READ_ONLY_SURFACE_KEYS,
+  hrRecordsDirectorySurfaceKey,
+  hrRecordsIncompleteSurfaceKey,
+  hrRecordsAssignmentsSurfaceKey,
+  hrRecordsAuditTrailSurfaceKey,
+  hrRecordsStatusHistorySurfaceKey,
+  hrRecordsDocumentReferencesSurfaceKey,
+  hrRecordsSeparatedSurfaceKey,
+  hrRecordsUiCopy,
+  parseHrRecordsSearchParams,
+  toHrRecordsPageModelInput,
+  type HrRecordsSearchParams,
+  type HrRecordsListSurfaceKey,
+  hrRecordsDirectorySearchParam,
+  hrRecordsIncompleteSearchParam,
+  hrRecordsAssignmentsSearchParam,
+  hrRecordsAuditTrailSearchParam,
+  hrRecordsStatusHistorySearchParam,
+  hrRecordsDocumentReferencesSearchParam,
+  hrRecordsSeparatedSearchParam,
+  hrRecordsEmploymentStatusFilterParam,
+} from "./employee-management/employee-records-management/metadata";
+
+export {
+  hrRecordsRoutePaths,
+  hrEmployeeDetailRoutePath,
+  type HrRecordsRoutePath,
+} from "./employee-management/employee-records-management/contracts/hr.workforce.records-route.contract";
+
+/** @deprecated Use hrRecordsUiCopy */
+export { hrRecordsUiCopy as hrEmployeesUiCopy } from "./employee-management/employee-records-management/metadata";
 
 export const hrLeaveUiCopy = {
   page: {

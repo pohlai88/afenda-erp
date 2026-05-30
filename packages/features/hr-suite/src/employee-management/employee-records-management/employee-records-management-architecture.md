@@ -97,3 +97,83 @@
 |  12 | Every employee record change creates an audit event.                                             |
 |  13 | Rehired employees retain previous employment history.                                            |
 |  14 | Separated employees remain available as read-only historical records.                            |
+
+---
+
+## As-built summary (code-verified)
+
+Parent doctrine: [ARCH-010](../../../../docs/architecture/010-hr-feature-package-architecture.md) · Golden path: `compliance-regulatory-tracking`.
+
+| Layer | Path | Status |
+| ----- | ---- | ------ |
+| Schema & queries | `packages/db/src/schema/hr.ts` (`hr_employee_profiles`, `hr_employee_emergency_contacts`, `hr_employee_record_events`), `hr-employee-records.ts`, `hr-employee-records-commands.ts`, `hr-commands.ts` | Shipped |
+| Access policy | `policies/hr.workforce.records-access.policy.server.ts` | Shipped |
+| Surface registry | `surface/hr.workforce.records-surface-metadata.shared.ts` | Shipped (7 Pattern C lists) |
+| Search params | `data/hr.workforce.records-search-params.parse.shared.ts` | Shipped |
+| Page models | `data/hr.workforce.records.page-model.server.ts`, `data/hr.workforce.records.detail.page-model.server.ts` | Shipped |
+| Workbench UI | `components/hr.workforce.records-section.component.server.tsx` | Shipped |
+| Detail UI | `components/hr.workforce.records-detail-section.component.server.tsx` | Shipped |
+| App adapters | `records.server.tsx` (`/hr/records`), `records-detail.server.tsx` (`/hr/records/[id]`), `employees.server.tsx` (alias) | Shipped |
+
+### HRM shipment matrix (HRM-EMP-REC-001 – 020)
+
+| Code | Status | Implementation |
+| ---- | ------ | -------------- |
+| HRM-EMP-REC-001 | Shipped | `createHrEmployeeRecord` + workbench create form; detail page model |
+| HRM-EMP-REC-002 | Shipped | Unique `employee_number` per org (`hr_employees_org_number_uidx`) |
+| HRM-EMP-REC-003 | Shipped | Profile table: identity type/number, nationality; directory + detail |
+| HRM-EMP-REC-004 | Shipped | Profile: DOB, gender, marital status, language preference |
+| HRM-EMP-REC-005 | Shipped | Profile: personal email, phone, addresses; company email on `hr_employees` |
+| HRM-EMP-REC-006 | Shipped | `hr_employee_emergency_contacts` + detail/update actions |
+| HRM-EMP-REC-007 | Shipped | Employment status, dates, type, worker category on `hr_employees` |
+| HRM-EMP-REC-008 | Shipped | Grade, level, position assignment on employee + assignments |
+| HRM-EMP-REC-009 | Shipped | Legal entity, location, department refs on employee + assignments |
+| HRM-EMP-REC-010 | Shipped | Manager, matrix manager, HR owner refs |
+| HRM-EMP-REC-011 | Shipped | Assignment history list + effective-dated `hr_employee_assignments` |
+| HRM-EMP-REC-012 | Shipped | Status history list (lifecycle events ∪ record status events) |
+| HRM-EMP-REC-013 | Shipped | Document references list (read `hr_employee_documents` — vault owned by Documents) |
+| HRM-EMP-REC-014 | Shipped | Incomplete profiles register with expanded mandatory field checks |
+| HRM-EMP-REC-015 | Shipped | Duplicate detection: employee number, email, identity number, phone |
+| HRM-EMP-REC-016 | Shipped | `rehireHrEmployee` preserves prior record; links via `rehired_from_employee_id` |
+| HRM-EMP-REC-017 | Shipped | Assignment mutation with `assignmentEffectiveFrom` |
+| HRM-EMP-REC-018 | Shipped | Sensitive masking (email, identity, phone, address, DOB) without `hr.employees.sensitive.read` |
+| HRM-EMP-REC-019 | Shipped | `hr_employee_record_events` + IAM audit via `finalizeRecordsMutation` |
+| HRM-EMP-REC-020 | Shipped | Separated roster (read-only) + `archiveHrEmployeeRecord` |
+
+### Enterprise acceptance criteria
+
+| No. | Status | Evidence |
+| --: | ------ | -------- |
+| 1 | Met | Create with identity + employment start date defaults |
+| 2 | Met | Org-scoped unique employee number |
+| 3 | Met | `findHrEmployeeDuplicateCandidates` + command guards |
+| 4 | Met | Detail/update gated by `hr.employees.write`; read by `hr.employees.read` |
+| 5 | Met | Status history register |
+| 6 | Met | Directory + detail show dept, job, grade, manager, location |
+| 7 | Met | Assignment action accepts effective date |
+| 8 | Met | Assignment rows preserve superseded placements; record events store prev/new |
+| 9 | Met | Document references list (FK read to document vault) |
+| 10 | Met | Incomplete profiles list with missing field labels |
+| 11 | Met | Sensitive field masking in list + detail page models |
+| 12 | Met | Record events + IAM audit on every mutation |
+| 13 | Met | Rehire creates new employee row; prior history retained |
+| 14 | Met | Separated list + archived employees remain queryable |
+
+### Governed surface keys
+
+- `hr.workforce.records.overview.stats` (Pattern B)
+- `hr.workforce.records.incomplete.list`
+- `hr.workforce.records.directory.list`
+- `hr.workforce.records.assignments.list`
+- `hr.workforce.records.audit-trail.list`
+- `hr.workforce.records.status-history.list`
+- `hr.workforce.records.document-references.list`
+- `hr.workforce.records.separated.list`
+
+Read-only workbench lists: assignments, audit trail, status history, document references.
+
+### Capabilities
+
+- `hr.employees.read` — workbench + detail read
+- `hr.employees.write` — create, update, assignment, rehire, archive
+- `hr.employees.sensitive.read` — unmasked PII in directory and detail
