@@ -1,27 +1,26 @@
-import { and, count, desc, eq, inArray, isNull } from "drizzle-orm";
+import { and, count, eq, inArray, isNull } from "drizzle-orm";
 import { runWithOrganizationContext, type AfendaTransaction } from "./client";
 import { createEntityId } from "./ids";
 import { appliesComplianceObligationToEmployee } from "./hr-compliance-scope.shared";
-import {
-  activeLaborLawObligationKindCondition,
-  buildEmployeeObligationTrackingKey,
-} from "./hr-compliance-labor-law.shared";
+import { buildEmployeeObligationTrackingKey } from "./hr-compliance-labor-law.shared";
 import { buildPaginatedWindow, formatHrEmployeeDisplayName } from "./hr-compliance.shared";
 import {
   activeEmployeeFilters,
   appendEmployeeRequirementWindowSearchCondition,
+  buildEmployeeRequirementMissingFirstOrderBy,
   clampPageSize,
   normalizeStoredRequirementStatusForMutation,
 } from "./hr-compliance.internal";
 import { HrComplianceCommandError } from "./hr-compliance.types";
-import type { HrEmployeeLaborLawRequirementWindow } from "./hr-compliance.types";
+import type { HrEmployeePolicyAcknowledgementWindow } from "./hr-compliance.types";
+import { activePolicyAcknowledgementObligationKindCondition } from "./hr-compliance-policy-acknowledgement.shared";
 import {
   hrComplianceEmployeeRequirements,
   hrComplianceObligations,
   hrEmployees,
 } from "./schema/hr";
 
-export async function syncHrEmployeeLaborLawRequirementsInTx(
+export async function syncHrEmployeePolicyAcknowledgementsInTx(
   db: AfendaTransaction,
   input: {
     organizationId: string;
@@ -33,158 +32,158 @@ export async function syncHrEmployeeLaborLawRequirementsInTx(
   totalTracked: number;
 }> {
   const [employees, obligations, trackedRows] = await Promise.all([
-      db
-        .select({
-          id: hrEmployees.id,
-          countryCode: hrEmployees.countryCode,
-          legalEntityCode: hrEmployees.legalEntityCode,
-          workLocationCode: hrEmployees.workLocationCode,
-          employmentType: hrEmployees.employmentType,
-          workerCategory: hrEmployees.workerCategory,
-          departmentId: hrEmployees.currentDepartmentId,
-        })
-        .from(hrEmployees)
-        .where(
-          and(
-            eq(hrEmployees.organizationId, input.organizationId),
-            isNull(hrEmployees.archivedAt),
-            eq(hrEmployees.employmentStatus, "active"),
-          ),
+    db
+      .select({
+        id: hrEmployees.id,
+        countryCode: hrEmployees.countryCode,
+        legalEntityCode: hrEmployees.legalEntityCode,
+        workLocationCode: hrEmployees.workLocationCode,
+        employmentType: hrEmployees.employmentType,
+        workerCategory: hrEmployees.workerCategory,
+        departmentId: hrEmployees.currentDepartmentId,
+      })
+      .from(hrEmployees)
+      .where(
+        and(
+          eq(hrEmployees.organizationId, input.organizationId),
+          isNull(hrEmployees.archivedAt),
+          eq(hrEmployees.employmentStatus, "active"),
         ),
-      db
-        .select({
-          id: hrComplianceObligations.id,
-          dueDate: hrComplianceObligations.dueDate,
-          countryCode: hrComplianceObligations.countryCode,
-          legalEntityCode: hrComplianceObligations.legalEntityCode,
-          workLocationCode: hrComplianceObligations.workLocationCode,
-          employmentType: hrComplianceObligations.employmentType,
-          workerCategory: hrComplianceObligations.workerCategory,
-          departmentId: hrComplianceObligations.departmentId,
-        })
-        .from(hrComplianceObligations)
-        .where(
-          and(
-            eq(hrComplianceObligations.organizationId, input.organizationId),
-            eq(hrComplianceObligations.status, "active"),
-            activeLaborLawObligationKindCondition,
-          ),
+      ),
+    db
+      .select({
+        id: hrComplianceObligations.id,
+        dueDate: hrComplianceObligations.dueDate,
+        countryCode: hrComplianceObligations.countryCode,
+        legalEntityCode: hrComplianceObligations.legalEntityCode,
+        workLocationCode: hrComplianceObligations.workLocationCode,
+        employmentType: hrComplianceObligations.employmentType,
+        workerCategory: hrComplianceObligations.workerCategory,
+        departmentId: hrComplianceObligations.departmentId,
+      })
+      .from(hrComplianceObligations)
+      .where(
+        and(
+          eq(hrComplianceObligations.organizationId, input.organizationId),
+          eq(hrComplianceObligations.status, "active"),
+          activePolicyAcknowledgementObligationKindCondition,
         ),
-      db
-        .select({
-          id: hrComplianceEmployeeRequirements.id,
-          employeeId: hrComplianceEmployeeRequirements.employeeId,
-          obligationId: hrComplianceEmployeeRequirements.obligationId,
-          dueDate: hrComplianceEmployeeRequirements.dueDate,
-        })
-        .from(hrComplianceEmployeeRequirements)
-        .innerJoin(
-          hrComplianceObligations,
+      ),
+    db
+      .select({
+        id: hrComplianceEmployeeRequirements.id,
+        employeeId: hrComplianceEmployeeRequirements.employeeId,
+        obligationId: hrComplianceEmployeeRequirements.obligationId,
+        dueDate: hrComplianceEmployeeRequirements.dueDate,
+      })
+      .from(hrComplianceEmployeeRequirements)
+      .innerJoin(
+        hrComplianceObligations,
+        eq(
+          hrComplianceEmployeeRequirements.obligationId,
+          hrComplianceObligations.id,
+        ),
+      )
+      .where(
+        and(
           eq(
-            hrComplianceEmployeeRequirements.obligationId,
-            hrComplianceObligations.id,
+            hrComplianceEmployeeRequirements.organizationId,
+            input.organizationId,
           ),
-        )
-        .where(
-          and(
-            eq(
-              hrComplianceEmployeeRequirements.organizationId,
-              input.organizationId,
-            ),
-            activeLaborLawObligationKindCondition,
-          ),
+          activePolicyAcknowledgementObligationKindCondition,
         ),
-    ]);
+      ),
+  ]);
 
-    const trackedByKey = new Map(
-      trackedRows.map((row) => [
-        buildEmployeeObligationTrackingKey(row.employeeId, row.obligationId),
-        row,
-      ]),
-    );
+  const trackedByKey = new Map(
+    trackedRows.map((row) => [
+      buildEmployeeObligationTrackingKey(row.employeeId, row.obligationId),
+      row,
+    ]),
+  );
 
-    const validKeys = new Set<string>();
-    const inserts: (typeof hrComplianceEmployeeRequirements.$inferInsert)[] = [];
-    const dueDateUpdates: Array<{ id: string; dueDate: Date | null }> = [];
+  const validKeys = new Set<string>();
+  const inserts: (typeof hrComplianceEmployeeRequirements.$inferInsert)[] = [];
+  const dueDateUpdates: Array<{ id: string; dueDate: Date | null }> = [];
 
-    for (const employee of employees) {
-      for (const obligation of obligations) {
-        if (
-          !appliesComplianceObligationToEmployee(obligation, {
-            ...employee,
-            departmentId: employee.departmentId,
-          })
-        ) {
-          continue;
-        }
+  for (const employee of employees) {
+    for (const obligation of obligations) {
+      if (
+        !appliesComplianceObligationToEmployee(obligation, {
+          ...employee,
+          departmentId: employee.departmentId,
+        })
+      ) {
+        continue;
+      }
 
-        const key = buildEmployeeObligationTrackingKey(
-          employee.id,
-          obligation.id,
-        );
-        validKeys.add(key);
+      const key = buildEmployeeObligationTrackingKey(
+        employee.id,
+        obligation.id,
+      );
+      validKeys.add(key);
 
-        const tracked = trackedByKey.get(key);
-        if (!tracked) {
-          inserts.push({
-            id: createEntityId("hr_cmp_req"),
-            organizationId: input.organizationId,
-            employeeId: employee.id,
-            obligationId: obligation.id,
-            status: "pending",
-            dueDate: obligation.dueDate,
-          });
-          continue;
-        }
+      const tracked = trackedByKey.get(key);
+      if (!tracked) {
+        inserts.push({
+          id: createEntityId("hr_cmp_req"),
+          organizationId: input.organizationId,
+          employeeId: employee.id,
+          obligationId: obligation.id,
+          status: "pending",
+          dueDate: obligation.dueDate,
+        });
+        continue;
+      }
 
-        const obligationDueMs = obligation.dueDate?.getTime() ?? null;
-        const trackedDueMs = tracked.dueDate?.getTime() ?? null;
-        if (obligationDueMs !== trackedDueMs) {
-          dueDateUpdates.push({
-            id: tracked.id,
-            dueDate: obligation.dueDate ?? null,
-          });
-        }
+      const obligationDueMs = obligation.dueDate?.getTime() ?? null;
+      const trackedDueMs = tracked.dueDate?.getTime() ?? null;
+      if (obligationDueMs !== trackedDueMs) {
+        dueDateUpdates.push({
+          id: tracked.id,
+          dueDate: obligation.dueDate ?? null,
+        });
       }
     }
+  }
 
-    const staleIds = trackedRows
-      .filter(
-        (row) =>
-          !validKeys.has(
-            buildEmployeeObligationTrackingKey(row.employeeId, row.obligationId),
+  const staleIds = trackedRows
+    .filter(
+      (row) =>
+        !validKeys.has(
+          buildEmployeeObligationTrackingKey(row.employeeId, row.obligationId),
+        ),
+    )
+    .map((row) => row.id);
+
+  if (staleIds.length > 0) {
+    await db
+      .delete(hrComplianceEmployeeRequirements)
+      .where(
+        and(
+          eq(
+            hrComplianceEmployeeRequirements.organizationId,
+            input.organizationId,
           ),
-      )
-      .map((row) => row.id);
-
-    if (staleIds.length > 0) {
-      await db
-        .delete(hrComplianceEmployeeRequirements)
-        .where(
-          and(
-            eq(
-              hrComplianceEmployeeRequirements.organizationId,
-              input.organizationId,
-            ),
-            inArray(hrComplianceEmployeeRequirements.id, staleIds),
-          ),
-        );
-    }
-
-    if (inserts.length > 0) {
-      await db.insert(hrComplianceEmployeeRequirements).values(inserts);
-    }
-
-    if (dueDateUpdates.length > 0) {
-      await Promise.all(
-        dueDateUpdates.map((update) =>
-          db
-            .update(hrComplianceEmployeeRequirements)
-            .set({ dueDate: update.dueDate })
-            .where(eq(hrComplianceEmployeeRequirements.id, update.id)),
+          inArray(hrComplianceEmployeeRequirements.id, staleIds),
         ),
       );
-    }
+  }
+
+  if (inserts.length > 0) {
+    await db.insert(hrComplianceEmployeeRequirements).values(inserts);
+  }
+
+  if (dueDateUpdates.length > 0) {
+    await Promise.all(
+      dueDateUpdates.map((update) =>
+        db
+          .update(hrComplianceEmployeeRequirements)
+          .set({ dueDate: update.dueDate })
+          .where(eq(hrComplianceEmployeeRequirements.id, update.id)),
+      ),
+    );
+  }
 
   return {
     createdCount: inserts.length,
@@ -194,7 +193,7 @@ export async function syncHrEmployeeLaborLawRequirementsInTx(
   };
 }
 
-export async function syncHrEmployeeLaborLawRequirements(input: {
+export async function syncHrEmployeePolicyAcknowledgements(input: {
   organizationId: string;
 }): Promise<{
   createdCount: number;
@@ -203,24 +202,24 @@ export async function syncHrEmployeeLaborLawRequirements(input: {
   totalTracked: number;
 }> {
   return runWithOrganizationContext(input.organizationId, (db) =>
-    syncHrEmployeeLaborLawRequirementsInTx(db, input),
+    syncHrEmployeePolicyAcknowledgementsInTx(db, input),
   );
 }
 
-export async function listHrEmployeeLaborLawRequirementsWindow(input: {
+export async function listHrEmployeePolicyAcknowledgementsWindow(input: {
   organizationId: string;
   limit?: number;
   offset?: number;
   search?: string;
   status?: (typeof hrComplianceEmployeeRequirements.$inferSelect)["status"];
-}): Promise<HrEmployeeLaborLawRequirementWindow> {
+}): Promise<HrEmployeePolicyAcknowledgementWindow> {
   const pageSize = clampPageSize(input.limit);
   const offset = Math.max(0, input.offset ?? 0);
 
   return runWithOrganizationContext(input.organizationId, async (db) => {
     const conditions = [
       eq(hrComplianceEmployeeRequirements.organizationId, input.organizationId),
-      activeLaborLawObligationKindCondition,
+      activePolicyAcknowledgementObligationKindCondition,
       eq(hrComplianceObligations.status, "active"),
       activeEmployeeFilters(input.organizationId),
     ];
@@ -288,7 +287,13 @@ export async function listHrEmployeeLaborLawRequirementsWindow(input: {
           ),
         )
         .where(whereClause)
-        .orderBy(desc(hrComplianceEmployeeRequirements.updatedAt))
+        .orderBy(
+          ...buildEmployeeRequirementMissingFirstOrderBy({
+            statusColumn: hrComplianceEmployeeRequirements.status,
+            dueDateColumn: hrComplianceEmployeeRequirements.dueDate,
+            updatedAtColumn: hrComplianceEmployeeRequirements.updatedAt,
+          }),
+        )
         .limit(pageSize)
         .offset(offset),
     ]);
@@ -320,7 +325,7 @@ export async function listHrEmployeeLaborLawRequirementsWindow(input: {
   });
 }
 
-export async function updateHrEmployeeLaborLawRequirementStatusInTx(
+export async function updateHrEmployeePolicyAcknowledgementStatusInTx(
   db: AfendaTransaction,
   input: {
     organizationId: string;
@@ -348,7 +353,7 @@ export async function updateHrEmployeeLaborLawRequirementStatusInTx(
           input.organizationId,
         ),
         eq(hrComplianceEmployeeRequirements.id, input.requirementId),
-        activeLaborLawObligationKindCondition,
+        activePolicyAcknowledgementObligationKindCondition,
       ),
     )
     .limit(1);
@@ -372,13 +377,13 @@ export async function updateHrEmployeeLaborLawRequirementStatusInTx(
   return { requirementId: input.requirementId };
 }
 
-export async function updateHrEmployeeLaborLawRequirementStatus(input: {
+export async function updateHrEmployeePolicyAcknowledgementStatus(input: {
   organizationId: string;
   requirementId: string;
   status: (typeof hrComplianceEmployeeRequirements.$inferSelect)["status"];
   reviewNotes?: string | null;
 }): Promise<{ requirementId: string }> {
   return runWithOrganizationContext(input.organizationId, (db) =>
-    updateHrEmployeeLaborLawRequirementStatusInTx(db, input),
+    updateHrEmployeePolicyAcknowledgementStatusInTx(db, input),
   );
 }

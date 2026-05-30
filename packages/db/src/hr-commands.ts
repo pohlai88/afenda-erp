@@ -11,6 +11,8 @@ export type HrEmployeeCommandErrorCode =
   | "employee_archived"
   | "duplicate_employee_number"
   | "duplicate_email"
+  | "duplicate_identity_number"
+  | "duplicate_phone"
   | "invalid_manager"
   | "invalid_department"
   | "invalid_position";
@@ -357,133 +359,150 @@ export async function createHrEmployee(
   });
 }
 
+export async function updateHrEmployeeCoreInTx(
+  db: AfendaTransaction,
+  input: UpdateHrEmployeeCoreInput,
+): Promise<{ employeeId: string; changedFields: string[]; assignmentId: string | null }> {
+  await assertEmployeeWritable(db, input.organizationId, input.employeeId);
+
+  const [existing] = await db
+    .select({
+      employeeNumber: hrEmployees.employeeNumber,
+      legalName: hrEmployees.legalName,
+      preferredName: hrEmployees.preferredName,
+      email: hrEmployees.email,
+      employmentStatus: hrEmployees.employmentStatus,
+    })
+    .from(hrEmployees)
+    .where(eq(hrEmployees.id, input.employeeId))
+    .limit(1);
+
+  if (!existing) {
+    throw new HrEmployeeCommandError("employee_not_found");
+  }
+
+  const nextEmployeeNumber = input.employeeNumber?.trim() ?? existing.employeeNumber;
+  const nextLegalName = input.legalName?.trim() ?? existing.legalName;
+  const nextPreferredName =
+    input.preferredName !== undefined
+      ? input.preferredName?.trim() || null
+      : existing.preferredName;
+  const nextEmail =
+    input.email !== undefined ? input.email?.trim() || null : existing.email;
+
+  await assertNoDuplicateEmployeeIdentity(db, {
+    organizationId: input.organizationId,
+    employeeNumber: nextEmployeeNumber,
+    email: nextEmail,
+    excludeEmployeeId: input.employeeId,
+  });
+
+  const changedFields: string[] = [];
+  if (existing.employeeNumber !== nextEmployeeNumber) {
+    changedFields.push("employeeNumber");
+  }
+  if (existing.legalName !== nextLegalName) {
+    changedFields.push("legalName");
+  }
+  if (existing.preferredName !== nextPreferredName) {
+    changedFields.push("preferredName");
+  }
+  if (existing.email !== nextEmail) {
+    changedFields.push("email");
+  }
+  if (
+    input.employmentStatus &&
+    input.employmentStatus !== existing.employmentStatus
+  ) {
+    changedFields.push("employmentStatus");
+  }
+
+  if (changedFields.length > 0) {
+    await db
+      .update(hrEmployees)
+      .set({
+        employeeNumber: nextEmployeeNumber,
+        legalName: nextLegalName,
+        preferredName: nextPreferredName,
+        email: nextEmail,
+        ...(input.employmentStatus
+          ? { employmentStatus: input.employmentStatus }
+          : {}),
+      })
+      .where(eq(hrEmployees.id, input.employeeId));
+  }
+
+  let assignmentId: string | null = null;
+  if (placementProvided(input.placement)) {
+    const assignment = await upsertHrEmployeeEffectiveAssignmentInTx(db, {
+      organizationId: input.organizationId,
+      employeeId: input.employeeId,
+      placement: input.placement,
+      reason: input.assignmentReason ?? "placement_update",
+    });
+    assignmentId = assignment.assignmentId;
+    changedFields.push(...assignment.changedFields);
+  }
+
+  return {
+    employeeId: input.employeeId,
+    changedFields,
+    assignmentId,
+  };
+}
+
 export async function updateHrEmployeeCore(
   input: UpdateHrEmployeeCoreInput,
 ): Promise<{ employeeId: string; changedFields: string[]; assignmentId: string | null }> {
-  return runWithOrganizationContext(input.organizationId, async (db) => {
-    await assertEmployeeWritable(db, input.organizationId, input.employeeId);
+  return runWithOrganizationContext(input.organizationId, async (db) =>
+    updateHrEmployeeCoreInTx(db, input),
+  );
+}
 
-    const [existing] = await db
-      .select({
-        employeeNumber: hrEmployees.employeeNumber,
-        legalName: hrEmployees.legalName,
-        preferredName: hrEmployees.preferredName,
-        email: hrEmployees.email,
-        employmentStatus: hrEmployees.employmentStatus,
-      })
-      .from(hrEmployees)
-      .where(eq(hrEmployees.id, input.employeeId))
-      .limit(1);
+export async function archiveHrEmployeeInTx(
+  db: AfendaTransaction,
+  input: {
+    organizationId: string;
+    employeeId: string;
+  },
+): Promise<{ employeeId: string }> {
+  await assertEmployeeWritable(db, input.organizationId, input.employeeId);
 
-    if (!existing) {
-      throw new HrEmployeeCommandError("employee_not_found");
-    }
+  const archivedAt = new Date();
 
-    const nextEmployeeNumber = input.employeeNumber?.trim() ?? existing.employeeNumber;
-    const nextLegalName = input.legalName?.trim() ?? existing.legalName;
-    const nextPreferredName =
-      input.preferredName !== undefined
-        ? input.preferredName?.trim() || null
-        : existing.preferredName;
-    const nextEmail =
-      input.email !== undefined ? input.email?.trim() || null : existing.email;
+  await db
+    .update(hrEmployees)
+    .set({
+      archivedAt,
+      employmentStatus: "archived",
+    })
+    .where(eq(hrEmployees.id, input.employeeId));
 
-    await assertNoDuplicateEmployeeIdentity(db, {
-      organizationId: input.organizationId,
-      employeeNumber: nextEmployeeNumber,
-      email: nextEmail,
-      excludeEmployeeId: input.employeeId,
-    });
+  await db
+    .update(hrEmployeeAssignments)
+    .set({
+      effectiveTo: archivedAt,
+      assignmentStatus: "cancelled",
+    })
+    .where(
+      and(
+        eq(hrEmployeeAssignments.organizationId, input.organizationId),
+        eq(hrEmployeeAssignments.employeeId, input.employeeId),
+        eq(hrEmployeeAssignments.assignmentStatus, "active"),
+        isNull(hrEmployeeAssignments.effectiveTo),
+      ),
+    );
 
-    const changedFields: string[] = [];
-    if (existing.employeeNumber !== nextEmployeeNumber) {
-      changedFields.push("employeeNumber");
-    }
-    if (existing.legalName !== nextLegalName) {
-      changedFields.push("legalName");
-    }
-    if (existing.preferredName !== nextPreferredName) {
-      changedFields.push("preferredName");
-    }
-    if (existing.email !== nextEmail) {
-      changedFields.push("email");
-    }
-    if (
-      input.employmentStatus &&
-      input.employmentStatus !== existing.employmentStatus
-    ) {
-      changedFields.push("employmentStatus");
-    }
-
-    if (changedFields.length > 0) {
-      await db
-        .update(hrEmployees)
-        .set({
-          employeeNumber: nextEmployeeNumber,
-          legalName: nextLegalName,
-          preferredName: nextPreferredName,
-          email: nextEmail,
-          ...(input.employmentStatus
-            ? { employmentStatus: input.employmentStatus }
-            : {}),
-        })
-        .where(eq(hrEmployees.id, input.employeeId));
-    }
-
-    let assignmentId: string | null = null;
-    if (placementProvided(input.placement)) {
-      const assignment = await upsertHrEmployeeEffectiveAssignmentInTx(db, {
-        organizationId: input.organizationId,
-        employeeId: input.employeeId,
-        placement: input.placement,
-        reason: input.assignmentReason ?? "placement_update",
-      });
-      assignmentId = assignment.assignmentId;
-      changedFields.push(...assignment.changedFields);
-    }
-
-    return {
-      employeeId: input.employeeId,
-      changedFields,
-      assignmentId,
-    };
-  });
+  return { employeeId: input.employeeId };
 }
 
 export async function archiveHrEmployee(input: {
   organizationId: string;
   employeeId: string;
 }): Promise<{ employeeId: string }> {
-  return runWithOrganizationContext(input.organizationId, async (db) => {
-    await assertEmployeeWritable(db, input.organizationId, input.employeeId);
-
-    const archivedAt = new Date();
-
-    await db
-      .update(hrEmployees)
-      .set({
-        archivedAt,
-        employmentStatus: "archived",
-      })
-      .where(eq(hrEmployees.id, input.employeeId));
-
-    await db
-      .update(hrEmployeeAssignments)
-      .set({
-        effectiveTo: archivedAt,
-        assignmentStatus: "cancelled",
-      })
-      .where(
-        and(
-          eq(hrEmployeeAssignments.organizationId, input.organizationId),
-          eq(hrEmployeeAssignments.employeeId, input.employeeId),
-          eq(hrEmployeeAssignments.assignmentStatus, "active"),
-          isNull(hrEmployeeAssignments.effectiveTo),
-        ),
-      );
-
-    return { employeeId: input.employeeId };
-  });
+  return runWithOrganizationContext(input.organizationId, async (db) =>
+    archiveHrEmployeeInTx(db, input),
+  );
 }
 
 export async function listHrEmployeeAssignments(input: {

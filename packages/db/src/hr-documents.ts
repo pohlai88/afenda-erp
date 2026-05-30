@@ -1,13 +1,29 @@
 import { createHash } from "node:crypto";
-import { and, count, desc, eq, ilike, isNotNull, isNull, lte, or } from "drizzle-orm";
-import { runWithOrganizationContext } from "./client";
+import {
+  and,
+  count,
+  desc,
+  eq,
+  gte,
+  ilike,
+  isNotNull,
+  isNull,
+  lte,
+  or,
+  sql,
+} from "drizzle-orm";
+import { runWithOrganizationContext, type AfendaTransaction } from "./client";
 import { createEntityId } from "./ids";
 import {
+  hrDocumentAcknowledgments,
+  hrDocumentAuditEvents,
   hrDocumentRequirements,
+  hrDocumentRetentionPolicies,
   hrEmployeeDocuments,
   hrEmployees,
 } from "./schema/hr";
 import { listOrganizationsForCoreErpSeed } from "./erp";
+import { listHrEmployeeDirectoryWindow } from "./hr";
 
 const HR_DOC_DEFAULT_PAGE_SIZE = 25;
 const HR_DOC_MAX_PAGE_SIZE = 100;
@@ -27,7 +43,9 @@ export type HrEmployeeDocumentRow = {
   employeeNumber: string;
   employeeDisplayName: string;
   documentType: string;
+  documentGroup: string | null;
   title: string;
+  blobUrl: string;
   mimeType: string;
   sizeBytes: number;
   classification: (typeof hrEmployeeDocuments.$inferSelect)["classification"];
@@ -35,6 +53,10 @@ export type HrEmployeeDocumentRow = {
   lifecycleStatus: (typeof hrEmployeeDocuments.$inferSelect)["lifecycleStatus"];
   effectiveFrom: Date;
   effectiveTo: Date | null;
+  rejectionReason: string | null;
+  versionNumber: number;
+  isLatestActive: boolean;
+  supersedesDocumentId: string | null;
   uploadedAt: Date;
 };
 
@@ -63,9 +85,11 @@ export async function listHrEmployeeDocumentsWindow(input: {
   employeeId?: string;
   documentType?: string;
   includeArchived?: boolean;
+  latestOnly?: boolean;
 }): Promise<HrEmployeeDocumentWindow> {
   const pageSize = clampPageSize(input.limit);
   const offset = Math.max(0, input.offset ?? 0);
+  const latestOnly = input.latestOnly ?? true;
 
   return runWithOrganizationContext(input.organizationId, async (db) => {
     const conditions = [
@@ -74,6 +98,10 @@ export async function listHrEmployeeDocumentsWindow(input: {
 
     if (!input.includeArchived) {
       conditions.push(eq(hrEmployeeDocuments.lifecycleStatus, "active"));
+    }
+
+    if (latestOnly) {
+      conditions.push(eq(hrEmployeeDocuments.isLatestActive, true));
     }
 
     if (input.employeeId) {
@@ -88,15 +116,42 @@ export async function listHrEmployeeDocumentsWindow(input: {
 
     const trimmedSearch = input.search?.trim();
     if (trimmedSearch) {
-      const pattern = `%${trimmedSearch}%`;
-      conditions.push(
-        or(
-          ilike(hrEmployeeDocuments.title, pattern),
-          ilike(hrEmployeeDocuments.documentType, pattern),
-          ilike(hrEmployees.employeeNumber, pattern),
-          ilike(hrEmployees.legalName, pattern),
-        )!,
-      );
+      const normalized = trimmedSearch.toLowerCase();
+      const now = new Date();
+      const horizon = new Date(now);
+      horizon.setUTCDate(horizon.getUTCDate() + 14);
+
+      if (normalized === "expiring") {
+        conditions.push(
+          and(
+            isNotNull(hrEmployeeDocuments.effectiveTo),
+            gte(hrEmployeeDocuments.effectiveTo, now),
+            lte(hrEmployeeDocuments.effectiveTo, horizon),
+          )!,
+        );
+      } else if (normalized === "expired") {
+        conditions.push(
+          and(
+            isNotNull(hrEmployeeDocuments.effectiveTo),
+            lte(hrEmployeeDocuments.effectiveTo, now),
+          )!,
+        );
+      } else {
+        const pattern = `%${trimmedSearch}%`;
+        conditions.push(
+          or(
+            ilike(hrEmployeeDocuments.title, pattern),
+            ilike(hrEmployeeDocuments.documentType, pattern),
+            ilike(hrEmployeeDocuments.documentGroup, pattern),
+            ilike(sql`${hrEmployeeDocuments.verificationStatus}::text`, pattern),
+            ilike(sql`${hrEmployeeDocuments.classification}::text`, pattern),
+            ilike(sql`${hrEmployeeDocuments.lifecycleStatus}::text`, pattern),
+            ilike(hrEmployees.employeeNumber, pattern),
+            ilike(hrEmployees.legalName, pattern),
+            ilike(hrEmployees.preferredName, pattern),
+          )!,
+        );
+      }
     }
 
     const whereClause = and(...conditions);
@@ -120,7 +175,9 @@ export async function listHrEmployeeDocumentsWindow(input: {
         legalName: hrEmployees.legalName,
         preferredName: hrEmployees.preferredName,
         documentType: hrEmployeeDocuments.documentType,
+        documentGroup: hrEmployeeDocuments.documentGroup,
         title: hrEmployeeDocuments.title,
+        blobUrl: hrEmployeeDocuments.blobUrl,
         mimeType: hrEmployeeDocuments.mimeType,
         sizeBytes: hrEmployeeDocuments.sizeBytes,
         classification: hrEmployeeDocuments.classification,
@@ -128,6 +185,10 @@ export async function listHrEmployeeDocumentsWindow(input: {
         lifecycleStatus: hrEmployeeDocuments.lifecycleStatus,
         effectiveFrom: hrEmployeeDocuments.effectiveFrom,
         effectiveTo: hrEmployeeDocuments.effectiveTo,
+        rejectionReason: hrEmployeeDocuments.rejectionReason,
+        versionNumber: hrEmployeeDocuments.versionNumber,
+        isLatestActive: hrEmployeeDocuments.isLatestActive,
+        supersedesDocumentId: hrEmployeeDocuments.supersedesDocumentId,
         uploadedAt: hrEmployeeDocuments.createdAt,
       })
       .from(hrEmployeeDocuments)
@@ -146,7 +207,9 @@ export async function listHrEmployeeDocumentsWindow(input: {
       employeeNumber: row.employeeNumber,
       employeeDisplayName: row.preferredName?.trim() || row.legalName,
       documentType: row.documentType,
+      documentGroup: row.documentGroup,
       title: row.title,
+      blobUrl: row.blobUrl,
       mimeType: row.mimeType,
       sizeBytes: row.sizeBytes,
       classification: row.classification,
@@ -154,6 +217,10 @@ export async function listHrEmployeeDocumentsWindow(input: {
       lifecycleStatus: row.lifecycleStatus,
       effectiveFrom: row.effectiveFrom,
       effectiveTo: row.effectiveTo,
+      rejectionReason: row.rejectionReason,
+      versionNumber: row.versionNumber,
+      isLatestActive: row.isLatestActive,
+      supersedesDocumentId: row.supersedesDocumentId,
       uploadedAt: row.uploadedAt,
     }));
 
@@ -167,12 +234,41 @@ export async function listHrEmployeeDocumentsWindow(input: {
 }
 
 export class HrDocumentCommandError extends Error {
-  readonly code: "employee_not_found" | "document_not_found" | "document_archived";
+  readonly code:
+    | "employee_not_found"
+    | "document_not_found"
+    | "document_archived"
+    | "invalid_replacement";
 
   constructor(code: HrDocumentCommandError["code"], message?: string) {
     super(message ?? code);
     this.code = code;
   }
+}
+
+async function insertHrDocumentAuditEventInTx(
+  db: AfendaTransaction,
+  input: {
+    organizationId: string;
+    documentId?: string | null;
+    employeeId?: string | null;
+    action: string;
+    actorUserId?: string | null;
+    summary: string;
+    metadata?: string | null;
+  },
+) {
+  await db.insert(hrDocumentAuditEvents).values({
+    id: createEntityId("hr_doc_audit"),
+    organizationId: input.organizationId,
+    documentId: input.documentId ?? null,
+    employeeId: input.employeeId ?? null,
+    action: input.action,
+    actorUserId: input.actorUserId ?? null,
+    summary: input.summary,
+    metadata: input.metadata ?? null,
+    occurredAt: new Date(),
+  });
 }
 
 export async function registerHrEmployeeDocument(input: {
@@ -225,6 +321,16 @@ export async function registerHrEmployeeDocument(input: {
       classification: input.classification ?? "internal",
       effectiveFrom,
       effectiveTo: input.effectiveTo ?? null,
+      versionNumber: 1,
+      isLatestActive: true,
+    });
+
+    await insertHrDocumentAuditEventInTx(db, {
+      organizationId: input.organizationId,
+      documentId,
+      employeeId: input.employeeId,
+      action: "hr.document.upload",
+      summary: `Uploaded document ${input.title.trim()}`,
     });
 
     return { documentId };
@@ -296,6 +402,13 @@ export async function verifyHrEmployeeDocument(input: {
       .set({ verificationStatus: "verified" })
       .where(eq(hrEmployeeDocuments.id, input.documentId));
 
+    await insertHrDocumentAuditEventInTx(db, {
+      organizationId: input.organizationId,
+      documentId: input.documentId,
+      action: "hr.document.verify",
+      summary: "Document verified",
+    });
+
     return { documentId: input.documentId };
   });
 }
@@ -329,6 +442,13 @@ export async function rejectHrEmployeeDocument(input: {
         rejectionReason: input.rejectionReason.trim(),
       })
       .where(eq(hrEmployeeDocuments.id, input.documentId));
+
+    await insertHrDocumentAuditEventInTx(db, {
+      organizationId: input.organizationId,
+      documentId: input.documentId,
+      action: "hr.document.reject",
+      summary: `Document rejected: ${input.rejectionReason.trim()}`,
+    });
 
     return { documentId: input.documentId };
   });
@@ -463,5 +583,423 @@ export async function runHrDocumentExpirySweep(input?: { withinDays?: number }) 
     expiredArchivedCount,
     expiringSoonCount,
     withinDays,
+  };
+}
+
+export async function replaceHrEmployeeDocument(input: {
+  organizationId: string;
+  documentId: string;
+  title: string;
+  blobUrl: string;
+  mimeType: string;
+  sizeBytes: number;
+  effectiveTo?: Date | null;
+}): Promise<{ documentId: string; previousDocumentId: string }> {
+  return runWithOrganizationContext(input.organizationId, async (db) => {
+    const [existing] = await db
+      .select()
+      .from(hrEmployeeDocuments)
+      .where(
+        and(
+          eq(hrEmployeeDocuments.organizationId, input.organizationId),
+          eq(hrEmployeeDocuments.id, input.documentId),
+          eq(hrEmployeeDocuments.lifecycleStatus, "active"),
+        ),
+      )
+      .limit(1);
+
+    if (!existing) {
+      throw new HrDocumentCommandError("document_not_found");
+    }
+
+    const newDocumentId = createEntityId("hr_doc");
+    const payloadHash = hashHrDocumentPayload({
+      blobUrl: input.blobUrl,
+      title: input.title.trim(),
+      sizeBytes: input.sizeBytes,
+    });
+
+    await db
+      .update(hrEmployeeDocuments)
+      .set({ isLatestActive: false })
+      .where(eq(hrEmployeeDocuments.id, existing.id));
+
+    await db.insert(hrEmployeeDocuments).values({
+      id: newDocumentId,
+      organizationId: existing.organizationId,
+      employeeId: existing.employeeId,
+      documentType: existing.documentType,
+      documentGroup: existing.documentGroup,
+      title: input.title.trim(),
+      blobUrl: input.blobUrl.trim(),
+      payloadHash,
+      mimeType: input.mimeType.trim(),
+      sizeBytes: input.sizeBytes,
+      classification: existing.classification,
+      verificationStatus: "pending",
+      lifecycleStatus: "active",
+      effectiveFrom: new Date(),
+      effectiveTo: input.effectiveTo ?? existing.effectiveTo,
+      supersedesDocumentId: existing.id,
+      versionNumber: existing.versionNumber + 1,
+      isLatestActive: true,
+    });
+
+    await insertHrDocumentAuditEventInTx(db, {
+      organizationId: input.organizationId,
+      documentId: newDocumentId,
+      employeeId: existing.employeeId,
+      action: "hr.document.replace",
+      summary: `Replaced document ${existing.title} with version ${existing.versionNumber + 1}`,
+      metadata: JSON.stringify({ previousDocumentId: existing.id }),
+    });
+
+    return { documentId: newDocumentId, previousDocumentId: existing.id };
+  });
+}
+
+export type HrDocumentMissingMandatoryRow = {
+  id: string;
+  employeeId: string;
+  employeeNumber: string;
+  employeeDisplayName: string;
+  documentType: string;
+  requirementTitle: string;
+  posture: "missing";
+};
+
+export type HrDocumentMissingMandatoryWindow = {
+  rows: readonly HrDocumentMissingMandatoryRow[];
+  pageSize: number;
+  totalCount: number;
+  hasNextPage: boolean;
+};
+
+export async function listHrDocumentMissingMandatoryWindow(input: {
+  organizationId: string;
+  limit?: number;
+  offset?: number;
+  search?: string;
+}): Promise<HrDocumentMissingMandatoryWindow> {
+  const [requirements, employees, documents] = await Promise.all([
+    listHrDocumentRequirements({ organizationId: input.organizationId }),
+    listHrEmployeeDirectoryWindow({
+      organizationId: input.organizationId,
+      limit: HR_DOC_MAX_PAGE_SIZE,
+    }),
+    listHrEmployeeDocumentsWindow({
+      organizationId: input.organizationId,
+      limit: HR_DOC_MAX_PAGE_SIZE,
+      latestOnly: true,
+    }),
+  ]);
+
+  const verifiedByEmployeeType = new Set(
+    documents.rows
+      .filter((row) => row.verificationStatus === "verified")
+      .map((row) => `${row.employeeId}:${row.documentType}`),
+  );
+
+  const activeEmployees = employees.rows.filter(
+    (employee) => employee.employmentStatus === "active",
+  );
+
+  const rows: HrDocumentMissingMandatoryRow[] = [];
+  for (const employee of activeEmployees) {
+    for (const req of requirements) {
+      if (
+        req.requiredForStatus &&
+        req.requiredForStatus !== employee.employmentStatus
+      ) {
+        continue;
+      }
+      const key = `${employee.id}:${req.documentType}`;
+      if (verifiedByEmployeeType.has(key)) {
+        continue;
+      }
+      rows.push({
+        id: key,
+        employeeId: employee.id,
+        employeeNumber: employee.employeeNumber,
+        employeeDisplayName: employee.displayName,
+        documentType: req.documentType,
+        requirementTitle: req.title,
+        posture: "missing",
+      });
+    }
+  }
+
+  const trimmedSearch = input.search?.trim().toLowerCase();
+  const filtered = trimmedSearch
+    ? rows.filter(
+        (row) =>
+          row.employeeDisplayName.toLowerCase().includes(trimmedSearch) ||
+          row.documentType.toLowerCase().includes(trimmedSearch) ||
+          row.requirementTitle.toLowerCase().includes(trimmedSearch),
+      )
+    : rows;
+
+  const pageSize = clampPageSize(input.limit);
+  const offset = Math.max(0, input.offset ?? 0);
+  const page = filtered.slice(offset, offset + pageSize);
+
+  return {
+    rows: page,
+    pageSize,
+    totalCount: filtered.length,
+    hasNextPage: offset + page.length < filtered.length,
+  };
+}
+
+export async function listHrDocumentAuditTrailWindow(input: {
+  organizationId: string;
+  limit?: number;
+  offset?: number;
+  search?: string;
+}) {
+  const pageSize = clampPageSize(input.limit);
+  const offset = Math.max(0, input.offset ?? 0);
+
+  return runWithOrganizationContext(input.organizationId, async (db) => {
+    const conditions = [
+      eq(hrDocumentAuditEvents.organizationId, input.organizationId),
+    ];
+    const trimmedSearch = input.search?.trim();
+    if (trimmedSearch) {
+      const pattern = `%${trimmedSearch}%`;
+      conditions.push(
+        or(
+          ilike(hrDocumentAuditEvents.action, pattern),
+          ilike(hrDocumentAuditEvents.summary, pattern),
+          ilike(hrDocumentAuditEvents.actorUserId, pattern),
+        )!,
+      );
+    }
+
+    const whereClause = and(...conditions);
+    const [totalRow] = await db
+      .select({ total: count() })
+      .from(hrDocumentAuditEvents)
+      .where(whereClause);
+
+    const rows = await db
+      .select()
+      .from(hrDocumentAuditEvents)
+      .where(whereClause)
+      .orderBy(desc(hrDocumentAuditEvents.occurredAt))
+      .limit(pageSize)
+      .offset(offset);
+
+    return {
+      rows,
+      pageSize,
+      totalCount: Number(totalRow?.total ?? 0),
+      hasNextPage: offset + rows.length < Number(totalRow?.total ?? 0),
+    };
+  });
+}
+
+export async function upsertHrDocumentRetentionPolicy(input: {
+  organizationId: string;
+  documentType?: string | null;
+  documentGroup?: string | null;
+  retentionDays: number;
+  archiveOnSeparation?: boolean;
+}) {
+  return runWithOrganizationContext(input.organizationId, async (db) => {
+    const documentType = input.documentType?.trim() || null;
+    const documentGroup = input.documentGroup?.trim() || null;
+
+    const [existing] = await db
+      .select({ id: hrDocumentRetentionPolicies.id })
+      .from(hrDocumentRetentionPolicies)
+      .where(
+        and(
+          eq(hrDocumentRetentionPolicies.organizationId, input.organizationId),
+          eq(hrDocumentRetentionPolicies.active, true),
+          documentType
+            ? eq(hrDocumentRetentionPolicies.documentType, documentType)
+            : isNull(hrDocumentRetentionPolicies.documentType),
+          documentGroup
+            ? eq(hrDocumentRetentionPolicies.documentGroup, documentGroup)
+            : isNull(hrDocumentRetentionPolicies.documentGroup),
+        ),
+      )
+      .limit(1);
+
+    if (existing) {
+      await db
+        .update(hrDocumentRetentionPolicies)
+        .set({
+          retentionDays: input.retentionDays,
+          archiveOnSeparation: input.archiveOnSeparation ?? true,
+        })
+        .where(eq(hrDocumentRetentionPolicies.id, existing.id));
+      return { policyId: existing.id };
+    }
+
+    const policyId = createEntityId("hr_doc_ret");
+    await db.insert(hrDocumentRetentionPolicies).values({
+      id: policyId,
+      organizationId: input.organizationId,
+      documentType,
+      documentGroup,
+      retentionDays: input.retentionDays,
+      archiveOnSeparation: input.archiveOnSeparation ?? true,
+    });
+    return { policyId };
+  });
+}
+
+export async function listHrDocumentRetentionPolicies(input: {
+  organizationId: string;
+}) {
+  return runWithOrganizationContext(input.organizationId, async (db) =>
+    db
+      .select()
+      .from(hrDocumentRetentionPolicies)
+      .where(
+        and(
+          eq(hrDocumentRetentionPolicies.organizationId, input.organizationId),
+          eq(hrDocumentRetentionPolicies.active, true),
+        ),
+      )
+      .orderBy(hrDocumentRetentionPolicies.documentType),
+  );
+}
+
+export async function recordHrDocumentAcknowledgment(input: {
+  organizationId: string;
+  employeeId: string;
+  policyKey: string;
+  policyVersion: string;
+  acknowledgmentMethod: string;
+  employeeDocumentId?: string | null;
+}) {
+  return runWithOrganizationContext(input.organizationId, async (db) => {
+    const id = createEntityId("hr_doc_ack");
+    await db.insert(hrDocumentAcknowledgments).values({
+      id,
+      organizationId: input.organizationId,
+      employeeId: input.employeeId,
+      employeeDocumentId: input.employeeDocumentId ?? null,
+      policyKey: input.policyKey.trim(),
+      policyVersion: input.policyVersion.trim(),
+      acknowledgmentMethod: input.acknowledgmentMethod.trim(),
+      acknowledgedAt: new Date(),
+    });
+    return { acknowledgmentId: id };
+  });
+}
+
+export async function listHrDocumentAcknowledgmentsWindow(input: {
+  organizationId: string;
+  limit?: number;
+  offset?: number;
+  search?: string;
+}) {
+  const pageSize = clampPageSize(input.limit);
+  const offset = Math.max(0, input.offset ?? 0);
+
+  return runWithOrganizationContext(input.organizationId, async (db) => {
+    const conditions = [
+      eq(hrDocumentAcknowledgments.organizationId, input.organizationId),
+    ];
+    const trimmedSearch = input.search?.trim();
+    if (trimmedSearch) {
+      const pattern = `%${trimmedSearch}%`;
+      conditions.push(
+        or(
+          ilike(hrDocumentAcknowledgments.policyKey, pattern),
+          ilike(hrDocumentAcknowledgments.policyVersion, pattern),
+          ilike(hrDocumentAcknowledgments.acknowledgmentMethod, pattern),
+          ilike(hrEmployees.employeeNumber, pattern),
+          ilike(hrEmployees.legalName, pattern),
+        )!,
+      );
+    }
+
+    const whereClause = and(...conditions);
+    const [totalRow] = await db
+      .select({ total: count() })
+      .from(hrDocumentAcknowledgments)
+      .innerJoin(
+        hrEmployees,
+        eq(hrDocumentAcknowledgments.employeeId, hrEmployees.id),
+      )
+      .where(whereClause);
+
+    const rows = await db
+      .select({
+        id: hrDocumentAcknowledgments.id,
+        employeeId: hrDocumentAcknowledgments.employeeId,
+        employeeNumber: hrEmployees.employeeNumber,
+        legalName: hrEmployees.legalName,
+        preferredName: hrEmployees.preferredName,
+        policyKey: hrDocumentAcknowledgments.policyKey,
+        policyVersion: hrDocumentAcknowledgments.policyVersion,
+        acknowledgmentMethod: hrDocumentAcknowledgments.acknowledgmentMethod,
+        acknowledgedAt: hrDocumentAcknowledgments.acknowledgedAt,
+      })
+      .from(hrDocumentAcknowledgments)
+      .innerJoin(
+        hrEmployees,
+        eq(hrDocumentAcknowledgments.employeeId, hrEmployees.id),
+      )
+      .where(whereClause)
+      .orderBy(desc(hrDocumentAcknowledgments.acknowledgedAt))
+      .limit(pageSize)
+      .offset(offset);
+
+    return {
+      rows: rows.map((row) => ({
+        id: row.id,
+        employeeId: row.employeeId,
+        employeeNumber: row.employeeNumber,
+        employeeDisplayName: row.preferredName?.trim() || row.legalName,
+        policyKey: row.policyKey,
+        policyVersion: row.policyVersion,
+        acknowledgmentMethod: row.acknowledgmentMethod,
+        acknowledgedAt: row.acknowledgedAt,
+      })),
+      pageSize,
+      totalCount: Number(totalRow?.total ?? 0),
+      hasNextPage: offset + rows.length < Number(totalRow?.total ?? 0),
+    };
+  });
+}
+
+export async function getHrEmployeeDocumentReadiness(input: {
+  organizationId: string;
+  employeeId: string;
+}) {
+  const [documents, requirements] = await Promise.all([
+    listHrEmployeeDocumentsWindow({
+      organizationId: input.organizationId,
+      employeeId: input.employeeId,
+      limit: HR_DOC_MAX_PAGE_SIZE,
+      latestOnly: true,
+    }),
+    listHrDocumentRequirements({ organizationId: input.organizationId }),
+  ]);
+
+  const verifiedTypes = new Set(
+    documents.rows
+      .filter((row) => row.verificationStatus === "verified")
+      .map((row) => row.documentType),
+  );
+
+  const missingMandatoryCount = requirements.filter(
+    (req) => !verifiedTypes.has(req.documentType),
+  ).length;
+
+  return {
+    employeeId: input.employeeId,
+    activeDocumentCount: documents.rows.length,
+    pendingVerificationCount: documents.rows.filter(
+      (row) => row.verificationStatus === "pending",
+    ).length,
+    missingMandatoryCount,
+    verifiedDocumentCount: verifiedTypes.size,
   };
 }

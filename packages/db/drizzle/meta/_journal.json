@@ -162,6 +162,62 @@
       "when": 1780069097409,
       "tag": "0022_panoramic_roughhouse",
       "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1780071134101,
+      "tag": "0023_fancy_ted_forrester",
+      "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1780074850671,
+      "tag": "0024_smiling_grey_gargoyle",
+      "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1780077489173,
+      "tag": "0025_bright_rattler",
+      "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "7",
+      "when": 1780080149537,
+      "tag": "0026_panoramic_skullbuster",
+      "breakpoints": true
+    },
+    {
+      "idx": 27,
+      "version": "7",
+      "when": 1780080405164,
+      "tag": "0027_mute_sauron",
+      "breakpoints": true
+    },
+    {
+      "idx": 28,
+      "version": "7",
+      "when": 1780091989784,
+      "tag": "0028_tiny_blonde_phantom",
+      "breakpoints": true
+    },
+    {
+      "idx": 29,
+      "version": "7",
+      "when": 1780122306589,
+      "tag": "0029_panoramic_microchip",
+      "breakpoints": true
+    },
+    {
+      "idx": 30,
+      "version": "7",
+      "when": 1780122540778,
+      "tag": "0030_solid_wallop",
+      "breakpoints": true
     }
   ]
 }

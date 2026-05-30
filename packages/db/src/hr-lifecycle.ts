@@ -1,4 +1,16 @@
-import { and, count, desc, eq, ilike, inArray, isNull, lte, or, sql } from "drizzle-orm";
+import {
+  and,
+  count,
+  desc,
+  eq,
+  ilike,
+  inArray,
+  isNotNull,
+  isNull,
+  lte,
+  or,
+  sql,
+} from "drizzle-orm";
 import { runWithOrganizationContext, type AfendaTransaction } from "./client";
 import { createEntityId } from "./ids";
 import { upsertHrEmployeeEffectiveAssignmentInTx,
@@ -9,6 +21,7 @@ import {
   hrEmployees,
   hrLifecycleEvents,
   hrLifecycleTransitions,
+  hrOffboardingCases,
 } from "./schema/hr";
 
 export type HrEmploymentStatus =
@@ -371,6 +384,340 @@ export async function listHrLifecycleOverviewWindow(input: {
   });
 }
 
+export type HrLifecycleProbationDueRow = {
+  id: string;
+  employeeNumber: string;
+  displayName: string;
+  employmentStatus: HrEmploymentStatus;
+  probationEndDate: Date;
+};
+
+export type HrLifecycleProbationDueWindow = {
+  rows: readonly HrLifecycleProbationDueRow[];
+  pageSize: number;
+  totalCount: number;
+  hasNextPage: boolean;
+};
+
+const PROBATION_REVIEW_HORIZON_DAYS = 30;
+
+export async function listHrLifecycleProbationDueWindow(input: {
+  organizationId: string;
+  limit?: number;
+  offset?: number;
+  search?: string;
+  asOf?: Date;
+}): Promise<HrLifecycleProbationDueWindow> {
+  const pageSize = clampPageSize(input.limit);
+  const offset = Math.max(0, input.offset ?? 0);
+  const asOf = input.asOf ?? new Date();
+  const horizon = new Date(asOf);
+  horizon.setDate(horizon.getDate() + PROBATION_REVIEW_HORIZON_DAYS);
+
+  return runWithOrganizationContext(input.organizationId, async (db) => {
+    const conditions = [
+      eq(hrEmployees.organizationId, input.organizationId),
+      eq(hrEmployees.employmentStatus, "probation"),
+      isNull(hrEmployees.archivedAt),
+      isNotNull(hrEmployees.probationEndDate),
+      lte(hrEmployees.probationEndDate, horizon),
+    ];
+
+    const trimmedSearch = input.search?.trim();
+    if (trimmedSearch) {
+      const pattern = `%${trimmedSearch}%`;
+      conditions.push(
+        or(
+          ilike(hrEmployees.employeeNumber, pattern),
+          ilike(hrEmployees.legalName, pattern),
+          ilike(hrEmployees.preferredName, pattern),
+        )!,
+      );
+    }
+
+    const whereClause = and(...conditions);
+
+    const [totalRow] = await db
+      .select({ total: count() })
+      .from(hrEmployees)
+      .where(whereClause);
+
+    const actualTotal = Number(totalRow?.total ?? 0);
+
+    const rows = await db
+      .select({
+        id: hrEmployees.id,
+        employeeNumber: hrEmployees.employeeNumber,
+        legalName: hrEmployees.legalName,
+        preferredName: hrEmployees.preferredName,
+        employmentStatus: hrEmployees.employmentStatus,
+        probationEndDate: hrEmployees.probationEndDate,
+      })
+      .from(hrEmployees)
+      .where(whereClause)
+      .orderBy(hrEmployees.probationEndDate)
+      .limit(pageSize)
+      .offset(offset);
+
+    const mapped: HrLifecycleProbationDueRow[] = rows
+      .filter((row) => row.probationEndDate)
+      .map((row) => ({
+        id: row.id,
+        employeeNumber: row.employeeNumber,
+        displayName: row.preferredName?.trim() || row.legalName,
+        employmentStatus: row.employmentStatus,
+        probationEndDate: row.probationEndDate!,
+      }));
+
+    return {
+      rows: mapped,
+      pageSize,
+      totalCount: actualTotal,
+      hasNextPage: offset + mapped.length < actualTotal,
+    };
+  });
+}
+
+export type HrLifecycleAuditEventRow = HrLifecycleEventRow & {
+  employeeNumber: string;
+  displayName: string;
+};
+
+export type HrLifecycleAuditEventWindow = {
+  rows: readonly HrLifecycleAuditEventRow[];
+  pageSize: number;
+  totalCount: number;
+  hasNextPage: boolean;
+};
+
+export async function listHrLifecycleAuditEventsWindow(input: {
+  organizationId: string;
+  limit?: number;
+  offset?: number;
+  search?: string;
+}): Promise<HrLifecycleAuditEventWindow> {
+  const pageSize = clampPageSize(input.limit);
+  const offset = Math.max(0, input.offset ?? 0);
+
+  return runWithOrganizationContext(input.organizationId, async (db) => {
+    const conditions = [eq(hrLifecycleEvents.organizationId, input.organizationId)];
+
+    const trimmedSearch = input.search?.trim();
+    if (trimmedSearch) {
+      const pattern = `%${trimmedSearch}%`;
+      conditions.push(
+        or(
+          ilike(hrEmployees.employeeNumber, pattern),
+          ilike(hrEmployees.legalName, pattern),
+          ilike(hrEmployees.preferredName, pattern),
+          ilike(hrLifecycleEvents.kind, pattern),
+          ilike(hrLifecycleEvents.reason, pattern),
+        )!,
+      );
+    }
+
+    const whereClause = and(...conditions);
+
+    const [totalRow] = await db
+      .select({ total: count() })
+      .from(hrLifecycleEvents)
+      .innerJoin(
+        hrEmployees,
+        and(
+          eq(hrLifecycleEvents.employeeId, hrEmployees.id),
+          eq(hrLifecycleEvents.organizationId, hrEmployees.organizationId),
+        ),
+      )
+      .where(whereClause);
+
+    const actualTotal = Number(totalRow?.total ?? 0);
+
+    const rows = await db
+      .select({
+        id: hrLifecycleEvents.id,
+        employeeId: hrLifecycleEvents.employeeId,
+        employeeNumber: hrEmployees.employeeNumber,
+        legalName: hrEmployees.legalName,
+        preferredName: hrEmployees.preferredName,
+        kind: hrLifecycleEvents.kind,
+        previousStatus: hrLifecycleEvents.previousStatus,
+        newStatus: hrLifecycleEvents.newStatus,
+        effectiveDate: hrLifecycleEvents.effectiveDate,
+        reason: hrLifecycleEvents.reason,
+        approvalReference: hrLifecycleEvents.approvalReference,
+        createdAt: hrLifecycleEvents.createdAt,
+      })
+      .from(hrLifecycleEvents)
+      .innerJoin(
+        hrEmployees,
+        and(
+          eq(hrLifecycleEvents.employeeId, hrEmployees.id),
+          eq(hrLifecycleEvents.organizationId, hrEmployees.organizationId),
+        ),
+      )
+      .where(whereClause)
+      .orderBy(desc(hrLifecycleEvents.effectiveDate), desc(hrLifecycleEvents.createdAt))
+      .limit(pageSize)
+      .offset(offset);
+
+    const mapped: HrLifecycleAuditEventRow[] = rows.map((row) => ({
+      id: row.id,
+      employeeId: row.employeeId,
+      employeeNumber: row.employeeNumber,
+      displayName: row.preferredName?.trim() || row.legalName,
+      kind: row.kind,
+      previousStatus: row.previousStatus,
+      newStatus: row.newStatus,
+      effectiveDate: row.effectiveDate,
+      reason: row.reason,
+      approvalReference: row.approvalReference,
+      createdAt: row.createdAt,
+    }));
+
+    return {
+      rows: mapped,
+      pageSize,
+      totalCount: actualTotal,
+      hasNextPage: offset + mapped.length < actualTotal,
+    };
+  });
+}
+
+export type HrLifecycleNoticePeriodRow = {
+  id: string;
+  employeeNumber: string;
+  displayName: string;
+  employmentStatus: HrEmploymentStatus;
+  lastWorkingDate: Date | null;
+  offboardingCaseId: string | null;
+};
+
+export type HrLifecycleNoticePeriodWindow = {
+  rows: readonly HrLifecycleNoticePeriodRow[];
+  pageSize: number;
+  totalCount: number;
+  hasNextPage: boolean;
+};
+
+export async function listHrLifecycleNoticePeriodWindow(input: {
+  organizationId: string;
+  limit?: number;
+  offset?: number;
+  search?: string;
+}): Promise<HrLifecycleNoticePeriodWindow> {
+  const pageSize = clampPageSize(input.limit);
+  const offset = Math.max(0, input.offset ?? 0);
+
+  return runWithOrganizationContext(input.organizationId, async (db) => {
+    const conditions = [
+      eq(hrEmployees.organizationId, input.organizationId),
+      eq(hrEmployees.employmentStatus, "notice_period"),
+      isNull(hrEmployees.archivedAt),
+    ];
+
+    const trimmedSearch = input.search?.trim();
+    if (trimmedSearch) {
+      const pattern = `%${trimmedSearch}%`;
+      conditions.push(
+        or(
+          ilike(hrEmployees.employeeNumber, pattern),
+          ilike(hrEmployees.legalName, pattern),
+          ilike(hrEmployees.preferredName, pattern),
+        )!,
+      );
+    }
+
+    const whereClause = and(...conditions);
+
+    const [totalRow] = await db
+      .select({ total: count() })
+      .from(hrEmployees)
+      .where(whereClause);
+
+    const actualTotal = Number(totalRow?.total ?? 0);
+
+    const rows = await db
+      .select({
+        id: hrEmployees.id,
+        employeeNumber: hrEmployees.employeeNumber,
+        legalName: hrEmployees.legalName,
+        preferredName: hrEmployees.preferredName,
+        employmentStatus: hrEmployees.employmentStatus,
+        offboardingCaseId: hrOffboardingCases.id,
+        lastWorkingDate: hrOffboardingCases.lastWorkingDate,
+      })
+      .from(hrEmployees)
+      .leftJoin(
+        hrOffboardingCases,
+        and(
+          eq(hrOffboardingCases.employeeId, hrEmployees.id),
+          eq(hrOffboardingCases.organizationId, hrEmployees.organizationId),
+          eq(hrOffboardingCases.status, "in_progress"),
+        ),
+      )
+      .where(whereClause)
+      .orderBy(hrEmployees.employeeNumber)
+      .limit(pageSize)
+      .offset(offset);
+
+    const mapped: HrLifecycleNoticePeriodRow[] = rows.map((row) => ({
+      id: row.id,
+      employeeNumber: row.employeeNumber,
+      displayName: row.preferredName?.trim() || row.legalName,
+      employmentStatus: row.employmentStatus,
+      lastWorkingDate: row.lastWorkingDate,
+      offboardingCaseId: row.offboardingCaseId,
+    }));
+
+    return {
+      rows: mapped,
+      pageSize,
+      totalCount: actualTotal,
+      hasNextPage: offset + mapped.length < actualTotal,
+    };
+  });
+}
+
+export async function getHrEmployeeLifecycleSnapshot(input: {
+  organizationId: string;
+  employeeId: string;
+}): Promise<{
+  employeeId: string;
+  employmentStatus: HrEmploymentStatus;
+  probationEndDate: Date | null;
+  confirmationDate: Date | null;
+} | null> {
+  return runWithOrganizationContext(input.organizationId, async (db) => {
+    const [row] = await db
+      .select({
+        id: hrEmployees.id,
+        employmentStatus: hrEmployees.employmentStatus,
+        probationEndDate: hrEmployees.probationEndDate,
+        confirmationDate: hrEmployees.confirmationDate,
+      })
+      .from(hrEmployees)
+      .where(
+        and(
+          eq(hrEmployees.organizationId, input.organizationId),
+          eq(hrEmployees.id, input.employeeId),
+          isNull(hrEmployees.archivedAt),
+        ),
+      )
+      .limit(1);
+
+    if (!row) {
+      return null;
+    }
+
+    return {
+      employeeId: row.id,
+      employmentStatus: row.employmentStatus,
+      probationEndDate: row.probationEndDate,
+      confirmationDate: row.confirmationDate,
+    };
+  });
+}
+
 export async function listHrLifecycleEventsForEmployee(input: {
   organizationId: string;
   employeeId: string;
@@ -714,6 +1061,133 @@ export type HrLifecycleTransitionSweepResult = {
   organizationCount: number;
   appliedCount: number;
 };
+
+export type HrLifecyclePendingTransitionRow = {
+  id: string;
+  employeeId: string;
+  employeeNumber: string;
+  displayName: string;
+  fromStatus: HrEmploymentStatus;
+  toStatus: HrEmploymentStatus;
+  effectiveDate: Date;
+  reason: string | null;
+  approvalReference: string | null;
+};
+
+export type HrLifecyclePendingTransitionWindow = {
+  rows: readonly HrLifecyclePendingTransitionRow[];
+  pageSize: number;
+  totalCount: number;
+  hasNextPage: boolean;
+};
+
+export async function listHrLifecyclePendingTransitionsWindow(input: {
+  organizationId: string;
+  limit?: number;
+  offset?: number;
+  search?: string;
+}): Promise<HrLifecyclePendingTransitionWindow> {
+  const pageSize = clampPageSize(input.limit);
+  const offset = Math.max(0, input.offset ?? 0);
+
+  return runWithOrganizationContext(input.organizationId, async (db) => {
+    const conditions = [
+      eq(hrLifecycleTransitions.organizationId, input.organizationId),
+      eq(hrLifecycleTransitions.status, "pending"),
+      isNull(hrEmployees.archivedAt),
+    ];
+
+    const trimmedSearch = input.search?.trim();
+    if (trimmedSearch) {
+      const pattern = `%${trimmedSearch}%`;
+      conditions.push(
+        or(
+          ilike(hrEmployees.employeeNumber, pattern),
+          ilike(hrEmployees.legalName, pattern),
+          ilike(hrEmployees.preferredName, pattern),
+        )!,
+      );
+    }
+
+    const whereClause = and(...conditions);
+
+    const [totalRow] = await db
+      .select({ total: count() })
+      .from(hrLifecycleTransitions)
+      .innerJoin(
+        hrEmployees,
+        and(
+          eq(hrLifecycleTransitions.employeeId, hrEmployees.id),
+          eq(hrLifecycleTransitions.organizationId, hrEmployees.organizationId),
+        ),
+      )
+      .where(whereClause);
+
+    const actualTotal = Number(totalRow?.total ?? 0);
+
+    const rows = await db
+      .select({
+        id: hrLifecycleTransitions.id,
+        employeeId: hrLifecycleTransitions.employeeId,
+        employeeNumber: hrEmployees.employeeNumber,
+        legalName: hrEmployees.legalName,
+        preferredName: hrEmployees.preferredName,
+        fromStatus: hrLifecycleTransitions.fromStatus,
+        toStatus: hrLifecycleTransitions.toStatus,
+        effectiveDate: hrLifecycleTransitions.effectiveDate,
+        reason: hrLifecycleTransitions.reason,
+        approvalReference: hrLifecycleTransitions.approvalReference,
+      })
+      .from(hrLifecycleTransitions)
+      .innerJoin(
+        hrEmployees,
+        and(
+          eq(hrLifecycleTransitions.employeeId, hrEmployees.id),
+          eq(hrLifecycleTransitions.organizationId, hrEmployees.organizationId),
+        ),
+      )
+      .where(whereClause)
+      .orderBy(hrLifecycleTransitions.effectiveDate)
+      .limit(pageSize)
+      .offset(offset);
+
+    const mapped: HrLifecyclePendingTransitionRow[] = rows.map((row) => ({
+      id: row.id,
+      employeeId: row.employeeId,
+      employeeNumber: row.employeeNumber,
+      displayName: row.preferredName?.trim() || row.legalName,
+      fromStatus: row.fromStatus,
+      toStatus: row.toStatus,
+      effectiveDate: row.effectiveDate,
+      reason: row.reason,
+      approvalReference: row.approvalReference,
+    }));
+
+    return {
+      rows: mapped,
+      pageSize,
+      totalCount: actualTotal,
+      hasNextPage: offset + mapped.length < actualTotal,
+    };
+  });
+}
+
+export async function countHrLifecyclePendingTransitions(input: {
+  organizationId: string;
+}): Promise<number> {
+  return runWithOrganizationContext(input.organizationId, async (db) => {
+    const [row] = await db
+      .select({ total: count() })
+      .from(hrLifecycleTransitions)
+      .where(
+        and(
+          eq(hrLifecycleTransitions.organizationId, input.organizationId),
+          eq(hrLifecycleTransitions.status, "pending"),
+        ),
+      );
+    return Number(row?.total ?? 0);
+  });
+}
 
 export async function runHrLifecycleTransitionSweep(): Promise<HrLifecycleTransitionSweepResult> {
   const organizations = await listOrganizationsForCoreErpSeed();

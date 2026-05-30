@@ -1,0 +1,3 @@
+ALTER TABLE "hr_compliance_exceptions" ADD COLUMN "corrective_action_owner_employee_id" text;--> statement-breakpoint
+ALTER TABLE "hr_compliance_exceptions" ADD CONSTRAINT "hr_compliance_exceptions_corrective_action_owner_employee_id_hr_employees_id_fk" FOREIGN KEY ("corrective_action_owner_employee_id") REFERENCES "public"."hr_employees"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
+CREATE INDEX "hr_compliance_exceptions_org_corrective_owner_idx" ON "hr_compliance_exceptions" USING btree ("organization_id","corrective_action_owner_employee_id");

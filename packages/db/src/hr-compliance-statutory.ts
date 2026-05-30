@@ -3,9 +3,9 @@ import { runWithOrganizationContext, type AfendaTransaction } from "./client";
 import { createEntityId } from "./ids";
 import { appliesComplianceObligationToEmployee } from "./hr-compliance-scope.shared";
 import {
-  activeLaborLawObligationKindCondition,
-  buildEmployeeObligationTrackingKey,
-} from "./hr-compliance-labor-law.shared";
+  activeStatutoryObligationKindCondition,
+} from "./hr-compliance-statutory.shared";
+import { buildEmployeeObligationTrackingKey } from "./hr-compliance-labor-law.shared";
 import { buildPaginatedWindow, formatHrEmployeeDisplayName } from "./hr-compliance.shared";
 import {
   activeEmployeeFilters,
@@ -14,14 +14,14 @@ import {
   normalizeStoredRequirementStatusForMutation,
 } from "./hr-compliance.internal";
 import { HrComplianceCommandError } from "./hr-compliance.types";
-import type { HrEmployeeLaborLawRequirementWindow } from "./hr-compliance.types";
+import type { HrEmployeeStatutoryRequirementWindow } from "./hr-compliance.types";
 import {
   hrComplianceEmployeeRequirements,
   hrComplianceObligations,
   hrEmployees,
 } from "./schema/hr";
 
-export async function syncHrEmployeeLaborLawRequirementsInTx(
+export async function syncHrEmployeeStatutoryRequirementsInTx(
   db: AfendaTransaction,
   input: {
     organizationId: string;
@@ -67,7 +67,7 @@ export async function syncHrEmployeeLaborLawRequirementsInTx(
           and(
             eq(hrComplianceObligations.organizationId, input.organizationId),
             eq(hrComplianceObligations.status, "active"),
-            activeLaborLawObligationKindCondition,
+            activeStatutoryObligationKindCondition,
           ),
         ),
       db
@@ -91,7 +91,7 @@ export async function syncHrEmployeeLaborLawRequirementsInTx(
               hrComplianceEmployeeRequirements.organizationId,
               input.organizationId,
             ),
-            activeLaborLawObligationKindCondition,
+            activeStatutoryObligationKindCondition,
           ),
         ),
     ]);
@@ -194,7 +194,7 @@ export async function syncHrEmployeeLaborLawRequirementsInTx(
   };
 }
 
-export async function syncHrEmployeeLaborLawRequirements(input: {
+export async function syncHrEmployeeStatutoryRequirements(input: {
   organizationId: string;
 }): Promise<{
   createdCount: number;
@@ -203,24 +203,24 @@ export async function syncHrEmployeeLaborLawRequirements(input: {
   totalTracked: number;
 }> {
   return runWithOrganizationContext(input.organizationId, (db) =>
-    syncHrEmployeeLaborLawRequirementsInTx(db, input),
+    syncHrEmployeeStatutoryRequirementsInTx(db, input),
   );
 }
 
-export async function listHrEmployeeLaborLawRequirementsWindow(input: {
+export async function listHrEmployeeStatutoryRequirementsWindow(input: {
   organizationId: string;
   limit?: number;
   offset?: number;
   search?: string;
   status?: (typeof hrComplianceEmployeeRequirements.$inferSelect)["status"];
-}): Promise<HrEmployeeLaborLawRequirementWindow> {
+}): Promise<HrEmployeeStatutoryRequirementWindow> {
   const pageSize = clampPageSize(input.limit);
   const offset = Math.max(0, input.offset ?? 0);
 
   return runWithOrganizationContext(input.organizationId, async (db) => {
     const conditions = [
       eq(hrComplianceEmployeeRequirements.organizationId, input.organizationId),
-      activeLaborLawObligationKindCondition,
+      activeStatutoryObligationKindCondition,
       eq(hrComplianceObligations.status, "active"),
       activeEmployeeFilters(input.organizationId),
     ];
@@ -320,7 +320,7 @@ export async function listHrEmployeeLaborLawRequirementsWindow(input: {
   });
 }
 
-export async function updateHrEmployeeLaborLawRequirementStatusInTx(
+export async function updateHrEmployeeStatutoryRequirementStatusInTx(
   db: AfendaTransaction,
   input: {
     organizationId: string;
@@ -348,7 +348,7 @@ export async function updateHrEmployeeLaborLawRequirementStatusInTx(
           input.organizationId,
         ),
         eq(hrComplianceEmployeeRequirements.id, input.requirementId),
-        activeLaborLawObligationKindCondition,
+        activeStatutoryObligationKindCondition,
       ),
     )
     .limit(1);
@@ -372,13 +372,13 @@ export async function updateHrEmployeeLaborLawRequirementStatusInTx(
   return { requirementId: input.requirementId };
 }
 
-export async function updateHrEmployeeLaborLawRequirementStatus(input: {
+export async function updateHrEmployeeStatutoryRequirementStatus(input: {
   organizationId: string;
   requirementId: string;
   status: (typeof hrComplianceEmployeeRequirements.$inferSelect)["status"];
   reviewNotes?: string | null;
 }): Promise<{ requirementId: string }> {
   return runWithOrganizationContext(input.organizationId, (db) =>
-    updateHrEmployeeLaborLawRequirementStatusInTx(db, input),
+    updateHrEmployeeStatutoryRequirementStatusInTx(db, input),
   );
 }

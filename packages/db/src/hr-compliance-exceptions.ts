@@ -1,8 +1,15 @@
-import { and, count, desc, eq, ilike, inArray, or } from "drizzle-orm";
+import { and, count, desc, eq, ilike, inArray, isNotNull, lt, or } from "drizzle-orm";
+import { alias } from "drizzle-orm/pg-core";
 import { runWithOrganizationContext, type AfendaTransaction } from "./client";
 import { createEntityId } from "./ids";
+import {
+  HR_COMPLIANCE_EXCEPTION_GAP_KINDS,
+  type HrComplianceExceptionGapKind,
+} from "./hr-compliance-exception-sync.shared";
+import { utcComplianceDayBounds } from "./hr-compliance-calendar.shared";
 import { buildPaginatedWindow, formatHrEmployeeDisplayName } from "./hr-compliance.shared";
-import { clampPageSize, loadComplianceExceptionForMutation } from "./hr-compliance.internal";
+import { clampPageSize, loadComplianceExceptionForMutation, assertComplianceOwnerEmployeeInOrg } from "./hr-compliance.internal";
+import { HrComplianceCommandError } from "./hr-compliance.types";
 import type { HrComplianceExceptionWindow } from "./hr-compliance.types";
 import { hrComplianceExceptions, hrEmployees } from "./schema/hr";
 
@@ -18,6 +25,7 @@ export async function listHrComplianceExceptionsWindow(input: {
   const offset = Math.max(0, input.offset ?? 0);
 
   return runWithOrganizationContext(input.organizationId, async (db) => {
+    const ownerEmployee = alias(hrEmployees, "corrective_action_owner");
     const conditions = [
       eq(hrComplianceExceptions.organizationId, input.organizationId),
     ];
@@ -32,16 +40,33 @@ export async function listHrComplianceExceptionsWindow(input: {
 
     const trimmedSearch = input.search?.trim();
     if (trimmedSearch) {
-      const pattern = `%${trimmedSearch}%`;
-      conditions.push(
-        or(
-          ilike(hrComplianceExceptions.title, pattern),
-          ilike(hrComplianceExceptions.complianceArea, pattern),
-          ilike(hrComplianceExceptions.itemType, pattern),
-          ilike(hrEmployees.employeeNumber, pattern),
-          ilike(hrEmployees.legalName, pattern),
-        )!,
-      );
+      const normalizedSearch = trimmedSearch.toLowerCase().replace(/[\s-]+/g, "_");
+      if (normalizedSearch === "overdue") {
+        const { start: startOfToday } = utcComplianceDayBounds(new Date());
+        conditions.push(
+          and(
+            eq(hrComplianceExceptions.status, "in_progress"),
+            isNotNull(hrComplianceExceptions.correctiveActionDueDate),
+            lt(hrComplianceExceptions.correctiveActionDueDate, startOfToday),
+          )!,
+        );
+      } else {
+        const pattern = `%${trimmedSearch}%`;
+        conditions.push(
+          or(
+            ilike(hrComplianceExceptions.title, pattern),
+            ilike(hrComplianceExceptions.complianceArea, pattern),
+            ilike(hrComplianceExceptions.itemType, pattern),
+            ilike(hrComplianceExceptions.gapKind, pattern),
+            ilike(hrEmployees.employeeNumber, pattern),
+            ilike(hrEmployees.legalName, pattern),
+            ilike(hrEmployees.preferredName, pattern),
+            ilike(ownerEmployee.employeeNumber, pattern),
+            ilike(ownerEmployee.legalName, pattern),
+            ilike(ownerEmployee.preferredName, pattern),
+          )!,
+        );
+      }
     }
 
     const whereClause = and(...conditions);
@@ -52,6 +77,13 @@ export async function listHrComplianceExceptionsWindow(input: {
       .leftJoin(
         hrEmployees,
         eq(hrComplianceExceptions.employeeId, hrEmployees.id),
+      )
+      .leftJoin(
+        ownerEmployee,
+        eq(
+          hrComplianceExceptions.correctiveActionOwnerEmployeeId,
+          ownerEmployee.id,
+        ),
       )
       .where(whereClause);
 
@@ -64,16 +96,31 @@ export async function listHrComplianceExceptionsWindow(input: {
         preferredName: hrEmployees.preferredName,
         complianceArea: hrComplianceExceptions.complianceArea,
         itemType: hrComplianceExceptions.itemType,
+        gapKind: hrComplianceExceptions.gapKind,
         title: hrComplianceExceptions.title,
         severity: hrComplianceExceptions.severity,
         status: hrComplianceExceptions.status,
+        correctiveActionOwnerEmployeeId:
+          hrComplianceExceptions.correctiveActionOwnerEmployeeId,
+        ownerEmployeeNumber: ownerEmployee.employeeNumber,
+        ownerLegalName: ownerEmployee.legalName,
+        ownerPreferredName: ownerEmployee.preferredName,
         correctiveActionDueDate: hrComplianceExceptions.correctiveActionDueDate,
+        correctiveActionDescription:
+          hrComplianceExceptions.correctiveActionDescription,
         createdAt: hrComplianceExceptions.createdAt,
       })
       .from(hrComplianceExceptions)
       .leftJoin(
         hrEmployees,
         eq(hrComplianceExceptions.employeeId, hrEmployees.id),
+      )
+      .leftJoin(
+        ownerEmployee,
+        eq(
+          hrComplianceExceptions.correctiveActionOwnerEmployeeId,
+          ownerEmployee.id,
+        ),
       )
       .where(whereClause)
       .orderBy(desc(hrComplianceExceptions.createdAt))
@@ -95,10 +142,20 @@ export async function listHrComplianceExceptionsWindow(input: {
           : null,
         complianceArea: row.complianceArea,
         itemType: row.itemType,
+        gapKind: row.gapKind,
         title: row.title,
         severity: row.severity,
         status: row.status,
+        correctiveActionOwnerEmployeeId: row.correctiveActionOwnerEmployeeId,
+        correctiveActionOwnerEmployeeNumber: row.ownerEmployeeNumber,
+        correctiveActionOwnerDisplayName: row.correctiveActionOwnerEmployeeId
+          ? formatHrEmployeeDisplayName({
+              preferredName: row.ownerPreferredName,
+              legalName: row.ownerLegalName,
+            })
+          : null,
         correctiveActionDueDate: row.correctiveActionDueDate,
+        correctiveActionDescription: row.correctiveActionDescription,
         createdAt: row.createdAt,
       })),
       pageSize,
@@ -118,13 +175,37 @@ export async function createHrComplianceExceptionInTx(
     severity?: (typeof hrComplianceExceptions.$inferInsert)["severity"];
     employeeId?: string | null;
     correctiveActionDescription?: string | null;
+    correctiveActionOwnerEmployeeId?: string | null;
     correctiveActionDueDate?: Date | null;
+    sourceReferenceId?: string | null;
+    gapKind?: string | null;
   },
 ): Promise<{ exceptionId: string }> {
+  const gapKind = input.gapKind?.trim() || null;
+  if (
+    gapKind &&
+    !HR_COMPLIANCE_EXCEPTION_GAP_KINDS.includes(
+      gapKind as HrComplianceExceptionGapKind,
+    )
+  ) {
+    throw new HrComplianceCommandError("invalid_exception_gap_kind");
+  }
+
   const exceptionId = createEntityId("hr_cmp_exc");
-  const hasCorrectiveAction =
-    Boolean(input.correctiveActionDescription?.trim()) ||
-    input.correctiveActionDueDate != null;
+  const hasOwner = input.correctiveActionOwnerEmployeeId != null;
+  const hasDueDate = input.correctiveActionDueDate != null;
+  if (hasOwner !== hasDueDate) {
+    throw new HrComplianceCommandError("corrective_action_assignment_incomplete");
+  }
+
+  const hasAssignedCorrectiveAction = hasOwner && hasDueDate;
+
+  if (input.correctiveActionOwnerEmployeeId) {
+    await assertComplianceOwnerEmployeeInOrg(db, {
+      organizationId: input.organizationId,
+      employeeId: input.correctiveActionOwnerEmployeeId,
+    });
+  }
 
   await db.insert(hrComplianceExceptions).values({
     id: exceptionId,
@@ -134,10 +215,14 @@ export async function createHrComplianceExceptionInTx(
     complianceArea: input.complianceArea.trim(),
     itemType: input.itemType.trim(),
     severity: input.severity ?? "medium",
-    status: hasCorrectiveAction ? "in_progress" : "open",
+    status: hasAssignedCorrectiveAction ? "in_progress" : "open",
     correctiveActionDescription:
       input.correctiveActionDescription?.trim() || null,
+    correctiveActionOwnerEmployeeId:
+      input.correctiveActionOwnerEmployeeId ?? null,
     correctiveActionDueDate: input.correctiveActionDueDate ?? null,
+    sourceReferenceId: input.sourceReferenceId?.trim() || null,
+    gapKind,
   });
 
   return { exceptionId };
@@ -151,7 +236,10 @@ export async function createHrComplianceException(input: {
   severity?: (typeof hrComplianceExceptions.$inferInsert)["severity"];
   employeeId?: string | null;
   correctiveActionDescription?: string | null;
+  correctiveActionOwnerEmployeeId?: string | null;
   correctiveActionDueDate?: Date | null;
+  sourceReferenceId?: string | null;
+  gapKind?: string | null;
 }): Promise<{ exceptionId: string }> {
   return runWithOrganizationContext(input.organizationId, (db) =>
     createHrComplianceExceptionInTx(db, input),
@@ -164,19 +252,30 @@ export async function assignHrComplianceCorrectiveActionInTx(
     organizationId: string;
     exceptionId: string;
     correctiveActionDescription: string;
+    correctiveActionOwnerEmployeeId: string;
     correctiveActionDueDate: Date;
   },
 ): Promise<{ exceptionId: string }> {
-  const exception = await loadComplianceExceptionForMutation(db, input);
+  await loadComplianceExceptionForMutation(db, input);
+  await assertComplianceOwnerEmployeeInOrg(db, {
+    organizationId: input.organizationId,
+    employeeId: input.correctiveActionOwnerEmployeeId,
+  });
 
   await db
     .update(hrComplianceExceptions)
     .set({
       status: "in_progress",
       correctiveActionDescription: input.correctiveActionDescription.trim(),
+      correctiveActionOwnerEmployeeId: input.correctiveActionOwnerEmployeeId,
       correctiveActionDueDate: input.correctiveActionDueDate,
     })
-    .where(eq(hrComplianceExceptions.id, exception.id));
+    .where(
+      and(
+        eq(hrComplianceExceptions.organizationId, input.organizationId),
+        eq(hrComplianceExceptions.id, input.exceptionId),
+      ),
+    );
 
   return { exceptionId: input.exceptionId };
 }
@@ -185,6 +284,7 @@ export async function assignHrComplianceCorrectiveAction(input: {
   organizationId: string;
   exceptionId: string;
   correctiveActionDescription: string;
+  correctiveActionOwnerEmployeeId: string;
   correctiveActionDueDate: Date;
 }): Promise<{ exceptionId: string }> {
   return runWithOrganizationContext(input.organizationId, (db) =>
@@ -202,6 +302,10 @@ export async function updateHrComplianceCorrectiveActionProgressInTx(
 ): Promise<{ exceptionId: string }> {
   const exception = await loadComplianceExceptionForMutation(db, input);
 
+  if (exception.status !== "in_progress") {
+    throw new HrComplianceCommandError("corrective_action_not_assigned");
+  }
+
   const progressLine = `[${new Date().toISOString().slice(0, 10)}] ${input.progressNote.trim()}`;
   const previous = exception.correctiveActionDescription?.trim();
   const correctiveActionDescription = previous
@@ -214,7 +318,12 @@ export async function updateHrComplianceCorrectiveActionProgressInTx(
       status: "in_progress",
       correctiveActionDescription,
     })
-    .where(eq(hrComplianceExceptions.id, exception.id));
+    .where(
+      and(
+        eq(hrComplianceExceptions.organizationId, input.organizationId),
+        eq(hrComplianceExceptions.id, exception.id),
+      ),
+    );
 
   return { exceptionId: input.exceptionId };
 }
@@ -249,7 +358,12 @@ export async function waiveHrComplianceExceptionInTx(
       resolutionNote,
       resolvedAt: new Date(),
     })
-    .where(eq(hrComplianceExceptions.id, exception.id));
+    .where(
+      and(
+        eq(hrComplianceExceptions.organizationId, input.organizationId),
+        eq(hrComplianceExceptions.id, exception.id),
+      ),
+    );
 
   return { exceptionId: input.exceptionId };
 }
@@ -282,7 +396,12 @@ export async function resolveHrComplianceExceptionInTx(
       resolutionNote: input.resolutionNote?.trim() || null,
       resolvedAt: new Date(),
     })
-    .where(eq(hrComplianceExceptions.id, exception.id));
+    .where(
+      and(
+        eq(hrComplianceExceptions.organizationId, input.organizationId),
+        eq(hrComplianceExceptions.id, exception.id),
+      ),
+    );
 
   return { exceptionId: input.exceptionId };
 }
