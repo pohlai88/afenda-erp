@@ -1,5 +1,2 @@
-/**
- * @afenda-bucket data
- * Scaffold placeholder from packages/_template-definition.
- */
-export {};
+export * from "./hr.workforce.offboarding.page-model.server";
+export * from "./hr.workforce.offboarding-search-params.parse.shared";
