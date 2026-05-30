@@ -25,7 +25,6 @@ export type HrEmployeeDirectoryRow = {
   departmentName: string | null;
   positionTitle: string | null;
   managerDisplayName: string | null;
-  employmentStartDate: Date | null;
   updatedAt: Date;
 };
 
@@ -42,7 +41,6 @@ export async function listHrEmployeeDirectoryWindow(input: {
   offset?: number;
   search?: string;
   includeArchived?: boolean;
-  employmentStatus?: (typeof hrEmployees.$inferSelect)["employmentStatus"];
 }): Promise<HrEmployeeDirectoryWindow> {
   const pageSize = clampHrPageSize(input.limit);
   const offset = Math.max(0, input.offset ?? 0);
@@ -53,10 +51,6 @@ export async function listHrEmployeeDirectoryWindow(input: {
 
     if (!input.includeArchived) {
       conditions.push(isNull(hrEmployees.archivedAt));
-    }
-
-    if (input.employmentStatus) {
-      conditions.push(eq(hrEmployees.employmentStatus, input.employmentStatus));
     }
 
     const trimmedSearch = input.search?.trim();
@@ -93,7 +87,6 @@ export async function listHrEmployeeDirectoryWindow(input: {
         positionTitle: hrPositions.title,
         managerLegalName: managerEmployee.legalName,
         managerPreferredName: managerEmployee.preferredName,
-        employmentStartDate: hrEmployees.employmentStartDate,
         updatedAt: hrEmployees.updatedAt,
       })
       .from(hrEmployees)
@@ -121,7 +114,6 @@ export async function listHrEmployeeDirectoryWindow(input: {
       positionTitle: row.positionTitle,
       managerDisplayName:
         row.managerPreferredName?.trim() || row.managerLegalName?.trim() || null,
-      employmentStartDate: row.employmentStartDate,
       updatedAt: row.updatedAt,
     }));
 

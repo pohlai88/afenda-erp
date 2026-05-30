@@ -1,7 +1,5 @@
-export {
-  archiveHrEmployeeRecordAction,
-  createHrEmployeeRecordAction,
-  recordHrEmployeeAssignmentAction,
-  rehireHrEmployeeRecordAction,
-  updateHrEmployeeRecordAction,
-} from "./hr.workforce.records.actions.server";
+/**
+ * @afenda-bucket actions
+ * Scaffold placeholder from packages/_template-definition.
+ */
+export {};

@@ -8,8 +8,6 @@ export * from "./hr";
 export * from "./hr-commands";
 export * from "./hr-documents";
 export * from "./hr-lifecycle";
-export * from "./hr-employee-records";
-export * from "./hr-employee-records-commands";
 export * from "./hr-offboarding";
 export * from "./hr-compliance";
 export * from "./hr-leave";

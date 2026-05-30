@@ -32,8 +32,6 @@ export {
   waiveHrComplianceExceptionAction,
 } from "./employee-management/compliance-regulatory-tracking/server";
 
-export * from "./employee-management/employee-records-management/server";
-
 export { requireHrRead } from "./policies/hr-module-access.policy.server";
 
 function denied() {
@@ -70,6 +68,12 @@ export function HrDocumentsAccessDenied() {
   return React.createElement(EmptyState, {
     title: "Access restricted",
     description: "Documents are not available.",
+  });
+}
+export function HrEmployeesAccessDenied() {
+  return React.createElement(EmptyState, {
+    title: "Access restricted",
+    description: "Employees are not available.",
   });
 }
 export function HrLifecycleAccessDenied() {
@@ -115,6 +119,9 @@ export function HrAttendanceSection(_props: any) {
 export function HrDocumentsSection(_props: any) {
   return React.createElement(EmptyState, { title: "Documents" });
 }
+export function HrEmployeesSection(_props: any) {
+  return React.createElement(EmptyState, { title: "Employees" });
+}
 export function HrEmployeeCreateSection(_props: any) {
   return React.createElement(EmptyState, { title: "Add employee" });
 }
@@ -149,6 +156,13 @@ export function HrShiftsSection(_props: any) {
   return React.createElement(EmptyState, { title: "Shifts" });
 }
 
+export async function requireHrEmployeesRead() {
+  denied();
+  return { organization: { id: "" }, canWrite: false, canViewLifecycle: false };
+}
+export async function requireHrEmployeesWrite() {
+  denied();
+}
 export async function requireHrAttendanceRead() {
   denied();
   return { organization: { id: "" }, canWrite: false };
@@ -182,6 +196,10 @@ export async function requireHrShiftsRead() {
   return { organization: { id: "" }, canWrite: false };
 }
 
+export async function buildHrEmployeesPageModel(_args: any) {
+  denied();
+  return { window: { rows: [] }, searchValue: "" };
+}
 export async function buildHrAttendancePageModel(_args: any) {
   denied();
   return { window: { rows: [] }, searchValue: "" };
@@ -221,9 +239,21 @@ export async function buildHrShiftsPageModel(_args: any) {
   };
 }
 
+export async function listHrEmployeeDirectory(_args: any) {
+  denied();
+  return { rows: [] as Array<{ id: string; employeeNumber: string; displayName: string }> };
+}
 export async function loadHrOnboardingFormOptions(_organizationId?: string) {
   denied();
   return { employees: [] as Array<{ id: string; label: string }>, checklistItems: [] as any[] };
+}
+export async function loadHrEmployeeFormOptions(_args?: any) {
+  denied();
+  return {};
+}
+export async function getHrEmployeeDetail(_args: any) {
+  denied();
+  return null as any;
 }
 export async function listHrEmployeeLifecycleEvents(_args: any) {
   denied();

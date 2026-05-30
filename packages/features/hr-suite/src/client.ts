@@ -8,9 +8,3 @@ export {
 } from "./employee-management/compliance-regulatory-tracking/client";
 
 export { HrModuleNav } from "./navigation/hr-module-nav.component.client";
-
-export {
-  HrRecordsCreateEmployeeForm,
-  HrRecordsDirectoryTrailingCell,
-  HrRecordsSeparatedTrailingCell,
-} from "./employee-management/employee-records-management/client";

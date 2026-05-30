@@ -51,18 +51,6 @@ export const rlsEvaluation: readonly RlsEvaluationItem[] = [
     reason: "Effective-dated placement rows are organization scoped.",
   },
   {
-    table: "hr_reporting_relationships",
-    tenantColumn: "organization_id",
-    recommendation: "candidate",
-    reason: "Reporting line rows are organization scoped.",
-  },
-  {
-    table: "hr_org_structure_audit_events",
-    tenantColumn: "organization_id",
-    recommendation: "candidate",
-    reason: "Org structure audit ledger rows are organization scoped.",
-  },
-  {
     table: "hr_employee_documents",
     tenantColumn: "organization_id",
     recommendation: "candidate",
