@@ -196,6 +196,7 @@ export async function buildHrRecordsPageModel(input: HrRecordsPageModelInput) {
     ? buildHrRecordsDirectoryListSurface({
         window: directoryLoad.value,
         searchValue: input.directorySearch,
+        employmentStatusFilter: input.employmentStatusFilter,
         canViewSensitive: input.canViewSensitive,
         canWrite: input.canWrite,
       })

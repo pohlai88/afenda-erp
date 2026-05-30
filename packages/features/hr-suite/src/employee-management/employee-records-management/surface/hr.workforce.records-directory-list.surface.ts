@@ -10,6 +10,7 @@ import {
 } from "./hr.workforce.records-list.shared";
 import { hrRecordsDirectoryColumnsId } from "./hr.workforce.records-surface-columns.shared";
 import { hrRecordsUiCopy } from "./hr.workforce.records-ui.copy.shared";
+import { HR_RECORDS_EMPLOYMENT_STATUSES } from "../schemas/hr.workforce.records-employment-status.schema";
 
 export const hrRecordsDirectorySurfaceKey =
   "hr.workforce.records.directory.list";
@@ -22,12 +23,14 @@ export const hrRecordsEmploymentStatusFilterParam =
 export function buildHrRecordsDirectoryListSurface(input: {
   window: HrEmployeeDirectoryWindow;
   searchValue?: string;
+  employmentStatusFilter?: string;
   canViewSensitive?: boolean;
   canWrite?: boolean;
 }): ReturnType<typeof buildRecordsOperationalListSurface> {
   const {
     window,
     searchValue,
+    employmentStatusFilter,
     canViewSensitive = false,
     canWrite = false,
   } = input;
@@ -40,6 +43,18 @@ export function buildHrRecordsDirectoryListSurface(input: {
       label: copy.searchLabel,
       placeholder: copy.searchPlaceholder,
       value: searchValue,
+      filters: [
+        {
+          id: "employmentStatus",
+          label: copy.statusFilterLabel,
+          param: hrRecordsEmploymentStatusFilterParam,
+          value: employmentStatusFilter,
+          options: HR_RECORDS_EMPLOYMENT_STATUSES.map((status) => ({
+            label: formatRecordsEmploymentStatusLabel(status),
+            value: status,
+          })),
+        },
+      ],
     }),
     window,
     surface: {

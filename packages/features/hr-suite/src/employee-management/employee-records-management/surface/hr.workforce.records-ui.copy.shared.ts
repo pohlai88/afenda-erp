@@ -29,6 +29,7 @@ export const hrRecordsUiCopy = {
       "Master employee roster with current placement and employment status.",
     searchLabel: "Search employees",
     searchPlaceholder: "Employee number, name, or email",
+    statusFilterLabel: "Employment status",
     colEmployee: "Employee",
     colStatus: "Status",
     colEmail: "Email",

@@ -6,6 +6,8 @@ import {
 } from "@afenda/governed-surface";
 import type { ListSurfaceRendererConfigurationInput } from "@afenda/governed-surface/schemas";
 
+import type { ListSurfaceToolbarFilter } from "@afenda/governed-surface";
+
 import { hrWorkforceRecordsReadPermission } from "../contracts/hr.workforce.records.contract";
 
 export type RecordsListWindow = {
@@ -23,6 +25,7 @@ export function buildRecordsListSearchToolbar(input: {
   label: string;
   placeholder: string;
   value?: string;
+  filters?: readonly ListSurfaceToolbarFilter[];
 }) {
   return {
     search: {
@@ -31,6 +34,11 @@ export function buildRecordsListSearchToolbar(input: {
       placeholder: input.placeholder,
       value: input.value ?? "",
     },
+    ...(input.filters?.length ? { filters: [...input.filters] } : {}),
+    resetParams: [
+      input.param,
+      ...(input.filters ?? []).map((filter) => filter.param),
+    ],
   } as const;
 }
 
