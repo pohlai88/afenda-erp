@@ -113,3 +113,23 @@
 |  18 | Unauthorized users cannot modify organization hierarchy data.                                                 |
 |  19 | Every organization hierarchy change creates an audit event.                                                   |
 |  20 | Organization chart data can be filtered by company, business unit, department, manager, location, and status. |
+
+---
+
+## As-built summary (code-verified)
+
+| Area | Status | HRM codes | Notes |
+| ---- | ------ | --------- | ----- |
+| Workbench route | Shipped | ORG-004, 023 | `/hr/org` via `apps/erp/src/lib/hr-sections/org.server.tsx` |
+| Organization units CRUD | Shipped | ORG-001–003, 012–016, 024–025 | `upsertHrOrgUnit` with loop/self-parent guards + audit |
+| Unit types | Shipped | ORG-002 | legal_entity, business_unit, department, sub_department, team, location |
+| Positions + occupancy | Shipped | ORG-009–011, 020 | filled/vacant derived; planned/frozen/closed stored |
+| Reporting lines | Shipped | ORG-005–007, 021–022 | direct, dotted_line, matrix via `hr_reporting_relationships` |
+| Org chart visualization | Shipped | ORG-004 | `HrOrgChartTreePanel` client tree from `loadHrOrgChartTreeNodes` |
+| Headcount + vacancies | Shipped | ORG-019–020 | overview stats + dedicated list surfaces |
+| Effective dating | Shipped | ORG-012–014 | `effectiveFrom`/`effectiveTo` on units and positions; future units excluded from current tree |
+| Cost center + location | Shipped | ORG-017–018 | nullable codes on units and positions |
+| Audit trail | Shipped | ORG-025 | `hr_org_structure_audit_events` on every mutation |
+| Export | Shipped | ORG-023 | `exportHrOrgStructureAction` / `exportHrOrgStructureRows` |
+| Approval chain API | Shipped | ORG-021–022 | `resolveHrManagerApprovalChainAction` |
+| Access control | Shipped | ORG-024 | `hr.org.read` / `hr.org.write` capability guards |
