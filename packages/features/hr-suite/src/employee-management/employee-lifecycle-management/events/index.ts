@@ -1,5 +1,2 @@
-/**
- * @afenda-bucket events
- * Scaffold placeholder from packages/_template-definition.
- */
-export {};
+/** @afenda-bucket events */
+export * from "./hr.workforce.lifecycle.event";

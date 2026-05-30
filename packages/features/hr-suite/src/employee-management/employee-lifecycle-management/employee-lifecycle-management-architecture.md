@@ -1,5 +1,8 @@
 # Employee Lifecycle Management
 
+> **Parent doctrine:** [ARCH-002](../../../../../docs/architecture/002-erp-kernel-package-architecture.md) · [ARCH-006](../../../../../docs/architecture/006-metadata-driven-ui-architecture.md) · [ARCH-010](../../../../../docs/architecture/010-hr-feature-package-architecture.md)  
+> **Golden reference:** `employee-management/compliance-regulatory-tracking/` · rule `afenda-hr-reference-slice`
+
 ## Definition
 
 **Employee Lifecycle Management is the HRM function that tracks, controls, and automates the complete employee journey from pre-boarding, hiring, onboarding, probation, confirmation, movement, promotion, transfer, suspension, resignation, termination, retirement, and post-employment record closure.**
@@ -119,3 +122,92 @@
 |  18 | Automated notifications are sent for pending, overdue, and completed lifecycle actions.                                     |
 |  19 | Every lifecycle transition creates an audit event.                                                                          |
 |  20 | Separated or retired employees retain lifecycle history after record archival.                                              |
+
+---
+
+## Implementation plan (10 slices)
+
+Golden path: clone `compliance-regulatory-tracking`. Domain prefix: **`hr.workforce.lifecycle`**. Capabilities: `hr.lifecycle.read`, `hr.lifecycle.write`.
+
+| Slice | Goal | HRM codes (primary) |
+| ----- | ---- | ------------------- |
+| **1** | Vertical scaffold + architecture matrix | — |
+| **2** | Access policy + package door wiring | LCY-001, 027 |
+| **3** | Surface registry + search params + metadata tests | LCY-002, 003 |
+| **4** | Page model + Pattern B overview + roster Pattern C | LCY-002, 003, 025 (read) |
+| **5** | Pending transitions + status mutations | LCY-023, 024, 025, 028 |
+| **6** | Probation + confirmation forms/actions | LCY-007–010 |
+| **7** | Employee movement workflows | LCY-011–014 |
+| **8** | Suspension, notice, separation paths | LCY-017–019, 021–022 |
+| **9** | Audit trail + module exposure + notifications (minimal) | LCY-026, 027, 028 |
+| **10** | `SHIPPED_CAPABILITIES`, E2E, remove root stubs | all → Shipped or Deferred |
+
+**Deferred (explicit owner, no half-ship):** LCY-004…006 onboarding tasks → Onboarding; LCY-015…016 contract renewal → schema slice; pre-boarding stage → Employee Records / enum migration.
+
+**Verification each slice:** `check-hr-feature-vertical-naming.mts` (after Slice 10), `@afenda/feature-hr-suite test`, `architecture:check`, `lint:governed-renderers` when surfaces change.
+
+---
+
+## As-built summary (code-verified)
+
+**Route:** `/hr/lifecycle` · **Module:** `@afenda/feature-hr-suite` · **Capabilities:** `hr.lifecycle.read`, `hr.lifecycle.write`
+
+| Layer | Location |
+| ----- | -------- |
+| App adapter | `apps/erp/src/lib/hr-sections/lifecycle.server.tsx` |
+| Workbench | `components/hr.workforce.lifecycle-section.component.server.tsx` |
+| Page model | `data/hr.workforce.lifecycle.page-model.server.ts` |
+| DB commands | `@afenda/db` → `hr-lifecycle.ts` |
+| Export doors | `server.ts`, `client.ts`, `metadata.ts` |
+
+### HRM-LCY shipment matrix
+
+| Code | Status |
+| ---- | ------ |
+| HRM-LCY-001 | **Shipped** (schemas + `hr_employment_status` enum alignment) |
+| HRM-LCY-002 | **Shipped** (overview roster + KPI snapshot) |
+| HRM-LCY-003 | **Partial** — filter via `lifecycleEmploymentStatus`; pre-boarding **Deferred** |
+| HRM-LCY-023 | **Shipped** — `changeHrEmploymentStatus` + Zod stored-status guard |
+| HRM-LCY-024 | **Shipped** — future-dated queue + pending transitions list |
+| HRM-LCY-007 | **Shipped** — probation-due list + derived review posture |
+| HRM-LCY-008 | **Shipped** — `recordHrProbationOutcome` + trailing form |
+| HRM-LCY-009 | **Shipped** — confirmation via probation outcome / `confirmHrEmployment` |
+| HRM-LCY-010 | **Shipped** — status updates via `@afenda/db` commands |
+| HRM-LCY-011 … HRM-LCY-014 | **Shipped** — movement panel + `recordHrEmployeeMovement` |
+| HRM-LCY-004 … HRM-LCY-006 | **Partial** — onboarding cases queue + `startHrOnboarding` action |
+| HRM-LCY-017 … HRM-LCY-022 | **Shipped** — exit panel + notice period + offboarding case start |
+| HRM-LCY-018 … HRM-LCY-020 | **Partial** — offboarding cases list; clearance UI Slice 12 |
+| HRM-LCY-019 | **Shipped** — notice period register + last working from case |
+| HRM-LCY-025 | **Shipped** — org audit trail Pattern C list |
+| HRM-LCY-027 | **Shipped** — `resolveHrEmployeeLifecycleStage` read helper |
+| HRM-LCY-028 | **Shipped** — execution audit on all lifecycle mutations |
+| HRM-LCY-015 … HRM-LCY-016 | **Deferred** — contract renewal (schema) |
+| HRM-LCY-026 | **Deferred** — notifications |
+
+**Workbench surfaces:** pending → probation → onboarding cases → notice period → offboarding cases → exit panel → movement → roster → audit trail.
+
+**Slice 10:** `SHIPPED_CAPABILITIES`, `apps/erp/tests/e2e/hr-lifecycle.spec.ts`.
+
+---
+
+## Implementation plan — phase 2 (slice 11+)
+
+| Slice | Goal | HRM codes |
+| ----- | ---- | --------- |
+| **11** | Onboarding/offboarding queues + notice period + exit panel | LCY-004–006, 017–020, 021–022 (partial) |
+| **12** | Checklist/clearance item completion UI | LCY-006, 020 (execution) |
+| **13** | Contract renewal horizon | LCY-015–016 (schema + list) |
+| **14** | Lifecycle reminders (minimal) | LCY-026 |
+
+---
+
+### Slice 11 as-built (code-verified)
+
+| Code | Status |
+| ---- | ------ |
+| HRM-LCY-004 … HRM-LCY-006 | **Partial** — `listHrOnboardingCasesWindow`, `startHrOnboardingCaseAction`, onboarding cases list |
+| HRM-LCY-017 … HRM-LCY-022 | **Shipped** — notice period list, exit panel, `initiateHrNoticePeriodAction`, `startHrOffboardingCaseAction` |
+| HRM-LCY-018 … HRM-LCY-020 | **Partial** — offboarding cases list + `startHrOffboarding` wiring; clearance completion Slice 12 |
+| HRM-LCY-019 | **Shipped** — `listHrLifecycleNoticePeriodWindow` + last working date from active case |
+
+**Workbench order:** scheduled transitions → probation → onboarding cases → notice period → offboarding cases → exit pathways → movement → roster → audit trail.
