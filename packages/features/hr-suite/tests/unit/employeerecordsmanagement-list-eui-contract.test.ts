@@ -23,6 +23,7 @@ import { hrRecordsAuditTrailSearchParam, hrRecordsAuditTrailSurfaceKey } from ".
 import {
   hrRecordsDirectorySearchParam,
   hrRecordsDirectorySurfaceKey,
+  hrRecordsEmploymentStatusFilterParam,
 } from "../../src/employee-management/employee-records-management/surface/hr.workforce.records-directory-list.surface";
 import { hrRecordsDocumentReferencesSearchParam, hrRecordsDocumentReferencesSurfaceKey } from "../../src/employee-management/employee-records-management/surface/hr.workforce.records-document-references-list.surface";
 import {
@@ -60,7 +61,14 @@ describe("records Pattern C governed list EUI contract", () => {
         buildHrRecordsDirectoryListSurface({
           window: emptyWindow,
           canViewSensitive: true,
+          employmentStatusFilter: "active",
         }),
+      extraAssertions: (surface: ReturnType<typeof buildHrRecordsDirectoryListSurface>) => {
+        expect(surface.presentation.toolbar?.filters?.[0]?.param).toBe(
+          hrRecordsEmploymentStatusFilterParam,
+        );
+        expect(surface.presentation.toolbar?.filters?.[0]?.value).toBe("active");
+      },
     },
     {
       label: "assignment history",
@@ -126,6 +134,9 @@ describe("records Pattern C governed list EUI contract", () => {
       );
       expect(surface.surface.columnsId).toBe(testCase.columnsId);
       expect(surface.surface.rowKey).toBe("id");
+      if ("extraAssertions" in testCase && testCase.extraAssertions) {
+        testCase.extraAssertions(surface);
+      }
     });
   }
 });
