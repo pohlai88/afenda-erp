@@ -1,9 +1,12 @@
-import { hrComplianceUiCopy, toHrCompliancePageModelInput } from "@afenda/feature-hr-suite/metadata";
 import {
-  buildHrCompliancePageModel,
-  HrComplianceAccessDeniedPanel,
-  HrComplianceWorkbenchSection,
-  requireHrComplianceRead,
+  hrOffboardingUiCopy,
+  toHrOffboardingPageModelInput,
+} from "@afenda/feature-hr-suite/metadata";
+import {
+  buildHrOffboardingPageModel,
+  HrOffboardingAccessDeniedPanel,
+  HrOffboardingWorkbenchSection,
+  requireHrOffboardingRead,
 } from "@afenda/feature-hr-suite/server";
 import {
   ExecutionAccessDeniedError,
@@ -14,45 +17,45 @@ import type { Metadata } from "next";
 import type { HrSectionPageProps } from "./registry.server";
 
 export const metadata: Metadata = {
-  title: `${hrComplianceUiCopy.page.title} — HR`,
-  description: hrComplianceUiCopy.page.description,
+  title: `${hrOffboardingUiCopy.page.title} — HR`,
+  description: hrOffboardingUiCopy.page.description,
 };
 
-function isComplianceAccessFailure(error: unknown) {
+function isOffboardingAccessFailure(error: unknown) {
   return (
     error instanceof ExecutionContextRequiredError ||
     error instanceof ExecutionAccessDeniedError
   );
 }
 
-export default async function HrCompliancePage({
+export default async function HrOffboardingPage({
   searchParams,
 }: HrSectionPageProps) {
-  let guard: Awaited<ReturnType<typeof requireHrComplianceRead>>;
+  let guard: Awaited<ReturnType<typeof requireHrOffboardingRead>>;
   let resolvedSearchParams:
     | Record<string, string | string[] | undefined>
     | undefined;
 
   try {
     [guard, resolvedSearchParams] = await Promise.all([
-      requireHrComplianceRead(),
+      requireHrOffboardingRead(),
       searchParams ?? Promise.resolve(undefined),
     ]);
   } catch (error) {
-    if (isComplianceAccessFailure(error)) {
-      return <HrComplianceAccessDeniedPanel />;
+    if (isOffboardingAccessFailure(error)) {
+      return <HrOffboardingAccessDeniedPanel />;
     }
     throw error;
   }
 
-  const model = await buildHrCompliancePageModel(
-    toHrCompliancePageModelInput({
+  const model = await buildHrOffboardingPageModel(
+    toHrOffboardingPageModelInput({
       organizationId: guard.organization.id,
-      canWrite: guard.hasCapability("hr.compliance.write"),
+      canWrite: guard.hasCapability("hr.offboarding.write"),
       canViewSensitive: guard.canViewSensitive,
       searchParams: resolvedSearchParams,
     }),
   );
 
-  return <HrComplianceWorkbenchSection model={model} />;
+  return <HrOffboardingWorkbenchSection model={model} />;
 }

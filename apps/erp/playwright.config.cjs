@@ -10,16 +10,16 @@ const isCi = Boolean(process.env.CI);
 const e2ePort = process.env.PLAYWRIGHT_PORT ?? "3100";
 const baseURL =
   process.env.PLAYWRIGHT_BASE_URL ?? `http://localhost:${e2ePort}`;
-const neonAuthEnabled = process.env.AFENDA_NEON_AUTH_ENABLED === "1";
 
+/** E2E always uses dev cookie auth so demo owner retains full appCapabilities (incl. hr.compliance.*). */
 function createE2eServerEnv() {
   return {
     PORT: e2ePort,
     NODE_ENV: "production",
     AFENDA_DEV_AUTH_BYPASS: "0",
-    AFENDA_NEON_AUTH_ENABLED: neonAuthEnabled ? "1" : "0",
-    NEXT_PUBLIC_AFENDA_NEON_AUTH_ENABLED: neonAuthEnabled ? "1" : "0",
-    AFENDA_E2E_DEV_AUTH: neonAuthEnabled ? "0" : "1",
+    AFENDA_NEON_AUTH_ENABLED: "0",
+    NEXT_PUBLIC_AFENDA_NEON_AUTH_ENABLED: "0",
+    AFENDA_E2E_DEV_AUTH: "1",
     NEXT_PUBLIC_APP_NAME: "Afenda ERP",
     NEXT_PUBLIC_SITE_URL: `http://localhost:${e2ePort}`,
     NEXT_PUBLIC_STAGE: "ci",
@@ -59,7 +59,7 @@ module.exports = defineConfig({
         command: `pnpm exec next start --port ${e2ePort}`,
         cwd: ".",
         url: baseURL,
-        reuseExistingServer: !isCi,
+        reuseExistingServer: false,
         timeout: 120_000,
         env: createE2eServerEnv(),
       },

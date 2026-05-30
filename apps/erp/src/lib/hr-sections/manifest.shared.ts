@@ -9,6 +9,30 @@ export const hrSectionManifest = {
     label: "Compliance",
     featureArea: "employee-management/compliance-regulatory-tracking",
   },
+  lifecycle: {
+    label: "Lifecycle",
+    featureArea: "employee-management/employee-lifecycle-management",
+  },
+  offboarding: {
+    label: "Offboarding",
+    featureArea: "employee-management/offboarding-exit-management",
+  },
+  documents: {
+    label: "Documents",
+    featureArea: "employee-management/documents-management",
+  },
+  employees: {
+    label: "Employees",
+    featureArea: "employee-management/employee-records-management",
+  },
+  records: {
+    label: "Records",
+    featureArea: "employee-management/employee-records-management",
+  },
+  org: {
+    label: "Organization",
+    featureArea: "employee-management/organizational-chart-hierarchy",
+  },
 } as const;
 
 export type HrSectionSlug = keyof typeof hrSectionManifest;

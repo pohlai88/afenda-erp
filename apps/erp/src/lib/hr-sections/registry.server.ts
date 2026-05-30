@@ -1,14 +1,13 @@
-import { hrComplianceRoutePaths } from "@afenda/feature-hr-suite/metadata";
+import { hrSectionManifest, type HrSectionSlug } from "./manifest.shared";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import type { ComponentType } from "react";
-import { hrSectionManifest, type HrSectionSlug } from "./manifest.shared";
-
 export type { HrSectionSlug } from "./manifest.shared";
 export { describeHrSection, hrSectionManifest } from "./manifest.shared";
 
 export type HrSectionPageProps = {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
+  employeeId?: string;
 };
 
 type HrSectionModule = {
@@ -18,17 +17,40 @@ type HrSectionModule = {
 
 const sectionLoaders = {
   compliance: () => import("./compliance.server"),
+  lifecycle: () => import("./lifecycle.server"),
+  offboarding: () => import("./offboarding.server"),
+  documents: () => import("./documents.server"),
+  employees: () => import("./employees.server"),
+  records: () => import("./records.server"),
+  org: () => import("./org.server"),
 } satisfies Record<HrSectionSlug, () => Promise<HrSectionModule>>;
 
-export const hrSectionSlugs = Object.values(hrComplianceRoutePaths)
-  .filter((path) => path !== hrComplianceRoutePaths.hub)
-  .map((path) => path.replace("/hr/", "")) as HrSectionSlug[];
+export const hrSectionSlugs = Object.keys(
+  hrSectionManifest,
+) as HrSectionSlug[];
 
 function isHrSectionSlug(slug: string): slug is HrSectionSlug {
   return slug in sectionLoaders;
 }
 
+export function resolveHrEmployeeRecordId(section: string[]): string | null {
+  if (section.length !== 2 || section[0] !== "records") {
+    return null;
+  }
+
+  const employeeId = section[1]?.trim();
+  return employeeId || null;
+}
+
+export function isHrRecordsDetailRoute(section: string[]): boolean {
+  return resolveHrEmployeeRecordId(section) !== null;
+}
+
 export function resolveHrSectionSlug(section: string[]): HrSectionSlug {
+  if (isHrRecordsDetailRoute(section)) {
+    notFound();
+  }
+
   const slug = section[0];
 
   if (!slug || section.length > 1 || !isHrSectionSlug(slug)) {
@@ -40,6 +62,10 @@ export function resolveHrSectionSlug(section: string[]): HrSectionSlug {
 
 export async function loadHrSection(slug: HrSectionSlug) {
   return sectionLoaders[slug]();
+}
+
+export async function loadHrRecordsDetailSection() {
+  return import("./records-detail.server");
 }
 
 const manifestSlugs = Object.keys(hrSectionManifest) as HrSectionSlug[];

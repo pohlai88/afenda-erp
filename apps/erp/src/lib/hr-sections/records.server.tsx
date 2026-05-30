@@ -1,9 +1,12 @@
-import { hrComplianceUiCopy, toHrCompliancePageModelInput } from "@afenda/feature-hr-suite/metadata";
 import {
-  buildHrCompliancePageModel,
-  HrComplianceAccessDeniedPanel,
-  HrComplianceWorkbenchSection,
-  requireHrComplianceRead,
+  hrRecordsUiCopy,
+  toHrRecordsPageModelInput,
+} from "@afenda/feature-hr-suite/metadata";
+import {
+  buildHrRecordsPageModel,
+  HrRecordsAccessDeniedPanel,
+  HrRecordsWorkbenchSection,
+  requireHrRecordsRead,
 } from "@afenda/feature-hr-suite/server";
 import {
   ExecutionAccessDeniedError,
@@ -14,45 +17,45 @@ import type { Metadata } from "next";
 import type { HrSectionPageProps } from "./registry.server";
 
 export const metadata: Metadata = {
-  title: `${hrComplianceUiCopy.page.title} — HR`,
-  description: hrComplianceUiCopy.page.description,
+  title: `${hrRecordsUiCopy.page.title} — HR`,
+  description: hrRecordsUiCopy.page.description,
 };
 
-function isComplianceAccessFailure(error: unknown) {
+function isRecordsAccessFailure(error: unknown) {
   return (
     error instanceof ExecutionContextRequiredError ||
     error instanceof ExecutionAccessDeniedError
   );
 }
 
-export default async function HrCompliancePage({
+export default async function HrRecordsPage({
   searchParams,
 }: HrSectionPageProps) {
-  let guard: Awaited<ReturnType<typeof requireHrComplianceRead>>;
+  let guard: Awaited<ReturnType<typeof requireHrRecordsRead>>;
   let resolvedSearchParams:
     | Record<string, string | string[] | undefined>
     | undefined;
 
   try {
     [guard, resolvedSearchParams] = await Promise.all([
-      requireHrComplianceRead(),
+      requireHrRecordsRead(),
       searchParams ?? Promise.resolve(undefined),
     ]);
   } catch (error) {
-    if (isComplianceAccessFailure(error)) {
-      return <HrComplianceAccessDeniedPanel />;
+    if (isRecordsAccessFailure(error)) {
+      return <HrRecordsAccessDeniedPanel />;
     }
     throw error;
   }
 
-  const model = await buildHrCompliancePageModel(
-    toHrCompliancePageModelInput({
+  const model = await buildHrRecordsPageModel(
+    toHrRecordsPageModelInput({
       organizationId: guard.organization.id,
-      canWrite: guard.hasCapability("hr.compliance.write"),
+      canWrite: guard.hasCapability("hr.employees.write"),
       canViewSensitive: guard.canViewSensitive,
       searchParams: resolvedSearchParams,
     }),
   );
 
-  return <HrComplianceWorkbenchSection model={model} />;
+  return <HrRecordsWorkbenchSection model={model} />;
 }

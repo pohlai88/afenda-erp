@@ -1,6 +1,10 @@
 import { describeWorkspaceDataSource } from "@afenda/kernel";
 import { GovernedDetailTabs } from "@afenda/governed-surface/server";
 import { getModuleFeatureMetadata } from "@/lib/module-feature-metadata";
+import {
+  HrEmployeeRecordDetailPage,
+  isHrEmployeeRecordDetailRoute,
+} from "@/lib/hr-sections/record-detail.server";
 import { loadModuleRecordDetailContext } from "@/workspace-routes/workspace-route-cache";
 import { SectionPanel, StatusBadge } from "@afenda/ui";
 import Link from "next/link";
@@ -12,6 +16,10 @@ export async function RecordDetailSection({
   moduleId: string;
   recordId: string;
 }) {
+  if (isHrEmployeeRecordDetailRoute(moduleId)) {
+    return <HrEmployeeRecordDetailPage recordId={recordId} />;
+  }
+
   const { moduleDefinition, organization, record, dataMode, moduleId: resolvedModuleId } =
     await loadModuleRecordDetailContext(moduleId, recordId);
 
@@ -31,7 +39,7 @@ export async function RecordDetailSection({
         aside={
           <div className="flex flex-col gap-3 text-right">
             <StatusBadge label={record.status} tone="neutral" />
-            <div className="type-caption uppercase tracking-wide text-muted">
+            <div className="type-caption uppercase tracking-wide">
               {organization.slug}
             </div>
           </div>

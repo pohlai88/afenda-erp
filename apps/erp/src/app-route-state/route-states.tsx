@@ -1,5 +1,6 @@
 import { appBrandName, getAppShellSkeletonNavItemIds } from "@afenda/kernel";
 import { Skeleton } from "@afenda/ui/skeleton";
+import { HR_COMPLIANCE_LIST_SURFACE_KEYS } from "@afenda/feature-hr-suite/metadata";
 import { ui } from "@afenda/ui/design-system";
 import { cn } from "@afenda/ui/utils";
 import Link from "next/link";
@@ -22,11 +23,11 @@ export function RouteStatePanel({
   return (
     <main className="flex min-h-full items-center justify-center px-surface-2xl py-16">
       <div className="w-full max-w-lg rounded-panel border border-line bg-surface-strong p-8 shadow-elevation-1">
-        <div className="type-caption uppercase tracking-wide text-muted">
+        <div className="type-caption uppercase tracking-wide">
           {appBrandName}
         </div>
         <h1 className="mt-3 type-section-title font-semibold text-foreground">{title}</h1>
-        <p className="mt-3 type-body leading-6 text-muted">{description}</p>
+        <p className="mt-3 type-muted">{description}</p>
         {action ? (
           action.href ? (
             <Link
@@ -144,15 +145,16 @@ export function SystemAdminAuditPageSkeleton() {
 export function HrCompliancePageSkeleton() {
   return (
     <div
-      className="flex flex-col gap-surface-2xl"
+      className="@container flex flex-col gap-surface-2xl"
       aria-busy="true"
       aria-label="Loading HR compliance"
     >
       <Skeleton className="h-20 w-full max-w-2xl rounded-panel" />
-      <SystemAdminListSectionPlaceholder />
-      <SystemAdminListSectionPlaceholder />
-      <SystemAdminListSectionPlaceholder />
-      <SystemAdminListSectionPlaceholder />
+      {Array.from({ length: HR_COMPLIANCE_LIST_SURFACE_KEYS.length }, (_, index) => (
+        <SystemAdminListSectionPlaceholder
+          key={`hr-compliance-list-${index}`}
+        />
+      ))}
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import { HrModuleNav } from "@afenda/feature-hr-suite/client";
 import { resolveHrModuleNavItems } from "@afenda/feature-hr-suite/metadata";
-import { requireExecutionContext } from "@afenda/kernel/execution";
+import { resolveExecutionContext } from "@afenda/kernel/execution";
 import { assertHrModuleId, HR_MODULE_ID } from "@/lib/hr-route.shared";
 
 export async function HrSectionNav({ moduleId }: { moduleId: string }) {
@@ -9,7 +9,11 @@ export async function HrSectionNav({ moduleId }: { moduleId: string }) {
     return null;
   }
 
-  const context = await requireExecutionContext();
+  const context = await resolveExecutionContext();
+  if (!context) {
+    return null;
+  }
+
   const navItems = resolveHrModuleNavItems(context.capabilities).map(
     (item) => ({
       href: item.href,
