@@ -1,17 +1,27 @@
-export { hrComplianceExceptionsSurfaceKey } from "./hr.workforce.compliance-exceptions-list.surface";
-export { hrComplianceLaborLawRequirementsSurfaceKey } from "./hr.workforce.compliance-labor-law-requirements-list.surface";
-export { hrComplianceObligationsSurfaceKey } from "./hr.workforce.compliance-obligations-list.surface";
-export { hrComplianceWorkEligibilitySurfaceKey } from "./hr.workforce.compliance-work-eligibility-list.surface";
-
 export const hrComplianceUiCopy = {
   page: {
     title: "Compliance",
     description:
-      "Configure HR compliance obligations and track labor law requirements applicable to employees.",
+      "Configure HR compliance obligations and track alerts, review queue items, mandatory filings, policy acknowledgments, labor law, safety training, workplace safety, work eligibility, work authorization requirements, regulatory deadlines, and the compliance audit trail.",
   },
   accessDenied: {
     title: "Access restricted",
     description: "Compliance records are not available for this account.",
+  },
+  sensitiveAccess: {
+    title: "Sensitive detail restricted",
+    workAuthDescription:
+      "Work authorization document numbers and review notes require the sensitive compliance read permission. Operational status and expiry dates remain visible.",
+    workEligibilityDescription:
+      "Work eligibility review notes require the sensitive compliance read permission. Status and renewal dates remain visible.",
+    evidenceLinksDescription:
+      "Restricted or confidential evidence titles and notes require the sensitive compliance read permission. Submission posture remains visible.",
+    auditTrailDescription:
+      "Sensitive audit metadata such as document numbers and review notes require the sensitive compliance read permission. Event type, actor, and timestamps remain visible.",
+    alertsDescription:
+      "Work authorization alert detail derived from document numbers requires the sensitive compliance read permission. Severity, deadlines, and operational posture remain visible.",
+    reviewQueueDescription:
+      "Work eligibility, work authorization, and sensitive evidence review items require the sensitive compliance read permission. Filing confirmations remain visible.",
   },
   obligations: {
     sectionTitle: "Compliance obligations",
@@ -52,6 +62,59 @@ export const hrComplianceUiCopy = {
     formFieldDueDate: "Due date",
     formFieldCountryPlaceholder: "MY",
   },
+  filing: {
+    sectionTitle: "Mandatory filings",
+    sectionDescription:
+      "Track mandatory filing requirements and filing deadlines by legal entity and jurisdiction.",
+    surfaceHeaderTitle: "Mandatory filing register",
+    emptyTitle: "No mandatory filings tracked",
+    emptyDescription:
+      "Configure filing obligations and sync filing rows for active mandatory filing requirements.",
+    searchLabel: "Search filings",
+    searchPlaceholder: "Search by filing code, title, entity, or area",
+    colRequirement: "Filing requirement",
+    colArea: "Area",
+    colScope: "Scope",
+    colStatus: "Status",
+    colDeadline: "Filing deadline",
+    colSubmitted: "Submitted",
+    colConfirmed: "Confirmed",
+    colActions: "Actions",
+    syncTitle: "Sync filing register",
+    syncDescription:
+      "Materialize filing rows for active filing obligations and refresh pending deadlines from obligation templates.",
+    syncActionLabel: "Sync filings",
+    trailingUpdateActionLabel: "Update filing",
+    trailingUpdateStatusLabel: "Filing status",
+    trailingDeadlineLabel: "Filing deadline",
+    trailingDeadlinePlaceholder: "Regulatory submission due date",
+    trailingReviewNotesPlaceholder: "Review notes",
+  },
+  policyAcknowledgement: {
+    sectionTitle: "Policy acknowledgments",
+    sectionDescription:
+      "Track mandatory HR policy acknowledgments by employee and policy version based on obligation scope.",
+    surfaceHeaderTitle: "Employee policy acknowledgment register",
+    emptyTitle: "No policy acknowledgments tracked",
+    emptyDescription:
+      "Configure policy acknowledgement obligations and sync applicable rows for active employees.",
+    searchLabel: "Search policy acknowledgments",
+    searchPlaceholder: "Search by employee, policy, version, or status (e.g. missing, overdue, at risk)",
+    colEmployee: "Employee",
+    colPolicy: "Policy",
+    colPolicyVersion: "Version",
+    colStatus: "Status",
+    colDue: "Acknowledgment due",
+    colAcknowledged: "Acknowledged",
+    colActions: "Actions",
+    syncTitle: "Sync applicable acknowledgments",
+    syncDescription:
+      "Materialize policy acknowledgement obligation rows for active employees whose scope matches configured obligations.",
+    syncActionLabel: "Sync acknowledgments",
+    trailingMarkCompliantLabel: "Record acknowledgment",
+    trailingUpdateStatusLabel: "Acknowledgment status",
+    trailingReviewNotesPlaceholder: "Review notes",
+  },
   exceptions: {
     sectionTitle: "Open exceptions",
     sectionDescription:
@@ -59,27 +122,36 @@ export const hrComplianceUiCopy = {
     surfaceHeaderTitle: "Open exceptions",
     emptyTitle: "No open exceptions",
     emptyDescription:
-      "Open compliance exceptions appear here when an obligation gap is recorded.",
+      "Open compliance exceptions appear here when a missing, expired, overdue, or failed compliance item is detected, or when you record a case manually.",
     searchLabel: "Search exceptions",
-    searchPlaceholder: "Search by title, employee, or area",
+    searchPlaceholder: "Search by title, employee, area, gap, or overdue",
     colTitle: "Title",
     colEmployee: "Employee",
     colArea: "Area",
+    colGap: "Gap",
     colSeverity: "Severity",
     colStatus: "Status",
+    colOwner: "Corrective owner",
     colDue: "Corrective due",
     colActions: "Actions",
     trailingClosedDisabledReason:
       "Closed exceptions cannot receive new corrective actions.",
     trailingAssignLabel: "Assign corrective action",
     trailingProgressLabel: "Update progress",
+    trailingProgressNoteLabel: "Progress note",
     trailingResolveLabel: "Resolve",
     trailingWaiveLabel: "Waive",
+    trailingCorrectiveOwnerLabel: "Action owner",
+    trailingCorrectiveOwnerPlaceholder: "Select owner",
+    trailingCorrectiveDescriptionLabel: "Corrective action",
     trailingCorrectiveDescriptionPlaceholder: "Corrective action",
     trailingCorrectiveDuePlaceholder: "Corrective due date",
     trailingProgressPlaceholder: "Progress note",
+    trailingResolutionNoteLabel: "Resolution note",
     trailingResolutionPlaceholder: "Resolution note",
+    trailingWaiverReasonLabel: "Waiver reason",
     trailingWaiverReasonPlaceholder: "Waiver reason",
+    trailingApprovalReferenceLabel: "Approval reference",
     trailingApprovalReferencePlaceholder: "Approval reference",
     trailingReviewNotesPlaceholder: "Review notes",
     createTitle: "Record exception",
@@ -89,6 +161,11 @@ export const hrComplianceUiCopy = {
     formFieldItemType: "Item type",
     formFieldArea: "Area",
     formFieldSeverity: "Severity",
+    formFieldCorrectiveDescription: "Corrective action",
+    formFieldCorrectiveOwner: "Action owner",
+    formFieldCorrectiveDue: "Corrective due",
+    formFieldCorrectivePairHint:
+      "Assign owner and due date together to start corrective action tracking.",
   },
   laborLaw: {
     sectionTitle: "Labor law requirements",
@@ -99,7 +176,7 @@ export const hrComplianceUiCopy = {
     emptyDescription:
       "Configure labor law obligations and sync applicable requirements for active employees.",
     searchLabel: "Search labor law requirements",
-    searchPlaceholder: "Search by employee, requirement code, or area",
+    searchPlaceholder: "Search by employee, requirement code, or status (e.g. pending, overdue, at risk)",
     colEmployee: "Employee",
     colRequirement: "Requirement",
     colArea: "Area",
@@ -113,6 +190,88 @@ export const hrComplianceUiCopy = {
     syncActionLabel: "Sync requirements",
     trailingMarkCompliantLabel: "Update status",
     trailingUpdateStatusLabel: "Requirement status",
+    trailingReviewNotesPlaceholder: "Review notes",
+  },
+  statutory: {
+    sectionTitle: "Statutory employment requirements",
+    sectionDescription:
+      "Track statutory employment registrations, contribution readiness, and classification compliance by employee scope.",
+    surfaceHeaderTitle: "Statutory employment register",
+    emptyTitle: "No statutory employment requirements tracked",
+    emptyDescription:
+      "Configure statutory obligations and sync applicable requirements for active employees.",
+    searchLabel: "Search statutory requirements",
+    searchPlaceholder:
+      "Search by employee, requirement code, or status (e.g. pending, overdue, at risk)",
+    colEmployee: "Employee",
+    colRequirement: "Requirement",
+    colArea: "Area",
+    colStatus: "Status",
+    colDue: "Due",
+    colCompleted: "Completed",
+    colActions: "Actions",
+    syncTitle: "Sync applicable requirements",
+    syncDescription:
+      "Materialize statutory obligation rows for active employees whose scope matches configured obligations.",
+    syncActionLabel: "Sync requirements",
+    trailingMarkCompliantLabel: "Update status",
+    trailingUpdateStatusLabel: "Requirement status",
+    trailingReviewNotesPlaceholder: "Review notes",
+  },
+  workplaceSafety: {
+    sectionTitle: "Workplace safety requirements",
+    sectionDescription:
+      "Track workplace safety compliance requirements applicable to each employee based on obligation scope.",
+    surfaceHeaderTitle: "Employee workplace safety register",
+    emptyTitle: "No workplace safety requirements tracked",
+    emptyDescription:
+      "Configure safety obligations and sync applicable requirements for active employees.",
+    searchLabel: "Search workplace safety requirements",
+    searchPlaceholder: "Search by employee, requirement code, or status (e.g. pending, overdue, at risk)",
+    colEmployee: "Employee",
+    colRequirement: "Requirement",
+    colArea: "Area",
+    colStatus: "Status",
+    colDue: "Certification expiry",
+    colCompleted: "Completed",
+    colActions: "Actions",
+    syncTitle: "Sync applicable requirements",
+    syncDescription:
+      "Materialize workplace safety obligation rows for active employees whose scope matches configured obligations.",
+    syncActionLabel: "Sync requirements",
+    trailingMarkCompliantLabel: "Update status",
+    trailingUpdateStatusLabel: "Requirement status",
+    trailingCertificationExpiryLabel: "Certification expiry",
+    trailingCertificationExpiryPlaceholder: "Certification expiry or renewal date",
+    trailingReviewNotesPlaceholder: "Review notes",
+  },
+  safetyTraining: {
+    sectionTitle: "Safety training and certifications",
+    sectionDescription:
+      "Track mandatory safety training and certification requirements applicable to each employee.",
+    surfaceHeaderTitle: "Employee safety training register",
+    emptyTitle: "No safety training requirements tracked",
+    emptyDescription:
+      "Configure training or safety obligations and sync applicable requirements for active employees.",
+    searchLabel: "Search safety training requirements",
+    searchPlaceholder:
+      "Search by employee, requirement code, or status (e.g. overdue, at risk, expired)",
+    colEmployee: "Employee",
+    colRequirement: "Requirement",
+    colKind: "Kind",
+    colArea: "Area",
+    colStatus: "Status",
+    colDue: "Certification expiry",
+    colCompleted: "Completed",
+    colActions: "Actions",
+    syncTitle: "Sync applicable requirements",
+    syncDescription:
+      "Materialize safety training and certification obligation rows for active employees whose scope matches configured obligations.",
+    syncActionLabel: "Sync requirements",
+    trailingMarkCompliantLabel: "Update status",
+    trailingUpdateStatusLabel: "Requirement status",
+    trailingCertificationExpiryLabel: "Certification expiry",
+    trailingCertificationExpiryPlaceholder: "Certification expiry date",
     trailingReviewNotesPlaceholder: "Review notes",
   },
   workEligibility: {
@@ -138,5 +297,204 @@ export const hrComplianceUiCopy = {
     trailingUpdateActionLabel: "Update status",
     trailingExpiresPlaceholder: "Authorization expiry",
     trailingReviewNotesPlaceholder: "Review notes",
+  },
+  workAuthDocuments: {
+    sectionTitle: "Work authorization documents",
+    sectionDescription:
+      "Track work permit, visa, passport, and right-to-work document status with expiry dates for active employees. Missing, expiring, and expired documents are flagged and surfaced first in the register.",
+    surfaceHeaderTitle: "Employee work authorization documents",
+    emptyTitle: "No work authorization documents tracked",
+    emptyDescription:
+      "Ensure document tracking rows for active employees to monitor permit, visa, passport, and right-to-work status.",
+    searchLabel: "Search work authorization documents",
+    searchPlaceholder:
+      "Search by employee, document number, type, or status (e.g. missing, expiring, expired)",
+    colEmployee: "Employee",
+    colDocumentType: "Document type",
+    colStatus: "Status",
+    colDocumentNumber: "Document number",
+    colIssued: "Issued",
+    colVerified: "Verified",
+    colExpires: "Expires",
+    colActions: "Actions",
+    ensureTitle: "Ensure document tracking",
+    ensureDescription:
+      "Create missing document rows for each active employee across work permit, visa, passport, and right-to-work types, and reconcile stale rows without document numbers back to missing.",
+    ensureActionLabel: "Ensure document rows",
+    trailingUpdateStatusLabel: "Document status",
+    trailingUpdateActionLabel: "Update document",
+    trailingDocumentNumberPlaceholder: "Document number",
+    trailingIssuedPlaceholder: "Issued date",
+    trailingExpiresPlaceholder: "Expiry date",
+    trailingReviewNotesPlaceholder: "Review notes",
+  },
+  regulatoryCalendar: {
+    sectionTitle: "Regulatory calendar",
+    sectionDescription:
+      "Unified view of upcoming filing deadlines, renewals, requirement due dates, and corrective action dates across HR compliance.",
+    mergeTruncatedNotice:
+      "Only the earliest 1,000 deadlines are shown; refine search or reduce open obligations if expected items are missing.",
+    surfaceHeaderTitle: "Compliance deadline calendar",
+    emptyTitle: "No compliance deadlines scheduled",
+    emptyDescription:
+      "Configure obligations, filings, employee requirements, and corrective actions with due dates to populate the regulatory calendar.",
+    searchLabel: "Search regulatory calendar",
+    searchPlaceholder: "Search by title, employee, area, or deadline type",
+    colDeadline: "Deadline",
+    colTitle: "Item",
+    colKind: "Deadline type",
+    colSubject: "Subject",
+    colArea: "Area",
+    colPosture: "Posture",
+    colSourceStatus: "Source status",
+    orgWideSubjectLabel: "Organization-wide",
+  },
+  alerts: {
+    sectionTitle: "Compliance alerts",
+    sectionDescription:
+      "Active alerts for compliance deadlines, renewals, expiries, and overdue actions requiring operator attention.",
+    mergeTruncatedNotice:
+      "Only the highest-priority 1,000 alerts are shown; refine search or resolve open items if expected alerts are missing.",
+    surfaceHeaderTitle: "Compliance alert register",
+    emptyTitle: "No active compliance alerts",
+    emptyDescription:
+      "Alerts appear when filings, renewals, certifications, documents, or corrective actions need attention.",
+    searchLabel: "Search compliance alerts",
+    searchPlaceholder:
+      "Search by title, employee, alert type, or severity (e.g. deadline, renewal, expiry, overdue)",
+    colSeverity: "Severity",
+    colAlertKind: "Alert type",
+    colTriggerAt: "Trigger date",
+    colTitle: "Item",
+    colSourceKind: "Source",
+    colSubject: "Subject",
+    colArea: "Area",
+    colSourceStatus: "Source status",
+    orgWideSubjectLabel: "Organization-wide",
+    noTriggerDateLabel: "—",
+  },
+  evidenceLinks: {
+    sectionTitle: "Compliance evidence",
+    sectionDescription:
+      "Link supporting employee documents to compliance records for audit readiness and corrective action evidence.",
+    surfaceHeaderTitle: "Evidence link register",
+    emptyTitle: "No compliance evidence linked",
+    emptyDescription:
+      "Link supporting documents from employee records to filings, requirements, work authorization rows, eligibility checks, or open exceptions.",
+    searchLabel: "Search evidence links",
+    searchPlaceholder:
+      "Search by record label, document title, type, employee, or submission state",
+    colRecord: "Compliance record",
+    colRecordKind: "Record type",
+    colEmployee: "Employee",
+    colDocument: "Document",
+    colDocumentType: "Document type",
+    colSubmissionState: "Submission state",
+    colLinkedAt: "Linked",
+    colActions: "Actions",
+    trailingUpdateStateLabel: "Update submission",
+    trailingUnlinkLabel: "Unlink",
+    trailingSubmissionStateLabel: "Submission state",
+    trailingNotesPlaceholder: "Review notes",
+    trailingLinkLabel: "Link evidence",
+    trailingDocumentLabel: "Supporting document",
+    trailingDocumentPlaceholder: "Select employee document",
+    trailingLinkNotesPlaceholder: "Link notes (optional)",
+    orgWideSubjectLabel: "Organization-wide",
+    linkFormTitle: "Link supporting evidence",
+    linkFormDescription:
+      "Attach an active employee document to a compliance record by record type and identifier.",
+    linkFormRecordKindLabel: "Record type",
+    linkFormRecordIdLabel: "Record ID",
+    linkFormRecordIdPlaceholder: "Paste the row ID from the source list",
+    linkFormSubmitLabel: "Link document",
+    documentPickerEmptyTitle: "No active employee documents",
+    documentPickerEmptyDescription:
+      "Upload documents on employee records before linking compliance evidence.",
+    trailingDocumentEmptyEmployeeDescription:
+      "This employee has no active documents to link. Upload a document on their record first.",
+  },
+  reviewQueue: {
+    sectionTitle: "Review and approval queue",
+    sectionDescription:
+      "Central inbox for submitted filings, pending work eligibility and authorization verification, and evidence awaiting acknowledgment.",
+    mergeTruncatedNotice:
+      "Only the earliest 1,000 review items are shown; refine search or clear resolved items if expected entries are missing.",
+    surfaceHeaderTitle: "Compliance review queue",
+    emptyTitle: "No compliance reviews pending",
+    emptyDescription:
+      "Items appear when filings are submitted, eligibility or work authorization awaits verification, or evidence is submitted for acknowledgment.",
+    searchLabel: "Search review queue",
+    searchPlaceholder:
+      "Search by title, employee, review type, or status",
+    colQueuedAt: "Queued",
+    colEntryKind: "Review type",
+    colTitle: "Item",
+    colSubject: "Subject",
+    colArea: "Area",
+    colSourceStatus: "Current status",
+    colRequiredAction: "Required action",
+    colActions: "Review",
+    orgWideSubjectLabel: "Organization-wide",
+    trailingApproveLabel: "Approve",
+    trailingRejectLabel: "Reject",
+    trailingReviewNotesPlaceholder: "Review notes (optional)",
+  },
+  auditTrail: {
+    sectionTitle: "Compliance audit trail",
+    sectionDescription:
+      "Immutable record of compliance checks, status updates, filings, exceptions, corrective actions, waivers, and evidence changes.",
+    surfaceHeaderTitle: "Audit events",
+    emptyTitle: "No compliance audit events yet",
+    emptyDescription:
+      "Mutations on obligations, requirements, filings, work authorization, eligibility, exceptions, and evidence links appear here.",
+    searchLabel: "Search audit trail",
+    searchPlaceholder:
+      "Search by action, actor, target, summary, or metadata",
+    colOccurredAt: "When",
+    colCategory: "Category",
+    colAction: "Action",
+    colActor: "Actor",
+    colTarget: "Target",
+    colSummary: "Summary",
+    colMetadata: "Details",
+  },
+  overview: {
+    sectionTitle: "Compliance overview",
+    sectionDescription:
+      "Org-wide compliance posture across requirements, exceptions, filings, alerts, and pending reviews.",
+    statGroupRiskLabel: "Risk posture",
+    statGroupFollowUpLabel: "Operational follow-up",
+  },
+  overviewBreakdown: {
+    sectionTitle: "Compliance breakdown by dimension",
+    sectionDescription:
+      "Tracked requirement posture grouped by department, legal entity, work location, and worker category.",
+    surfaceHeaderTitle: "Dimension breakdown",
+    emptyTitle: "No tracked requirements in scope",
+    emptyDescription:
+      "Configure obligations and sync employee requirements to populate the compliance breakdown.",
+    colDimension: "Dimension",
+    colDimensionValue: "Value",
+    colTracked: "Tracked",
+    colAtRisk: "At risk",
+    colOverdue: "Overdue",
+    colOpenExceptions: "Open exceptions",
+  },
+  reports: {
+    sectionTitle: "Compliance reports",
+    sectionDescription:
+      "Export CSV reports for filings, expiries, open exceptions, training, policy acknowledgments, and work eligibility.",
+    panelDescription:
+      "Each export includes up to 5,000 rows. Sensitive review notes are redacted unless you have sensitive compliance read access.",
+    pendingLabel: "Exporting…",
+    exportLabels: {
+      filings: "Export filings",
+      expiry: "Export expiries",
+      exceptions: "Export exceptions",
+      training: "Export training",
+      acknowledgments: "Export acknowledgments",
+      work_eligibility: "Export work eligibility",
+    },
   },
 } as const;

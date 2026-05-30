@@ -6,6 +6,9 @@ export const hrComplianceRoutePaths = {
 export type HrComplianceRoutePath =
   (typeof hrComplianceRoutePaths)[keyof typeof hrComplianceRoutePaths];
 
-export function hrEmployeeDetailRoutePath(employeeId: string): `/hr/employees/${string}` {
-  return `/hr/employees/${employeeId}`;
+/** Employee rows link to the module record detail route (ARCH-006 / App Router). */
+export function hrEmployeeDetailRoutePath(
+  employeeId: string,
+): `/hr/records/${string}` {
+  return `/hr/records/${employeeId}`;
 }

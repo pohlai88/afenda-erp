@@ -13,13 +13,35 @@ describe("parseHrComplianceSearchParams", () => {
         complianceObligationSearch: " policy ",
         complianceExceptionSearch: " visa ",
         complianceLaborLawSearch: " overtime ",
+        complianceStatutorySearch: " epf ",
+        compliancePolicyAcknowledgementSearch: " handbook ",
+        complianceSafetyTrainingSearch: " forklift ",
+        complianceWorkplaceSafetySearch: " induction ",
         complianceWorkEligibilitySearch: " permit ",
+        complianceWorkAuthDocumentSearch: " passport ",
+        complianceFilingSearch: " epf ",
+        complianceRegulatoryCalendarSearch: " renewal ",
+        complianceAlertsSearch: " overdue ",
+        complianceReviewQueueSearch: " filing ",
+        complianceEvidenceLinksSearch: " permit scan ",
+        complianceAuditTrailSearch: " filing update ",
       }),
     ).toEqual({
       obligationSearch: "policy",
       exceptionSearch: "visa",
       laborLawSearch: "overtime",
+      statutorySearch: "epf",
+      policyAcknowledgementSearch: "handbook",
+      safetyTrainingSearch: "forklift",
+      workplaceSafetySearch: "induction",
       workEligibilitySearch: "permit",
+      workAuthDocumentSearch: "passport",
+      filingSearch: "epf",
+      regulatoryCalendarSearch: "renewal",
+      alertsSearch: "overdue",
+      reviewQueueSearch: "filing",
+      evidenceLinksSearch: "permit scan",
+      auditTrailSearch: "filing update",
     });
   });
 
@@ -32,7 +54,67 @@ describe("parseHrComplianceSearchParams", () => {
       obligationSearch: "shared",
       exceptionSearch: "shared",
       laborLawSearch: "shared",
+      statutorySearch: "shared",
+      policyAcknowledgementSearch: "shared",
+      safetyTrainingSearch: "shared",
+      workplaceSafetySearch: "shared",
       workEligibilitySearch: "shared",
+      workAuthDocumentSearch: "shared",
+      filingSearch: "shared",
+      regulatoryCalendarSearch: "shared",
+      alertsSearch: "shared",
+      reviewQueueSearch: "shared",
+      evidenceLinksSearch: "shared",
+      auditTrailSearch: "shared",
+    });
+  });
+
+  it("falls back to shared search param when list-specific params are omitted", () => {
+    expect(
+      parseHrComplianceSearchParams({
+        search: " global ",
+      }),
+    ).toEqual({
+      obligationSearch: "global",
+      exceptionSearch: "global",
+      laborLawSearch: "global",
+      statutorySearch: "global",
+      policyAcknowledgementSearch: "global",
+      safetyTrainingSearch: "global",
+      workplaceSafetySearch: "global",
+      workEligibilitySearch: "global",
+      workAuthDocumentSearch: "global",
+      filingSearch: "global",
+      regulatoryCalendarSearch: "global",
+      alertsSearch: "global",
+      reviewQueueSearch: "global",
+      evidenceLinksSearch: "global",
+      auditTrailSearch: "global",
+    });
+  });
+
+  it("prefers complianceSearch over shared search", () => {
+    expect(
+      parseHrComplianceSearchParams({
+        search: "generic",
+        complianceSearch: "legacy",
+      }),
+    ).toEqual({
+      obligationSearch: "legacy",
+      exceptionSearch: "legacy",
+      laborLawSearch: "legacy",
+      statutorySearch: "legacy",
+      policyAcknowledgementSearch: "legacy",
+      safetyTrainingSearch: "legacy",
+      workplaceSafetySearch: "legacy",
+      workEligibilitySearch: "legacy",
+      workAuthDocumentSearch: "legacy",
+      filingSearch: "legacy",
+      regulatoryCalendarSearch: "legacy",
+      alertsSearch: "legacy",
+      reviewQueueSearch: "legacy",
+      evidenceLinksSearch: "legacy",
+      auditTrailSearch: "legacy",
     });
   });
 
@@ -46,7 +128,18 @@ describe("parseHrComplianceSearchParams", () => {
       obligationSearch: "obligation-only",
       exceptionSearch: "legacy",
       laborLawSearch: "legacy",
+      statutorySearch: "legacy",
+      policyAcknowledgementSearch: "legacy",
+      safetyTrainingSearch: "legacy",
+      workplaceSafetySearch: "legacy",
       workEligibilitySearch: "legacy",
+      workAuthDocumentSearch: "legacy",
+      filingSearch: "legacy",
+      regulatoryCalendarSearch: "legacy",
+      alertsSearch: "legacy",
+      reviewQueueSearch: "legacy",
+      evidenceLinksSearch: "legacy",
+      auditTrailSearch: "legacy",
     });
   });
 });

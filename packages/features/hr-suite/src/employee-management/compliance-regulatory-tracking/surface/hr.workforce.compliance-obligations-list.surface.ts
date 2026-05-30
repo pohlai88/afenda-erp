@@ -10,7 +10,9 @@ import {
   buildComplianceOperationalListSurface,
   formatComplianceListEnumCell,
   resolveComplianceObligationStatusBadgeTone,
+  resolveComplianceObligationRowTone,
 } from "./hr.workforce.compliance-list.shared";
+import { hrComplianceObligationsColumnsId } from "./hr.workforce.compliance-surface-columns.shared";
 import { hrComplianceUiCopy } from "./hr.workforce.compliance-ui.copy.shared";
 
 export const hrComplianceObligationsSurfaceKey =
@@ -37,7 +39,7 @@ export function buildHrComplianceObligationsListSurface(input: {
     window,
     surface: {
       headerTitle: copy.surfaceHeaderTitle,
-      columnsId: "hr.workforce.compliance.obligations",
+      columnsId: hrComplianceObligationsColumnsId,
       emptyTitle: copy.emptyTitle,
       emptyDescription: copy.emptyDescription,
     },
@@ -70,6 +72,7 @@ export function buildHrComplianceObligationsListSurface(input: {
     ],
     rows: window.rows.map((row) => ({
       id: row.id,
+      rowTone: resolveComplianceObligationRowTone(row.status),
       cells: {
         code: row.code,
         title: row.title,

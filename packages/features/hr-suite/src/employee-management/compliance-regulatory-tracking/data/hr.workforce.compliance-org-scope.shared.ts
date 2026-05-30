@@ -5,6 +5,14 @@ export class HrComplianceOrganizationScopeError extends Error {
   }
 }
 
+/** HRM-CMP-024 — raised when a sensitive compliance mutation lacks authorization. */
+export class HrComplianceSensitiveAccessError extends Error {
+  constructor() {
+    super("Sensitive compliance records require additional authorization.");
+    this.name = "HrComplianceSensitiveAccessError";
+  }
+}
+
 export function assertOrganizationScope(
   sessionOrganizationId: string,
   requestedOrganizationId: string,

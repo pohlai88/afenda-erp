@@ -4,17 +4,30 @@ import { type ActionResult } from "@afenda/governed-surface/schemas";
 import { useActionState } from "react";
 
 import { ActionFormErrors } from "@afenda/governed-surface/client";
+import { Alert, AlertDescription, AlertTitle } from "@afenda/ui/alert";
 import { Button } from "@afenda/ui/button";
 import { Field, FieldGroup, FieldLabel } from "@afenda/ui/field";
 import { Input } from "@afenda/ui/input";
 
 import {
   createHrComplianceExceptionAction,
+  ensureHrWorkAuthorizationDocumentsAction,
   ensureHrWorkEligibilityTrackingAction,
+  linkHrComplianceEvidenceAction,
   syncHrEmployeeLaborLawRequirementsAction,
+  syncHrEmployeeStatutoryRequirementsAction,
+  syncHrEmployeePolicyAcknowledgementsAction,
+  syncHrComplianceFilingsAction,
+  syncHrEmployeeSafetyTrainingRequirementsAction,
+  syncHrEmployeeWorkplaceSafetyRequirementsAction,
   upsertHrComplianceObligationAction,
 } from "../actions/hr.workforce.compliance.actions.server";
 import { HRM_COMPLIANCE_OBLIGATION_KINDS } from "../data/hr.workforce.compliance-obligation.shared";
+import {
+  HR_COMPLIANCE_EVIDENCE_RECORD_KINDS,
+  type HrComplianceDocumentPickerOption,
+  type HrComplianceEvidenceRecordKind,
+} from "../data/hr.workforce.compliance-evidence-links.shared";
 import {
   HRM_COMPLIANCE_AREAS,
   HRM_COMPLIANCE_EXCEPTION_SEVERITIES,
@@ -197,7 +210,11 @@ export function HrComplianceObligationUpsertForm({
   );
 }
 
-export function HrComplianceExceptionCreateForm() {
+export function HrComplianceExceptionCreateForm({
+  employeeOptions = [],
+}: {
+  employeeOptions?: readonly { value: string; label: string }[];
+}) {
   const copy = hrComplianceUiCopy.exceptions;
 
   return (
@@ -246,6 +263,48 @@ export function HrComplianceExceptionCreateForm() {
           ))}
         </select>
       </Field>
+      <Field className="@md/field-group:col-span-2">
+        <FieldLabel htmlFor="exception-corrective-description">
+          {copy.formFieldCorrectiveDescription}
+        </FieldLabel>
+        <Input
+          id="exception-corrective-description"
+          name="correctiveActionDescription"
+          placeholder={copy.trailingCorrectiveDescriptionPlaceholder}
+        />
+      </Field>
+      <Field>
+        <FieldLabel htmlFor="exception-corrective-owner">
+          {copy.formFieldCorrectiveOwner}
+        </FieldLabel>
+        <select
+          id="exception-corrective-owner"
+          name="correctiveActionOwnerEmployeeId"
+          className={COMPLIANCE_NATIVE_SELECT_CLASS}
+          defaultValue=""
+        >
+          <option value="">{copy.trailingCorrectiveOwnerPlaceholder}</option>
+          {employeeOptions.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+      </Field>
+      <Field>
+        <FieldLabel htmlFor="exception-corrective-due">
+          {copy.formFieldCorrectiveDue}
+        </FieldLabel>
+        <Input
+          id="exception-corrective-due"
+          name="correctiveActionDueDate"
+          type="datetime-local"
+          placeholder={copy.trailingCorrectiveDuePlaceholder}
+        />
+      </Field>
+      <Field className="@md/field-group:col-span-2">
+        <p className="type-muted">{copy.formFieldCorrectivePairHint}</p>
+      </Field>
     </ComplianceFormShell>
   );
 }
@@ -261,6 +320,61 @@ export function HrComplianceLaborLawSyncForm() {
   );
 }
 
+export function HrComplianceStatutorySyncForm() {
+  const copy = hrComplianceUiCopy.statutory;
+
+  return (
+    <ComplianceNoFieldActionForm
+      action={syncHrEmployeeStatutoryRequirementsAction}
+      submitLabel={copy.syncActionLabel}
+    />
+  );
+}
+
+export function HrCompliancePolicyAcknowledgementSyncForm() {
+  const copy = hrComplianceUiCopy.policyAcknowledgement;
+
+  return (
+    <ComplianceNoFieldActionForm
+      action={syncHrEmployeePolicyAcknowledgementsAction}
+      submitLabel={copy.syncActionLabel}
+    />
+  );
+}
+
+export function HrComplianceFilingSyncForm() {
+  const copy = hrComplianceUiCopy.filing;
+
+  return (
+    <ComplianceNoFieldActionForm
+      action={syncHrComplianceFilingsAction}
+      submitLabel={copy.syncActionLabel}
+    />
+  );
+}
+
+export function HrComplianceWorkplaceSafetySyncForm() {
+  const copy = hrComplianceUiCopy.workplaceSafety;
+
+  return (
+    <ComplianceNoFieldActionForm
+      action={syncHrEmployeeWorkplaceSafetyRequirementsAction}
+      submitLabel={copy.syncActionLabel}
+    />
+  );
+}
+
+export function HrComplianceSafetyTrainingSyncForm() {
+  const copy = hrComplianceUiCopy.safetyTraining;
+
+  return (
+    <ComplianceNoFieldActionForm
+      action={syncHrEmployeeSafetyTrainingRequirementsAction}
+      submitLabel={copy.syncActionLabel}
+    />
+  );
+}
+
 export function HrComplianceWorkEligibilityEnsureForm() {
   const copy = hrComplianceUiCopy.workEligibility;
 
@@ -269,5 +383,115 @@ export function HrComplianceWorkEligibilityEnsureForm() {
       action={ensureHrWorkEligibilityTrackingAction}
       submitLabel={copy.ensureActionLabel}
     />
+  );
+}
+
+export function HrComplianceWorkAuthDocumentsEnsureForm() {
+  const copy = hrComplianceUiCopy.workAuthDocuments;
+
+  return (
+    <ComplianceNoFieldActionForm
+      action={ensureHrWorkAuthorizationDocumentsAction}
+      submitLabel={copy.ensureActionLabel}
+    />
+  );
+}
+
+export function ComplianceEvidenceDocumentPickerEmpty({
+  employeeScoped,
+}: {
+  employeeScoped: boolean;
+}) {
+  const copy = hrComplianceUiCopy.evidenceLinks;
+
+  return (
+    <Alert>
+      <AlertTitle>{copy.documentPickerEmptyTitle}</AlertTitle>
+      <AlertDescription>
+        {employeeScoped
+          ? copy.trailingDocumentEmptyEmployeeDescription
+          : copy.documentPickerEmptyDescription}
+      </AlertDescription>
+    </Alert>
+  );
+}
+
+export function HrComplianceEvidenceLinkForm({
+  documentOptions,
+}: {
+  documentOptions: readonly HrComplianceDocumentPickerOption[];
+}) {
+  const copy = hrComplianceUiCopy.evidenceLinks;
+
+  if (documentOptions.length === 0) {
+    return <ComplianceEvidenceDocumentPickerEmpty employeeScoped={false} />;
+  }
+
+  return (
+    <ComplianceFormShell
+      action={linkHrComplianceEvidenceAction}
+      submitLabel={copy.linkFormSubmitLabel}
+    >
+        <Field>
+          <FieldLabel htmlFor="evidence-record-kind">
+            {copy.linkFormRecordKindLabel}
+          </FieldLabel>
+          <select
+            id="evidence-record-kind"
+            name="recordKind"
+            className={COMPLIANCE_NATIVE_SELECT_CLASS}
+            required
+            defaultValue="work_auth_document"
+          >
+            {HR_COMPLIANCE_EVIDENCE_RECORD_KINDS.map((kind: HrComplianceEvidenceRecordKind) => (
+              <option key={kind} value={kind}>
+                {formatComplianceEnumLabel(kind)}
+              </option>
+            ))}
+          </select>
+        </Field>
+        <Field>
+          <FieldLabel htmlFor="evidence-record-id">
+            {copy.linkFormRecordIdLabel}
+          </FieldLabel>
+          <Input
+            id="evidence-record-id"
+            name="recordId"
+            required
+            placeholder={copy.linkFormRecordIdPlaceholder}
+          />
+        </Field>
+        <Field>
+          <FieldLabel htmlFor="evidence-employee-document">
+            {copy.trailingDocumentLabel}
+          </FieldLabel>
+          <select
+            id="evidence-employee-document"
+            name="employeeDocumentId"
+            className={COMPLIANCE_NATIVE_SELECT_CLASS}
+            required
+            defaultValue=""
+          >
+            <option value="" disabled>
+              {copy.trailingDocumentPlaceholder}
+            </option>
+            {documentOptions.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </Field>
+        <Field>
+          <FieldLabel htmlFor="evidence-link-notes">
+            {copy.trailingLinkNotesPlaceholder}
+          </FieldLabel>
+          <Input
+            id="evidence-link-notes"
+            name="notes"
+            placeholder={copy.trailingLinkNotesPlaceholder}
+          />
+        </Field>
+    </ComplianceFormShell>
   );
 }

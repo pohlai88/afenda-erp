@@ -1,5 +1,60 @@
 /**
  * Governed metadata door — employee-management/compliance-regulatory-tracking
- * List surfaces, surface keys, and metadata-only copy. No tenant I/O.
+ * Surface keys, columns registry, UI copy, and search param parsing only (no builders).
  */
-export * from "./surface";
+export {
+  getHrComplianceListSurfaceKeys,
+  HR_COMPLIANCE_LIST_SURFACE_COLUMNS_BY_KEY,
+  HR_COMPLIANCE_LIST_SEARCH_PARAMS_BY_KEY,
+  HR_COMPLIANCE_LIST_SEARCH_PARAM_MODEL_FIELDS,
+  HR_COMPLIANCE_LIST_SURFACE_KEYS,
+  HR_COMPLIANCE_WORKBENCH_READ_ONLY_SURFACE_KEYS,
+  hrComplianceAlertsSurfaceKey,
+  hrComplianceReviewQueueSurfaceKey,
+  hrComplianceExceptionsSurfaceKey,
+  hrComplianceFilingsSurfaceKey,
+  hrComplianceLaborLawRequirementsSurfaceKey,
+  hrComplianceStatutoryRequirementsSurfaceKey,
+  hrComplianceObligationsSurfaceKey,
+  hrCompliancePolicyAcknowledgementsSurfaceKey,
+  hrComplianceRegulatoryCalendarSurfaceKey,
+  hrComplianceSafetyTrainingRequirementsSurfaceKey,
+  hrComplianceWorkAuthDocumentsSurfaceKey,
+  hrComplianceWorkEligibilitySurfaceKey,
+  hrComplianceWorkplaceSafetyRequirementsSurfaceKey,
+  hrComplianceEvidenceLinksSurfaceKey,
+  hrComplianceAuditTrailSurfaceKey,
+  type HrComplianceListSurfaceKey,
+} from "./surface/hr.workforce.compliance-surface-metadata.shared";
+
+export { hrComplianceUiCopy } from "./surface/hr.workforce.compliance-ui.copy.shared";
+
+export {
+  hrComplianceOverviewStatSurfaceKey,
+  buildHrComplianceOverviewStatGroups,
+} from "./surface/hr.workforce.compliance-overview-stat.surface";
+
+export {
+  hrComplianceOverviewBreakdownSurfaceKey,
+} from "./surface/hr.workforce.compliance-overview-breakdown-list.surface";
+
+export {
+  parseHrComplianceSearchParams,
+  toHrCompliancePageModelInput,
+  type HrComplianceSearchParams,
+  hrComplianceAlertsSearchParam,
+  hrComplianceExceptionSearchParam,
+  hrComplianceFilingSearchParam,
+  hrComplianceLaborLawSearchParam,
+  hrComplianceStatutorySearchParam,
+  hrComplianceObligationSearchParam,
+  hrCompliancePolicyAcknowledgementSearchParam,
+  hrComplianceRegulatoryCalendarSearchParam,
+  hrComplianceSafetyTrainingSearchParam,
+  hrComplianceWorkAuthDocumentSearchParam,
+  hrComplianceWorkEligibilitySearchParam,
+  hrComplianceWorkplaceSafetySearchParam,
+  hrComplianceEvidenceLinksSearchParam,
+  hrComplianceAuditTrailSearchParam,
+  hrComplianceReviewQueueSearchParam,
+} from "./data/hr.workforce.compliance-search-params.parse.shared";
