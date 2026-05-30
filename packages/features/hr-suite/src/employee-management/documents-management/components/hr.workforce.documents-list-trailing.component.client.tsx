@@ -84,7 +84,9 @@ export function HrDocumentsRepositoryTrailingCell({
           rowId={row.id}
         >
           <Field>
-            <FieldLabel htmlFor={`replace-title-${row.id}`}>Title</FieldLabel>
+            <FieldLabel htmlFor={`replace-title-${row.id}`}>
+              {copy.formFieldTitle}
+            </FieldLabel>
             <Input
               id={`replace-title-${row.id}`}
               name="title"
@@ -93,7 +95,9 @@ export function HrDocumentsRepositoryTrailingCell({
             />
           </Field>
           <Field>
-            <FieldLabel htmlFor={`replace-blob-${row.id}`}>Blob URL</FieldLabel>
+            <FieldLabel htmlFor={`replace-blob-${row.id}`}>
+              {copy.formFieldBlobUrl}
+            </FieldLabel>
             <Input
               id={`replace-blob-${row.id}`}
               name="blobUrl"

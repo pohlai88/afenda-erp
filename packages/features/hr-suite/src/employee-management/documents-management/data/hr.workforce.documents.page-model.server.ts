@@ -415,7 +415,6 @@ export async function buildHrDocumentsPageModel(
       ? buildHrDocumentsRequirementsListSurface({
           window: requirementsWindow,
           searchValue: input.requirementsSearch,
-          canWrite: input.canWrite,
         })
       : buildDocumentsListLoadErrorPlaceholder({
           columnsId:
@@ -461,7 +460,6 @@ export async function buildHrDocumentsPageModel(
       ? buildHrDocumentsRetentionListSurface({
           window: retentionWindow,
           searchValue: input.retentionSearch,
-          canWrite: input.canWrite,
         })
       : buildDocumentsListLoadErrorPlaceholder({
           columnsId:

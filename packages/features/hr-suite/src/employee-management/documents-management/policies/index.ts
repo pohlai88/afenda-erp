@@ -1,6 +1,2 @@
-export {
-  requireHrDocumentsRead,
-  requireHrDocumentsWrite,
-  requireHrDocumentsSensitiveWrite,
-  type HrDocumentsExecutionGuard,
-} from "./hr.workforce.documents-access.policy.server";
+/** @afenda-bucket policies */
+export * from "./hr.workforce.documents-access.policy.server";

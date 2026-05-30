@@ -3,9 +3,10 @@ import {
   buildDocumentsOperationalListSurface,
   formatDocumentsListEnumCell,
 } from "./hr.workforce.documents-list.shared";
-export const hrDocumentsRequirementsSearchParam = "documentsRequirementsSearch";
 import { hrDocumentsRequirementsColumnsId } from "./hr.workforce.documents-surface-columns.shared";
 import { hrDocumentsUiCopy } from "./hr.workforce.documents-ui.copy.shared";
+
+export const hrDocumentsRequirementsSearchParam = "documentsRequirementsSearch";
 
 export type HrDocumentRequirementRow = {
   id: string;
@@ -28,7 +29,6 @@ export const hrDocumentsRequirementsSurfaceKey =
 export function buildHrDocumentsRequirementsListSurface(input: {
   window: HrDocumentRequirementWindow;
   searchValue?: string;
-  canWrite?: boolean;
 }) {
   const copy = hrDocumentsUiCopy.requirements;
 

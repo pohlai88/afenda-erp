@@ -2,9 +2,10 @@ import {
   buildDocumentsListSearchToolbar,
   buildDocumentsOperationalListSurface,
 } from "./hr.workforce.documents-list.shared";
-export const hrDocumentsRetentionSearchParam = "documentsRetentionSearch";
 import { hrDocumentsRetentionColumnsId } from "./hr.workforce.documents-surface-columns.shared";
 import { hrDocumentsUiCopy } from "./hr.workforce.documents-ui.copy.shared";
+
+export const hrDocumentsRetentionSearchParam = "documentsRetentionSearch";
 
 export type HrDocumentRetentionPolicyRow = {
   id: string;
@@ -27,7 +28,6 @@ export const hrDocumentsRetentionSurfaceKey =
 export function buildHrDocumentsRetentionListSurface(input: {
   window: HrDocumentRetentionPolicyWindow;
   searchValue?: string;
-  canWrite?: boolean;
 }) {
   const copy = hrDocumentsUiCopy.retention;
 

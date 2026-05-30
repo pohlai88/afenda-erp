@@ -30,7 +30,6 @@ import {
   HrDocumentsAcknowledgmentForm,
 } from "./hr.workforce.documents-forms.component.client";
 import { HrDocumentsRepositoryTrailingCell } from "./hr.workforce.documents-list-trailing.component.client";
-import { HrDocumentsTrailingPickerProvider } from "./hr.workforce.documents.trailing-pickers.component.client";
 
 const documentsForbiddenState = {
   variant: "forbidden" as const,
@@ -167,10 +166,7 @@ export function HrDocumentsWorkbenchSection({
   const copy = hrDocumentsUiCopy;
 
   return (
-    <HrDocumentsTrailingPickerProvider
-      employeeOptions={model.employeePickerOptions}
-    >
-      <div className="flex flex-col gap-surface-xl">
+    <div className="flex flex-col gap-surface-xl">
         <SectionPanel
           headingLevel={1}
           title={copy.page.title}
@@ -293,6 +289,5 @@ export function HrDocumentsWorkbenchSection({
           loadError={model.acknowledgmentsLoadError}
         />
       </div>
-    </HrDocumentsTrailingPickerProvider>
   );
 }

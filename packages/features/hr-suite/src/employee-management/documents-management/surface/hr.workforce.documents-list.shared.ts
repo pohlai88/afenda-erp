@@ -146,7 +146,7 @@ export function resolveDocumentsRepositoryTrailingAction(
       descriptor: {
         id: "replace-document",
         label: "Replace",
-        intent: "compliance",
+        intent: "default",
       },
     });
   }
@@ -156,7 +156,7 @@ export function resolveDocumentsRepositoryTrailingAction(
     descriptor: {
       id: "review-document",
       label: "Review",
-      intent: "compliance",
+      intent: "approval",
     },
   });
 }
