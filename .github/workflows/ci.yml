@@ -120,6 +120,18 @@ jobs:
           NEXT_PUBLIC_SITE_URL: http://localhost:3000
           NEXT_PUBLIC_STAGE: ci
 
+      - name: UI primitive visual regression
+        run: pnpm test:visual
+        env:
+          CI: "true"
+          AFENDA_DEV_AUTH_BYPASS: "0"
+          AFENDA_NEON_AUTH_ENABLED: "0"
+          AFENDA_E2E_DEV_AUTH: "1"
+          NODE_ENV: production
+          NEXT_PUBLIC_APP_NAME: Afenda ERP
+          NEXT_PUBLIC_SITE_URL: http://localhost:3000
+          NEXT_PUBLIC_STAGE: ci
+
       - name: Check test artifact layout
         if: always()
         run: pnpm artifacts:check

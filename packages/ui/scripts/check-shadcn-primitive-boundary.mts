@@ -1,134 +1,72 @@
 /**
- * Guards @afenda/ui shadcn fork boundary — description slots and palette drift.
+ * Four-layer @afenda/ui contract-drift audit (single-pass I/O).
  *
  * Run: pnpm audit:shadcn-primitives
+ * Profile: pnpm audit:shadcn-primitives --profile
  */
-import { readFileSync, readdirSync, statSync, existsSync } from "node:fs";
-import { extname, join, relative } from "node:path";
-import { fileURLToPath } from "node:url";
+import { runAllUiAudits } from "../audits/run-all.ts";
+import { assertPathsExist, printViolations } from "../audits/shared.ts";
 
-import {
-  UI_PRIMITIVE_DESCRIPTION_DRIFT_PATTERN,
-  buildRawPalettePattern,
-} from "../src/design-system.color-contract.shared.ts";
-
-const packageRoot = join(fileURLToPath(import.meta.url), "..", "..");
-const uiSrc = join(packageRoot, "src");
-const repoRoot = join(packageRoot, "..", "..");
-
-const DESCRIPTION_SLOT_NAMES =
-  /function\s+(?:\w+Description|TableCaption|CommandEmpty|ComboboxEmpty|InputGroupText)\s*\(/;
-
-type Violation = {
-  file: string;
-  line: number;
-  rule: string;
-  match: string;
-  hint: string;
-};
-
-function walkFiles(dir: string): string[] {
-  const results: string[] = [];
-  for (const entry of readdirSync(dir)) {
-    const full = join(dir, entry);
-    if (statSync(full).isDirectory()) {
-      results.push(...walkFiles(full));
-    } else if (extname(entry) === ".tsx") {
-      results.push(full);
-    }
-  }
-  return results;
-}
-
-function relPosix(file: string): string {
-  return relative(repoRoot, file).replace(/\\/g, "/");
-}
-
-function auditFile(filePath: string): Violation[] {
-  const rel = relPosix(filePath);
-  const content = readFileSync(filePath, "utf8");
-  const lines = content.split("\n");
-  const violations: Violation[] = [];
-  const palettePattern = buildRawPalettePattern();
-
-  let inDescriptionSlot = false;
-  let descriptionDepth = 0;
-
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i]!;
-    const lineNo = i + 1;
-
-    if (DESCRIPTION_SLOT_NAMES.test(line)) {
-      inDescriptionSlot = true;
-      descriptionDepth = 0;
-    }
-
-    if (inDescriptionSlot) {
-      descriptionDepth += (line.match(/{/g) ?? []).length;
-      descriptionDepth -= (line.match(/}/g) ?? []).length;
-
-      if (
-        !line.includes("uiTypography.muted") &&
-        UI_PRIMITIVE_DESCRIPTION_DRIFT_PATTERN.test(line)
-      ) {
-        UI_PRIMITIVE_DESCRIPTION_DRIFT_PATTERN.lastIndex = 0;
-        const match = UI_PRIMITIVE_DESCRIPTION_DRIFT_PATTERN.exec(line)?.[0] ?? "description drift";
-        UI_PRIMITIVE_DESCRIPTION_DRIFT_PATTERN.lastIndex = 0;
-        violations.push({
-          file: rel,
-          line: lineNo,
-          rule: "primitive-description-drift",
-          match,
-          hint: "Use uiTypography.muted (type-muted) in description/helper slots",
-        });
-      }
-
-      if (descriptionDepth <= 0 && line.includes("}")) {
-        inDescriptionSlot = false;
-      }
-    }
-
-    palettePattern.lastIndex = 0;
-    let paletteMatch: RegExpExecArray | null;
-    while ((paletteMatch = palettePattern.exec(line)) !== null) {
-      violations.push({
-        file: rel,
-        line: lineNo,
-        rule: "no-raw-palette-in-ui",
-        match: paletteMatch[0],
-        hint: "Use semantic ERP tokens — never add slate/gray/zinc/neutral/stone to @afenda/ui",
-      });
-    }
-  }
-
-  return violations;
+function parseArgs(argv: string[]): {
+  strictVisual: boolean;
+  warningsAsErrors: boolean;
+  profile: boolean;
+} {
+  return {
+    strictVisual: argv.includes("--strict-visual"),
+    warningsAsErrors: argv.includes("--warnings-as-errors"),
+    profile: argv.includes("--profile"),
+  };
 }
 
 function main(): void {
-  if (!existsSync(uiSrc)) {
-    console.error(`Missing UI source: ${uiSrc}`);
-    process.exit(1);
-  }
+  const { strictVisual, warningsAsErrors, profile } = parseArgs(process.argv.slice(2));
+  assertPathsExist();
 
-  const violations: Violation[] = [];
-  for (const file of walkFiles(uiSrc)) {
-    violations.push(...auditFile(file));
-  }
-
-  console.log("Shadcn primitive boundary audit");
+  console.log("@afenda/ui contract drift audit");
   console.log("=".repeat(40));
+  console.log(
+    "Doctrine: fork shadcn only for Afenda semantic tokens, a11y hardening, and enterprise density.",
+  );
 
-  if (violations.length === 0) {
-    console.log("\nNo violations. Description slots and palette boundary hold.");
+  const { layers } = runAllUiAudits({ strictVisual, profile });
+
+  let totalErrors = 0;
+  let totalWarnings = 0;
+
+  for (const layer of layers) {
+    if (profile && layer.violations.length === 0) {
+      console.log(`\n${layer.title}`);
+      console.log("-".repeat(40));
+      console.log(`  ✓ ${layer.ms.toFixed(1)}ms`);
+      continue;
+    }
+    const { errors, warnings } = printViolations(layer.title, layer.violations);
+    totalErrors += errors;
+    totalWarnings += warnings;
+    if (profile) {
+      console.log(`  (${layer.ms.toFixed(1)}ms)`);
+    }
+  }
+
+  if (profile) {
+    const totalMs = layers.reduce((sum, layer) => sum + layer.ms, 0);
+    console.log(`\nTotal audit time: ${totalMs.toFixed(1)}ms (excludes tsx startup)`);
+  }
+
+  console.log("\n" + "=".repeat(40));
+  if (totalErrors === 0 && (totalWarnings === 0 || !warningsAsErrors)) {
+    console.log("Contract boundary holds.");
+    if (totalWarnings > 0) {
+      console.log(`${totalWarnings} warning(s) — review or run audit:shadcn-upstream:sync`);
+    }
+    console.log("Visual runtime gate: pnpm test:visual");
     return;
   }
 
-  for (const v of violations) {
-    console.log(`  ✗ ${v.file}:${v.line}  [${v.rule}]  ${v.match}`);
-    console.log(`    → ${v.hint}`);
-  }
-
-  console.log(`\n${violations.length} violation(s). See packages/ui/shadcn-update.md`);
+  console.log(
+    `\n${totalErrors} error(s), ${totalWarnings} warning(s). See packages/ui/shadcn-update.md`,
+  );
   process.exit(1);
 }
 

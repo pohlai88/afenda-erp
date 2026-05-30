@@ -47,6 +47,14 @@ module.exports = defineConfig({
     screenshot: "only-on-failure",
     video: "retain-on-failure",
   },
+  /** Platform-agnostic baselines — CI (Linux) and local (win32) share PNG names. */
+  snapshotPathTemplate:
+    "{testDir}/{testFileDir}/{testFileName}-snapshots/{arg}{ext}",
+  expect: {
+    toHaveScreenshot: {
+      maxDiffPixelRatio: 0.02,
+    },
+  },
   projects: [
     {
       name: "chromium",

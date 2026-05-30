@@ -120,7 +120,9 @@ Always use full structure when you use `Card`: `CardHeader` + `CardTitle` (+ opt
 | Script | Catches |
 | ------ | ------- |
 | `pnpm audit:shadcn-composition --strict` | `space-y`, raw `<button>`, excessive `Card`, nested cards, fake card divs |
-| `pnpm audit:shadcn-primitives` | Description-slot drift in UI fork |
+| `pnpm audit:shadcn-primitives` | Four-layer contract drift in `@afenda/ui` (upstream, tokens, exports, visual scaffold) |
+| `pnpm audit:shadcn-upstream:sync` | Refresh `.upstream/shadcn/manifest.json` after shadcn add |
+| `pnpm test:visual` | Primitive screenshot regression (`/interface-lab/primitives`) |
 | `pnpm audit:governed-design-tokens --scope=all --strict` | Token bypass |
 
 Bundled: `pnpm design-system:check`

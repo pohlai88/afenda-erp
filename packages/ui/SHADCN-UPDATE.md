@@ -104,10 +104,31 @@ All gates run via `pnpm design-system:check` (also in `architecture:check`):
 | Script | Catches |
 | ------ | ------- |
 | `audit:tailwind-token-parity` | CSS ↔ TS drift, missing `@theme` fills, orphan `@utility`, banned `@utility text-{fill}` |
-| `audit:shadcn-primitives` | Description-slot drift (`text-sm text-muted-foreground`), raw palette in `packages/ui` |
+| `audit:shadcn-primitives` | Four-layer **contract drift** (upstream manifest, tokens, exports/structure, interface-lab scaffold) |
+| `audit:shadcn-upstream:sync` | Regenerate `.upstream/shadcn/manifest.json` after intentional shadcn add/upgrade |
 | `audit:governed-design-tokens --scope=all --strict` | Product code: fill-as-ink, palette, typography, tw-animate outside UI, redundant ink stacks |
+| `test:visual` | Playwright screenshot regression for interface-lab primitive previews |
 
 `@afenda/ui` `pretypecheck` runs `audit:shadcn-primitives` automatically.
+
+### Contract drift layers (`packages/ui/audits/`)
+
+Single-pass I/O: each `.tsx` file is read once per run (`source-cache.ts` → `run-all.ts`).
+
+1. **Shadcn upstream** — compare `src/` to `.upstream/shadcn/manifest.json` (exports, root functions, `data-slot`, `cva` / `Slot` / `cn` structure). **Exports are sourced from the manifest** — run `audit:shadcn-upstream:sync` after shadcn add; do not duplicate export lists elsewhere.
+2. **Token drift** — raw palette, description-slot typography, inline color/style, raw elevation/radius (warnings until migrated).
+3. **Primitive contracts** — export doors + representative shadcn patterns per file (`primitive-contracts.ts` overrides only).
+4. **Visual behavior** — `/interface-lab/primitives` + `ui-primitives-visual.spec.ts`; runtime gate `pnpm test:visual` (CI e2e job).
+
+Local baseline seed (no production build):
+
+```bash
+pnpm test:visual:update
+```
+
+Doctrine:
+
+> `@afenda/ui` may fork shadcn only for Afenda semantic tokens, accessibility hardening, and enterprise density — never for random visual invention.
 
 ## References
 

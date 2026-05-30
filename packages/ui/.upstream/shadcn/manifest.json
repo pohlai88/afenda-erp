@@ -1,0 +1,1655 @@
+{
+  "version": 1,
+  "generatedAt": "2026-05-30T13:10:25.464Z",
+  "note": "Approved shadcn structure snapshot for @afenda/ui. Regenerate only after intentional primitive changes.",
+  "files": {
+    "accordion.tsx": {
+      "exports": [
+        "Accordion",
+        "AccordionItem",
+        "AccordionTrigger",
+        "AccordionContent"
+      ],
+      "rootFunctions": [
+        "Accordion",
+        "AccordionItem",
+        "AccordionTrigger",
+        "AccordionContent"
+      ],
+      "dataSlots": [
+        "accordion",
+        "accordion-item",
+        "accordion-trigger",
+        "accordion-trigger-icon",
+        "accordion-content"
+      ],
+      "displayNames": [],
+      "hasCva": false,
+      "hasSlot": false,
+      "hasCn": true,
+      "hasReactImport": true
+    },
+    "alert-dialog.tsx": {
+      "exports": [
+        "AlertDialog",
+        "AlertDialogAction",
+        "AlertDialogCancel",
+        "AlertDialogContent",
+        "AlertDialogDescription",
+        "AlertDialogFooter",
+        "AlertDialogHeader",
+        "AlertDialogMedia",
+        "AlertDialogOverlay",
+        "AlertDialogPortal",
+        "AlertDialogTitle",
+        "AlertDialogTrigger"
+      ],
+      "rootFunctions": [
+        "AlertDialog",
+        "AlertDialogTrigger",
+        "AlertDialogPortal",
+        "AlertDialogOverlay",
+        "AlertDialogContent",
+        "AlertDialogHeader",
+        "AlertDialogFooter",
+        "AlertDialogMedia",
+        "AlertDialogTitle",
+        "AlertDialogDescription",
+        "AlertDialogAction",
+        "AlertDialogCancel"
+      ],
+      "dataSlots": [
+        "alert-dialog",
+        "alert-dialog-trigger",
+        "alert-dialog-portal",
+        "alert-dialog-overlay",
+        "alert-dialog-content",
+        "alert-dialog-header",
+        "alert-dialog-footer",
+        "alert-dialog-media",
+        "alert-dialog-title",
+        "alert-dialog-description",
+        "alert-dialog-action",
+        "alert-dialog-cancel"
+      ],
+      "displayNames": [],
+      "hasCva": false,
+      "hasSlot": false,
+      "hasCn": true,
+      "hasReactImport": true
+    },
+    "alert.tsx": {
+      "exports": [
+        "Alert",
+        "AlertTitle",
+        "AlertDescription",
+        "AlertAction"
+      ],
+      "rootFunctions": [
+        "Alert",
+        "AlertTitle",
+        "AlertDescription",
+        "AlertAction"
+      ],
+      "dataSlots": [
+        "alert",
+        "alert-title",
+        "alert-description",
+        "alert-action"
+      ],
+      "displayNames": [],
+      "hasCva": true,
+      "hasSlot": false,
+      "hasCn": true,
+      "hasReactImport": true
+    },
+    "aspect-ratio.tsx": {
+      "exports": [
+        "AspectRatio"
+      ],
+      "rootFunctions": [
+        "AspectRatio"
+      ],
+      "dataSlots": [
+        "aspect-ratio"
+      ],
+      "displayNames": [],
+      "hasCva": false,
+      "hasSlot": false,
+      "hasCn": false,
+      "hasReactImport": false
+    },
+    "avatar.tsx": {
+      "exports": [
+        "Avatar",
+        "AvatarImage",
+        "AvatarFallback",
+        "AvatarGroup",
+        "AvatarGroupCount",
+        "AvatarBadge"
+      ],
+      "rootFunctions": [
+        "Avatar",
+        "AvatarImage",
+        "AvatarFallback",
+        "AvatarBadge",
+        "AvatarGroup",
+        "AvatarGroupCount"
+      ],
+      "dataSlots": [
+        "avatar",
+        "avatar-image",
+        "avatar-fallback",
+        "avatar-badge",
+        "avatar-group",
+        "avatar-group-count"
+      ],
+      "displayNames": [],
+      "hasCva": false,
+      "hasSlot": false,
+      "hasCn": true,
+      "hasReactImport": true
+    },
+    "badge.tsx": {
+      "exports": [
+        "Badge",
+        "badgeVariants"
+      ],
+      "rootFunctions": [
+        "Badge"
+      ],
+      "dataSlots": [
+        "badge"
+      ],
+      "displayNames": [],
+      "hasCva": true,
+      "hasSlot": true,
+      "hasCn": true,
+      "hasReactImport": true
+    },
+    "breadcrumb.tsx": {
+      "exports": [
+        "Breadcrumb",
+        "BreadcrumbList",
+        "BreadcrumbItem",
+        "BreadcrumbLink",
+        "BreadcrumbPage",
+        "BreadcrumbSeparator",
+        "BreadcrumbEllipsis"
+      ],
+      "rootFunctions": [
+        "Breadcrumb",
+        "BreadcrumbList",
+        "BreadcrumbItem",
+        "BreadcrumbLink",
+        "BreadcrumbPage",
+        "BreadcrumbSeparator",
+        "BreadcrumbEllipsis"
+      ],
+      "dataSlots": [
+        "breadcrumb",
+        "breadcrumb-list",
+        "breadcrumb-item",
+        "breadcrumb-link",
+        "breadcrumb-page",
+        "breadcrumb-separator",
+        "breadcrumb-ellipsis"
+      ],
+      "displayNames": [],
+      "hasCva": false,
+      "hasSlot": true,
+      "hasCn": true,
+      "hasReactImport": true
+    },
+    "button-group.tsx": {
+      "exports": [
+        "ButtonGroup",
+        "ButtonGroupSeparator",
+        "ButtonGroupText",
+        "buttonGroupVariants"
+      ],
+      "rootFunctions": [
+        "ButtonGroup",
+        "ButtonGroupText",
+        "ButtonGroupSeparator"
+      ],
+      "dataSlots": [
+        "button-group",
+        "button-group-separator"
+      ],
+      "displayNames": [],
+      "hasCva": true,
+      "hasSlot": true,
+      "hasCn": true,
+      "hasReactImport": false
+    },
+    "button.tsx": {
+      "exports": [
+        "Button",
+        "buttonVariants"
+      ],
+      "rootFunctions": [
+        "Button"
+      ],
+      "dataSlots": [
+        "button"
+      ],
+      "displayNames": [],
+      "hasCva": true,
+      "hasSlot": true,
+      "hasCn": true,
+      "hasReactImport": true
+    },
+    "calendar.tsx": {
+      "exports": [
+        "Calendar",
+        "CalendarDayButton"
+      ],
+      "rootFunctions": [
+        "Calendar",
+        "CalendarDayButton"
+      ],
+      "dataSlots": [
+        "calendar"
+      ],
+      "displayNames": [],
+      "hasCva": false,
+      "hasSlot": false,
+      "hasCn": true,
+      "hasReactImport": true
+    },
+    "card.tsx": {
+      "exports": [
+        "Card",
+        "CardHeader",
+        "CardFooter",
+        "CardTitle",
+        "CardAction",
+        "CardDescription",
+        "CardContent"
+      ],
+      "rootFunctions": [
+        "Card",
+        "CardHeader",
+        "CardTitle",
+        "CardDescription",
+        "CardAction",
+        "CardContent",
+        "CardFooter"
+      ],
+      "dataSlots": [
+        "card",
+        "card-header",
+        "card-title",
+        "card-description",
+        "card-action",
+        "card-content",
+        "card-footer"
+      ],
+      "displayNames": [],
+      "hasCva": false,
+      "hasSlot": false,
+      "hasCn": true,
+      "hasReactImport": true
+    },
+    "carousel.tsx": {
+      "exports": [
+        "CarouselApi",
+        "Carousel",
+        "CarouselContent",
+        "CarouselItem",
+        "CarouselPrevious",
+        "CarouselNext",
+        "useCarousel"
+      ],
+      "rootFunctions": [
+        "useCarousel",
+        "Carousel",
+        "CarouselContent",
+        "CarouselItem",
+        "CarouselPrevious",
+        "CarouselNext"
+      ],
+      "dataSlots": [
+        "carousel",
+        "carousel-content",
+        "carousel-item",
+        "carousel-previous",
+        "carousel-next"
+      ],
+      "displayNames": [],
+      "hasCva": false,
+      "hasSlot": false,
+      "hasCn": true,
+      "hasReactImport": true
+    },
+    "chart.tsx": {
+      "exports": [
+        "ChartContainer",
+        "ChartTooltip",
+        "ChartTooltipContent",
+        "ChartLegend",
+        "ChartLegendContent",
+        "ChartStyle"
+      ],
+      "rootFunctions": [
+        "useChart",
+        "ChartContainer",
+        "ChartTooltipContent",
+        "ChartLegendContent",
+        "getPayloadConfigFromPayload"
+      ],
+      "dataSlots": [
+        "chart"
+      ],
+      "displayNames": [],
+      "hasCva": false,
+      "hasSlot": false,
+      "hasCn": true,
+      "hasReactImport": true
+    },
+    "checkbox.tsx": {
+      "exports": [
+        "Checkbox"
+      ],
+      "rootFunctions": [
+        "Checkbox"
+      ],
+      "dataSlots": [
+        "checkbox",
+        "checkbox-indicator"
+      ],
+      "displayNames": [],
+      "hasCva": false,
+      "hasSlot": false,
+      "hasCn": true,
+      "hasReactImport": true
+    },
+    "collapsible.tsx": {
+      "exports": [
+        "Collapsible",
+        "CollapsibleTrigger",
+        "CollapsibleContent"
+      ],
+      "rootFunctions": [
+        "Collapsible",
+        "CollapsibleTrigger",
+        "CollapsibleContent"
+      ],
+      "dataSlots": [
+        "collapsible",
+        "collapsible-trigger",
+        "collapsible-content"
+      ],
+      "displayNames": [],
+      "hasCva": false,
+      "hasSlot": false,
+      "hasCn": false,
+      "hasReactImport": false
+    },
+    "combobox.tsx": {
+      "exports": [
+        "Combobox",
+        "ComboboxInput",
+        "ComboboxContent",
+        "ComboboxList",
+        "ComboboxItem",
+        "ComboboxGroup",
+        "ComboboxLabel",
+        "ComboboxCollection",
+        "ComboboxEmpty",
+        "ComboboxSeparator",
+        "ComboboxChips",
+        "ComboboxChip",
+        "ComboboxChipsInput",
+        "ComboboxTrigger",
+        "ComboboxValue",
+        "useComboboxAnchor"
+      ],
+      "rootFunctions": [
+        "ComboboxValue",
+        "ComboboxTrigger",
+        "ComboboxClear",
+        "ComboboxInput",
+        "ComboboxContent",
+        "ComboboxList",
+        "ComboboxItem",
+        "ComboboxGroup",
+        "ComboboxLabel",
+        "ComboboxCollection",
+        "ComboboxEmpty",
+        "ComboboxSeparator",
+        "ComboboxChips",
+        "ComboboxChip",
+        "ComboboxChipsInput",
+        "useComboboxAnchor"
+      ],
+      "dataSlots": [
+        "combobox-value",
+        "combobox-trigger",
+        "combobox-clear",
+        "input-group-button",
+        "combobox-content",
+        "combobox-list",
+        "combobox-item",
+        "combobox-group",
+        "combobox-label",
+        "combobox-collection",
+        "combobox-empty",
+        "combobox-separator",
+        "combobox-chips",
+        "combobox-chip",
+        "combobox-chip-remove",
+        "combobox-chip-input"
+      ],
+      "displayNames": [],
+      "hasCva": false,
+      "hasSlot": false,
+      "hasCn": true,
+      "hasReactImport": true
+    },
+    "command.tsx": {
+      "exports": [
+        "Command",
+        "CommandDialog",
+        "CommandInput",
+        "CommandList",
+        "CommandEmpty",
+        "CommandLoading",
+        "CommandGroup",
+        "CommandItem",
+        "CommandShortcut",
+        "CommandSeparator"
+      ],
+      "rootFunctions": [
+        "Command",
+        "CommandDialog",
+        "CommandInput",
+        "CommandList",
+        "CommandEmpty",
+        "CommandGroup",
+        "CommandSeparator",
+        "CommandItem",
+        "CommandLoading",
+        "CommandShortcut"
+      ],
+      "dataSlots": [
+        "command",
+        "command-input-wrapper",
+        "command-input",
+        "command-list",
+        "command-empty",
+        "command-group",
+        "command-separator",
+        "command-item",
+        "command-loading",
+        "command-shortcut"
+      ],
+      "displayNames": [],
+      "hasCva": false,
+      "hasSlot": false,
+      "hasCn": true,
+      "hasReactImport": true
+    },
+    "context-menu.tsx": {
+      "exports": [
+        "ContextMenu",
+        "ContextMenuTrigger",
+        "ContextMenuContent",
+        "ContextMenuItem",
+        "ContextMenuCheckboxItem",
+        "ContextMenuRadioItem",
+        "ContextMenuLabel",
+        "ContextMenuSeparator",
+        "ContextMenuShortcut",
+        "ContextMenuGroup",
+        "ContextMenuPortal",
+        "ContextMenuSub",
+        "ContextMenuSubContent",
+        "ContextMenuSubTrigger",
+        "ContextMenuRadioGroup"
+      ],
+      "rootFunctions": [
+        "ContextMenu",
+        "ContextMenuTrigger",
+        "ContextMenuGroup",
+        "ContextMenuPortal",
+        "ContextMenuSub",
+        "ContextMenuRadioGroup",
+        "ContextMenuContent",
+        "ContextMenuItem",
+        "ContextMenuSubTrigger",
+        "ContextMenuSubContent",
+        "ContextMenuCheckboxItem",
+        "ContextMenuRadioItem",
+        "ContextMenuLabel",
+        "ContextMenuSeparator",
+        "ContextMenuShortcut"
+      ],
+      "dataSlots": [
+        "context-menu",
+        "context-menu-trigger",
+        "context-menu-group",
+        "context-menu-portal",
+        "context-menu-sub",
+        "context-menu-radio-group",
+        "context-menu-content",
+        "context-menu-item",
+        "context-menu-sub-trigger",
+        "context-menu-sub-content",
+        "context-menu-checkbox-item",
+        "context-menu-radio-item",
+        "context-menu-label",
+        "context-menu-separator",
+        "context-menu-shortcut"
+      ],
+      "displayNames": [],
+      "hasCva": false,
+      "hasSlot": false,
+      "hasCn": true,
+      "hasReactImport": true
+    },
+    "dialog.tsx": {
+      "exports": [
+        "Dialog",
+        "DialogClose",
+        "DialogContent",
+        "DialogDescription",
+        "DialogFooter",
+        "DialogHeader",
+        "DialogOverlay",
+        "DialogPortal",
+        "DialogTitle",
+        "DialogTrigger"
+      ],
+      "rootFunctions": [
+        "Dialog",
+        "DialogTrigger",
+        "DialogPortal",
+        "DialogClose",
+        "DialogOverlay",
+        "DialogContent",
+        "DialogHeader",
+        "DialogFooter",
+        "DialogTitle",
+        "DialogDescription"
+      ],
+      "dataSlots": [
+        "dialog",
+        "dialog-trigger",
+        "dialog-portal",
+        "dialog-close",
+        "dialog-overlay",
+        "dialog-content",
+        "dialog-header",
+        "dialog-footer",
+        "dialog-title",
+        "dialog-description"
+      ],
+      "displayNames": [],
+      "hasCva": false,
+      "hasSlot": false,
+      "hasCn": true,
+      "hasReactImport": true
+    },
+    "direction.tsx": {
+      "exports": [
+        "DirectionProvider",
+        "useDirection"
+      ],
+      "rootFunctions": [
+        "DirectionProvider"
+      ],
+      "dataSlots": [],
+      "displayNames": [],
+      "hasCva": false,
+      "hasSlot": false,
+      "hasCn": false,
+      "hasReactImport": true
+    },
+    "drawer.tsx": {
+      "exports": [
+        "Drawer",
+        "DrawerPortal",
+        "DrawerOverlay",
+        "DrawerTrigger",
+        "DrawerClose",
+        "DrawerContent",
+        "DrawerHeader",
+        "DrawerFooter",
+        "DrawerTitle",
+        "DrawerDescription"
+      ],
+      "rootFunctions": [
+        "Drawer",
+        "DrawerTrigger",
+        "DrawerPortal",
+        "DrawerClose",
+        "DrawerOverlay",
+        "DrawerContent",
+        "DrawerHeader",
+        "DrawerFooter",
+        "DrawerTitle",
+        "DrawerDescription"
+      ],
+      "dataSlots": [
+        "drawer",
+        "drawer-trigger",
+        "drawer-portal",
+        "drawer-close",
+        "drawer-overlay",
+        "drawer-content",
+        "drawer-header",
+        "drawer-footer",
+        "drawer-title",
+        "drawer-description"
+      ],
+      "displayNames": [],
+      "hasCva": false,
+      "hasSlot": false,
+      "hasCn": true,
+      "hasReactImport": true
+    },
+    "dropdown-menu.tsx": {
+      "exports": [
+        "DropdownMenu",
+        "DropdownMenuPortal",
+        "DropdownMenuTrigger",
+        "DropdownMenuContent",
+        "DropdownMenuGroup",
+        "DropdownMenuLabel",
+        "DropdownMenuItem",
+        "DropdownMenuCheckboxItem",
+        "DropdownMenuRadioGroup",
+        "DropdownMenuRadioItem",
+        "DropdownMenuSeparator",
+        "DropdownMenuShortcut",
+        "DropdownMenuSub",
+        "DropdownMenuSubTrigger",
+        "DropdownMenuSubContent"
+      ],
+      "rootFunctions": [
+        "DropdownMenu",
+        "DropdownMenuPortal",
+        "DropdownMenuContent",
+        "DropdownMenuGroup",
+        "DropdownMenuItem",
+        "DropdownMenuCheckboxItem",
+        "DropdownMenuRadioGroup",
+        "DropdownMenuRadioItem",
+        "DropdownMenuLabel",
+        "DropdownMenuSeparator",
+        "DropdownMenuShortcut",
+        "DropdownMenuSub",
+        "DropdownMenuSubTrigger",
+        "DropdownMenuSubContent"
+      ],
+      "dataSlots": [
+        "dropdown-menu",
+        "dropdown-menu-portal",
+        "dropdown-menu-trigger",
+        "dropdown-menu-content",
+        "dropdown-menu-group",
+        "dropdown-menu-item",
+        "dropdown-menu-checkbox-item",
+        "dropdown-menu-checkbox-item-indicator",
+        "dropdown-menu-radio-group",
+        "dropdown-menu-radio-item",
+        "dropdown-menu-radio-item-indicator",
+        "dropdown-menu-label",
+        "dropdown-menu-separator",
+        "dropdown-menu-shortcut",
+        "dropdown-menu-sub",
+        "dropdown-menu-sub-trigger",
+        "dropdown-menu-sub-content"
+      ],
+      "displayNames": [],
+      "hasCva": false,
+      "hasSlot": false,
+      "hasCn": true,
+      "hasReactImport": true
+    },
+    "empty.tsx": {
+      "exports": [
+        "Empty",
+        "EmptyHeader",
+        "EmptyTitle",
+        "EmptyDescription",
+        "EmptyContent",
+        "EmptyMedia"
+      ],
+      "rootFunctions": [
+        "Empty",
+        "EmptyHeader",
+        "EmptyMedia",
+        "EmptyTitle",
+        "EmptyDescription",
+        "EmptyContent"
+      ],
+      "dataSlots": [
+        "empty",
+        "empty-header",
+        "empty-icon",
+        "empty-title",
+        "empty-description",
+        "empty-content"
+      ],
+      "displayNames": [],
+      "hasCva": true,
+      "hasSlot": false,
+      "hasCn": true,
+      "hasReactImport": false
+    },
+    "field.tsx": {
+      "exports": [
+        "Field",
+        "FieldLabel",
+        "FieldDescription",
+        "FieldError",
+        "FieldGroup",
+        "FieldLegend",
+        "FieldSeparator",
+        "FieldSet",
+        "FieldContent",
+        "FieldTitle"
+      ],
+      "rootFunctions": [
+        "FieldSet",
+        "FieldLegend",
+        "FieldGroup",
+        "Field",
+        "FieldContent",
+        "FieldLabel",
+        "FieldTitle",
+        "FieldDescription",
+        "FieldSeparator",
+        "FieldError"
+      ],
+      "dataSlots": [
+        "field-set",
+        "field-legend",
+        "field-group",
+        "field",
+        "field-content",
+        "field-label",
+        "field-description",
+        "field-separator",
+        "field-separator-content",
+        "field-error"
+      ],
+      "displayNames": [],
+      "hasCva": true,
+      "hasSlot": false,
+      "hasCn": true,
+      "hasReactImport": false
+    },
+    "hover-card.tsx": {
+      "exports": [
+        "HoverCard",
+        "HoverCardTrigger",
+        "HoverCardContent"
+      ],
+      "rootFunctions": [
+        "HoverCard",
+        "HoverCardTrigger",
+        "HoverCardContent"
+      ],
+      "dataSlots": [
+        "hover-card",
+        "hover-card-trigger",
+        "hover-card-portal",
+        "hover-card-content"
+      ],
+      "displayNames": [],
+      "hasCva": false,
+      "hasSlot": false,
+      "hasCn": true,
+      "hasReactImport": true
+    },
+    "input-group.tsx": {
+      "exports": [
+        "InputGroup",
+        "InputGroupAddon",
+        "InputGroupButton",
+        "InputGroupText",
+        "InputGroupInput",
+        "InputGroupTextarea"
+      ],
+      "rootFunctions": [
+        "InputGroup",
+        "InputGroupAddon",
+        "InputGroupButton",
+        "InputGroupText",
+        "InputGroupInput",
+        "InputGroupTextarea"
+      ],
+      "dataSlots": [
+        "input-group",
+        "input-group-addon",
+        "input-group-control"
+      ],
+      "displayNames": [],
+      "hasCva": true,
+      "hasSlot": false,
+      "hasCn": true,
+      "hasReactImport": true
+    },
+    "input-otp.tsx": {
+      "exports": [
+        "InputOTP",
+        "InputOTPGroup",
+        "InputOTPSlot",
+        "InputOTPSeparator"
+      ],
+      "rootFunctions": [
+        "InputOTP",
+        "InputOTPGroup",
+        "InputOTPSlot",
+        "InputOTPSeparator"
+      ],
+      "dataSlots": [
+        "input-otp",
+        "input-otp-group",
+        "input-otp-slot",
+        "input-otp-separator"
+      ],
+      "displayNames": [],
+      "hasCva": false,
+      "hasSlot": false,
+      "hasCn": true,
+      "hasReactImport": true
+    },
+    "input.tsx": {
+      "exports": [
+        "Input"
+      ],
+      "rootFunctions": [
+        "Input"
+      ],
+      "dataSlots": [
+        "input"
+      ],
+      "displayNames": [],
+      "hasCva": false,
+      "hasSlot": false,
+      "hasCn": true,
+      "hasReactImport": true
+    },
+    "item.tsx": {
+      "exports": [
+        "Item",
+        "ItemMedia",
+        "ItemContent",
+        "ItemActions",
+        "ItemGroup",
+        "ItemSeparator",
+        "ItemTitle",
+        "ItemDescription",
+        "ItemHeader",
+        "ItemFooter"
+      ],
+      "rootFunctions": [
+        "ItemGroup",
+        "ItemSeparator",
+        "Item",
+        "ItemMedia",
+        "ItemContent",
+        "ItemTitle",
+        "ItemDescription",
+        "ItemActions",
+        "ItemHeader",
+        "ItemFooter"
+      ],
+      "dataSlots": [
+        "item-group",
+        "item-separator",
+        "item",
+        "item-media",
+        "item-content",
+        "item-title",
+        "item-description",
+        "item-actions",
+        "item-header",
+        "item-footer"
+      ],
+      "displayNames": [],
+      "hasCva": true,
+      "hasSlot": true,
+      "hasCn": true,
+      "hasReactImport": true
+    },
+    "kbd.tsx": {
+      "exports": [
+        "Kbd",
+        "KbdGroup"
+      ],
+      "rootFunctions": [
+        "Kbd",
+        "KbdGroup"
+      ],
+      "dataSlots": [
+        "kbd",
+        "kbd-group"
+      ],
+      "displayNames": [],
+      "hasCva": false,
+      "hasSlot": false,
+      "hasCn": true,
+      "hasReactImport": false
+    },
+    "label.tsx": {
+      "exports": [
+        "Label"
+      ],
+      "rootFunctions": [
+        "Label"
+      ],
+      "dataSlots": [
+        "label"
+      ],
+      "displayNames": [],
+      "hasCva": false,
+      "hasSlot": false,
+      "hasCn": true,
+      "hasReactImport": true
+    },
+    "menubar.tsx": {
+      "exports": [
+        "Menubar",
+        "MenubarPortal",
+        "MenubarMenu",
+        "MenubarTrigger",
+        "MenubarContent",
+        "MenubarGroup",
+        "MenubarSeparator",
+        "MenubarLabel",
+        "MenubarItem",
+        "MenubarShortcut",
+        "MenubarCheckboxItem",
+        "MenubarRadioGroup",
+        "MenubarRadioItem",
+        "MenubarSub",
+        "MenubarSubTrigger",
+        "MenubarSubContent"
+      ],
+      "rootFunctions": [
+        "Menubar",
+        "MenubarMenu",
+        "MenubarGroup",
+        "MenubarPortal",
+        "MenubarRadioGroup",
+        "MenubarTrigger",
+        "MenubarContent",
+        "MenubarItem",
+        "MenubarCheckboxItem",
+        "MenubarRadioItem",
+        "MenubarLabel",
+        "MenubarSeparator",
+        "MenubarShortcut",
+        "MenubarSub",
+        "MenubarSubTrigger",
+        "MenubarSubContent"
+      ],
+      "dataSlots": [
+        "menubar",
+        "menubar-menu",
+        "menubar-group",
+        "menubar-portal",
+        "menubar-radio-group",
+        "menubar-trigger",
+        "menubar-content",
+        "menubar-item",
+        "menubar-checkbox-item",
+        "menubar-radio-item",
+        "menubar-label",
+        "menubar-separator",
+        "menubar-shortcut",
+        "menubar-sub",
+        "menubar-sub-trigger",
+        "menubar-sub-content"
+      ],
+      "displayNames": [],
+      "hasCva": false,
+      "hasSlot": false,
+      "hasCn": true,
+      "hasReactImport": true
+    },
+    "native-select.tsx": {
+      "exports": [
+        "NativeSelect",
+        "NativeSelectOptGroup",
+        "NativeSelectOption"
+      ],
+      "rootFunctions": [
+        "NativeSelect",
+        "NativeSelectOption",
+        "NativeSelectOptGroup"
+      ],
+      "dataSlots": [
+        "native-select-wrapper",
+        "native-select",
+        "native-select-icon",
+        "native-select-option",
+        "native-select-optgroup"
+      ],
+      "displayNames": [],
+      "hasCva": false,
+      "hasSlot": false,
+      "hasCn": true,
+      "hasReactImport": true
+    },
+    "navigation-menu.tsx": {
+      "exports": [
+        "NavigationMenu",
+        "NavigationMenuList",
+        "NavigationMenuItem",
+        "NavigationMenuContent",
+        "NavigationMenuTrigger",
+        "NavigationMenuLink",
+        "NavigationMenuIndicator",
+        "NavigationMenuViewport",
+        "navigationMenuTriggerStyle"
+      ],
+      "rootFunctions": [
+        "NavigationMenu",
+        "NavigationMenuList",
+        "NavigationMenuItem",
+        "NavigationMenuTrigger",
+        "NavigationMenuContent",
+        "NavigationMenuViewport",
+        "NavigationMenuLink",
+        "NavigationMenuIndicator"
+      ],
+      "dataSlots": [
+        "navigation-menu",
+        "navigation-menu-list",
+        "navigation-menu-item",
+        "navigation-menu-trigger",
+        "navigation-menu-content",
+        "navigation-menu-viewport",
+        "navigation-menu-link",
+        "navigation-menu-indicator"
+      ],
+      "displayNames": [],
+      "hasCva": true,
+      "hasSlot": false,
+      "hasCn": true,
+      "hasReactImport": true
+    },
+    "pagination.tsx": {
+      "exports": [
+        "Pagination",
+        "PaginationContent",
+        "PaginationEllipsis",
+        "PaginationItem",
+        "PaginationLink",
+        "PaginationNext",
+        "PaginationPrevious"
+      ],
+      "rootFunctions": [
+        "Pagination",
+        "PaginationContent",
+        "PaginationItem",
+        "PaginationLink",
+        "PaginationPrevious",
+        "PaginationNext",
+        "PaginationEllipsis"
+      ],
+      "dataSlots": [
+        "pagination",
+        "pagination-content",
+        "pagination-item",
+        "pagination-link",
+        "pagination-ellipsis"
+      ],
+      "displayNames": [],
+      "hasCva": false,
+      "hasSlot": false,
+      "hasCn": true,
+      "hasReactImport": true
+    },
+    "popover.tsx": {
+      "exports": [
+        "Popover",
+        "PopoverAnchor",
+        "PopoverContent",
+        "PopoverDescription",
+        "PopoverHeader",
+        "PopoverTitle",
+        "PopoverTrigger"
+      ],
+      "rootFunctions": [
+        "Popover",
+        "PopoverTrigger",
+        "PopoverContent",
+        "PopoverAnchor",
+        "PopoverHeader",
+        "PopoverTitle",
+        "PopoverDescription"
+      ],
+      "dataSlots": [
+        "popover",
+        "popover-trigger",
+        "popover-content",
+        "popover-anchor",
+        "popover-header",
+        "popover-title",
+        "popover-description"
+      ],
+      "displayNames": [],
+      "hasCva": false,
+      "hasSlot": false,
+      "hasCn": true,
+      "hasReactImport": true
+    },
+    "presence.tsx": {
+      "exports": [
+        "Presence"
+      ],
+      "rootFunctions": [],
+      "dataSlots": [],
+      "displayNames": [],
+      "hasCva": false,
+      "hasSlot": false,
+      "hasCn": false,
+      "hasReactImport": false
+    },
+    "progress.tsx": {
+      "exports": [
+        "Progress"
+      ],
+      "rootFunctions": [
+        "Progress"
+      ],
+      "dataSlots": [
+        "progress",
+        "progress-indicator"
+      ],
+      "displayNames": [],
+      "hasCva": false,
+      "hasSlot": false,
+      "hasCn": true,
+      "hasReactImport": true
+    },
+    "radio-group.tsx": {
+      "exports": [
+        "RadioGroup",
+        "RadioGroupItem"
+      ],
+      "rootFunctions": [
+        "RadioGroup",
+        "RadioGroupItem"
+      ],
+      "dataSlots": [
+        "radio-group",
+        "radio-group-item",
+        "radio-group-indicator"
+      ],
+      "displayNames": [],
+      "hasCva": false,
+      "hasSlot": false,
+      "hasCn": true,
+      "hasReactImport": true
+    },
+    "resizable.tsx": {
+      "exports": [
+        "ResizableHandle",
+        "ResizablePanel",
+        "ResizablePanelGroup"
+      ],
+      "rootFunctions": [
+        "ResizablePanelGroup",
+        "ResizablePanel",
+        "ResizableHandle"
+      ],
+      "dataSlots": [
+        "resizable-panel-group",
+        "resizable-panel",
+        "resizable-handle"
+      ],
+      "displayNames": [],
+      "hasCva": false,
+      "hasSlot": false,
+      "hasCn": true,
+      "hasReactImport": false
+    },
+    "scroll-area.tsx": {
+      "exports": [
+        "ScrollArea",
+        "ScrollBar"
+      ],
+      "rootFunctions": [
+        "ScrollArea",
+        "ScrollBar"
+      ],
+      "dataSlots": [
+        "scroll-area",
+        "scroll-area-viewport",
+        "scroll-area-scrollbar",
+        "scroll-area-thumb"
+      ],
+      "displayNames": [],
+      "hasCva": false,
+      "hasSlot": false,
+      "hasCn": true,
+      "hasReactImport": true
+    },
+    "select.tsx": {
+      "exports": [
+        "Select",
+        "SelectContent",
+        "SelectGroup",
+        "SelectItem",
+        "SelectLabel",
+        "SelectScrollDownButton",
+        "SelectScrollUpButton",
+        "SelectSeparator",
+        "SelectTrigger",
+        "SelectValue"
+      ],
+      "rootFunctions": [
+        "Select",
+        "SelectGroup",
+        "SelectValue",
+        "SelectTrigger",
+        "SelectContent",
+        "SelectLabel",
+        "SelectItem",
+        "SelectSeparator",
+        "SelectScrollUpButton",
+        "SelectScrollDownButton"
+      ],
+      "dataSlots": [
+        "select",
+        "select-group",
+        "select-value",
+        "select-trigger",
+        "select-content",
+        "select-label",
+        "select-item",
+        "select-separator",
+        "select-scroll-up-button",
+        "select-scroll-down-button"
+      ],
+      "displayNames": [],
+      "hasCva": false,
+      "hasSlot": false,
+      "hasCn": true,
+      "hasReactImport": true
+    },
+    "separator.tsx": {
+      "exports": [
+        "Separator"
+      ],
+      "rootFunctions": [
+        "Separator"
+      ],
+      "dataSlots": [
+        "separator"
+      ],
+      "displayNames": [],
+      "hasCva": false,
+      "hasSlot": false,
+      "hasCn": true,
+      "hasReactImport": true
+    },
+    "sheet.tsx": {
+      "exports": [
+        "Sheet",
+        "SheetTrigger",
+        "SheetClose",
+        "SheetContent",
+        "SheetHeader",
+        "SheetFooter",
+        "SheetTitle",
+        "SheetDescription"
+      ],
+      "rootFunctions": [
+        "Sheet",
+        "SheetTrigger",
+        "SheetClose",
+        "SheetPortal",
+        "SheetOverlay",
+        "SheetContent",
+        "SheetHeader",
+        "SheetFooter",
+        "SheetTitle",
+        "SheetDescription"
+      ],
+      "dataSlots": [
+        "sheet",
+        "sheet-trigger",
+        "sheet-close",
+        "sheet-portal",
+        "sheet-overlay",
+        "sheet-content",
+        "sheet-header",
+        "sheet-footer",
+        "sheet-title",
+        "sheet-description"
+      ],
+      "displayNames": [],
+      "hasCva": false,
+      "hasSlot": false,
+      "hasCn": true,
+      "hasReactImport": true
+    },
+    "sidebar.tsx": {
+      "exports": [
+        "Sidebar",
+        "SidebarContent",
+        "SidebarFooter",
+        "SidebarGroup",
+        "SidebarGroupAction",
+        "SidebarGroupContent",
+        "SidebarGroupLabel",
+        "SidebarHeader",
+        "SidebarInput",
+        "SidebarInset",
+        "SidebarMenu",
+        "SidebarMenuAction",
+        "SidebarMenuBadge",
+        "SidebarMenuButton",
+        "SidebarMenuItem",
+        "SidebarMenuSkeleton",
+        "SidebarMenuSub",
+        "SidebarMenuSubButton",
+        "SidebarMenuSubItem",
+        "SidebarProvider",
+        "SidebarRail",
+        "SidebarSeparator",
+        "SidebarTrigger",
+        "useSidebar"
+      ],
+      "rootFunctions": [
+        "writeSidebarPreferenceCookie",
+        "useSidebar",
+        "SidebarProvider",
+        "Sidebar",
+        "SidebarTrigger",
+        "SidebarRail",
+        "SidebarInset",
+        "SidebarInput",
+        "SidebarHeader",
+        "SidebarFooter",
+        "SidebarSeparator",
+        "SidebarContent",
+        "SidebarGroup",
+        "SidebarGroupLabel",
+        "SidebarGroupAction",
+        "SidebarGroupContent",
+        "SidebarMenu",
+        "SidebarMenuItem",
+        "SidebarMenuButton",
+        "SidebarMenuAction",
+        "SidebarMenuBadge",
+        "SidebarMenuSkeleton",
+        "SidebarMenuSub",
+        "SidebarMenuSubItem",
+        "SidebarMenuSubButton"
+      ],
+      "dataSlots": [
+        "sidebar-wrapper",
+        "sidebar",
+        "sidebar-gap",
+        "sidebar-container",
+        "sidebar-inner",
+        "sidebar-trigger",
+        "sidebar-rail",
+        "sidebar-inset",
+        "sidebar-input",
+        "sidebar-header",
+        "sidebar-footer",
+        "sidebar-separator",
+        "sidebar-content",
+        "sidebar-group",
+        "sidebar-group-label",
+        "sidebar-group-action",
+        "sidebar-group-content",
+        "sidebar-menu",
+        "sidebar-menu-item",
+        "sidebar-menu-button",
+        "sidebar-menu-action",
+        "sidebar-menu-badge",
+        "sidebar-menu-skeleton",
+        "sidebar-menu-sub",
+        "sidebar-menu-sub-item",
+        "sidebar-menu-sub-button"
+      ],
+      "displayNames": [],
+      "hasCva": true,
+      "hasSlot": true,
+      "hasCn": true,
+      "hasReactImport": true
+    },
+    "skeleton.tsx": {
+      "exports": [
+        "Skeleton"
+      ],
+      "rootFunctions": [
+        "Skeleton"
+      ],
+      "dataSlots": [
+        "skeleton"
+      ],
+      "displayNames": [],
+      "hasCva": false,
+      "hasSlot": false,
+      "hasCn": true,
+      "hasReactImport": false
+    },
+    "slider.tsx": {
+      "exports": [
+        "Slider"
+      ],
+      "rootFunctions": [
+        "Slider"
+      ],
+      "dataSlots": [
+        "slider",
+        "slider-track",
+        "slider-range",
+        "slider-thumb"
+      ],
+      "displayNames": [],
+      "hasCva": false,
+      "hasSlot": false,
+      "hasCn": true,
+      "hasReactImport": true
+    },
+    "sonner.tsx": {
+      "exports": [
+        "Toaster"
+      ],
+      "rootFunctions": [],
+      "dataSlots": [],
+      "displayNames": [],
+      "hasCva": false,
+      "hasSlot": false,
+      "hasCn": false,
+      "hasReactImport": false
+    },
+    "spinner.tsx": {
+      "exports": [
+        "Spinner"
+      ],
+      "rootFunctions": [
+        "Spinner"
+      ],
+      "dataSlots": [],
+      "displayNames": [],
+      "hasCva": false,
+      "hasSlot": false,
+      "hasCn": true,
+      "hasReactImport": false
+    },
+    "switch.tsx": {
+      "exports": [
+        "Switch"
+      ],
+      "rootFunctions": [
+        "Switch"
+      ],
+      "dataSlots": [
+        "switch",
+        "switch-thumb"
+      ],
+      "displayNames": [],
+      "hasCva": false,
+      "hasSlot": false,
+      "hasCn": true,
+      "hasReactImport": true
+    },
+    "table.tsx": {
+      "exports": [
+        "Table",
+        "TableHeader",
+        "TableBody",
+        "TableFooter",
+        "TableHead",
+        "TableRow",
+        "TableCell",
+        "TableCaption"
+      ],
+      "rootFunctions": [
+        "Table",
+        "TableHeader",
+        "TableBody",
+        "TableFooter",
+        "TableRow",
+        "TableHead",
+        "TableCell",
+        "TableCaption"
+      ],
+      "dataSlots": [
+        "table-container",
+        "table",
+        "table-header",
+        "table-body",
+        "table-footer",
+        "table-row",
+        "table-head",
+        "table-cell",
+        "table-caption"
+      ],
+      "displayNames": [],
+      "hasCva": false,
+      "hasSlot": false,
+      "hasCn": true,
+      "hasReactImport": true
+    },
+    "tabs.tsx": {
+      "exports": [
+        "Tabs",
+        "TabsList",
+        "TabsTrigger",
+        "TabsContent",
+        "tabsListVariants"
+      ],
+      "rootFunctions": [
+        "Tabs",
+        "TabsList",
+        "TabsTrigger",
+        "TabsContent"
+      ],
+      "dataSlots": [
+        "tabs",
+        "tabs-list",
+        "tabs-trigger",
+        "tabs-content"
+      ],
+      "displayNames": [],
+      "hasCva": true,
+      "hasSlot": false,
+      "hasCn": true,
+      "hasReactImport": true
+    },
+    "textarea.tsx": {
+      "exports": [
+        "Textarea"
+      ],
+      "rootFunctions": [
+        "Textarea"
+      ],
+      "dataSlots": [
+        "textarea"
+      ],
+      "displayNames": [],
+      "hasCva": false,
+      "hasSlot": false,
+      "hasCn": true,
+      "hasReactImport": true
+    },
+    "theme-provider.tsx": {
+      "exports": [],
+      "rootFunctions": [],
+      "dataSlots": [],
+      "displayNames": [],
+      "hasCva": false,
+      "hasSlot": false,
+      "hasCn": false,
+      "hasReactImport": false
+    },
+    "toggle-group.tsx": {
+      "exports": [
+        "ToggleGroup",
+        "ToggleGroupItem"
+      ],
+      "rootFunctions": [
+        "ToggleGroup",
+        "ToggleGroupItem"
+      ],
+      "dataSlots": [
+        "toggle-group",
+        "toggle-group-item"
+      ],
+      "displayNames": [],
+      "hasCva": false,
+      "hasSlot": false,
+      "hasCn": true,
+      "hasReactImport": true
+    },
+    "toggle.tsx": {
+      "exports": [
+        "Toggle",
+        "toggleVariants"
+      ],
+      "rootFunctions": [
+        "Toggle"
+      ],
+      "dataSlots": [
+        "toggle"
+      ],
+      "displayNames": [],
+      "hasCva": true,
+      "hasSlot": false,
+      "hasCn": true,
+      "hasReactImport": true
+    },
+    "tooltip.tsx": {
+      "exports": [
+        "Tooltip",
+        "TooltipContent",
+        "TooltipProvider",
+        "TooltipTrigger"
+      ],
+      "rootFunctions": [
+        "TooltipProvider",
+        "Tooltip",
+        "TooltipTrigger",
+        "TooltipContent"
+      ],
+      "dataSlots": [
+        "tooltip-provider",
+        "tooltip",
+        "tooltip-trigger",
+        "tooltip-content"
+      ],
+      "displayNames": [],
+      "hasCva": false,
+      "hasSlot": false,
+      "hasCn": true,
+      "hasReactImport": true
+    }
+  }
+}
