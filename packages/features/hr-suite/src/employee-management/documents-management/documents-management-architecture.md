@@ -1,5 +1,25 @@
 # Document Management
 
+> **Implementation pattern:** clone `../compliance-regulatory-tracking/` — Cursor rule `**afenda-hr-reference-slice`**, checklist `packages/features/hr-suite/docs/hr-reference-slice-checklist.md`. Requirements below; add `## As-built summary` when code ships.
+
+## As-built summary
+
+| Area | Status | Notes |
+| ---- | ------ | ----- |
+| Workbench route | Shipped | `/hr/documents` via `apps/erp/src/lib/hr-sections/documents.server.tsx` |
+| Overview (Pattern B) | Shipped | Vault posture + expiry counts from `loadHrDocumentsOverviewSnapshot` |
+| Repository list + register | Shipped | Enum-safe search; verify/reject/replace trailing via stable client cells |
+| Requirements + missing mandatory | Shipped | Requirement upsert form; derived missing register |
+| Version lineage | Shipped | `replaceHrEmployeeDocument`, `versionNumber`, `isLatestActive` |
+| Expiry posture | Shipped | Flag-first derivation at read; expiring watchlist surface |
+| Sensitive access | Shipped | `hr.documents.sensitive.read`; title masking on lists |
+| Retention policies | Shipped | Policy register + upsert action |
+| Audit trail + acknowledgments | Shipped | Audit events on upload/verify/reject/replace; ack register |
+| Readiness API | Shipped | `getHrEmployeeDocumentReadiness` / server action |
+| E2E harness | Shipped | `apps/erp/tests/e2e/hr-documents.spec.ts` (serial, dev auth) |
+
+**Expiry decision (slice 6):** Option B — flag-first at read; `runHrDocumentExpirySweep` remains cron-only archive helper and does not drive workbench posture.
+
 ## Definition
 
 **Document Management is the HRM function that stores, organizes, secures, tracks, and controls employee-related documents, including employment contracts, identity documents, certifications, HR letters, policy acknowledgments, statutory documents, and document expiry records.**
@@ -7,6 +27,7 @@
 ---
 
 # Document Management Includes
+
 
 | Area                             | What It Covers                                                                              |
 | -------------------------------- | ------------------------------------------------------------------------------------------- |
@@ -27,9 +48,11 @@
 | **Retention Control**            | Retention period, archive rule, deletion/anonymization rule                                 |
 | **Audit Trail**                  | Uploaded by, viewed by, downloaded by, verified by, replaced by, timestamp                  |
 
+
 ---
 
 # Document Management Does Not Include
+
 
 | Excluded Area                         | Owned By                                         |
 | ------------------------------------- | ------------------------------------------------ |
@@ -47,17 +70,21 @@
 | Asset assignment documents            | Asset Management / Document Management link only |
 | Legal case handling                   | Legal / Compliance Management                    |
 
+
 ---
 
 # Document Management Requirement Statement
+
 
 | Requirement             | Description                                                                                                                                                                                                                                                                                                                          |
 | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | **Document Management** | Stores, organizes, secures, versions, tracks, and manages employee-related documents such as employment contracts, identity documents, certifications, HR letters, statutory forms, medical certificates, and policy acknowledgments, with expiry tracking, verification status, access control, retention rules, and audit history. |
 
+
 ---
 
 # Enterprise Functional Requirements
+
 
 | Code            | Requirement                                                                                                                 |
 | --------------- | --------------------------------------------------------------------------------------------------------------------------- |
@@ -87,29 +114,33 @@
 | **HRM-DOC-024** | System shall support employee-submitted documents through Employee Self-Service where enabled.                              |
 | **HRM-DOC-025** | System shall expose document readiness status to Employee Records Management, Compliance, Payroll, and Offboarding modules. |
 
+
 ---
 
 # Enterprise Acceptance Criteria
 
+
 | No. | Acceptance Criteria                                                                         |
-| --: | ------------------------------------------------------------------------------------------- |
-|   1 | Authorized HR user can upload a document and link it to an employee record.                 |
-|   2 | Uploaded document must have document type, employee reference, upload date, and status.     |
-|   3 | Mandatory documents are clearly identified.                                                 |
-|   4 | Missing mandatory documents are flagged.                                                    |
-|   5 | Document can be marked as pending verification, verified, rejected, expired, or archived.   |
-|   6 | Rejected document stores rejection reason.                                                  |
-|   7 | Document expiry date can be recorded.                                                       |
-|   8 | Expiring documents are flagged before expiry.                                               |
-|   9 | Expired documents are clearly shown as expired.                                             |
-|  10 | Document replacement creates a new version without losing previous version history.         |
-|  11 | Latest document version is clearly identified.                                              |
-|  12 | Employees can submit permitted documents through self-service where enabled.                |
-|  13 | Employees can acknowledge required policies.                                                |
-|  14 | Policy acknowledgment records store employee, policy version, date, and timestamp.          |
-|  15 | Sensitive documents are hidden from unauthorized users.                                     |
-|  16 | Document download is restricted based on permission.                                        |
-|  17 | HR can search documents by employee, type, status, expiry, and verification state.          |
-|  18 | Employee record can display linked document readiness without owning the document workflow. |
-|  19 | Document records remain available after employee separation according to retention policy.  |
-|  20 | Every document action creates an audit event.                                               |
+| --- | ------------------------------------------------------------------------------------------- |
+| 1   | Authorized HR user can upload a document and link it to an employee record.                 |
+| 2   | Uploaded document must have document type, employee reference, upload date, and status.     |
+| 3   | Mandatory documents are clearly identified.                                                 |
+| 4   | Missing mandatory documents are flagged.                                                    |
+| 5   | Document can be marked as pending verification, verified, rejected, expired, or archived.   |
+| 6   | Rejected document stores rejection reason.                                                  |
+| 7   | Document expiry date can be recorded.                                                       |
+| 8   | Expiring documents are flagged before expiry.                                               |
+| 9   | Expired documents are clearly shown as expired.                                             |
+| 10  | Document replacement creates a new version without losing previous version history.         |
+| 11  | Latest document version is clearly identified.                                              |
+| 12  | Employees can submit permitted documents through self-service where enabled.                |
+| 13  | Employees can acknowledge required policies.                                                |
+| 14  | Policy acknowledgment records store employee, policy version, date, and timestamp.          |
+| 15  | Sensitive documents are hidden from unauthorized users.                                     |
+| 16  | Document download is restricted based on permission.                                        |
+| 17  | HR can search documents by employee, type, status, expiry, and verification state.          |
+| 18  | Employee record can display linked document readiness without owning the document workflow. |
+| 19  | Document records remain available after employee separation according to retention policy.  |
+| 20  | Every document action creates an audit event.                                               |
+
+

@@ -1,5 +1,6 @@
-/**
- * @afenda-bucket policies
- * Scaffold placeholder from packages/_template-definition.
- */
-export {};
+export {
+  requireHrDocumentsRead,
+  requireHrDocumentsWrite,
+  requireHrDocumentsSensitiveWrite,
+  type HrDocumentsExecutionGuard,
+} from "./hr.workforce.documents-access.policy.server";

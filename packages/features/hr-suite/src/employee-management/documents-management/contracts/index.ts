@@ -1,5 +1,9 @@
-/**
- * @afenda-bucket contracts
- * Scaffold placeholder from packages/_template-definition.
- */
-export {};
+export {
+  hrWorkforceDocumentsReadPermission,
+  hrWorkforceDocumentsWritePermission,
+  hrWorkforceDocumentsSensitiveReadPermission,
+} from "./hr.workforce.documents.contract";
+export {
+  hrDocumentsRoutePaths,
+  type HrDocumentsRoutePath,
+} from "./hr.workforce.documents-route.contract";
