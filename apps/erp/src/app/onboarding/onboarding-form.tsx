@@ -12,7 +12,7 @@ export function OnboardingForm() {
       <h2 className="type-section-title font-semibold text-foreground">
         {onboardingFormCopy.title}
       </h2>
-      <p className="mt-3 type-body leading-6 text-muted-foreground">
+      <p className="mt-3 type-muted">
         {onboardingFormCopy.description}
       </p>
       <form action={completeOnboardingAction} className="mt-surface-3xl flex flex-col gap-5">

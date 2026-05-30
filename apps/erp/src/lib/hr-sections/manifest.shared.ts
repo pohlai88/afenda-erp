@@ -13,6 +13,26 @@ export const hrSectionManifest = {
     label: "Benefits",
     featureArea: "payroll-compensation/benefits-administration",
   },
+  "leave-attendance": {
+    label: "Leave & Attendance",
+    featureArea: "time-attendance/leave-attendance-management",
+  },
+  "absence-analytics-trends": {
+    label: "Absence Analytics & Trends",
+    featureArea: "time-attendance/absence-analytics-trends",
+  },
+  leave: {
+    label: "Leave",
+    featureArea: "time-attendance/leave-attendance-management",
+  },
+  attendance: {
+    label: "Attendance",
+    featureArea: "time-attendance/leave-attendance-management",
+  },
+  "flexible-work-arrangement": {
+    label: "Flexible Work",
+    featureArea: "time-attendance/flexible-work-arrangement-tracking",
+  },
 } as const;
 
 export type HrSectionSlug = keyof typeof hrSectionManifest;

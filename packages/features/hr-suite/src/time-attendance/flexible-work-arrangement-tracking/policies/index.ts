@@ -1,5 +1,2 @@
-/**
- * @afenda-bucket policies
- * Scaffold placeholder from packages/_template-definition.
- */
-export {};
+export * from "./hr.time.fwa-routing.policy.server";
+export * from "./hr.time.fwa-access.policy.server";

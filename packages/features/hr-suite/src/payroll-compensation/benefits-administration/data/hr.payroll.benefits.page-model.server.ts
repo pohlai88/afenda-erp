@@ -113,7 +113,7 @@ export async function buildHrBenefitsPageModel(
     }),
     enrollmentsList: buildHrBenefitsEnrollmentsListSurface({
       canWrite: input.canWrite,
-      window: enrollmentsWindow,
+      window: { ...enrollmentsWindow, rows: [...enrollmentsWindow.rows] },
       searchValue: input.enrollmentsSearch,
     }),
     providersList: buildHrBenefitsProvidersListSurface({

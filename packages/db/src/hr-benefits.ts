@@ -24,6 +24,7 @@ export type {
   HrBenefitEnrollmentWindowRow,
   HrBenefitOpenEnrollmentWindowList,
   HrBenefitOpenEnrollmentWindowRow,
+  HrBenefitPayrollDeductionRefRow,
   HrBenefitPlanWindow,
   HrBenefitPlanWindowRow,
 } from "./hr-benefits.types";

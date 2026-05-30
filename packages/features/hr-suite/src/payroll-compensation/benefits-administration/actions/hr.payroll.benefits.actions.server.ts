@@ -8,6 +8,7 @@ import {
   buildHrBenefitReportCsv,
   createHrBenefitEnrollmentInTx,
   linkHrBenefitDocumentInTx,
+  recordHrBenefitLifeEventInTx,
   markHrBenefitDeductionRefsSyncedInTx,
   unlinkHrBenefitDocumentInTx,
   upsertHrBenefitProviderInTx,
@@ -30,6 +31,8 @@ import {
   parseHrBenefitsEnrollmentApprovalForm,
   parseHrBenefitsEnrollmentChangeForm,
   parseHrBenefitsEnrollmentCreateForm,
+  parseHrBenefitsLifeEventRecordForm,
+  parseHrBenefitsNewHireEnrollmentForm,
   parseHrBenefitsPayrollExportForm,
   parseHrBenefitsProviderForm,
   parseHrBenefitsVerifyDependentsForm,
@@ -97,6 +100,94 @@ export async function createHrBenefitEnrollmentAction(
       action: hrPayrollBenefitsAuditActions.enrollment.created,
       targetId: created.enrollmentId,
       summary: "Benefit enrollment created",
+      metadata: created,
+    };
+  });
+}
+
+export async function recordHrBenefitLifeEventAction(
+  _previous: ActionResult | undefined,
+  formData: FormData,
+): Promise<ActionResult> {
+  const { session, organization } = await requireHrBenefitsWrite();
+  const parsed = parseHrBenefitsLifeEventRecordForm(formData);
+  if (!parsed.success) return zodActionFailure(parsed.error);
+
+  return finalizeBenefitsMutation(organization.id, async (db) => {
+    const recorded = await recordHrBenefitLifeEventInTx(db, {
+      organizationId: organization.id,
+      employeeId: parsed.data.employeeId,
+      kind: parsed.data.kind,
+      eventDate: parsed.data.eventDate,
+      notes: parsed.data.notes,
+      approvalReference: parsed.data.approvalReference,
+    });
+
+    await appendHrBenefitAuditEventInTx(db, {
+      organizationId: organization.id,
+      employeeId: parsed.data.employeeId,
+      actorUserId: session.id,
+      action: hrPayrollBenefitsAuditActions.lifeEvent.recorded,
+      summary: `Life event recorded (${parsed.data.kind})`,
+      metadata: {
+        lifeEventId: recorded.lifeEventId,
+        eventDate: parsed.data.eventDate.toISOString(),
+      },
+    });
+
+    return {
+      organizationId: organization.id,
+      actorId: session.id,
+      action: hrPayrollBenefitsAuditActions.lifeEvent.recorded,
+      targetId: recorded.lifeEventId,
+      summary: "Benefit life event recorded",
+      metadata: recorded,
+    };
+  });
+}
+
+export async function createNewHireBenefitEnrollmentAction(
+  _previous: ActionResult | undefined,
+  formData: FormData,
+): Promise<ActionResult> {
+  const { session, organization } = await requireHrBenefitsWrite();
+  const parsed = parseHrBenefitsNewHireEnrollmentForm(formData);
+  if (!parsed.success) return zodActionFailure(parsed.error);
+
+  return finalizeBenefitsMutation(organization.id, async (db) => {
+    const created = await createHrBenefitEnrollmentInTx(db, {
+      organizationId: organization.id,
+      employeeId: parsed.data.employeeId,
+      planId: parsed.data.planId,
+      coverageLevel: parsed.data.coverageLevel,
+      enrollmentChannel: "new_hire",
+      coverageStartDate: parsed.data.coverageStartDate,
+      coverageEndDate: parsed.data.coverageEndDate,
+      eligibilityOverrideReference: parsed.data.eligibilityOverrideReference,
+      enrolledByUserId: session.id,
+      dependents: parsed.data.dependents,
+    });
+
+    await appendHrBenefitAuditEventInTx(db, {
+      organizationId: organization.id,
+      enrollmentId: created.enrollmentId,
+      employeeId: parsed.data.employeeId,
+      planId: parsed.data.planId,
+      actorUserId: session.id,
+      action: hrPayrollBenefitsAuditActions.enrollment.created,
+      summary: "New hire benefit enrollment created",
+      metadata: {
+        coverageLevel: parsed.data.coverageLevel,
+        enrollmentChannel: "new_hire",
+      },
+    });
+
+    return {
+      organizationId: organization.id,
+      actorId: session.id,
+      action: hrPayrollBenefitsAuditActions.enrollment.created,
+      targetId: created.enrollmentId,
+      summary: "New hire benefit enrollment created",
       metadata: created,
     };
   });

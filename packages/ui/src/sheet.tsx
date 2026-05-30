@@ -4,7 +4,7 @@ import * as React from "react";
 import { Dialog as SheetPrimitive } from "radix-ui";
 
 import { cn } from "./utils";
-import { uiRadius } from "./design-system";
+import { uiRadius, uiTypography } from "./design-system";
 import { Button } from "./button";
 import { XIcon } from "lucide-react";
 
@@ -130,7 +130,7 @@ function SheetDescription({
   return (
     <SheetPrimitive.Description
       data-slot="sheet-description"
-      className={cn("text-sm text-muted-foreground", className)}
+      className={cn(uiTypography.muted, className)}
       {...props}
     />
   );

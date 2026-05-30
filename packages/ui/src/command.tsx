@@ -5,6 +5,7 @@ import { Command as CommandPrimitive } from "cmdk";
 import { LoaderCircleIcon, SearchIcon } from "lucide-react";
 
 import { cn } from "./utils";
+import { uiTypography } from "./design-system";
 import {
   Dialog,
   DialogContent,
@@ -114,10 +115,7 @@ function CommandEmpty({
   return (
     <CommandPrimitive.Empty
       data-slot="command-empty"
-      className={cn(
-        "py-8 text-center text-sm text-muted-foreground",
-        className,
-      )}
+      className={cn("py-8 text-center", uiTypography.muted, className)}
       {...props}
     />
   );
@@ -190,10 +188,7 @@ function CommandLoading({
   return (
     <CommandPrimitive.Loading
       data-slot="command-loading"
-      className={cn(
-        "py-8 text-center text-sm text-muted-foreground",
-        className,
-      )}
+      className={cn("py-8 text-center", uiTypography.muted, className)}
       {...props}
     >
       {children ?? (

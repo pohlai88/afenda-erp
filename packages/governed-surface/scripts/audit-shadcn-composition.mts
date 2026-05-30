@@ -125,10 +125,131 @@ function walkFiles(dir: string): string[] {
   return results;
 }
 
+/** File-level composition checks (nested Card, section anti-patterns). */
+function auditFileLevel(filePath: string, content: string): Violation[] {
+  const rel = filePath.replace(/\\/g, "/");
+  const violations: Violation[] = [];
+  const isProduct =
+    rel.includes("apps/erp/src/") ||
+    rel.includes("packages/features/") ||
+    rel.includes("packages/governed-surface/src/");
+  if (!isProduct || !rel.endsWith(".tsx")) {
+    return violations;
+  }
+
+  const suppressFile = /\/\/\s*audit-shadcn:\s*ignore-file/.test(content);
+  if (suppressFile) return violations;
+
+  const cardOpens = (content.match(/<Card[\s>/]/g) ?? []).length;
+  const hasSectionPanel = /\bSectionPanel(?!Lite)\b/.test(content);
+  const isSectionFile =
+    /section\.component\.(server|client)\.tsx$/i.test(rel) ||
+    /-section\.server\.tsx$/i.test(rel);
+  const isPlayground = /playground|gallery|metadata-renderer-gallery/i.test(rel);
+
+  if (
+    isSectionFile &&
+    !isPlayground &&
+    cardOpens >= 1 &&
+    !hasSectionPanel &&
+    !/\/\/\s*audit-shadcn:\s*ignore\s+prefer-section-panel/.test(content)
+  ) {
+    violations.push({
+      file: filePath,
+      line: 1,
+      col: 1,
+      ruleId: "prefer-section-panel",
+      match: `${cardOpens}× <Card>`,
+      suggestion:
+        "Use SectionPanel from @afenda/ui for module sections — see packages/ui/COMPOSITION.md",
+      severity: "warning",
+    });
+  }
+
+  if (cardOpens >= 3 && !hasSectionPanel && !isPlayground) {
+    violations.push({
+      file: filePath,
+      line: 1,
+      col: 1,
+      ruleId: "excessive-card-usage",
+      match: `${cardOpens}× <Card>`,
+      suggestion:
+        "Prefer SectionPanel + BulletColumns / ObservabilityIndicatorList — see packages/ui/COMPOSITION.md",
+      severity: "warning",
+    });
+  }
+
+  if (/<CardContent[\s\S]*?<Card[\s>/]/m.test(content)) {
+    violations.push({
+      file: filePath,
+      line: 1,
+      col: 1,
+      ruleId: "no-nested-card",
+      match: "<Card> inside <CardContent>",
+      suggestion: "Flatten layout with SectionPanel or sibling Cards — no nested Card",
+      severity: "error",
+    });
+  }
+
+  if (
+    /<div[^>]*className="[^"]*\brounded-(?:control|section|card)\b[^"]*\bborder\b[^"]*\bp-surface-/m.test(
+      content,
+    ) &&
+    !/\bSectionPanel(?!Lite)\b/.test(content) &&
+    !/\/\/\s*audit-shadcn:\s*ignore\s+no-fake-card-div/.test(content)
+  ) {
+    violations.push({
+      file: filePath,
+      line: 1,
+      col: 1,
+      ruleId: "no-fake-card-div",
+      match: "rounded-* border p-surface-* div",
+      suggestion: "Use SectionPanel or Card with CardHeader — not a styled div",
+      severity: "warning",
+    });
+  }
+
+  if (
+    cardOpens > 0 &&
+    !/<CardHeader\b/.test(content) &&
+    !isPlayground &&
+    !/\/\/\s*audit-shadcn:\s*ignore\s+card-without-header/.test(content)
+  ) {
+    violations.push({
+      file: filePath,
+      line: 1,
+      col: 1,
+      ruleId: "card-without-header",
+      match: "<Card> without <CardHeader>",
+      suggestion:
+        "Use CardHeader + CardTitle (+ CardDescription) or switch to SectionPanel",
+      severity: "info",
+    });
+  }
+
+  if (
+    /\bSectionPanelLite\b/.test(content) &&
+    !/\/\/\s*audit-shadcn:\s*ignore\s+section-panel-lite/.test(content)
+  ) {
+    violations.push({
+      file: filePath,
+      line: 1,
+      col: 1,
+      ruleId: "no-section-panel-lite",
+      match: "SectionPanelLite",
+      suggestion:
+        "Import SubsectionPanel from @afenda/ui — see packages/ui/COMPOSITION.md",
+      severity: "error",
+    });
+  }
+
+  return violations;
+}
+
 function auditFile(filePath: string, rules: Rule[]): Violation[] {
   const content = readFileSync(filePath, "utf8");
   const lines = content.split("\n");
-  const violations: Violation[] = [];
+  const violations: Violation[] = [...auditFileLevel(filePath, content)];
   const hasFieldGroupImport =
     /from\s+["']@afenda\/ui(?:\/field)?["']/.test(content) &&
     /\bFieldGroup\b/.test(content);

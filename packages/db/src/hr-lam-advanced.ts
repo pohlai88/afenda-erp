@@ -1157,3 +1157,30 @@ export async function resolveEmployeeIdsVisibleToActor(input: {
     return [input.selfEmployeeId, ...teamRows.map((row) => row.id)];
   });
 }
+
+/** Maps an auth user to linked HR employee row(s) via normalized work email. */
+export async function resolveHrEmployeeIdsForAuthUser(input: {
+  organizationId: string;
+  authUserId: string;
+  authUserEmail?: string | null;
+}): Promise<readonly string[]> {
+  const normalizedEmail = input.authUserEmail?.trim().toLowerCase();
+  if (!normalizedEmail) {
+    return [];
+  }
+
+  return runWithOrganizationContext(input.organizationId, async (db) => {
+    const rows = await db
+      .select({ id: hrEmployees.id })
+      .from(hrEmployees)
+      .where(
+        and(
+          eq(hrEmployees.organizationId, input.organizationId),
+          isNull(hrEmployees.archivedAt),
+          sql`lower(${hrEmployees.email}) = ${normalizedEmail}`,
+        ),
+      );
+
+    return rows.map((row) => row.id);
+  });
+}

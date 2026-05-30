@@ -7,6 +7,8 @@ import type { GovernedListTrailingCellProps } from "@afenda/governed-surface/cli
 import {
   HrBenefitsEnrollmentCreateForm,
   HrBenefitsEnrollmentsTrailingCell,
+  HrBenefitsLifeEventRecordForm,
+  HrBenefitsNewHireEnrollmentForm,
 } from "../client";
 import type { HrBenefitsPageModel } from "../data/hr.payroll.benefits.page-model.server";
 import {
@@ -15,6 +17,7 @@ import {
   hrBenefitsEnrollmentsSurfaceKey,
   hrBenefitsOpenEnrollmentSurfaceKey,
   hrBenefitsPlansSurfaceKey,
+  hrBenefitsProvidersSurfaceKey,
 } from "../data/hr.payroll.benefits-search-params.parse.shared";
 import { HrBenefitsReportsExportPanel } from "./hr.payroll.benefits-reports.component.client";
 import { hrBenefitsUiCopy } from "../surface/hr.payroll.benefits-ui.copy.shared";
@@ -77,13 +80,19 @@ export function HrBenefitsWorkbenchSection({
   canWrite?: boolean;
 }) {
   return (
-    <div className="@container flex flex-col gap-6">
+    <div className="@container flex flex-col gap-surface-lg">
       {!pageModel.canViewSensitive ? (
         <Alert variant="default" title="Sensitive benefit detail restricted">
           {hrBenefitsUiCopy.sensitiveAccess.enrollmentsDescription}
         </Alert>
       ) : null}
-      {canWrite ? <HrBenefitsEnrollmentCreateForm /> : null}
+      {canWrite ? (
+        <>
+          <HrBenefitsNewHireEnrollmentForm />
+          <HrBenefitsLifeEventRecordForm />
+          <HrBenefitsEnrollmentCreateForm />
+        </>
+      ) : null}
       <HrBenefitsListSection
         title={hrBenefitsUiCopy.plans.surfaceHeaderTitle}
         description="Benefit plan catalog with category, provider, and contribution references."
@@ -108,6 +117,12 @@ export function HrBenefitsWorkbenchSection({
         surfaceKey={hrBenefitsEnrollmentsSurfaceKey}
         listConfiguration={pageModel.enrollmentsList}
         TrailingCell={canWrite ? HrBenefitsEnrollmentsTrailingCell : undefined}
+      />
+      <HrBenefitsListSection
+        title={hrBenefitsUiCopy.providers.surfaceHeaderTitle}
+        description="Insurance carriers, benefit vendors, and plan administrators."
+        surfaceKey={hrBenefitsProvidersSurfaceKey}
+        listConfiguration={pageModel.providersList}
       />
       <SectionPanel
         headingLevel={2}

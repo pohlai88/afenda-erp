@@ -239,7 +239,8 @@ export const uiText = {
   label: "type-label",
   body: "type-body",
   description: "type-muted",
-  code: "type-mono-cell",
+  /** Inline mono in tables and chips — not block code panels (see uiTypography.code / uiSurface.code). */
+  mono: "type-mono-cell",
 } as const;
 
 /** Ink tokens — safe for copy color. */
@@ -255,6 +256,7 @@ export const uiColorInk = {
   warning: "text-warning-foreground",
   info: "text-info-foreground",
   critical: "text-critical-foreground",
+  codeBlock: "text-code-block-foreground",
 } as const;
 
 /** Fill tokens — surfaces only; pair with uiColorInk for copy on tinted backgrounds. */
@@ -266,6 +268,7 @@ export const uiColorFill = {
   secondary: "bg-secondary",
   card: "bg-card",
   popover: "bg-popover",
+  codeBlock: "bg-code-block",
 } as const;
 
 /**
@@ -305,6 +308,23 @@ export const uiSurface = {
   section: "surface-section",
   focus: "surface-focus",
   code: "surface-code",
+} as const;
+
+/**
+ * ERP composition hints for agents and audits — see packages/ui/COMPOSITION.md.
+ * Prefer shell exports over raw Card stacking in product code.
+ */
+export const uiComposition = {
+  section: "SectionPanel",
+  subsection: "SubsectionPanel",
+  bulletGrid: "BulletColumns",
+  indicatorRow: "ObservabilityIndicatorList",
+  statusChip: "StatusBadge",
+  empty: "Empty",
+  callout: "Alert",
+  form: "FieldGroup",
+  governedList: "GovernedPatternCListSection",
+  docs: "packages/ui/COMPOSITION.md",
 } as const;
 
 /** Dense ERP table primitives for metadata-driven list renderers. */

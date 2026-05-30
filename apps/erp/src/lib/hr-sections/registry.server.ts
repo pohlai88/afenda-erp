@@ -1,6 +1,9 @@
 import {
   hrBenefitsRoutePaths,
   hrComplianceRoutePaths,
+  hrAatRoutePaths,
+  hrLamRoutePaths,
+  hrFwaRoutePaths,
 } from "@afenda/feature-hr-suite/metadata";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
@@ -22,15 +25,30 @@ type HrSectionModule = {
 const sectionLoaders = {
   compliance: () => import("./compliance.server"),
   benefits: () => import("./benefits.server"),
+  "leave-attendance": () => import("./leave-attendance.server"),
+  "absence-analytics-trends": () => import("./absence-analytics-trends.server"),
+  leave: () => import("./leave.server"),
+  attendance: () => import("./attendance.server"),
+  "flexible-work-arrangement": () => import("./flexible-work-arrangement.server"),
 } satisfies Record<HrSectionSlug, () => Promise<HrSectionModule>>;
 
 const hrRoutePaths = [
   ...Object.values(hrComplianceRoutePaths),
   ...Object.values(hrBenefitsRoutePaths),
+  ...Object.values(hrLamRoutePaths),
+  ...Object.values(hrAatRoutePaths),
+  ...Object.values(hrFwaRoutePaths),
 ] as const;
 
+const hrSectionHubPaths = new Set<string>([
+  hrComplianceRoutePaths.hub,
+  hrBenefitsRoutePaths.hub,
+  hrAatRoutePaths.hub,
+  hrFwaRoutePaths.hub,
+]);
+
 export const hrSectionSlugs = hrRoutePaths
-  .filter((path) => path !== hrComplianceRoutePaths.hub)
+  .filter((path) => !hrSectionHubPaths.has(path))
   .map((path) => path.replace("/hr/", "")) as HrSectionSlug[];
 
 function isHrSectionSlug(slug: string): slug is HrSectionSlug {

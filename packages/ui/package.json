@@ -1,6 +1,7 @@
 {
   "name": "@afenda/ui",
   "version": "0.1.0",
+  "description": "Afenda shadcn fork — see shadcn-update.md after imports; COMPOSITION.md for SectionPanel vs Card",
   "private": true,
   "type": "module",
   "main": "./dist/index.js",
@@ -40,6 +41,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
     "lint": "tsc -p tsconfig.json --noEmit",
+    "pretypecheck": "pnpm -w audit:shadcn-primitives",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run"
   },

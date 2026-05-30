@@ -13,27 +13,44 @@ export * from "./employee-management/offboarding-exit-management/server";
 export * from "./employee-management/employee-records-management/server";
 export * from "./employee-management/organizational-chart-hierarchy/server";
 export * from "./time-attendance/leave-attendance-management/server";
+export * from "./time-attendance/flexible-work-arrangement-tracking/server";
 export * from "./payroll-compensation/benefits-administration/server";
+export * from "./time-attendance/absence-analytics-trends/server";
 
 export { requireHrRead } from "./policies/hr-module-access.policy.server";
 
 import {
   buildHrAttendancePageModel,
+  buildHrLamPageModel,
   buildHrLeavePageModel,
   HrAttendanceWorkbenchSection,
+  HrLamWorkbenchSection,
   HrLeaveWorkbenchSection,
   HrLamAccessDeniedPanel,
   requireHrLamAttendanceRead,
   requireHrLamRead,
 } from "./time-attendance/leave-attendance-management/server";
 
+import {
+  buildHrFwaPageModel,
+  HrFwaWorkbenchSection,
+  HrFwaAccessDeniedPanel,
+  requireHrFwaRead,
+} from "./time-attendance/flexible-work-arrangement-tracking/server";
+
 export {
-  buildHrAttendancePageModel,
+  buildHrLamPageModel,
   buildHrLeavePageModel,
+  buildHrAttendancePageModel,
+  HrLamWorkbenchSection,
   HrAttendanceWorkbenchSection,
   HrLeaveWorkbenchSection,
   requireHrLamAttendanceRead,
   requireHrLamRead,
+  buildHrFwaPageModel,
+  HrFwaWorkbenchSection,
+  HrFwaAccessDeniedPanel,
+  requireHrFwaRead,
 };
 
 export { HrLamAccessDeniedPanel as HrAttendanceAccessDeniedPanel };

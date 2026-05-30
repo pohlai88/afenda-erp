@@ -88,7 +88,7 @@ export function ForgotPasswordForm() {
   return (
     <div>
       <h2 className="type-section-title font-semibold text-foreground">{copy.title}</h2>
-      <p className="mt-3 type-body leading-6 text-muted-foreground">
+      <p className="mt-3 type-muted">
         {step === "request" ? copy.requestDescription : copy.resetDescription}
       </p>
 

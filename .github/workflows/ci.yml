@@ -45,11 +45,11 @@ jobs:
       - name: Lint governed renderer contracts
         run: pnpm lint:governed-renderer-contracts
 
+      - name: Audit design-system contract
+        run: pnpm design-system:check
+
       - name: Audit governed design-system tokens
         run: pnpm audit:governed-design-tokens --strict
-
-      - name: Audit consumer design tokens
-        run: pnpm audit:governed-design-tokens --scope=all --strict
 
       - name: Audit shadcn composition
         run: pnpm audit:shadcn-composition --strict

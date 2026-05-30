@@ -1,5 +1,4 @@
-/**
- * @afenda-bucket components
- * Scaffold placeholder from packages/_template-definition.
- */
-export {};
+export {
+  HrAatAccessDeniedPanel,
+  HrAatWorkbenchSection,
+} from "./hr.time.aat-section.component.server";

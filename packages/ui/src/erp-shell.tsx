@@ -10,6 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from "./card";
+import { uiTitle, uiTypography } from "./design-system";
 import {
   Empty,
   EmptyDescription,
@@ -57,15 +58,13 @@ export function SectionPanel({
           <div className="flex flex-col gap-surface-lg lg:flex-row lg:items-start lg:justify-between">
             <div className="max-w-3xl">
               {eyebrow ? (
-                <p className="text-xs uppercase tracking-wide text-muted-foreground">
-                  {eyebrow}
-                </p>
+                <p className={uiTypography.label}>{eyebrow}</p>
               ) : null}
-              <HeadingTag className="mt-2 text-2xl font-semibold text-foreground">
+              <HeadingTag className={`mt-2 ${uiTitle.lg} text-foreground`}>
                 {title}
               </HeadingTag>
               {description ? (
-                <CardDescription className="mt-3 text-sm leading-7">
+                <CardDescription className="mt-3 leading-7">
                   {description}
                 </CardDescription>
               ) : null}
@@ -82,6 +81,24 @@ export function SectionPanel({
         ) : null}
       </Card>
     </section>
+  );
+}
+
+/** Compact form tile — Card with header inside grids (not a section wrapper). */
+export function SubsectionPanel({
+  title,
+  children,
+}: {
+  title: string;
+  children: ReactNode;
+}) {
+  return (
+    <Card size="sm" className="gap-surface-sm py-surface-md">
+      <CardHeader className="px-surface-md pb-0">
+        <CardTitle>{title}</CardTitle>
+      </CardHeader>
+      <CardContent className="px-surface-md pt-surface-sm">{children}</CardContent>
+    </Card>
   );
 }
 
@@ -103,7 +120,7 @@ export function BulletColumns({
             <CardDescription className="leading-7">{item.summary}</CardDescription>
           </CardHeader>
           <CardContent>
-            <ul className="flex flex-col gap-2 text-sm leading-6 text-muted-foreground">
+            <ul className={`flex flex-col gap-2 ${uiTypography.muted} leading-6`}>
               {item.bullets.map((bullet) => (
                 <li key={bullet} className="flex gap-2">
                   <span
@@ -132,7 +149,7 @@ function IndicatorCard({ indicator }: { indicator: IndicatorItem }) {
   return (
     <Card size="sm">
       <CardHeader className="grid-cols-[1fr_auto]">
-        <CardTitle className="text-sm">{indicator.label}</CardTitle>
+        <CardTitle>{indicator.label}</CardTitle>
         <CardAction>
           <StatusBadge label={indicator.value} tone={indicator.tone} />
         </CardAction>
@@ -158,7 +175,7 @@ export function ObservabilityIndicatorList({
       ))}
       {footer ? (
         <Card className="border-dashed bg-card">
-          <CardContent className="text-sm text-muted-foreground">{footer}</CardContent>
+          <CardContent className={uiTypography.muted}>{footer}</CardContent>
         </Card>
       ) : null}
     </div>
@@ -191,7 +208,7 @@ function ModuleLinkCard({
       size="sm"
     >
       <CardHeader className="grid-cols-[1fr_auto]">
-        <CardTitle className="text-sm">{module.label}</CardTitle>
+        <CardTitle>{module.label}</CardTitle>
         <CardAction>
           <StatusBadge label={module.statusLabel} tone={module.statusTone} />
         </CardAction>

@@ -6,7 +6,10 @@ import { hrLifecycleRoutePaths } from "../employee-management/employee-lifecycle
 import { hrOffboardingRoutePaths } from "../employee-management/offboarding-exit-management/contracts/hr.workforce.offboarding-route.contract";
 import { hrOrgRoutePaths } from "../employee-management/organizational-chart-hierarchy/contracts/hr.workforce.org-route.contract";
 import { hrBenefitsRoutePaths } from "../payroll-compensation/benefits-administration/contracts/hr.payroll.benefits-route.contract";
+import { hrAatRoutePaths } from "../time-attendance/absence-analytics-trends/contracts/hr.time.aat-route.contract";
 import { hrRecordsRoutePaths } from "../employee-management/employee-records-management/contracts/hr.workforce.records-route.contract";
+import { hrLamRoutePaths } from "../time-attendance/leave-attendance-management/contracts/hr.time.lam-route.contract";
+import { hrFwaRoutePaths } from "../time-attendance/flexible-work-arrangement-tracking/contracts/hr.time.fwa-route.contract";
 
 type HrNavCapability = Extract<AppCapability, `hr.${string}`>;
 
@@ -58,6 +61,42 @@ export const hrModuleNavItems = [
     href: hrBenefitsRoutePaths.benefits,
     label: "Benefits",
     requiredCapabilities: ["hr.benefits.read", "hr.benefits.write"],
+  },
+  {
+    href: hrLamRoutePaths.hub,
+    label: "Leave & Attendance",
+    requiredCapabilities: [
+      "hr.leave.read",
+      "hr.leave.write",
+      "hr.attendance.read",
+      "hr.attendance.write",
+    ],
+  },
+  {
+    href: hrLamRoutePaths.leave,
+    label: "Leave",
+    requiredCapabilities: ["hr.leave.read", "hr.leave.write"],
+  },
+  {
+    href: hrLamRoutePaths.attendance,
+    label: "Attendance",
+    requiredCapabilities: ["hr.attendance.read", "hr.attendance.write"],
+  },
+  {
+    href: hrFwaRoutePaths.hub,
+    label: "Flexible Work",
+    requiredCapabilities: ["hr.fwa.read", "hr.fwa.write"],
+  },
+  {
+    href: hrAatRoutePaths.hub,
+    label: "Absence Analytics",
+    requiredCapabilities: [
+      "hr.leave.read",
+      "hr.leave.write",
+      "hr.attendance.read",
+      "hr.attendance.write",
+      "hr.compliance.read",
+    ],
   },
 ] as const satisfies readonly HrModuleNavItem[];
 

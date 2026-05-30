@@ -5,7 +5,7 @@ export * from "./actions/hr.time.attendance.lam.actions.server";
 export * from "./actions/hr.time.attendance.lam.mutation.shared.server";
 export * from "./data/hr.time.lam.page-model.server";
 export * from "./data/hr.time.attendance.lam-audit-trail.shared.server";
-export * from "./data/lam-acceptance-coverage.shared";
+export * from "./data/hr.time.lam-acceptance-coverage.shared";
 export * from "./events/hr.time.attendance.lam.event";
 export * from "./policies/hr.time.lam-access.policy.server";
 export * from "./contracts/hr.time.lam.contract";

@@ -51,7 +51,7 @@ async function SignUpPageInner() {
           <h2 className="type-section-title font-semibold text-foreground">
             {signUpEnvironmentCopy.title}
           </h2>
-          <p className="mt-3 type-body leading-6 text-muted-foreground">
+          <p className="mt-3 type-muted">
             {signUpEnvironmentCopy.description}
           </p>
           <Button asChild className="mt-surface-3xl">

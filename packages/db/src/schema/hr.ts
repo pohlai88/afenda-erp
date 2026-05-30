@@ -350,18 +350,77 @@ export const hrLamNotificationKindEnum = pgEnum("hr_lam_notification_kind", [
   "attendance_correction_decided",
 ]);
 
+/** HRM-AAT-019 — absence risk classification bands. */
+export const hrAatAbsenceRiskLevelEnum = pgEnum("hr_aat_absence_risk_level", [
+  "normal",
+  "watch",
+  "at_risk",
+  "high_risk",
+  "critical",
+]);
+
+/** HRM-AAT-021 — corrective action reference kinds. */
+export const hrAatCorrectiveActionKindEnum = pgEnum(
+  "hr_aat_corrective_action_kind",
+  ["coaching", "hr_review", "attendance_improvement_plan"],
+);
+
+/** HRM-AAT-027 — absence analytics notification kinds. */
+export const hrAatNotificationKindEnum = pgEnum("hr_aat_notification_kind", [
+  "risk_threshold_exceeded",
+  "risk_level_escalated",
+]);
+
+/** HRM-AAT-028 — analytics snapshot period granularity. */
+export const hrAatSnapshotPeriodKindEnum = pgEnum(
+  "hr_aat_snapshot_period_kind",
+  ["daily", "weekly", "monthly", "quarterly", "yearly"],
+);
+
 export const hrOvertimeTypeEnum = pgEnum("hr_overtime_type", [
   "regular",
   "weekend",
   "holiday",
   "public_holiday",
+  "rest_day",
+  "off_day",
+  "night",
+  "emergency",
+]);
+
+export const hrOvertimeTimingKindEnum = pgEnum("hr_overtime_timing_kind", [
+  "planned",
+  "actual",
 ]);
 
 export const hrOvertimeRequestStatusEnum = pgEnum("hr_overtime_request_status", [
+  "draft",
+  "submitted",
   "pending",
   "approved",
   "rejected",
+  "returned",
   "cancelled",
+  "payroll_ready",
+  "paid",
+]);
+
+export const hrOvertimeAuditActionEnum = pgEnum("hr_overtime_audit_action", [
+  "request_create",
+  "request_draft_save",
+  "request_submit",
+  "request_cancel",
+  "request_approve",
+  "request_reject",
+  "request_return",
+  "request_adjust",
+  "eligibility_validate",
+  "exception_approve",
+  "exception_reject",
+  "calculation_apply",
+  "payroll_export",
+  "payroll_ready",
+  "paid",
 ]);
 
 export const hrShiftTemplateStatusEnum = pgEnum("hr_shift_template_status", [
@@ -2110,6 +2169,728 @@ export const hrShiftAssignments = pgTable(
     index("hr_shift_assignments_org_shift_start_idx").on(
       table.organizationId,
       table.shiftStart,
+    ),
+  ],
+);
+
+/** HRM-AAT-018 — org-level configurable absence risk thresholds. */
+export const hrAatAbsenceRiskThresholds = pgTable(
+  "hr_aat_absence_risk_thresholds",
+  {
+    organizationId: organizationReference().primaryKey(),
+    watchAbsenceRatePercent: numeric("watch_absence_rate_percent", {
+      precision: 5,
+      scale: 2,
+    })
+      .notNull()
+      .default("5"),
+    atRiskAbsenceRatePercent: numeric("at_risk_absence_rate_percent", {
+      precision: 5,
+      scale: 2,
+    })
+      .notNull()
+      .default("10"),
+    highRiskAbsenceRatePercent: numeric("high_risk_absence_rate_percent", {
+      precision: 5,
+      scale: 2,
+    })
+      .notNull()
+      .default("15"),
+    criticalAbsenceRatePercent: numeric("critical_absence_rate_percent", {
+      precision: 5,
+      scale: 2,
+    })
+      .notNull()
+      .default("25"),
+    watchAbsenceFrequency: integer("watch_absence_frequency").notNull().default(3),
+    atRiskAbsenceFrequency: integer("at_risk_absence_frequency")
+      .notNull()
+      .default(5),
+    highRiskAbsenceFrequency: integer("high_risk_absence_frequency")
+      .notNull()
+      .default(7),
+    criticalAbsenceFrequency: integer("critical_absence_frequency")
+      .notNull()
+      .default(10),
+    updatedByAuthUserId: text("updated_by_auth_user_id"),
+    ...timestampColumns,
+  },
+);
+
+/** HRM-AAT-021 — insight-linked corrective action references. */
+export const hrAatCorrectiveActionRefs = pgTable(
+  "hr_aat_corrective_action_refs",
+  {
+    id: text("id").primaryKey(),
+    organizationId: organizationReference(),
+    employeeId: text("employee_id")
+      .notNull()
+      .references(() => hrEmployees.id, { onDelete: "cascade" }),
+    insightKind: text("insight_kind").notNull(),
+    insightRef: text("insight_ref"),
+    actionKind: hrAatCorrectiveActionKindEnum("action_kind").notNull(),
+    externalReference: text("external_reference").notNull(),
+    periodStart: timestamp("period_start", { withTimezone: true }).notNull(),
+    periodEnd: timestamp("period_end", { withTimezone: true }).notNull(),
+    notes: text("notes"),
+    createdByAuthUserId: text("created_by_auth_user_id").notNull(),
+    ...timestampColumns,
+  },
+  (table) => [
+    index("hr_aat_corrective_refs_org_employee_idx").on(
+      table.organizationId,
+      table.employeeId,
+    ),
+    index("hr_aat_corrective_refs_org_insight_idx").on(
+      table.organizationId,
+      table.insightKind,
+      table.insightRef,
+    ),
+  ],
+);
+
+/** HRM-AAT-028 — historical absence analytics snapshots by period. */
+export const hrAatAnalyticsSnapshots = pgTable(
+  "hr_aat_analytics_snapshots",
+  {
+    id: text("id").primaryKey(),
+    organizationId: organizationReference(),
+    periodKind: hrAatSnapshotPeriodKindEnum("period_kind")
+      .notNull()
+      .default("monthly"),
+    periodStart: timestamp("period_start", { withTimezone: true }).notNull(),
+    periodEnd: timestamp("period_end", { withTimezone: true }).notNull(),
+    dimension: text("dimension").notNull(),
+    snapshotPayload: jsonb("snapshot_payload")
+      .$type<Record<string, unknown>>()
+      .notNull(),
+    generatedByAuthUserId: text("generated_by_auth_user_id").notNull(),
+    ...timestampColumns,
+  },
+  (table) => [
+    index("hr_aat_snapshots_org_period_idx").on(
+      table.organizationId,
+      table.periodStart,
+      table.periodEnd,
+    ),
+    uniqueIndex("hr_aat_snapshots_org_period_dim_unique").on(
+      table.organizationId,
+      table.periodKind,
+      table.periodStart,
+      table.periodEnd,
+      table.dimension,
+    ),
+  ],
+);
+
+/** HRM-AAT-027 — HR/manager notifications when absence risk exceeds thresholds. */
+export const hrAatNotifications = pgTable(
+  "hr_aat_notifications",
+  {
+    id: text("id").primaryKey(),
+    organizationId: organizationReference(),
+    recipientAuthUserId: text("recipient_auth_user_id").notNull(),
+    recipientRole: text("recipient_role").notNull(),
+    kind: hrAatNotificationKindEnum("kind").notNull(),
+    subjectType: text("subject_type").notNull(),
+    subjectId: text("subject_id").notNull(),
+    employeeId: text("employee_id").references(() => hrEmployees.id, {
+      onDelete: "cascade",
+    }),
+    riskLevel: hrAatAbsenceRiskLevelEnum("risk_level").notNull(),
+    title: text("title").notNull(),
+    body: text("body").notNull(),
+    readAt: timestamp("read_at", { withTimezone: true }),
+    ...timestampColumns,
+  },
+  (table) => [
+    index("hr_aat_notifications_org_recipient_idx").on(
+      table.organizationId,
+      table.recipientAuthUserId,
+    ),
+    index("hr_aat_notifications_org_employee_idx").on(
+      table.organizationId,
+      table.employeeId,
+    ),
+    index("hr_aat_notifications_org_subject_idx").on(
+      table.organizationId,
+      table.subjectType,
+      table.subjectId,
+    ),
+  ],
+);
+
+/** HRM-FWA-002 — canonical flexible work arrangement kinds. */
+export const hrFwaArrangementKindEnum = pgEnum("hr_fwa_arrangement_kind", [
+  "hybrid",
+  "remote",
+  "compressed_week",
+  "flexible_hours",
+  "staggered_hours",
+  "part_time",
+  "temporary",
+]);
+
+export const hrFwaArrangementStatusEnum = pgEnum("hr_fwa_arrangement_status", [
+  "draft",
+  "pending",
+  "active",
+  "suspended",
+  "terminated",
+  "expired",
+]);
+
+export const hrFwaRequestStatusEnum = pgEnum("hr_fwa_request_status", [
+  "pending",
+  "returned",
+  "approved",
+  "rejected",
+  "cancelled",
+]);
+
+export const hrFwaRequestInitiatorEnum = pgEnum("hr_fwa_request_initiator", [
+  "employee",
+  "manager",
+  "hr",
+]);
+
+export const hrFwaApprovalStageKindEnum = pgEnum("hr_fwa_approval_stage_kind", [
+  "manager",
+  "hr",
+  "department",
+  "exception",
+]);
+
+export const hrFwaApprovalStageStatusEnum = pgEnum(
+  "hr_fwa_approval_stage_status",
+  ["pending", "approved", "rejected", "skipped"],
+);
+
+export const hrFwaRemoteLocationKindEnum = pgEnum("hr_fwa_remote_location_kind", [
+  "home_office",
+  "client_site",
+  "branch",
+  "project_site",
+  "other",
+]);
+
+export const hrFwaComplianceBreachKindEnum = pgEnum(
+  "hr_fwa_compliance_breach_kind",
+  [
+    "excessive_remote_days",
+    "missed_office_days",
+    "unapproved_remote_location",
+    "incomplete_attendance",
+    "working_hours_non_compliance",
+  ],
+);
+
+export const hrFwaComplianceBreachStatusEnum = pgEnum(
+  "hr_fwa_compliance_breach_status",
+  ["open", "acknowledged", "resolved", "waived"],
+);
+
+export const hrFwaAuditActionEnum = pgEnum("hr_fwa_audit_action", [
+  "request_submitted",
+  "eligibility_validated",
+  "eligibility_failed",
+  "approval",
+  "rejection",
+  "returned",
+  "renewal",
+  "suspension",
+  "termination",
+  "exception_approved",
+  "compliance_breach",
+  "schedule_updated",
+  "payroll_reference",
+]);
+
+export type HrFwaSchedulePatternDetails = {
+  workDays?: readonly number[];
+  officeDays?: readonly number[];
+  remoteDays?: readonly number[];
+  restDays?: readonly number[];
+  coreHoursStartMinutes?: number;
+  coreHoursEndMinutes?: number;
+  flexibleStartEarliestMinutes?: number;
+  flexibleStartLatestMinutes?: number;
+  flexibleEndEarliestMinutes?: number;
+  flexibleEndLatestMinutes?: number;
+  expectedWeeklyHours?: number;
+  extendedDailyHours?: number;
+  compressedWorkingDaysPerWeek?: number;
+};
+
+/** HRM-FWA-003 — policy grouping for FWA eligibility and routing. */
+export const hrFwaPolicyGroups = pgTable(
+  "hr_fwa_policy_groups",
+  {
+    id: text("id").primaryKey(),
+    organizationId: organizationReference(),
+    code: text("code").notNull(),
+    label: text("label").notNull(),
+    description: text("description"),
+    minOfficeDaysPerWeek: integer("min_office_days_per_week"),
+    maxRemoteDaysPerWeek: integer("max_remote_days_per_week"),
+    requireHrApproval: boolean("require_hr_approval").notNull().default(true),
+    requireDepartmentApproval: boolean("require_department_approval")
+      .notNull()
+      .default(false),
+    allowExceptionApproval: boolean("allow_exception_approval")
+      .notNull()
+      .default(true),
+    active: boolean("active").notNull().default(true),
+    ...timestampColumns,
+  },
+  (table) => [
+    uniqueIndex("hr_fwa_policy_groups_org_code_uidx").on(
+      table.organizationId,
+      table.code,
+    ),
+    index("hr_fwa_policy_groups_org_active_idx").on(
+      table.organizationId,
+      table.active,
+    ),
+  ],
+);
+
+/** HRM-FWA-001 — configurable flexible work arrangement types per org. */
+export const hrFwaArrangementTypeConfigs = pgTable(
+  "hr_fwa_arrangement_type_configs",
+  {
+    id: text("id").primaryKey(),
+    organizationId: organizationReference(),
+    policyGroupCode: text("policy_group_code").notNull().default("default"),
+    arrangementKind: hrFwaArrangementKindEnum("arrangement_kind").notNull(),
+    label: text("label").notNull(),
+    description: text("description"),
+    requiresSupportingDocument: boolean("requires_supporting_document")
+      .notNull()
+      .default(false),
+    requiresRemoteLocation: boolean("requires_remote_location")
+      .notNull()
+      .default(false),
+    minDurationDays: integer("min_duration_days"),
+    maxDurationDays: integer("max_duration_days"),
+    active: boolean("active").notNull().default(true),
+    ...timestampColumns,
+  },
+  (table) => [
+    uniqueIndex("hr_fwa_type_configs_org_group_kind_uidx").on(
+      table.organizationId,
+      table.policyGroupCode,
+      table.arrangementKind,
+    ),
+    index("hr_fwa_type_configs_org_group_idx").on(
+      table.organizationId,
+      table.policyGroupCode,
+    ),
+    index("hr_fwa_type_configs_org_active_idx").on(
+      table.organizationId,
+      table.active,
+    ),
+  ],
+);
+
+/** HRM-FWA-003 — eligibility rules scoped by org attributes and policy group. */
+export const hrFwaEligibilityRules = pgTable(
+  "hr_fwa_eligibility_rules",
+  {
+    id: text("id").primaryKey(),
+    organizationId: organizationReference(),
+    policyGroupCode: text("policy_group_code").notNull().default("default"),
+    arrangementKind: hrFwaArrangementKindEnum("arrangement_kind"),
+    legalEntityCode: text("legal_entity_code"),
+    countryCode: text("country_code"),
+    workLocationCode: text("work_location_code"),
+    departmentId: text("department_id").references(() => hrDepartments.id, {
+      onDelete: "set null",
+    }),
+    roleCode: text("role_code"),
+    grade: text("grade"),
+    employmentType: text("employment_type"),
+    employeeCategory: text("employee_category"),
+    eligible: boolean("eligible").notNull().default(true),
+    requiresExceptionApproval: boolean("requires_exception_approval")
+      .notNull()
+      .default(false),
+    effectiveFrom: timestamp("effective_from", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    effectiveTo: timestamp("effective_to", { withTimezone: true }),
+    ...timestampColumns,
+  },
+  (table) => [
+    index("hr_fwa_eligibility_rules_org_group_kind_idx").on(
+      table.organizationId,
+      table.policyGroupCode,
+      table.arrangementKind,
+    ),
+    index("hr_fwa_eligibility_rules_org_scope_idx").on(
+      table.organizationId,
+      table.legalEntityCode,
+      table.countryCode,
+      table.workLocationCode,
+    ),
+    index("hr_fwa_eligibility_rules_org_effective_idx").on(
+      table.organizationId,
+      table.effectiveFrom,
+      table.effectiveTo,
+    ),
+  ],
+);
+
+export const hrFwaSchedulePatterns = pgTable(
+  "hr_fwa_schedule_patterns",
+  {
+    id: text("id").primaryKey(),
+    organizationId: organizationReference(),
+    employeeId: text("employee_id").references(() => hrEmployees.id, {
+      onDelete: "set null",
+    }),
+    label: text("label"),
+    patternDetails: jsonb("pattern_details")
+      .$type<HrFwaSchedulePatternDetails>()
+      .notNull()
+      .default({}),
+    ...timestampColumns,
+  },
+  (table) => [
+    index("hr_fwa_schedule_patterns_org_employee_idx").on(
+      table.organizationId,
+      table.employeeId,
+    ),
+  ],
+);
+
+export const hrFwaRemoteLocations = pgTable(
+  "hr_fwa_remote_locations",
+  {
+    id: text("id").primaryKey(),
+    organizationId: organizationReference(),
+    employeeId: text("employee_id")
+      .notNull()
+      .references(() => hrEmployees.id, { onDelete: "cascade" }),
+    label: text("label").notNull(),
+    locationKind: hrFwaRemoteLocationKindEnum("location_kind")
+      .notNull()
+      .default("home_office"),
+    countryCode: text("country_code"),
+    regionCode: text("region_code"),
+    addressLine: text("address_line"),
+    isApproved: boolean("is_approved").notNull().default(false),
+    approvedAt: timestamp("approved_at", { withTimezone: true }),
+    approvedByAuthUserId: text("approved_by_auth_user_id"),
+    restrictionNotes: text("restriction_notes"),
+    ...timestampColumns,
+  },
+  (table) => [
+    index("hr_fwa_remote_locations_org_employee_idx").on(
+      table.organizationId,
+      table.employeeId,
+    ),
+    index("hr_fwa_remote_locations_org_approved_idx").on(
+      table.organizationId,
+      table.isApproved,
+    ),
+  ],
+);
+
+export const hrFwaRequests = pgTable(
+  "hr_fwa_requests",
+  {
+    id: text("id").primaryKey(),
+    organizationId: organizationReference(),
+    employeeId: text("employee_id")
+      .notNull()
+      .references(() => hrEmployees.id, { onDelete: "cascade" }),
+    arrangementKind: hrFwaArrangementKindEnum("arrangement_kind").notNull(),
+    policyGroupCode: text("policy_group_code").notNull().default("default"),
+    status: hrFwaRequestStatusEnum("status").notNull().default("pending"),
+    initiatorKind: hrFwaRequestInitiatorEnum("initiator_kind")
+      .notNull()
+      .default("employee"),
+    initiatorEmployeeId: text("initiator_employee_id"),
+    initiatorAuthUserId: text("initiator_auth_user_id"),
+    reason: text("reason"),
+    startDate: timestamp("start_date", { withTimezone: true }).notNull(),
+    endDate: timestamp("end_date", { withTimezone: true }),
+    schedulePatternId: text("schedule_pattern_id").references(
+      () => hrFwaSchedulePatterns.id,
+      { onDelete: "set null" },
+    ),
+    remoteLocationId: text("remote_location_id").references(
+      () => hrFwaRemoteLocations.id,
+      { onDelete: "set null" },
+    ),
+    supportingDocumentId: text("supporting_document_id").references(
+      () => hrEmployeeDocuments.id,
+      { onDelete: "set null" },
+    ),
+    approvalStage: hrFwaApprovalStageKindEnum("approval_stage")
+      .notNull()
+      .default("manager"),
+    currentApproverAuthUserId: text("current_approver_auth_user_id"),
+    eligibilitySnapshot: jsonb("eligibility_snapshot").$type<
+      Record<string, unknown>
+    >(),
+    policySnapshot: jsonb("policy_snapshot").$type<Record<string, unknown>>(),
+    exceptionRequested: boolean("exception_requested").notNull().default(false),
+    rejectionReason: text("rejection_reason"),
+    decisionNote: text("decision_note"),
+    returnedNote: text("returned_note"),
+    submittedAt: timestamp("submitted_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    decidedAt: timestamp("decided_at", { withTimezone: true }),
+    ...timestampColumns,
+  },
+  (table) => [
+    index("hr_fwa_requests_org_status_idx").on(
+      table.organizationId,
+      table.status,
+    ),
+    index("hr_fwa_requests_org_employee_idx").on(
+      table.organizationId,
+      table.employeeId,
+    ),
+    index("hr_fwa_requests_org_submitted_idx").on(
+      table.organizationId,
+      table.submittedAt,
+    ),
+    index("hr_fwa_requests_org_approver_idx").on(
+      table.organizationId,
+      table.currentApproverAuthUserId,
+    ),
+    index("hr_fwa_requests_org_kind_idx").on(
+      table.organizationId,
+      table.arrangementKind,
+    ),
+  ],
+);
+
+export const hrFwaApprovalStages = pgTable(
+  "hr_fwa_approval_stages",
+  {
+    id: text("id").primaryKey(),
+    organizationId: organizationReference(),
+    requestId: text("request_id")
+      .notNull()
+      .references(() => hrFwaRequests.id, { onDelete: "cascade" }),
+    stageKind: hrFwaApprovalStageKindEnum("stage_kind").notNull(),
+    title: text("title").notNull(),
+    assigneeRole: text("assignee_role"),
+    assigneeAuthUserId: text("assignee_auth_user_id"),
+    status: hrFwaApprovalStageStatusEnum("status")
+      .notNull()
+      .default("pending"),
+    sortOrder: integer("sort_order").notNull().default(0),
+    decidedAt: timestamp("decided_at", { withTimezone: true }),
+    decisionNote: text("decision_note"),
+    ...timestampColumns,
+  },
+  (table) => [
+    index("hr_fwa_approval_stages_org_request_idx").on(
+      table.organizationId,
+      table.requestId,
+    ),
+    uniqueIndex("hr_fwa_approval_stages_request_kind_uidx").on(
+      table.requestId,
+      table.stageKind,
+    ),
+  ],
+);
+
+export const hrFwaArrangements = pgTable(
+  "hr_fwa_arrangements",
+  {
+    id: text("id").primaryKey(),
+    organizationId: organizationReference(),
+    employeeId: text("employee_id")
+      .notNull()
+      .references(() => hrEmployees.id, { onDelete: "cascade" }),
+    requestId: text("request_id").references(() => hrFwaRequests.id, {
+      onDelete: "set null",
+    }),
+    arrangementKind: hrFwaArrangementKindEnum("arrangement_kind").notNull(),
+    policyGroupCode: text("policy_group_code").notNull().default("default"),
+    status: hrFwaArrangementStatusEnum("status").notNull().default("active"),
+    effectiveFrom: timestamp("effective_from", { withTimezone: true }).notNull(),
+    effectiveTo: timestamp("effective_to", { withTimezone: true }),
+    reviewDate: timestamp("review_date", { withTimezone: true }),
+    renewalDate: timestamp("renewal_date", { withTimezone: true }),
+    schedulePatternId: text("schedule_pattern_id").references(
+      () => hrFwaSchedulePatterns.id,
+      { onDelete: "set null" },
+    ),
+    remoteLocationId: text("remote_location_id").references(
+      () => hrFwaRemoteLocations.id,
+      { onDelete: "set null" },
+    ),
+    reason: text("reason"),
+    exceptionApproved: boolean("exception_approved").notNull().default(false),
+    exceptionReason: text("exception_reason"),
+    suspendedAt: timestamp("suspended_at", { withTimezone: true }),
+    suspensionReason: text("suspension_reason"),
+    terminatedAt: timestamp("terminated_at", { withTimezone: true }),
+    terminationReason: text("termination_reason"),
+    payrollReference: text("payroll_reference"),
+    ...timestampColumns,
+  },
+  (table) => [
+    index("hr_fwa_arrangements_org_employee_idx").on(
+      table.organizationId,
+      table.employeeId,
+    ),
+    index("hr_fwa_arrangements_org_status_idx").on(
+      table.organizationId,
+      table.status,
+    ),
+    index("hr_fwa_arrangements_org_effective_idx").on(
+      table.organizationId,
+      table.effectiveFrom,
+      table.effectiveTo,
+    ),
+    index("hr_fwa_arrangements_org_kind_idx").on(
+      table.organizationId,
+      table.arrangementKind,
+    ),
+    index("hr_fwa_arrangements_org_payroll_ref_idx").on(
+      table.organizationId,
+      table.payrollReference,
+    ),
+  ],
+);
+
+export const hrFwaComplianceBreaches = pgTable(
+  "hr_fwa_compliance_breaches",
+  {
+    id: text("id").primaryKey(),
+    organizationId: organizationReference(),
+    arrangementId: text("arrangement_id")
+      .notNull()
+      .references(() => hrFwaArrangements.id, { onDelete: "cascade" }),
+    employeeId: text("employee_id")
+      .notNull()
+      .references(() => hrEmployees.id, { onDelete: "cascade" }),
+    breachKind: hrFwaComplianceBreachKindEnum("breach_kind").notNull(),
+    status: hrFwaComplianceBreachStatusEnum("status")
+      .notNull()
+      .default("open"),
+    periodStart: timestamp("period_start", { withTimezone: true }).notNull(),
+    periodEnd: timestamp("period_end", { withTimezone: true }).notNull(),
+    expectedValue: text("expected_value"),
+    actualValue: text("actual_value"),
+    description: text("description").notNull(),
+    detectedAt: timestamp("detected_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    resolvedAt: timestamp("resolved_at", { withTimezone: true }),
+    resolutionNote: text("resolution_note"),
+    ...timestampColumns,
+  },
+  (table) => [
+    index("hr_fwa_compliance_breaches_org_arrangement_idx").on(
+      table.organizationId,
+      table.arrangementId,
+    ),
+    index("hr_fwa_compliance_breaches_org_employee_idx").on(
+      table.organizationId,
+      table.employeeId,
+    ),
+    index("hr_fwa_compliance_breaches_org_status_idx").on(
+      table.organizationId,
+      table.status,
+    ),
+    index("hr_fwa_compliance_breaches_org_detected_idx").on(
+      table.organizationId,
+      table.detectedAt,
+    ),
+  ],
+);
+
+/** HRM-FWA-029 — in-app notifications for FWA lifecycle events. */
+export const hrFwaNotificationKindEnum = pgEnum("hr_fwa_notification_kind", [
+  "request_submitted",
+  "request_approved",
+  "request_rejected",
+  "request_returned",
+  "arrangement_expiring",
+  "arrangement_renewed",
+  "arrangement_suspended",
+  "arrangement_terminated",
+  "compliance_breach",
+  "review_due",
+]);
+
+export const hrFwaNotifications = pgTable(
+  "hr_fwa_notifications",
+  {
+    id: text("id").primaryKey(),
+    organizationId: organizationReference(),
+    recipientAuthUserId: text("recipient_auth_user_id").notNull(),
+    kind: hrFwaNotificationKindEnum("kind").notNull(),
+    subjectType: text("subject_type").notNull(),
+    subjectId: text("subject_id").notNull(),
+    title: text("title").notNull(),
+    body: text("body").notNull(),
+    readAt: timestamp("read_at", { withTimezone: true }),
+    ...timestampColumns,
+  },
+  (table) => [
+    index("hr_fwa_notifications_org_recipient_idx").on(
+      table.organizationId,
+      table.recipientAuthUserId,
+    ),
+    index("hr_fwa_notifications_org_subject_idx").on(
+      table.organizationId,
+      table.subjectType,
+      table.subjectId,
+    ),
+  ],
+);
+
+export const hrFwaAuditEvents = pgTable(
+  "hr_fwa_audit_events",
+  {
+    id: text("id").primaryKey(),
+    organizationId: organizationReference(),
+    arrangementId: text("arrangement_id").references(() => hrFwaArrangements.id, {
+      onDelete: "set null",
+    }),
+    requestId: text("request_id").references(() => hrFwaRequests.id, {
+      onDelete: "set null",
+    }),
+    employeeId: text("employee_id").references(() => hrEmployees.id, {
+      onDelete: "set null",
+    }),
+    action: hrFwaAuditActionEnum("action").notNull(),
+    actorAuthUserId: text("actor_auth_user_id"),
+    actorEmployeeId: text("actor_employee_id"),
+    summary: text("summary").notNull(),
+    metadata: jsonb("metadata").$type<Record<string, unknown>>(),
+    occurredAt: timestamp("occurred_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    ...timestampColumns,
+  },
+  (table) => [
+    index("hr_fwa_audit_events_org_occurred_idx").on(
+      table.organizationId,
+      table.occurredAt,
+    ),
+    index("hr_fwa_audit_events_org_arrangement_idx").on(
+      table.organizationId,
+      table.arrangementId,
+    ),
+    index("hr_fwa_audit_events_org_request_idx").on(
+      table.organizationId,
+      table.requestId,
+    ),
+    index("hr_fwa_audit_events_org_employee_idx").on(
+      table.organizationId,
+      table.employeeId,
     ),
   ],
 );

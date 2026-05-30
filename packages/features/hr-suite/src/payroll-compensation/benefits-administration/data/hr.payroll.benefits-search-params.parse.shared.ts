@@ -21,6 +21,7 @@ export const HR_BENEFITS_LIST_SURFACE_KEYS = [
   hrBenefitsEligibilityRulesSurfaceKey,
   hrBenefitsOpenEnrollmentSurfaceKey,
   hrBenefitsEnrollmentsSurfaceKey,
+  hrBenefitsProvidersSurfaceKey,
   hrBenefitsAuditTrailSurfaceKey,
 ] as const;
 
@@ -35,6 +36,7 @@ export const HR_BENEFITS_LIST_SEARCH_PARAMS_BY_KEY: Record<
   [hrBenefitsEligibilityRulesSurfaceKey]: hrBenefitsEligibilityRulesSearchParam,
   [hrBenefitsOpenEnrollmentSurfaceKey]: hrBenefitsOpenEnrollmentSearchParam,
   [hrBenefitsEnrollmentsSurfaceKey]: hrBenefitsEnrollmentsSearchParam,
+  [hrBenefitsProvidersSurfaceKey]: hrBenefitsProvidersSearchParam,
   [hrBenefitsAuditTrailSurfaceKey]: hrBenefitsAuditTrailSearchParam,
 };
 
@@ -43,6 +45,7 @@ export type HrBenefitsSearchParams = {
   eligibilityRulesSearch?: string;
   openEnrollmentSearch?: string;
   enrollmentsSearch?: string;
+  providersSearch?: string;
   auditTrailSearch?: string;
 };
 
@@ -54,6 +57,7 @@ export const HR_BENEFITS_LIST_SEARCH_PARAM_MODEL_FIELDS: Record<
   [hrBenefitsEligibilityRulesSearchParam]: "eligibilityRulesSearch",
   [hrBenefitsOpenEnrollmentSearchParam]: "openEnrollmentSearch",
   [hrBenefitsEnrollmentsSearchParam]: "enrollmentsSearch",
+  [hrBenefitsProvidersSearchParam]: "providersSearch",
   [hrBenefitsAuditTrailSearchParam]: "auditTrailSearch",
 };
 
@@ -118,5 +122,6 @@ export const HR_BENEFITS_LIST_SURFACE_COLUMNS_BY_KEY: Record<
   [hrBenefitsEligibilityRulesSurfaceKey]: "hr.payroll.benefits.eligibility-rules",
   [hrBenefitsOpenEnrollmentSurfaceKey]: "hr.payroll.benefits.open-enrollment",
   [hrBenefitsEnrollmentsSurfaceKey]: "hr.payroll.benefits.enrollments",
+  [hrBenefitsProvidersSurfaceKey]: "hr.payroll.benefits.providers",
   [hrBenefitsAuditTrailSurfaceKey]: "hr.payroll.benefits.audit-trail",
 };

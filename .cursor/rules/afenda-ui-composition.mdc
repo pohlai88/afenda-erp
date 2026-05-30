@@ -1,0 +1,55 @@
+---
+description: Afenda ERP UI composition — SectionPanel over Card stacks, FieldGroup forms, governed lists; overrides generic shadcn Card-dashboard defaults
+globs: apps/erp/src/**/*.tsx,packages/features/*/src/**/*.tsx,packages/governed-surface/src/**/*.tsx
+alwaysApply: false
+---
+
+# Afenda UI composition (agents + IDE)
+
+Canonical doc: `packages/ui/COMPOSITION.md`. Token doc: `packages/ui/shadcn-update.md`.
+
+Upstream shadcn skill: `.agents/skills/shadcn/SKILL.md` — **Afenda ERP rules below take precedence** in scoped paths.
+
+## Pick shell before primitives
+
+1. **Module section** → `SectionPanel` from `@afenda/ui` (title, description, eyebrow, aside).
+2. **Governed list/stat** → `GovernedPatternCListSection` / stat groups from `@afenda/governed-surface`.
+3. **Form** → `FieldGroup` + `Field` + `FieldLabel` (never `div` + `space-y-*` / bare `grid` form layout).
+4. **Empty / callout** → `Empty` or `Alert` — not custom dashed-border divs.
+5. **Card** → only for **single tiles** (indicator, bullet column item, dialog inner panel) — **never** as the outer section wrapper.
+
+## Banned patterns in product code
+
+| Do not generate | Use instead |
+| --------------- | ----------- |
+| `<Card><CardHeader>…<CardContent><Card>…` (nested cards) | `SectionPanel` + `BulletColumns` or one card per tile |
+| Multiple top-level `<Card>` siblings for a section | One `SectionPanel` |
+| `div` with `rounded-section border p-surface-*` as section chrome | `SectionPanel` or `surface-panel` utility |
+| `SectionPanelLite` / local card clones | `SubsectionPanel` from `@afenda/ui` |
+| Raw `<button>` | `Button` from `@afenda/ui` |
+| `space-y-*` / `space-x-*` | `flex flex-col gap-*` / `flex flex-row gap-*` |
+| Hand-built ERP tables in features | Governed list section + metadata |
+
+## Component quick pick
+
+| Need | Component |
+| ---- | --------- |
+| Section header + body | `SectionPanel` |
+| 2-column bullet explainer | `BulletColumns` |
+| KPI row | `ObservabilityIndicatorList` or governed stats |
+| 2–5 toggled options | `ToggleGroup` |
+| Form tile in grid (3-up pathway forms) | `SubsectionPanel` |
+| Modal task | `Dialog` + `DialogTitle` + `DialogDescription` |
+| Destructive confirm | `AlertDialog` |
+| Side panel | `Sheet` |
+| Code block | `surface-code` + `type-code` |
+
+## After shadcn add
+
+See `packages/ui/shadcn-update.md` — map typography to `type-*`, run `pnpm design-system:check`.
+
+## Verification
+
+```bash
+pnpm design-system:check
+```

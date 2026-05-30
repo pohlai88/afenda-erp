@@ -17,7 +17,10 @@ import {
 import { z } from "zod";
 
 import { hrTimeLeaveAuditActions } from "../events/hr.time.leave.event";
-import { requireHrTimeLeaveWrite } from "../policies/hr.time.leave-access.policy.server";
+import {
+  requireHrTimeLeaveDecide,
+  requireHrTimeLeaveWrite,
+} from "../policies/hr.time.leave-access.policy.server";
 import {
   adjustHrLeaveBalanceFormSchema,
   carryForwardHrLeaveFormSchema,
@@ -39,7 +42,7 @@ export async function decideHrLeaveApplicationAction(
     return zodActionFailure(parsed.error);
   }
 
-  const guard = await requireHrTimeLeaveWrite();
+  const guard = await requireHrTimeLeaveDecide();
   const {
     requestId,
     decision,
@@ -68,8 +71,8 @@ export async function decideHrLeaveApplicationAction(
       returnedNote,
       clarificationNote,
       actorAuthUserId: guard.session.id,
-      actorCanHrApprove: true,
-      actorManagerEmployeeIds: [],
+      actorCanHrApprove: guard.actorCanHrApprove,
+      actorManagerEmployeeIds: guard.actorManagerEmployeeIds,
     });
 
     return {

@@ -1,0 +1,68 @@
+export const hrAatUiCopy = {
+  page: {
+    title: "Absence Analytics & Trends",
+    description:
+      "Analyze absence patterns, risk indicators, historical snapshots, and audit history.",
+  },
+  accessDenied: {
+    title: "Access restricted",
+    description:
+      "You do not have permission to view absence analytics for this organization.",
+  },
+  overview: {
+    sectionTitle: "Overview",
+    absenceRateLabel: "Absence rate",
+    lostWorkdaysLabel: "Lost workdays",
+    atRiskEmployeesLabel: "At-risk employees",
+    snapshotsLabel: "Snapshots preserved",
+  },
+  riskIndicators: {
+    sectionTitle: "Absence risk indicators",
+    surfaceHeaderTitle: "Employee absence risk",
+    searchLabel: "Search risk indicators",
+    searchPlaceholder: "Employee, number, or risk level",
+    emptyTitle: "No risk indicators",
+    emptyDescription: "No employees exceed configured absence risk thresholds for this period.",
+    colEmployee: "Employee",
+    colRiskLevel: "Risk level",
+    colAbsenceRate: "Absence rate",
+    colFrequency: "Frequency",
+    colLostWorkdays: "Lost workdays",
+  },
+  snapshots: {
+    sectionTitle: "Historical snapshots",
+    surfaceHeaderTitle: "Analytics snapshots by period",
+    searchLabel: "Search snapshots",
+    searchPlaceholder: "Period kind or dimension",
+    emptyTitle: "No snapshots",
+    emptyDescription: "Analytics snapshots are preserved when analytics are generated.",
+    colPeriod: "Period",
+    colDimension: "Dimension",
+    colSummary: "Summary",
+    colGenerated: "Generated",
+  },
+  notifications: {
+    sectionTitle: "Risk notifications",
+    surfaceHeaderTitle: "Threshold alerts",
+    searchLabel: "Search notifications",
+    searchPlaceholder: "Title, body, or risk level",
+    emptyTitle: "No notifications",
+    emptyDescription: "HR and managers are notified when absence risk exceeds thresholds.",
+    colTitle: "Alert",
+    colRiskLevel: "Risk level",
+    colRecipient: "Recipient role",
+    colWhen: "Sent",
+  },
+  audit: {
+    sectionTitle: "Audit trail",
+    surfaceHeaderTitle: "Absence analytics audit",
+    searchLabel: "Search audit trail",
+    searchPlaceholder: "Action, summary, or actor",
+    emptyTitle: "No audit events",
+    emptyDescription:
+      "Analytics generation, threshold changes, exports, risk reviews, and corrective action references appear here.",
+    colAction: "Action",
+    colTarget: "Target",
+    colWhen: "When",
+  },
+} as const;

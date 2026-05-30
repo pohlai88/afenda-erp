@@ -36,6 +36,7 @@ describe("hr benefits workbench metadata", () => {
       eligibilityRulesSearch: "hr.payroll.benefits.eligibility-rules.list-query",
       openEnrollmentSearch: "hr.payroll.benefits.open-enrollment.list-query",
       enrollmentsSearch: "hr.payroll.benefits.enrollments.list-query",
+      providersSearch: "hr.payroll.benefits.providers.list-query",
       auditTrailSearch: "hr.payroll.benefits.audit-trail.list-query",
     });
   });

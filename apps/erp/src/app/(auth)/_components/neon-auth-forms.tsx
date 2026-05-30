@@ -133,7 +133,7 @@ export function NeonAuthForm({
   return (
     <div>
       <h2 className="type-section-title font-semibold text-foreground">{labels.title}</h2>
-      <p className="mt-3 type-body leading-6 text-muted-foreground">
+      <p className="mt-3 type-muted">
         {labels.description}
       </p>
 

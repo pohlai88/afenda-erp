@@ -20,9 +20,12 @@ import { readFileSync, readdirSync, statSync, existsSync } from "node:fs";
 import { extname, join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 
-// ---------------------------------------------------------------------------
-// Types
-// ---------------------------------------------------------------------------
+import {
+  buildBannedTextFillPattern,
+  buildRawPalettePattern,
+  UI_REDUNDANT_INK_PATTERN,
+  UI_TW_ANIMATE_CLASS_PATTERN,
+} from "../../ui/src/design-system.color-contract.shared.ts";
 
 type Severity = "error" | "warning" | "info";
 
@@ -101,21 +104,40 @@ const RULES: Rule[] = [
     id: "no-text-fill-token",
     severity: "error",
     description:
-      "Fill color token used for copy — @theme --color-muted generates text-muted (surface fill, not ink)",
-    pattern: /\btext-(muted|accent|secondary|card|popover)(?![\w-])/g,
+      "Fill color token used for copy — @theme --color-* generates text-* surface fills, not ink",
+    pattern: buildBannedTextFillPattern(),
     suggestion:
-      "type-caption | type-muted | type-label | text-muted-foreground | text-accent-foreground  (never text-muted for copy)",
+      "type-caption | type-muted | type-label | text-*-foreground  (never text-muted/text-surface for copy)",
     fileFilter: /\.tsx$/,
   },
   {
     id: "no-raw-palette",
-    severity: "warning",
+    severity: "error",
     description:
       "Raw Tailwind palette color — use semantic ERP tokens (OKLCH via @theme inline)",
-    pattern:
-      /\b(bg|text|border|ring|from|to|via|hover:bg|hover:border|hover:text|file:bg)-(slate|gray|zinc)-/g,
+    pattern: buildRawPalettePattern(),
     suggestion:
       "bg-primary | bg-surface | type-muted | surface-code | hover:bg-surface-hover | hover:border-border  (uiColorInk / uiColorFill)",
+    fileFilter: /\.tsx$/,
+  },
+  {
+    id: "no-redundant-ink",
+    severity: "warning",
+    description:
+      "Redundant text-muted-foreground paired with type-* utility that already sets ink",
+    pattern: UI_REDUNDANT_INK_PATTERN,
+    suggestion:
+      "Use type-muted or type-caption alone — do not stack text-muted-foreground",
+    fileFilter: /\.tsx$/,
+  },
+  {
+    id: "no-tw-animate-external",
+    severity: "error",
+    description:
+      "tw-animate-css class outside packages/ui — overlay motion belongs in shadcn fork only",
+    pattern: UI_TW_ANIMATE_CLASS_PATTERN,
+    suggestion:
+      "Use @theme --animate-surface-in | command-in | material-resolving, or compose via @afenda/ui primitives",
     fileFilter: /\.tsx$/,
   },
   {
@@ -143,7 +165,7 @@ const RULES: Rule[] = [
   },
   {
     id: "no-raw-gap-semantic",
-    severity: "info",
+    severity: "warning",
     description: "Raw gap value with a semantic equivalent",
     pattern: /\bgap-(4|6|8|10|12)\b/g,
     suggestion:
@@ -151,7 +173,7 @@ const RULES: Rule[] = [
   },
   {
     id: "no-raw-spacing-semantic",
-    severity: "info",
+    severity: "warning",
     description: "Raw margin/padding with a semantic equivalent",
     pattern: /\b(mt|mb|mx|my|pt|pb|px|py)-(4|6|8|10|12)\b/g,
     suggestion:
@@ -453,6 +475,11 @@ function main(): void {
   }
 
   if (scope !== "governed" && (errorCount > 0 || warnCount > 0)) {
+    process.exit(1);
+  }
+
+  const infoCount = allViolations.filter((v) => v.severity === "info").length;
+  if (strict && infoCount > 0 && args.includes("--strict-info")) {
     process.exit(1);
   }
 }

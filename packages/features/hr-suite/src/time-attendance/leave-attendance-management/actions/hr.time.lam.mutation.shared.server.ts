@@ -11,6 +11,7 @@ import type { HrTimeLamAuditAction } from "../events/hr.time.lam.event";
 import { toHrLamActionFailure } from "../data/hr.time.lam-action-result.shared";
 
 const LAM_REVALIDATE_PATHS = [
+  hrLamRoutePaths.hub,
   hrLamRoutePaths.leave,
   hrLamRoutePaths.attendance,
 ] as const;

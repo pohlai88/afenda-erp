@@ -30,7 +30,11 @@ export {
 export * from "./hr-attendance";
 export * from "./hr-lam";
 export * from "./hr-lam-advanced";
+export * from "./hr-aat-advanced";
 export * from "./hr-lam-workflow";
+export * from "./hr-fwa";
+export * from "./hr-fwa-workflow";
+export * from "./hr-fwa-compliance";
 export * from "./hr-benefits";
 export * from "./hr-overtime";
 export * from "./hr-shifts";

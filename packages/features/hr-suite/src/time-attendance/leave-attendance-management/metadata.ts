@@ -48,4 +48,4 @@ export {
   buildHrLamAuditTrailListSurface,
 } from "./surface/hr.time.attendance.lam-audit-trail-list.surface";
 
-export { assertLamCoverageComplete, LAM_REQUIREMENT_COVERAGE } from "./data/lam-acceptance-coverage.shared";
+export { assertLamCoverageComplete, LAM_REQUIREMENT_COVERAGE } from "./data/hr.time.lam-acceptance-coverage.shared";

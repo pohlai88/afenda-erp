@@ -68,7 +68,7 @@ export function WorkspaceOrgPanel({
       <Card className="overflow-hidden shadow-elevation-1">
         <div className="h-1 bg-primary" aria-hidden />
         <CardHeader>
-          <p className="type-caption uppercase tracking-wide text-muted-foreground">
+          <p className="type-label">
             Active tenant
           </p>
           <div className="mt-surface-md flex items-start gap-surface-md">
@@ -79,7 +79,7 @@ export function WorkspaceOrgPanel({
             </Avatar>
             <div className="min-w-0 flex-1">
               <CardTitle className="truncate">{organizationName}</CardTitle>
-              <p className="mt-1 type-mono-cell text-muted-foreground">
+              <p className="mt-1 type-mono-muted">
                 {organizationSlug}
               </p>
             </div>
@@ -95,13 +95,13 @@ export function WorkspaceOrgPanel({
 
           <dl className="mt-surface-lg grid grid-cols-2 gap-surface-sm rounded-section border border-border bg-muted/30 p-surface-md">
             <div>
-              <dt className="type-caption text-muted-foreground">Routes</dt>
+              <dt className="type-caption">Routes</dt>
               <dd className="mt-1 type-body font-semibold tabular-nums text-foreground">
                 {activeRouteCount}
               </dd>
             </div>
             <div>
-              <dt className="type-caption text-muted-foreground">Access</dt>
+              <dt className="type-caption">Access</dt>
               <dd className="mt-1 type-caption font-medium text-foreground">
                 Scoped
               </dd>

@@ -194,6 +194,32 @@ export {
 export { hrRecordsUiCopy as hrEmployeesUiCopy } from "./employee-management/employee-records-management/metadata";
 
 export {
+  getHrFwaListSurfaceKeys,
+  HR_FWA_LIST_SURFACE_COLUMNS_BY_KEY,
+  HR_FWA_LIST_SEARCH_PARAMS_BY_KEY,
+  HR_FWA_LIST_SEARCH_PARAM_MODEL_FIELDS,
+  HR_FWA_LIST_SURFACE_KEYS,
+  hrFwaArrangementsSurfaceKey,
+  hrFwaArrangementsSearchParam,
+  hrFwaRequestsSurfaceKey,
+  hrFwaRequestsSearchParam,
+  hrFwaComplianceSurfaceKey,
+  hrFwaComplianceSearchParam,
+  hrFwaReportsSurfaceKey,
+  hrFwaAuditTrailSurfaceKey,
+  hrFwaAuditTrailSearchParam,
+  hrFwaUiCopy,
+  parseHrFwaSearchParams,
+  toHrFwaPageModelInput,
+  type HrFwaSearchParams,
+  type HrFwaListSurfaceKey,
+  hrFwaRoutePaths,
+  type HrFwaRoutePath,
+  assertFwaCoverageComplete,
+  FWA_REQUIREMENT_COVERAGE,
+} from "./time-attendance/flexible-work-arrangement-tracking/metadata";
+
+export {
   getHrLamListSurfaceKeys,
   HR_LAM_LIST_SURFACE_COLUMNS_BY_KEY,
   HR_LAM_LIST_SEARCH_PARAMS_BY_KEY,
@@ -305,6 +331,31 @@ export {
   hrBenefitsRoutePaths,
   type HrBenefitsRoutePath,
 } from "./payroll-compensation/benefits-administration/contracts/hr.payroll.benefits-route.contract";
+
+export {
+  getHrAatListSurfaceKeys,
+  HR_AAT_LIST_SURFACE_COLUMNS_BY_KEY,
+  HR_AAT_LIST_SEARCH_PARAMS_BY_KEY,
+  HR_AAT_LIST_SEARCH_PARAM_MODEL_FIELDS,
+  HR_AAT_LIST_SURFACE_KEYS,
+  HR_AAT_WORKBENCH_READ_ONLY_SURFACE_KEYS,
+  hrAatAuditTrailSearchParam,
+  hrAatAuditTrailSurfaceKey,
+  hrAatNotificationsSearchParam,
+  hrAatNotificationsSurfaceKey,
+  hrAatRiskIndicatorsSearchParam,
+  hrAatRiskIndicatorsSurfaceKey,
+  hrAatSnapshotsSearchParam,
+  hrAatSnapshotsSurfaceKey,
+  hrAatOverviewStatSurfaceKey,
+  hrAatUiCopy,
+  parseHrAatSearchParams,
+  toHrAatPageModelInput,
+  type HrAatSearchParams,
+  type HrAatListSurfaceKey,
+  hrAatRoutePaths,
+  type HrAatRoutePath,
+} from "./time-attendance/absence-analytics-trends/metadata";
 
 export const hrOnboardingUiCopy = {
   page: {

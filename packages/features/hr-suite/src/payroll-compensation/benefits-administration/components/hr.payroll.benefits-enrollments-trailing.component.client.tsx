@@ -18,7 +18,7 @@ import { HRM_BENEFIT_DEPENDENT_RELATIONSHIPS } from "../schemas/hr.payroll.benef
 import { hrBenefitsUiCopy } from "../surface/hr.payroll.benefits-ui.copy.shared";
 
 const enrollmentSelectClass =
-  "min-h-[var(--af-field-height)] w-full rounded-lg border border-transparent bg-input/50 px-[var(--af-field-px)] py-[var(--af-field-py)] text-sm";
+  "min-h-field w-full rounded-control border border-transparent bg-input/50 px-field-px py-field-py type-control";
 
 function HiddenEnrollmentId({ row }: { row: GovernedListTrailingCellProps["row"] }) {
   return (

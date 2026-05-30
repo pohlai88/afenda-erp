@@ -1,5 +1,8 @@
 # shadcn/ui update checklist (`@afenda/ui`)
 
+**Composition (agents):** [`COMPOSITION.md`](./COMPOSITION.md) · Cursor rule `.cursor/rules/afenda-ui-composition.mdc`  
+**Upstream shadcn skill:** `.agents/skills/shadcn/SKILL.md` (from [shadcn/ui skills](https://ui.shadcn.com/docs/skills))
+
 Afenda keeps shadcn components in [`packages/ui/src`](./src). Config: [`apps/erp/components.json`](../../apps/erp/components.json) (`"config": ""` — Tailwind v4 CSS-first).
 
 Run from repo root after `pnpm dlx shadcn@latest add …` (aliases point here).
@@ -27,8 +30,7 @@ Run from repo root after `pnpm dlx shadcn@latest add …` (aliases point here).
 5. **Verify**
 
 ```bash
-pnpm audit:tailwind-token-parity
-pnpm audit:governed-design-tokens --scope=app --strict
+pnpm design-system:check
 pnpm --filter @afenda/ui typecheck
 ```
 
@@ -37,24 +39,75 @@ pnpm --filter @afenda/ui typecheck
 | Layer | Rule |
 | ----- | ---- |
 | `packages/ui/src/**` (internal) | May keep shadcn `text-sm`, `text-xs`, `animate-in/*`, selective `dark:` for nova variant |
-| CardDescription, EmptyDescription, Field helpers | Must use `type-muted` / `type-caption` |
+| Description slots (`*Description`, `TableCaption`, command/combobox empty) | Must use `type-muted` |
+| `FieldTitle` | `type-control` + `font-medium` |
+| `EmptyContent` | `type-body` |
 | `apps/erp`, `packages/features`, `packages/governed-surface` | Must use `type-*` and `ui.*` only — never raw `text-sm` / palette colors |
 
-## Animation (`tw-animate-css`)
+## Animation strategy (`tw-animate-css`)
 
-- **Keep** `@import "tw-animate-css"` in `globals.css` until each primitive animation has a `@theme --animate-*` equivalent.
-- **Ban** new `animate-in`, `fade-in-0`, `slide-in-from-*`, `zoom-in-95` usage outside `packages/ui`.
-- **Migration order** (when mapping): dialog → popover → sheet → tooltip.
-- Native ERP motion already lives in `@theme`: `surface-in`, `surface-out`, `command-in`, `material-resolving`.
+### Policy (do not remove import yet)
 
-## Inventory: tw-animate class usage in `packages/ui`
+- **Keep** `@import "tw-animate-css"` in `globals.css` until every primitive below has a tested `@theme --animate-*` equivalent.
+- **Ban** new `animate-in`, `fade-in-0`, `slide-in-from-*`, `zoom-in-95` (and related tw-animate classes) outside `packages/ui`.
+- **YAGNI:** do not delete `tw-animate-css` in a bulk pass — 50+ class strings across overlays; migrate one primitive at a time.
 
-Primitives using shadcn/tw-animate utilities (do not remove import until migrated):
+### Native ERP motion (already in `@theme`)
 
-- **Overlays:** `dialog`, `sheet`, `drawer`, `popover`, `hover-card`, `tooltip`, `dropdown-menu`, `context-menu`, `menubar`, `navigation-menu`, `select`, `combobox`
-- **Patterns:** `animate-in`, `animate-out`, `fade-in-0`, `fade-out-0`, `zoom-in-95`, `zoom-out-95`, `slide-in-from-*`, `slide-out-to-*`
+Use these for new product surfaces instead of tw-animate:
 
-Cross-reference native tokens in `apps/erp/src/app/globals.css` (`--animate-surface-in`, etc.) before adding new keyframes.
+| Token | Use |
+| ----- | --- |
+| `--animate-surface-in` / `surface-out` | Panel / card enter-exit |
+| `--animate-command-in` | Command palette |
+| `--animate-material-resolving` | Lynx loading states |
+
+Defined in `apps/erp/src/app/globals.css`. Cross-reference before adding keyframes.
+
+### Migration order (when mapping 1:1)
+
+1. **dialog** + **alert-dialog** (backdrop fade + content zoom)
+2. **popover** + **hover-card** + **dropdown-menu** + **context-menu** + **menubar**
+3. **sheet** + **drawer** (directional slide + backdrop)
+4. **tooltip** + **select** + **combobox** + **navigation-menu**
+
+### Inventory: tw-animate usage in `packages/ui/src` (13 files, ~21 class strings)
+
+| File | tw-animate patterns |
+| ---- | ------------------- |
+| `alert-dialog.tsx` | backdrop `fade-in/out`; content `zoom-in-95` / `zoom-out-95` |
+| `combobox.tsx` | `slide-in-from-*`, `animate-in/out`, `fade-in-0`, `zoom-in-95` |
+| `context-menu.tsx` | 2 surfaces: slide + fade + zoom (open/closed) |
+| `dialog.tsx` | backdrop fade; content zoom |
+| `drawer.tsx` | backdrop fade only |
+| `dropdown-menu.tsx` | 2 surfaces: slide + fade + zoom |
+| `hover-card.tsx` | slide + fade + zoom |
+| `menubar.tsx` | 2 surfaces: slide + fade (+ zoom on submenu) |
+| `navigation-menu.tsx` | horizontal slide (`slide-in-from-left/right-52`), viewport `zoom-in/out-90`, indicator fade |
+| `popover.tsx` | slide + fade + zoom |
+| `select.tsx` | slide + fade + zoom |
+| `sheet.tsx` | backdrop fade; panel directional `slide-in-from-*-10` / `slide-out-to-*` |
+| `tooltip.tsx` | slide + fade + zoom (`delayed-open` + `open` states) |
+
+**Class families in use:** `animate-in`, `animate-out`, `fade-in-0`, `fade-out-0`, `fade-in`, `fade-out`, `zoom-in-95`, `zoom-out-95`, `zoom-in-90`, `zoom-out-90`, `slide-in-from-{top,left,right,bottom}-2`, `slide-in-from-*-10`, `slide-in-from-left-52`, `slide-out-to-*`.
+
+Re-run inventory after shadcn upgrades:
+
+```bash
+rg "animate-in|animate-out|fade-in|fade-out|zoom-in|zoom-out|slide-in-from|slide-out-to" packages/ui/src --glob "*.tsx"
+```
+
+## Enforcement (CI)
+
+All gates run via `pnpm design-system:check` (also in `architecture:check`):
+
+| Script | Catches |
+| ------ | ------- |
+| `audit:tailwind-token-parity` | CSS ↔ TS drift, missing `@theme` fills, orphan `@utility`, banned `@utility text-{fill}` |
+| `audit:shadcn-primitives` | Description-slot drift (`text-sm text-muted-foreground`), raw palette in `packages/ui` |
+| `audit:governed-design-tokens --scope=all --strict` | Product code: fill-as-ink, palette, typography, tw-animate outside UI, redundant ink stacks |
+
+`@afenda/ui` `pretypecheck` runs `audit:shadcn-primitives` automatically.
 
 ## References
 

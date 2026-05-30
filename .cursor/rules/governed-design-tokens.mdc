@@ -9,6 +9,7 @@ alwaysApply: false
 Single source of truth for token usage in `@afenda/governed-surface` and consumer packages.
 **Authoritative TypeScript definition:** `packages/ui/src/design-system.ts` — `uiTypography`, `uiRadius`, `uiZIndex`, `uiStatusToneClasses`, `uiRiskToneClasses`, `uiSurfaceElevation`.
 **Enforcement script:** `pnpm audit:governed-design-tokens --strict` (gates CI for governed-surface errors; consumer scopes with `--scope=all --strict` gate errors and warnings).
+**shadcn import checklist:** `packages/ui/shadcn-update.md` (post-`shadcn add` token mapping and animation policy).
 **Suppression syntax:** add a same-line comment `// audit-ds: ignore <rule-id> — <reason>`.
 
 ---
@@ -30,11 +31,19 @@ In Tailwind v4 `@theme inline`, `--color-muted` generates `text-muted` as a **su
 | `bg-muted/30 text-muted` | `bg-muted/30 type-muted` |
 | Mono slug on chip | `type-mono-muted` |
 
-Parity guard: `pnpm audit:tailwind-token-parity` (also in `architecture:check`).
+Parity guard: `pnpm audit:tailwind-token-parity` (also in `design-system:check` / `architecture:check`).
+
+### Redundant ink — `no-redundant-ink`
+
+Never stack `text-muted-foreground` on a `type-*` utility that already embeds ink (`type-muted`, `type-caption`, etc.).
+
+### tw-animate outside UI — `no-tw-animate-external`
+
+`animate-in`, `fade-in-0`, `slide-in-from-*`, `zoom-in-95`, etc. are **banned outside `packages/ui`**. Product code must use `@theme` motion tokens or compose `@afenda/ui` overlay primitives.
 
 ### Raw palette — `no-raw-palette`
 
-Never use Tailwind default palette utilities in app, feature, or governed surfaces. Use semantic tokens from `globals.css` / `design-system.ts`.
+Never use Tailwind default palette utilities in app, feature, or governed surfaces. Use semantic tokens from `globals.css` / `design-system.ts`. Banned stems: `slate`, `gray`, `zinc`, `neutral`, `stone`. **Error-level** in all scopes.
 
 | Wrong | Correct |
 |---|---|
@@ -160,10 +169,13 @@ Exception: top-level page layout components (e.g. `GovernedSurface`) that are al
 
 | Gate | Command | Fail condition |
 |---|---|---|
+| Design system bundle | `pnpm design-system:check` | Parity, shadcn primitive boundary, or consumer token audit failure |
+| Token parity | `pnpm audit:tailwind-token-parity` | CSS ↔ `design-system.ts` drift, missing `@theme` fill, orphan `@utility` |
+| Shadcn primitive boundary | `pnpm audit:shadcn-primitives` | Description-slot drift or raw palette in `packages/ui` |
 | Build gate | `@afenda/governed-surface` `pnpm build` (runs `audit:design-tokens` first) | Any `error`-level violation in `governed-surface` |
 | CI / local | `pnpm audit:governed-design-tokens --strict` | Same as build gate |
-| Advisory scan | `pnpm audit:governed-design-tokens --scope=all --strict` | Errors and warnings in features/app |
-| Composition | `pnpm audit:shadcn-composition --strict` | space-y, raw button, form FieldGroup |
+| Consumer scan | `pnpm audit:governed-design-tokens --scope=all --strict` | Errors and warnings in features/app/governed |
+| Composition | `pnpm audit:shadcn-composition --strict` | Nested Card, fake card divs, SectionPanel preference — see `packages/ui/COMPOSITION.md` |
 | Renderer parity | `pnpm lint:governed-renderers` | Registry/contract mismatch |
 | Architecture | `pnpm architecture:check` | Package boundary violation |
 

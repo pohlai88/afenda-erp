@@ -140,7 +140,7 @@ export function HrOffboardingWorkbenchSection({
       >
         <Link
           href={hrLifecycleRoutePaths.lifecycle}
-          className="text-sm font-medium underline-offset-4 hover:underline"
+          className="type-control font-medium underline-offset-4 hover:underline"
         >
           Open lifecycle workbench
         </Link>

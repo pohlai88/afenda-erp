@@ -4,7 +4,7 @@ import * as React from "react";
 import { Popover as PopoverPrimitive } from "radix-ui";
 
 import { cn } from "./utils";
-import { uiRadius } from "./design-system";
+import { uiRadius, uiTypography } from "./design-system";
 
 function Popover({
   ...props
@@ -74,7 +74,7 @@ function PopoverDescription({
   return (
     <p
       data-slot="popover-description"
-      className={cn("text-muted-foreground", className)}
+      className={cn(uiTypography.muted, className)}
       {...props}
     />
   );

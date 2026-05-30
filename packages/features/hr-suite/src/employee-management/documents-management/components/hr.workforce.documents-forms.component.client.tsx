@@ -64,7 +64,7 @@ export function HrDocumentsRegisterForm({
         <select
           id="documents-register-employee"
           name="employeeId"
-          className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+          className="w-full rounded-control border border-input bg-background px-3 py-2 type-control"
           required
           defaultValue=""
         >
@@ -97,7 +97,7 @@ export function HrDocumentsRegisterForm({
         <select
           id="documents-register-classification"
           name="classification"
-          className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+          className="w-full rounded-control border border-input bg-background px-3 py-2 type-control"
           defaultValue="internal"
         >
           <option value="internal">Internal</option>
@@ -179,7 +179,7 @@ export function HrDocumentsRequirementUpsertForm() {
         <select
           id="documents-req-status"
           name="requiredForStatus"
-          className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+          className="w-full rounded-control border border-input bg-background px-3 py-2 type-control"
           defaultValue="active"
         >
           <option value="onboarding">Onboarding</option>
@@ -239,7 +239,7 @@ export function HrDocumentsRetentionPolicyForm() {
         <select
           id="documents-retention-archive"
           name="archiveOnSeparation"
-          className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+          className="w-full rounded-control border border-input bg-background px-3 py-2 type-control"
           defaultValue="true"
         >
           <option value="true">Yes</option>
@@ -269,7 +269,7 @@ export function HrDocumentsAcknowledgmentForm({
         <select
           id="documents-ack-employee"
           name="employeeId"
-          className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+          className="w-full rounded-control border border-input bg-background px-3 py-2 type-control"
           required
           defaultValue=""
         >

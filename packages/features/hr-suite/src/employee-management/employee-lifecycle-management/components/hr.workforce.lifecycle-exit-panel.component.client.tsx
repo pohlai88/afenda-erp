@@ -3,6 +3,7 @@
 import { useActionState } from "react";
 
 import { ActionFormErrors } from "@afenda/governed-surface/client";
+import { SubsectionPanel } from "@afenda/ui";
 import { Button } from "@afenda/ui/button";
 import { Field, FieldLabel } from "@afenda/ui/field";
 import { Input } from "@afenda/ui/input";
@@ -15,7 +16,7 @@ import {
 import { hrLifecycleUiCopy } from "../surface/hr.workforce.lifecycle-ui.copy.shared";
 
 const LIFECYCLE_SELECT_CLASS =
-  "border-input bg-background ring-offset-background focus-visible:ring-ring flex h-9 w-full min-w-0 rounded-control border px-3 py-1 text-sm shadow-elevation-1 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50";
+  "min-h-field w-full rounded-control border border-transparent bg-input/50 px-field-px py-field-py type-control";
 
 function ExitPathwayForm({
   action,
@@ -71,8 +72,8 @@ export function HrLifecycleExitPanel() {
   const copy = hrLifecycleUiCopy.exit;
 
   return (
-    <div className="grid gap-surface-lg @lg:grid-cols-3">
-      <SectionPanelLite title={copy.noticeSubmitLabel}>
+    <div className="@container grid gap-surface-lg @lg:grid-cols-3">
+      <SubsectionPanel title={copy.noticeSubmitLabel}>
         <ExitPathwayForm
           action={initiateHrNoticePeriodAction}
           submitLabel={copy.noticeSubmitLabel}
@@ -98,9 +99,9 @@ export function HrLifecycleExitPanel() {
             />
           </Field>
         </ExitPathwayForm>
-      </SectionPanelLite>
+      </SubsectionPanel>
 
-      <SectionPanelLite title={copy.offboardingSubmitLabel}>
+      <SubsectionPanel title={copy.offboardingSubmitLabel}>
         <ExitPathwayForm
           action={startHrOffboardingCaseAction}
           submitLabel={copy.offboardingSubmitLabel}
@@ -126,9 +127,9 @@ export function HrLifecycleExitPanel() {
             />
           </Field>
         </ExitPathwayForm>
-      </SectionPanelLite>
+      </SubsectionPanel>
 
-      <SectionPanelLite title={copy.onboardingSubmitLabel}>
+      <SubsectionPanel title={copy.onboardingSubmitLabel}>
         <ExitPathwayForm
           action={startHrOnboardingCaseAction}
           submitLabel={copy.onboardingSubmitLabel}
@@ -149,22 +150,7 @@ export function HrLifecycleExitPanel() {
             </select>
           </Field>
         </ExitPathwayForm>
-      </SectionPanelLite>
-    </div>
-  );
-}
-
-function SectionPanelLite({
-  title,
-  children,
-}: {
-  title: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="flex flex-col gap-surface-sm rounded-control border p-surface-md">
-      <h3 className="text-sm font-medium">{title}</h3>
-      {children}
+      </SubsectionPanel>
     </div>
   );
 }

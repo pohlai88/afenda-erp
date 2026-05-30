@@ -43,9 +43,9 @@ export function HrOrgUnitForm({
   const copy = hrOrgUiCopy.forms;
 
   return (
-    <form action={action} className="flex flex-col gap-3 rounded-section border p-4">
+    <form action={action} className="@container flex flex-col gap-3 rounded-section border p-4">
       <h3 className="type-subtitle">{copy.orgUnitTitle}</h3>
-      <div className="grid gap-3 md:grid-cols-2">
+      <div className="grid gap-3 @md:grid-cols-2">
         <div>
           <Label htmlFor="org-unit-code">Code</Label>
           <Input id="org-unit-code" name="code" required />
@@ -150,9 +150,9 @@ export function HrOrgPositionForm({
   const copy = hrOrgUiCopy.forms;
 
   return (
-    <form action={action} className="flex flex-col gap-3 rounded-section border p-4">
+    <form action={action} className="@container flex flex-col gap-3 rounded-section border p-4">
       <h3 className="type-subtitle">{copy.positionTitle}</h3>
-      <div className="grid gap-3 md:grid-cols-2">
+      <div className="grid gap-3 @md:grid-cols-2">
         <div>
           <Label htmlFor="org-position-code">Code</Label>
           <Input id="org-position-code" name="code" required />
@@ -234,9 +234,9 @@ export function HrOrgReportingLineForm({
   const copy = hrOrgUiCopy.forms;
 
   return (
-    <form action={action} className="flex flex-col gap-3 rounded-section border p-4">
+    <form action={action} className="@container flex flex-col gap-3 rounded-section border p-4">
       <h3 className="type-subtitle">{copy.reportingLineTitle}</h3>
-      <div className="grid gap-3 md:grid-cols-2">
+      <div className="grid gap-3 @md:grid-cols-2">
         <div>
           <Label htmlFor="org-reporting-employee">Employee</Label>
           <Select name="employeeId" required>

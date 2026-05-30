@@ -165,7 +165,7 @@ export function LynxToolPayloadDetails({
             {copied ? "Copied" : "Copy"}
           </Button>
         </div>
-        <pre className="max-h-64 overflow-auto rounded-control bg-foreground p-3 type-mono-cell text-background">
+        <pre className="surface-code max-h-64 overflow-auto p-3 type-code">
           <code>{serializedValue}</code>
         </pre>
       </div>

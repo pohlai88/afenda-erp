@@ -69,7 +69,7 @@ export function GovernedAuditPanel({ model }: GovernedAuditPanelProps) {
         <Table
           density={tableDensity}
           aria-label={model.headerTitle}
-          className="min-w-[720px] text-left type-control"
+          className="min-w-[720px] text-left type-control" // audit-ds: ignore no-arbitrary-value — table minimum scroll width
         >
           <TableHeader className="sticky top-0 z-raised bg-card shadow-elevation-1">
             <TableRow>
@@ -88,7 +88,7 @@ export function GovernedAuditPanel({ model }: GovernedAuditPanelProps) {
                   key={row.id}
                   className={cn("hover:bg-muted/30", AUDIT_ROW_TONE_CLASS[tone])}
                 >
-                  <TableCell className="type-mono-cell whitespace-nowrap text-muted-foreground">
+                  <TableCell className="type-mono-muted whitespace-nowrap">
                     <time dateTime={row.occurredAt}>{row.occurredAt}</time>
                     {row.durationLabel ? (
                       <span className="block type-mono-cell">

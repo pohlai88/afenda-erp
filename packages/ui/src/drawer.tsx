@@ -4,7 +4,7 @@ import * as React from "react";
 import { Drawer as DrawerPrimitive } from "vaul";
 
 import { cn } from "./utils";
-import { uiRadius } from "./design-system";
+import { uiRadius, uiTypography } from "./design-system";
 
 function Drawer({
   ...props
@@ -117,7 +117,7 @@ function DrawerDescription({
   return (
     <DrawerPrimitive.Description
       data-slot="drawer-description"
-      className={cn("text-sm text-muted-foreground", className)}
+      className={cn(uiTypography.muted, className)}
       {...props}
     />
   );

@@ -5,6 +5,7 @@ import {
 } from "@afenda/kernel/execution";
 
 import { hrTimeLeaveCapabilities } from "../contracts/hr.time.leave.contract";
+import { resolveHrLeaveApproverContext as resolveLeaveApproverContext } from "../data/hr.time.leave-approver-context.shared.server";
 
 export async function requireHrTimeLeaveRead() {
   const context = await requireExecutionContext();
@@ -27,4 +28,21 @@ export async function requireHrTimeLeaveWrite() {
     throw new Error("hr_leave_write_required");
   }
   return guard;
+}
+
+export async function resolveHrLeaveApproverContext(
+  guard: Awaited<ReturnType<typeof requireHrTimeLeaveRead>>,
+) {
+  return resolveLeaveApproverContext({
+    organizationId: guard.organization.id,
+    authUserId: guard.session.id,
+    canWrite: guard.canWrite,
+  });
+}
+
+/** Leave decision boundary: HR write or manager employee identity (enforced again in DB). */
+export async function requireHrTimeLeaveDecide() {
+  const guard = await requireHrTimeLeaveRead();
+  const approver = await resolveHrLeaveApproverContext(guard);
+  return { ...guard, ...approver };
 }

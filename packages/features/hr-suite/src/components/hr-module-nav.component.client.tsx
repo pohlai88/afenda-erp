@@ -38,7 +38,7 @@ export function HrModuleNav({
             className={
               active
                 ? "rounded-control border border-line bg-surface-strong px-3 py-1.5 type-control font-medium text-foreground"
-                : "rounded-control px-3 py-1.5 type-control text-muted-foreground transition hover:bg-surface-strong hover:text-foreground"
+                : "rounded-control px-3 py-1.5 type-muted transition hover:bg-surface-strong hover:text-foreground"
             }
           >
             {item.label}

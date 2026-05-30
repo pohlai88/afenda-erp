@@ -1,5 +1,2 @@
-/**
- * @afenda-bucket policies
- * Scaffold placeholder from packages/_template-definition.
- */
-export {};
+export * from "./hr.time.aat-access.policy.server";
+export * from "./hr.time.aat-risk-threshold.policy.server";

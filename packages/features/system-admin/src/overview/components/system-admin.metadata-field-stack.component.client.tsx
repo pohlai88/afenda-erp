@@ -14,7 +14,7 @@ export function SystemAdminMetadataFieldStack({
   return (
     <section className="flex flex-col gap-surface-sm">
       <h3 className="type-label">{label}</h3>
-      <div className={mono ? "type-mono-cell text-muted-foreground" : "type-body"}>
+      <div className={mono ? "type-mono-muted" : "type-body"}>
         {children}
       </div>
     </section>

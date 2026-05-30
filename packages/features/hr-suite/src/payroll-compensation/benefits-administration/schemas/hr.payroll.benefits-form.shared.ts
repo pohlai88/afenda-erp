@@ -11,6 +11,8 @@ import {
 import {
   addHrBenefitEnrollmentDependentFormSchema,
   createHrBenefitEnrollmentFormSchema,
+  createNewHireBenefitEnrollmentFormSchema,
+  recordHrBenefitLifeEventFormSchema,
   verifyHrBenefitEnrollmentDependentsFormSchema,
 } from "./hr.payroll.benefits-enrollment.schema";
 
@@ -67,6 +69,14 @@ export function parseHrBenefitsEnrollmentChangeForm(formData: FormData) {
 
 export function parseHrBenefitsEnrollmentCreateForm(formData: FormData) {
   return parseForm(createHrBenefitEnrollmentFormSchema, formData);
+}
+
+export function parseHrBenefitsNewHireEnrollmentForm(formData: FormData) {
+  return parseForm(createNewHireBenefitEnrollmentFormSchema, formData);
+}
+
+export function parseHrBenefitsLifeEventRecordForm(formData: FormData) {
+  return parseForm(recordHrBenefitLifeEventFormSchema, formData);
 }
 
 export function parseHrBenefitsAddDependentForm(formData: FormData) {

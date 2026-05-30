@@ -4,6 +4,7 @@ import { useMemo } from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "./utils";
+import { uiTypography } from "./design-system";
 import { Label } from "./label";
 import { Separator } from "./separator";
 
@@ -120,7 +121,8 @@ function FieldTitle({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="field-label"
       className={cn(
-        "flex w-fit items-center gap-2 text-sm font-medium group-data-[disabled=true]/field:opacity-50",
+        "flex w-fit items-center gap-2 font-medium group-data-[disabled=true]/field:opacity-50",
+        uiTypography.control,
         className,
       )}
       {...props}
@@ -133,8 +135,9 @@ function FieldDescription({ className, ...props }: React.ComponentProps<"p">) {
     <p
       data-slot="field-description"
       className={cn(
-        "text-left text-sm leading-normal font-normal text-muted-foreground group-has-data-horizontal/field:text-balance",
+        "text-left group-has-data-horizontal/field:text-balance",
         "last:mt-0 nth-last-2:-mt-1",
+        uiTypography.muted,
         "[&>a]:underline [&>a]:underline-offset-4 [&>a:hover]:text-primary",
         className,
       )}

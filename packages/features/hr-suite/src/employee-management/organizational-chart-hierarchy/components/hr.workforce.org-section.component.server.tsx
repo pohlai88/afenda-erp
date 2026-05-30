@@ -80,7 +80,7 @@ export function HrOrgWorkbenchSection({ model }: { model: HrOrgPageModel }) {
       <HrOrgChartTreePanel nodes={model.orgChartNodes} />
 
       {model.canWrite ? (
-        <div className="grid gap-surface-md xl:grid-cols-3">
+        <div className="@container grid gap-surface-md @xl:grid-cols-3">
           <HrOrgUnitForm
             orgUnitOptions={model.orgUnitPickerOptions}
             employeeOptions={model.employeePickerOptions}

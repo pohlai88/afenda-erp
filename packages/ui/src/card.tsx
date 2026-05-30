@@ -1,7 +1,7 @@
 import * as React from "react";
 
 import { cn } from "./utils";
-import { type CardSize, ui, uiRadius, uiTitle } from "./design-system";
+import { type CardSize, ui, uiRadius, uiTitle, uiTypography } from "./design-system";
 
 function Card({
   className,
@@ -13,7 +13,7 @@ function Card({
       data-slot="card"
       data-size={size}
       className={cn(
-        "group/card flex flex-col gap-surface-lg overflow-hidden bg-card py-surface-lg text-sm text-card-foreground ring-1 ring-foreground/5 has-[>img:first-child]:pt-0 data-[size=sm]:gap-surface-md data-[size=sm]:py-surface-md dark:ring-foreground/10",
+        "group/card flex flex-col gap-surface-lg overflow-hidden bg-card py-surface-lg type-body text-card-foreground ring-1 ring-foreground/5 has-[>img:first-child]:pt-0 data-[size=sm]:gap-surface-md data-[size=sm]:py-surface-md dark:ring-foreground/10",
         ui.elevation.card,
         ui.radius.card,
         uiRadius.surfaceMediaTop,
@@ -53,7 +53,7 @@ function CardDescription({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="card-description"
-      className={cn("text-sm text-muted-foreground", className)}
+      className={cn(uiTypography.muted, className)}
       {...props}
     />
   );

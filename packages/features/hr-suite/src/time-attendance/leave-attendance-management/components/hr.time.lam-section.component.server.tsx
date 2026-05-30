@@ -74,7 +74,7 @@ export function HrLamAccessDeniedPanel() {
 
 export function HrLamWorkbenchSection({ model }: { model: HrLamPageModel }) {
   return (
-    <div className="@container flex flex-col gap-6">
+    <div className="@container flex flex-col gap-surface-lg">
       <HrLamGovernedListSection
         title={hrLamUiCopy.attendanceDays.sectionTitle}
         description={hrLamUiCopy.attendanceDays.emptyDescription}
@@ -137,7 +137,7 @@ export function HrLamWorkbenchSection({ model }: { model: HrLamPageModel }) {
 
 export function HrLeaveWorkbenchSection({ model }: { model: HrLamPageModel }) {
   return (
-    <div className="@container flex flex-col gap-6">
+    <div className="@container flex flex-col gap-surface-lg">
       <HrLamGovernedListSection
         title={hrLamUiCopy.leaveRequests.sectionTitle}
         description={hrLamUiCopy.leaveRequests.emptyDescription}

@@ -486,7 +486,7 @@ export default function MetadataRendererGalleryPage() {
 
       {/* ── Detail tabs ─────────────────────────────────────────────────── */}
       <GallerySection label="Detail tabs — Record detail">
-        <pre className="surface-inset max-h-96 overflow-auto p-surface-lg type-mono-cell text-muted-foreground">
+        <pre className="surface-inset max-h-96 overflow-auto p-surface-lg type-mono-muted">
           {JSON.stringify(detailTabs, null, 2)}
         </pre>
       </GallerySection>

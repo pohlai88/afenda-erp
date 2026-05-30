@@ -127,7 +127,7 @@
 
 **Route:** `/hr/benefits` · **Module:** `@afenda/feature-hr-suite` · **Capabilities:** `hr.benefits.read`, `hr.benefits.write`
 
-Pattern C registry order: benefit plans → eligibility rules → open enrollment windows → enrollments → audit trail (read-only).
+Pattern C registry order: benefit plans → eligibility rules → open enrollment windows → enrollments → providers → audit trail (read-only).
 
 ### HRM-BEN shipment matrix
 
@@ -137,9 +137,9 @@ Pattern C registry order: benefit plans → eligibility rules → open enrollmen
 | HRM-BEN-002 | **Shipped** — `hr_benefit_category` enum + plan schema `category` |
 | HRM-BEN-003 | **Shipped** — `hr_benefit_eligibility_rules` + `upsertHrBenefitEligibilityRuleAction` |
 | HRM-BEN-004 | **Shipped** — `determineHrBenefitEligibility` / `determineHrBenefitEligibilityAction`; `appliesBenefitEligibilityRuleToEmployee()` |
-| HRM-BEN-005 | **Shipped** — `createNewHireBenefitEnrollmentAction` (`enrollment_channel = new_hire`) |
-| HRM-BEN-006 | **Shipped** — `hr_benefit_open_enrollment_windows` + `upsertHrBenefitOpenEnrollmentWindowAction`; open enrollment guard on enroll |
-| HRM-BEN-007 | **Shipped** — `recordHrBenefitLifeEventAction` + `createLifeEventBenefitEnrollmentAction` |
+| HRM-BEN-005 | **Shipped** — `createNewHireBenefitEnrollmentAction` + `HrBenefitsNewHireEnrollmentForm` (`enrollment_channel = new_hire`) |
+| HRM-BEN-006 | **Shipped** — `hr_benefit_open_enrollment_windows` + open enrollment guard on `createHrBenefitEnrollmentAction` |
+| HRM-BEN-007 | **Shipped** — `recordHrBenefitLifeEventAction` + `HrBenefitsLifeEventRecordForm`; life-event enroll via `createHrBenefitEnrollmentAction` with `lifeEventId` |
 
 Enterprise acceptance criteria **1–3, 6–8** are covered by the above (plan create with category/rules; eligibility determination; new hire / open enrollment / life-event enrollment paths).
 
@@ -189,7 +189,7 @@ Enterprise acceptance criteria **1–3, 6–8** are covered by the above (plan c
 
 **Route:** `/hr/benefits` · **Capabilities:** `hr.benefits.read`, `hr.benefits.write`, `hr.benefits.sensitive.read`
 
-Pattern C registry order: benefit plans → eligibility rules → open enrollment windows → enrollments (masked contribution columns without sensitive read) → benefit reports (CSV export) → audit trail (read-only).
+Pattern C registry order: benefit plans → eligibility rules → open enrollment windows → enrollments (masked contribution columns without sensitive read) → providers → benefit reports (CSV export) → audit trail (read-only).
 
 | Code | Status | As-built |
 | ---- | ------ | -------- |

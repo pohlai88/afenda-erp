@@ -1,5 +1,7 @@
 export {
   HrBenefitsEnrollmentCreateForm,
+  HrBenefitsLifeEventRecordForm,
+  HrBenefitsNewHireEnrollmentForm,
 } from "./components/hr.payroll.benefits-enrollment-forms.component.client";
 
 export {

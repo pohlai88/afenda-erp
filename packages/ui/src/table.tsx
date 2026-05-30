@@ -3,7 +3,7 @@
 import * as React from "react";
 
 import { cn } from "./utils";
-import type { uiDensity } from "./design-system";
+import { uiTypography, type uiDensity } from "./design-system";
 
 function Table({
   className,
@@ -112,7 +112,7 @@ function TableCaption({
   return (
     <caption
       data-slot="table-caption"
-      className={cn("mt-4 text-sm text-muted-foreground", className)}
+      className={cn("mt-4", uiTypography.muted, className)}
       {...props}
     />
   );

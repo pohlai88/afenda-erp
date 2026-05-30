@@ -30,7 +30,7 @@ export function DevSignInForm({
       </h2>
       <p
         className={cn(
-          "mt-3 type-body leading-6 text-muted-foreground",
+          "mt-3 type-muted",
           compact && "type-caption leading-5",
         )}
       >

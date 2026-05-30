@@ -50,6 +50,8 @@ export const appCapabilities = [
   "hr.onboarding.write",
   "hr.attendance.read",
   "hr.attendance.write",
+  "hr.fwa.read",
+  "hr.fwa.write",
   "hr.overtime.read",
   "hr.overtime.write",
   "hr.shifts.read",

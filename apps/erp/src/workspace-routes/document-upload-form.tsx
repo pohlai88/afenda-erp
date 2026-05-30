@@ -161,7 +161,7 @@ export function DocumentUploadForm({
             {uploadCopy.titleLabel}
           </span>
           <input
-            className="w-full rounded-section border border-line bg-surface px-3 py-2 type-body text-foreground outline-none transition focus:border-slate-400"
+            className="w-full rounded-section border border-line bg-surface px-3 py-2 type-body text-foreground outline-none transition focus:border-ring"
             maxLength={160}
             name="title"
             placeholder={uploadCopy.titlePlaceholder}
@@ -173,7 +173,7 @@ export function DocumentUploadForm({
             {uploadCopy.ownerEntityLabel}
           </span>
           <input
-            className="w-full rounded-section border border-line bg-surface px-3 py-2 type-body text-foreground outline-none transition focus:border-slate-400"
+            className="w-full rounded-section border border-line bg-surface px-3 py-2 type-body text-foreground outline-none transition focus:border-ring"
             maxLength={160}
             name="ownerEntityId"
             placeholder={uploadCopy.ownerEntityPlaceholder}

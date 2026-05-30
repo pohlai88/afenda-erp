@@ -94,7 +94,7 @@ export function SystemAdminBillingPlanCheckout({
           </Button>
         </div>
       </FieldGroup>
-      <p className="type-caption text-muted-foreground">
+      <p className="type-caption">
         {systemAdminBillingUiCopy.plans.checkoutHint}
       </p>
     </div>

@@ -239,6 +239,20 @@
       "when": 1780127724792,
       "tag": "0033_opposite_junta",
       "breakpoints": true
+    },
+    {
+      "idx": 34,
+      "version": "7",
+      "when": 1780130920338,
+      "tag": "0034_old_jasper_sitwell",
+      "breakpoints": true
+    },
+    {
+      "idx": 35,
+      "version": "7",
+      "when": 1780131144065,
+      "tag": "0035_whole_machine_man",
+      "breakpoints": true
     }
   ]
 }

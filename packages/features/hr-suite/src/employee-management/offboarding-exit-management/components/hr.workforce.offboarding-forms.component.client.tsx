@@ -12,7 +12,7 @@ import { initiateHrOffboardingExitCaseAction } from "../actions/hr.workforce.off
 import { hrOffboardingUiCopy } from "../surface/hr.workforce.offboarding-ui.copy.shared";
 
 const OFFBOARDING_SELECT_CLASS =
-  "border-input bg-background ring-offset-background focus-visible:ring-ring flex h-9 w-full min-w-0 rounded-control border px-3 py-1 text-sm shadow-elevation-1 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50";
+  "border-input bg-background ring-offset-background focus-visible:ring-ring flex h-9 w-full min-w-0 rounded-control border px-3 py-1 type-control shadow-elevation-1 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50";
 
 export function HrOffboardingInitiatePanel({
   employeeOptions,

@@ -4,6 +4,7 @@ import * as React from "react";
 import { Combobox as ComboboxPrimitive } from "@base-ui/react";
 
 import { cn } from "./utils";
+import { uiTypography } from "./design-system";
 import { Button } from "./button";
 import {
   InputGroup,
@@ -196,7 +197,8 @@ function ComboboxEmpty({ className, ...props }: ComboboxPrimitive.Empty.Props) {
     <ComboboxPrimitive.Empty
       data-slot="combobox-empty"
       className={cn(
-        "hidden w-full justify-center py-2 text-center text-sm text-muted-foreground group-data-empty/combobox-content:flex",
+        "hidden w-full justify-center py-2 text-center group-data-empty/combobox-content:flex",
+        uiTypography.muted,
         className,
       )}
       {...props}

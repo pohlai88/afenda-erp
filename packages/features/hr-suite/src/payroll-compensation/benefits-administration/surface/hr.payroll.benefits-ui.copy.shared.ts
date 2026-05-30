@@ -64,6 +64,21 @@ export const hrBenefitsUiCopy = {
     colStatus: "Status",
     colEffectiveFrom: "Effective from",
   },
+  newHireEnrollment: {
+    title: "New hire enrollment",
+    description:
+      "Enroll a newly activated employee into a benefit plan (HRM-BEN-005).",
+    submitLabel: "Create new hire enrollment",
+  },
+  lifeEvent: {
+    title: "Record life event",
+    description:
+      "Record a qualifying life event before life-event enrollment (HRM-BEN-007).",
+    submitLabel: "Record life event",
+    colKind: "Event kind",
+    colEventDate: "Event date",
+    colApprovalReference: "Approval reference",
+  },
   enrollments: {
     surfaceHeaderTitle: "Benefit enrollments",
     searchLabel: "Search enrollments",

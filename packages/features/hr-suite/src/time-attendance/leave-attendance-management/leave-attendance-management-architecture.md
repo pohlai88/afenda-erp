@@ -147,8 +147,39 @@
 | HRM-LAM-007 | Done | `submitHrLeaveApplication` + `submitHrLamLeaveApplicationAction` |
 | HRM-LAM-008 | Done | `requiresSupportingDocument` on type config + request `supportingDocumentId` |
 | HRM-LAM-009 | Done | Balance validation + pending ledger reserve on submit |
-| HRM-LAM-010 | Done | Eligibility validation via entitlement rules + confirmation gate |
+| HRM-LAM-010 | Done | `validateLeaveEligibility` in `hr-lam.ts` (entitlement rules + confirmation gate) — distinct from LAM-011 workflow rules |
+| HRM-LAM-011 | Done | `validateHrLeaveApplicationPolicy` → `validateLeaveApplicationRules` (notice, max days, blackout, overlap) |
+| HRM-LAM-012 | Done | `decideHrLeaveApplication` + approval stages on `hr_leave_requests` |
+| HRM-LAM-013 | Done | `resolveLeaveApprovalRouteFromChain` / `resolveHrLeaveApprovalRouteForEmployee` |
+| HRM-LAM-014 | Done | `decideHrLeaveApplication` (approve, reject, return, request_clarification) |
+| HRM-LAM-015 | Done | `rejection_reason_required` in `decideHrLeaveApplication` |
+| HRM-LAM-016 | Done | Balance ledger updates on approve / cancel / reversal |
+| HRM-LAM-017 | Done | `cancelHrLeaveApplication`, `amendHrLeaveApplication` |
+| HRM-LAM-018 | Done | `adjustHrLeaveBalanceManual` + `adjustHrLeaveBalanceAction` |
+| HRM-LAM-019 | Done | `processHrLeaveCarryForwardForYear` |
+| HRM-LAM-020 | Done | Unpaid leave `payrollDeductionReference` + payroll export commands |
+| HRM-LAM-021 | Done | Medical cert columns on `hr_leave_requests` / `hr_leave_type_configs`; `assertMedicalCertificateWhenRequired` on submit |
+| HRM-LAM-022 | Done | `detectAttendanceExceptions`, `listAttendanceExceptionsWindow`, `regenerateAttendanceDayFromEvents` |
+| HRM-LAM-023 | Done | `hr_attendance_policies.attendance_corrections_enabled`; `submitAttendanceCorrectionForApproval` |
+| HRM-LAM-024 | Done | `hr_attendance_correction_requests` + approve/reject commands + `approveLamAttendanceCorrectionAction` |
+| HRM-LAM-025 | Done | `summarizeHrAttendanceForPeriod` (employee/dept/manager/entity/location groupBy) |
+| HRM-LAM-026 | Done | Payroll refs on days/leave + `listHrLamPayrollReferencesForPeriod` + payroll-refs list surface |
+| HRM-LAM-027 | Done | `hr.time.lam-access.policy.server.ts` + `resolveEmployeeIdsVisibleToActor` scoped reads |
+| HRM-LAM-028 | Done | `hr_lam_notifications` + `enqueueHrLamNotification` on correction/exception actions |
+| HRM-LAM-029 | Done | Reports list surface + summary/exception windows by period |
+| HRM-LAM-030 | Done | `hr.time.attendance.lam.event.ts` audit actions + execution audit trail list surface |
 
 Feature slice: `packages/features/hr-suite/src/time-attendance/leave-attendance-management/`  
-DB commands: `packages/db/src/hr-lam.ts`  
-Migration: `packages/db/drizzle/0031_*` (generated)
+DB commands: `packages/db/src/hr-lam.ts`, `packages/db/src/hr-lam-advanced.ts`, `packages/db/src/hr-lam-workflow.ts`  
+ERP adapters: `apps/erp/src/lib/hr-sections/{leave-attendance,leave,attendance}.server.tsx`  
+Migration: `packages/db/drizzle/0031_*`, `0032_*`, `0033_opposite_junta` (journal); remove orphan duplicate SQL files if present
+
+**Metadata registry:** `HR_LAM_LIST_SURFACE_KEYS` (8 Pattern C surfaces), searchable params via `HR_LAM_LIST_SEARCH_PARAM_MODEL_FIELDS` → `buildHrLamPageModel`. Guarded by `leaveattendancemanagement-workbench-metadata.test.ts`.
+
+### Manager approval identity
+
+Leave decisions resolve approver authority in `resolveHrLeaveApproverContext` (`hr.time.leave-access.policy.server.ts`): `actorCanHrApprove` when the actor holds `hr.leave.write`; `actorManagerEmployeeIds` from `resolveHrEmployeeIdsForAuthUser` (auth profile email ↔ `hr_employees.email`). DB command `decideHrLeaveApplication` enforces stage routing against `policySnapshot.route.managerEmployeeIds`.
+
+### Migration drift (operator)
+
+If `pnpm db:migrate` fails with `type "hr_attendance_day_state" already exists`, the physical enum predates the Drizzle journal entry on that database. **Do not hand-edit migration SQL.** Reconcile the ledger only (record migration `0031_youthful_celestials` in `__drizzle_migrations` after verifying objects exist) or reset the dev branch. Re-run `pnpm db:migrate` after ledger alignment.

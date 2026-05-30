@@ -31,6 +31,7 @@
     "@afenda/governed-surface": "workspace:*",
     "@afenda/kernel": "workspace:*",
     "@afenda/ui": "workspace:*",
+    "drizzle-orm": "catalog:",
     "zod": "catalog:"
   },
   "scripts": {
