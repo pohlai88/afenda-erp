@@ -1,5 +1,6 @@
 /**
- * Validates shipped HR feature vertical slices follow system-admin naming discipline.
+ * Validates shipped HR vertical slices: naming discipline + compliance reference-slice pattern.
+ * Golden path: employee-management/compliance-regulatory-tracking (rule afenda-hr-reference-slice).
  * Run: pnpm exec tsx packages/features/hr-suite/scripts/check-hr-feature-vertical-naming.mts
  */
 import fs from "node:fs";
@@ -8,11 +9,21 @@ import { fileURLToPath } from "node:url";
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 const srcDir = path.join(root, "src");
+const testsDir = path.join(root, "tests", "unit");
 
 /** Capability folders with as-built implementation (expand as slices ship). */
-const SHIPPED_CAPABILITIES = [
+export const SHIPPED_CAPABILITIES = [
   "employee-management/compliance-regulatory-tracking",
+  "employee-management/documents-management",
+  "employee-management/employee-lifecycle-management",
+  "employee-management/offboarding-exit-management",
+  "employee-management/employee-records-management",
+  "employee-management/organizational-chart-hierarchy",
 ] as const;
+
+/** Canonical slice agents must clone — do not delete while other slices ship. */
+export const HR_REFERENCE_SLICE_CAPABILITY =
+  "employee-management/compliance-regulatory-tracking" as const;
 
 const DOOR_FILES = new Set([
   "server.ts",
@@ -33,7 +44,7 @@ const REQUIRED_BUCKETS = [
 ] as const;
 
 const IMPLEMENTATION_FILE =
-  /^hr\.[a-z0-9]+(?:\.[a-z0-9-]+)*\.[a-z0-9-]+\.(?:actions\.server|policy\.server|page-model\.server|surface|shared|schema|contract|event|component\.(?:client|server))\.tsx?$/;
+  /^hr\.[a-z0-9]+(?:\.[a-z0-9-]+)*\.[a-z0-9-]+\.(?:actions\.server|policy\.server|page-model\.server|shared\.server|surface|shared|schema|contract|event|component\.(?:client|server))\.tsx?$/;
 
 const problems: string[] = [];
 
@@ -108,10 +119,98 @@ function validateCapability(capabilityRel: string) {
       problems.push(`${capabilityRel}: surface/ bucket has no surface or copy files`);
     }
   }
+
+  validateReferenceSlicePattern(capabilityRel, capabilityDir);
+}
+
+function fileExistsMatching(dir: string, pattern: RegExp): boolean {
+  if (!fs.existsSync(dir)) return false;
+  return fs.readdirSync(dir).some((name) => pattern.test(name));
+}
+
+function readFileIfExists(filePath: string): string {
+  if (!fs.existsSync(filePath)) return "";
+  return fs.readFileSync(filePath, "utf8");
+}
+
+/** Pattern learned from compliance-regulatory-tracking (see docs/hr-reference-slice-checklist.md). */
+function validateReferenceSlicePattern(
+  capabilityRel: string,
+  capabilityDir: string,
+) {
+  const slug = path.basename(capabilityDir);
+  const archPath = path.join(capabilityDir, `${slug}-architecture.md`);
+  const archBody = readFileIfExists(archPath);
+
+  if (!archBody.includes("## As-built summary")) {
+    problems.push(
+      `${capabilityRel}: ${slug}-architecture.md must include "## As-built summary" (copy compliance doc structure)`,
+    );
+  }
+
+  const requiredRelative = [
+    ["policies", /-access\.policy\.server\.ts$/],
+    ["data", /\.page-model\.server\.ts$/],
+    ["data", /search-params\.parse\.shared\.ts$/],
+    ["surface", /-surface-metadata\.shared\.ts$/],
+    ["surface", /-ui\.copy\.shared\.ts$/],
+    ["components", /-section\.component\.server\.tsx$/],
+  ] as const;
+
+  for (const [bucket, pattern] of requiredRelative) {
+    const bucketDir = path.join(capabilityDir, bucket);
+    if (!fileExistsMatching(bucketDir, pattern)) {
+      problems.push(
+        `${capabilityRel}: missing reference-slice file in ${bucket}/ matching ${pattern}`,
+      );
+    }
+  }
+
+  const metadataPath = path.join(capabilityDir, "metadata.ts");
+  const metadataBody = readFileIfExists(metadataPath);
+  if (!metadataBody.includes("surface-metadata")) {
+    problems.push(
+      `${capabilityRel}: metadata.ts must re-export surface registry (see compliance metadata.ts)`,
+    );
+  }
+
+  const surfaceMetaDir = path.join(capabilityDir, "surface");
+  const registryFile = fs.existsSync(surfaceMetaDir)
+    ? fs
+        .readdirSync(surfaceMetaDir)
+        .find((name) => name.endsWith("-surface-metadata.shared.ts"))
+    : undefined;
+  if (registryFile) {
+    const registryBody = readFileIfExists(
+      path.join(surfaceMetaDir, registryFile),
+    );
+    if (!/_LIST_SURFACE_KEYS/.test(registryBody)) {
+      problems.push(
+        `${capabilityRel}: surface registry must export *_LIST_SURFACE_KEYS (ARCH-006 workbench registry)`,
+      );
+    }
+  }
+
+  const slugToken = slug.replace(/-regulatory-tracking$/, "").replace(/-/g, "");
+  const testPrefix = slug.includes("compliance") ? "compliance" : slugToken;
+  const testFiles = fs.existsSync(testsDir)
+    ? fs.readdirSync(testsDir).filter((name) => name.includes(testPrefix))
+    : [];
+  if (testFiles.length < 3) {
+    problems.push(
+      `${capabilityRel}: expected at least 3 Vitest files under tests/unit/*${testPrefix}* (registry, search-params, list contract)`,
+    );
+  }
 }
 
 for (const capability of SHIPPED_CAPABILITIES) {
   validateCapability(capability);
+}
+
+if (!fs.existsSync(path.join(srcDir, HR_REFERENCE_SLICE_CAPABILITY))) {
+  problems.push(
+    `Missing HR reference slice directory: ${HR_REFERENCE_SLICE_CAPABILITY} (required golden path)`,
+  );
 }
 
 if (problems.length > 0) {

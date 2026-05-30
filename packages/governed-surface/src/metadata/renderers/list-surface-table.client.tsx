@@ -2,7 +2,6 @@
 
 import {
   Fragment,
-  useEffect,
   useMemo,
   useRef,
   useState,
@@ -263,51 +262,6 @@ export function ListSurfaceTableClient({
     new Set(),
   );
   const chromeXClass = listSurfaceChromeXClass(density);
-
-  useEffect(() => {
-    if (presentationVariant !== "table-only" || rows.length === 0) {
-      return;
-    }
-
-    const outer = scrollRef.current?.closest("[data-testid]");
-    const shell = outer?.querySelector('[class*="group/list-chrome"]');
-    if (!(outer instanceof HTMLElement) || !(shell instanceof HTMLElement)) {
-      return;
-    }
-
-    const outerStyle = getComputedStyle(outer);
-    const shellStyle = getComputedStyle(shell);
-
-    // #region agent log
-    fetch("http://127.0.0.1:7922/ingest/b7d5f191-1853-4442-9c5d-aeba930a6ba2", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Debug-Session-Id": "98eee7",
-      },
-      body: JSON.stringify({
-        sessionId: "98eee7",
-        runId: "table-chrome-post-fix-v2",
-        hypothesisId: "H2-nested-scroll-clip",
-        location: "list-surface-table.client.tsx:chrome-verify",
-        message: "List table chrome layer metrics",
-        data: {
-          surfaceKey: surfaceKey ?? null,
-          outerBoxShadow: outerStyle.boxShadow,
-          outerBorderRadius: outerStyle.borderRadius,
-          shellBoxShadow: shellStyle.boxShadow,
-          shellBorderRadius: shellStyle.borderRadius,
-          shellOverflowX: shellStyle.overflowX,
-          shellOverflowY: shellStyle.overflowY,
-          viewportOverflowX: scrollRef.current
-            ? getComputedStyle(scrollRef.current).overflowX
-            : null,
-        },
-        timestamp: Date.now(),
-      }),
-    }).catch(() => {});
-    // #endregion
-  }, [presentationVariant, rows.length, surfaceKey]);
 
   const visibleColumns = useMemo(
     () => columns.filter((column) => !hiddenColumns.has(column.id)),

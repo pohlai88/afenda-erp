@@ -23,6 +23,7 @@ const auditEntityTypeByTargetType: Record<string, AuditEntityType> = {
   "user-profile": "user-profile",
   record: "erp-record",
   "erp-record": "erp-record",
+  hr_compliance: "system",
   "workflow-item": "workflow-item",
   "saved-view": "saved-view",
   document: "document",

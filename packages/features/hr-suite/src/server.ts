@@ -6,31 +6,12 @@ import { SectionPanel } from "@afenda/ui";
  * Public server door for feature packages.
  * Re-export from actions/, data/, events/, policies/.
  */
-export * from "./metadata";
-
-export {
-  HrComplianceAccessDenied,
-  HrComplianceAccessDeniedPanel,
-  HrComplianceOrganizationScopeError,
-  HrComplianceSection,
-  HrComplianceWorkbenchSection,
-  archiveHrComplianceObligationAction,
-  assignHrComplianceCorrectiveActionAction,
-  buildHrCompliancePageModel,
-  createHrComplianceExceptionAction,
-  ensureHrWorkEligibilityTrackingAction,
-  loadComplianceFormOptions,
-  parseHrComplianceSearchParams,
-  requireHrComplianceRead,
-  requireHrComplianceWrite,
-  resolveHrComplianceExceptionAction,
-  syncHrEmployeeLaborLawRequirementsAction,
-  updateHrComplianceCorrectiveActionProgressAction,
-  updateHrEmployeeLaborLawRequirementAction,
-  updateHrWorkEligibilityAction,
-  upsertHrComplianceObligationAction,
-  waiveHrComplianceExceptionAction,
-} from "./employee-management/compliance-regulatory-tracking/server";
+export * from "./employee-management/compliance-regulatory-tracking/server";
+export * from "./employee-management/documents-management/server";
+export * from "./employee-management/employee-lifecycle-management/server";
+export * from "./employee-management/offboarding-exit-management/server";
+export * from "./employee-management/employee-records-management/server";
+export * from "./employee-management/organizational-chart-hierarchy/server";
 
 export { requireHrRead } from "./policies/hr-module-access.policy.server";
 
@@ -64,34 +45,10 @@ export function HrAttendanceAccessDenied() {
     description: "Attendance is not available.",
   });
 }
-export function HrDocumentsAccessDenied() {
-  return React.createElement(EmptyState, {
-    title: "Access restricted",
-    description: "Documents are not available.",
-  });
-}
-export function HrEmployeesAccessDenied() {
-  return React.createElement(EmptyState, {
-    title: "Access restricted",
-    description: "Employees are not available.",
-  });
-}
-export function HrLifecycleAccessDenied() {
-  return React.createElement(EmptyState, {
-    title: "Access restricted",
-    description: "Lifecycle is not available.",
-  });
-}
 export function HrLeaveAccessDenied() {
   return React.createElement(EmptyState, {
     title: "Access restricted",
     description: "Leave is not available.",
-  });
-}
-export function HrOffboardingAccessDenied() {
-  return React.createElement(EmptyState, {
-    title: "Access restricted",
-    description: "Offboarding is not available.",
   });
 }
 export function HrOnboardingAccessDenied() {
@@ -116,26 +73,14 @@ export function HrShiftsAccessDenied() {
 export function HrAttendanceSection(_props: any) {
   return React.createElement(EmptyState, { title: "Attendance" });
 }
-export function HrDocumentsSection(_props: any) {
-  return React.createElement(EmptyState, { title: "Documents" });
-}
-export function HrEmployeesSection(_props: any) {
-  return React.createElement(EmptyState, { title: "Employees" });
-}
 export function HrEmployeeCreateSection(_props: any) {
   return React.createElement(EmptyState, { title: "Add employee" });
 }
 export function HrEmployeeDetailSection(_props: any) {
   return React.createElement(EmptyState, { title: "Employee detail" });
 }
-export function HrLifecycleSection(_props: any) {
-  return React.createElement(EmptyState, { title: "Lifecycle" });
-}
 export function HrLeaveSection(_props: any) {
   return React.createElement(EmptyState, { title: "Leave" });
-}
-export function HrOffboardingSection(_props: any) {
-  return React.createElement(EmptyState, { title: "Offboarding" });
 }
 export function HrOnboardingSection(_props: any) {
   return React.createElement(EmptyState, { title: "Onboarding" });
@@ -156,30 +101,11 @@ export function HrShiftsSection(_props: any) {
   return React.createElement(EmptyState, { title: "Shifts" });
 }
 
-export async function requireHrEmployeesRead() {
-  denied();
-  return { organization: { id: "" }, canWrite: false, canViewLifecycle: false };
-}
-export async function requireHrEmployeesWrite() {
-  denied();
-}
 export async function requireHrAttendanceRead() {
   denied();
   return { organization: { id: "" }, canWrite: false };
 }
-export async function requireHrDocumentsRead() {
-  denied();
-  return { organization: { id: "" }, canWrite: false };
-}
-export async function requireHrLifecycleRead() {
-  denied();
-  return { organization: { id: "" }, canWrite: false };
-}
 export async function requireHrLeaveRead() {
-  denied();
-  return { organization: { id: "" }, canWrite: false };
-}
-export async function requireHrOffboardingRead() {
   denied();
   return { organization: { id: "" }, canWrite: false };
 }
@@ -196,29 +122,13 @@ export async function requireHrShiftsRead() {
   return { organization: { id: "" }, canWrite: false };
 }
 
-export async function buildHrEmployeesPageModel(_args: any) {
-  denied();
-  return { window: { rows: [] }, searchValue: "" };
-}
 export async function buildHrAttendancePageModel(_args: any) {
-  denied();
-  return { window: { rows: [] }, searchValue: "" };
-}
-export async function buildHrDocumentsPageModel(_args: any) {
-  denied();
-  return { window: { rows: [] }, searchValue: "", requirements: [] };
-}
-export async function buildHrLifecyclePageModel(_args: any) {
   denied();
   return { window: { rows: [] }, searchValue: "" };
 }
 export async function buildHrLeavePageModel(_args: any) {
   denied();
   return { window: { rows: [] }, pendingWindow: { rows: [] }, searchValue: "" };
-}
-export async function buildHrOffboardingPageModel(_args: any) {
-  denied();
-  return { window: { rows: [] }, searchValue: "", clearanceItems: [] };
 }
 export async function buildHrOnboardingPageModel(_args: any) {
   denied();
@@ -239,10 +149,6 @@ export async function buildHrShiftsPageModel(_args: any) {
   };
 }
 
-export async function listHrEmployeeDirectory(_args: any) {
-  denied();
-  return { rows: [] as Array<{ id: string; employeeNumber: string; displayName: string }> };
-}
 export async function loadHrOnboardingFormOptions(_organizationId?: string) {
   denied();
   return { employees: [] as Array<{ id: string; label: string }>, checklistItems: [] as any[] };
@@ -250,10 +156,6 @@ export async function loadHrOnboardingFormOptions(_organizationId?: string) {
 export async function loadHrEmployeeFormOptions(_args?: any) {
   denied();
   return {};
-}
-export async function getHrEmployeeDetail(_args: any) {
-  denied();
-  return null as any;
 }
 export async function listHrEmployeeLifecycleEvents(_args: any) {
   denied();

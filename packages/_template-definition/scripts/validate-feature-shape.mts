@@ -142,10 +142,7 @@ if (rel.startsWith("apps/erp/src/")) {
   validateAppPath(rel);
 }
 
-if (
-  rel.includes("employee-management/compliance-regulatory-tracking/") &&
-  isFeaturePath(rel)
-) {
+if (rel.includes("employee-management/") && isFeaturePath(rel)) {
   const script = path.join(
     root,
     "packages/features/hr-suite/scripts/check-hr-feature-vertical-naming.mts",

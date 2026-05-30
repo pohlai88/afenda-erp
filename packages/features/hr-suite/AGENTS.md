@@ -10,7 +10,12 @@ Scaffold default: `packages/_template-definition`.
 
 ## Vertical slices (shipped capabilities)
 
-Implemented capabilities use the same bucket layout as `@afenda/feature-system-admin` under `src/<category>/<capability>/` with slice doors (`server.ts`, `client.ts`, `metadata.ts`). File prefix: `hr.<domain>.*` (e.g. `hr.workforce.compliance.actions.server.ts`). List surfaces live in `surface/`, not `data/`. See rule `afenda-hr-feature-vertical` and `scripts/check-hr-feature-vertical-naming.mts`.
+**Golden path:** copy `src/employee-management/compliance-regulatory-tracking/` for every new shipped capability — not legacy `@afenda/feature-hr` layouts.
+
+- Cursor rules: `afenda-hr-reference-slice` (pattern), `afenda-hr-feature-vertical` (naming/buckets)
+- Checklist: `docs/hr-reference-slice-checklist.md`
+- CI guard: `scripts/check-hr-feature-vertical-naming.mts` (`SHIPPED_CAPABILITIES` + reference-slice pattern)
+- File prefix: `hr.<domain>.*` (e.g. `hr.workforce.compliance.actions.server.ts`); list surfaces in `surface/`, not `data/`
 
 ## Buckets
 - `src/actions/`
