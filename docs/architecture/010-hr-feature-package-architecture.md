@@ -49,6 +49,19 @@ Add category folders when a slice ships; do not create nested `package.json` wor
 3. Resolve tenant scope from server session only; enforce capabilities at mutations and sensitive reads.
 4. Lists use governed Pattern C server windows — never ship full datasets for client pagination.
 
+## Reference slice (golden path)
+
+Shipped HR capabilities under `src/<category>/<capability-slug>/` must follow the **compliance-regulatory-tracking** vertical slice (not legacy `@afenda/feature-hr` or ad-hoc layouts).
+
+| Artifact | Location |
+| -------- | -------- |
+| Canonical implementation | `packages/features/hr-suite/src/employee-management/compliance-regulatory-tracking/` |
+| Agent rule | `.cursor/rules/afenda-hr-reference-slice.mdc` |
+| Human checklist | `packages/features/hr-suite/docs/hr-reference-slice-checklist.md` |
+| CI guard | `packages/features/hr-suite/scripts/check-hr-feature-vertical-naming.mts` (`SHIPPED_CAPABILITIES` + pattern checks) |
+
+New slices (e.g. `documents-management`) stay scaffold-only until they pass the checklist and are added to `SHIPPED_CAPABILITIES`.
+
 ## Current state
 
-Scaffold only: metadata delegates to `@afenda/kernel` generic module workspace (`erp_module_records`). No `packages/db/src/schema/hr` until the first accepted schema slice. Migration `0030_revert_hr_migration_tables` removes tables from the withdrawn `0027` / `0029` attempt.
+Compliance workbench is shipped at `/hr/compliance` (see capability `compliance-regulatory-tracking-architecture.md`). Other HR sections may still use package-root compatibility stubs until their slice ships. Physical HR schema lives in `@afenda/db` per accepted TRACK-004 slices.

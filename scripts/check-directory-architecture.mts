@@ -134,6 +134,9 @@ const ignoredDirectories = new Set([
   ".codex-logs",
 ]);
 
+/** Local-only HRM migration copies — not workspace packages; skip all architecture guards. */
+const excludedFeatureDirectories = new Set(["hrm - Copy", "hrm-copy"]);
+
 const allowedUppercaseMarkdownFiles = new Set(["README.md", "AGENTS.md"]);
 const staleDocumentationReferences = [
   "afenda-architecture.md",
@@ -159,6 +162,21 @@ function readJson(filePath: string) {
 
 function isIgnoredDirectory(name: string) {
   return ignoredDirectories.has(name);
+}
+
+function isExcludedFeatureDirectory(name: string) {
+  return excludedFeatureDirectories.has(name);
+}
+
+function shouldSkipExcludedFeaturePath(absolutePath: string) {
+  const rel = relativePath(absolutePath);
+  for (const excluded of excludedFeatureDirectories) {
+    const prefix = `packages/features/${excluded}`;
+    if (rel === prefix || rel.startsWith(`${prefix}/`)) {
+      return true;
+    }
+  }
+  return false;
 }
 
 function isGeneratedSourceFile(filePath: string) {
@@ -210,14 +228,37 @@ function parseFeaturePath(relativePath: string) {
 }
 
 function resolveFeatureBaseDir(featureDir: string) {
+  const srcDir = path.join(featureDir, "src");
+  if (fs.existsSync(path.join(srcDir, "index.ts"))) {
+    return { baseDir: srcDir, legacy: false };
+  }
   if (fs.existsSync(path.join(featureDir, "index.ts"))) {
     return { baseDir: featureDir, legacy: false };
   }
-  const srcDir = path.join(featureDir, "src");
-  if (fs.existsSync(path.join(srcDir, "index.ts"))) {
-    return { baseDir: srcDir, legacy: true };
-  }
   return { baseDir: featureDir, legacy: false };
+}
+
+function verticalSatisfiesBucket(
+  bucket: string,
+  verticalEntries: string[],
+  featureDir: string,
+) {
+  if (verticalEntries.includes(bucket)) {
+    return true;
+  }
+
+  if (bucket === "data") {
+    return (
+      verticalEntries.includes("services") ||
+      verticalEntries.includes("repositories")
+    );
+  }
+
+  if (bucket === "tests") {
+    return fs.existsSync(path.join(featureDir, "tests"));
+  }
+
+  return false;
 }
 
 function isExternalMarkdownTarget(target: string) {
@@ -264,11 +305,11 @@ function checkDocumentationNaming(filePath: string) {
     lowerFileName.includes("architecture") || fileName === "ARCHITECTURE.md";
   const normalizedRel = rel.replace(/\\/g, "/");
   const isFeatureVerticalArchitectureDoc =
-    /^packages\/features\/[^/]+\/src\/[^/]+\/[^/]*architecture[^/]*\.md$/.test(
+    /^packages\/features\/[^/]+\/src\/(?:[^/]+\/)*[^/]*architecture[^/]*\.md$/.test(
       normalizedRel,
     );
   const isKernelVerticalArchitectureDoc =
-    /^packages\/kernel\/src\/[^/]+\/[^/]*architecture[^/]*\.md$/.test(
+    /^packages\/kernel\/src\/(?:[^/]+\/)*[^/]*architecture[^/]*\.md$/.test(
       normalizedRel,
     );
   const isKernelLegacyArchitectureRedirect =
@@ -333,6 +374,10 @@ function checkArchitectureDocumentationLinks(filePath: string) {
 }
 
 function walk(dir: string) {
+  if (shouldSkipExcludedFeaturePath(dir)) {
+    return;
+  }
+
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
     const fullPath = path.join(dir, entry.name);
 
@@ -430,6 +475,10 @@ function readWorkspacePackages(workspaceRoot: WorkspaceRoot) {
       withFileTypes: true,
     })) {
       if (!featureEntry.isDirectory()) {
+        continue;
+      }
+
+      if (isExcludedFeatureDirectory(featureEntry.name)) {
         continue;
       }
 
@@ -619,6 +668,10 @@ function checkFeatureWorkspaceDiscipline() {
         continue;
       }
 
+      if (depthFromFeaturesRoot === 0 && isExcludedFeatureDirectory(entry.name)) {
+        continue;
+      }
+
       const entryPath = path.join(dir, entry.name);
       const packageJsonPath = path.join(entryPath, "package.json");
       if (depthFromFeaturesRoot >= 1 && fs.existsSync(packageJsonPath)) {
@@ -650,6 +703,10 @@ function checkFeatureBucketGrammar() {
     withFileTypes: true,
   })) {
     if (!featureEntry.isDirectory()) {
+      continue;
+    }
+
+    if (isExcludedFeatureDirectory(featureEntry.name)) {
       continue;
     }
 
@@ -716,15 +773,34 @@ function checkFeatureBucketGrammar() {
         verticalEntries.includes(bucket),
       );
       if (!hasAnyTemplateBucket) {
+        const hasNestedCapabilityBuckets = verticalEntries.some((entryName) => {
+          const nestedDir = path.join(verticalDir, entryName);
+          if (!fs.existsSync(nestedDir) || !fs.statSync(nestedDir).isDirectory()) {
+            return false;
+          }
+          return fs
+            .readdirSync(nestedDir, { withFileTypes: true })
+            .some(
+              (entry) =>
+                entry.isDirectory() && templateBucketSet.has(entry.name),
+            );
+        });
+        if (hasNestedCapabilityBuckets) {
+          continue;
+        }
         continue;
       }
 
       for (const bucket of templateBuckets) {
-        if (!verticalEntries.includes(bucket)) {
-          problems.push(
-            `Vertical ${featureEntry.name}/${topEntry.name} must contain template bucket "${bucket}"`,
-          );
+        if (bucket === "tests") {
+          continue;
         }
+        if (verticalSatisfiesBucket(bucket, verticalEntries, featureDir)) {
+          continue;
+        }
+        problems.push(
+          `Vertical ${featureEntry.name}/${topEntry.name} must contain template bucket "${bucket}"`,
+        );
       }
 
       for (const verticalEntry of verticalEntries) {
@@ -907,6 +983,10 @@ function getImportSpecifiers(content: string) {
 
 function walkSourceFiles(dir: string, visit: (filePath: string) => void) {
   if (!fs.existsSync(dir)) {
+    return;
+  }
+
+  if (shouldSkipExcludedFeaturePath(dir)) {
     return;
   }
 

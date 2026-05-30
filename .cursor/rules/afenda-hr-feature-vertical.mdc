@@ -6,7 +6,7 @@ alwaysApply: false
 
 # HR feature vertical slices (`@afenda/feature-hr-suite`)
 
-**ARCH-010** (HR package) · **ARCH-002** · **ARCH-008**. Reference implementation: `@afenda/feature-system-admin` (rule `afenda-system-admin`).
+**ARCH-010** (HR package) · **ARCH-002** · **ARCH-008**. **Golden path:** `employee-management/compliance-regulatory-tracking` (rule **`afenda-hr-reference-slice`**). Folder/naming discipline also mirrors `@afenda/feature-system-admin`.
 
 ## Shipped capability layout
 
@@ -74,4 +74,4 @@ pnpm architecture:check
 pnpm lint:governed-renderers   # when surfaces change
 ```
 
-Guard runs in `pnpm architecture:check` and via `validate-feature-shape` hooks on edit.
+Guard runs in `pnpm architecture:check` and via `validate-feature-shape` hooks on edit. Shipped slices must pass reference-slice pattern checks (registry, page model, architecture as-built) — see **`afenda-hr-reference-slice`** and `docs/hr-reference-slice-checklist.md`.

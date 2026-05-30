@@ -24,6 +24,8 @@ Canonical index: `docs/architecture/README.md` (`ARCH-001`–`ARCH-011`; **ARCH-
 | `packages/db/**`                                                    | `afenda-database`         | **ARCH-005**, **ARCH-002** (ownership) |
 | `packages/governed-surface/**` or domain `*surface*` / `*metadata*` | `afenda-governed-ui`      | **ARCH-006**, **ARCH-007**             |
 | `packages/features/**` (other modules)                            | `afenda-feature-packages` | **ARCH-008**, **ARCH-002**, **ARCH-004** |
+| `packages/features/hr-suite/src/**/employee-management/**`      | `afenda-hr-reference-slice` | **ARCH-010**, compliance golden slice + `docs/hr-reference-slice-checklist.md` |
+| `apps/erp/src/lib/hr-sections/**`                                 | `afenda-hr-reference-slice` | **ARCH-001** thin adapters only |
 | `packages/kernel/src/execution-kernel/**`                           | `afenda-core`             | **ARCH-002** §5, **ARCH-011** (boundary) |
 | `packages/config/src/next.ts` (transpile list)                      | `afenda-core`             | **ARCH-008** (app ↔ transpile sync)    |
 | `scripts/check-directory-architecture.mts`                          | —                         | **ARCH-003**, **ARCH-008**             |

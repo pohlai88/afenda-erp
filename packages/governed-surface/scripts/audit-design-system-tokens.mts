@@ -53,7 +53,18 @@ type Violation = {
 
 const RULES: Rule[] = [
   {
-    id: "no-raw-z-numeric",
+    id: "no-text-fill-token",
+    severity: "error",
+    description:
+      "text-{fill} uses a surface/background token as ink — nearly invisible on light backgrounds",
+    // Core shadcn footguns only. Excludes text-background (valid inverse on code blocks)
+    // and compound tokens like text-sidebar-accent-foreground.
+    pattern: /\btext-(muted|accent|secondary|card|popover)(?![\w-])/g,
+    suggestion:
+      "text-muted-foreground | text-accent-foreground | type-muted | type-caption  (never text-muted for copy)",
+    fileFilter: /\.tsx$/,
+  },
+  {
     severity: "error",
     description: "Raw numeric z-index class (numeric or bracket form)",
     // Catches z-10, z-50, z-[1], z-[999]

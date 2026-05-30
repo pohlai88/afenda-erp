@@ -37,20 +37,30 @@ const ROUTES = [
   },
   {
     test: (p) =>
-      p.startsWith("packages/features/hr-suite/") &&
-      p.includes("compliance-regulatory-tracking/"),
+      p.startsWith("apps/erp/src/lib/hr-sections/") ||
+      p === "apps/erp/src/lib/hr-sections/manifest.shared.ts",
     hint: [
-      "**HR compliance vertical** — rule `afenda-hr-feature-vertical` (mirrors system-admin).",
-      "Prefix files `hr.workforce.compliance.*`; list surfaces in `surface/`; audit in `events/`.",
-      "Doors: server (I/O), client (components), metadata (surfaces/copy only).",
-      "Before done: `pnpm exec tsx packages/features/hr-suite/scripts/check-hr-feature-vertical-naming.mts`.",
+      "**HR section adapter** — rules `afenda-hr-reference-slice` + `afenda-erp-app`.",
+      "Thin guard → page model → workbench only; register slug in `manifest.shared.ts`.",
+      "Clone `compliance.server.tsx`; behavior lives in `@afenda/feature-hr-suite`.",
+    ].join(" "),
+  },
+  {
+    test: (p) =>
+      p.startsWith("packages/features/hr-suite/") &&
+      p.includes("employee-management/"),
+    hint: [
+      "**HR employee-management slice** — rules `afenda-hr-reference-slice` (golden path) + `afenda-hr-feature-vertical`.",
+      "Clone `compliance-regulatory-tracking/` (seven layers, registry-driven Pattern C).",
+      "Checklist: `packages/features/hr-suite/docs/hr-reference-slice-checklist.md`.",
+      "Before ship: add to SHIPPED_CAPABILITIES + `pnpm exec tsx packages/features/hr-suite/scripts/check-hr-feature-vertical-naming.mts`.",
     ].join(" "),
   },
   {
     test: (p) => p.startsWith("packages/features/hr-suite/"),
     hint: [
-      "**@afenda/feature-hr-suite** — rule `afenda-hr-feature-vertical` + `afenda-feature-packages`.",
-      "Doctrine: **ARCH-010**, **ARCH-008**. Shipped slices use `hr.<domain>.*` file naming like system-admin.",
+      "**@afenda/feature-hr-suite** — rules `afenda-hr-reference-slice`, `afenda-hr-feature-vertical`, `afenda-feature-packages`.",
+      "Doctrine: **ARCH-010**, **ARCH-008**. New workbenches: copy compliance slice, not legacy hr or ad-hoc layouts.",
       "Before done: `pnpm architecture:check`; `pnpm --filter @afenda/feature-hr-suite test`.",
     ].join(" "),
   },
