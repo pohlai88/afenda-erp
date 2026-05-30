@@ -66,11 +66,25 @@ const permissionCatalog = [
       "Read people operations summaries and workforce exception state.",
   },
   {
+    key: "hr.employees.read",
+    module: "hr",
+    label: "View workforce employees",
+    description:
+      "Read employee master profiles, directory registers, and assignment history.",
+  },
+  {
     key: "hr.employees.write",
     module: "hr",
     label: "Manage workforce employees",
     description:
       "Create, update, archive employees and record placement assignments.",
+  },
+  {
+    key: "hr.employees.sensitive.read",
+    module: "hr",
+    label: "View sensitive employee fields",
+    description:
+      "Read masked-sensitive employee contact and identity fields in master profiles.",
   },
   {
     key: "hr.documents.read",
@@ -86,6 +100,13 @@ const permissionCatalog = [
       "Register, verify, and archive employee document metadata in the vault.",
   },
   {
+    key: "hr.documents.sensitive.read",
+    module: "hr",
+    label: "View sensitive HR documents",
+    description:
+      "Read confidential or restricted document titles and download protected artifacts.",
+  },
+  {
     key: "hr.lifecycle.read",
     module: "hr",
     label: "View HR lifecycle",
@@ -98,6 +119,20 @@ const permissionCatalog = [
     label: "Manage HR lifecycle",
     description:
       "Record status changes, probation outcomes, and employee movements.",
+  },
+  {
+    key: "hr.org.read",
+    module: "hr",
+    label: "View HR organization",
+    description:
+      "Read organization units, positions, reporting lines, and org chart structure.",
+  },
+  {
+    key: "hr.org.write",
+    module: "hr",
+    label: "Manage HR organization",
+    description:
+      "Create and update organization units, positions, and reporting relationships.",
   },
   {
     key: "hr.offboarding.read",
@@ -123,6 +158,13 @@ const permissionCatalog = [
     label: "Manage HR compliance",
     description:
       "Register obligations, log exceptions, and resolve compliance items.",
+  },
+  {
+    key: "hr.compliance.sensitive.read",
+    module: "hr",
+    label: "View sensitive HR compliance records",
+    description:
+      "Read identity numbers, restricted evidence titles, and sensitive compliance review notes.",
   },
   {
     key: "hr.leave.read",
