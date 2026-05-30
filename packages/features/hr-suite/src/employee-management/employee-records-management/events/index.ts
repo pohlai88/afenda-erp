@@ -1,5 +1,5 @@
-/**
- * @afenda-bucket events
- * Scaffold placeholder from packages/_template-definition.
- */
-export {};
+export {
+  hrRecordsAuditActions,
+  hrRecordsAuditActionsLegacy,
+  type HrRecordsAuditAction,
+} from "./hr.workforce.records.event";

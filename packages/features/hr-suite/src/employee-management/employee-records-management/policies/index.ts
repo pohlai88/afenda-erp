@@ -1,5 +1,2 @@
-/**
- * @afenda-bucket policies
- * Scaffold placeholder from packages/_template-definition.
- */
-export {};
+export { requireHrRecordsRead, requireHrRecordsWrite, requireHrRecordsSensitiveWrite } from "./hr.workforce.records-access.policy.server";
+export type { HrRecordsExecutionGuard } from "./hr.workforce.records-access.policy.server";
