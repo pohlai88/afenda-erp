@@ -38,7 +38,7 @@ export function buildRecordsListSearchToolbar(input: {
     resetParams: [
       input.param,
       ...(input.filters ?? []).map((filter) => filter.param),
-    ],
+    ] as string[],
   } as const;
 }
 
