@@ -1,5 +1,5 @@
 /**
- * Module section catch-all (system-admin, hr). Slug → thin app adapter → feature package.
+ * Module section catch-all (system-admin, hr). Slug â†’ thin app adapter â†’ feature package.
  */
 import {
   HrCompliancePageSkeleton,
@@ -7,7 +7,9 @@ import {
 } from "@/app-route-state/route-states";
 import { ModuleSectionRouteSkeleton } from "@/app-route-state/module-section-route-skeleton.client";
 import {
+  loadHrRecordsDetailSection,
   loadHrSection,
+  resolveHrEmployeeRecordId,
   resolveHrSectionSlug,
   hrSectionSlugs,
   type HrSectionPageProps,
@@ -63,6 +65,11 @@ async function resolveSectionMetadata(
 
   if (moduleId === HR_MODULE_ID) {
     assertHrModuleId(moduleId);
+    const employeeId = resolveHrEmployeeRecordId(section);
+    if (employeeId) {
+      const sectionModule = await loadHrRecordsDetailSection();
+      return sectionModule.metadata ?? {};
+    }
     const slug = resolveHrSectionSlug(section);
     const sectionModule = await loadHrSection(slug);
     return sectionModule.metadata ?? {};
@@ -78,11 +85,83 @@ export async function generateMetadata({
   return resolveSectionMetadata(moduleId, section);
 }
 
-function sectionSkeleton(moduleId: string) {
+function sectionSkeleton(moduleId: string, section: string[]) {
   if (moduleId === HR_MODULE_ID) {
-    return <HrCompliancePageSkeleton />;
+    if (section[0] === "compliance") {
+      return <HrCompliancePageSkeleton />;
+    }
+    return <ModuleSectionRouteSkeleton />;
   }
   return <SystemAdminSectionSkeleton />;
+}
+
+async function SystemAdminSectionContent({
+  section,
+  searchParams,
+}: {
+  section: string[];
+  searchParams?: ModuleSectionRouteProps["searchParams"];
+}) {
+  const slug = resolveSystemAdminSectionSlug(section);
+  const { default: SectionPage } = await loadSystemAdminSection(slug);
+
+  return (
+    <SectionPage
+      searchParams={
+        searchParams as SystemAdminSectionPageProps["searchParams"]
+      }
+    />
+  );
+}
+
+async function HrSectionContent({
+  section,
+  searchParams,
+}: {
+  section: string[];
+  searchParams?: ModuleSectionRouteProps["searchParams"];
+}) {
+  const employeeId = resolveHrEmployeeRecordId(section);
+  if (employeeId) {
+    const { default: SectionPage } = await loadHrRecordsDetailSection();
+    return (
+      <SectionPage
+        employeeId={employeeId}
+        searchParams={searchParams as HrSectionPageProps["searchParams"]}
+      />
+    );
+  }
+
+  const slug = resolveHrSectionSlug(section);
+  const { default: SectionPage } = await loadHrSection(slug);
+
+  return (
+    <SectionPage searchParams={searchParams as HrSectionPageProps["searchParams"]} />
+  );
+}
+
+async function ModuleSectionContent({
+  moduleId,
+  section,
+  searchParams,
+}: {
+  moduleId: string;
+  section: string[];
+  searchParams?: ModuleSectionRouteProps["searchParams"];
+}) {
+  if (moduleId === SYSTEM_ADMIN_MODULE_ID) {
+    assertSystemAdminModuleId(moduleId);
+    return (
+      <SystemAdminSectionContent section={section} searchParams={searchParams} />
+    );
+  }
+
+  if (moduleId === HR_MODULE_ID) {
+    assertHrModuleId(moduleId);
+    return <HrSectionContent section={section} searchParams={searchParams} />;
+  }
+
+  notFound();
 }
 
 export default function ModuleSectionRoute({
@@ -91,37 +170,15 @@ export default function ModuleSectionRoute({
 }: ModuleSectionRouteProps) {
   return (
     <Suspense fallback={<ModuleSectionRouteSkeleton />}>
-      {params.then(async ({ moduleId, section }) => {
-        if (moduleId === SYSTEM_ADMIN_MODULE_ID) {
-          assertSystemAdminModuleId(moduleId);
-          const slug = resolveSystemAdminSectionSlug(section);
-          const { default: SectionPage } = await loadSystemAdminSection(slug);
-          return (
-            <Suspense fallback={sectionSkeleton(moduleId)}>
-              <SectionPage
-                searchParams={
-                  searchParams as SystemAdminSectionPageProps["searchParams"]
-                }
-              />
-            </Suspense>
-          );
-        }
-
-        if (moduleId === HR_MODULE_ID) {
-          assertHrModuleId(moduleId);
-          const slug = resolveHrSectionSlug(section);
-          const { default: SectionPage } = await loadHrSection(slug);
-          return (
-            <Suspense fallback={sectionSkeleton(moduleId)}>
-              <SectionPage
-                searchParams={searchParams as HrSectionPageProps["searchParams"]}
-              />
-            </Suspense>
-          );
-        }
-
-        notFound();
-      })}
+      {params.then(({ moduleId, section }) => (
+        <Suspense fallback={sectionSkeleton(moduleId, section)}>
+          <ModuleSectionContent
+            moduleId={moduleId}
+            section={section}
+            searchParams={searchParams}
+          />
+        </Suspense>
+      ))}
     </Suspense>
   );
 }
