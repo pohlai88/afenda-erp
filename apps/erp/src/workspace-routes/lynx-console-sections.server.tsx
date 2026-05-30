@@ -27,7 +27,7 @@ export async function LynxConsoleHeroSection() {
             label={pageModel.heroCopy.statusLabel}
             tone={pageModel.heroCopy.statusTone}
           />
-          <div className="type-caption uppercase tracking-wide text-muted">
+          <div className="type-caption uppercase tracking-wide">
             {organization.slug}
           </div>
         </div>
@@ -110,7 +110,7 @@ export async function LynxConsoleWorkspaceSection() {
                   <div className="type-body font-semibold text-foreground">
                     Lynx readiness
                   </div>
-                  <p className="mt-2 type-body leading-6 text-muted">
+                  <p className="mt-2 type-muted leading-6">
                     {readiness.summary}
                   </p>
                 </div>

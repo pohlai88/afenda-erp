@@ -31,7 +31,7 @@ export async function RecordDetailSection({
         aside={
           <div className="flex flex-col gap-3 text-right">
             <StatusBadge label={record.status} tone="neutral" />
-            <div className="type-caption uppercase tracking-wide text-muted">
+            <div className="type-caption uppercase tracking-wide">
               {organization.slug}
             </div>
           </div>

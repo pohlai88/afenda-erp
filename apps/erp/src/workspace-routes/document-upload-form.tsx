@@ -37,7 +37,7 @@ function getStateClassName(tone: UploadState["tone"]) {
     return "border-amber-200 bg-amber-50 text-amber-900";
   }
 
-  return "border-line bg-surface text-muted";
+  return "border-line bg-surface text-muted-foreground";
 }
 
 function isAllowedContentType(contentType: string) {
@@ -188,7 +188,7 @@ export function DocumentUploadForm({
         <input
           ref={fileInputRef}
           accept={documentUploadAccept}
-          className="w-full rounded-section border border-dashed border-line bg-surface px-3 py-3 type-body text-muted file:mr-4 file:rounded-control file:border-0 file:bg-slate-950 file:px-3 file:py-2 file:type-body file:font-medium file:text-white"
+          className="w-full rounded-section border border-dashed border-line bg-surface px-3 py-3 type-muted file:mr-4 file:rounded-control file:border-0 file:bg-primary file:px-3 file:py-2 file:type-body file:font-medium file:text-primary-foreground"
           name="file"
           type="file"
         />
@@ -201,7 +201,7 @@ export function DocumentUploadForm({
           {state.message}
         </div>
         <button
-          className="rounded-section bg-slate-950 px-surface-lg py-2 type-body font-medium text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-400"
+          className="rounded-section bg-primary px-surface-lg py-2 type-body font-medium text-primary-foreground transition hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-50"
           disabled={isUploading || !blobConfigured}
           type="submit"
         >

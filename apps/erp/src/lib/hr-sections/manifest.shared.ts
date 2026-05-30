@@ -9,6 +9,10 @@ export const hrSectionManifest = {
     label: "Compliance",
     featureArea: "employee-management/compliance-regulatory-tracking",
   },
+  benefits: {
+    label: "Benefits",
+    featureArea: "payroll-compensation/benefits-administration",
+  },
 } as const;
 
 export type HrSectionSlug = keyof typeof hrSectionManifest;

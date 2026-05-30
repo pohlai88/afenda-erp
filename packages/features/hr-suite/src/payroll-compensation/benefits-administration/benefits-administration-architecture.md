@@ -120,3 +120,152 @@
 |  19 | Benefit cost and enrollment reports can be generated.                                                                                   |
 |  20 | Sensitive benefit information is hidden from unauthorized users.                                                                        |
 |  21 | Every benefit enrollment, waiver, change, termination, approval, and deduction integration creates an audit event.                      |
+
+---
+
+## Shipment (HRM-BEN-001..007)
+
+**Route:** `/hr/benefits` · **Module:** `@afenda/feature-hr-suite` · **Capabilities:** `hr.benefits.read`, `hr.benefits.write`
+
+Pattern C registry order: benefit plans → eligibility rules → open enrollment windows → enrollments → audit trail (read-only).
+
+### HRM-BEN shipment matrix
+
+| Code | Status |
+| ---- | ------ |
+| HRM-BEN-001 | **Shipped** — plan upsert/archive via `upsertHrBenefitPlanAction` / `archiveHrBenefitPlanAction`; `hr_benefit_plans` |
+| HRM-BEN-002 | **Shipped** — `hr_benefit_category` enum + plan schema `category` |
+| HRM-BEN-003 | **Shipped** — `hr_benefit_eligibility_rules` + `upsertHrBenefitEligibilityRuleAction` |
+| HRM-BEN-004 | **Shipped** — `determineHrBenefitEligibility` / `determineHrBenefitEligibilityAction`; `appliesBenefitEligibilityRuleToEmployee()` |
+| HRM-BEN-005 | **Shipped** — `createNewHireBenefitEnrollmentAction` (`enrollment_channel = new_hire`) |
+| HRM-BEN-006 | **Shipped** — `hr_benefit_open_enrollment_windows` + `upsertHrBenefitOpenEnrollmentWindowAction`; open enrollment guard on enroll |
+| HRM-BEN-007 | **Shipped** — `recordHrBenefitLifeEventAction` + `createLifeEventBenefitEnrollmentAction` |
+
+Enterprise acceptance criteria **1–3, 6–8** are covered by the above (plan create with category/rules; eligibility determination; new hire / open enrollment / life-event enrollment paths).
+
+| AC | Covered by |
+| -- | ---------- |
+| 1 | BEN-001 plan upsert with category, provider, eligibility rules, contributions, effective dates |
+| 2 | BEN-002 category enum on plans |
+| 3 | BEN-004 eligibility determination across scope + tenure |
+| 6 | BEN-005 new hire enrollment action |
+| 7 | BEN-006 open enrollment window configuration + active window guard |
+| 8 | BEN-007 life event record + life-event enrollment |
+
+**App adapter:** `apps/erp/src/lib/hr-sections/benefits.server.tsx` · **DB:** `@afenda/db` `hr-benefits.ts` · **Feature slice:** `packages/features/hr-suite/src/payroll-compensation/benefits-administration/`
+
+---
+
+## Shipment (HRM-BEN-008..014)
+
+| Code | Status | As-built |
+| ---- | ------ | -------- |
+| HRM-BEN-008 | **Shipped** | `createHrBenefitEnrollmentInTx` + `createHrBenefitEnrollmentAction`; enrollments Pattern C list (`listHrBenefitEnrollmentsWindow`) |
+| HRM-BEN-009 | **Shipped** | `addHrBenefitEnrollmentDependentInTx` + enrollment `dependents[]`; trailing **Add dependent** |
+| HRM-BEN-010 | **Shipped** | `validateEnrollmentDependents` + `verifyHrBenefitEnrollmentDependentsInTx`; trailing **Verify dependents** |
+| HRM-BEN-011 | **Shipped** | `hr_benefit_coverage_level` enum; `assertCoverageLevelAllowedForPlan` / `validateEnrollmentDependents` |
+| HRM-BEN-012 | **Shipped** | `coverage_start_date` / `coverage_end_date` on enrollments and dependents; `assertBenefitCoverageDatesValid` |
+| HRM-BEN-013 | **Shipped** | `resolveEnrollmentContributionRows` → `hr_benefit_enrollment_contributions` (employer payer) |
+| HRM-BEN-014 | **Shipped** | Same helper persists employee payer rows from plan `employee_contribution_amount` |
+
+| AC | Covered by |
+| -- | ---------- |
+| 4 | BEN-008 eligible employee enrollment |
+| 5 | BEN-008 `employee_ineligible` unless `eligibilityOverrideReference` (audit `hr.benefits.eligibility.override.approve`) |
+| 9 | BEN-009 dependent add on enrollment create and trailing |
+| 10 | BEN-010 dependent validation + verify action |
+| 11 | BEN-011 coverage level enum stored on enrollment |
+| 12 | BEN-012 coverage effective dates on enrollment and dependents |
+| 13 | BEN-013 employer contribution rows from plan amounts |
+| 14 | BEN-014 employee contribution rows from plan amounts |
+
+**Governed UI:** `buildHrBenefitsEnrollmentsListSurface` with `resolveBenefitsEnrollmentTrailingAction`; client trailing via `HrBenefitsEnrollmentsTrailingCell` (`@afenda/governed-surface/client`). Write users see `HrBenefitsEnrollmentCreateForm` when `hr.benefits.write`.
+
+**Tests:** `tests/unit/benefits-enrollment.shared.test.ts` (eligibility guard, coverage enum, contribution storage).
+
+---
+
+## Shipment (HRM-BEN-022..028)
+
+**Route:** `/hr/benefits` · **Capabilities:** `hr.benefits.read`, `hr.benefits.write`, `hr.benefits.sensitive.read`
+
+Pattern C registry order: benefit plans → eligibility rules → open enrollment windows → enrollments (masked contribution columns without sensitive read) → benefit reports (CSV export) → audit trail (read-only).
+
+| Code | Status | As-built |
+| ---- | ------ | -------- |
+| HRM-BEN-022 | **Shipped** | `hr_benefit_coverage_status` enum; `assertHrBenefitCoverageStatusTransition` / `updateHrBenefitCoverageStatusInTx` |
+| HRM-BEN-023 | **Shipped** | `adjustHrBenefitCoverageForEmploymentStatusInTx`; `hr-lifecycle.ts` employment status hook |
+| HRM-BEN-024 | **Shipped** | `buildHrBenefitReportCsv` (`kind = cost`) |
+| HRM-BEN-025 | **Shipped** | `buildHrBenefitReportCsv` (`kind = enrollment`) + `HrBenefitsReportsExportPanel` |
+| HRM-BEN-026 | **Shipped** | `buildHrBenefitReportCsv` (`kind = payroll_deduction`) |
+| HRM-BEN-027 | **Shipped** | `hr.benefits.sensitive.read`; masked list columns and report CSV |
+| HRM-BEN-028 | **Shipped** | `hr_benefit_audit_events`; Pattern C audit trail; verbs for enrollment, coverage, reports, provider |
+
+| AC | Covered by |
+| -- | ---------- |
+| 16 | BEN-022 coverage status enum + transitions |
+| 17 | BEN-023 employment-driven coverage adjust/terminate |
+| 19 | BEN-024–026 CSV report export |
+| 20 | BEN-027 sensitive read + masking |
+| 21 | BEN-028 audit events on mutations |
+
+**Tests:** `benefitsadministration-coverage-status.test.ts`, `benefitsadministration-access.policy.test.ts`, `benefitsadministration-enrollment-audit.test.ts`.
+
+---
+
+## As-built summary (code-verified)
+
+**Route:** `/hr/benefits` · **Module:** `@afenda/feature-hr-suite` · **Capabilities:** `hr.benefits.read`, `hr.benefits.write`, `hr.benefits.sensitive.read`
+
+| Layer | Location |
+| ----- | -------- |
+| Schema | `@afenda/db` → `packages/db/src/schema/hr-benefits.ts` |
+| Enrollment commands | `hr-benefits-enrollment-create.ts`, `hr-benefits-enrollment.shared.ts` |
+| Slice | `packages/features/hr-suite/src/payroll-compensation/benefits-administration/` |
+| Export doors | `server.ts`, `client.ts` (enrollment form + trailing), `metadata.ts` |
+| Access policy | `policies/hr.payroll.benefits-access.policy.server.ts` |
+| Audit verbs | `events/hr.payroll.benefits.event.ts` (`hrPayrollBenefitsAuditActions`) |
+| Page model | `data/hr.payroll.benefits.page-model.server.ts` (`Promise.all` list loaders) |
+| Coverage / employment | `packages/db/src/hr-benefits-coverage.ts`; lifecycle hook in `hr-lifecycle.ts` |
+| Reports | `HrBenefitsReportsExportPanel` + `exportHrBenefitReportAction` |
+
+### HRM-BEN shipment matrix (BEN-015..021)
+
+| Code | Status | As-built |
+| ---- | ------ | -------- |
+| HRM-BEN-015 | **Shipped** | `createHrBenefitDeductionReferenceInTx` — employee-paid payroll deduction refs on active enrollment |
+| HRM-BEN-016 | **Shipped** | `_integration/payroll-deductions.server.ts` + `listHrBenefitPayrollDeductionRefs` (reference-only; Payroll Processing consumes, does not recalc) |
+| HRM-BEN-017 | **Shipped** | Recurring `frequency` on `hr_benefit_deduction_references`; `updateHrBenefitDeductionReferenceInTx` on contribution change |
+| HRM-BEN-018 | **Shipped** | `applyHrBenefitEnrollmentChangeInTx` — plan, coverage, dependent, contribution changes persisted to `hr_benefit_enrollment_changes` |
+| HRM-BEN-019 | **Shipped** | `approveHrBenefitEnrollmentInTx` — `pending` → `active`; deduction ref when employee contribution exists |
+| HRM-BEN-020 | **Shipped** | `hr_benefit_providers` + `upsertHrBenefitProviderInTx` |
+| HRM-BEN-021 | **Shipped** | `linkHrBenefitDocumentInTx` — `employeeDocumentId` or `externalReference` (no storage engine) |
+
+### Mutations & audit (HRM-BEN-028)
+
+Server Actions call `finalizeBenefitsMutation()` — domain `*InTx` command plus `writeExecutionAuditEventInTransaction()` (`targetType: hr_benefits`) in one transaction. Domain rows also append to `hr_benefit_audit_events` via `appendHrBenefitAuditEventInTx`. Audit verbs in `events/hr.payroll.benefits.event.ts`.
+
+| Action | Requirement | Audit verb |
+| ------ | ----------- | ---------- |
+| `upsertHrBenefitProviderAction` | HRM-BEN-020 | `hr.benefits.provider.create` |
+| `approveHrBenefitEnrollmentAction` | HRM-BEN-019, HRM-BEN-015 | `hr.benefits.enrollment.approve`, `hr.benefits.deduction.reference.create` |
+| `applyHrBenefitEnrollmentChangeAction` | HRM-BEN-018, HRM-BEN-017 | `hr.benefits.enrollment.change` |
+| `linkHrBenefitDocumentAction` / `unlinkHrBenefitDocumentAction` | HRM-BEN-021 | `hr.benefits.document.link` / `unlink` |
+| `exportHrBenefitPayrollDeductionRefsAction` | HRM-BEN-016 | `hr.benefits.deduction.payroll.integrate` |
+| `exportHrBenefitReportAction` | HRM-BEN-024–026 | `hr.benefits.report.export` |
+| `createHrBenefitEnrollmentAction` | HRM-BEN-008, AC 4–5 | `hr.benefits.enrollment.create`, optional `hr.benefits.eligibility.override.approve` |
+| `addHrBenefitEnrollmentDependentAction` | HRM-BEN-009 | `hr.benefits.dependent.add` |
+| `verifyHrBenefitEnrollmentDependentsAction` | HRM-BEN-010 | `hr.benefits.dependent.eligibility.verify` |
+
+### Payroll Processing integration boundary
+
+| Layer | Path | Role |
+| ----- | ---- | ---- |
+| DB export | `packages/db/src/hr-benefits-deductions.ts` | `listHrBenefitPayrollDeductionRefs` — active approved enrollments with recurring deduction refs |
+| Feature bridge | `payroll-compensation/_integration/payroll-deductions.server.ts` | `listApprovedBenefitPayrollDeductionRefs`, `acknowledgeBenefitPayrollDeductionSync` |
+| Benefits action | `actions/hr.payroll.benefits.actions.server.ts` | `exportHrBenefitPayrollDeductionRefsAction` marks `syncedAt` after export |
+| Payroll Processing | `payroll-compensation/payroll-processing/` | **Consumer** — reads refs; owns calculation and run finalization (not implemented here) |
+
+Benefits Administration **does not** calculate net pay, apply statutory rules, or finalize payroll runs.
+
+Per-code as-built detail for HRM-BEN-015 … HRM-BEN-028 is code-verified in `data/hr.payroll.benefits-acceptance-coverage.shared.ts`.

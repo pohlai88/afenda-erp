@@ -1,0 +1,41 @@
+
+> @afenda/erp@0.1.0 build C:\JackProject\afenda-erp\apps\erp
+> next build
+
+Ôû▓ Next.js 16.2.6 (Turbopack)
+- Environments: .env.local
+- Cache Components enabled
+- Experiments (use with caution):
+  Ô£ô instantNavigationDevToolsToggle
+
+  Creating an optimized production build ...
+Turbopack build encountered 1 warnings:
+./apps/erp/next.config.ts
+Encountered unexpected file in NFT list
+A file was traced that indicates that the whole project was traced unintentionally. Somewhere in the import trace below, there are:
+- filesystem operations (like path.join, path.resolve or fs.readFile), or
+- very dynamic requires (like require('./' + foo)).
+To resolve this, you can
+- remove them if possible, or
+- only use them in development, or
+- make sure they are statically scoped to some subfolder: path.join(process.cwd(), 'data', bar), or
+- add ignore comments: path.join(/*turbopackIgnore: true*/ process.cwd(), bar)
+
+Import trace:
+  Server Component:
+    ./apps/erp/next.config.ts
+    ./packages/features/system-admin/dist/reliability/data/system-admin.repo-root-file.repository.server.js
+    ./packages/features/system-admin/dist/reliability/data/index.js
+    ./packages/features/system-admin/dist/reliability/server.js
+    ./packages/features/system-admin/dist/server.js
+    ./apps/erp/src/workspace-routes/lynx-runs-route.sections.server.tsx
+    ./apps/erp/src/workspace-routes/lynx-runs-route.tsx
+    ./apps/erp/src/app/(workspace)/lynx/runs/page.tsx
+
+
+Ô£ô Compiled successfully in 41s
+  Running TypeScript ...
+  Finished TypeScript in 66s ...
+  Collecting page data using 21 workers ...
+Ô¿» Invalid segment configuration export detected. This can cause unexpected behavior from the configs not being applied. You should see the relevant failures in the logs above. Please fix them to continue.
+ÔÇëELIFECYCLEÔÇë Command failed with exit code 1.

@@ -1,5 +1,6 @@
 import type { AppCapability } from "@afenda/auth";
 
+import { hrBenefitsRoutePaths } from "../payroll-compensation/benefits-administration/contracts/hr.payroll.benefits-route.contract";
 import { hrComplianceRoutePaths } from "../employee-management/compliance-regulatory-tracking/contracts/hr.workforce.compliance-route.contract";
 
 type HrNavCapability = Extract<AppCapability, `hr.${string}`>;
@@ -22,6 +23,11 @@ export const hrModuleNavItems = [
     href: hrComplianceRoutePaths.compliance,
     label: "Compliance",
     requiredCapabilities: ["hr.compliance.read", "hr.compliance.write"],
+  },
+  {
+    href: hrBenefitsRoutePaths.benefits,
+    label: "Benefits",
+    requiredCapabilities: ["hr.benefits.read", "hr.benefits.write"],
   },
 ] as const satisfies readonly HrModuleNavItem[];
 

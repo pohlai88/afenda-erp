@@ -1,5 +1,13 @@
 import { z } from "zod";
 
+export {
+  UI_BANNED_TEXT_FILL_PATTERN,
+  UI_BANNED_TEXT_FILL_UTILITIES,
+  UI_COLOR_FILL_TOKENS,
+  UI_TYPOGRAPHY_UTILITY_KEYS,
+  type UiTypographyUtilityKey,
+} from "./design-system.color-contract.shared";
+
 /**
  * Enterprise UI contract (not docs).
  *
@@ -228,11 +236,36 @@ export const uiTitle = {
 } as const;
 
 export const uiText = {
-  label:
-    "text-label-small font-medium tracking-label text-muted-foreground uppercase",
-  body: "text-body-sm leading-body text-foreground",
-  description: "text-body-sm leading-body text-muted-foreground",
-  code: "font-mono text-caption leading-caption tracking-code",
+  label: "type-label",
+  body: "type-body",
+  description: "type-muted",
+  code: "type-mono-cell",
+} as const;
+
+/** Ink tokens — safe for copy color. */
+export const uiColorInk = {
+  foreground: "text-foreground",
+  muted: "text-muted-foreground",
+  primary: "text-primary",
+  primaryForeground: "text-primary-foreground",
+  secondary: "text-secondary-foreground",
+  accent: "text-accent-foreground",
+  destructive: "text-destructive",
+  success: "text-success-foreground",
+  warning: "text-warning-foreground",
+  info: "text-info-foreground",
+  critical: "text-critical-foreground",
+} as const;
+
+/** Fill tokens — surfaces only; pair with uiColorInk for copy on tinted backgrounds. */
+export const uiColorFill = {
+  background: "bg-background",
+  surface: "bg-surface",
+  muted: "bg-muted",
+  accent: "bg-accent",
+  secondary: "bg-secondary",
+  card: "bg-card",
+  popover: "bg-popover",
 } as const;
 
 /**
@@ -255,6 +288,9 @@ export const uiTypography = {
   sectionLabel: "type-section-label",
   control: "type-control",
   monoCell: "type-mono-cell",
+  monoMuted: "type-mono-muted",
+  code: "type-code",
+  codeLabel: "type-code-label",
 } as const;
 
 /** Composite surface utilities. Use these before composing raw border/radius/shadow classes. */
@@ -268,6 +304,7 @@ export const uiSurface = {
   command: "surface-command",
   section: "surface-section",
   focus: "surface-focus",
+  code: "surface-code",
 } as const;
 
 /** Dense ERP table primitives for metadata-driven list renderers. */
@@ -520,6 +557,10 @@ export const ui = {
   priority: uiPriorityClasses,
   state: uiOperationalStateClasses,
   zIndex: uiZIndex,
+  color: {
+    ink: uiColorInk,
+    fill: uiColorFill,
+  },
 } as const;
 
 export const uiSurfaceContractSchema = z

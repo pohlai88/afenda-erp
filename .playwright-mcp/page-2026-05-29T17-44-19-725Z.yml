@@ -1,0 +1,46 @@
+- generic [active] [ref=e1]:
+  - main [ref=e2]:
+    - generic [ref=e3]:
+      - generic [ref=e4]:
+        - generic [ref=e5]: Afenda ERP
+        - heading "Tenant-aware ERP access with full-stack organization context." [level=1] [ref=e6]
+        - paragraph [ref=e7]: Authentication, tenant membership, and protected routing share one server-side model. Operators sign in through branch-aware Neon Auth and continue into a scoped workspace.
+        - generic [ref=e8]:
+          - generic [ref=e9]:
+            - generic [ref=e10]: This step
+            - generic [ref=e11]: Sign in
+            - paragraph [ref=e12]: Sign in with email, Google, or your development session.
+          - list [ref=e13]:
+            - listitem [ref=e14]: Branch-aware Neon Auth with tenant-scoped sessions
+            - listitem [ref=e15]: Organization onboarding before module access
+            - listitem [ref=e16]: Role capabilities enforced on every protected route
+      - generic [ref=e21]:
+        - heading "Sign in to your workspace" [level=2] [ref=e22]
+        - paragraph [ref=e23]: Use your operator credentials for this tenant workspace.
+        - generic [ref=e24]:
+          - button "Continue with Google" [ref=e25]:
+            - img
+            - text: Continue with Google
+          - generic [ref=e29]: or
+        - generic [ref=e30]:
+          - generic [ref=e31]:
+            - generic [ref=e32]: Email
+            - textbox "Email" [ref=e33]
+          - generic [ref=e34]:
+            - generic [ref=e35]: Password
+            - textbox "Password" [ref=e36]
+          - link "Forgot password?" [ref=e38] [cursor=pointer]:
+            - /url: /forgot-password
+          - button "Sign in" [ref=e39]
+        - paragraph [ref=e40]:
+          - text: Need an account?
+          - link "Create account" [ref=e41] [cursor=pointer]:
+            - /url: /sign-up
+  - complementary "Developer sign-in" [ref=e42]:
+    - group [ref=e43]:
+      - generic "Developer sign-in Demo access" [ref=e44] [cursor=pointer]:
+        - generic [ref=e45]: Developer sign-in
+        - generic [ref=e46]: Demo access
+  - button "Open Next.js Dev Tools" [ref=e52] [cursor=pointer]:
+    - img [ref=e53]
+  - alert [ref=e56]

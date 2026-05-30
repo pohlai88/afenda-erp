@@ -1,0 +1,45 @@
+[    1293ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/_next/static/chunks/06-__next_dist_0e2k50v._.js:2971
+[    1974ms] [LOG] [HMR] connected @ http://localhost:3000/_next/static/chunks/06-__next_dist_0e2k50v._.js:2971
+[    3042ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/06-__next_dist_0e2k50v._.js:2971
+[    3062ms] [LOG] [Fast Refresh] done in 245ms @ http://localhost:3000/_next/static/chunks/06-__next_dist_0e2k50v._.js:2971
+[    3166ms] [LOG] %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit @ http://localhost:3000/_next/static/chunks/06-__next_dist_0e2k50v._.js:2971
+[    3167ms] [LOG] %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {route: /sign-in, path: /sign-in} @ http://localhost:3000/_next/static/chunks/06-__next_dist_0e2k50v._.js:2971
+[    3168ms] [LOG] %c[Vercel Web Analytics]%c Page view would be ignored by `beforeSend` because null was returned. color: rgb(120, 120, 120) color: inherit {type: pageview, url: http://localhost:3000/sign-in, payload: undefined} @ http://localhost:3000/_next/static/chunks/06-__next_dist_0e2k50v._.js:2971
+[    3171ms] [LOG] %c[Vercel Speed Insights]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit @ http://localhost:3000/_next/static/chunks/06-__next_dist_0e2k50v._.js:2971
+[    4475ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/06-__next_dist_0e2k50v._.js:2971
+[    4549ms] [LOG] [Fast Refresh] done in 175ms @ http://localhost:3000/_next/static/chunks/06-__next_dist_0e2k50v._.js:2971
+[   11764ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/06-__next_dist_0e2k50v._.js:2971
+[   11816ms] [LOG] [Fast Refresh] done in 157ms @ http://localhost:3000/_next/static/chunks/06-__next_dist_0e2k50v._.js:2971
+[   13439ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/06-__next_dist_0e2k50v._.js:2971
+[   13468ms] [LOG] [Fast Refresh] done in 131ms @ http://localhost:3000/_next/static/chunks/06-__next_dist_0e2k50v._.js:2971
+[   14936ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/06-__next_dist_0e2k50v._.js:2971
+[   14976ms] [LOG] [Fast Refresh] done in 143ms @ http://localhost:3000/_next/static/chunks/06-__next_dist_0e2k50v._.js:2971
+[   16343ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/06-__next_dist_0e2k50v._.js:2971
+[   16360ms] [LOG] [Fast Refresh] done in 130ms @ http://localhost:3000/_next/static/chunks/06-__next_dist_0e2k50v._.js:2971
+[   19876ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/06-__next_dist_0e2k50v._.js:2971
+[   19943ms] [LOG] [Fast Refresh] done in 168ms @ http://localhost:3000/_next/static/chunks/06-__next_dist_0e2k50v._.js:2971
+[   23519ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/06-__next_dist_0e2k50v._.js:2971
+[   23560ms] [LOG] [Fast Refresh] done in 156ms @ http://localhost:3000/_next/static/chunks/06-__next_dist_0e2k50v._.js:2971
+[   27129ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/06-__next_dist_0e2k50v._.js:2971
+[   27199ms] [LOG] [Fast Refresh] done in 173ms @ http://localhost:3000/_next/static/chunks/06-__next_dist_0e2k50v._.js:2971
+[   28358ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/06-__next_dist_0e2k50v._.js:2971
+[   28407ms] [LOG] [Fast Refresh] done in 156ms @ http://localhost:3000/_next/static/chunks/06-__next_dist_0e2k50v._.js:2971
+[   29438ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/06-__next_dist_0e2k50v._.js:2971
+[   29483ms] [LOG] [Fast Refresh] done in 150ms @ http://localhost:3000/_next/static/chunks/06-__next_dist_0e2k50v._.js:2971
+[   31179ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/06-__next_dist_0e2k50v._.js:2971
+[   31258ms] [LOG] [Fast Refresh] done in 188ms @ http://localhost:3000/_next/static/chunks/06-__next_dist_0e2k50v._.js:2971
+[   32205ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/06-__next_dist_0e2k50v._.js:2971
+[   36711ms] [LOG] [Fast Refresh] done in 4605ms @ http://localhost:3000/_next/static/chunks/06-__next_dist_0e2k50v._.js:2971
+[   37366ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/06-__next_dist_0e2k50v._.js:2971
+[   40188ms] [LOG] [Fast Refresh] done in 2927ms @ http://localhost:3000/_next/static/chunks/06-__next_dist_0e2k50v._.js:2971
+[   46218ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/06-__next_dist_0e2k50v._.js:2971
+[   46302ms] [LOG] [Fast Refresh] done in 186ms @ http://localhost:3000/_next/static/chunks/06-__next_dist_0e2k50v._.js:2971
+[   50399ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/06-__next_dist_0e2k50v._.js:2971
+[   50572ms] [LOG] [Fast Refresh] done in 276ms @ http://localhost:3000/_next/static/chunks/06-__next_dist_0e2k50v._.js:2971
+[   51151ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/06-__next_dist_0e2k50v._.js:2971
+[   51200ms] [LOG] [Fast Refresh] done in 152ms @ http://localhost:3000/_next/static/chunks/06-__next_dist_0e2k50v._.js:2971
+[   51821ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/06-__next_dist_0e2k50v._.js:2971
+[   51901ms] [LOG] [Fast Refresh] done in 187ms @ http://localhost:3000/_next/static/chunks/06-__next_dist_0e2k50v._.js:2971
+[   52344ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/06-__next_dist_0e2k50v._.js:2971
+[   52415ms] [LOG] [Fast Refresh] done in 174ms @ http://localhost:3000/_next/static/chunks/06-__next_dist_0e2k50v._.js:2971
+[   54029ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/06-__next_dist_0e2k50v._.js:2971

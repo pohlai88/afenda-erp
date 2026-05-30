@@ -167,6 +167,26 @@ const permissionCatalog = [
       "Read identity numbers, restricted evidence titles, and sensitive compliance review notes.",
   },
   {
+    key: "hr.benefits.read",
+    module: "hr",
+    label: "View HR benefits",
+    description: "Read benefit plans, enrollments, and coverage status.",
+  },
+  {
+    key: "hr.benefits.write",
+    module: "hr",
+    label: "Manage HR benefits",
+    description:
+      "Configure benefit plans, enroll employees, and manage benefit changes.",
+  },
+  {
+    key: "hr.benefits.sensitive.read",
+    module: "hr",
+    label: "View sensitive HR benefits",
+    description:
+      "Read employee and employer contribution amounts and payroll deduction values on benefit registers.",
+  },
+  {
     key: "hr.leave.read",
     module: "hr",
     label: "View HR leave",

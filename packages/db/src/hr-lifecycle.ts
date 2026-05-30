@@ -12,6 +12,7 @@ import {
   sql,
 } from "drizzle-orm";
 import { runWithOrganizationContext, type AfendaTransaction } from "./client";
+import { adjustHrBenefitCoverageForEmploymentStatusInTx } from "./hr-benefits-coverage";
 import { createEntityId } from "./ids";
 import { upsertHrEmployeeEffectiveAssignmentInTx,
   type HrEmployeePlacementInput,
@@ -268,6 +269,14 @@ async function applyEmploymentStatusChange(
         : {}),
     })
     .where(eq(hrEmployees.id, input.employeeId));
+
+  await adjustHrBenefitCoverageForEmploymentStatusInTx(db, {
+    organizationId: input.organizationId,
+    employeeId: input.employeeId,
+    employmentStatus: input.toStatus,
+    effectiveDate: input.effectiveDate,
+    actorUserId: null,
+  });
 
   return { eventId, previousStatus: employee.employmentStatus };
 }

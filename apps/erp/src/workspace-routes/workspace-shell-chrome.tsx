@@ -61,7 +61,7 @@ export function WorkspaceOrgPanel({
         </div>
         <div className="min-w-0">
           <div className="type-subtitle text-foreground">Afenda</div>
-          <div className="type-caption text-muted">Operational workspace</div>
+          <div className="type-caption">Operational workspace</div>
         </div>
       </div>
 
@@ -164,7 +164,7 @@ export function WorkspaceCommandHeader({
           <div className="truncate type-body font-medium text-foreground">
             {sessionName}
           </div>
-          <div className="truncate type-caption text-muted">{sessionEmail}</div>
+          <div className="truncate type-caption">{sessionEmail}</div>
         </div>
         <Separator
           className="mx-1 hidden h-9 @sm:block"

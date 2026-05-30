@@ -81,7 +81,7 @@ export async function DashboardHeaderSection({
             label={moduleDefinition.status.label}
             tone={moduleDefinition.status.tone}
           />
-          <div className="type-caption uppercase tracking-wide text-muted">
+          <div className="type-caption uppercase tracking-wide">
             {organization.slug}
           </div>
         </div>

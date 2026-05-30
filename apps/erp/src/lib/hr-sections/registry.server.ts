@@ -1,4 +1,7 @@
-import { hrComplianceRoutePaths } from "@afenda/feature-hr-suite/metadata";
+import {
+  hrBenefitsRoutePaths,
+  hrComplianceRoutePaths,
+} from "@afenda/feature-hr-suite/metadata";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import type { ComponentType } from "react";
@@ -18,9 +21,15 @@ type HrSectionModule = {
 
 const sectionLoaders = {
   compliance: () => import("./compliance.server"),
+  benefits: () => import("./benefits.server"),
 } satisfies Record<HrSectionSlug, () => Promise<HrSectionModule>>;
 
-export const hrSectionSlugs = Object.values(hrComplianceRoutePaths)
+const hrRoutePaths = [
+  ...Object.values(hrComplianceRoutePaths),
+  ...Object.values(hrBenefitsRoutePaths),
+] as const;
+
+export const hrSectionSlugs = hrRoutePaths
   .filter((path) => path !== hrComplianceRoutePaths.hub)
   .map((path) => path.replace("/hr/", "")) as HrSectionSlug[];
 

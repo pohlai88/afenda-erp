@@ -1,0 +1,73 @@
+---
+description: Golden HR vertical slice pattern from compliance-regulatory-tracking — copy for every new shipped capability
+globs: "packages/features/hr-suite/src/**/employee-management/**/*|apps/erp/src/lib/hr-sections/**/*|packages/features/hr-suite/tests/**/*"
+alwaysApply: false
+---
+
+# HR reference slice (golden path)
+
+**Canonical reference:** `packages/features/hr-suite/src/employee-management/compliance-regulatory-tracking/`  
+**Architecture trail:** `compliance-regulatory-tracking-architecture.md` (requirements + `## As-built summary` + per-code tables)  
+**Companion rule:** `afenda-hr-feature-vertical` (folders, naming regex, export doors)
+
+Do **not** re-invent layout from `@afenda/feature-system-admin` or legacy `@afenda/feature-hr` for new HR workbenches — **clone compliance**, rename domain.
+
+## When this rule applies
+
+- Implementing or extending any `employee-management/<capability>/` slice (e.g. `documents-management`).
+- Adding `/hr/<section>` app adapters under `apps/erp/src/lib/hr-sections/`.
+- Shipping governed lists/stats for HR (`surface/`, Pattern B + C).
+
+Scaffold-only folders (placeholder `index.ts` only) may stay minimal until the slice ships.
+
+## Seven layers (all required for a shipped slice)
+
+| Layer | Owner | Pattern |
+| ----- | ----- | ------- |
+| 1. Schema & commands | `@afenda/db` | `hr-*.ts` modules; org-scoped windows; no DDL in feature package |
+| 2. Access policy | `policies/hr.<domain>-access.policy.server.ts` | `requireHr*Read/Write`; optional sensitive capability (fail closed) |
+| 3. Metadata registry | `surface/hr.<domain>-surface-metadata.shared.ts` | `*_LIST_SURFACE_KEYS`, search-param map, columns registry — **single source** |
+| 4. Search params | `data/hr.<domain>-search-params.parse.shared.ts` | Parse URL → page-model input; every registry param maps to a model field (test it) |
+| 5. Page model | `data/hr.<domain>.page-model.server.ts` | Parallel list loads; `settle*ListLoad` placeholders; call `build*ListSurface` from `surface/` only |
+| 6. Governed UI | `surface/*.surface.ts` + `components/*-section.component.server.tsx` | Pattern B overview + Pattern C lists; trailing schemas accept **stored** statuses only |
+| 7. App adapter | `apps/erp/src/lib/hr-sections/<slug>.server.tsx` | Guard once → `to*PageModelInput` → `build*PageModel` → workbench section; register in `manifest.shared.ts` |
+
+Export doors: slice `server.ts` (I/O), `client.ts` (components), `metadata.ts` (keys, copy, parsers — **no tenant I/O**). Re-export from package `metadata.ts` / `server.ts`; **never** add long-lived stubs in package root `server.ts` for a shipped slice.
+
+## Learnings to reuse (from compliance)
+
+- **Derived vs stored status:** derive overdue/expiring/missing at read; Zod trailing schemas reject derived tokens on mutation; normalize to `pending` on write when needed.
+- **Sensitive registers:** separate capability (e.g. `hr.<area>.sensitive.read`); mask in page model; document picker excludes restricted rows when false; mutations use `require*SensitiveWrite()`.
+- **Registry-driven tests:** `compliance-workbench-metadata.test.ts`, `compliance-search-params.test.ts`, `compliance-list-eui-contract.test.ts` — add `<capability>-*` equivalents before marking shipped.
+- **Architecture doc:** extend `*-architecture.md` with parent ARCH links, `## As-built summary`, HRM-* shipment matrix, per-requirement tables as code lands.
+- **Cross-module boundaries:** vault/versioning in Document Management; obligation monitoring in Compliance — link by FK/readiness, do not duplicate storage UI.
+
+## Promoting a new capability to “shipped”
+
+1. Implement all seven layers under `src/employee-management/<capability>/`.
+2. Add capability path to `SHIPPED_CAPABILITIES` in `packages/features/hr-suite/scripts/check-hr-feature-vertical-naming.mts` (pattern checks run automatically).
+3. Register `hrSectionManifest` + `apps/erp/src/lib/hr-sections/<slug>.server.tsx` + route skeleton if new section.
+4. Export slice from package `server.ts` / `metadata.ts` (remove root-level `denied()` stubs for that area).
+5. Run verification (below) and update architecture shipment matrix.
+
+## Anti-patterns
+
+| Avoid | Use instead |
+| ----- | ----------- |
+| List `*.surface.ts` under `data/` | `surface/` bucket |
+| Full dataset to client for pagination | Server window + `GovernedPatternCListSection` |
+| Audit strings in `contracts/` | `events/*.event.ts` |
+| Client importing `@afenda/db` | `./server` actions + page model |
+| Hand-written DDL in feature package | `packages/db/src/schema` → `pnpm db:generate` → `pnpm db:migrate` |
+| Shipping without `## As-built summary` in architecture md | Same PR as first real UI |
+
+## Verification
+
+```bash
+pnpm exec tsx packages/features/hr-suite/scripts/check-hr-feature-vertical-naming.mts
+pnpm --filter @afenda/feature-hr-suite test
+pnpm architecture:check
+pnpm lint:governed-renderers   # when surfaces/registry change
+```
+
+Human checklist: `packages/features/hr-suite/docs/hr-reference-slice-checklist.md`.

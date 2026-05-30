@@ -93,7 +93,7 @@ function MiniMetric({
 }) {
   return (
     <div className="rounded-section border border-line bg-surface-strong px-3 py-2">
-      <div className="type-caption uppercase tracking-wide text-muted">{label}</div>
+      <div className="type-caption uppercase tracking-wide">{label}</div>
       <div className="mt-1 type-body font-semibold text-foreground">{value}</div>
     </div>
   );
@@ -130,7 +130,7 @@ function ConfidenceCard({ value }: { value: unknown }) {
         />
       </div>
       {typeof value.explanation === "string" ? (
-        <div className="mt-3 type-body leading-6 text-muted">
+        <div className="mt-3 type-muted leading-6">
           {value.explanation}
         </div>
       ) : null}
@@ -151,7 +151,7 @@ function EvidenceList({ value }: { value: unknown }) {
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="type-caption uppercase tracking-wide text-muted">Evidence</div>
+      <div className="type-caption uppercase tracking-wide">Evidence</div>
       {evidence.map((item, index) => {
         const label =
           getString(item.label) ?? getString(item.sourceId) ?? "Source";
@@ -175,11 +175,11 @@ function EvidenceList({ value }: { value: unknown }) {
                   {label}
                 </div>
               )}
-              <div className="type-caption text-muted">
+              <div className="type-caption">
                 {getString(item.moduleId) ?? "module"}
               </div>
             </div>
-            <div className="mt-1 type-body leading-6 text-muted">
+            <div className="mt-1 type-muted leading-6">
               {getString(item.signal) ??
                 getString(item.recordId) ??
                 "Evidence source"}
@@ -220,13 +220,13 @@ function SandboxCard({ value }: { value: unknown }) {
       />
       {sandboxId ? (
         <Link
-          className="mt-1 inline-flex items-center rounded bg-muted/30 px-2 py-0.5 font-mono type-caption text-muted underline-offset-2 hover:underline"
+          className="mt-1 inline-flex items-center rounded bg-muted/30 px-2 py-0.5 type-mono-muted underline-offset-2 hover:underline"
           href={`/system-admin#ai-sandboxes-${sandboxId}`}
         >
           sandbox: {sandboxId}
         </Link>
       ) : null}
-      <div className="mt-2 type-body leading-6 text-muted">
+      <div className="mt-2 type-muted leading-6">
         {getString(diff.summary) ?? "Action preview"}
       </div>
       <div className="@container mt-3 grid gap-2 @sm:grid-cols-4">
@@ -236,7 +236,7 @@ function SandboxCard({ value }: { value: unknown }) {
         <MiniMetric label="Risk" value={getString(risk.riskLevel) ?? "-"} />
       </div>
       {requiredHumanChecks.length > 0 ? (
-        <ul className="flex flex-col mt-3  type-body leading-6 text-muted gap-1">
+        <ul className="flex flex-col mt-3  type-muted leading-6 gap-1">
           {requiredHumanChecks.slice(0, 4).map((check) => (
             <li key={check}>{check}</li>
           ))}
@@ -270,7 +270,7 @@ function DiagnosisCards({ value }: { value: unknown }) {
             tone={getToneForRisk(diagnosis.severity)}
             value={getString(diagnosis.severity)}
           />
-          <div className="mt-2 type-body leading-6 text-muted">
+          <div className="mt-2 type-muted leading-6">
             {getString(diagnosis.explanation) ?? "No explanation supplied."}
           </div>
           <div className="mt-3">
@@ -297,7 +297,7 @@ function RecoveryPlanCard({ value }: { value: unknown }) {
           label={getString(value.title) ?? "Recovery playbook"}
           value={getString(value.workflowId)}
         />
-        <div className="mt-2 type-body leading-6 text-muted">
+        <div className="mt-2 type-muted leading-6">
           {getString(value.summary) ?? "Recovery plan generated."}
         </div>
       </div>
@@ -314,7 +314,7 @@ function RecoveryPlanCard({ value }: { value: unknown }) {
               tone={getToneForRisk(action.riskLevel)}
               value={getString(action.priority)}
             />
-            <div className="mt-2 type-body leading-6 text-muted">
+            <div className="mt-2 type-muted leading-6">
               {getString(action.expectedImpact) ??
                 "No expected impact supplied."}
             </div>
@@ -354,7 +354,7 @@ function ApprovalOutputCard({ value }: { value: unknown }) {
           tone={getToneForStatus(approvalState)}
           value={approvalState}
         />
-        <div className="mt-2 type-body leading-6 text-muted">
+        <div className="mt-2 type-muted leading-6">
           Proposal {getString(value.proposalId) ?? "pending"} for{" "}
           {getString(value.moduleId) ?? "module"}.
           {getString(value.sandboxId) ? (
@@ -445,7 +445,7 @@ function ErpReadToolOutputCard({ value }: { value: unknown }) {
 
       {signals.length > 0 ? (
         <div className="flex flex-col gap-2">
-          <div className="type-caption uppercase tracking-wide text-muted">
+          <div className="type-caption uppercase tracking-wide">
             Signals
           </div>
           {signals.slice(0, 6).map((signal, index) => (
@@ -458,7 +458,7 @@ function ErpReadToolOutputCard({ value }: { value: unknown }) {
                 tone={getToneForStatus(signal.status)}
                 value={getString(signal.value) ?? getString(signal.status)}
               />
-              <div className="mt-1 type-body leading-6 text-muted">
+              <div className="mt-1 type-muted leading-6">
                 {getString(signal.detail) ?? "No detail supplied."}
               </div>
             </div>
@@ -472,10 +472,10 @@ function ErpReadToolOutputCard({ value }: { value: unknown }) {
         <div className="@container grid gap-3 @md:grid-cols-2">
           {missingData.length > 0 ? (
             <div className="rounded-section border border-line bg-surface-strong p-3">
-              <div className="type-caption uppercase tracking-wide text-muted">
+              <div className="type-caption uppercase tracking-wide">
                 Missing data
               </div>
-              <ul className="flex flex-col mt-2  type-body leading-6 text-muted gap-1">
+              <ul className="flex flex-col mt-2  type-muted leading-6 gap-1">
                 {missingData.slice(0, 5).map((item) => (
                   <li key={item}>{item}</li>
                 ))}
@@ -484,10 +484,10 @@ function ErpReadToolOutputCard({ value }: { value: unknown }) {
           ) : null}
           {safeNextActions.length > 0 ? (
             <div className="rounded-section border border-line bg-surface-strong p-3">
-              <div className="type-caption uppercase tracking-wide text-muted">
+              <div className="type-caption uppercase tracking-wide">
                 Safe next actions
               </div>
-              <ul className="flex flex-col mt-2  type-body leading-6 text-muted gap-1">
+              <ul className="flex flex-col mt-2  type-muted leading-6 gap-1">
                 {safeNextActions.slice(0, 5).map((item) => (
                   <li key={item}>{item}</li>
                 ))}
@@ -529,7 +529,7 @@ export function Tool({
         <div className="type-body font-semibold text-foreground">
           {part.type.replace(/^tool-/, "")}
         </div>
-        <div className="rounded-control bg-slate-100 px-2 py-1 type-caption text-muted">
+        <div className="rounded-control bg-muted/30 px-2 py-1 type-caption">
           {part.state ?? "pending"}
         </div>
       </div>
@@ -550,14 +550,14 @@ export function Tool({
       {part.state === "approval-requested" && approvalId ? (
         <div className="mt-3 flex gap-2">
           <button
-            className="rounded-control bg-slate-950 px-3 py-2 type-body font-medium text-white"
+            className="rounded-control bg-primary px-3 py-2 type-body font-medium text-primary-foreground transition hover:bg-primary-hover"
             onClick={() => onApprove?.(approvalId)}
             type="button"
           >
             Approve
           </button>
           <button
-            className="rounded-control border border-line bg-surface px-3 py-2 type-body font-medium text-slate-700"
+            className="rounded-control border border-line bg-surface px-3 py-2 type-body font-medium text-foreground transition hover:bg-surface-hover"
             onClick={() => onReject?.(approvalId)}
             type="button"
           >

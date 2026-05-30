@@ -59,7 +59,7 @@ export function Message({
           : "border-line bg-surface"
       }`}
     >
-      <div className="mb-3 type-caption uppercase tracking-wide text-muted">
+      <div className="mb-3 type-caption uppercase tracking-wide">
         {message.role}
       </div>
       <div className="flex flex-col gap-3">

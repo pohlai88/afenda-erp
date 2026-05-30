@@ -46,7 +46,7 @@ function getStateClassName(status: ExtractionState["status"]) {
     return "border-amber-200 bg-amber-50 text-amber-900";
   }
 
-  return "border-line bg-surface text-muted";
+  return "border-line bg-surface text-muted-foreground";
 }
 
 function isExtractionPayload(payload: unknown): payload is ExtractionPayload {
@@ -74,13 +74,13 @@ function ExtractionReview({ payload }: { payload: ExtractionPayload }) {
     <div className="grid gap-surface-lg rounded-section border border-line bg-surface p-4">
       <div className="@container grid gap-3 @md:grid-cols-4">
         <div>
-          <div className="type-caption uppercase tracking-wide text-muted">Type</div>
+          <div className="type-caption uppercase tracking-wide">Type</div>
           <div className="mt-1 type-body font-semibold text-foreground">
             {extraction.documentType}
           </div>
         </div>
         <div>
-          <div className="type-caption uppercase tracking-wide text-muted">
+          <div className="type-caption uppercase tracking-wide">
             Counterparty
           </div>
           <div className="mt-1 type-body font-semibold text-foreground">
@@ -88,7 +88,7 @@ function ExtractionReview({ payload }: { payload: ExtractionPayload }) {
           </div>
         </div>
         <div>
-          <div className="type-caption uppercase tracking-wide text-muted">
+          <div className="type-caption uppercase tracking-wide">
             Reference
           </div>
           <div className="mt-1 type-body font-semibold text-foreground">
@@ -96,7 +96,7 @@ function ExtractionReview({ payload }: { payload: ExtractionPayload }) {
           </div>
         </div>
         <div>
-          <div className="type-caption uppercase tracking-wide text-muted">
+          <div className="type-caption uppercase tracking-wide">
             Total
           </div>
           <div className="mt-1 type-body font-semibold text-foreground">
@@ -106,7 +106,7 @@ function ExtractionReview({ payload }: { payload: ExtractionPayload }) {
       </div>
       <div className="@container grid gap-3 @md:grid-cols-3">
         <div className="rounded-section border border-line bg-surface-strong p-3">
-          <div className="type-caption uppercase tracking-wide text-muted">
+          <div className="type-caption uppercase tracking-wide">
             Confidence
           </div>
           <div className="mt-1 type-card-title font-semibold text-foreground">
@@ -114,7 +114,7 @@ function ExtractionReview({ payload }: { payload: ExtractionPayload }) {
           </div>
         </div>
         <div className="rounded-section border border-line bg-surface-strong p-3">
-          <div className="type-caption uppercase tracking-wide text-muted">
+          <div className="type-caption uppercase tracking-wide">
             Review status
           </div>
           <div className="mt-1 type-card-title font-semibold text-foreground">
@@ -122,7 +122,7 @@ function ExtractionReview({ payload }: { payload: ExtractionPayload }) {
           </div>
         </div>
         <div className="rounded-section border border-line bg-surface-strong p-3">
-          <div className="type-caption uppercase tracking-wide text-muted">
+          <div className="type-caption uppercase tracking-wide">
             Suggested action
           </div>
           <div className="mt-1 type-card-title font-semibold text-foreground">
@@ -131,7 +131,7 @@ function ExtractionReview({ payload }: { payload: ExtractionPayload }) {
         </div>
       </div>
       <div className="rounded-section border border-line bg-surface-strong p-3">
-        <div className="type-caption uppercase tracking-wide text-muted">
+        <div className="type-caption uppercase tracking-wide">
           Review notes
         </div>
         <p className="mt-2 type-body leading-6 text-foreground">
@@ -149,7 +149,7 @@ function ExtractionReview({ payload }: { payload: ExtractionPayload }) {
               key={`${item.description}-${index}`}
             >
               <div className="text-foreground">{item.description}</div>
-              <div className="text-muted">{item.quantity}</div>
+              <div className="type-muted">{item.quantity}</div>
               <div className="font-medium text-foreground">
                 {formatAmount(item.amountCents, extraction.currency)}
               </div>
@@ -161,7 +161,7 @@ function ExtractionReview({ payload }: { payload: ExtractionPayload }) {
         <summary className="cursor-pointer px-3 py-2 type-body font-semibold text-foreground">
           {extractionCopy.rawPayloadTitle}
         </summary>
-        <pre className="max-h-72 overflow-auto border-t border-line bg-slate-950 p-4 type-caption leading-5 text-slate-100">
+        <pre className="surface-code max-h-72 overflow-auto border-t border-code-block-border p-4 type-code">
           {JSON.stringify(payload, null, 2)}
         </pre>
       </details>
@@ -250,7 +250,7 @@ export function DocumentExtractionForm({ moduleId }: { moduleId: ModuleId }) {
             {extractionCopy.titleLabel}
           </span>
           <input
-            className="w-full rounded-section border border-line bg-surface px-3 py-2 type-body text-foreground outline-none transition focus:border-slate-400"
+            className="w-full rounded-section border border-line bg-surface px-3 py-2 type-body text-foreground outline-none transition focus:border-ring"
             name="title"
             placeholder={extractionCopy.titlePlaceholder}
             required
@@ -262,7 +262,7 @@ export function DocumentExtractionForm({ moduleId }: { moduleId: ModuleId }) {
             {extractionCopy.documentIdLabel}
           </span>
           <input
-            className="w-full rounded-section border border-line bg-surface px-3 py-2 type-body text-foreground outline-none transition focus:border-slate-400"
+            className="w-full rounded-section border border-line bg-surface px-3 py-2 type-body text-foreground outline-none transition focus:border-ring"
             name="documentId"
             placeholder={extractionCopy.documentIdPlaceholder}
             type="text"
@@ -274,7 +274,7 @@ export function DocumentExtractionForm({ moduleId }: { moduleId: ModuleId }) {
           {extractionCopy.documentTextLabel}
         </span>
         <textarea
-          className="min-h-32 w-full resize-y rounded-section border border-line bg-surface px-3 py-2 type-body text-foreground outline-none transition focus:border-slate-400"
+          className="min-h-32 w-full resize-y rounded-section border border-line bg-surface px-3 py-2 type-body text-foreground outline-none transition focus:border-ring"
           maxLength={12000}
           minLength={20}
           name="documentText"
@@ -290,7 +290,7 @@ export function DocumentExtractionForm({ moduleId }: { moduleId: ModuleId }) {
           {state.message}
         </div>
         <button
-          className="rounded-section bg-slate-950 px-surface-lg py-2 type-body font-medium text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-400"
+          className="rounded-section bg-primary px-surface-lg py-2 type-body font-medium text-primary-foreground transition hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-50"
           disabled={state.status === "running"}
           type="submit"
         >

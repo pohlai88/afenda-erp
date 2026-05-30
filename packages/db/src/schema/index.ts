@@ -1,5 +1,6 @@
 export * from "./audit";
 export * from "./hr";
+export * from "./hr-benefits";
 export * from "./billing";
 export * from "./ai";
 export * from "./common";

@@ -98,6 +98,27 @@ const RULES: Rule[] = [
       "bg-critical/* | text-critical | ring-critical | border-l-critical  (uiRiskToneClasses / uiStatusToneClasses)",
   },
   {
+    id: "no-text-fill-token",
+    severity: "error",
+    description:
+      "Fill color token used for copy — @theme --color-muted generates text-muted (surface fill, not ink)",
+    pattern: /\btext-(muted|accent|secondary|card|popover)(?![\w-])/g,
+    suggestion:
+      "type-caption | type-muted | type-label | text-muted-foreground | text-accent-foreground  (never text-muted for copy)",
+    fileFilter: /\.tsx$/,
+  },
+  {
+    id: "no-raw-palette",
+    severity: "warning",
+    description:
+      "Raw Tailwind palette color — use semantic ERP tokens (OKLCH via @theme inline)",
+    pattern:
+      /\b(bg|text|border|ring|from|to|via|hover:bg|hover:border|hover:text|file:bg)-(slate|gray|zinc)-/g,
+    suggestion:
+      "bg-primary | bg-surface | type-muted | surface-code | hover:bg-surface-hover | hover:border-border  (uiColorInk / uiColorFill)",
+    fileFilter: /\.tsx$/,
+  },
+  {
     id: "no-raw-typography",
     severity: "warning",
     description:

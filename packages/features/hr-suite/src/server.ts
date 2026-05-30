@@ -12,12 +12,32 @@ export * from "./employee-management/employee-lifecycle-management/server";
 export * from "./employee-management/offboarding-exit-management/server";
 export * from "./employee-management/employee-records-management/server";
 export * from "./employee-management/organizational-chart-hierarchy/server";
+export * from "./time-attendance/leave-attendance-management/server";
+export * from "./payroll-compensation/benefits-administration/server";
 
 export { requireHrRead } from "./policies/hr-module-access.policy.server";
 
-function denied() {
-  throw new Error("HR Suite not yet implemented.");
-}
+import {
+  buildHrAttendancePageModel,
+  buildHrLeavePageModel,
+  HrAttendanceWorkbenchSection,
+  HrLeaveWorkbenchSection,
+  HrLamAccessDeniedPanel,
+  requireHrLamAttendanceRead,
+  requireHrLamRead,
+} from "./time-attendance/leave-attendance-management/server";
+
+export {
+  buildHrAttendancePageModel,
+  buildHrLeavePageModel,
+  HrAttendanceWorkbenchSection,
+  HrLeaveWorkbenchSection,
+  requireHrLamAttendanceRead,
+  requireHrLamRead,
+};
+
+export { HrLamAccessDeniedPanel as HrAttendanceAccessDeniedPanel };
+export { HrLamAccessDeniedPanel as HrLeaveAccessDeniedPanel };
 
 function EmptyState({
   title,
@@ -40,17 +60,37 @@ function EmptyState({
 }
 
 export function HrAttendanceAccessDenied() {
-  return React.createElement(EmptyState, {
-    title: "Access restricted",
-    description: "Attendance is not available.",
-  });
+  return React.createElement(HrLamAccessDeniedPanel);
 }
 export function HrLeaveAccessDenied() {
-  return React.createElement(EmptyState, {
-    title: "Access restricted",
-    description: "Leave is not available.",
-  });
+  return React.createElement(HrLamAccessDeniedPanel);
 }
+export function HrAttendanceSection({
+  model,
+}: {
+  model: React.ComponentProps<typeof HrAttendanceWorkbenchSection>["model"];
+}) {
+  return React.createElement(HrAttendanceWorkbenchSection, { model });
+}
+export function HrLeaveSection({
+  model,
+}: {
+  model: React.ComponentProps<typeof HrLeaveWorkbenchSection>["model"];
+}) {
+  return React.createElement(HrLeaveWorkbenchSection, { model });
+}
+
+export async function requireHrAttendanceRead() {
+  return requireHrLamAttendanceRead();
+}
+export async function requireHrLeaveRead() {
+  return requireHrLamRead();
+}
+
+function denied() {
+  throw new Error("HR Suite not yet implemented.");
+}
+
 export function HrOnboardingAccessDenied() {
   return React.createElement(EmptyState, {
     title: "Access restricted",
@@ -70,17 +110,11 @@ export function HrShiftsAccessDenied() {
   });
 }
 
-export function HrAttendanceSection(_props: any) {
-  return React.createElement(EmptyState, { title: "Attendance" });
-}
 export function HrEmployeeCreateSection(_props: any) {
   return React.createElement(EmptyState, { title: "Add employee" });
 }
 export function HrEmployeeDetailSection(_props: any) {
   return React.createElement(EmptyState, { title: "Employee detail" });
-}
-export function HrLeaveSection(_props: any) {
-  return React.createElement(EmptyState, { title: "Leave" });
 }
 export function HrOnboardingSection(_props: any) {
   return React.createElement(EmptyState, { title: "Onboarding" });
@@ -101,14 +135,6 @@ export function HrShiftsSection(_props: any) {
   return React.createElement(EmptyState, { title: "Shifts" });
 }
 
-export async function requireHrAttendanceRead() {
-  denied();
-  return { organization: { id: "" }, canWrite: false };
-}
-export async function requireHrLeaveRead() {
-  denied();
-  return { organization: { id: "" }, canWrite: false };
-}
 export async function requireHrOnboardingRead() {
   denied();
   return { organization: { id: "" }, canWrite: false };
@@ -122,14 +148,6 @@ export async function requireHrShiftsRead() {
   return { organization: { id: "" }, canWrite: false };
 }
 
-export async function buildHrAttendancePageModel(_args: any) {
-  denied();
-  return { window: { rows: [] }, searchValue: "" };
-}
-export async function buildHrLeavePageModel(_args: any) {
-  denied();
-  return { window: { rows: [] }, pendingWindow: { rows: [] }, searchValue: "" };
-}
 export async function buildHrOnboardingPageModel(_args: any) {
   denied();
   return { window: { rows: [] }, searchValue: "", checklistItems: [] };
@@ -151,7 +169,10 @@ export async function buildHrShiftsPageModel(_args: any) {
 
 export async function loadHrOnboardingFormOptions(_organizationId?: string) {
   denied();
-  return { employees: [] as Array<{ id: string; label: string }>, checklistItems: [] as any[] };
+  return {
+    employees: [] as Array<{ id: string; label: string }>,
+    checklistItems: [] as any[],
+  };
 }
 export async function loadHrEmployeeFormOptions(_args?: any) {
   denied();

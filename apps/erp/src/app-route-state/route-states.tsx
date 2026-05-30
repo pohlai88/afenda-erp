@@ -22,22 +22,22 @@ export function RouteStatePanel({
   return (
     <main className="flex min-h-full items-center justify-center px-surface-2xl py-16">
       <div className="w-full max-w-lg rounded-panel border border-line bg-surface-strong p-8 shadow-elevation-1">
-        <div className="type-caption uppercase tracking-wide text-muted">
+        <div className="type-caption uppercase tracking-wide">
           {appBrandName}
         </div>
         <h1 className="mt-3 type-section-title font-semibold text-foreground">{title}</h1>
-        <p className="mt-3 type-body leading-6 text-muted">{description}</p>
+        <p className="mt-3 type-muted leading-6">{description}</p>
         {action ? (
           action.href ? (
             <Link
-              className="mt-surface-2xl inline-flex rounded-section border border-line bg-surface px-surface-lg py-2 type-body font-medium text-foreground transition hover:border-slate-300 hover:bg-slate-50"
+              className="mt-surface-2xl inline-flex rounded-section border border-line bg-surface px-surface-lg py-2 type-body font-medium text-foreground transition hover:border-border hover:bg-surface-hover"
               href={action.href}
             >
               {action.label}
             </Link>
           ) : (
             <button
-              className="mt-surface-2xl inline-flex rounded-section border border-line bg-surface px-surface-lg py-2 type-body font-medium text-foreground transition hover:border-slate-300 hover:bg-slate-50"
+              className="mt-surface-2xl inline-flex rounded-section border border-line bg-surface px-surface-lg py-2 type-body font-medium text-foreground transition hover:border-border hover:bg-surface-hover"
               onClick={action.onClick}
               type="button"
             >

@@ -1,5 +1,1 @@
-/**
- * @afenda-bucket data
- * Scaffold placeholder from packages/_template-definition.
- */
-export {};
+export * from "./hr.time.leave-action-result.shared";

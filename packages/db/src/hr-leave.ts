@@ -1,6 +1,5 @@
 import { and, count, desc, eq, ilike, or } from "drizzle-orm";
 import { runWithOrganizationContext } from "./client";
-import { createEntityId } from "./ids";
 import { hrEmployees, hrLeaveRequests } from "./schema/hr";
 
 export type HrLeaveRequestRow = {
@@ -10,11 +9,14 @@ export type HrLeaveRequestRow = {
   employeeDisplayName: string;
   leaveType: (typeof hrLeaveRequests.$inferSelect)["leaveType"];
   status: (typeof hrLeaveRequests.$inferSelect)["status"];
+  approvalStage?: (typeof hrLeaveRequests.$inferSelect)["approvalStage"];
   startAt: Date;
   endAt: Date;
   durationDays: string;
   reason: string | null;
   decisionNote: string | null;
+  rejectionReason?: string | null;
+  payrollDeductionReference?: string | null;
   submittedAt: Date;
   decidedAt: Date | null;
 };
@@ -49,37 +51,6 @@ function clampPageSize(limit: number | undefined): number {
   const size = Math.floor(limit);
   if (size < 1) return DEFAULT_PAGE_SIZE;
   return Math.min(size, MAX_PAGE_SIZE);
-}
-
-function computeDurationDays(startAt: Date, endAt: Date): string {
-  if (endAt.getTime() < startAt.getTime()) {
-    throw new HrLeaveCommandError("invalid_date_range");
-  }
-  const msPerDay = 86_400_000;
-  const days = (endAt.getTime() - startAt.getTime()) / msPerDay + 1;
-  return days.toFixed(2);
-}
-
-async function assertEmployeeInOrg(
-  organizationId: string,
-  employeeId: string,
-): Promise<void> {
-  await runWithOrganizationContext(organizationId, async (db) => {
-    const [employee] = await db
-      .select({ id: hrEmployees.id })
-      .from(hrEmployees)
-      .where(
-        and(
-          eq(hrEmployees.organizationId, organizationId),
-          eq(hrEmployees.id, employeeId),
-        ),
-      )
-      .limit(1);
-
-    if (!employee) {
-      throw new HrLeaveCommandError("employee_not_found");
-    }
-  });
 }
 
 export async function listHrLeaveRequestsWindow(input: {
@@ -186,118 +157,54 @@ export async function submitHrLeaveRequest(input: {
   startAt: Date;
   endAt: Date;
   reason?: string | null;
+  supportingDocumentId?: string | null;
+  policyGroupCode?: string;
 }): Promise<{ requestId: string }> {
-  await assertEmployeeInOrg(input.organizationId, input.employeeId);
-  const durationDays = computeDurationDays(input.startAt, input.endAt);
-
-  return runWithOrganizationContext(input.organizationId, async (db) => {
-    const requestId = createEntityId("hr_lv_req");
-    await db.insert(hrLeaveRequests).values({
-      id: requestId,
-      organizationId: input.organizationId,
-      employeeId: input.employeeId,
-      leaveType: input.leaveType,
-      startAt: input.startAt,
-      endAt: input.endAt,
-      durationDays,
-      reason: input.reason?.trim() || null,
-    });
-
-    return { requestId };
-  });
-}
-
-async function decideHrLeaveRequest(input: {
-  organizationId: string;
-  requestId: string;
-  status: "approved" | "rejected";
-  decisionNote?: string | null;
-}): Promise<{ requestId: string }> {
-  return runWithOrganizationContext(input.organizationId, async (db) => {
-    const [request] = await db
-      .select({
-        id: hrLeaveRequests.id,
-        status: hrLeaveRequests.status,
-      })
-      .from(hrLeaveRequests)
-      .where(
-        and(
-          eq(hrLeaveRequests.organizationId, input.organizationId),
-          eq(hrLeaveRequests.id, input.requestId),
-        ),
-      )
-      .limit(1);
-
-    if (!request) {
-      throw new HrLeaveCommandError("request_not_found");
-    }
-    if (request.status !== "pending") {
-      throw new HrLeaveCommandError("request_not_pending");
-    }
-
-    await db
-      .update(hrLeaveRequests)
-      .set({
-        status: input.status,
-        decisionNote: input.decisionNote?.trim() || null,
-        decidedAt: new Date(),
-      })
-      .where(eq(hrLeaveRequests.id, input.requestId));
-
-    return { requestId: input.requestId };
-  });
+  const { submitHrLeaveApplication } = await import("./hr-lam");
+  return submitHrLeaveApplication(input);
 }
 
 export async function approveHrLeaveRequest(input: {
   organizationId: string;
   requestId: string;
   decisionNote?: string | null;
+  actorAuthUserId: string;
+  actorCanHrApprove: boolean;
+  actorManagerEmployeeIds?: readonly string[];
 }): Promise<{ requestId: string }> {
-  return decideHrLeaveRequest({ ...input, status: "approved" });
+  const { decideHrLeaveApplication } = await import("./hr-lam-workflow");
+  const result = await decideHrLeaveApplication({
+    ...input,
+    decision: "approve",
+  });
+  return { requestId: result.requestId };
 }
 
 export async function rejectHrLeaveRequest(input: {
   organizationId: string;
   requestId: string;
+  rejectionReason: string;
   decisionNote?: string | null;
+  actorAuthUserId: string;
+  actorCanHrApprove: boolean;
 }): Promise<{ requestId: string }> {
-  return decideHrLeaveRequest({ ...input, status: "rejected" });
+  const { decideHrLeaveApplication } = await import("./hr-lam-workflow");
+  const result = await decideHrLeaveApplication({
+    organizationId: input.organizationId,
+    requestId: input.requestId,
+    decision: "reject",
+    rejectionReason: input.rejectionReason,
+    decisionNote: input.decisionNote,
+    actorAuthUserId: input.actorAuthUserId,
+    actorCanHrApprove: input.actorCanHrApprove,
+  });
+  return { requestId: result.requestId };
 }
 
 export async function cancelHrLeaveRequest(input: {
   organizationId: string;
   requestId: string;
 }): Promise<{ requestId: string }> {
-  return runWithOrganizationContext(input.organizationId, async (db) => {
-    const [request] = await db
-      .select({
-        id: hrLeaveRequests.id,
-        status: hrLeaveRequests.status,
-      })
-      .from(hrLeaveRequests)
-      .where(
-        and(
-          eq(hrLeaveRequests.organizationId, input.organizationId),
-          eq(hrLeaveRequests.id, input.requestId),
-        ),
-      )
-      .limit(1);
-
-    if (!request) {
-      throw new HrLeaveCommandError("request_not_found");
-    }
-    if (request.status !== "pending") {
-      throw new HrLeaveCommandError("request_not_pending");
-    }
-
-    await db
-      .update(hrLeaveRequests)
-      .set({
-        status: "cancelled",
-        decidedAt: new Date(),
-      })
-      .where(eq(hrLeaveRequests.id, input.requestId));
-
-    return { requestId: input.requestId };
-  });
+  const { cancelHrLeaveApplication } = await import("./hr-lam-workflow");
+  return cancelHrLeaveApplication(input);
 }

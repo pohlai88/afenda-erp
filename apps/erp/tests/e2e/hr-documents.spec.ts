@@ -1,0 +1,134 @@
+import { expect, test } from "@playwright/test";
+
+import {
+  getHrDocumentsListSurfaceKeys,
+  hrDocumentsRepositorySearchParam,
+  hrDocumentsRepositorySurfaceKey,
+  hrDocumentsUiCopy,
+} from "@afenda/feature-hr-suite/metadata";
+import { governedListSectionTestId } from "@afenda/governed-surface";
+
+async function devSignIn(page: import("@playwright/test").Page) {
+  await page.context().clearCookies();
+  await page.goto("/sign-in");
+  const devSignInButton = page.getByRole("button", {
+    name: "Continue to dashboard",
+  });
+
+  if (!(await devSignInButton.isVisible({ timeout: 5_000 }).catch(() => false))) {
+    test.skip(true, "Dev sign-in is unavailable while Neon Auth is active.");
+  }
+
+  await devSignInButton.click();
+  await expect(page).toHaveURL(/\/dashboard/, { timeout: 15_000 });
+}
+
+async function dismissDevSignInPanel(page: import("@playwright/test").Page) {
+  await page.evaluate(() => {
+    document
+      .querySelector('aside[aria-label="Developer sign-in"]')
+      ?.remove();
+  });
+}
+
+async function gotoDocumentsWorkbench(
+  page: import("@playwright/test").Page,
+  search = "",
+) {
+  const path = search ? `/hr/documents?${search}` : "/hr/documents";
+  await page.goto(path, {
+    waitUntil: "domcontentloaded",
+    timeout: 60_000,
+  });
+  await expect(page).toHaveURL(/\/hr\/documents/, { timeout: 15_000 });
+  await expect(
+    page.getByRole("heading", { level: 1, name: hrDocumentsUiCopy.page.title }),
+  ).toBeVisible({ timeout: 60_000 });
+  await expect(
+    page.getByRole("alert").filter({ hasText: "Access restricted" }),
+  ).not.toBeVisible();
+  await expect(
+    page.locator('[data-testid^="governed-list-section:"]').first(),
+  ).toBeVisible({ timeout: 240_000 });
+  await dismissDevSignInPanel(page);
+}
+
+async function expectGovernedSectionVisible(
+  page: import("@playwright/test").Page,
+  surfaceKey: string,
+) {
+  const section = page.getByTestId(governedListSectionTestId(surfaceKey));
+  await expect(section).toBeVisible({ timeout: 120_000 });
+  await section.scrollIntoViewIfNeeded();
+  return section;
+}
+
+function sectionSearchInput(
+  section: import("@playwright/test").Locator,
+  name: string,
+) {
+  return section.getByRole("textbox", { name });
+}
+
+test.describe("HR documents workbench", () => {
+  test.describe.configure({ mode: "serial" });
+
+  test("renders documents overview and repository without access denied", async ({
+    page,
+  }) => {
+    test.setTimeout(360_000);
+
+    await devSignIn(page);
+    await gotoDocumentsWorkbench(page);
+
+    await expect(
+      page.getByRole("heading", { name: hrDocumentsUiCopy.overview.sectionTitle }),
+    ).toBeVisible();
+
+    const repositorySection = await expectGovernedSectionVisible(
+      page,
+      getHrDocumentsListSurfaceKeys()[0]!,
+    );
+    await expect(
+      repositorySection.getByText(
+        `${hrDocumentsUiCopy.repository.sectionTitle} unavailable`,
+      ),
+    ).not.toBeVisible();
+    await expect(
+      sectionSearchInput(
+        repositorySection,
+        hrDocumentsUiCopy.repository.searchLabel,
+      ),
+    ).toBeVisible({ timeout: 120_000 });
+  });
+
+  test("preserves repository search in the URL", async ({ page }) => {
+    test.setTimeout(360_000);
+
+    await devSignIn(page);
+    const query = "passport-scan";
+    await gotoDocumentsWorkbench(
+      page,
+      `${hrDocumentsRepositorySearchParam}=${encodeURIComponent(query)}`,
+    );
+
+    const repositorySection = await expectGovernedSectionVisible(
+      page,
+      hrDocumentsRepositorySurfaceKey,
+    );
+    await expect(
+      repositorySection.getByText(
+        `${hrDocumentsUiCopy.repository.sectionTitle} unavailable`,
+      ),
+    ).not.toBeVisible();
+    await expect(
+      sectionSearchInput(
+        repositorySection,
+        hrDocumentsUiCopy.repository.searchLabel,
+      ),
+    ).toHaveValue(query);
+    await expect(page).toHaveURL(
+      new RegExp(`${hrDocumentsRepositorySearchParam}=${query}`),
+    );
+  });
+});

@@ -16,7 +16,22 @@ export * from "./hr-org-overview";
 export * from "./hr-offboarding";
 export * from "./hr-compliance";
 export * from "./hr-leave";
+export * from "./hr-leave-balance";
+export * from "./hr-leave-routing";
+export {
+  assertMaxConsecutiveDays,
+  assertMinimumNoticePeriod,
+  assertNoBlackoutConflict,
+  assertNoOverlappingLeave,
+  computeLeaveDurationDays,
+  HrLeaveValidationError,
+  validateLeaveApplicationRules,
+} from "./hr-leave-validation";
 export * from "./hr-attendance";
+export * from "./hr-lam";
+export * from "./hr-lam-advanced";
+export * from "./hr-lam-workflow";
+export * from "./hr-benefits";
 export * from "./hr-overtime";
 export * from "./hr-shifts";
 export * from "./hr-onboarding";

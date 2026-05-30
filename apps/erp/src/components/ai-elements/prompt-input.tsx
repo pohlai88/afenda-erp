@@ -27,18 +27,18 @@ export function PromptInput({
       <label className="block">
         <span className="sr-only">Ask the ERP assistant</span>
         <textarea
-          className="min-h-24 w-full resize-y rounded-section border border-line bg-surface px-3 py-2 type-body text-foreground outline-none transition focus:border-slate-400"
+          className="min-h-24 w-full resize-y rounded-section border border-line bg-surface px-3 py-2 type-body text-foreground outline-none transition focus:border-ring"
           onChange={(event) => onValueChange(event.target.value)}
           placeholder={placeholder}
           value={value}
         />
       </label>
       <div className="mt-3 flex items-center justify-between gap-3">
-        <div className="type-caption uppercase tracking-wide text-muted">
+        <div className="type-caption uppercase tracking-wide">
           {status}
         </div>
         <button
-          className="rounded-section bg-slate-950 px-surface-lg py-2 type-body font-medium text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-400"
+          className="rounded-section bg-primary px-surface-lg py-2 type-body font-medium text-primary-foreground transition hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-50"
           disabled={disabled}
           type="submit"
         >

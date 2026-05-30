@@ -19,6 +19,33 @@ Single source of truth for token usage in `@afenda/governed-surface` and consume
 
 Never write raw `text-xs`, `text-sm`, `text-base`, `text-lg`, `text-xl`, `text-2xl`, `text-3xl` in `.tsx` files inside governed-surface or feature packages. Use the `type-*` semantic utilities from `globals.css` and `uiTypography` from `@afenda/ui/design-system`.
 
+### Fill vs ink — `no-text-fill-token`
+
+In Tailwind v4 `@theme inline`, `--color-muted` generates `text-muted` as a **surface fill** (~94% lightness), not ink. Never use `text-muted`, `text-accent`, `text-secondary`, `text-card`, or `text-popover` for copy.
+
+| Wrong | Correct |
+|---|---|
+| `text-muted` | `type-caption`, `type-muted`, or `text-muted-foreground` |
+| `type-caption text-muted` | `type-caption` alone (already includes ink) |
+| `bg-muted/30 text-muted` | `bg-muted/30 type-muted` |
+| Mono slug on chip | `type-mono-muted` |
+
+Parity guard: `pnpm audit:tailwind-token-parity` (also in `architecture:check`).
+
+### Raw palette — `no-raw-palette`
+
+Never use Tailwind default palette utilities in app, feature, or governed surfaces. Use semantic tokens from `globals.css` / `design-system.ts`.
+
+| Wrong | Correct |
+|---|---|
+| `bg-slate-950` / `text-slate-100` | `surface-code`, `type-code`, or `bg-primary` for CTAs |
+| `hover:bg-slate-50` | `hover:bg-surface-hover` |
+| `hover:border-slate-300` | `hover:border-border` |
+| `bg-slate-100` chip | `bg-muted/30` + `type-caption` |
+| `text-slate-700` | `type-body` / `text-foreground` |
+
+`packages/ui` primitives are exempt (shadcn fork); product code is not.
+
 | Raw class | Semantic replacement | Intent |
 |---|---|---|
 | `text-xs text-muted-foreground` | `type-caption` | Secondary metadata, timestamps |

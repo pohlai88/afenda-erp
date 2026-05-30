@@ -5,6 +5,7 @@ import { hrDocumentsRoutePaths } from "../employee-management/documents-manageme
 import { hrLifecycleRoutePaths } from "../employee-management/employee-lifecycle-management/contracts/hr.workforce.lifecycle-route.contract";
 import { hrOffboardingRoutePaths } from "../employee-management/offboarding-exit-management/contracts/hr.workforce.offboarding-route.contract";
 import { hrOrgRoutePaths } from "../employee-management/organizational-chart-hierarchy/contracts/hr.workforce.org-route.contract";
+import { hrBenefitsRoutePaths } from "../payroll-compensation/benefits-administration/contracts/hr.payroll.benefits-route.contract";
 import { hrRecordsRoutePaths } from "../employee-management/employee-records-management/contracts/hr.workforce.records-route.contract";
 
 type HrNavCapability = Extract<AppCapability, `hr.${string}`>;
@@ -52,6 +53,11 @@ export const hrModuleNavItems = [
     href: hrOrgRoutePaths.org,
     label: "Organization",
     requiredCapabilities: ["hr.org.read", "hr.org.write"],
+  },
+  {
+    href: hrBenefitsRoutePaths.benefits,
+    label: "Benefits",
+    requiredCapabilities: ["hr.benefits.read", "hr.benefits.write"],
   },
 ] as const satisfies readonly HrModuleNavItem[];
 

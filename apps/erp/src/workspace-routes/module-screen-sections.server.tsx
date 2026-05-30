@@ -53,7 +53,7 @@ export async function ModuleScreenHeaderSection({
             label={moduleDefinition.status.label}
             tone={moduleDefinition.status.tone}
           />
-          <div className="type-caption uppercase tracking-wide text-muted">
+          <div className="type-caption uppercase tracking-wide">
             {organization.slug}
           </div>
         </div>
@@ -105,7 +105,7 @@ export async function ModuleScreenHeaderSection({
           {moduleDefinition.actions.map((action) => (
             <Link
               key={action.href}
-              className="rounded-control border border-line bg-surface-strong px-3 py-2 type-body font-medium text-foreground transition hover:border-slate-300 hover:bg-slate-50"
+              className="rounded-control border border-line bg-surface-strong px-3 py-2 type-body font-medium text-foreground transition hover:border-border hover:bg-surface-hover"
               href={action.href}
             >
               {action.label}
@@ -398,4 +398,3 @@ export async function ModuleScreenFooterSection({
       </SectionPanel>
     </>
   );
-}

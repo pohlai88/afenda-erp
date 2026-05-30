@@ -1,0 +1,46 @@
+[     151ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/06-__next_dist_0e2k50v._.js:2971
+[     176ms] [LOG] [Fast Refresh] done in 137ms @ http://localhost:3000/_next/static/chunks/06-__next_dist_0e2k50v._.js:2971
+[     288ms] [LOG] %c[Vercel Speed Insights]%c [vitals] color: rgb(120, 120, 120) color: inherit {speed: 4g, metrics: Array(3), scriptVersion: 0.1.3, sdkName: @vercel/speed-insights/next, sdkVersion: 2.0.0} /_vercel/speed-insights/vitals @ http://localhost:3000/_next/static/chunks/06-__next_dist_0e2k50v._.js:2971
+[     289ms] [LOG] %c[Vercel Speed Insights]%c [vitals] color: rgb(120, 120, 120) color: inherit {speed: 4g, metrics: Array(1), scriptVersion: 0.1.3, sdkName: @vercel/speed-insights/next, sdkVersion: 2.0.0} /_vercel/speed-insights/vitals @ http://localhost:3000/_next/static/chunks/06-__next_dist_0e2k50v._.js:2971
+[     596ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/_next/static/chunks/06-__next_dist_0e2k50v._.js:2971
+[     661ms] [LOG] [HMR] connected @ http://localhost:3000/_next/static/chunks/06-__next_dist_0e2k50v._.js:2971
+[    1040ms] [LOG] %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit @ http://localhost:3000/_next/static/chunks/06-__next_dist_0e2k50v._.js:2971
+[    1041ms] [LOG] %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {route: /sign-in, path: /sign-in} @ http://localhost:3000/_next/static/chunks/06-__next_dist_0e2k50v._.js:2971
+[    1042ms] [LOG] %c[Vercel Web Analytics]%c Page view would be ignored by `beforeSend` because null was returned. color: rgb(120, 120, 120) color: inherit {type: pageview, url: http://localhost:3000/sign-in, payload: undefined} @ http://localhost:3000/_next/static/chunks/06-__next_dist_0e2k50v._.js:2971
+[    1044ms] [LOG] %c[Vercel Speed Insights]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit @ http://localhost:3000/_next/static/chunks/06-__next_dist_0e2k50v._.js:2971
+[   49665ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/06-__next_dist_0e2k50v._.js:2971
+[   49789ms] [LOG] [Fast Refresh] done in 235ms @ http://localhost:3000/_next/static/chunks/06-__next_dist_0e2k50v._.js:2971
+[   51589ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/06-__next_dist_0e2k50v._.js:2971
+[   51672ms] [LOG] [Fast Refresh] done in 193ms @ http://localhost:3000/_next/static/chunks/06-__next_dist_0e2k50v._.js:2971
+[   56812ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/06-__next_dist_0e2k50v._.js:2971
+[   56907ms] [LOG] [Fast Refresh] done in 210ms @ http://localhost:3000/_next/static/chunks/06-__next_dist_0e2k50v._.js:2971
+[   59300ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/06-__next_dist_0e2k50v._.js:2971
+[   59559ms] [LOG] [Fast Refresh] done in 371ms @ http://localhost:3000/_next/static/chunks/06-__next_dist_0e2k50v._.js:2971
+[   65180ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/06-__next_dist_0e2k50v._.js:2971
+[   65484ms] [LOG] [Fast Refresh] done in 413ms @ http://localhost:3000/_next/static/chunks/06-__next_dist_0e2k50v._.js:2971
+[   99845ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/06-__next_dist_0e2k50v._.js:2971
+[   99936ms] [LOG] [Fast Refresh] done in 192ms @ http://localhost:3000/_next/static/chunks/06-__next_dist_0e2k50v._.js:2971
+[  100295ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/06-__next_dist_0e2k50v._.js:2971
+[  100449ms] [LOG] [Fast Refresh] done in 255ms @ http://localhost:3000/_next/static/chunks/06-__next_dist_0e2k50v._.js:2971
+[  133381ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/06-__next_dist_0e2k50v._.js:2971
+[  133867ms] [LOG] [Fast Refresh] done in 595ms @ http://localhost:3000/_next/static/chunks/06-__next_dist_0e2k50v._.js:2971
+[  150902ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/06-__next_dist_0e2k50v._.js:2971
+[  151166ms] [LOG] [Fast Refresh] done in 368ms @ http://localhost:3000/_next/static/chunks/06-__next_dist_0e2k50v._.js:2971
+[  166790ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/06-__next_dist_0e2k50v._.js:2971
+[  167546ms] [LOG] [Fast Refresh] done in 841ms @ http://localhost:3000/_next/static/chunks/06-__next_dist_0e2k50v._.js:2971
+[  167972ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/06-__next_dist_0e2k50v._.js:2971
+[  168023ms] [LOG] [Fast Refresh] done in 153ms @ http://localhost:3000/_next/static/chunks/06-__next_dist_0e2k50v._.js:2971
+[  168229ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/06-__next_dist_0e2k50v._.js:2971
+[  168237ms] [LOG] [Fast Refresh] done in 112ms @ http://localhost:3000/_next/static/chunks/06-__next_dist_0e2k50v._.js:2971
+[  168410ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/sign-in?_rsc=cdWoszF2STaqQFx0:0
+[  168536ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/06-__next_dist_0e2k50v._.js:2971
+[  168560ms] [LOG] [Fast Refresh] done in 135ms @ http://localhost:3000/_next/static/chunks/06-__next_dist_0e2k50v._.js:2971
+[  168987ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/06-__next_dist_0e2k50v._.js:2971
+[  169016ms] [LOG] [Fast Refresh] done in 139ms @ http://localhost:3000/_next/static/chunks/06-__next_dist_0e2k50v._.js:2971
+[  169135ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/06-__next_dist_0e2k50v._.js:2971
+[  169162ms] [LOG] [Fast Refresh] done in 128ms @ http://localhost:3000/_next/static/chunks/06-__next_dist_0e2k50v._.js:2971
+[  169392ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/06-__next_dist_0e2k50v._.js:2971
+[  169527ms] [LOG] [Fast Refresh] done in 237ms @ http://localhost:3000/_next/static/chunks/06-__next_dist_0e2k50v._.js:2971
+[  169867ms] [LOG] %c[Vercel Speed Insights]%c [vitals] color: rgb(120, 120, 120) color: inherit {speed: 4g, metrics: Array(3), scriptVersion: 0.1.3, sdkName: @vercel/speed-insights/next, sdkVersion: 2.0.0} /_vercel/speed-insights/vitals @ http://localhost:3000/_next/static/chunks/06-__next_dist_0e2k50v._.js:2971
+[  169868ms] [LOG] %c[Vercel Speed Insights]%c [vitals] color: rgb(120, 120, 120) color: inherit {speed: 4g, metrics: Array(1), scriptVersion: 0.1.3, sdkName: @vercel/speed-insights/next, sdkVersion: 2.0.0} /_vercel/speed-insights/vitals @ http://localhost:3000/_next/static/chunks/06-__next_dist_0e2k50v._.js:2971
+[  169876ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/sign-in:0

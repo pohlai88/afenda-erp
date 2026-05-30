@@ -31,6 +31,8 @@ export const hrAttendanceUiCopy = {
   } satisfies HrUiCopyPage,
 };
 
+export { hrLamUiCopy as hrLeaveUiCopy } from "./time-attendance/leave-attendance-management/metadata";
+
 export {
   getHrComplianceListSurfaceKeys,
   HR_COMPLIANCE_LIST_SURFACE_COLUMNS_BY_KEY,
@@ -191,12 +193,30 @@ export {
 /** @deprecated Use hrRecordsUiCopy */
 export { hrRecordsUiCopy as hrEmployeesUiCopy } from "./employee-management/employee-records-management/metadata";
 
-export const hrLeaveUiCopy = {
-  page: {
-    title: "Leave",
-    description: "Leave is managed by HR Suite.",
-  } satisfies HrUiCopyPage,
-};
+export {
+  getHrLamListSurfaceKeys,
+  HR_LAM_LIST_SURFACE_COLUMNS_BY_KEY,
+  HR_LAM_LIST_SEARCH_PARAMS_BY_KEY,
+  HR_LAM_LIST_SEARCH_PARAM_MODEL_FIELDS,
+  HR_LAM_LIST_SURFACE_KEYS,
+  HR_LAM_WORKBENCH_READ_ONLY_SURFACE_KEYS,
+  hrLamAttendanceDaysSurfaceKey,
+  hrLamAttendanceDaysSearchParam,
+  hrLamLeaveRequestsSurfaceKey,
+  hrLamLeaveRequestsSearchParam,
+  hrLamLeaveBalancesSurfaceKey,
+  hrLamLeaveBalancesSearchParam,
+  hrLamUiCopy,
+  parseHrLamSearchParams,
+  toHrLamPageModelInput,
+  type HrLamSearchParams,
+  type HrLamListSurfaceKey,
+  hrLamRoutePaths,
+  type HrLamRoutePath,
+} from "./time-attendance/leave-attendance-management/metadata";
+
+/** @deprecated Use hrLamUiCopy */
+export { hrLamUiCopy as hrLeaveAttendanceUiCopy } from "./time-attendance/leave-attendance-management/metadata";
 
 export {
   getHrLifecycleListSurfaceKeys,
@@ -254,6 +274,37 @@ export {
   hrOffboardingRoutePaths,
   type HrOffboardingRoutePath,
 } from "./employee-management/offboarding-exit-management/contracts/hr.workforce.offboarding-route.contract";
+
+export {
+  getHrBenefitsListSurfaceKeys,
+  HR_BENEFITS_LIST_SURFACE_COLUMNS_BY_KEY,
+  HR_BENEFITS_LIST_SEARCH_PARAMS_BY_KEY,
+  HR_BENEFITS_LIST_SEARCH_PARAM_MODEL_FIELDS,
+  HR_BENEFITS_LIST_SURFACE_KEYS,
+  HR_BENEFITS_WORKBENCH_READ_ONLY_SURFACE_KEYS,
+  hrBenefitsAuditTrailSearchParam,
+  hrBenefitsAuditTrailSurfaceKey,
+  hrBenefitsEligibilityRulesSearchParam,
+  hrBenefitsEligibilityRulesSurfaceKey,
+  hrBenefitsEnrollmentsSearchParam,
+  hrBenefitsEnrollmentsSurfaceKey,
+  hrBenefitsOpenEnrollmentSearchParam,
+  hrBenefitsOpenEnrollmentSurfaceKey,
+  hrBenefitsPlansSearchParam,
+  hrBenefitsPlansSurfaceKey,
+  hrBenefitsProvidersSearchParam,
+  hrBenefitsProvidersSurfaceKey,
+  hrBenefitsUiCopy,
+  parseHrBenefitsSearchParams,
+  toHrBenefitsPageModelInput,
+  type HrBenefitsSearchParams,
+  type HrBenefitsListSurfaceKey,
+} from "./payroll-compensation/benefits-administration/metadata";
+
+export {
+  hrBenefitsRoutePaths,
+  type HrBenefitsRoutePath,
+} from "./payroll-compensation/benefits-administration/contracts/hr.payroll.benefits-route.contract";
 
 export const hrOnboardingUiCopy = {
   page: {

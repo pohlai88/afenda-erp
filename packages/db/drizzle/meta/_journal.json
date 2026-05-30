@@ -218,6 +218,27 @@
       "when": 1780122540778,
       "tag": "0030_solid_wallop",
       "breakpoints": true
+    },
+    {
+      "idx": 31,
+      "version": "7",
+      "when": 1780127199098,
+      "tag": "0031_youthful_celestials",
+      "breakpoints": true
+    },
+    {
+      "idx": 32,
+      "version": "7",
+      "when": 1780127409693,
+      "tag": "0032_eminent_grim_reaper",
+      "breakpoints": true
+    },
+    {
+      "idx": 33,
+      "version": "7",
+      "when": 1780127724792,
+      "tag": "0033_opposite_junta",
+      "breakpoints": true
     }
   ]
 }

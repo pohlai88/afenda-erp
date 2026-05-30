@@ -53,7 +53,7 @@ export function ErpAssistantPanel({
         <div className="type-body font-semibold text-foreground">
           {erpAssistantPanelCopy.title}
         </div>
-        <div className="mt-1 type-body text-muted">
+        <div className="mt-1 type-muted">
           {erpAssistantPanelCopy.description}
         </div>
       </div>
@@ -62,7 +62,7 @@ export function ErpAssistantPanel({
           {assistantPrompts.map((prompt) => (
             <button
               key={prompt.id}
-              className="rounded-section border border-line bg-surface px-3 py-3 text-left type-body font-medium leading-5 text-foreground transition hover:border-slate-300 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
+              className="rounded-section border border-line bg-surface px-3 py-3 text-left type-body font-medium leading-5 text-foreground transition hover:border-border hover:bg-surface-hover disabled:cursor-not-allowed disabled:opacity-60"
               disabled={isBusy}
               onClick={() => sendPrompt(prompt.prompt)}
               type="button"
@@ -74,7 +74,7 @@ export function ErpAssistantPanel({
       </div>
       <Conversation>
         {messages.length === 0 ? (
-          <div className="rounded-section border border-dashed border-line bg-surface px-surface-lg py-3 type-body leading-6 text-muted">
+          <div className="rounded-section border border-dashed border-line bg-surface px-surface-lg py-3 type-muted leading-6">
             Ask about {getAssistantEmptyStateHint()},{" "}
             {erpAssistantPanelCopy.emptyStateSuffix}
           </div>

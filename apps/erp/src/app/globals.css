@@ -128,6 +128,12 @@
   --z-modal: 400;
   --z-tooltip: 500;
   --z-toast: 600;
+
+  /* Code / terminal panels — inverted contrast block on operational surfaces. */
+  --code-block: oklch(0.18 0.022 248);
+  --code-block-foreground: oklch(0.94 0.008 248);
+  --code-block-border: oklch(0.28 0.024 248);
+  --code-block-muted: oklch(0.62 0.02 248);
 }
 
 @theme inline {
@@ -214,6 +220,10 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
+  --color-code-block: var(--code-block);
+  --color-code-block-foreground: var(--code-block-foreground);
+  --color-code-block-border: var(--code-block-border);
+  --color-code-block-muted: var(--code-block-muted);
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -456,6 +466,11 @@ a {
   --sidebar-accent-foreground: var(--foreground);
   --sidebar-border: var(--line);
   --sidebar-ring: var(--ring);
+
+  --code-block: oklch(0.11 0.014 248);
+  --code-block-foreground: oklch(0.92 0.01 248);
+  --code-block-border: oklch(0.22 0.016 248);
+  --code-block-muted: oklch(0.58 0.02 248);
 }
 
 @layer base {
@@ -562,34 +577,33 @@ a {
 }
 
 @utility type-display {
-  @apply font-heading text-display leading-display tracking-display font-semibold;
+  @apply font-heading text-display leading-display tracking-display font-semibold text-foreground;
 }
 
 @utility type-hero {
-  @apply font-heading text-hero leading-display tracking-display font-semibold;
+  @apply font-heading text-hero leading-display tracking-display font-semibold text-foreground;
 }
 
 @utility type-page-title {
-  @apply font-heading text-title-1 leading-heading tracking-heading font-semibold;
+  @apply font-heading text-title-1 leading-heading tracking-heading font-semibold text-foreground;
 }
 
 @utility type-section-title {
-  @apply font-heading text-title-3 leading-title tracking-title font-semibold;
+  @apply font-heading text-title-3 leading-title tracking-title font-semibold text-foreground;
 }
 
 @utility type-card-title {
-  @apply font-heading text-title-4 leading-title tracking-title font-semibold;
+  @apply font-heading text-title-4 leading-title tracking-title font-semibold text-foreground;
 }
 
 @utility type-body {
-  @apply text-body leading-body;
+  @apply text-body leading-body text-foreground;
 }
 
-/* Secondary copy — not the muted surface fill token used by `bg-muted`. */
-@utility text-muted {
-  @apply text-muted-foreground;
-}
-
+/*
+ * Fill vs ink: @theme --color-muted generates text-muted (surface fill ~94% L).
+ * Never use text-muted for copy — use type-* utilities or text-*-foreground.
+ */
 @utility type-muted {
   @apply text-body leading-body text-muted-foreground;
 }
@@ -611,11 +625,23 @@ a {
 }
 
 @utility type-control {
-  @apply text-body-sm leading-control tracking-control;
+  @apply text-body-sm leading-control tracking-control text-foreground;
 }
 
 @utility type-mono-cell {
-  @apply font-mono text-caption leading-caption tracking-code;
+  @apply font-mono text-caption leading-caption tracking-code text-foreground;
+}
+
+@utility type-mono-muted {
+  @apply font-mono text-caption leading-caption tracking-code text-muted-foreground;
+}
+
+@utility type-code {
+  @apply font-mono text-caption leading-caption tracking-code text-code-block-foreground;
+}
+
+@utility type-code-label {
+  @apply text-caption leading-caption font-semibold tracking-label uppercase text-code-block-muted;
 }
 
 @utility surface-page {
@@ -627,7 +653,7 @@ a {
 }
 
 @utility surface-panel {
-  @apply rounded-panel border border-border bg-surface-raised shadow-elevation-1;
+  @apply rounded-panel border border-border bg-surface-raised text-foreground shadow-elevation-1;
 }
 
 @utility surface-dialog {
@@ -635,15 +661,19 @@ a {
 }
 
 @utility surface-inset {
-  @apply rounded-section border border-border bg-surface-inset;
+  @apply rounded-section border border-border bg-surface-inset text-foreground;
 }
 
 @utility surface-toolbar {
-  @apply rounded-control border border-border bg-surface-muted;
+  @apply rounded-control border border-border bg-surface-muted text-foreground;
 }
 
 @utility surface-command {
   @apply rounded-surface border border-border bg-surface-raised shadow-elevation-3;
+}
+
+@utility surface-code {
+  @apply overflow-hidden rounded-control border border-code-block-border bg-code-block text-code-block-foreground;
 }
 
 @utility surface-focus {
@@ -736,9 +766,9 @@ a {
 }
 
 @utility surface-section {
-  @apply rounded-section border border-border bg-surface;
+  @apply rounded-section border border-border bg-surface text-foreground;
 }
 
 @utility type-subtitle {
-  @apply font-heading text-title-5 leading-title tracking-title font-semibold;
+  @apply font-heading text-title-5 leading-title tracking-title font-semibold text-foreground;
 }

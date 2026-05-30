@@ -2,6 +2,7 @@ import {
   boolean,
   index,
   integer,
+  jsonb,
   numeric,
   pgEnum,
   pgTable,
@@ -252,16 +253,42 @@ export const hrComplianceEvidenceRecordKindEnum = pgEnum(
 export const hrLeaveTypeEnum = pgEnum("hr_leave_type", [
   "annual",
   "sick",
+  "medical",
   "unpaid",
+  "maternity",
+  "paternity",
   "compassionate",
+  "emergency",
+  "study",
+  "replacement",
+  "hospitalization",
   "other",
 ]);
 
 export const hrLeaveRequestStatusEnum = pgEnum("hr_leave_request_status", [
   "pending",
+  "returned",
+  "clarification_requested",
   "approved",
   "rejected",
   "cancelled",
+]);
+
+export const hrLeaveApprovalStageEnum = pgEnum("hr_leave_approval_stage", [
+  "manager",
+  "hr",
+  "complete",
+]);
+
+export const hrLeaveBalanceLedgerKindEnum = pgEnum("hr_leave_balance_ledger_kind", [
+  "pending_reserve",
+  "pending_release",
+  "used",
+  "manual_correction",
+  "carry_forward",
+  "forfeiture",
+  "reversal",
+  "amendment_delta",
 ]);
 
 export const hrAttendancePunchTypeEnum = pgEnum("hr_attendance_punch_type", [
@@ -278,6 +305,49 @@ export const hrAttendanceSourceEnum = pgEnum("hr_attendance_source", [
   "manual",
   "time_clock",
   "import",
+]);
+
+export const hrAttendanceDayStatusEnum = pgEnum("hr_attendance_day_status", [
+  "present",
+  "absent",
+  "late",
+  "early_out",
+  "half_day",
+  "rest_day",
+  "off_day",
+  "public_holiday",
+  "missing_punch",
+]);
+
+export const hrAttendanceDayStateEnum = pgEnum("hr_attendance_day_state", [
+  "open",
+  "computed",
+  "locked",
+]);
+
+export const hrAttendanceExceptionCodeEnum = pgEnum("hr_attendance_exception_code", [
+  "late_arrival",
+  "early_out",
+  "absent",
+  "missing_clock_in",
+  "missing_clock_out",
+  "unapproved_absence",
+]);
+
+export const hrAttendanceCorrectionStatusEnum = pgEnum(
+  "hr_attendance_correction_status",
+  ["pending", "approved", "rejected", "cancelled"],
+);
+
+export const hrLamNotificationKindEnum = pgEnum("hr_lam_notification_kind", [
+  "leave_submitted",
+  "leave_approved",
+  "leave_rejected",
+  "leave_cancelled",
+  "leave_returned",
+  "leave_overdue",
+  "attendance_correction_submitted",
+  "attendance_correction_decided",
 ]);
 
 export const hrOvertimeTypeEnum = pgEnum("hr_overtime_type", [
@@ -1516,6 +1586,130 @@ export const hrComplianceEvidenceLinks = pgTable(
   ],
 );
 
+export const hrLeavePolicies = pgTable(
+  "hr_leave_policies",
+  {
+    id: text("id").primaryKey(),
+    organizationId: organizationReference(),
+    policyGroupCode: text("policy_group_code").notNull().default("default"),
+    minNoticeDays: integer("min_notice_days").notNull().default(1),
+    maxConsecutiveDays: integer("max_consecutive_days"),
+    requireHrApprovalWhenDaysGte: integer("require_hr_approval_when_days_gte"),
+    requireHrApprovalLeaveTypes: jsonb("require_hr_approval_leave_types")
+      .$type<readonly string[]>()
+      .notNull()
+      .default([]),
+    managerChainMaxDepth: integer("manager_chain_max_depth").notNull().default(3),
+    allowCancellationWhilePending: boolean("allow_cancellation_while_pending")
+      .notNull()
+      .default(true),
+    allowAmendmentAfterApproval: boolean("allow_amendment_after_approval")
+      .notNull()
+      .default(false),
+    carryForwardEnabled: boolean("carry_forward_enabled").notNull().default(true),
+    maxCarryForwardDays: numeric("max_carry_forward_days", {
+      precision: 6,
+      scale: 2,
+    }),
+    forfeitureAtYearEnd: boolean("forfeiture_at_year_end").notNull().default(true),
+    ...timestampColumns,
+  },
+  (table) => [
+    uniqueIndex("hr_leave_policies_org_group_uidx").on(
+      table.organizationId,
+      table.policyGroupCode,
+    ),
+  ],
+);
+
+export const hrLeaveBlackoutPeriods = pgTable(
+  "hr_leave_blackout_periods",
+  {
+    id: text("id").primaryKey(),
+    organizationId: organizationReference(),
+    label: text("label").notNull(),
+    startAt: timestamp("start_at", { withTimezone: true }).notNull(),
+    endAt: timestamp("end_at", { withTimezone: true }).notNull(),
+    leaveTypes: jsonb("leave_types").$type<readonly string[] | null>(),
+    ...timestampColumns,
+  },
+  (table) => [
+    index("hr_leave_blackout_org_start_idx").on(
+      table.organizationId,
+      table.startAt,
+    ),
+  ],
+);
+
+export const hrLeaveTypeConfigs = pgTable(
+  "hr_leave_type_configs",
+  {
+    id: text("id").primaryKey(),
+    organizationId: organizationReference(),
+    policyGroupCode: text("policy_group_code").notNull().default("default"),
+    leaveType: hrLeaveTypeEnum("leave_type").notNull(),
+    label: text("label").notNull(),
+    requiresSupportingDocument: boolean("requires_supporting_document")
+      .notNull()
+      .default(false),
+    requiresMedicalCertificate: boolean("requires_medical_certificate")
+      .notNull()
+      .default(false),
+    active: boolean("active").notNull().default(true),
+    ...timestampColumns,
+  },
+  (table) => [
+    uniqueIndex("hr_leave_type_configs_org_group_type_uidx").on(
+      table.organizationId,
+      table.policyGroupCode,
+      table.leaveType,
+    ),
+    index("hr_leave_type_configs_org_group_idx").on(
+      table.organizationId,
+      table.policyGroupCode,
+    ),
+  ],
+);
+
+export const hrLeaveEntitlementRules = pgTable(
+  "hr_leave_entitlement_rules",
+  {
+    id: text("id").primaryKey(),
+    organizationId: organizationReference(),
+    policyGroupCode: text("policy_group_code").notNull().default("default"),
+    leaveType: hrLeaveTypeEnum("leave_type").notNull(),
+    legalEntityCode: text("legal_entity_code"),
+    countryCode: text("country_code"),
+    workLocationCode: text("work_location_code"),
+    employmentType: text("employment_type"),
+    grade: text("grade"),
+    minTenureMonths: integer("min_tenure_months"),
+    maxTenureMonths: integer("max_tenure_months"),
+    annualEntitlementDays: numeric("annual_entitlement_days", {
+      precision: 8,
+      scale: 2,
+    }).notNull(),
+    requiresConfirmation: boolean("requires_confirmation").notNull().default(false),
+    effectiveFrom: timestamp("effective_from", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    effectiveTo: timestamp("effective_to", { withTimezone: true }),
+    ...timestampColumns,
+  },
+  (table) => [
+    index("hr_leave_entitlement_rules_org_group_type_idx").on(
+      table.organizationId,
+      table.policyGroupCode,
+      table.leaveType,
+    ),
+    index("hr_leave_entitlement_rules_org_effective_idx").on(
+      table.organizationId,
+      table.effectiveFrom,
+      table.effectiveTo,
+    ),
+  ],
+);
+
 export const hrLeaveRequests = pgTable(
   "hr_leave_requests",
   {
@@ -1526,11 +1720,30 @@ export const hrLeaveRequests = pgTable(
       .references(() => hrEmployees.id, { onDelete: "cascade" }),
     leaveType: hrLeaveTypeEnum("leave_type").notNull(),
     status: hrLeaveRequestStatusEnum("status").notNull().default("pending"),
+    policyGroupCode: text("policy_group_code").notNull().default("default"),
+    approvalStage: hrLeaveApprovalStageEnum("approval_stage")
+      .notNull()
+      .default("manager"),
+    currentApproverAuthUserId: text("current_approver_auth_user_id"),
+    entitlementYear: integer("entitlement_year").notNull(),
+    supportingDocumentId: text("supporting_document_id").references(
+      () => hrEmployeeDocuments.id,
+      { onDelete: "set null" },
+    ),
+    medicalCertificateReference: text("medical_certificate_reference"),
+    panelClinicReference: text("panel_clinic_reference"),
+    hospitalizationReference: text("hospitalization_reference"),
     startAt: timestamp("start_at", { withTimezone: true }).notNull(),
     endAt: timestamp("end_at", { withTimezone: true }).notNull(),
     durationDays: numeric("duration_days", { precision: 6, scale: 2 }).notNull(),
     reason: text("reason"),
     decisionNote: text("decision_note"),
+    rejectionReason: text("rejection_reason"),
+    returnedNote: text("returned_note"),
+    clarificationNote: text("clarification_note"),
+    amendmentOfRequestId: text("amendment_of_request_id"),
+    policySnapshot: jsonb("policy_snapshot").$type<Record<string, unknown>>(),
+    payrollDeductionReference: text("payroll_deduction_reference"),
     submittedAt: timestamp("submitted_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
@@ -1549,6 +1762,90 @@ export const hrLeaveRequests = pgTable(
     index("hr_leave_requests_org_submitted_idx").on(
       table.organizationId,
       table.submittedAt,
+    ),
+    index("hr_leave_requests_org_approver_idx").on(
+      table.organizationId,
+      table.currentApproverAuthUserId,
+    ),
+    index("hr_leave_requests_org_payroll_ref_idx").on(
+      table.organizationId,
+      table.payrollDeductionReference,
+    ),
+  ],
+);
+
+export const hrLeaveBalances = pgTable(
+  "hr_leave_balances",
+  {
+    id: text("id").primaryKey(),
+    organizationId: organizationReference(),
+    employeeId: text("employee_id")
+      .notNull()
+      .references(() => hrEmployees.id, { onDelete: "cascade" }),
+    leaveType: hrLeaveTypeEnum("leave_type").notNull(),
+    entitlementYear: integer("entitlement_year").notNull(),
+    openingDays: numeric("opening_days", { precision: 8, scale: 2 })
+      .notNull()
+      .default("0"),
+    earnedDays: numeric("earned_days", { precision: 8, scale: 2 })
+      .notNull()
+      .default("0"),
+    usedDays: numeric("used_days", { precision: 8, scale: 2 })
+      .notNull()
+      .default("0"),
+    pendingDays: numeric("pending_days", { precision: 8, scale: 2 })
+      .notNull()
+      .default("0"),
+    adjustedDays: numeric("adjusted_days", { precision: 8, scale: 2 })
+      .notNull()
+      .default("0"),
+    forfeitedDays: numeric("forfeited_days", { precision: 8, scale: 2 })
+      .notNull()
+      .default("0"),
+    carriedForwardDays: numeric("carried_forward_days", { precision: 8, scale: 2 })
+      .notNull()
+      .default("0"),
+    ...timestampColumns,
+  },
+  (table) => [
+    uniqueIndex("hr_leave_balances_org_employee_type_year_uidx").on(
+      table.organizationId,
+      table.employeeId,
+      table.leaveType,
+      table.entitlementYear,
+    ),
+    index("hr_leave_balances_org_employee_idx").on(
+      table.organizationId,
+      table.employeeId,
+    ),
+  ],
+);
+
+export const hrLeaveBalanceLedger = pgTable(
+  "hr_leave_balance_ledger",
+  {
+    id: text("id").primaryKey(),
+    organizationId: organizationReference(),
+    balanceId: text("balance_id")
+      .notNull()
+      .references(() => hrLeaveBalances.id, { onDelete: "cascade" }),
+    leaveRequestId: text("leave_request_id").references(() => hrLeaveRequests.id, {
+      onDelete: "set null",
+    }),
+    kind: hrLeaveBalanceLedgerKindEnum("kind").notNull(),
+    amountDays: numeric("amount_days", { precision: 8, scale: 2 }).notNull(),
+    reason: text("reason").notNull(),
+    authorizedByAuthUserId: text("authorized_by_auth_user_id"),
+    ...timestampColumns,
+  },
+  (table) => [
+    index("hr_leave_balance_ledger_org_balance_idx").on(
+      table.organizationId,
+      table.balanceId,
+    ),
+    index("hr_leave_balance_ledger_org_request_idx").on(
+      table.organizationId,
+      table.leaveRequestId,
     ),
   ],
 );
@@ -1583,6 +1880,138 @@ export const hrAttendanceRecords = pgTable(
     uniqueIndex("hr_attendance_records_org_idempotency_uidx").on(
       table.organizationId,
       table.idempotencyKey,
+    ),
+  ],
+);
+
+export const hrAttendanceDays = pgTable(
+  "hr_attendance_days",
+  {
+    id: text("id").primaryKey(),
+    organizationId: organizationReference(),
+    employeeId: text("employee_id")
+      .notNull()
+      .references(() => hrEmployees.id, { onDelete: "cascade" }),
+    workDate: timestamp("work_date", { withTimezone: true }).notNull(),
+    workCalendarCode: text("work_calendar_code").notNull().default("default"),
+    status: hrAttendanceDayStatusEnum("status").notNull(),
+    dayState: hrAttendanceDayStateEnum("day_state").notNull().default("open"),
+    calculationSnapshot: jsonb("calculation_snapshot").$type<
+      Record<string, unknown>
+    >(),
+    payrollDeductionReference: text("payroll_deduction_reference"),
+    latenessDeductionReference: text("lateness_deduction_reference"),
+    absenceDeductionReference: text("absence_deduction_reference"),
+    notes: text("notes"),
+    ...timestampColumns,
+  },
+  (table) => [
+    uniqueIndex("hr_attendance_days_org_employee_date_uidx").on(
+      table.organizationId,
+      table.employeeId,
+      table.workDate,
+    ),
+    index("hr_attendance_days_org_status_idx").on(
+      table.organizationId,
+      table.status,
+    ),
+    index("hr_attendance_days_org_calendar_idx").on(
+      table.organizationId,
+      table.workCalendarCode,
+    ),
+    index("hr_attendance_days_org_payroll_ref_idx").on(
+      table.organizationId,
+      table.payrollDeductionReference,
+    ),
+  ],
+);
+
+export const hrAttendancePolicies = pgTable(
+  "hr_attendance_policies",
+  {
+    id: text("id").primaryKey(),
+    organizationId: organizationReference(),
+    policyGroupCode: text("policy_group_code").notNull().default("default"),
+    attendanceCorrectionsEnabled: boolean("attendance_corrections_enabled")
+      .notNull()
+      .default(true),
+    graceMinutesLate: integer("grace_minutes_late").notNull().default(15),
+    standardStartMinutes: integer("standard_start_minutes").notNull().default(540),
+    standardEndMinutes: integer("standard_end_minutes").notNull().default(1020),
+    ...timestampColumns,
+  },
+  (table) => [
+    uniqueIndex("hr_attendance_policies_org_group_uidx").on(
+      table.organizationId,
+      table.policyGroupCode,
+    ),
+  ],
+);
+
+export const hrAttendanceCorrectionRequests = pgTable(
+  "hr_attendance_correction_requests",
+  {
+    id: text("id").primaryKey(),
+    organizationId: organizationReference(),
+    employeeId: text("employee_id")
+      .notNull()
+      .references(() => hrEmployees.id, { onDelete: "cascade" }),
+    attendanceDayId: text("attendance_day_id")
+      .notNull()
+      .references(() => hrAttendanceDays.id, { onDelete: "cascade" }),
+    exceptionCode: hrAttendanceExceptionCodeEnum("exception_code").notNull(),
+    status: hrAttendanceCorrectionStatusEnum("status")
+      .notNull()
+      .default("pending"),
+    proposedStatus: hrAttendanceDayStatusEnum("proposed_status"),
+    reason: text("reason").notNull(),
+    decisionNote: text("decision_note"),
+    currentApproverAuthUserId: text("current_approver_auth_user_id"),
+    submittedAt: timestamp("submitted_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    decidedAt: timestamp("decided_at", { withTimezone: true }),
+    ...timestampColumns,
+  },
+  (table) => [
+    index("hr_attendance_correction_org_status_idx").on(
+      table.organizationId,
+      table.status,
+    ),
+    index("hr_attendance_correction_org_employee_idx").on(
+      table.organizationId,
+      table.employeeId,
+    ),
+    index("hr_attendance_correction_org_day_idx").on(
+      table.organizationId,
+      table.attendanceDayId,
+    ),
+  ],
+);
+
+export const hrLamNotifications = pgTable(
+  "hr_lam_notifications",
+  {
+    id: text("id").primaryKey(),
+    organizationId: organizationReference(),
+    recipientAuthUserId: text("recipient_auth_user_id").notNull(),
+    kind: hrLamNotificationKindEnum("kind").notNull(),
+    subjectType: text("subject_type").notNull(),
+    subjectId: text("subject_id").notNull(),
+    title: text("title").notNull(),
+    body: text("body").notNull(),
+    readAt: timestamp("read_at", { withTimezone: true }),
+    ...timestampColumns,
+  },
+  (table) => [
+    index("hr_lam_notifications_org_recipient_idx").on(
+      table.organizationId,
+      table.recipientAuthUserId,
+    ),
+    index("hr_lam_notifications_org_subject_idx").on(
+      table.organizationId,
+      table.subjectType,
+      table.subjectId,
     ),
   ],
 );

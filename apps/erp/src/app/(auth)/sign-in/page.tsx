@@ -50,7 +50,7 @@ async function SignInPageInner() {
       ) : devCookieAuthEnabled ? (
         <DevSignInForm />
       ) : (
-        <div className="rounded-section border border-line bg-surface px-surface-lg py-3 type-body leading-6 text-muted">
+        <div className="rounded-section border border-line bg-surface px-surface-lg py-3 type-muted leading-6">
           {signInEnvironmentCopy.disabledMessage}
         </div>
       )}
