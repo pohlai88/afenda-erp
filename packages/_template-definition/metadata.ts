@@ -1,4 +1,4 @@
-import { createModuleFeatureMetadata } from "@afenda/kernel";
+import { createModuleFeatureMetadata } from "@afenda/kernel/feature-metadata";
 
 /**
  * Governed metadata door — replace __MODULE_ID__ during scaffold.

@@ -34,7 +34,7 @@ vi.mock("@afenda/kernel/execution", () => ({
   writeExecutionAuditEvent: (...args: unknown[]) => mockWriteAudit(...args),
 }));
 
-vi.mock("../../src/integrations", () => ({
+vi.mock("../../src/integrations/events/system-admin.webhook-dispatch.event", () => ({
   dispatchSystemAdminWebhook: (...args: unknown[]) =>
     mockDispatchWebhook(...args),
 }));
@@ -70,7 +70,7 @@ describe("system admin approvals", () => {
     ({ updateSystemAdminApprovalRuleAction } = await import(
       "../../src/approvals/actions/system-admin.approval-rules.actions.server"
     ));
-  }, 30_000);
+  });
 
   beforeEach(() => {
     vi.clearAllMocks();

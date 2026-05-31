@@ -1,4 +1,4 @@
-import { createModuleFeatureMetadata } from "@afenda/kernel";
+import { createModuleFeatureMetadata } from "@afenda/kernel/feature-metadata";
 
 /**
  * Governed metadata door.
@@ -22,7 +22,11 @@ export const {
   getWorkItemKanbanSurfaceKey,
 } = createModuleFeatureMetadata("hr");
 
-type HrUiCopyPage = { title: string; description: string; addEmployeeLabel?: string };
+type HrUiCopyPage = {
+  title: string;
+  description: string;
+  addEmployeeLabel?: string;
+};
 
 export const hrAttendanceUiCopy = {
   page: {

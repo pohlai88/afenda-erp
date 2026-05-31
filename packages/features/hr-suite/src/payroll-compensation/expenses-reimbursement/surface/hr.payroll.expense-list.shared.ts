@@ -1,11 +1,11 @@
-import {
-  buildGovernedListSurface,
-  GOVERNED_METADATA_SCHEMA_VERSION,
-  resolveListSurfaceRowTrailingAction,
-  type ListSurfaceRendererConfigurationResolvedInput,
-} from "@afenda/governed-surface";
+import type { ListSurfaceRendererConfigurationResolvedInput } from "@afenda/governed-surface";
 import type { ListSurfaceRendererConfigurationInput } from "@afenda/governed-surface/schemas";
 
+import {
+  buildHrSuiteListSearchToolbar,
+  buildHrSuiteOperationalListSurface,
+  resolveHrSuiteListTrailingAction,
+} from "../../../hr-suite-integration/metadata";
 import { hrPayrollExpenseReadPermission } from "../contracts/hr.payroll.expense.contract";
 import type { HrExpenseClaimStatus } from "../schemas/hr.payroll.expense-constants.shared";
 import { formatExpenseEnumLabel } from "../schemas/hr.payroll.expense-form.shared";
@@ -14,9 +14,11 @@ export type ExpenseListWindow = {
   pageSize: number;
   totalCount: number;
   hasNextPage: boolean;
+  nextCursor?: string;
 };
 
-type ExpenseListColumn = ListSurfaceRendererConfigurationInput["columns"][number];
+type ExpenseListColumn =
+  ListSurfaceRendererConfigurationInput["columns"][number];
 type ExpenseListRow = ListSurfaceRendererConfigurationInput["rows"][number];
 
 export function buildExpenseListSearchToolbar(input: {
@@ -25,14 +27,7 @@ export function buildExpenseListSearchToolbar(input: {
   placeholder: string;
   value?: string;
 }) {
-  return {
-    search: {
-      param: input.param,
-      label: input.label,
-      placeholder: input.placeholder,
-      value: input.value,
-    },
-  };
+  return buildHrSuiteListSearchToolbar(input);
 }
 
 export function buildExpenseOperationalListSurface(input: {
@@ -48,48 +43,34 @@ export function buildExpenseOperationalListSurface(input: {
   columns: readonly ExpenseListColumn[];
   rows: readonly ExpenseListRow[];
 }): ListSurfaceRendererConfigurationResolvedInput {
-  return buildGovernedListSurface({
-    __schemaVersion: GOVERNED_METADATA_SCHEMA_VERSION,
-    dataNature: "table",
-    presentationProfile: "erp-operational-table",
-    requiresErpPermission: hrPayrollExpenseReadPermission,
-    presentation: {
-      primaryColumnId: input.primaryColumnId,
-      toolbar: input.searchToolbar,
-    },
-    pagination: {
-      pageSize: input.window.pageSize,
-      totalCount: input.window.totalCount,
-      hasNextPage: input.window.hasNextPage,
-    },
+  return buildHrSuiteOperationalListSurface({
+    primaryColumnId: input.primaryColumnId,
+    readPermission: hrPayrollExpenseReadPermission,
+    searchToolbar: input.searchToolbar,
+    window: input.window,
     surface: {
-      header: { title: input.surface.headerTitle },
+      headerTitle: input.surface.headerTitle,
       columnsId: input.surface.columnsId,
       rowKey: "id",
-      empty: {
-        variant: "muted",
-        title: input.surface.emptyTitle,
-        description: input.surface.emptyDescription,
-      },
+      emptyTitle: input.surface.emptyTitle,
+      emptyDescription: input.surface.emptyDescription,
     },
-    columns: [...input.columns],
-    rows: [...input.rows],
+    columns: input.columns,
+    rows: input.rows,
   });
 }
 
-const STATUS_BADGE_TONE: Record<
-  string,
-  "default" | "attention" | "critical"
-> = {
-  draft: "default",
-  submitted: "attention",
-  under_review: "attention",
-  approved: "default",
-  rejected: "critical",
-  returned: "attention",
-  paid: "default",
-  cancelled: "critical",
-};
+const STATUS_BADGE_TONE: Record<string, "default" | "attention" | "critical"> =
+  {
+    draft: "default",
+    submitted: "attention",
+    under_review: "attention",
+    approved: "default",
+    rejected: "critical",
+    returned: "attention",
+    paid: "default",
+    cancelled: "critical",
+  };
 
 export function resolveExpenseStatusBadgeTone(
   status: HrExpenseClaimStatus | string,
@@ -102,7 +83,7 @@ export function resolveExpenseClaimTrailingAction(input: {
   status: HrExpenseClaimStatus | string;
 }) {
   if (!input.canApprove) {
-    return resolveListSurfaceRowTrailingAction({
+    return resolveHrSuiteListTrailingAction({
       visible: false,
       allowed: false,
     });
@@ -113,7 +94,7 @@ export function resolveExpenseClaimTrailingAction(input: {
     input.status === "under_review" ||
     input.status === "returned"
   ) {
-    return resolveListSurfaceRowTrailingAction({
+    return resolveHrSuiteListTrailingAction({
       visible: true,
       allowed: true,
       descriptor: {
@@ -124,7 +105,7 @@ export function resolveExpenseClaimTrailingAction(input: {
     });
   }
 
-  return resolveListSurfaceRowTrailingAction({
+  return resolveHrSuiteListTrailingAction({
     visible: false,
     allowed: false,
   });

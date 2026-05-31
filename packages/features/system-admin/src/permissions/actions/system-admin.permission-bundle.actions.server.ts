@@ -5,7 +5,7 @@ import { upsertRoleOverride } from "@afenda/db";
 import { writeExecutionAuditEvent } from "@afenda/kernel/execution";
 import { logServerEvent } from "@afenda/observability";
 import { revalidatePath } from "next/cache";
-import { dispatchSystemAdminWebhook } from "../../integrations/server";
+import { dispatchSystemAdminWebhook } from "../../integrations/events/system-admin.webhook-dispatch.event";
 import { requireSystemAdminPermissionsManage } from "../policies/system-admin.permissions.policy.server";
 import {
   assertSystemAdminFormActionResult,

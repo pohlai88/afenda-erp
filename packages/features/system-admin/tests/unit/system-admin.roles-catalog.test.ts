@@ -32,7 +32,7 @@ vi.mock("next/cache", () => ({
   revalidatePath: vi.fn(),
 }));
 
-vi.mock("../../src/integrations/server", () => ({
+vi.mock("../../src/integrations/events/system-admin.webhook-dispatch.event", () => ({
   dispatchSystemAdminWebhook: vi.fn(async () => undefined),
 }));
 

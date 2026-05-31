@@ -39,7 +39,7 @@ vi.mock("@afenda/db", async (importOriginal) => {
   };
 });
 
-vi.mock("../../src/integrations", () => ({
+vi.mock("../../src/integrations/events/system-admin.webhook-dispatch.event", () => ({
   dispatchSystemAdminWebhook: (...args: unknown[]) => mockDispatchWebhook(...args),
 }));
 

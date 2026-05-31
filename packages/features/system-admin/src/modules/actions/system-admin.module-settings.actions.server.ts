@@ -19,7 +19,7 @@ import {
   zodActionFailure,
 } from "../../tenant-execution/contracts/system-admin.action-result.contract";
 import { systemAdminRoutePaths } from "../../overview/contracts/system-admin.route-paths.contract";
-import { dispatchSystemAdminWebhook } from "../../integrations/server";
+import { dispatchSystemAdminWebhook } from "../../integrations/events/system-admin.webhook-dispatch.event";
 import {
   formatModuleDependencyIssue,
   listDisabledModuleDependencyKeys,

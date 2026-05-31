@@ -1,10 +1,10 @@
 import { hrTalentCareerPathingUiCopy } from "@afenda/feature-hr-suite/metadata";
 import {
-  HrTalentCareerPathingAccessDeniedPanel,
-  HrTalentCareerPathingPage,
-  buildHrTalentCareerPathingPageModel,
-  requireHrTalentRead,
-  toHrTalentCareerPathingPageModelInput,
+  HrCareerPathingAccessDeniedPanel,
+  HrCareerPathingSection,
+  buildHrCareerPathPageModel,
+  requireHrCareerPathingRead,
+  toHrCareerPathingPageModelInput,
 } from "@afenda/feature-hr-suite/server";
 import type { Metadata } from "next";
 
@@ -20,27 +20,22 @@ export default async function HrCareerPathingPage({
 }) {
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
 
-  let guard: Awaited<ReturnType<typeof requireHrTalentRead>>;
+  let guard: Awaited<ReturnType<typeof requireHrCareerPathingRead>>;
 
   try {
-    guard = await requireHrTalentRead();
+    guard = await requireHrCareerPathingRead();
   } catch {
-    return <HrTalentCareerPathingAccessDeniedPanel />;
+    return <HrCareerPathingAccessDeniedPanel />;
   }
 
-  const pageModel = await buildHrTalentCareerPathingPageModel(
-    toHrTalentCareerPathingPageModelInput({
+  const pageModel = await buildHrCareerPathPageModel(
+    toHrCareerPathingPageModelInput({
       organizationId: guard.organization.id,
       actorAuthUserId: guard.session.id,
-      canWrite: guard.canWriteTalent,
+      canWrite: guard.canWrite,
       searchParams: resolvedSearchParams,
     }),
   );
 
-  return (
-    <HrTalentCareerPathingPage
-      model={pageModel}
-      canWrite={guard.canWriteTalent}
-    />
-  );
+  return <HrCareerPathingSection pageModel={pageModel} />;
 }

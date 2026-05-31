@@ -2,7 +2,7 @@
 
 import { writeExecutionAuditEvent } from "@afenda/kernel/execution";
 import { revalidatePath } from "next/cache";
-import { dispatchSystemAdminWebhook } from "../../integrations/server";
+import { dispatchSystemAdminWebhook } from "../../integrations/events/system-admin.webhook-dispatch.event";
 import { systemAdminMembershipWebhookEvents } from "../../memberships/events/system-admin.memberships.event";
 import {
   requireSystemAdminRolesManage,

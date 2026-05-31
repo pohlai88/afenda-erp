@@ -41,7 +41,7 @@ vi.mock("next/cache", () => ({
   revalidatePath: vi.fn(),
 }));
 
-vi.mock("../../src/integrations/server", () => ({
+vi.mock("../../src/integrations/events/system-admin.webhook-dispatch.event", () => ({
   dispatchSystemAdminWebhook: vi.fn(),
 }));
 
@@ -101,7 +101,7 @@ describe("system admin audit viewer", () => {
     } = await import(
       "../../src/audit-viewer/actions/system-admin.audit.actions.server"
     ));
-  }, 30_000);
+  });
 
   beforeEach(() => {
     vi.clearAllMocks();

@@ -36,9 +36,20 @@ vi.mock("@afenda/kernel/execution", () => ({
   writeExecutionAuditEvent: (...args: unknown[]) => mockWriteAudit(...args),
 }));
 
-vi.mock("../../src/memberships/data", () => ({
-  updateMembershipStatus: (...args: unknown[]) => mockUpdateMembershipStatus(...args),
-}));
+vi.mock(
+  "../../src/memberships/data/system-admin.memberships.query.server",
+  async (importOriginal) => {
+    const actual =
+      await importOriginal<
+        typeof import("../../src/memberships/data/system-admin.memberships.query.server")
+      >();
+    return {
+      ...actual,
+      updateMembershipStatus: (...args: unknown[]) =>
+        mockUpdateMembershipStatus(...args),
+    };
+  },
+);
 
 vi.mock("@afenda/db", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@afenda/db")>();
@@ -52,18 +63,37 @@ vi.mock("@afenda/db", async (importOriginal) => {
   };
 });
 
-vi.mock("../../src/users/data", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("../../src/users/data")>();
-  return {
-    ...actual,
-    assertSystemAdminUserCanBeInvited: (...args: unknown[]) =>
-      mockAssertInvite(...args),
-    createSystemAdminUserInvitation: (...args: unknown[]) =>
-      mockCreateInvite(...args),
-    inspectSystemAdminUserAccess: (...args: unknown[]) =>
-      mockInspectAccess(...args),
-  };
-});
+vi.mock(
+  "../../src/users/data/system-admin.users.query.server",
+  async (importOriginal) => {
+    const actual =
+      await importOriginal<
+        typeof import("../../src/users/data/system-admin.users.query.server")
+      >();
+    return {
+      ...actual,
+      assertSystemAdminUserCanBeInvited: (...args: unknown[]) =>
+        mockAssertInvite(...args),
+      createSystemAdminUserInvitation: (...args: unknown[]) =>
+        mockCreateInvite(...args),
+    };
+  },
+);
+
+vi.mock(
+  "../../src/users/data/system-admin.users-access.query.server",
+  async (importOriginal) => {
+    const actual =
+      await importOriginal<
+        typeof import("../../src/users/data/system-admin.users-access.query.server")
+      >();
+    return {
+      ...actual,
+      inspectSystemAdminUserAccess: (...args: unknown[]) =>
+        mockInspectAccess(...args),
+    };
+  },
+);
 
 vi.mock("next/cache", () => ({
   revalidatePath: vi.fn(),
@@ -175,7 +205,6 @@ describe("system admin users actions", () => {
         expect(result.error).toContain("already invited");
       }
     },
-    20_000,
   );
 
   it("writes audit evidence on invite", async () => {

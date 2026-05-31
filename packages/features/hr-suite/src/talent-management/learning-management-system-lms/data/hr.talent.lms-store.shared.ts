@@ -151,6 +151,10 @@ type HrLmsOrgStore = {
 
 const stores = new Map<string, HrLmsOrgStore>();
 
+export function shouldUseHrLmsStoreFallback() {
+  return process.env.NODE_ENV === "test" || Boolean(process.env.VITEST);
+}
+
 function seedStore(organizationId: string): HrLmsOrgStore {
   const courseCompliance: HrLmsCourseRecord = {
     id: "lms-course-compliance-001",
@@ -489,7 +493,9 @@ export function submitHrLmsAssessmentAttemptInStore(input: {
   score: number;
 }) {
   const store = getStore(input.organizationId);
-  const enrollment = store.enrollments.find((row) => row.id === input.enrollmentId);
+  const enrollment = store.enrollments.find(
+    (row) => row.id === input.enrollmentId,
+  );
   if (!enrollment) {
     throw new Error("enrollment_not_found");
   }
@@ -501,7 +507,10 @@ export function submitHrLmsAssessmentAttemptInStore(input: {
   const priorAttempts = store.assessments.filter(
     (row) => row.enrollmentId === input.enrollmentId,
   );
-  if (course.attemptLimit != null && priorAttempts.length >= course.attemptLimit) {
+  if (
+    course.attemptLimit != null &&
+    priorAttempts.length >= course.attemptLimit
+  ) {
     throw new Error("attempt_limit_exceeded");
   }
 

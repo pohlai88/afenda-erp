@@ -52,7 +52,7 @@ vi.mock("next/cache", () => ({
   revalidatePath: vi.fn(),
 }));
 
-vi.mock("../../src/integrations/server", () => ({
+vi.mock("../../src/integrations/events/system-admin.webhook-dispatch.event", () => ({
   dispatchSystemAdminWebhook: vi.fn(async () => undefined),
 }));
 
@@ -88,7 +88,6 @@ describe("system admin roles", () => {
       expect(roles).toHaveLength(systemAdminSeedRoles.length);
       expect(roles.find((role) => role.key === "admin")?.assignedMembers).toBe(2);
     },
-    20_000,
   );
 
   it("builds page model with permission counts and catalog view audit", async () => {

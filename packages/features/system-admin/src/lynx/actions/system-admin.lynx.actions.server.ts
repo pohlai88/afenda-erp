@@ -10,7 +10,7 @@ import { writeExecutionAuditEvent } from "@afenda/kernel/execution";
 import { logServerEvent } from "@afenda/observability";
 import { revalidatePath } from "next/cache";
 import { requireSystemAdminLynxApprove } from "../policies/system-admin.lynx.policy.server";
-import { dispatchSystemAdminWebhook } from "../../integrations/server";
+import { dispatchSystemAdminWebhook } from "../../integrations/events/system-admin.webhook-dispatch.event";
 
 async function resolveLynxApprover() {
   return requireSystemAdminLynxApprove();

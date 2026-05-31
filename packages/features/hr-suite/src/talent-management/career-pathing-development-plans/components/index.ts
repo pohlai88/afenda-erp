@@ -1,5 +1,4 @@
-/**
- * @afenda-bucket components
- * Scaffold placeholder from packages/_template-definition.
- */
-export {};
+export {
+  HrCareerPathingAccessDeniedPanel,
+  HrCareerPathingSection,
+} from "./hr.talent.career-pathing-section.component.server";

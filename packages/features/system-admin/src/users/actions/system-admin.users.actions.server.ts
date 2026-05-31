@@ -7,7 +7,7 @@ import {
 } from "@afenda/db";
 import { writeExecutionAuditEvent } from "@afenda/kernel/execution";
 import { revalidatePath } from "next/cache";
-import { updateMembershipStatus } from "../../memberships/data";
+import { updateMembershipStatus } from "../../memberships/data/system-admin.memberships.query.server";
 import {
   systemAdminActionFailure,
   systemAdminActionSuccess,
@@ -17,8 +17,8 @@ import {
 import {
   assertSystemAdminUserCanBeInvited,
   createSystemAdminUserInvitation,
-  inspectSystemAdminUserAccess,
-} from "../data";
+} from "../data/system-admin.users.query.server";
+import { inspectSystemAdminUserAccess } from "../data/system-admin.users-access.query.server";
 import { requireSystemAdminUsersManage, requireSystemAdminUsersRead } from "../policies";
 import {
   systemAdminCancelInvitationInputSchema,

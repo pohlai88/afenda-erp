@@ -1,6 +1,7 @@
 import React from "react";
 
 export * from "./actions/hr.time.clock-integration.actions.server";
+export * from "./actions/hr.time.clock-integration.api-ingest.actions.server";
 export * from "./data/hr.time.clock-integration-devices.shared.server";
 export * from "./data/hr.time.clock-integration.page-model.server";
 export * from "./data/hr.time.clock-integration-search-params.parse.shared";
@@ -9,6 +10,7 @@ export * from "./data/hr.time.clock-integration-lam-export.shared.server";
 export * from "./data/hr.time.clock-integration-overtime-refs.shared.server";
 export * from "./data/hr.time.clock-integration-payroll-refs.shared.server";
 export * from "./data/hr.time.clock-integration-sync-alerts.shared.server";
+export * from "./data/hr.time.clock-integration-sync.shared.server";
 export * from "./data/hr.time.clock-integration-reports.shared";
 export * from "./schemas";
 export * from "./contracts";

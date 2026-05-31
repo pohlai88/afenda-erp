@@ -39,7 +39,7 @@ vi.mock("@afenda/observability", () => ({
   logServerEvent: (...args: unknown[]) => mockLogServerEvent(...args),
 }));
 
-vi.mock("../../src/integrations", () => ({
+vi.mock("../../src/integrations/events/system-admin.webhook-dispatch.event", () => ({
   dispatchSystemAdminWebhook: (...args: unknown[]) => mockDispatchWebhook(...args),
 }));
 
@@ -74,7 +74,7 @@ describe("system admin permissions", () => {
     ({ setRoleOverride } = await import(
       "../../src/permissions/actions/system-admin.permission-bundle.actions.server"
     ));
-  }, 30_000);
+  });
 
   beforeEach(() => {
     vi.clearAllMocks();

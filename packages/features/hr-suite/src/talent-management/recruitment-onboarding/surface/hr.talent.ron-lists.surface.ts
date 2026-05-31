@@ -1,9 +1,10 @@
-import {
-  buildGovernedListSurface,
-  GOVERNED_METADATA_SCHEMA_VERSION,
-} from "@afenda/governed-surface";
 import type { ListSurfaceRendererConfigurationInput } from "@afenda/governed-surface/schemas";
 
+import {
+  buildHrSuiteListSearchToolbar,
+  buildHrSuiteOperationalListSurface,
+  type HrSuiteListSurfaceProfile,
+} from "../../../hr-suite-integration/metadata";
 import {
   hrRonApplicationDetailRoutePath,
   hrRonOfferDetailRoutePath,
@@ -46,6 +47,7 @@ type RonWindow<T> = {
   pageSize?: number;
   totalCount?: number;
   hasNextPage?: boolean;
+  nextCursor?: string;
 };
 
 function formatEnumLabel(value: string) {
@@ -57,22 +59,6 @@ function formatEnumLabel(value: string) {
 
 function formatDate(value: string) {
   return value.slice(0, 10);
-}
-
-function createSearchToolbar(input: {
-  param: string;
-  label: string;
-  placeholder: string;
-  value?: string;
-}) {
-  return {
-    search: {
-      param: input.param,
-      label: input.label,
-      placeholder: input.placeholder,
-      value: input.value ?? "",
-    },
-  } as const;
 }
 
 function buildRonListSurface<T>(input: {
@@ -87,36 +73,37 @@ function buildRonListSurface<T>(input: {
   columns: RonListColumn[];
   window: RonWindow<T>;
   rows: RonListRow[];
-  presentationProfile?: "erp-operational-table" | "erp-exception-table" | "erp-audit-ledger";
+  presentationProfile?: Extract<
+    HrSuiteListSurfaceProfile,
+    "erp-operational-table" | "erp-exception-table" | "erp-audit-ledger"
+  >;
 }) {
-  return buildGovernedListSurface({
-    __schemaVersion: GOVERNED_METADATA_SCHEMA_VERSION,
-    dataNature: "table",
-    presentationProfile: input.presentationProfile ?? "erp-operational-table",
-    requiresErpPermission: hrTalentRonReadPermission,
-    presentation: {
-      primaryColumnId: input.primaryColumnId,
-      toolbar: createSearchToolbar({
-        param: input.searchParam,
-        label: "Search",
-        placeholder: input.searchPlaceholder,
-        value: input.searchValue,
-      }),
-    },
-    pagination: {
+  return buildHrSuiteOperationalListSurface({
+    primaryColumnId: input.primaryColumnId,
+    readPermission: hrTalentRonReadPermission,
+    ...(input.presentationProfile
+      ? { profile: input.presentationProfile }
+      : {}),
+    searchToolbar: buildHrSuiteListSearchToolbar({
+      param: input.searchParam,
+      label: "Search",
+      placeholder: input.searchPlaceholder,
+      ...(input.searchValue === undefined ? {} : { value: input.searchValue }),
+    }),
+    window: {
       pageSize: input.window.pageSize ?? Math.max(input.rows.length, 25),
       totalCount: input.window.totalCount ?? input.rows.length,
       hasNextPage: input.window.hasNextPage ?? false,
+      ...(input.window.nextCursor
+        ? { nextCursor: input.window.nextCursor }
+        : {}),
     },
     surface: {
-      header: { title: input.headerTitle },
+      headerTitle: input.headerTitle,
       columnsId: HR_RON_LIST_SURFACE_COLUMNS_BY_KEY[input.surfaceKey],
       rowKey: "id",
-      empty: {
-        variant: "muted",
-        title: input.emptyTitle,
-        description: input.emptyDescription,
-      },
+      emptyTitle: input.emptyTitle,
+      emptyDescription: input.emptyDescription,
     },
     columns: input.columns,
     rows: input.rows,
@@ -140,12 +127,33 @@ export function buildHrRonRequisitionsListSurface(input: {
     emptyDescription: copy.emptyDescription,
     window: { rows: input.rows },
     columns: [
-      { id: "title", header: "Role", priority: "primary", cellKind: { kind: "text" } },
-      { id: "departmentName", header: "Department", cellKind: { kind: "text" } },
-      { id: "hiringManagerDisplayName", header: "Hiring manager", cellKind: { kind: "text" } },
-      { id: "requisitionType", header: "Type", cellKind: { kind: "badge", tone: "default" } },
+      {
+        id: "title",
+        header: "Role",
+        priority: "primary",
+        cellKind: { kind: "text" },
+      },
+      {
+        id: "departmentName",
+        header: "Department",
+        cellKind: { kind: "text" },
+      },
+      {
+        id: "hiringManagerDisplayName",
+        header: "Hiring manager",
+        cellKind: { kind: "text" },
+      },
+      {
+        id: "requisitionType",
+        header: "Type",
+        cellKind: { kind: "badge", tone: "default" },
+      },
       { id: "headcount", header: "Headcount", cellKind: { kind: "text" } },
-      { id: "status", header: "Status", cellKind: { kind: "badge", tone: "default" } },
+      {
+        id: "status",
+        header: "Status",
+        cellKind: { kind: "badge", tone: "default" },
+      },
     ],
     rows: input.rows.map((row) => ({
       id: row.id,
@@ -169,7 +177,9 @@ export function buildHrRonPostingsListSurface(input: {
   searchValue?: string;
 }) {
   const copy = hrRonUiCopy.postings;
-  const requisitionById = new Map(input.requisitions.map((row) => [row.id, row]));
+  const requisitionById = new Map(
+    input.requisitions.map((row) => [row.id, row]),
+  );
   return buildRonListSurface({
     surfaceKey: input.surfaceKey,
     primaryColumnId: "title",
@@ -181,11 +191,24 @@ export function buildHrRonPostingsListSurface(input: {
     emptyDescription: copy.emptyDescription,
     window: { rows: input.rows },
     columns: [
-      { id: "title", header: "Posting", priority: "primary", cellKind: { kind: "text" } },
+      {
+        id: "title",
+        header: "Posting",
+        priority: "primary",
+        cellKind: { kind: "text" },
+      },
       { id: "requisition", header: "Requisition", cellKind: { kind: "text" } },
-      { id: "channel", header: "Channel", cellKind: { kind: "badge", tone: "default" } },
+      {
+        id: "channel",
+        header: "Channel",
+        cellKind: { kind: "badge", tone: "default" },
+      },
       { id: "integrationTarget", header: "Target", cellKind: { kind: "text" } },
-      { id: "status", header: "Status", cellKind: { kind: "badge", tone: "default" } },
+      {
+        id: "status",
+        header: "Status",
+        cellKind: { kind: "badge", tone: "default" },
+      },
       { id: "publishedAt", header: "Published", cellKind: { kind: "text" } },
     ],
     rows: input.rows.map((row) => ({
@@ -193,11 +216,14 @@ export function buildHrRonPostingsListSurface(input: {
       rowHref: hrRonRequisitionDetailRoutePath(row.requisitionId),
       cells: {
         title: row.title,
-        requisition: requisitionById.get(row.requisitionId)?.title ?? row.requisitionId,
+        requisition:
+          requisitionById.get(row.requisitionId)?.title ?? row.requisitionId,
         channel: formatEnumLabel(row.channel),
         integrationTarget: row.integrationTarget ?? "Not configured",
         status: formatEnumLabel(row.status),
-        publishedAt: row.publishedAt ? formatDate(row.publishedAt) : "Not published",
+        publishedAt: row.publishedAt
+          ? formatDate(row.publishedAt)
+          : "Not published",
       },
     })),
   });
@@ -211,7 +237,9 @@ export function buildHrRonApplicationsListSurface(input: {
   searchValue?: string;
 }) {
   const copy = hrRonUiCopy.applications;
-  const requisitionById = new Map(input.requisitions.map((row) => [row.id, row]));
+  const requisitionById = new Map(
+    input.requisitions.map((row) => [row.id, row]),
+  );
   return buildRonListSurface({
     surfaceKey: input.surfaceKey,
     primaryColumnId: "candidate",
@@ -223,11 +251,28 @@ export function buildHrRonApplicationsListSurface(input: {
     emptyDescription: copy.emptyDescription,
     window: { rows: input.rows },
     columns: [
-      { id: "candidate", header: "Candidate", priority: "primary", cellKind: { kind: "text" } },
+      {
+        id: "candidate",
+        header: "Candidate",
+        priority: "primary",
+        cellKind: { kind: "text" },
+      },
       { id: "requisition", header: "Requisition", cellKind: { kind: "text" } },
-      { id: "source", header: "Source", cellKind: { kind: "badge", tone: "default" } },
-      { id: "stage", header: "Stage", cellKind: { kind: "badge", tone: "default" } },
-      { id: "status", header: "Status", cellKind: { kind: "badge", tone: "default" } },
+      {
+        id: "source",
+        header: "Source",
+        cellKind: { kind: "badge", tone: "default" },
+      },
+      {
+        id: "stage",
+        header: "Stage",
+        cellKind: { kind: "badge", tone: "default" },
+      },
+      {
+        id: "status",
+        header: "Status",
+        cellKind: { kind: "badge", tone: "default" },
+      },
       { id: "submittedAt", header: "Submitted", cellKind: { kind: "text" } },
     ],
     rows: input.rows.map((row) => ({
@@ -235,7 +280,8 @@ export function buildHrRonApplicationsListSurface(input: {
       rowHref: hrRonApplicationDetailRoutePath(row.id),
       cells: {
         candidate: input.candidateNames.get(row.candidateId) ?? row.candidateId,
-        requisition: requisitionById.get(row.requisitionId)?.title ?? row.requisitionId,
+        requisition:
+          requisitionById.get(row.requisitionId)?.title ?? row.requisitionId,
         source: formatEnumLabel(row.source),
         stage: formatEnumLabel(row.stage),
         status: formatEnumLabel(row.status),
@@ -263,11 +309,28 @@ export function buildHrRonInterviewsListSurface(input: {
     emptyDescription: copy.emptyDescription,
     window: { rows: input.rows },
     columns: [
-      { id: "candidate", header: "Candidate", priority: "primary", cellKind: { kind: "text" } },
-      { id: "interviewType", header: "Type", cellKind: { kind: "badge", tone: "default" } },
-      { id: "interviewerCount", header: "Interviewers", cellKind: { kind: "text" } },
+      {
+        id: "candidate",
+        header: "Candidate",
+        priority: "primary",
+        cellKind: { kind: "text" },
+      },
+      {
+        id: "interviewType",
+        header: "Type",
+        cellKind: { kind: "badge", tone: "default" },
+      },
+      {
+        id: "interviewerCount",
+        header: "Interviewers",
+        cellKind: { kind: "text" },
+      },
       { id: "scheduledAt", header: "Scheduled", cellKind: { kind: "text" } },
-      { id: "confirmation", header: "Notification", cellKind: { kind: "badge", tone: "default" } },
+      {
+        id: "confirmation",
+        header: "Notification",
+        cellKind: { kind: "badge", tone: "default" },
+      },
     ],
     rows: input.rows.map((row) => ({
       id: row.id,
@@ -301,11 +364,20 @@ export function buildHrRonOffersListSurface(input: {
     emptyDescription: copy.emptyDescription,
     window: { rows: input.rows },
     columns: [
-      { id: "candidate", header: "Candidate", priority: "primary", cellKind: { kind: "text" } },
+      {
+        id: "candidate",
+        header: "Candidate",
+        priority: "primary",
+        cellKind: { kind: "text" },
+      },
       { id: "proposedRole", header: "Role", cellKind: { kind: "text" } },
       { id: "salary", header: "Salary", cellKind: { kind: "text" } },
       { id: "startDate", header: "Start", cellKind: { kind: "text" } },
-      { id: "status", header: "Status", cellKind: { kind: "badge", tone: "default" } },
+      {
+        id: "status",
+        header: "Status",
+        cellKind: { kind: "badge", tone: "default" },
+      },
       { id: "letter", header: "Letter", cellKind: { kind: "text" } },
     ],
     rows: input.rows.map((row) => ({
@@ -341,9 +413,22 @@ export function buildHrRonOnboardingTasksListSurface(input: {
     window: { rows: input.rows },
     presentationProfile: "erp-exception-table",
     columns: [
-      { id: "title", header: "Task", priority: "primary", cellKind: { kind: "text" } },
-      { id: "ownerRole", header: "Owner", cellKind: { kind: "badge", tone: "default" } },
-      { id: "status", header: "Status", cellKind: { kind: "badge", tone: "default" } },
+      {
+        id: "title",
+        header: "Task",
+        priority: "primary",
+        cellKind: { kind: "text" },
+      },
+      {
+        id: "ownerRole",
+        header: "Owner",
+        cellKind: { kind: "badge", tone: "default" },
+      },
+      {
+        id: "status",
+        header: "Status",
+        cellKind: { kind: "badge", tone: "default" },
+      },
       { id: "mandatory", header: "Mandatory", cellKind: { kind: "text" } },
       { id: "blocking", header: "Blocking", cellKind: { kind: "text" } },
       { id: "dueDate", header: "Due", cellKind: { kind: "text" } },
@@ -351,7 +436,9 @@ export function buildHrRonOnboardingTasksListSurface(input: {
     rows: input.rows.map((row) => ({
       id: row.id,
       rowTone:
-        row.status === "blocked" || row.status === "overdue" ? "critical" : undefined,
+        row.status === "blocked" || row.status === "overdue"
+          ? "critical"
+          : undefined,
       cells: {
         title: row.title,
         ownerRole: formatEnumLabel(row.ownerRole),
@@ -382,9 +469,22 @@ export function buildHrRonReadinessListSurface(input: {
     window: { rows: input.rows },
     presentationProfile: "erp-exception-table",
     columns: [
-      { id: "employeeReferenceId", header: "Employee ref", priority: "primary", cellKind: { kind: "text" } },
-      { id: "domain", header: "Domain", cellKind: { kind: "badge", tone: "default" } },
-      { id: "status", header: "Status", cellKind: { kind: "badge", tone: "default" } },
+      {
+        id: "employeeReferenceId",
+        header: "Employee ref",
+        priority: "primary",
+        cellKind: { kind: "text" },
+      },
+      {
+        id: "domain",
+        header: "Domain",
+        cellKind: { kind: "badge", tone: "default" },
+      },
+      {
+        id: "status",
+        header: "Status",
+        cellKind: { kind: "badge", tone: "default" },
+      },
       { id: "missingItems", header: "Missing", cellKind: { kind: "text" } },
       { id: "updatedAt", header: "Updated", cellKind: { kind: "text" } },
     ],
@@ -419,11 +519,28 @@ export function buildHrRonReportsListSurface(input: {
     emptyDescription: copy.emptyDescription,
     window: { rows: input.rows },
     columns: [
-      { id: "groupLabel", header: "Group", priority: "primary", cellKind: { kind: "text" } },
-      { id: "applicationCount", header: "Applications", cellKind: { kind: "text" } },
+      {
+        id: "groupLabel",
+        header: "Group",
+        priority: "primary",
+        cellKind: { kind: "text" },
+      },
+      {
+        id: "applicationCount",
+        header: "Applications",
+        cellKind: { kind: "text" },
+      },
       { id: "hiredCount", header: "Hired", cellKind: { kind: "text" } },
-      { id: "offerAcceptedCount", header: "Accepted offers", cellKind: { kind: "text" } },
-      { id: "onboardingBlockedCount", header: "Blocked onboarding", cellKind: { kind: "text" } },
+      {
+        id: "offerAcceptedCount",
+        header: "Accepted offers",
+        cellKind: { kind: "text" },
+      },
+      {
+        id: "onboardingBlockedCount",
+        header: "Blocked onboarding",
+        cellKind: { kind: "text" },
+      },
     ],
     rows: input.rows.map((row) => ({
       id: row.id,
@@ -456,10 +573,19 @@ export function buildHrRonAuditTrailListSurface(input: {
     window: { rows: input.rows },
     presentationProfile: "erp-audit-ledger",
     columns: [
-      { id: "summary", header: "Summary", priority: "primary", cellKind: { kind: "text" } },
+      {
+        id: "summary",
+        header: "Summary",
+        priority: "primary",
+        cellKind: { kind: "text" },
+      },
       { id: "action", header: "Action", cellKind: { kind: "text" } },
       { id: "actorId", header: "Actor", cellKind: { kind: "text" } },
-      { id: "targetType", header: "Target", cellKind: { kind: "badge", tone: "default" } },
+      {
+        id: "targetType",
+        header: "Target",
+        cellKind: { kind: "badge", tone: "default" },
+      },
       { id: "occurredAt", header: "Occurred", cellKind: { kind: "text" } },
     ],
     rows: input.rows.map((row) => ({

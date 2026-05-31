@@ -6,6 +6,28 @@ import {
   HR_CPM_CYCLE_TYPES,
 } from "./hr.payroll.cpm-constants.shared";
 
+type HrCpmBudgetPoolRequiredScopeField =
+  | "legalEntityCode"
+  | "departmentId"
+  | "businessUnitCode"
+  | "grade"
+  | "locationCode"
+  | "managerEmployeeId";
+
+const requiredBudgetPoolScopeFieldByScope: Partial<
+  Record<
+    (typeof HR_CPM_BUDGET_POOL_SCOPES)[number],
+    HrCpmBudgetPoolRequiredScopeField
+  >
+> = {
+  legal_entity: "legalEntityCode",
+  department: "departmentId",
+  business_unit: "businessUnitCode",
+  grade: "grade",
+  location: "locationCode",
+  manager_group: "managerEmployeeId",
+};
+
 export const hrCpmCreateCycleSchema = z.object({
   code: z.string().min(1).max(64),
   name: z.string().min(1).max(256),
@@ -29,21 +51,39 @@ export const hrCpmCreateCycleSchema = z.object({
     .default({ steps: [] }),
 });
 
-export const hrCpmBudgetPoolSchema = z.object({
-  cycleId: z.string().min(1),
-  code: z.string().min(1).max(64),
-  name: z.string().min(1).max(256),
-  scope: z.enum(HR_CPM_BUDGET_POOL_SCOPES),
-  allocatedAmount: z.number().nonnegative(),
-  scopeRef: z.string().nullable().optional(),
-  legalEntityCode: z.string().nullable().optional(),
-  departmentId: z.string().nullable().optional(),
-  businessUnitCode: z.string().nullable().optional(),
-  grade: z.string().nullable().optional(),
-  locationCode: z.string().nullable().optional(),
-  managerEmployeeId: z.string().nullable().optional(),
-  currencyCode: z.string().length(3).default("USD"),
-});
+export const hrCpmBudgetPoolSchema = z
+  .object({
+    cycleId: z.string().min(1),
+    code: z.string().min(1).max(64),
+    name: z.string().min(1).max(256),
+    scope: z.enum(HR_CPM_BUDGET_POOL_SCOPES),
+    allocatedAmount: z.number().nonnegative(),
+    scopeRef: z.string().nullable().optional(),
+    legalEntityCode: z.string().nullable().optional(),
+    departmentId: z.string().nullable().optional(),
+    businessUnitCode: z.string().nullable().optional(),
+    grade: z.string().nullable().optional(),
+    locationCode: z.string().nullable().optional(),
+    managerEmployeeId: z.string().nullable().optional(),
+    currencyCode: z.string().length(3).default("USD"),
+  })
+  .superRefine((data, ctx) => {
+    const requiredField = requiredBudgetPoolScopeFieldByScope[data.scope];
+
+    if (!requiredField) {
+      return;
+    }
+
+    const requiredValue = data[requiredField];
+
+    if (!requiredValue?.trim()) {
+      ctx.addIssue({
+        code: "custom",
+        message: `${data.scope} scope requires ${requiredField}.`,
+        path: [requiredField],
+      });
+    }
+  });
 
 export const hrCpmEligibilityRuleSchema = z.object({
   cycleId: z.string().min(1),
@@ -150,9 +190,10 @@ export const hrCpmRetentionRecommendationSchema = hrCpmRecommendationBaseSchema
   })
   .superRefine(assertCpmIncreaseInput);
 
-export const hrCpmSpecialRecommendationSchema = hrCpmRecommendationBaseSchema.extend({
-  adjustmentType: z.literal("special"),
-});
+export const hrCpmSpecialRecommendationSchema =
+  hrCpmRecommendationBaseSchema.extend({
+    adjustmentType: z.literal("special"),
+  });
 
 export const hrCpmRecommendationByTypeSchema = z.discriminatedUnion(
   "adjustmentType",
@@ -198,7 +239,9 @@ export const hrCpmFinalizeApprovalSchema = z.object({
 
 export type HrCpmCreateCycleInput = z.infer<typeof hrCpmCreateCycleSchema>;
 export type HrCpmBudgetPoolInput = z.infer<typeof hrCpmBudgetPoolSchema>;
-export type HrCpmRecommendationInput = z.infer<typeof hrCpmRecommendationSchema>;
+export type HrCpmRecommendationInput = z.infer<
+  typeof hrCpmRecommendationSchema
+>;
 export type HrCpmMeritRecommendationInput = z.infer<
   typeof hrCpmMeritRecommendationSchema
 >;
@@ -313,8 +356,7 @@ export function mapHrCpmCreateRecommendationFormToMutation(
     employeeId: form.employeeId,
     adjustmentType: form.adjustmentType,
     currentSalary: form.currentSalary,
-    increaseAmount:
-      form.increaseMode === "amount" ? form.increaseAmount : null,
+    increaseAmount: form.increaseMode === "amount" ? form.increaseAmount : null,
     increasePercent:
       form.increaseMode === "percent" ? form.increasePercent : null,
     budgetPoolId: form.budgetPoolId ?? null,

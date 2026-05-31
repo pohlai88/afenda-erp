@@ -49,7 +49,7 @@ vi.mock("@afenda/observability", () => ({
   logServerEvent: vi.fn(),
 }));
 
-vi.mock("../../src/integrations", () => ({
+vi.mock("../../src/integrations/events/system-admin.webhook-dispatch.event", () => ({
   dispatchSystemAdminWebhook: (...args: unknown[]) => mockDispatchWebhook(...args),
 }));
 
@@ -108,7 +108,6 @@ describe("system admin identity invitations", () => {
         }),
       );
     },
-    20_000,
   );
 
   it(
@@ -132,7 +131,6 @@ describe("system admin identity invitations", () => {
         expect(result.error).toContain("already invited");
       }
     },
-    20_000,
   );
 
   it("denies invite when identity write capability is missing", async () => {

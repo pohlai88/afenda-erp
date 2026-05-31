@@ -1,4 +1,3 @@
-
 export * from "./actions/hr.talent.career-pathing.actions.server";
 export * from "./contracts/hr.talent.career-pathing.contract";
 export * from "./contracts/hr.talent.career-pathing-integration.contract";
@@ -20,6 +19,7 @@ export * from "./data/hr.talent.career-pathing-foundation.page-model.server";
 export * from "./data/hr.talent.career-pathing-queries.server";
 export * from "./data/hr.talent.career-pathing-action-result.shared";
 export * from "./schemas";
+export * from "./components";
 export * from "./actions/hr.talent.career-pathing.mutation.shared.server";
 export * from "./policies/hr.talent.career-pathing-access.policy.server";
 

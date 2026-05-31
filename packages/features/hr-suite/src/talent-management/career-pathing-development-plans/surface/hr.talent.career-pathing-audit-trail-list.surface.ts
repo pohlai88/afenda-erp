@@ -1,5 +1,7 @@
-import type { HrCareerPathingAuditTrailWindow } from "../data/hr.talent.career-pathing-audit.server";
-import { formatCareerPathingAuditActionLabel } from "../data/hr.talent.career-pathing-audit.server";
+import {
+  formatCareerPathingAuditActionLabel,
+  type HrCareerPathingAuditTrailWindow,
+} from "../data/hr.talent.career-pathing-audit.shared";
 import { hrCareerPathingAuditSearchParam } from "../data/hr.talent.career-pathing-search-params.parse.shared";
 import {
   buildCareerPathingListSearchToolbar,

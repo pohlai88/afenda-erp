@@ -6,4 +6,5 @@ export * from "./hr.time.clock-integration-lam-export.shared.server";
 export * from "./hr.time.clock-integration-overtime-refs.shared.server";
 export * from "./hr.time.clock-integration-payroll-refs.shared.server";
 export * from "./hr.time.clock-integration-sync-alerts.shared.server";
+export * from "./hr.time.clock-integration-sync.shared.server";
 export * from "./hr.time.clock-integration-reports.shared";

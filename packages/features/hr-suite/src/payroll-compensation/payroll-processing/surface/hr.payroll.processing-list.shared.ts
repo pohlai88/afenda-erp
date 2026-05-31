@@ -1,18 +1,20 @@
-import {
-  buildGovernedListSurface,
-  GOVERNED_METADATA_SCHEMA_VERSION,
-} from "@afenda/governed-surface";
 import type { ListSurfaceRendererConfigurationInput } from "@afenda/governed-surface/schemas";
 
+import {
+  buildHrSuiteListSearchToolbar,
+  buildHrSuiteOperationalListSurface,
+} from "../../../hr-suite-integration/metadata";
 import { hrPayrollProcessingReadPermission } from "../contracts/hr.payroll.processing.contract";
 
 export type PayrollListWindow = {
   pageSize: number;
   totalCount: number;
   hasNextPage: boolean;
+  nextCursor?: string;
 };
 
-type PayrollListColumn = ListSurfaceRendererConfigurationInput["columns"][number];
+type PayrollListColumn =
+  ListSurfaceRendererConfigurationInput["columns"][number];
 type PayrollListRow = ListSurfaceRendererConfigurationInput["rows"][number];
 
 export function buildPayrollListSearchToolbar(input: {
@@ -21,14 +23,7 @@ export function buildPayrollListSearchToolbar(input: {
   placeholder: string;
   value?: string;
 }) {
-  return {
-    search: {
-      param: input.param,
-      label: input.label,
-      placeholder: input.placeholder,
-      value: input.value,
-    },
-  };
+  return buildHrSuiteListSearchToolbar(input);
 }
 
 export function formatPayrollEnumLabel(value: string) {
@@ -51,29 +46,17 @@ export function buildPayrollOperationalListSurface(input: {
   columns: PayrollListColumn[];
   rows: PayrollListRow[];
 }) {
-  return buildGovernedListSurface({
-    __schemaVersion: GOVERNED_METADATA_SCHEMA_VERSION,
-    dataNature: "table",
-    presentationProfile: "erp-operational-table",
-    requiresErpPermission: hrPayrollProcessingReadPermission,
-    presentation: {
-      primaryColumnId: input.primaryColumnId,
-      toolbar: input.searchToolbar,
-    },
-    pagination: {
-      pageSize: input.window.pageSize,
-      totalCount: input.window.totalCount,
-      hasNextPage: input.window.hasNextPage,
-    },
+  return buildHrSuiteOperationalListSurface({
+    primaryColumnId: input.primaryColumnId,
+    readPermission: hrPayrollProcessingReadPermission,
+    searchToolbar: input.searchToolbar,
+    window: input.window,
     surface: {
-      header: { title: input.surface.headerTitle },
+      headerTitle: input.surface.headerTitle,
       columnsId: input.surface.columnsId,
       rowKey: "id",
-      empty: {
-        variant: "muted",
-        title: input.surface.emptyTitle,
-        description: input.surface.emptyDescription,
-      },
+      emptyTitle: input.surface.emptyTitle,
+      emptyDescription: input.surface.emptyDescription,
     },
     columns: input.columns,
     rows: input.rows,

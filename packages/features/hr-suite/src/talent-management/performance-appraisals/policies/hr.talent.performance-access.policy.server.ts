@@ -1,12 +1,10 @@
 import type { AppCapability } from "@afenda/auth";
 import { resolveEmployeeIdsVisibleToActor } from "@afenda/db";
-import {
-  hasExecutionPermission,
-  requireExecutionContext,
-  requireExecutionPermission,
-  type ExecutionContext,
-} from "@afenda/kernel/execution";
 
+import {
+  requireHrCapability,
+  type HrModuleExecutionGuard,
+} from "../../../hr-suite-integration/server";
 import {
   HR_PER_APPROVE_CAPABILITY,
   HR_PER_AUDIT_READ_CAPABILITY,
@@ -23,7 +21,7 @@ import {
 export type HrPerformanceAccessScope = "self" | "team" | "org";
 
 export type HrPerformanceExecutionGuard = {
-  context: ExecutionContext;
+  context: HrModuleExecutionGuard["context"];
   organization: { id: string };
   canWritePerformance: boolean;
   canApprovePerformance: boolean;
@@ -38,30 +36,21 @@ export type HrPerformanceExecutionGuard = {
 };
 
 function toHrPerformanceExecutionGuard(
-  context: ExecutionContext,
+  moduleGuard: HrModuleExecutionGuard,
 ): HrPerformanceExecutionGuard {
-  const canReadPerformance = hasExecutionPermission(
-    context,
-    HR_PER_READ_CAPABILITY,
-  );
-  const canWritePerformance = hasExecutionPermission(
-    context,
+  const { context } = moduleGuard;
+  const canReadPerformance = moduleGuard.hasCapability(HR_PER_READ_CAPABILITY);
+  const canWritePerformance = moduleGuard.hasCapability(
     HR_PER_WRITE_CAPABILITY,
   );
-  const canApprovePerformance = hasExecutionPermission(
-    context,
+  const canApprovePerformance = moduleGuard.hasCapability(
     HR_PER_APPROVE_CAPABILITY,
   );
-  const canCalibratePerformance = hasExecutionPermission(
-    context,
+  const canCalibratePerformance = moduleGuard.hasCapability(
     HR_PER_CALIBRATE_CAPABILITY,
   );
-  const canReadAudit = hasExecutionPermission(
-    context,
-    HR_PER_AUDIT_READ_CAPABILITY,
-  );
-  const canReadCompensationOutcome = hasExecutionPermission(
-    context,
+  const canReadAudit = moduleGuard.hasCapability(HR_PER_AUDIT_READ_CAPABILITY);
+  const canReadCompensationOutcome = moduleGuard.hasCapability(
     HR_PER_COMPENSATION_READ_CAPABILITY,
   );
   const isLeadership = context.role === "owner" || context.role === "admin";
@@ -76,7 +65,7 @@ function toHrPerformanceExecutionGuard(
     canReadCompensationOutcome:
       canReadPerformance && (canReadCompensationOutcome || isLeadership),
     hasCapability(capability) {
-      return hasExecutionPermission(context, capability);
+      return moduleGuard.hasCapability(capability);
     },
     async resolveVisibleEmployeeIds(scopeInput) {
       if (!canReadPerformance) {
@@ -102,21 +91,21 @@ function toHrPerformanceExecutionGuard(
 }
 
 export async function requireHrPerformanceRead() {
-  const context = await requireExecutionContext();
-  requireExecutionPermission(context, HR_PER_READ_CAPABILITY);
-  return toHrPerformanceExecutionGuard(context);
+  return toHrPerformanceExecutionGuard(
+    await requireHrCapability(HR_PER_READ_CAPABILITY),
+  );
 }
 
 export async function requireHrPerformanceWrite() {
-  const context = await requireExecutionContext();
-  requireExecutionPermission(context, HR_PER_WRITE_CAPABILITY);
-  return toHrPerformanceExecutionGuard(context);
+  return toHrPerformanceExecutionGuard(
+    await requireHrCapability(HR_PER_WRITE_CAPABILITY),
+  );
 }
 
 export async function requireHrPerformanceApprove() {
-  const context = await requireExecutionContext();
-  requireExecutionPermission(context, HR_PER_APPROVE_CAPABILITY);
-  return toHrPerformanceExecutionGuard(context);
+  return toHrPerformanceExecutionGuard(
+    await requireHrCapability(HR_PER_APPROVE_CAPABILITY),
+  );
 }
 
 export function canHrPerformanceEditReview(

@@ -1,9 +1,10 @@
-import {
-  buildGovernedListSurface,
-  GOVERNED_METADATA_SCHEMA_VERSION,
-} from "@afenda/governed-surface";
 import type { ListSurfaceRendererConfigurationInput } from "@afenda/governed-surface/schemas";
 
+import {
+  buildHrSuiteListSearchToolbar,
+  buildHrSuiteOperationalListSurface,
+  type HrSuiteListSurfaceProfile,
+} from "../../../hr-suite-integration/metadata";
 import { hrTalentPerformanceReadPermission } from "../contracts/hr.talent.performance.contract";
 import type {
   HrPerformanceAuditEvent,
@@ -35,6 +36,7 @@ type PerformanceWindow<T> = {
   pageSize?: number;
   totalCount?: number;
   hasNextPage?: boolean;
+  nextCursor?: string;
 };
 
 function formatEnumLabel(value: string) {
@@ -52,22 +54,6 @@ function formatDate(value: string) {
   return value.slice(0, 10);
 }
 
-function createSearchToolbar(input: {
-  param: string;
-  label: string;
-  placeholder: string;
-  value?: string;
-}) {
-  return {
-    search: {
-      param: input.param,
-      label: input.label,
-      placeholder: input.placeholder,
-      value: input.value ?? "",
-    },
-  } as const;
-}
-
 function buildPerformanceListSurface<T>(input: {
   surfaceKey: HrPerformanceAppraisalsListSurfaceKey;
   primaryColumnId: string;
@@ -80,38 +66,38 @@ function buildPerformanceListSurface<T>(input: {
   columns: PerformanceListColumn[];
   window: PerformanceWindow<T>;
   rows: PerformanceListRow[];
-  presentationProfile?: "erp-operational-table" | "erp-exception-table" | "erp-audit-ledger";
+  presentationProfile?: Extract<
+    HrSuiteListSurfaceProfile,
+    "erp-operational-table" | "erp-exception-table" | "erp-audit-ledger"
+  >;
 }) {
-  return buildGovernedListSurface({
-    __schemaVersion: GOVERNED_METADATA_SCHEMA_VERSION,
-    dataNature: "table",
-    presentationProfile: input.presentationProfile ?? "erp-operational-table",
-    requiresErpPermission: hrTalentPerformanceReadPermission,
-    presentation: {
-      primaryColumnId: input.primaryColumnId,
-      toolbar: createSearchToolbar({
-        param: input.searchParam,
-        label: "Search",
-        placeholder: input.searchPlaceholder,
-        value: input.searchValue,
-      }),
-    },
-    pagination: {
+  return buildHrSuiteOperationalListSurface({
+    primaryColumnId: input.primaryColumnId,
+    readPermission: hrTalentPerformanceReadPermission,
+    ...(input.presentationProfile
+      ? { profile: input.presentationProfile }
+      : {}),
+    searchToolbar: buildHrSuiteListSearchToolbar({
+      param: input.searchParam,
+      label: "Search",
+      placeholder: input.searchPlaceholder,
+      ...(input.searchValue === undefined ? {} : { value: input.searchValue }),
+    }),
+    window: {
       pageSize: input.window.pageSize ?? Math.max(input.rows.length, 25),
       totalCount: input.window.totalCount ?? input.rows.length,
       hasNextPage: input.window.hasNextPage ?? false,
+      ...(input.window.nextCursor
+        ? { nextCursor: input.window.nextCursor }
+        : {}),
     },
     surface: {
-      header: { title: input.headerTitle },
-      columnsId: HR_PERFORMANCE_APPRAISALS_LIST_SURFACE_COLUMNS_BY_KEY[
-        input.surfaceKey
-      ],
+      headerTitle: input.headerTitle,
+      columnsId:
+        HR_PERFORMANCE_APPRAISALS_LIST_SURFACE_COLUMNS_BY_KEY[input.surfaceKey],
       rowKey: "id",
-      empty: {
-        variant: "muted",
-        title: input.emptyTitle,
-        description: input.emptyDescription,
-      },
+      emptyTitle: input.emptyTitle,
+      emptyDescription: input.emptyDescription,
     },
     columns: input.columns,
     rows: input.rows,
@@ -135,12 +121,33 @@ export function buildHrPerformanceAppraisalsCyclesListSurface(input: {
     emptyDescription: copy.emptyDescription,
     window: { rows: input.rows },
     columns: [
-      { id: "name", header: "Cycle", priority: "primary", cellKind: { kind: "text" } },
-      { id: "reviewType", header: "Type", cellKind: { kind: "badge", tone: "default" } },
+      {
+        id: "name",
+        header: "Cycle",
+        priority: "primary",
+        cellKind: { kind: "text" },
+      },
+      {
+        id: "reviewType",
+        header: "Type",
+        cellKind: { kind: "badge", tone: "default" },
+      },
       { id: "period", header: "Period", cellKind: { kind: "text" } },
-      { id: "submissionDeadline", header: "Submission", cellKind: { kind: "text" } },
-      { id: "approvalDeadline", header: "Approval", cellKind: { kind: "text" } },
-      { id: "status", header: "Status", cellKind: { kind: "badge", tone: "default" } },
+      {
+        id: "submissionDeadline",
+        header: "Submission",
+        cellKind: { kind: "text" },
+      },
+      {
+        id: "approvalDeadline",
+        header: "Approval",
+        cellKind: { kind: "text" },
+      },
+      {
+        id: "status",
+        header: "Status",
+        cellKind: { kind: "badge", tone: "default" },
+      },
     ],
     rows: input.rows.map((row) => ({
       id: row.id,
@@ -176,11 +183,28 @@ export function buildHrPerformanceAppraisalsReviewsListSurface(input: {
     emptyDescription: copy.emptyDescription,
     window: { rows: input.rows },
     columns: [
-      { id: "employeeDisplayName", header: "Employee", priority: "primary", cellKind: { kind: "text" } },
+      {
+        id: "employeeDisplayName",
+        header: "Employee",
+        priority: "primary",
+        cellKind: { kind: "text" },
+      },
       { id: "cycleName", header: "Cycle", cellKind: { kind: "text" } },
-      { id: "managerDisplayName", header: "Manager", cellKind: { kind: "text" } },
-      { id: "departmentName", header: "Department", cellKind: { kind: "text" } },
-      { id: "status", header: "Status", cellKind: { kind: "badge", tone: "default" } },
+      {
+        id: "managerDisplayName",
+        header: "Manager",
+        cellKind: { kind: "text" },
+      },
+      {
+        id: "departmentName",
+        header: "Department",
+        cellKind: { kind: "text" },
+      },
+      {
+        id: "status",
+        header: "Status",
+        cellKind: { kind: "badge", tone: "default" },
+      },
       { id: "finalRating", header: "Rating", cellKind: { kind: "text" } },
     ],
     rows: input.rows.map((row) => ({
@@ -205,7 +229,10 @@ export function buildHrPerformanceAppraisalsGoalsListSurface(input: {
 }) {
   const copy = hrPerformanceAppraisalsUiCopy.goals;
   const goals = input.rows.flatMap((review) =>
-    review.goals.map((goal) => ({ ...goal, employeeDisplayName: review.employeeDisplayName })),
+    review.goals.map((goal) => ({
+      ...goal,
+      employeeDisplayName: review.employeeDisplayName,
+    })),
   );
   return buildPerformanceListSurface({
     surfaceKey: input.surfaceKey,
@@ -218,12 +245,25 @@ export function buildHrPerformanceAppraisalsGoalsListSurface(input: {
     emptyDescription: copy.emptyDescription,
     window: { rows: goals },
     columns: [
-      { id: "employeeDisplayName", header: "Employee", cellKind: { kind: "text" } },
-      { id: "title", header: "Goal", priority: "primary", cellKind: { kind: "text" } },
+      {
+        id: "employeeDisplayName",
+        header: "Employee",
+        cellKind: { kind: "text" },
+      },
+      {
+        id: "title",
+        header: "Goal",
+        priority: "primary",
+        cellKind: { kind: "text" },
+      },
       { id: "target", header: "Target", cellKind: { kind: "text" } },
       { id: "weight", header: "Weight", cellKind: { kind: "text" } },
       { id: "progress", header: "Progress", cellKind: { kind: "text" } },
-      { id: "status", header: "Status", cellKind: { kind: "badge", tone: "default" } },
+      {
+        id: "status",
+        header: "Status",
+        cellKind: { kind: "badge", tone: "default" },
+      },
     ],
     rows: goals.map((goal) => ({
       id: goal.id,
@@ -263,10 +303,23 @@ export function buildHrPerformanceAppraisalsApprovalsListSurface(input: {
     presentationProfile: "erp-exception-table",
     window: { rows: steps },
     columns: [
-      { id: "employeeDisplayName", header: "Employee", priority: "primary", cellKind: { kind: "text" } },
-      { id: "role", header: "Step", cellKind: { kind: "badge", tone: "default" } },
+      {
+        id: "employeeDisplayName",
+        header: "Employee",
+        priority: "primary",
+        cellKind: { kind: "text" },
+      },
+      {
+        id: "role",
+        header: "Step",
+        cellKind: { kind: "badge", tone: "default" },
+      },
       { id: "sequence", header: "Order", cellKind: { kind: "text" } },
-      { id: "status", header: "Status", cellKind: { kind: "badge", tone: "default" } },
+      {
+        id: "status",
+        header: "Status",
+        cellKind: { kind: "badge", tone: "default" },
+      },
       { id: "decidedAt", header: "Decided", cellKind: { kind: "text" } },
     ],
     rows: steps.map((step) => ({
@@ -300,11 +353,28 @@ export function buildHrPerformanceAppraisalsOutcomesListSurface(input: {
     emptyDescription: copy.emptyDescription,
     window: { rows: outcomes },
     columns: [
-      { id: "employeeDisplayName", header: "Employee", priority: "primary", cellKind: { kind: "text" } },
+      {
+        id: "employeeDisplayName",
+        header: "Employee",
+        priority: "primary",
+        cellKind: { kind: "text" },
+      },
       { id: "finalRating", header: "Rating", cellKind: { kind: "text" } },
-      { id: "performanceCategory", header: "Outcome", cellKind: { kind: "badge", tone: "default" } },
-      { id: "promotionRecommended", header: "Promotion", cellKind: { kind: "text" } },
-      { id: "compensationReviewRecommended", header: "Comp review", cellKind: { kind: "text" } },
+      {
+        id: "performanceCategory",
+        header: "Outcome",
+        cellKind: { kind: "badge", tone: "default" },
+      },
+      {
+        id: "promotionRecommended",
+        header: "Promotion",
+        cellKind: { kind: "text" },
+      },
+      {
+        id: "compensationReviewRecommended",
+        header: "Comp review",
+        cellKind: { kind: "text" },
+      },
       { id: "finalizedAt", header: "Finalized", cellKind: { kind: "text" } },
     ],
     rows: outcomes.map((review) => ({
@@ -315,11 +385,16 @@ export function buildHrPerformanceAppraisalsOutcomesListSurface(input: {
         performanceCategory: review.outcome
           ? formatEnumLabel(review.outcome.performanceCategory)
           : "",
-        promotionRecommended: review.outcome?.promotionRecommended ? "Yes" : "No",
-        compensationReviewRecommended: review.outcome?.compensationReviewRecommended
+        promotionRecommended: review.outcome?.promotionRecommended
           ? "Yes"
           : "No",
-        finalizedAt: review.finalizedAt ? formatDate(review.finalizedAt) : "Pending",
+        compensationReviewRecommended: review.outcome
+          ?.compensationReviewRecommended
+          ? "Yes"
+          : "No",
+        finalizedAt: review.finalizedAt
+          ? formatDate(review.finalizedAt)
+          : "Pending",
       },
     })),
   });
@@ -342,11 +417,20 @@ export function buildHrPerformanceAppraisalsReportsListSurface(input: {
     emptyDescription: copy.emptyDescription,
     window: { rows: input.rows },
     columns: [
-      { id: "groupLabel", header: "Group", priority: "primary", cellKind: { kind: "text" } },
+      {
+        id: "groupLabel",
+        header: "Group",
+        priority: "primary",
+        cellKind: { kind: "text" },
+      },
       { id: "reviewCount", header: "Reviews", cellKind: { kind: "text" } },
       { id: "finalizedCount", header: "Finalized", cellKind: { kind: "text" } },
       { id: "overdueCount", header: "Overdue", cellKind: { kind: "text" } },
-      { id: "averageFinalRating", header: "Avg rating", cellKind: { kind: "text" } },
+      {
+        id: "averageFinalRating",
+        header: "Avg rating",
+        cellKind: { kind: "text" },
+      },
     ],
     rows: input.rows.map((row) => ({
       id: row.id,
@@ -379,8 +463,17 @@ export function buildHrPerformanceAppraisalsAuditTrailListSurface(input: {
     presentationProfile: "erp-audit-ledger",
     window: { rows: input.rows },
     columns: [
-      { id: "action", header: "Action", cellKind: { kind: "badge", tone: "default" } },
-      { id: "summary", header: "Summary", priority: "primary", cellKind: { kind: "text" } },
+      {
+        id: "action",
+        header: "Action",
+        cellKind: { kind: "badge", tone: "default" },
+      },
+      {
+        id: "summary",
+        header: "Summary",
+        priority: "primary",
+        cellKind: { kind: "text" },
+      },
       { id: "actorId", header: "Actor", cellKind: { kind: "text" } },
       { id: "occurredAt", header: "When", cellKind: { kind: "text" } },
     ],

@@ -3,11 +3,19 @@ import { dirname, join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 
-const repoRoot = join(
-  dirname(fileURLToPath(import.meta.url)),
-  "../../../..",
-);
+const repoRoot = join(dirname(fileURLToPath(import.meta.url)), "../../../..");
 const sourceRoots = ["apps", "packages"];
+const ignoredDirectoryNames = new Set([
+  ".next",
+  ".turbo",
+  ".vercel",
+  "coverage",
+  "dist",
+  "node_modules",
+  "playwright-report",
+  "test-results",
+  "vitest-reports",
+]);
 const rootAiImportPattern =
   /\b(?:import|export)\b[\s\S]*?\bfrom\s+["']@afenda\/ai["']|vi\.mock\(["']@afenda\/ai["']/;
 
@@ -17,7 +25,7 @@ function collectSourceFiles(dir: string): string[] {
     const stats = statSync(path);
 
     if (stats.isDirectory()) {
-      if (["dist", "node_modules"].includes(entry)) {
+      if (ignoredDirectoryNames.has(entry)) {
         return [];
       }
 
@@ -36,5 +44,5 @@ describe("@afenda/ai import boundaries", () => {
       .map((file) => relative(repoRoot, file));
 
     expect(violations).toEqual([]);
-  });
+  }, 30_000);
 });

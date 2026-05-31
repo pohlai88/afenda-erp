@@ -1,4 +1,4 @@
-import { createModuleFeatureMetadata } from "@afenda/kernel";
+import { createModuleFeatureMetadata } from "@afenda/kernel/feature-metadata";
 import { describe, expect, it } from "vitest";
 import {
   getModuleFeatureMetadata,

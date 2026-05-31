@@ -9,7 +9,7 @@ import {
   type SystemAdminActionResult,
   zodActionFailure,
 } from "../../tenant-execution/contracts/system-admin.action-result.contract";
-import { dispatchSystemAdminWebhook } from "../../integrations/server";
+import { dispatchSystemAdminWebhook } from "../../integrations/events/system-admin.webhook-dispatch.event";
 import {
   requireSystemAdminAuditExport,
   requireSystemAdminAuditReview,

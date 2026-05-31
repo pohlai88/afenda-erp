@@ -1,15 +1,16 @@
-import {
-  buildGovernedListSurface,
-  GOVERNED_METADATA_SCHEMA_VERSION,
-} from "@afenda/governed-surface";
 import type { ListSurfaceRendererConfigurationInput } from "@afenda/governed-surface/schemas";
 
+import {
+  buildHrSuiteListSearchToolbar,
+  buildHrSuiteOperationalListSurface,
+} from "../../../hr-suite-integration/metadata";
 import { hrPayrollMcpReadPermission } from "../contracts/hr.payroll.mcp.contract";
 
 export type McpListWindow = {
   pageSize: number;
   totalCount: number;
   hasNextPage: boolean;
+  nextCursor?: string;
 };
 
 type McpListColumn = ListSurfaceRendererConfigurationInput["columns"][number];
@@ -21,14 +22,7 @@ export function buildMcpListSearchToolbar(input: {
   placeholder: string;
   value?: string;
 }) {
-  return {
-    search: {
-      param: input.param,
-      label: input.label,
-      placeholder: input.placeholder,
-      value: input.value,
-    },
-  };
+  return buildHrSuiteListSearchToolbar(input);
 }
 
 export function formatMcpEnumLabel(value: string) {
@@ -51,29 +45,17 @@ export function buildMcpOperationalListSurface(input: {
   columns: McpListColumn[];
   rows: McpListRow[];
 }) {
-  return buildGovernedListSurface({
-    __schemaVersion: GOVERNED_METADATA_SCHEMA_VERSION,
-    dataNature: "table",
-    presentationProfile: "erp-operational-table",
-    requiresErpPermission: hrPayrollMcpReadPermission,
-    presentation: {
-      primaryColumnId: input.primaryColumnId,
-      toolbar: input.searchToolbar,
-    },
-    pagination: {
-      pageSize: input.window.pageSize,
-      totalCount: input.window.totalCount,
-      hasNextPage: input.window.hasNextPage,
-    },
+  return buildHrSuiteOperationalListSurface({
+    primaryColumnId: input.primaryColumnId,
+    readPermission: hrPayrollMcpReadPermission,
+    searchToolbar: input.searchToolbar,
+    window: input.window,
     surface: {
-      header: { title: input.surface.headerTitle },
+      headerTitle: input.surface.headerTitle,
       columnsId: input.surface.columnsId,
       rowKey: "id",
-      empty: {
-        variant: "muted",
-        title: input.surface.emptyTitle,
-        description: input.surface.emptyDescription,
-      },
+      emptyTitle: input.surface.emptyTitle,
+      emptyDescription: input.surface.emptyDescription,
     },
     columns: input.columns,
     rows: input.rows,

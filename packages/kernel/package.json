@@ -32,6 +32,12 @@
       "import": "./src/execution-kernel/capabilities/execution-capabilities.ts",
       "default": "./dist/execution-kernel/capabilities/execution-capabilities.js"
     },
+    "./feature-metadata": {
+      "types": "./src/modules/feature-metadata.ts",
+      "development": "./src/modules/feature-metadata.ts",
+      "import": "./src/modules/feature-metadata.ts",
+      "default": "./dist/modules/feature-metadata.js"
+    },
     "./execution-tenant-policy": {
       "types": "./src/execution-kernel/policy/tenant-execution-rules.ts",
       "development": "./src/execution-kernel/policy/tenant-execution-rules.ts",

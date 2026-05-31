@@ -1,19 +1,21 @@
-import {
-  buildGovernedListSurface,
-  GOVERNED_METADATA_SCHEMA_VERSION,
-  resolveListSurfaceRowTrailingAction,
-} from "@afenda/governed-surface";
 import type { ListSurfaceRendererConfigurationInput } from "@afenda/governed-surface/schemas";
 
+import {
+  buildHrSuiteListSearchToolbar,
+  buildHrSuiteOperationalListSurface,
+  resolveHrSuiteListTrailingAction,
+} from "../../../hr-suite-integration/metadata";
 import { hrPayrollBenefitsReadPermission } from "../contracts/hr.payroll.benefits.contract";
 
 export type BenefitsListWindow = {
   pageSize: number;
   totalCount: number;
   hasNextPage: boolean;
+  nextCursor?: string;
 };
 
-type BenefitsListColumn = ListSurfaceRendererConfigurationInput["columns"][number];
+type BenefitsListColumn =
+  ListSurfaceRendererConfigurationInput["columns"][number];
 type BenefitsListRow = ListSurfaceRendererConfigurationInput["rows"][number];
 
 export function buildBenefitsListSearchToolbar(input: {
@@ -22,14 +24,7 @@ export function buildBenefitsListSearchToolbar(input: {
   placeholder: string;
   value?: string;
 }) {
-  return {
-    search: {
-      param: input.param,
-      label: input.label,
-      placeholder: input.placeholder,
-      value: input.value,
-    },
-  };
+  return buildHrSuiteListSearchToolbar(input);
 }
 
 export function buildBenefitsOperationalListSurface(input: {
@@ -45,29 +40,17 @@ export function buildBenefitsOperationalListSurface(input: {
   columns: BenefitsListColumn[];
   rows: BenefitsListRow[];
 }) {
-  return buildGovernedListSurface({
-    __schemaVersion: GOVERNED_METADATA_SCHEMA_VERSION,
-    dataNature: "table",
-    presentationProfile: "erp-operational-table",
-    requiresErpPermission: hrPayrollBenefitsReadPermission,
-    presentation: {
-      primaryColumnId: input.primaryColumnId,
-      toolbar: input.searchToolbar,
-    },
-    pagination: {
-      pageSize: input.window.pageSize,
-      totalCount: input.window.totalCount,
-      hasNextPage: input.window.hasNextPage,
-    },
+  return buildHrSuiteOperationalListSurface({
+    primaryColumnId: input.primaryColumnId,
+    readPermission: hrPayrollBenefitsReadPermission,
+    searchToolbar: input.searchToolbar,
+    window: input.window,
     surface: {
-      header: { title: input.surface.headerTitle },
+      headerTitle: input.surface.headerTitle,
       columnsId: input.surface.columnsId,
       rowKey: "id",
-      empty: {
-        variant: "muted",
-        title: input.surface.emptyTitle,
-        description: input.surface.emptyDescription,
-      },
+      emptyTitle: input.surface.emptyTitle,
+      emptyDescription: input.surface.emptyDescription,
     },
     columns: input.columns,
     rows: input.rows,
@@ -89,14 +72,14 @@ export function resolveBenefitsEnrollmentTrailingAction(input: {
   unverifiedDependentCount: number;
 }) {
   if (!input.canWrite) {
-    return resolveListSurfaceRowTrailingAction({
+    return resolveHrSuiteListTrailingAction({
       visible: false,
       allowed: false,
     });
   }
 
   if (input.coverageStatus === "pending") {
-    return resolveListSurfaceRowTrailingAction({
+    return resolveHrSuiteListTrailingAction({
       visible: true,
       allowed: true,
       descriptor: {
@@ -108,7 +91,7 @@ export function resolveBenefitsEnrollmentTrailingAction(input: {
   }
 
   if (input.unverifiedDependentCount > 0) {
-    return resolveListSurfaceRowTrailingAction({
+    return resolveHrSuiteListTrailingAction({
       visible: true,
       allowed: true,
       descriptor: {
@@ -124,7 +107,7 @@ export function resolveBenefitsEnrollmentTrailingAction(input: {
     input.coverageLevel !== "employee_only" &&
     (input.coverageStatus === "active" || input.coverageStatus === "pending")
   ) {
-    return resolveListSurfaceRowTrailingAction({
+    return resolveHrSuiteListTrailingAction({
       visible: true,
       allowed: true,
       descriptor: {
@@ -135,7 +118,7 @@ export function resolveBenefitsEnrollmentTrailingAction(input: {
     });
   }
 
-  return resolveListSurfaceRowTrailingAction({
+  return resolveHrSuiteListTrailingAction({
     visible: false,
     allowed: false,
   });

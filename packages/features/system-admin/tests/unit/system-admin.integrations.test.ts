@@ -84,7 +84,7 @@ describe("system admin integrations", () => {
     ({ revokeApiCredentialAction } = await import(
       "../../src/integrations/actions/system-admin.integrations.actions.server"
     ));
-  }, 30_000);
+  });
 
   beforeEach(() => {
     vi.clearAllMocks();

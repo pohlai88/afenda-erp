@@ -5,15 +5,13 @@ import type { HrTalentCareerPathingAuditAction } from "../events/hr.talent.caree
 import {
   appendHrCareerPathingAuditEventToStore,
   listHrCareerPathingAuditEventsFromStore,
-  type HrCareerPathingAuditEventRecord,
 } from "./hr.talent.career-pathing-audit-store.shared";
+import type { HrCareerPathingAuditTrailWindow } from "./hr.talent.career-pathing-audit.shared";
 
-export type HrCareerPathingAuditTrailWindow = {
-  rows: HrCareerPathingAuditEventRecord[];
-  pageSize: number;
-  totalCount: number;
-  hasNextPage: boolean;
-};
+export {
+  formatCareerPathingAuditActionLabel,
+  type HrCareerPathingAuditTrailWindow,
+} from "./hr.talent.career-pathing-audit.shared";
 
 /** HRM-CAR-031 — paginated career pathing audit trail. */
 export async function listHrCareerPathingAuditTrailWindow(input: {
@@ -50,15 +48,6 @@ export async function emitHrCareerPathingAuditEvent(input: {
   }
 
   return { auditEventId: event.id };
-}
-
-export function formatCareerPathingAuditActionLabel(action: string): string {
-  return action
-    .replace(/^hr\.talent\.career_path\./, "")
-    .split(".")
-    .map((part) => part.replace(/_/g, " "))
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join(" · ");
 }
 
 export { HR_TALENT_CAREER_PATHING_MODULE_KEY };
