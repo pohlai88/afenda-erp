@@ -1,23 +1,23 @@
 import type { AppCapability } from "@afenda/auth";
 
-import { hrComplianceRoutePaths } from "../employee-management/compliance-regulatory-tracking/contracts/hr.workforce.compliance-route.contract";
-import { hrDocumentsRoutePaths } from "../employee-management/documents-management/contracts/hr.workforce.documents-route.contract";
-import { hrLifecycleRoutePaths } from "../employee-management/employee-lifecycle-management/contracts/hr.workforce.lifecycle-route.contract";
-import { hrOffboardingRoutePaths } from "../employee-management/offboarding-exit-management/contracts/hr.workforce.offboarding-route.contract";
-import { hrOrgRoutePaths } from "../employee-management/organizational-chart-hierarchy/contracts/hr.workforce.org-route.contract";
-import { hrBenefitsRoutePaths } from "../payroll-compensation/benefits-administration/contracts/hr.payroll.benefits-route.contract";
-import { hrBonusRoutePaths } from "../payroll-compensation/bonus-incentive-management/contracts/hr.payroll.bonus-route.contract";
-import { hrExpenseRoutePaths } from "../payroll-compensation/expenses-reimbursement/contracts/hr.payroll.expense-route.contract";
-import { hrCpmRoutePaths } from "../payroll-compensation/compensation-planning-modeling/contracts/hr.payroll.cpm-route.contract";
-import { hrCsfRoutePaths } from "../talent-management/competency-skills-framework/contracts/hr.talent.csf-route.contract";
-import { hrPerformanceRoutePaths } from "../talent-management/performance-appraisals/contracts/hr.talent.performance-route.contract";
-import { hrRonRoutePaths } from "../talent-management/recruitment-onboarding/contracts/hr.talent.ron-route.contract";
-import { hrPayrollProcessingRoutePaths } from "../payroll-compensation/payroll-processing/contracts/hr.payroll.processing-route.contract";
-import { hrAatRoutePaths } from "../time-attendance/absence-analytics-trends/contracts/hr.time.aat-route.contract";
-import { hrRecordsRoutePaths } from "../employee-management/employee-records-management/contracts/hr.workforce.records-route.contract";
-import { hrLamRoutePaths } from "../time-attendance/leave-attendance-management/contracts/hr.time.lam-route.contract";
-import { hrFwaRoutePaths } from "../time-attendance/flexible-work-arrangement-tracking/contracts/hr.time.fwa-route.contract";
-import { hrGeoRoutePaths } from "../time-attendance/geolocation-remote-checkin/contracts/hr.time.geo-route.contract";
+import { hrComplianceRoutePaths } from "../../employee-management/compliance-regulatory-tracking/contracts/hr.workforce.compliance-route.contract";
+import { hrDocumentsRoutePaths } from "../../employee-management/documents-management/contracts/hr.workforce.documents-route.contract";
+import { hrLifecycleRoutePaths } from "../../employee-management/employee-lifecycle-management/contracts/hr.workforce.lifecycle-route.contract";
+import { hrOffboardingRoutePaths } from "../../employee-management/offboarding-exit-management/contracts/hr.workforce.offboarding-route.contract";
+import { hrOrgRoutePaths } from "../../employee-management/organizational-chart-hierarchy/contracts/hr.workforce.org-route.contract";
+import { hrBenefitsRoutePaths } from "../../payroll-compensation/benefits-administration/contracts/hr.payroll.benefits-route.contract";
+import { hrBonusRoutePaths } from "../../payroll-compensation/bonus-incentive-management/contracts/hr.payroll.bonus-route.contract";
+import { hrExpenseRoutePaths } from "../../payroll-compensation/expenses-reimbursement/contracts/hr.payroll.expense-route.contract";
+import { hrCpmRoutePaths } from "../../payroll-compensation/compensation-planning-modeling/contracts/hr.payroll.cpm-route.contract";
+import { hrCsfRoutePaths } from "../../talent-management/competency-skills-framework/contracts/hr.talent.csf-route.contract";
+import { hrPerformanceRoutePaths } from "../../talent-management/performance-appraisals/contracts/hr.talent.performance-route.contract";
+import { hrRonRoutePaths } from "../../talent-management/recruitment-onboarding/contracts/hr.talent.ron-route.contract";
+import { hrPayrollProcessingRoutePaths } from "../../payroll-compensation/payroll-processing/contracts/hr.payroll.processing-route.contract";
+import { hrAatRoutePaths } from "../../time-attendance/absence-analytics-trends/contracts/hr.time.aat-route.contract";
+import { hrRecordsRoutePaths } from "../../employee-management/employee-records-management/contracts/hr.workforce.records-route.contract";
+import { hrLamRoutePaths } from "../../time-attendance/leave-attendance-management/contracts/hr.time.lam-route.contract";
+import { hrFwaRoutePaths } from "../../time-attendance/flexible-work-arrangement-tracking/contracts/hr.time.fwa-route.contract";
+import { hrGeoRoutePaths } from "../../time-attendance/geolocation-remote-checkin/contracts/hr.time.geo-route.contract";
 
 type HrNavCapability = Extract<AppCapability, `hr.${string}`>;
 

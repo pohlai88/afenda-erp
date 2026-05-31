@@ -25,7 +25,7 @@ import type { HrTimeClockValidationPipelineResult } from "@afenda/db";
 
 import { HrTimeClockCommandError } from "../data/hr.time.clock-integration-correction.shared.server";
 
-function mapHrTimeClockMutationError(error: unknown): ActionResult {
+function mapHrTimeClockMutationError<T = void>(error: unknown): ActionResult<T> {
   if (error instanceof HrTimeClockCommandError) {
     return actionFailure(error.code);
   }

@@ -11,6 +11,48 @@ const root = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 const srcDir = path.join(root, "src");
 const testsDir = path.join(root, "tests", "unit");
 
+const ALLOWED_ROOT_DIRECTORIES = new Set([
+  "employee-management",
+  "hr-suite-integration",
+  "industry-specific",
+  "payroll-compensation",
+  "talent-management",
+  "time-attendance",
+]);
+
+const FORBIDDEN_ROOT_BUCKETS = new Set([
+  "actions",
+  "components",
+  "contracts",
+  "data",
+  "events",
+  "navigation",
+  "policies",
+  "schemas",
+  "surface",
+  "tests",
+]);
+
+const HR_SUITE_INTEGRATION_DOORS = new Set([
+  "client.ts",
+  "index.ts",
+  "metadata.ts",
+  "server.ts",
+]);
+
+const HR_SUITE_INTEGRATION_IMPLEMENTATION_DIRS = new Set([
+  "actions",
+  "components",
+  "contracts",
+  "navigation",
+  "policies",
+  "surface",
+]);
+
+const HR_SUITE_INTEGRATION_LOCAL_DOCS = new Set([
+  "hr-suite-integration-architecture.md",
+]);
+
 /** Capability folders with as-built implementation (expand as slices ship). */
 export const SHIPPED_CAPABILITIES = [
   "employee-management/compliance-regulatory-tracking",
@@ -138,6 +180,84 @@ function readFileIfExists(filePath: string): string {
   return fs.readFileSync(filePath, "utf8");
 }
 
+function validateHrSuiteRootDiscipline() {
+  if (!fs.existsSync(srcDir)) {
+    problems.push("Missing src/ directory");
+    return;
+  }
+
+  for (const entry of fs.readdirSync(srcDir, { withFileTypes: true })) {
+    if (!entry.isDirectory()) continue;
+
+    if (FORBIDDEN_ROOT_BUCKETS.has(entry.name)) {
+      problems.push(
+        `src/${entry.name}: root bucket is forbidden; move capability code under src/<category>/<capability>/ or suite glue under src/hr-suite-integration/`,
+      );
+      continue;
+    }
+
+    if (!ALLOWED_ROOT_DIRECTORIES.has(entry.name)) {
+      problems.push(
+        `src/${entry.name}: unexpected HR Suite root directory; add capability code under an approved HR category or document the architecture exception`,
+      );
+    }
+  }
+}
+
+function validateHrSuiteIntegrationDoors() {
+  const integrationDir = path.join(srcDir, "hr-suite-integration");
+
+  if (!fs.existsSync(integrationDir)) {
+    problems.push("Missing src/hr-suite-integration/ directory");
+    return;
+  }
+
+  for (const door of HR_SUITE_INTEGRATION_DOORS) {
+    if (!fs.existsSync(path.join(integrationDir, door))) {
+      problems.push(`src/hr-suite-integration/${door}: missing integration door`);
+    }
+  }
+
+  for (const entry of fs.readdirSync(integrationDir, { withFileTypes: true })) {
+    if (
+      entry.isFile() &&
+      !HR_SUITE_INTEGRATION_DOORS.has(entry.name) &&
+      !HR_SUITE_INTEGRATION_LOCAL_DOCS.has(entry.name)
+    ) {
+      problems.push(
+        `src/hr-suite-integration/${entry.name}: integration root may only contain client.ts, index.ts, metadata.ts, server.ts, and approved local architecture docs`,
+      );
+    }
+
+    if (
+      entry.isDirectory() &&
+      !HR_SUITE_INTEGRATION_IMPLEMENTATION_DIRS.has(entry.name)
+    ) {
+      problems.push(
+        `src/hr-suite-integration/${entry.name}: unexpected integration implementation directory`,
+      );
+    }
+  }
+}
+
+function validateHrSuiteIntegrationImports() {
+  const integrationDir = path.join(srcDir, "hr-suite-integration");
+  const deepImportPattern =
+    /hr-suite-integration\/(?:actions|components|contracts|navigation|policies|surface)\//;
+
+  for (const file of listFiles(srcDir)) {
+    if (!/\.(?:ts|tsx)$/.test(file)) continue;
+    if (file.startsWith(integrationDir)) continue;
+
+    const body = readFileIfExists(file).replaceAll("\\", "/");
+    if (deepImportPattern.test(body)) {
+      problems.push(
+        `${rel(file)}: import hr-suite-integration through ./hr-suite-integration, ./client, ./server, or ./metadata instead of a deep implementation path`,
+      );
+    }
+  }
+}
+
 /** Pattern learned from compliance-regulatory-tracking (see docs/hr-reference-slice-checklist.md). */
 function validateReferenceSlicePattern(
   capabilityRel: string,
@@ -207,6 +327,10 @@ function validateReferenceSlicePattern(
     );
   }
 }
+
+validateHrSuiteRootDiscipline();
+validateHrSuiteIntegrationDoors();
+validateHrSuiteIntegrationImports();
 
 for (const capability of SHIPPED_CAPABILITIES) {
   validateCapability(capability);

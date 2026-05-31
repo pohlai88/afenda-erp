@@ -9,6 +9,10 @@ node_modules/
 *.tsbuildinfo
 
 .artifacts/
+artifacts/
+.playwright-mcp/
+build-log.txt
+dashboard-snapshot.yml
 **/coverage/
 **/test-results/
 **/playwright-report/

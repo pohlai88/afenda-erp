@@ -36,12 +36,12 @@ const BENEFITS_COMMAND_ERROR_MESSAGES = {
   plan_dependents_not_supported: "This benefit plan does not support dependent coverage.",
 };
 
-export function toBenefitsActionFailure(error: unknown): ActionResult {
+export function toBenefitsActionFailure<T = void>(error: unknown): ActionResult<T> {
   if (error instanceof HrBenefitsCommandError) {
-    return actionFailure(
+    return actionFailure<T>(
       BENEFITS_COMMAND_ERROR_MESSAGES[error.code] ?? error.message,
     );
   }
 
-  return actionFailure(BENEFITS_GENERIC_FAILURE_MESSAGE);
+  return actionFailure<T>(BENEFITS_GENERIC_FAILURE_MESSAGE);
 }

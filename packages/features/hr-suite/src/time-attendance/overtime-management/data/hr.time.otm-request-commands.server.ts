@@ -31,7 +31,7 @@ export async function submitHrTimeOtmRequest(
     endTime: input.endTime,
     hours: input.hours,
     reason: input.reason,
-    policyGroupCode: input.policyGroupCode,
+    policyGroupCode: input.policyGroupCode ?? "default",
     eligibilityExceptionReason: input.eligibilityExceptionReason,
     actorAuthUserId: input.actorAuthUserId,
   });
@@ -40,7 +40,7 @@ export async function submitHrTimeOtmRequest(
     organizationId: input.organizationId,
     requestId: result.requestId,
     employeeId: input.employeeId,
-    policyGroupCode: input.policyGroupCode,
+    policyGroupCode: input.policyGroupCode ?? "default",
     hasEligibilityException: Boolean(input.eligibilityExceptionReason?.trim()),
   });
 

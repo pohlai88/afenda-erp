@@ -48,8 +48,8 @@ export function buildCpmOperationalListSurface(input: {
     emptyTitle: string;
     emptyDescription: string;
   };
-  columns: CpmListColumn[];
-  rows: CpmListRow[];
+  columns: readonly CpmListColumn[];
+  rows: readonly CpmListRow[];
 }) {
   return buildGovernedListSurface({
     __schemaVersion: GOVERNED_METADATA_SCHEMA_VERSION,
@@ -75,7 +75,7 @@ export function buildCpmOperationalListSurface(input: {
         description: input.surface.emptyDescription,
       },
     },
-    columns: input.columns,
-    rows: input.rows,
+    columns: [...input.columns],
+    rows: [...input.rows],
   });
 }

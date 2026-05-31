@@ -15,6 +15,7 @@ import {
   verifyHrBenefitEnrollmentDependentsInTx,
 } from "@afenda/db";
 import {
+  assertFormActionResult,
   actionSuccess,
   zodActionFailure,
   type ActionResult,
@@ -226,6 +227,14 @@ export async function addHrBenefitEnrollmentDependentAction(
   });
 }
 
+export async function addHrBenefitEnrollmentDependentFormAction(
+  formData: FormData,
+): Promise<void> {
+  assertFormActionResult(
+    await addHrBenefitEnrollmentDependentAction(undefined, formData),
+  );
+}
+
 export async function verifyHrBenefitEnrollmentDependentsAction(
   _previous: ActionResult | undefined,
   formData: FormData,
@@ -258,6 +267,14 @@ export async function verifyHrBenefitEnrollmentDependentsAction(
       metadata: result,
     };
   });
+}
+
+export async function verifyHrBenefitEnrollmentDependentsFormAction(
+  formData: FormData,
+): Promise<void> {
+  assertFormActionResult(
+    await verifyHrBenefitEnrollmentDependentsAction(undefined, formData),
+  );
 }
 
 export async function upsertHrBenefitProviderAction(
@@ -348,6 +365,14 @@ export async function approveHrBenefitEnrollmentAction(
       metadata: result,
     };
   });
+}
+
+export async function approveHrBenefitEnrollmentFormAction(
+  formData: FormData,
+): Promise<void> {
+  assertFormActionResult(
+    await approveHrBenefitEnrollmentAction(undefined, formData),
+  );
 }
 
 export async function applyHrBenefitEnrollmentChangeAction(
@@ -490,7 +515,9 @@ export async function exportHrBenefitReportAction(
   });
 
   if (!parsed.success) {
-    return zodActionFailure(parsed.error);
+    return zodActionFailure<
+      Awaited<ReturnType<typeof buildHrBenefitReportCsv>>
+    >(parsed.error);
   }
 
   try {
@@ -536,9 +563,9 @@ export async function exportHrBenefitReportAction(
 
     return actionSuccess(exportBody);
   } catch (error) {
-    return toBenefitsActionFailure(error) as ActionResult<
+    return toBenefitsActionFailure<
       Awaited<ReturnType<typeof buildHrBenefitReportCsv>>
-    >;
+    >(error);
   }
 }
 

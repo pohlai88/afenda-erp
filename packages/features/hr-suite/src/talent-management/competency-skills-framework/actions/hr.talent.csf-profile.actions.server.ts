@@ -33,7 +33,7 @@ export async function upsertHrTalentCsfCompetencyProfileAction(input: unknown) {
 
   return runWithOrganizationContext(guard.organization.id, async (db) => {
     const { upsertHrCsfEmployeeCompetencyProfileInTx } = await import(
-      "@afenda/db/hr-competency-skills-profiles"
+      "@afenda/db"
     );
     return upsertHrCsfEmployeeCompetencyProfileInTx(db, {
       organizationId: guard.organization.id,
@@ -49,9 +49,7 @@ export async function upsertHrTalentCsfSkillProfileAction(input: unknown) {
   await assertProfileWriteAccess(guard, parsed.employeeId);
 
   return runWithOrganizationContext(guard.organization.id, async (db) => {
-    const { upsertHrCsfEmployeeSkillProfileInTx } = await import(
-      "@afenda/db/hr-competency-skills-profiles"
-    );
+    const { upsertHrCsfEmployeeSkillProfileInTx } = await import("@afenda/db");
     return upsertHrCsfEmployeeSkillProfileInTx(db, {
       organizationId: guard.organization.id,
       actorUserId: guard.session.id,
@@ -71,9 +69,7 @@ export async function listHrTalentCsfCompetencyProfilesAction(input: unknown) {
     throw new Error("Access denied for employee competency profiles.");
   }
 
-  const { listHrCsfEmployeeCompetencyProfiles } = await import(
-    "@afenda/db/hr-competency-skills-profiles"
-  );
+  const { listHrCsfEmployeeCompetencyProfiles } = await import("@afenda/db");
   return listHrCsfEmployeeCompetencyProfiles({
     organizationId: guard.organization.id,
     employeeId: parsed.employeeId,
@@ -91,9 +87,7 @@ export async function listHrTalentCsfSkillProfilesAction(input: unknown) {
     throw new Error("Access denied for employee skill profiles.");
   }
 
-  const { listHrCsfEmployeeSkillProfiles } = await import(
-    "@afenda/db/hr-competency-skills-profiles"
-  );
+  const { listHrCsfEmployeeSkillProfiles } = await import("@afenda/db");
   return listHrCsfEmployeeSkillProfiles({
     organizationId: guard.organization.id,
     employeeId: parsed.employeeId,

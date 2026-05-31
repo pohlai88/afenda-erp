@@ -44,7 +44,7 @@ export {
 export { HrGeoRemoteCheckinCapturePanel } from "./time-attendance/geolocation-remote-checkin/client";
 export { HrGeoPendingExceptionsTrailingCell } from "./time-attendance/geolocation-remote-checkin/client";
 
-export { HrModuleNav } from "./components/hr-module-nav.component.client";
+export { HrModuleNav } from "./hr-suite-integration/client";
 
 export {
   HrBenefitsEnrollmentCreateForm,

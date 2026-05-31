@@ -32,6 +32,11 @@
         "matcher": "Write|StrReplace"
       },
       {
+        "command": "node .cursor/hooks/guard-root-hygiene.mjs",
+        "matcher": "Write|StrReplace",
+        "failClosed": true
+      },
+      {
         "command": "node .cursor/hooks/guard-architecture-docs.mjs",
         "matcher": "Delete"
       }

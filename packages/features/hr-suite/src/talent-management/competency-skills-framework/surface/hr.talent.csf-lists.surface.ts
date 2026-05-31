@@ -28,13 +28,13 @@ import {
 import { hrCsfUiCopy } from "./hr.talent.csf-ui.copy.shared";
 
 export function buildHrCsfCompetenciesListSurface(input: {
-  rows: Array<{
+  rows: readonly {
     id: string;
     code: string;
     name: string;
     category: string;
     status: string;
-  }>;
+  }[];
   searchValue?: string;
 }) {
   const copy = hrCsfUiCopy.competencies;
@@ -73,13 +73,13 @@ export function buildHrCsfCompetenciesListSurface(input: {
 }
 
 export function buildHrCsfSkillsListSurface(input: {
-  rows: Array<{
+  rows: readonly {
     id: string;
     code: string;
     name: string;
     category: string;
     status: string;
-  }>;
+  }[];
   searchValue?: string;
 }) {
   const copy = hrCsfUiCopy.skills;
@@ -118,7 +118,7 @@ export function buildHrCsfSkillsListSurface(input: {
 }
 
 export function buildHrCsfGapsListSurface(input: {
-  rows: Array<{
+  rows: readonly {
     id: string;
     employeeDisplayName: string;
     itemName: string;
@@ -127,7 +127,7 @@ export function buildHrCsfGapsListSurface(input: {
     currentLevel: string;
     severity: string;
     priority: string;
-  }>;
+  }[];
   searchValue?: string;
 }) {
   const copy = hrCsfUiCopy.gaps;
@@ -176,7 +176,7 @@ export function buildHrCsfGapsListSurface(input: {
 }
 
 export function buildHrCsfReportsListSurface(input: {
-  rows: Array<{
+  rows: readonly {
     id: string;
     groupLabel: string;
     employeeCount: number;
@@ -184,7 +184,7 @@ export function buildHrCsfReportsListSurface(input: {
     competencyCount: number;
     gapCount: number;
     avgProficiencyIndex: number;
-  }>;
+  }[];
   searchValue?: string;
 }) {
   const copy = hrCsfUiCopy.reports;
@@ -228,13 +228,13 @@ export function buildHrCsfReportsListSurface(input: {
 
 export function buildHrCsfAuditListSurface(input: {
   window: {
-    rows: Array<{
+    rows: readonly {
       id: string;
       action: string;
       summary: string;
       actorAuthUserId: string | null;
       createdAt: string;
-    }>;
+    }[];
     pageSize: number;
     totalCount: number;
     hasNextPage: boolean;
@@ -276,7 +276,7 @@ export function buildHrCsfAuditListSurface(input: {
 }
 
 export function buildHrCsfMatchingListSurface(input: {
-  rows: Array<{
+  rows: readonly {
     employeeId: string;
     employeeDisplayName: string;
     departmentName: string;
@@ -284,7 +284,7 @@ export function buildHrCsfMatchingListSurface(input: {
     matchedSkillCount: number;
     requiredSkillCount: number;
     missingCriticalSkills: readonly string[];
-  }>;
+  }[];
   searchValue?: string;
 }) {
   const copy = hrCsfUiCopy.matching;

@@ -48,8 +48,8 @@ export function buildSbsOperationalListSurface(input: {
     emptyTitle: string;
     emptyDescription: string;
   };
-  columns: SbsListColumn[];
-  rows: SbsListRow[];
+  columns: readonly SbsListColumn[];
+  rows: readonly SbsListRow[];
 }) {
   return buildGovernedListSurface({
     __schemaVersion: GOVERNED_METADATA_SCHEMA_VERSION,
@@ -75,7 +75,7 @@ export function buildSbsOperationalListSurface(input: {
         description: input.surface.emptyDescription,
       },
     },
-    columns: input.columns,
-    rows: input.rows,
+    columns: [...input.columns],
+    rows: [...input.rows],
   });
 }

@@ -25,8 +25,9 @@ export async function emitHrExpenseAuditEvent(input: {
       actorUserId: input.actorAuthUserId,
       action: input.action,
       summary: input.summary,
-      reason: input.reason,
-      metadata: input.metadata,
+      metadata: input.reason
+        ? { ...(input.metadata ?? {}), reason: input.reason }
+        : input.metadata,
     });
 
     await writeExecutionAuditEventInTransaction(db, {

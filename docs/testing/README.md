@@ -61,3 +61,13 @@ On failure, GitHub Actions uploads:
 - **playwright-e2e** / **playwright-e2e-neon** — `.artifacts/playwright/` from e2e jobs
 
 Download them from the failed workflow run’s **Artifacts** section (retained 14 days).
+
+## Committed audit baselines (not runner output)
+
+Human-written audit snapshots belong under **`docs/testing/`**, not repo root `artifacts/`:
+
+| File | Purpose |
+| ---- | ------- |
+| `docs/testing/ui-audit-matrix.md` | Governed EUI / design-token audit baseline |
+
+Do **not** create a root `artifacts/` folder — it collides with gitignored `.artifacts/` used by `pnpm artifacts:init`. `pnpm architecture:check` fails if forbidden root paths are tracked.

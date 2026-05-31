@@ -21,7 +21,7 @@ Search tip: every document has a stable **`ARCH-###`** ID and a matching
 | **ARCH-007** | [007-governed-metadata-architecture.md](007-governed-metadata-architecture.md)             | Governed-surface renderer kernel, schemas, profiles, resolver                  |
 | **ARCH-008** | [008-workspace-package-discipline.md](008-workspace-package-discipline.md)                 | Workspace package classes, export doors, split policy, guard policy            |
 | **ARCH-009** | [009-machine-layer-doctrine.md](009-machine-layer-doctrine.md)                             | Lynx machine layer, four product layers, Knowledge substrate, brand contract   |
-| **ARCH-010** | [010-hr-feature-package-architecture.md](010-hr-feature-package-architecture.md)           | `@afenda/feature-hr-suite` boundaries, export doors, TRACK-004 migration layout      |
+| **ARCH-010** | [010-hr-feature-package-architecture.md](010-hr-feature-package-architecture.md)           | `@afenda/feature-hr-suite` foundation, integration doors, slice lifecycle, scaffold gates |
 | **ARCH-011** | [011-system-admin-enterprise-architecture.md](011-system-admin-enterprise-architecture.md) | System Admin control module, control domains, package boundary, kernel linkage |
 | **ARCH-011 (supplement)** | [011-system-admin-users-architecture.md](011-system-admin-users-architecture.md) | Users control domain — invitation, lifecycle, access review |
 | **ARCH-011 (supplement)** | [011-system-admin-memberships-architecture.md](011-system-admin-memberships-architecture.md) | Memberships control domain — participation lifecycle, role coverage |

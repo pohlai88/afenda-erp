@@ -1,1 +1,1 @@
-export * from "./actions/hr.payroll.sbs.actions.server";
+export * from "./hr.payroll.sbs.actions.server";

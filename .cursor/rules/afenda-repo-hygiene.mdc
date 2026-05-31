@@ -1,0 +1,26 @@
+---
+description: Repo root hygiene — .artifacts vs docs, no debug dumps at root
+alwaysApply: true
+---
+
+# Repo root hygiene
+
+## Test output (never commit)
+
+- **Only** `.artifacts/` (leading dot) holds Vitest coverage, Playwright traces, JUnit, and ad-hoc test logs.
+- Run `pnpm artifacts:init` before tests; `pnpm artifacts:check` fails if output drifts outside `.artifacts/`.
+
+## Do not create at repo root
+
+| Forbidden | Use instead |
+| --------- | ----------- |
+| `artifacts/` (no dot) | `.artifacts/` for generated output; `docs/testing/` for committed audit baselines |
+| `build-log.txt`, `*-snapshot.yml`, `page-*.yml` | `.artifacts/logs/` or delete after debugging |
+| `test-results/`, `playwright-report/`, `coverage/` | `.artifacts/playwright/`, `.artifacts/coverage/` |
+
+## Committed audit / design reports
+
+- UI audit matrices and testing notes: `docs/testing/` (e.g. `ui-audit-matrix.md`)
+- Primitive contracts: `packages/ui/audits/`
+
+`pnpm architecture:check` enforces root hygiene. Cursor hook `guard-root-hygiene.mjs` blocks agent writes to forbidden root paths.

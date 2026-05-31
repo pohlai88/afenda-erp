@@ -16,4 +16,22 @@ export const hrPayrollExpenseAuditActions = {
   report: {
     exported: "hr.expense.report.export",
   },
+  payment: {
+    payrollStaged: "hr.expense.payroll.integrate",
+    apStaged: "hr.expense.ap.integrate",
+    referenceRecorded: "hr.expense.payment.record",
+  },
+  accounting: {
+    allocated: "hr.expense.accounting.allocate",
+  },
+  notification: {
+    enqueued: "hr.expense.notification.enqueue",
+  },
 } as const;
+
+export type HrPayrollExpenseAuditAction =
+  | (typeof hrPayrollExpenseAuditActions.claim)[keyof typeof hrPayrollExpenseAuditActions.claim]
+  | (typeof hrPayrollExpenseAuditActions.report)[keyof typeof hrPayrollExpenseAuditActions.report]
+  | (typeof hrPayrollExpenseAuditActions.payment)[keyof typeof hrPayrollExpenseAuditActions.payment]
+  | (typeof hrPayrollExpenseAuditActions.accounting)[keyof typeof hrPayrollExpenseAuditActions.accounting]
+  | (typeof hrPayrollExpenseAuditActions.notification)[keyof typeof hrPayrollExpenseAuditActions.notification];

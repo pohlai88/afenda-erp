@@ -24,9 +24,9 @@ import {
 import { hrExpenseReportFilterSchema } from "../schemas/hr.payroll.expense-report.schema";
 
 export async function sendExpenseClaimToPayrollOrApAction(
-  _prev: ActionResult | undefined,
+  _prev: ActionResult<Awaited<ReturnType<typeof sendToPayrollOrAP>>> | undefined,
   formData: FormData,
-): Promise<ActionResult> {
+): Promise<ActionResult<Awaited<ReturnType<typeof sendToPayrollOrAP>>>> {
   const guard = await requireHrExpenseFinanceAccess();
   const parsed = hrExpenseSendToPayrollOrApSchema.safeParse({
     claimId: formData.get("claimId"),
@@ -34,7 +34,9 @@ export async function sendExpenseClaimToPayrollOrApAction(
   });
 
   if (!parsed.success) {
-    return toExpenseActionFailure(parsed.error);
+    return toExpenseActionFailure<Awaited<ReturnType<typeof sendToPayrollOrAP>>>(
+      parsed.error,
+    );
   }
 
   try {
@@ -45,14 +47,18 @@ export async function sendExpenseClaimToPayrollOrApAction(
     });
     return actionSuccess(result);
   } catch (error) {
-    return toExpenseActionFailure(error);
+    return toExpenseActionFailure<Awaited<ReturnType<typeof sendToPayrollOrAP>>>(
+      error,
+    );
   }
 }
 
 export async function recordExpensePaymentReferenceAction(
-  _prev: ActionResult | undefined,
+  _prev:
+    | ActionResult<Awaited<ReturnType<typeof recordPaymentReference>>>
+    | undefined,
   formData: FormData,
-): Promise<ActionResult> {
+): Promise<ActionResult<Awaited<ReturnType<typeof recordPaymentReference>>>> {
   const guard = await requireHrExpenseFinanceAccess();
   const parsed = hrExpenseRecordPaymentReferenceSchema.safeParse({
     claimId: formData.get("claimId"),
@@ -61,7 +67,9 @@ export async function recordExpensePaymentReferenceAction(
   });
 
   if (!parsed.success) {
-    return toExpenseActionFailure(parsed.error);
+    return toExpenseActionFailure<
+      Awaited<ReturnType<typeof recordPaymentReference>>
+    >(parsed.error);
   }
 
   try {
@@ -72,14 +80,22 @@ export async function recordExpensePaymentReferenceAction(
     });
     return actionSuccess(result);
   } catch (error) {
-    return toExpenseActionFailure(error);
+    return toExpenseActionFailure<
+      Awaited<ReturnType<typeof recordPaymentReference>>
+    >(error);
   }
 }
 
 export async function assignExpenseAccountingAllocationAction(
-  _prev: ActionResult | undefined,
+  _prev:
+    | ActionResult<
+        Awaited<ReturnType<typeof assignExpenseClaimAccountingAllocation>>
+      >
+    | undefined,
   formData: FormData,
-): Promise<ActionResult> {
+): Promise<
+  ActionResult<Awaited<ReturnType<typeof assignExpenseClaimAccountingAllocation>>>
+> {
   const guard = await requireHrExpenseFinanceAccess();
   const parsed = hrExpenseAccountingAllocationSchema.safeParse({
     claimId: formData.get("claimId"),
@@ -91,7 +107,9 @@ export async function assignExpenseAccountingAllocationAction(
   });
 
   if (!parsed.success) {
-    return toExpenseActionFailure(parsed.error);
+    return toExpenseActionFailure<
+      Awaited<ReturnType<typeof assignExpenseClaimAccountingAllocation>>
+    >(parsed.error);
   }
 
   try {
@@ -103,12 +121,16 @@ export async function assignExpenseAccountingAllocationAction(
     });
     return actionSuccess(result);
   } catch (error) {
-    return toExpenseActionFailure(error);
+    return toExpenseActionFailure<
+      Awaited<ReturnType<typeof assignExpenseClaimAccountingAllocation>>
+    >(error);
   }
 }
 
 export async function generateExpenseReportAction(
-  _prev: ActionResult | undefined,
+  _prev:
+    | ActionResult<{ content: string; rowCount: number; groupBy: string }>
+    | undefined,
   formData: FormData,
 ): Promise<ActionResult<{ content: string; rowCount: number; groupBy: string }>> {
   const guard = await requireHrExpenseRead();
@@ -125,11 +147,11 @@ export async function generateExpenseReportAction(
   });
 
   if (!parsed.success) {
-    return toExpenseActionFailure(parsed.error) as ActionResult<{
+    return toExpenseActionFailure<{
       content: string;
       rowCount: number;
       groupBy: string;
-    }>;
+    }>(parsed.error);
   }
 
   try {
@@ -144,10 +166,10 @@ export async function generateExpenseReportAction(
       groupBy: result.groupBy,
     });
   } catch (error) {
-    return toExpenseActionFailure(error) as ActionResult<{
+    return toExpenseActionFailure<{
       content: string;
       rowCount: number;
       groupBy: string;
-    }>;
+    }>(error);
   }
 }

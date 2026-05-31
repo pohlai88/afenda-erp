@@ -1,5 +1,4 @@
 import {
-  hrSbsAnalysesSearchParam,
   hrSbsAnalysesSurfaceKey,
   hrSbsAuditSearchParam,
   hrSbsAuditSurfaceKey,
@@ -36,7 +35,7 @@ export {
 
 export function buildHrSbsVersionsListSurface(input: {
   window: {
-    rows: Array<{
+    rows: readonly {
       id: string;
       code: string;
       label: string;
@@ -44,7 +43,7 @@ export function buildHrSbsVersionsListSurface(input: {
       surveyYear: number;
       versionStatus: string;
       effectiveDate: Date;
-    }>;
+    }[];
     pageSize: number;
     totalCount: number;
     hasNextPage: boolean;
@@ -95,14 +94,14 @@ export function buildHrSbsVersionsListSurface(input: {
 
 export function buildHrSbsMappingsListSurface(input: {
   window: {
-    rows: Array<{
+    rows: readonly {
       id: string;
       jobFamily: string | null;
       jobTitle: string | null;
       grade: string | null;
       locationCode: string | null;
       mappingStatus: string;
-    }>;
+    }[];
     pageSize: number;
     totalCount: number;
     hasNextPage: boolean;
@@ -151,14 +150,14 @@ export function buildHrSbsMappingsListSurface(input: {
 
 export function buildHrSbsAnalysesListSurface(input: {
   window: {
-    rows: Array<{
+    rows: readonly {
       analysisId: string;
       label: string | null;
       analyzedEmployeeCount: number;
       flaggedBelowTargetCount: number;
       flaggedAboveRangeCount: number;
       createdAt: string;
-    }>;
+    }[];
     pageSize: number;
     totalCount: number;
     hasNextPage: boolean;
@@ -199,12 +198,12 @@ export function buildHrSbsAnalysesListSurface(input: {
 }
 
 export function buildHrSbsBenchmarkReportListSurface(input: {
-  rows: Array<{
+  rows: readonly {
     employeeId: string;
     marketPosition: string;
     marketRatio: number | null;
     compaRatio: number | null;
-  }>;
+  }[];
 }) {
   const copy = hrSbsUiCopy.reports;
   return buildSbsOperationalListSurface({
@@ -235,14 +234,14 @@ export function buildHrSbsBenchmarkReportListSurface(input: {
 }
 
 export function buildHrSbsPayEquityReportListSurface(input: {
-  rows: Array<{
+  rows: readonly {
     id: string;
     dimension: string;
     groupKey: string;
     employeeCount: number;
     spreadPercent: number;
     flagged: boolean;
-  }>;
+  }[];
 }) {
   const copy = hrSbsUiCopy.reports;
   return buildSbsOperationalListSurface({
@@ -276,13 +275,13 @@ export function buildHrSbsPayEquityReportListSurface(input: {
 
 export function buildHrSbsAuditListSurface(input: {
   window: {
-    rows: Array<{
+    rows: readonly {
       id: string;
       action: string;
       summary: string | null;
       actorUserId: string;
       occurredAt: Date;
-    }>;
+    }[];
     pageSize: number;
     totalCount: number;
     hasNextPage: boolean;

@@ -13,8 +13,7 @@ import {
 import type { ListSurfaceRendererConfigurationResolvedInput } from "@afenda/governed-surface";
 
 import { hrOtmAttendanceReconcileColumnsId } from "../surface/hr.time.otm-surface-metadata.shared";
-
-const HR_OVERTIME_READ_PERMISSION = "hr.overtime.read" as const;
+import { hrTimeOtmReadPermission } from "../contracts/hr.time.otm-route.contract";
 
 export type HrTimeOtmAttendanceReconcileRow = {
   id: string;
@@ -121,7 +120,7 @@ export async function buildHrTimeOtmAttendanceReconcileListSurface(input: {
     __schemaVersion: GOVERNED_METADATA_SCHEMA_VERSION,
     dataNature: "table",
     presentationProfile: "erp-operational-table",
-    requiresErpPermission: HR_OVERTIME_READ_PERMISSION,
+    requiresErpPermission: hrTimeOtmReadPermission,
     presentation: {
       primaryColumnId: "employee",
     },

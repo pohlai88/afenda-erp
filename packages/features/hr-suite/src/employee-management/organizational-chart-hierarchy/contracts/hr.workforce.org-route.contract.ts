@@ -1,11 +1,12 @@
 export type HrOrgUnitType =
-  | "company"
-  | "division"
+  | "business_unit"
   | "department"
-  | "team"
-  | "cost_center";
+  | "legal_entity"
+  | "location"
+  | "sub_department"
+  | "team";
 
-export type HrOrgUnitStatus = "active" | "inactive" | "planned";
+export type HrOrgUnitStatus = "active" | "closed" | "frozen" | "planned";
 
 export type HrOrgChartNode = {
   id: string;

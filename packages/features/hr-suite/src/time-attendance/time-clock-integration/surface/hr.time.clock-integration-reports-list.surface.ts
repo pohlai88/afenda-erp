@@ -27,7 +27,6 @@ export function buildHrTimeClockReportsListSurface(input: {
       value: input.groupBy,
     }),
     window: {
-      rows: input.rows,
       pageSize: input.rows.length || 25,
       totalCount: input.rows.length,
       hasNextPage: false,

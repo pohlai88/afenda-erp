@@ -31,6 +31,29 @@ compliance-regulatory-tracking/
 
 Scaffold-only capabilities may keep placeholder buckets until a TRACK-004 slice ships.
 
+## HR Suite root discipline
+
+`src/` may contain only package public doors, HR category folders, and `hr-suite-integration/`.
+
+Allowed HR category folders:
+
+- `employee-management/`
+- `industry-specific/`
+- `payroll-compensation/`
+- `talent-management/`
+- `time-attendance/`
+
+Forbidden at HR Suite root: `actions/`, `components/`, `contracts/`, `data/`, `events/`, `navigation/`, `policies/`, `schemas/`, `surface/`, `tests/`.
+
+Suite-level glue belongs in `src/hr-suite-integration/`. It must expose exactly four root doors:
+
+- `index.ts` — environment-neutral constants/types only
+- `client.ts` — client components only
+- `server.ts` — server-only guards/actions only
+- `metadata.ts` — metadata-safe navigation/surface exports only
+
+Consumers must import only these doors. Do not deep-import `hr-suite-integration/components`, `hr-suite-integration/contracts`, `hr-suite-integration/navigation`, or `hr-suite-integration/policies` from outside `hr-suite-integration`.
+
 ## File naming (mirrors system-admin)
 
 Prefix: **`hr.<domain>.`** where `<domain>` matches governed surface keys (e.g. `hr.workforce.compliance` → keys `hr.workforce.compliance.obligations.list`).

@@ -7,8 +7,10 @@ export function OtmApprovalRoutesSection(input: {
 }) {
   return (
     <GovernedPatternCListSection
+      title="Overtime approval routes"
+      description="Approval routing rules for submitted overtime requests."
       surfaceKey="hrm:overtime:approval-routes"
-      surface={input.surface}
+      listConfiguration={input.surface}
     />
   );
 }

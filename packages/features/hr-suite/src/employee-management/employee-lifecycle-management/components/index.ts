@@ -1,5 +1,4 @@
-/**
- * @afenda-bucket components
- * Scaffold placeholder from packages/_template-definition.
- */
-export {};
+export {
+  HrLifecycleAccessDeniedPanel,
+  HrLifecycleWorkbenchSection,
+} from "./hr.workforce.lifecycle-section.component.server";

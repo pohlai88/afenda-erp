@@ -8,7 +8,9 @@ import {
 
 import {
   HR_EXPENSE_APPROVE_CAPABILITY,
+  HR_EXPENSE_FINANCE_READ_CAPABILITY,
   HR_EXPENSE_READ_CAPABILITY,
+  HR_EXPENSE_SENSITIVE_READ_CAPABILITY,
   HR_EXPENSE_WRITE_CAPABILITY,
 } from "../schemas/hr.payroll.expense-constants.shared";
 
@@ -23,6 +25,8 @@ export type HrExpenseExecutionGuard = {
     capabilities: readonly AppCapability[];
   };
   canApprove: boolean;
+  canViewFinance: boolean;
+  canViewSensitive: boolean;
   hasCapability(capability: AppCapability): boolean;
 };
 
@@ -32,6 +36,14 @@ function toHrExpenseExecutionGuard(
   const canApprove = hasExecutionPermission(
     context,
     HR_EXPENSE_APPROVE_CAPABILITY,
+  );
+  const canViewFinance = hasExecutionPermission(
+    context,
+    HR_EXPENSE_FINANCE_READ_CAPABILITY,
+  );
+  const canViewSensitive = hasExecutionPermission(
+    context,
+    HR_EXPENSE_SENSITIVE_READ_CAPABILITY,
   );
 
   return {
@@ -45,6 +57,8 @@ function toHrExpenseExecutionGuard(
       capabilities: context.capabilities,
     },
     canApprove,
+    canViewFinance,
+    canViewSensitive,
     hasCapability(capability: AppCapability) {
       return hasExecutionPermission(context, capability);
     },
@@ -72,8 +86,18 @@ export async function requireHrExpenseApprove() {
   return toHrExpenseExecutionGuard(context);
 }
 
+/** HRM-EXP-022/023 — finance handoff and payment reference actions. */
+export async function requireHrExpenseFinanceAccess() {
+  const context = await requireExecutionContext();
+  requireExecutionPermission(context, HR_EXPENSE_READ_CAPABILITY);
+  requireExecutionPermission(context, HR_EXPENSE_FINANCE_READ_CAPABILITY);
+  return toHrExpenseExecutionGuard(context);
+}
+
 export {
   HR_EXPENSE_APPROVE_CAPABILITY,
+  HR_EXPENSE_FINANCE_READ_CAPABILITY,
   HR_EXPENSE_READ_CAPABILITY,
+  HR_EXPENSE_SENSITIVE_READ_CAPABILITY,
   HR_EXPENSE_WRITE_CAPABILITY,
 };

@@ -38,7 +38,21 @@ import {
   resolveOtmSurfaceAccess,
 } from "./time-attendance/overtime-management/server";
 
-export { requireHrRead } from "./policies/hr-module-access.policy.server";
+export {
+  buildHrModuleExecutionGuard,
+  hrSuiteActionFailure,
+  requireHrCapabilities,
+  requireHrCapability,
+  requireHrRead,
+  toHrSuiteActionFailure,
+  toHrSuiteNativeFormAction,
+  toHrSuiteResultFormAction,
+  type HrModuleCapabilityRequirementMode,
+  type HrModuleExecutionGuard,
+  type HrSuiteActionFailureMapper,
+  type HrSuiteActionFailureOptions,
+  type HrSuiteActionStateHandler,
+} from "./hr-suite-integration/server";
 
 import {
   buildHrAttendancePageModel,

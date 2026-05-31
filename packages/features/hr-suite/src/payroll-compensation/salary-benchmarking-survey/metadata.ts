@@ -1,3 +1,5 @@
+import { HR_SBS_LIST_SURFACE_KEYS } from "./data/hr.payroll.sbs-search-params.parse.shared";
+
 export {
   HR_SBS_LIST_SURFACE_KEYS,
   hrSbsAnalysesSearchParam,

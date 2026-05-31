@@ -45,8 +45,8 @@ export function buildExpenseOperationalListSurface(input: {
     emptyTitle: string;
     emptyDescription: string;
   };
-  columns: ExpenseListColumn[];
-  rows: ExpenseListRow[];
+  columns: readonly ExpenseListColumn[];
+  rows: readonly ExpenseListRow[];
 }): ListSurfaceRendererConfigurationResolvedInput {
   return buildGovernedListSurface({
     __schemaVersion: GOVERNED_METADATA_SCHEMA_VERSION,
@@ -72,8 +72,8 @@ export function buildExpenseOperationalListSurface(input: {
         description: input.surface.emptyDescription,
       },
     },
-    columns: input.columns,
-    rows: input.rows,
+    columns: [...input.columns],
+    rows: [...input.rows],
   });
 }
 

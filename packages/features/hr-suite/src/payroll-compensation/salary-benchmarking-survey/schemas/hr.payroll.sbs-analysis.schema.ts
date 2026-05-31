@@ -6,9 +6,6 @@ import {
   SBS_PAY_GAP_DIMENSIONS,
 } from "../data/hr.payroll.sbs-calculations.shared";
 
-export const HR_SBS_READ_CAPABILITY = "hr.sbs.read" as const;
-export const HR_SBS_WRITE_CAPABILITY = "hr.sbs.write" as const;
-
 export const hrSbsThresholdConfigSchema = z.object({
   targetMarketRatioPercent: z.number().finite().positive().optional(),
   upperMarketRatioPercent: z.number().finite().positive().optional(),

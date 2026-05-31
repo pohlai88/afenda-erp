@@ -9,7 +9,6 @@ import {
   buildHrSbsVersionsListSurface,
 } from "../surface/hr.payroll.sbs-lists.surface";
 import {
-  hrSbsAnalysesSurfaceKey,
   hrSbsAuditSurfaceKey,
   hrSbsBenchmarkReportSurfaceKey,
   hrSbsMappingsSurfaceKey,
@@ -108,7 +107,7 @@ export async function buildHrSbsReportsPageModel(input: {
       })
     : [];
 
-  const payEquityRows: HrSbsPayEquityReportRow[] = snapshot
+  const payEquityRows: readonly HrSbsPayEquityReportRow[] = snapshot
     ? filterHrSbsPayEquityReportRows(
         snapshot.payEquityGroups.map((group) => ({
           dimension: group.dimension,

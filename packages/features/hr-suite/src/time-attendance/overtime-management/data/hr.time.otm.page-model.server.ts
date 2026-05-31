@@ -17,9 +17,9 @@ import {
   hrOtmRequestsColumnsId,
 } from "../surface/hr.time.otm-surface-metadata.shared";
 import type { HrTimeOtmReportGroupBy } from "../schemas/hr.time.otm.schema";
+import { hrTimeOtmReadPermission } from "../contracts/hr.time.otm-route.contract";
 
 const DEFAULT_PAGE_SIZE = 25;
-const HR_OVERTIME_READ_PERMISSION = "hr.overtime.read" as const;
 
 function formatAmountCents(amountCents: number | null): string {
   if (amountCents === null) {
@@ -40,7 +40,7 @@ function buildOtmRequestListSurface(input: {
     __schemaVersion: GOVERNED_METADATA_SCHEMA_VERSION,
     dataNature: "table",
     presentationProfile: "erp-operational-table",
-    requiresErpPermission: HR_OVERTIME_READ_PERMISSION,
+    requiresErpPermission: hrTimeOtmReadPermission,
     presentation: {
       primaryColumnId: "employee",
     },
@@ -198,7 +198,7 @@ export async function buildHrTimeOtmPageModel(input: {
       __schemaVersion: GOVERNED_METADATA_SCHEMA_VERSION,
       dataNature: "table",
       presentationProfile: "erp-operational-table",
-      requiresErpPermission: HR_OVERTIME_READ_PERMISSION,
+      requiresErpPermission: hrTimeOtmReadPermission,
       presentation: {
         primaryColumnId: "group",
       },

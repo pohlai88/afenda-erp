@@ -38,7 +38,7 @@ export function HrCpmRecommendationsTrailingCell({
   const canFinalize = readCpmTrailingCellValue(row, "canFinalizeCpm") === "true";
 
   return (
-    <GovernedTrailingActionSlot>
+    <GovernedTrailingActionSlot trailingAction={row.trailingAction}>
       <HrCpmRecommendationStatusBadge status={status} lockedAt={lockedAt} />
       <HrCpmSubmitRecommendationForm
         recommendationId={row.id}

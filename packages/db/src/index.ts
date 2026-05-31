@@ -75,6 +75,8 @@ export * from "./hr-bonus-incentive";
 export * from "./hr-compensation-planning";
 export * from "./hr-competency-skills";
 export * from "./hr-competency-skills-profiles";
+export * from "./hr-competency-skills-gaps";
+export * from "./hr-competency-skills-development";
 export * from "./hr-salary-benchmarking";
 export * from "./hr-payroll-processing";
 export * from "./hr-multi-country-payroll";

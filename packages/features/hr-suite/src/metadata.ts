@@ -83,9 +83,22 @@ export {
 } from "./employee-management/compliance-regulatory-tracking/contracts/hr.workforce.compliance-route.contract";
 
 export {
+  buildHrSuiteListSearchToolbar,
+  buildHrSuiteOperationalListSurface,
+  buildHrSuiteSearchParamModelFields,
+  buildHrSuiteSearchParamsBySurfaceKey,
+  defineHrSuiteActionDescriptor,
+  defineHrSuiteSearchParamRegistry,
   resolveHrModuleNavItems,
+  resolveHrSuiteListTrailingAction,
+  type BuildHrSuiteOperationalListSurfaceInput,
   type HrModuleNavItem,
-} from "./contracts/hr-module-nav.contract";
+  type HrSuiteListColumn,
+  type HrSuiteListRow,
+  type HrSuiteListSearchToolbarInput,
+  type HrSuiteListSurfaceProfile,
+  type HrSuiteSearchParamRegistryEntry,
+} from "./hr-suite-integration/metadata";
 
 export {
   getHrDocumentsListSurfaceKeys,

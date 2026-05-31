@@ -50,10 +50,10 @@ export async function attachHrExpenseClaimReceiptAction(
       await attachHrExpenseClaimReceipt({
         organizationId: organization.id,
         uploadedByAuthUserId: session.id,
+        ...parsed.data,
         receiptDate: parsed.data.receiptDate
           ? new Date(`${parsed.data.receiptDate}T00:00:00.000Z`)
           : null,
-        ...parsed.data,
       });
     } catch (error) {
       if (error instanceof HrExpenseCommandError) {

@@ -132,7 +132,18 @@ const ignoredDirectories = new Set([
   "dist",
   ".codex-runtime",
   ".codex-logs",
+  ".playwright-mcp",
 ]);
+
+/** Root `artifacts/` (no dot) collides with gitignored `.artifacts/` for test output. */
+const disallowedRootDirectoryNames = new Set(["artifacts"]);
+
+const disallowedRootFileNames = new Set([
+  "build-log.txt",
+  "dashboard-snapshot.yml",
+]);
+
+const disallowedRootFilePatterns = [/^page-[\dTZ:.-]+\.ya?ml$/i, /-snapshot\.ya?ml$/i];
 
 const allowedUppercaseMarkdownFiles = new Set(["README.md", "AGENTS.md"]);
 const staleDocumentationReferences = [
@@ -363,6 +374,36 @@ function walk(dir: string) {
 
     checkDocumentationNaming(fullPath);
     checkArchitectureDocumentationLinks(fullPath);
+  }
+}
+
+function checkRootHygiene() {
+  for (const entry of fs.readdirSync(root, { withFileTypes: true })) {
+    if (entry.isDirectory() && disallowedRootDirectoryNames.has(entry.name)) {
+      problems.push(
+        `Disallowed root directory "${entry.name}/": collides with ".artifacts/" (test output). Move reports to docs/testing/ and remove from git.`,
+      );
+      continue;
+    }
+
+    if (!entry.isFile()) {
+      continue;
+    }
+
+    if (disallowedRootFileNames.has(entry.name)) {
+      problems.push(
+        `Disallowed root file "${entry.name}": local debug output must not be committed. Delete and add to .gitignore; use .artifacts/logs/ if retention is needed.`,
+      );
+      continue;
+    }
+
+    if (
+      disallowedRootFilePatterns.some((pattern) => pattern.test(entry.name))
+    ) {
+      problems.push(
+        `Disallowed root snapshot file "${entry.name}": use .artifacts/playwright/ or docs/testing/, not the repo root.`,
+      );
+    }
   }
 }
 
@@ -1225,6 +1266,7 @@ function checkTurboBuildOutputs() {
 }
 
 walk(root);
+checkRootHygiene();
 checkAppUiBoundary();
 checkWorkspacePackageRegistry();
 checkFeatureWorkspaceDiscipline();

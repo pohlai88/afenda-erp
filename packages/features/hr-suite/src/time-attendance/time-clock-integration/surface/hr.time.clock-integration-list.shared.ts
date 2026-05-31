@@ -8,7 +8,7 @@ import type {
   ListSurfaceRendererConfigurationResolvedInput,
 } from "@afenda/governed-surface/schemas";
 
-import { hrTimeClockCapabilities } from "../contracts/hr.time.clock-integration.contract";
+import { hrTimeClockReadPermission } from "../contracts/hr.time.clock-integration.contract";
 
 export type TimeClockListWindow = {
   pageSize: number;
@@ -45,14 +45,14 @@ export function buildTimeClockOperationalListSurface(input: {
     emptyTitle: string;
     emptyDescription: string;
   };
-  columns: TimeClockListColumn[];
-  rows: TimeClockListRow[];
+  columns: readonly TimeClockListColumn[];
+  rows: readonly TimeClockListRow[];
 }): ListSurfaceRendererConfigurationResolvedInput {
   return buildGovernedListSurface({
     __schemaVersion: GOVERNED_METADATA_SCHEMA_VERSION,
     dataNature: "table",
     presentationProfile: "erp-operational-table",
-    requiresErpPermission: hrTimeClockCapabilities.read,
+    requiresErpPermission: hrTimeClockReadPermission,
     presentation: {
       primaryColumnId: input.primaryColumnId,
       toolbar: input.searchToolbar,
@@ -72,8 +72,8 @@ export function buildTimeClockOperationalListSurface(input: {
         description: input.surface.emptyDescription,
       },
     },
-    columns: input.columns,
-    rows: input.rows,
+    columns: [...input.columns],
+    rows: [...input.rows],
   });
 }
 
@@ -99,7 +99,7 @@ export function resolveTimeClockAdminTrailingAction(canAdmin: boolean) {
         descriptor: {
           id: "time-clock-manage",
           label: "Manage",
-          intent: "primary",
+          intent: "default",
         },
       })
     : resolveListSurfaceRowTrailingAction({
@@ -109,7 +109,7 @@ export function resolveTimeClockAdminTrailingAction(canAdmin: boolean) {
         descriptor: {
           id: "time-clock-manage",
           label: "Manage",
-          intent: "primary",
+          intent: "default",
         },
       });
 }

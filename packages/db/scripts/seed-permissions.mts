@@ -243,6 +243,69 @@ const permissionCatalog = [
       "Approve, reject, return, or adjust bonus and incentive payouts in the approval workflow.",
   },
   {
+    key: "hr.expense.read",
+    module: "hr",
+    label: "View HR expenses",
+    description:
+      "Read expense claims, reimbursement status, reports, and payment handoff state.",
+  },
+  {
+    key: "hr.expense.write",
+    module: "hr",
+    label: "Manage HR expenses",
+    description:
+      "Create claims, attach receipts, maintain claim references, and update expense records.",
+  },
+  {
+    key: "hr.expense.approve",
+    module: "hr",
+    label: "Approve HR expenses",
+    description:
+      "Approve, reject, return, or request clarification on submitted expense claims.",
+  },
+  {
+    key: "hr.expense.finance.read",
+    module: "hr",
+    label: "View HR expense finance handoff",
+    description:
+      "Read and process expense reimbursement payment and accounting handoff state.",
+  },
+  {
+    key: "hr.expense.audit.read",
+    module: "hr",
+    label: "View HR expense audit trail",
+    description:
+      "Read expense claim audit events, approval decisions, payment references, and report exports.",
+  },
+  {
+    key: "hr.expense.sensitive.read",
+    module: "hr",
+    label: "View sensitive HR expense data",
+    description:
+      "Read sensitive employee, receipt, merchant, and reimbursement details on expense claims.",
+  },
+  {
+    key: "hr.sbs.read",
+    module: "hr",
+    label: "View salary benchmarking",
+    description:
+      "Read salary survey versions, mappings, benchmarking reports, and pay-equity analysis.",
+  },
+  {
+    key: "hr.sbs.write",
+    module: "hr",
+    label: "Manage salary benchmarking",
+    description:
+      "Import survey data, maintain mappings, run benchmarking analysis, and update benchmark versions.",
+  },
+  {
+    key: "hr.sbs.approve",
+    module: "hr",
+    label: "Approve salary benchmarking mappings",
+    description:
+      "Review and approve salary survey mappings and benchmark version lifecycle changes.",
+  },
+  {
     key: "hr.leave.read",
     module: "hr",
     label: "View HR leave",

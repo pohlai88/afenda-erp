@@ -25,5 +25,4 @@ export type {
   DevelopmentRecommendationDraft,
   DevelopmentLinkDraft,
   HrCsfGapKind,
-  HrCsfSkillRequirementClass,
 } from "@afenda/db";

@@ -15,7 +15,7 @@ export function HrTimeClockFormsPanel({ canAdmin }: { canAdmin: boolean }) {
   return (
     <div className="@container grid gap-surface-md @md:grid-cols-2">
       <SectionPanel
-        headingLevel={4}
+        headingLevel={3}
         title={hrTimeClockUiCopy.forms.registerDeviceTitle}
       >
         <FieldGroup>
@@ -33,7 +33,7 @@ export function HrTimeClockFormsPanel({ canAdmin }: { canAdmin: boolean }) {
         </FieldGroup>
       </SectionPanel>
       <SectionPanel
-        headingLevel={4}
+        headingLevel={3}
         title={hrTimeClockUiCopy.forms.registerMappingTitle}
       >
         <FieldGroup>

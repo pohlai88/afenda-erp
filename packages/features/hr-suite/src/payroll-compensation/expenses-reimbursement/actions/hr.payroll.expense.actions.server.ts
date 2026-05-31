@@ -35,7 +35,9 @@ function revalidateExpenseWorkbench() {
 
 /** HRM-EXP-001 — create and submit expense claim. */
 export async function submitHrExpenseClaimAction(
-  _previous: ActionResult | undefined,
+  _previous:
+    | ActionResult<{ claimId: string; claimReference: string }>
+    | undefined,
   formData: FormData,
 ): Promise<ActionResult<{ claimId: string; claimReference: string }>> {
   const { session, organization } = await requireHrExpenseWrite();
@@ -52,12 +54,14 @@ export async function submitHrExpenseClaimAction(
   });
 
   if (!parsed.success) {
-    return zodActionFailure(parsed.error);
+    return zodActionFailure<{ claimId: string; claimReference: string }>(
+      parsed.error,
+    );
   }
 
   const receiptMandatory = expenseCategoryRequiresReceipt(parsed.data.category);
   if (receiptMandatory && !parsed.data.receiptReference?.trim()) {
-    return actionFailure(
+    return actionFailure<{ claimId: string; claimReference: string }>(
       `Receipt is required for ${formatExpenseEnumLabel(parsed.data.category)} claims.`,
     );
   }

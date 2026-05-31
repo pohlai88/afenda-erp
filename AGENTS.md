@@ -61,6 +61,7 @@ Lynx is the ERP machine layer — every machine-assisted modality routes through
 8. **Caching** — `cacheComponents: true` via `@afenda/config`. Cache only shared/non-tenant data. Tenant dashboards and org-scoped lists stay dynamic.
 9. **Cron** — `/api/cron/*` must validate `Authorization: Bearer ${CRON_SECRET}` (`src/lib/cron.ts`).
 10. **AI** — Gateway auth: `AI_GATEWAY_API_KEY` or `VERCEL_OIDC_TOKEN`. Mutating AI tools require human approval and domain services, not direct table writes.
+11. **Repo root hygiene** — Generated test output only under **`.artifacts/`** (`pnpm artifacts:init`). Never create root **`artifacts/`** (no dot), `build-log.txt`, or Playwright MCP snapshots at the repo root. Committed audit baselines go in **`docs/testing/`** (see rule `afenda-repo-hygiene`).
 
 ## As-built vs target
 
@@ -93,7 +94,7 @@ Server Actions: internal mutations. Route Handlers: webhooks, uploads, AI stream
 
 ## Before you finish
 
-Cursor hooks run drift checks on agent edits (`enforce-architecture-drift`, `guard-kernel-boundary-imports`); fix hook failures without asking the user to run commands. CI repeats the same guards on push.
+Cursor hooks run drift checks on agent edits (`enforce-architecture-drift`, `guard-kernel-boundary-imports`, `guard-root-hygiene`); fix hook failures without asking the user to run commands. CI repeats the same guards on push.
 
 ```bash
 pnpm typecheck

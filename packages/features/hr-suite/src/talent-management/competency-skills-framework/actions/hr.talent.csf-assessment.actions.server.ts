@@ -23,9 +23,7 @@ export async function submitHrTalentCsfSelfAssessmentAction(input: unknown) {
   await assessmentGuard.assertSelfAssessmentTarget(parsed.employeeId);
 
   return runWithOrganizationContext(assessmentGuard.organization.id, async (db) => {
-    const { submitHrCsfAssessmentInTx } = await import(
-      "@afenda/db/hr-competency-skills-profiles"
-    );
+    const { submitHrCsfAssessmentInTx } = await import("@afenda/db");
     return submitHrCsfAssessmentInTx(db, {
       organizationId: assessmentGuard.organization.id,
       actorUserId: assessmentGuard.session.id,
@@ -53,9 +51,7 @@ export async function submitHrTalentCsfManagerAssessmentAction(input: unknown) {
   await assessmentGuard.assertManagerAssessmentTarget(parsed.employeeId);
 
   return runWithOrganizationContext(assessmentGuard.organization.id, async (db) => {
-    const { submitHrCsfAssessmentInTx } = await import(
-      "@afenda/db/hr-competency-skills-profiles"
-    );
+    const { submitHrCsfAssessmentInTx } = await import("@afenda/db");
     return submitHrCsfAssessmentInTx(db, {
       organizationId: assessmentGuard.organization.id,
       actorUserId: assessmentGuard.session.id,
@@ -79,9 +75,7 @@ export async function validateHrTalentCsfAssessmentAction(input: unknown) {
   const parsed = hrCsfValidateAssessmentSchema.parse(input);
 
   return runWithOrganizationContext(assessmentGuard.organization.id, async (db) => {
-    const { validateHrCsfAssessmentInTx } = await import(
-      "@afenda/db/hr-competency-skills-profiles"
-    );
+    const { validateHrCsfAssessmentInTx } = await import("@afenda/db");
     return validateHrCsfAssessmentInTx(db, {
       organizationId: assessmentGuard.organization.id,
       actorUserId: assessmentGuard.session.id,
@@ -97,9 +91,7 @@ export async function addHrTalentCsfAssessmentEvidenceAction(input: unknown) {
   const parsed = hrCsfAddAssessmentEvidenceSchema.parse(input);
 
   return runWithOrganizationContext(assessmentGuard.organization.id, async (db) => {
-    const { addHrCsfAssessmentEvidenceInTx } = await import(
-      "@afenda/db/hr-competency-skills-profiles"
-    );
+    const { addHrCsfAssessmentEvidenceInTx } = await import("@afenda/db");
     return addHrCsfAssessmentEvidenceInTx(db, {
       organizationId: assessmentGuard.organization.id,
       actorUserId: assessmentGuard.session.id,

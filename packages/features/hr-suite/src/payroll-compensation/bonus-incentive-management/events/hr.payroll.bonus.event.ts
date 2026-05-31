@@ -62,8 +62,6 @@ export const hrPayrollBonusAuditActions = {
   },
 } as const;
 
-type BonusAuditActionGroup = (typeof hrPayrollBonusAuditActions)[keyof typeof hrPayrollBonusAuditActions];
-
 export type HrPayrollBonusAuditAction = {
-  [K in keyof BonusAuditActionGroup]: BonusAuditActionGroup[K][keyof BonusAuditActionGroup[K]];
-}[keyof BonusAuditActionGroup];
+  [Group in keyof typeof hrPayrollBonusAuditActions]: (typeof hrPayrollBonusAuditActions)[Group][keyof (typeof hrPayrollBonusAuditActions)[Group]];
+}[keyof typeof hrPayrollBonusAuditActions];

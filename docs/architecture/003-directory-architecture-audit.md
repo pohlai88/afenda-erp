@@ -29,6 +29,9 @@ intended production build.
 | `docs/roadmap/`      | Tracking / plans                  | `TRACK-###` + `00N-*.md`                                           |
 | `.github/`           | CI                                | quality, build, e2e, artifact upload on failure                    |
 | `.artifacts/`        | Test outputs (gitignored)         | coverage, vitest reports, playwright results                       |
+| `docs/testing/`      | Committed test/audit notes        | baselines (e.g. `ui-audit-matrix.md`) — not runner output          |
+
+**Forbidden at repo root:** `artifacts/` (no dot — collides with `.artifacts/`), `build-log.txt`, `*-snapshot.yml`, Playwright MCP `page-*.yml`. Enforced by `check-directory-architecture.mts` and Cursor `guard-root-hygiene.mjs`.
 
 ## Registered workspace packages
 

@@ -8,6 +8,12 @@ export const hrTimeClockCapabilities = {
   admin: "hr.timeClock.admin",
 } as const;
 
+export const hrTimeClockReadPermission = {
+  module: "hr",
+  object: "time_clock",
+  function: "read",
+} as const;
+
 export type HrTimeClockCapability =
   (typeof hrTimeClockCapabilities)[keyof typeof hrTimeClockCapabilities];
 

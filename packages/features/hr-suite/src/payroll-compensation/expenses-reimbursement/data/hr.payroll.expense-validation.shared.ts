@@ -1,5 +1,8 @@
 import {
   detectDuplicateClaims as detectDuplicateClaimsFromDb,
+  expenseMatchesEligibilityRule,
+  expenseRuleSpecificityScore,
+  resolveExpenseEligibilityFromRules,
   validateClaimPolicy as validateClaimPolicyFromDb,
   validateEligibility as validateEligibilityFromDb,
   type HrExpenseClaimCategory,
@@ -41,6 +44,12 @@ export function detectDuplicateClaims(input: {
 }): HrExpenseDuplicateDetectionResult {
   return detectDuplicateClaimsFromDb(input);
 }
+
+export {
+  expenseMatchesEligibilityRule,
+  expenseRuleSpecificityScore,
+  resolveExpenseEligibilityFromRules,
+};
 
 export type {
   HrExpenseClaimCategory,

@@ -1,12 +1,11 @@
 import {
-  hrExpenseClaims,
+  HrExpenseCommandError,
+  getHrExpenseClaimById,
   recordHrExpensePaymentReference,
-  runWithOrganizationContext,
   sendHrExpenseClaimToPayrollOrAp,
   updateHrExpenseClaimAccountingAllocation,
   type HrExpensePaymentChannel,
 } from "@afenda/db";
-import { and, eq } from "drizzle-orm";
 
 import type {
   HrExpensePaymentIntegrationPorts,
@@ -28,6 +27,14 @@ const defaultPorts: HrExpensePaymentIntegrationPorts = {
   accountsPayable: defaultHrExpenseAccountsPayableIntegrationPort,
 };
 
+function formatClaimAmount(value: string | null): string {
+  const amount = Number(value);
+  if (!Number.isFinite(amount) || amount <= 0) {
+    throw new HrExpenseCommandError("claim_not_approved");
+  }
+  return amount.toFixed(2);
+}
+
 /** HRM-EXP-022 — integrate approved reimbursement with Payroll or AP. */
 export async function sendToPayrollOrAP(
   input: HrExpenseSendToPayrollOrApInput & {
@@ -38,36 +45,22 @@ export async function sendToPayrollOrAP(
 ): Promise<HrExpensePaymentIntegrationResult> {
   const ports = { ...defaultPorts, ...input.ports };
 
-  const claim = await runWithOrganizationContext(input.organizationId, async (db) => {
-    const [row] = await db
-      .select({
-        id: hrExpenseClaims.id,
-        employeeId: hrExpenseClaims.employeeId,
-        categoryCode: hrExpenseClaims.categoryCode,
-        status: hrExpenseClaims.status,
-        amountCents: hrExpenseClaims.amountCents,
-        currencyCode: hrExpenseClaims.currencyCode,
-      })
-      .from(hrExpenseClaims)
-      .where(
-        and(
-          eq(hrExpenseClaims.organizationId, input.organizationId),
-          eq(hrExpenseClaims.id, input.claimId),
-        ),
-      )
-      .limit(1);
-    return row ?? null;
+  const claim = await getHrExpenseClaimById({
+    organizationId: input.organizationId,
+    claimId: input.claimId,
   });
 
   if (!claim) {
-    throw new Error("claim_not_found");
+    throw new HrExpenseCommandError("claim_not_found");
   }
 
-  if (!claim.amountCents || claim.amountCents <= 0) {
-    throw new Error("claim_not_approved");
+  if (claim.claimStatus !== "approved") {
+    throw new HrExpenseCommandError("claim_not_approved");
   }
 
-  const netPayableAmount = (claim.amountCents / 100).toFixed(2);
+  const netPayableAmount = formatClaimAmount(
+    claim.approvedAmount ?? claim.claimAmount,
+  );
   const paymentChannel = input.paymentChannel as HrExpensePaymentChannel;
   const staged =
     paymentChannel === "payroll"
@@ -76,7 +69,7 @@ export async function sendToPayrollOrAP(
           claimId: input.claimId,
           employeeId: claim.employeeId,
           netPayableAmount,
-          currencyCode: claim.currencyCode,
+          currencyCode: claim.claimCurrencyCode,
           categoryCode: claim.categoryCode,
         })
       : await ports.accountsPayable.stageVendorPayment({
@@ -84,7 +77,7 @@ export async function sendToPayrollOrAP(
           claimId: input.claimId,
           employeeId: claim.employeeId,
           netPayableAmount,
-          currencyCode: claim.currencyCode,
+          currencyCode: claim.claimCurrencyCode,
         });
 
   const auditAction =

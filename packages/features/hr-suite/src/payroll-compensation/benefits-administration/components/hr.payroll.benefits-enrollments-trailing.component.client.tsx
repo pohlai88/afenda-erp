@@ -10,9 +10,9 @@ import { Field, FieldLabel } from "@afenda/ui/field";
 import { Input } from "@afenda/ui/input";
 
 import {
-  addHrBenefitEnrollmentDependentAction,
-  approveHrBenefitEnrollmentAction,
-  verifyHrBenefitEnrollmentDependentsAction,
+  addHrBenefitEnrollmentDependentFormAction,
+  approveHrBenefitEnrollmentFormAction,
+  verifyHrBenefitEnrollmentDependentsFormAction,
 } from "../actions/hr.payroll.benefits.actions.server";
 import { HRM_BENEFIT_DEPENDENT_RELATIONSHIPS } from "../schemas/hr.payroll.benefits-form.shared";
 import { hrBenefitsUiCopy } from "../surface/hr.payroll.benefits-ui.copy.shared";
@@ -45,7 +45,7 @@ export function HrBenefitsEnrollmentsTrailingCell({
   if (descriptorId === "approve-enrollment") {
     return (
       <GovernedTrailingActionSlot trailingAction={trailingAction}>
-        <form action={approveHrBenefitEnrollmentAction} className="flex flex-col gap-2">
+        <form action={approveHrBenefitEnrollmentFormAction} className="flex flex-col gap-2">
           <HiddenEnrollmentId row={row} />
           <Button type="submit" variant="default" size="sm">
             {copy.trailingApproveLabel}
@@ -58,7 +58,7 @@ export function HrBenefitsEnrollmentsTrailingCell({
   if (descriptorId === "verify-dependents") {
     return (
       <GovernedTrailingActionSlot trailingAction={trailingAction}>
-        <form action={verifyHrBenefitEnrollmentDependentsAction} className="flex flex-col gap-2">
+        <form action={verifyHrBenefitEnrollmentDependentsFormAction} className="flex flex-col gap-2">
           <HiddenEnrollmentId row={row} />
           <Button type="submit" variant="outline" size="sm">
             {copy.trailingVerifyDependentsLabel}
@@ -71,7 +71,7 @@ export function HrBenefitsEnrollmentsTrailingCell({
   if (descriptorId === "add-dependent") {
     return (
       <GovernedTrailingActionSlot trailingAction={trailingAction}>
-        <form action={addHrBenefitEnrollmentDependentAction} className="flex flex-col gap-3">
+        <form action={addHrBenefitEnrollmentDependentFormAction} className="flex flex-col gap-3">
           <HiddenEnrollmentId row={row} />
           <Field>
             <FieldLabel>{copy.dependentNameLabel}</FieldLabel>

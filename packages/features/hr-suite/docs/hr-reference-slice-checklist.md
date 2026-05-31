@@ -1,6 +1,14 @@
 # HR reference slice checklist
 
-Copy **`employee-management/compliance-regulatory-tracking`** for every new shipped HR capability. Agents: rule **`afenda-hr-reference-slice`** · enforcement: `scripts/check-hr-feature-vertical-naming.mts`.
+Canonical architecture: `docs/architecture/010-hr-feature-package-architecture.md`.
+
+Copy **`employee-management/compliance-regulatory-tracking`** for every new
+shipped HR capability. Agents: rule **`afenda-hr-reference-slice`**; enforcement:
+`scripts/check-hr-feature-vertical-naming.mts`.
+
+ARCH-010 defines the slice lifecycle states: `scaffold-only`, `repair`,
+`shipped`, and `deprecated`. This checklist applies when a slice is moving to
+or changing while in `shipped`.
 
 ## Reference paths
 

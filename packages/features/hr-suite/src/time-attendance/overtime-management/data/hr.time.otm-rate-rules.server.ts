@@ -9,8 +9,7 @@ import {
 import type { ListSurfaceRendererConfigurationResolvedInput } from "@afenda/governed-surface";
 
 import { hrOtmRateRulesColumnsId } from "../surface/hr.time.otm-surface-metadata.shared";
-
-const HR_OVERTIME_READ_PERMISSION = "hr.overtime.read" as const;
+import { hrTimeOtmReadPermission } from "../contracts/hr.time.otm-route.contract";
 
 /** HRM-OTM-007 — Pattern C admin list for configured rate rules (AC 6). */
 export async function buildHrTimeOtmRateRulesListSurface(input: {
@@ -27,7 +26,7 @@ export async function buildHrTimeOtmRateRulesListSurface(input: {
     __schemaVersion: GOVERNED_METADATA_SCHEMA_VERSION,
     dataNature: "table",
     presentationProfile: "erp-operational-table",
-    requiresErpPermission: HR_OVERTIME_READ_PERMISSION,
+    requiresErpPermission: hrTimeOtmReadPermission,
     presentation: {
       primaryColumnId: "name",
     },

@@ -1,7 +1,7 @@
 import {
   listHrCsfAssessmentEvidence,
   listHrCsfAssessmentsForProfile,
-} from "@afenda/db/hr-competency-skills-profiles";
+} from "@afenda/db";
 
 import {
   canHrCsfViewEmployeeProfile,

@@ -2,12 +2,13 @@
 
 import { runWithOrganizationContext } from "@afenda/db";
 import {
+  actionFailure,
   actionSuccess,
   type ActionResult,
   zodActionFailure,
 } from "@afenda/governed-surface/schemas";
 
-import { requireHrRead } from "../../../policies/hr-module-access.policy.server";
+import { requireHrRead } from "../../../hr-suite-integration/server";
 import { analyzeEmployeeSkillAndCompetencyGaps } from "../data/hr.talent.csf-gap.server";
 import {
   classifyGap,
@@ -22,6 +23,12 @@ import {
   hrCsfListEmployeeGapsSchema,
 } from "../schemas/hr.talent.csf-gap.schema";
 
+function toCsfActionFailure<T = void>(error: unknown): ActionResult<T> {
+  return actionFailure<T>(
+    error instanceof Error ? error.message : "Competency gap action failed.",
+  );
+}
+
 export async function analyzeEmployeeGapsAction(
   input: unknown,
 ): Promise<ActionResult<Awaited<ReturnType<typeof analyzeEmployeeSkillAndCompetencyGaps>>>> {
@@ -29,7 +36,9 @@ export async function analyzeEmployeeGapsAction(
   const parsed = hrCsfAnalyzeEmployeeGapsSchema.safeParse(input);
 
   if (!parsed.success) {
-    return zodActionFailure(parsed.error);
+    return zodActionFailure<
+      Awaited<ReturnType<typeof analyzeEmployeeSkillAndCompetencyGaps>>
+    >(parsed.error);
   }
 
   try {
@@ -45,7 +54,9 @@ export async function analyzeEmployeeGapsAction(
 
     return actionSuccess(result);
   } catch (error) {
-    return zodActionFailure(error);
+    return toCsfActionFailure<
+      Awaited<ReturnType<typeof analyzeEmployeeSkillAndCompetencyGaps>>
+    >(error);
   }
 }
 

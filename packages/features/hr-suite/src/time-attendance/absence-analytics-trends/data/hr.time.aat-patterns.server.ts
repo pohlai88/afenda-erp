@@ -619,7 +619,11 @@ async function loadAatAbsenceContext(
       if (row.status === "public_holiday") {
         holidayDates.push(row.workDate);
       }
-      if (row.status === "absent" || row.status === "missing_punch") {
+      if (
+        row.status === "absent" ||
+        row.status === "missing_punch" ||
+        row.status === "half_day"
+      ) {
         events.push({
           employeeId: row.employeeId,
           absenceDate: row.workDate,

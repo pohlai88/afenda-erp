@@ -2,17 +2,24 @@
 
 import { runWithOrganizationContext } from "@afenda/db";
 import {
+  actionFailure,
   actionSuccess,
   type ActionResult,
   zodActionFailure,
 } from "@afenda/governed-surface/schemas";
 
-import { requireHrRead } from "../../../policies/hr-module-access.policy.server";
+import { requireHrRead } from "../../../hr-suite-integration/server";
 import { linkGapDevelopmentResource } from "../data/hr.talent.csf-development.server";
 import {
   hrCsfLinkDevelopmentResourceSchema,
   hrCsfListDevelopmentForGapSchema,
 } from "../schemas/hr.talent.csf-development.schema";
+
+function toCsfActionFailure<T = void>(error: unknown): ActionResult<T> {
+  return actionFailure<T>(
+    error instanceof Error ? error.message : "Competency development action failed.",
+  );
+}
 
 export async function linkDevelopmentResourceAction(
   input: unknown,
@@ -21,7 +28,7 @@ export async function linkDevelopmentResourceAction(
   const parsed = hrCsfLinkDevelopmentResourceSchema.safeParse(input);
 
   if (!parsed.success) {
-    return zodActionFailure(parsed.error);
+    return zodActionFailure<{ linkId: string }>(parsed.error);
   }
 
   try {
@@ -37,7 +44,7 @@ export async function linkDevelopmentResourceAction(
 
     return actionSuccess(result);
   } catch (error) {
-    return zodActionFailure(error);
+    return toCsfActionFailure<{ linkId: string }>(error);
   }
 }
 

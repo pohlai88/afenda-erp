@@ -74,10 +74,6 @@ function toHrCsfExecutionGuard(context: ExecutionContext): HrCsfExecutionGuard {
       if (scope === "org" && !canWriteCsf && !isLeadership) {
         scope = "team";
       }
-      if (scope === "team" && !canWriteCsf && context.role === "member") {
-        scope = "self";
-      }
-
       return resolveEmployeeIdsVisibleToActor({
         organizationId: context.organizationId,
         actorAuthUserId: context.userId,

@@ -92,7 +92,7 @@ export function HrCpmCycleDetailSection({
         headingLevel={1}
         title={`${pageModel.cycle.code} — ${pageModel.cycle.name}`}
         description={`${pageModel.cycle.cycleType} · ${pageModel.cycle.cycleStatus} · effective ${pageModel.cycle.effectiveDate.toLocaleDateString()}`}
-        actions={
+        aside={
           <Link
             className="type-muted hover:text-foreground"
             href={hrCpmRoutePaths.compensationPlanning}

@@ -75,7 +75,7 @@ export async function finalizeBonusMutationWithData<T>(
     revalidatePath(BONUS_REVALIDATE_PATH);
     return actionSuccess(data);
   } catch (error) {
-    return toBonusActionFailure(error) as ActionResult<T>;
+    return toBonusActionFailure<T>(error);
   }
 }
 

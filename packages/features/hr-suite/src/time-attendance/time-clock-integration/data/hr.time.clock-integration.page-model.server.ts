@@ -44,7 +44,6 @@ import {
   hrTimeClockRawPunchesSurfaceKey,
   hrTimeClockSyncBatchesSearchParam,
   hrTimeClockSyncBatchesSurfaceKey,
-  hrTimeClockReportsSurfaceKey,
 } from "../surface/hr.time.clock-integration-surface-metadata.shared";
 import { hrTimeClockReportGroupByParam } from "../surface/hr.time.clock-integration-reports-list.surface";
 import { hrTimeClockReportsColumnsId } from "../surface/hr.time.clock-integration-surface-columns.shared";
@@ -231,7 +230,10 @@ export async function buildHrTimeClockPageModel(
               search: input.auditTrailSearch ?? input.search,
             }),
         })
-      : Promise.resolve({ loadError: undefined as EmptyState | undefined }),
+      : Promise.resolve({
+          data: undefined,
+          loadError: undefined as EmptyState | undefined,
+        }),
     listHrTimeClockSyncAlerts({
       organizationId: input.organizationId,
       limit: 25,

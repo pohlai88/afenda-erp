@@ -217,7 +217,11 @@ export async function calculateBonusPayoutAction(
   await requireHrBonusRead();
   const { session, organization } = await requireHrBonusWrite();
   const parsed = parseCalculateBonusPayoutForm(formData);
-  if (!parsed.success) return zodActionFailure(parsed.error);
+  if (!parsed.success) {
+    return zodActionFailure<
+      BonusPayoutCalculationResult & { formulaId: string }
+    >(parsed.error);
+  }
 
   return finalizeBonusMutationWithData(organization.id, async (db) => {
     const result = await calculateHrBonusPayoutForPlanInTx(db, {
@@ -263,7 +267,11 @@ export async function calculateBonusPayoutReadAction(
 ): Promise<ActionResult<BonusPayoutCalculationResult & { formulaId: string }>> {
   const { organization } = await requireHrBonusRead();
   const parsed = parseCalculateBonusPayoutForm(formData);
-  if (!parsed.success) return zodActionFailure(parsed.error);
+  if (!parsed.success) {
+    return zodActionFailure<
+      BonusPayoutCalculationResult & { formulaId: string }
+    >(parsed.error);
+  }
 
   try {
     const { calculateHrBonusPayoutForPlanInTx, runWithOrganizationContext } =
@@ -290,6 +298,8 @@ export async function calculateBonusPayoutReadAction(
     const { toBonusActionFailure } = await import(
       "../data/hr.payroll.bonus-action-result.shared"
     );
-    return toBonusActionFailure(error);
+    return toBonusActionFailure<BonusPayoutCalculationResult & { formulaId: string }>(
+      error,
+    );
   }
 }

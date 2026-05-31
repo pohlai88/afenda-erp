@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 
 import {
   actionFailure,
+  actionSuccess,
   type ActionResult,
   zodActionFailure,
 } from "@afenda/governed-surface/schemas";
@@ -53,11 +54,14 @@ async function finalizeHrTimeClockAdminMutation(
     await writeExecutionAuditEvent({
       organizationId,
       actorId,
+      actorType: "user",
       action: auditAction,
+      targetType: "hr_time_clock",
+      targetId: organizationId,
       metadata: { data },
     });
     revalidatePath(hrTimeClockRoutePaths.hub);
-    return { ok: true, data };
+    return actionSuccess();
   } catch (error) {
     return mapHrTimeClockCommandError(error);
   }

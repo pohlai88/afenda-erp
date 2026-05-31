@@ -48,8 +48,8 @@ export function buildCsfOperationalListSurface(input: {
     emptyTitle: string;
     emptyDescription: string;
   };
-  columns: CsfListColumn[];
-  rows: CsfListRow[];
+  columns: readonly CsfListColumn[];
+  rows: readonly CsfListRow[];
 }) {
   return buildGovernedListSurface({
     __schemaVersion: GOVERNED_METADATA_SCHEMA_VERSION,
@@ -75,7 +75,7 @@ export function buildCsfOperationalListSurface(input: {
         description: input.surface.emptyDescription,
       },
     },
-    columns: input.columns,
-    rows: input.rows,
+    columns: [...input.columns],
+    rows: [...input.rows],
   });
 }

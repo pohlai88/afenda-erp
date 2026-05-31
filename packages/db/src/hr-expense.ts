@@ -40,6 +40,10 @@ export {
 } from "./hr-exp-approval.shared";
 
 export {
+  HrExpenseCommandError,
+} from "./hr-expense.shared";
+
+export {
   attachHrExpenseClaimReceipt,
   detectHrExpenseDuplicateClaims,
   listHrExpenseEligibilityRules,

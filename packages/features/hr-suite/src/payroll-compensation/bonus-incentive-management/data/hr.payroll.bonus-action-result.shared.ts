@@ -39,9 +39,9 @@ const BONUS_COMMAND_ERROR_MESSAGES: Record<
   adjusted_amount_required: "Adjusted amount is required.",
 };
 
-export function toBonusActionFailure(error: unknown): ActionResult {
+export function toBonusActionFailure<T = void>(error: unknown): ActionResult<T> {
   if (error instanceof HrBonusCommandError) {
-    return actionFailure(
+    return actionFailure<T>(
       BONUS_COMMAND_ERROR_MESSAGES[error.code] ?? error.message,
       undefined,
       error.code,
@@ -49,12 +49,12 @@ export function toBonusActionFailure(error: unknown): ActionResult {
   }
 
   if (error instanceof HrBonusPayoutCommandError) {
-    return actionFailure(error.message, undefined, error.code);
+    return actionFailure<T>(error.message, undefined, error.code);
   }
 
   if (error instanceof Error) {
-    return actionFailure(error.message || BONUS_GENERIC_FAILURE_MESSAGE);
+    return actionFailure<T>(error.message || BONUS_GENERIC_FAILURE_MESSAGE);
   }
 
-  return actionFailure(BONUS_GENERIC_FAILURE_MESSAGE);
+  return actionFailure<T>(BONUS_GENERIC_FAILURE_MESSAGE);
 }

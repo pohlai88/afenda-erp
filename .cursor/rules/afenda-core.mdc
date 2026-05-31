@@ -36,3 +36,5 @@ Required feature export doors: `.`, `./client`, `./server`, `./metadata` (`defau
 ## Verification
 
 Run `pnpm architecture:check` on layout/export/doc changes. Run `pnpm lint:governed-renderers` when touching governed renderers or registry. Schema changes: `packages/db/src/schema` → `pnpm db:generate` → `pnpm db:migrate` (rule `afenda-database-migrations` — no hand-written migration SQL unless the user explicitly requires it).
+
+Repo root: test output under `.artifacts/` only; never root `artifacts/`, `build-log.txt`, or MCP snapshot dumps (rule `afenda-repo-hygiene`).

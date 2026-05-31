@@ -1,3 +1,5 @@
+import { resolveListSurfaceRowTrailingAction } from "@afenda/governed-surface";
+
 import { hrCpmCycleDetailRoutePath } from "../contracts/hr.payroll.cpm-route.contract";
 import {
   hrCpmAuditSearchParam,
@@ -45,7 +47,7 @@ function formatMoney(value: number | null | undefined) {
 
 export function buildHrCpmCyclesListSurface(input: {
   window: {
-    rows: Array<{
+    rows: readonly {
       id: string;
       code: string;
       name: string;
@@ -53,7 +55,7 @@ export function buildHrCpmCyclesListSurface(input: {
       cycleStatus: string;
       effectiveDate: Date;
       currencyCode: string;
-    }>;
+    }[];
     pageSize: number;
     totalCount: number;
     hasNextPage: boolean;
@@ -108,7 +110,7 @@ export function buildHrCpmCyclesListSurface(input: {
 
 export function buildHrCpmParticipantsListSurface(input: {
   window: {
-    rows: Array<{
+    rows: readonly {
       id: string;
       employeeNumber: string;
       employeeName: string;
@@ -116,7 +118,7 @@ export function buildHrCpmParticipantsListSurface(input: {
       currentSalary: number | null;
       currentGrade: string | null;
       legalEntityCode: string | null;
-    }>;
+    }[];
     pageSize: number;
     totalCount: number;
     hasNextPage: boolean;
@@ -161,7 +163,7 @@ export function buildHrCpmParticipantsListSurface(input: {
 
 export function buildHrCpmRecommendationsListSurface(input: {
   window: {
-    rows: Array<{
+    rows: readonly {
       id: string;
       employeeNumber: string;
       employeeName: string;
@@ -172,7 +174,7 @@ export function buildHrCpmRecommendationsListSurface(input: {
       overBudget: boolean;
       bandFlag: string | null;
       lockedAt?: Date | null;
-    }>;
+    }[];
     pageSize: number;
     totalCount: number;
     hasNextPage: boolean;
@@ -230,12 +232,17 @@ export function buildHrCpmRecommendationsListSurface(input: {
           canReviewCpm: canApprove ? "true" : "false",
           canFinalizeCpm: canApprove ? "true" : "false",
         },
-        trailingAction: canWrite || canApprove
-          ? {
-              kind: "render",
-              descriptor: { id: "cpm-recommendation-workflow" },
-            }
-          : undefined,
+        trailingAction:
+          canWrite || canApprove
+            ? resolveListSurfaceRowTrailingAction({
+                allowed: true,
+                descriptor: {
+                  id: "cpm-recommendation-workflow",
+                  label: "Manage recommendation",
+                  intent: "approval",
+                },
+              })
+            : undefined,
       };
     }),
   });
@@ -243,7 +250,7 @@ export function buildHrCpmRecommendationsListSurface(input: {
 
 export function buildHrCpmReportsListSurface(input: {
   window: {
-    rows: Array<{
+    rows: readonly {
       id: string;
       cycleId: string;
       departmentId: string | null;
@@ -253,7 +260,7 @@ export function buildHrCpmReportsListSurface(input: {
       budgetPoolId: string | null;
       recommendationStatus: string;
       count: number;
-    }>;
+    }[];
     pageSize: number;
     totalCount: number;
     hasNextPage: boolean;
@@ -309,14 +316,14 @@ export function buildHrCpmReportsListSurface(input: {
 
 export function buildHrCpmAuditListSurface(input: {
   window: {
-    rows: Array<{
+    rows: readonly {
       id: string;
       action: string;
       summary: string | null;
       occurredAt: Date;
       actorUserId: string;
       cycleId: string | null;
-    }>;
+    }[];
     pageSize: number;
     totalCount: number;
     hasNextPage: boolean;

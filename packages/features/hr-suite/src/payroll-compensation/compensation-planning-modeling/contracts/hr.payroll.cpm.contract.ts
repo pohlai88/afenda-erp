@@ -7,5 +7,5 @@ export const hrPayrollCpmReadPermission = {
 export const hrPayrollCpmWritePermission = {
   module: "hr",
   object: "cpm",
-  function: "write",
+  function: "update",
 } as const;

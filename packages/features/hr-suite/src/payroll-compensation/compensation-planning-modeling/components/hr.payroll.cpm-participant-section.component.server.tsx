@@ -5,10 +5,7 @@ import {
 import { Alert, AlertDescription, AlertTitle, SectionPanel } from "@afenda/ui";
 import Link from "next/link";
 
-import {
-  hrCpmCycleDetailRoutePath,
-  hrCpmRoutePaths,
-} from "../contracts/hr.payroll.cpm-route.contract";
+import { hrCpmCycleDetailRoutePath } from "../contracts/hr.payroll.cpm-route.contract";
 import type { HrCpmParticipantPageModel } from "../data/hr.payroll.cpm-participant.page-model.server";
 import { hrCpmRecommendationsSurfaceKey } from "../data/hr.payroll.cpm-search-params.parse.shared";
 import {
@@ -38,7 +35,7 @@ export function HrCpmParticipantPlanningSection({
         headingLevel={1}
         title={pageModel.participant.employeeLabel}
         description={`${pageModel.cycle.code} — ${pageModel.cycle.name}`}
-        actions={
+        aside={
           <Link
             className="type-muted hover:text-foreground"
             href={hrCpmCycleDetailRoutePath(pageModel.cycle.id)}
