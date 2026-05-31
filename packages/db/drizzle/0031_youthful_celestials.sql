@@ -119,7 +119,15 @@ CREATE TABLE "hr_leave_type_configs" (
 ALTER TABLE "hr_leave_requests" ADD COLUMN "policy_group_code" text DEFAULT 'default' NOT NULL;--> statement-breakpoint
 ALTER TABLE "hr_leave_requests" ADD COLUMN "approval_stage" "hr_leave_approval_stage" DEFAULT 'manager' NOT NULL;--> statement-breakpoint
 ALTER TABLE "hr_leave_requests" ADD COLUMN "current_approver_auth_user_id" text;--> statement-breakpoint
-ALTER TABLE "hr_leave_requests" ADD COLUMN "entitlement_year" integer NOT NULL;--> statement-breakpoint
+ALTER TABLE "hr_leave_requests" ADD COLUMN IF NOT EXISTS "entitlement_year" integer;--> statement-breakpoint
+UPDATE "hr_leave_requests"
+SET "entitlement_year" = COALESCE(
+  EXTRACT(YEAR FROM "start_at" AT TIME ZONE 'UTC')::integer,
+  EXTRACT(YEAR FROM "submitted_at" AT TIME ZONE 'UTC')::integer,
+  EXTRACT(YEAR FROM CURRENT_DATE)::integer
+)
+WHERE "entitlement_year" IS NULL;--> statement-breakpoint
+ALTER TABLE "hr_leave_requests" ALTER COLUMN "entitlement_year" SET NOT NULL;--> statement-breakpoint
 ALTER TABLE "hr_leave_requests" ADD COLUMN "supporting_document_id" text;--> statement-breakpoint
 ALTER TABLE "hr_leave_requests" ADD COLUMN "rejection_reason" text;--> statement-breakpoint
 ALTER TABLE "hr_leave_requests" ADD COLUMN "returned_note" text;--> statement-breakpoint

@@ -65,6 +65,10 @@ export const hrSectionManifest = {
     label: "Performance Appraisals",
     featureArea: "talent-management/performance-appraisals",
   },
+  "recruitment-onboarding": {
+    label: "Recruitment & Onboarding",
+    featureArea: "talent-management/recruitment-onboarding",
+  },
 } as const;
 
 export type HrSectionSlug = keyof typeof hrSectionManifest;

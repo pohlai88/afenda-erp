@@ -292,7 +292,8 @@ export function validateClaimPolicy(
   }
 
   if (
-    categoryRule?.perClaimLimitCents !== null &&
+    categoryRule &&
+    categoryRule.perClaimLimitCents !== null &&
     categoryRule.perClaimLimitCents !== undefined &&
     input.claim.amountCents > categoryRule.perClaimLimitCents
   ) {
@@ -306,7 +307,8 @@ export function validateClaimPolicy(
     input.employeePeriodTotals.dailyCategoryTotalCents +
     input.claim.amountCents;
   if (
-    categoryRule?.dailyLimitCents !== null &&
+    categoryRule &&
+    categoryRule.dailyLimitCents !== null &&
     categoryRule.dailyLimitCents !== undefined &&
     projectedDailyTotal > categoryRule.dailyLimitCents
   ) {
@@ -320,7 +322,8 @@ export function validateClaimPolicy(
     input.employeePeriodTotals.monthlyCategoryTotalCents +
     input.claim.amountCents;
   if (
-    categoryRule?.monthlyLimitCents !== null &&
+    categoryRule &&
+    categoryRule.monthlyLimitCents !== null &&
     categoryRule.monthlyLimitCents !== undefined &&
     projectedMonthlyTotal > categoryRule.monthlyLimitCents
   ) {

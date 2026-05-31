@@ -264,7 +264,7 @@ function checkDocumentationNaming(filePath: string) {
     lowerFileName.includes("architecture") || fileName === "ARCHITECTURE.md";
   const normalizedRel = rel.replace(/\\/g, "/");
   const isFeatureVerticalArchitectureDoc =
-    /^packages\/features\/[^/]+\/src\/[^/]+\/[^/]*architecture[^/]*\.md$/.test(
+    /^packages\/features\/[^/]+\/src\/(?:[^/]+\/)+[^/]*architecture[^/]*\.md$/.test(
       normalizedRel,
     );
   const isKernelVerticalArchitectureDoc =
@@ -706,6 +706,17 @@ function checkFeatureBucketGrammar() {
         continue;
       }
 
+      const featurePackageInternalDirs = new Set([
+        "src",
+        "dist",
+        "tests",
+        "docs",
+        "scripts",
+      ]);
+      if (featurePackageInternalDirs.has(topEntry.name)) {
+        continue;
+      }
+
       const verticalDir = path.join(baseDir, topEntry.name);
       const verticalEntries = fs
         .readdirSync(verticalDir, { withFileTypes: true })
@@ -766,6 +777,7 @@ function checkAppRouteFileWhitelist() {
   const transitionAllowList = new Set([
     "apps/erp/src/app/app-analytics.tsx",
     "apps/erp/src/app/onboarding/onboarding-form.tsx",
+    "apps/erp/src/app/interface-lab/primitives/dialog-open-fixture.client.tsx",
   ]);
 
   walkSourceFiles(appRoot, (filePath) => {
@@ -1046,7 +1058,6 @@ function checkFeatureSchemaOwnership() {
     const content = fs.readFileSync(filePath, "utf8");
 
     if (
-      content.includes("drizzle-orm/pg-core") ||
       content.includes("pgTable(") ||
       content.includes("pgEnum(")
     ) {

@@ -210,6 +210,13 @@ export const hrExpensePolicies = pgTable(
     name: text("name").notNull().default("Default expense policy"),
     defaultCurrencyCode: text("default_currency_code").notNull().default("USD"),
     maxClaimAmountCents: integer("max_claim_amount_cents"),
+    requireFinanceSecondApproval: boolean("require_finance_second_approval")
+      .notNull()
+      .default(true),
+    requireHrSecondApproval: boolean("require_hr_second_approval")
+      .notNull()
+      .default(false),
+    managerChainMaxDepth: integer("manager_chain_max_depth").notNull().default(3),
     active: boolean("active").notNull().default(true),
     ...timestampColumns,
   },
@@ -221,6 +228,111 @@ export const hrExpensePolicies = pgTable(
     index("hr_expense_policies_org_active_idx").on(
       table.organizationId,
       table.active,
+    ),
+  ],
+);
+
+/** HRM-EXP-014 — approval routing rules per policy group. */
+export const hrExpenseApprovalRoutes = pgTable(
+  "hr_expense_approval_routes",
+  {
+    id: text("id").primaryKey(),
+    organizationId: organizationReference(),
+    policyGroupCode: text("policy_group_code").notNull().default("default"),
+    name: text("name").notNull(),
+    priority: integer("priority").notNull().default(0),
+    departmentId: text("department_id").references(() => hrDepartments.id, {
+      onDelete: "set null",
+    }),
+    costCenterCode: text("cost_center_code"),
+    legalEntityCode: text("legal_entity_code"),
+    categoryCode: text("category_code"),
+    projectCode: text("project_code"),
+    minAmountCents: integer("min_amount_cents"),
+    maxAmountCents: integer("max_amount_cents"),
+    requiresPolicyException: boolean("requires_policy_exception")
+      .notNull()
+      .default(false),
+    approverKind: hrExpenseApproverKindEnum("approver_kind").notNull(),
+    specificApproverAuthUserId: text("specific_approver_auth_user_id"),
+    managerChainMaxDepth: integer("manager_chain_max_depth"),
+    active: boolean("active").notNull().default(true),
+    effectiveFrom: timestamp("effective_from", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    effectiveTo: timestamp("effective_to", { withTimezone: true }),
+    ...timestampColumns,
+  },
+  (table) => [
+    index("hr_expense_approval_routes_org_group_idx").on(
+      table.organizationId,
+      table.policyGroupCode,
+    ),
+    index("hr_expense_approval_routes_org_priority_idx").on(
+      table.organizationId,
+      table.priority,
+    ),
+  ],
+);
+
+/** HRM-EXP-015 — per-claim approval workflow snapshot. */
+export const hrExpenseApprovals = pgTable(
+  "hr_expense_approvals",
+  {
+    id: text("id").primaryKey(),
+    organizationId: organizationReference(),
+    claimId: text("claim_id")
+      .notNull()
+      .references(() => hrExpenseClaims.id, { onDelete: "cascade" }),
+    status: hrExpenseApprovalStatusEnum("status").notNull().default("pending"),
+    snapshot: jsonb("snapshot").$type<Record<string, unknown>>().notNull(),
+    assignedApproverAuthUserId: text("assigned_approver_auth_user_id"),
+    decidedByAuthUserId: text("decided_by_auth_user_id"),
+    decidedAt: timestamp("decided_at", { withTimezone: true }),
+    ...timestampColumns,
+  },
+  (table) => [
+    uniqueIndex("hr_expense_approvals_org_claim_uidx").on(
+      table.organizationId,
+      table.claimId,
+    ),
+    index("hr_expense_approvals_org_status_idx").on(
+      table.organizationId,
+      table.status,
+    ),
+  ],
+);
+
+/** HRM-EXP-020 — policy exceptions (over-limit, late, missing receipt). */
+export const hrExpenseExceptions = pgTable(
+  "hr_expense_exceptions",
+  {
+    id: text("id").primaryKey(),
+    organizationId: organizationReference(),
+    claimId: text("claim_id")
+      .notNull()
+      .references(() => hrExpenseClaims.id, { onDelete: "cascade" }),
+    kind: hrExpenseExceptionKindEnum("kind").notNull(),
+    status: hrExpenseExceptionStatusEnum("status").notNull().default("open"),
+    message: text("message").notNull(),
+    metadata: jsonb("metadata").$type<Record<string, unknown>>(),
+    resolvedAt: timestamp("resolved_at", { withTimezone: true }),
+    resolvedByAuthUserId: text("resolved_by_auth_user_id"),
+    ...timestampColumns,
+  },
+  (table) => [
+    index("hr_expense_exceptions_org_claim_idx").on(
+      table.organizationId,
+      table.claimId,
+    ),
+    index("hr_expense_exceptions_org_status_idx").on(
+      table.organizationId,
+      table.status,
+    ),
+    uniqueIndex("hr_expense_exceptions_org_claim_kind_uidx").on(
+      table.organizationId,
+      table.claimId,
+      table.kind,
     ),
   ],
 );

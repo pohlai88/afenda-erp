@@ -15,7 +15,10 @@ import {
   HR_PER_READ_CAPABILITY,
   HR_PER_WRITE_CAPABILITY,
 } from "../schemas/hr.talent.performance-constants.shared";
-import { isPerformanceReviewLocked } from "../data/hr.talent.performance-store.shared";
+import {
+  isPerformanceReviewLocked,
+  type HrPerformanceReviewRecord,
+} from "../data/hr.talent.performance-store.shared";
 
 export type HrPerformanceAccessScope = "self" | "team" | "org";
 
@@ -118,7 +121,7 @@ export async function requireHrPerformanceApprove() {
 
 export function canHrPerformanceEditReview(
   guard: HrPerformanceExecutionGuard,
-  review: { status: string; lockedAt: string | null },
+  review: Pick<HrPerformanceReviewRecord, "status" | "lockedAt">,
 ) {
   return guard.canWritePerformance && !isPerformanceReviewLocked(review);
 }

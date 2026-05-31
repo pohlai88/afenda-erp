@@ -11,6 +11,7 @@ import {
   hrTimeClockRoutePaths,
   hrCsfRoutePaths,
   hrPerformanceRoutePaths,
+  hrRonRoutePaths,
 } from "@afenda/feature-hr-suite/metadata";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
@@ -33,6 +34,7 @@ const sectionLoaders = {
   compliance: () => import("./compliance.server"),
   benefits: () => import("./benefits.server"),
   bonus: () => import("./bonus.server"),
+  "payroll-processing": () => import("./payroll-processing.server"),
   expenses: () => import("./expenses.server"),
   "leave-attendance": () => import("./leave-attendance.server"),
   "absence-analytics-trends": () => import("./absence-analytics-trends.server"),
@@ -44,6 +46,7 @@ const sectionLoaders = {
   "time-clock": () => import("./time-clock.server"),
   "competency-skills": () => import("./competency-skills.server"),
   "performance-appraisals": () => import("./performance-appraisals.server"),
+  "recruitment-onboarding": () => import("./recruitment-onboarding.server"),
 } satisfies Record<HrSectionSlug, () => Promise<HrSectionModule>>;
 
 const hrRoutePaths = [
@@ -59,6 +62,7 @@ const hrRoutePaths = [
   ...Object.values(hrTimeClockRoutePaths),
   ...Object.values(hrCsfRoutePaths),
   ...Object.values(hrPerformanceRoutePaths),
+  ...Object.values(hrRonRoutePaths),
 ] as const;
 
 const hrSectionHubPaths = new Set<string>([
@@ -71,6 +75,7 @@ const hrSectionHubPaths = new Set<string>([
   hrTimeClockRoutePaths.hub,
   hrCsfRoutePaths.hub,
   hrPerformanceRoutePaths.hub,
+  hrRonRoutePaths.hub,
 ]);
 
 export const hrSectionSlugs = hrRoutePaths

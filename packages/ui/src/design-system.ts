@@ -311,7 +311,7 @@ export const uiSurface = {
 } as const;
 
 /**
- * ERP composition hints for agents and audits — see packages/ui/COMPOSITION.md.
+ * ERP composition hints for agents and audits — see packages/ui/composition.md.
  * Prefer shell exports over raw Card stacking in product code.
  */
 export const uiComposition = {
@@ -324,7 +324,7 @@ export const uiComposition = {
   callout: "Alert",
   form: "FieldGroup",
   governedList: "GovernedPatternCListSection",
-  docs: "packages/ui/COMPOSITION.md",
+  docs: "packages/ui/composition.md",
 } as const;
 
 /** Dense ERP table primitives for metadata-driven list renderers. */

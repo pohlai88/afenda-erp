@@ -40,8 +40,6 @@ import { hrEmployees } from "./schema/hr";
 
 export {
   HrCompensationCommandError,
-  formatNumeric,
-  parseNumeric,
   isHrCompensationRecommendationLocked,
   HR_COMPENSATION_LOCKED_STATUSES,
   HR_COMPENSATION_EDITABLE_STATUSES,
@@ -1753,11 +1751,13 @@ export async function getHrCompensationSalaryBandContext(input: {
 }): Promise<HrCompensationSalaryBandContext | null> {
   if (!input.grade) return null;
 
+  const grade = input.grade;
+
   return runWithOrganizationContext(input.organizationId, async (db) => {
     const band = await loadSalaryBandInTx(
       db,
       input.organizationId,
-      input.grade,
+      grade,
       input.legalEntityCode,
     );
 
@@ -1772,7 +1772,7 @@ export async function getHrCompensationSalaryBandContext(input: {
       .where(
         and(
           eq(hrCompensationSalaryBands.organizationId, input.organizationId),
-          eq(hrCompensationSalaryBands.grade, input.grade),
+          eq(hrCompensationSalaryBands.grade, grade),
           eq(hrCompensationSalaryBands.active, true),
           input.legalEntityCode
             ? eq(
@@ -1788,7 +1788,7 @@ export async function getHrCompensationSalaryBandContext(input: {
     const bandValidation = validateBandPosition(currentSalary, band);
 
     return {
-      grade: bandRow?.grade ?? input.grade,
+      grade: bandRow?.grade ?? grade,
       currencyCode: bandRow?.currencyCode ?? "USD",
       minimum: band.minimum,
       midpoint: band.midpoint,

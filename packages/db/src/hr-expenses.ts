@@ -556,7 +556,7 @@ export async function attachHrExpenseClaimReceipt(input: {
         pathname: input.pathname.trim(),
         contentType: input.contentType.trim(),
         sizeBytes: input.sizeBytes,
-        access: "organization",
+        access: "private",
         blobEtag: input.blobEtag ?? null,
         uploadedByAuthUserId: input.uploadedByAuthUserId,
         metadata: {

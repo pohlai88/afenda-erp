@@ -124,3 +124,25 @@
 |  22 | Unauthorized users cannot view or edit restricted performance appraisal data.                                                             |
 |  23 | Notifications are sent for pending, submitted, returned, overdue, acknowledged, and finalized reviews.                                    |
 |  24 | Every goal, self-assessment, manager evaluation, rating change, approval, acknowledgment, and finalization action creates an audit event. |
+
+---
+
+## As-built summary (code-verified)
+
+Performance Appraisals now ships as an HR Suite vertical slice under
+`talent-management/performance-appraisals` with:
+
+- feature-local constants, Zod schemas, domain store, workflow/scoring helpers,
+  reporting, notification, integration-reference, and audit utilities;
+- execution-kernel read/write/approve/calibration/compensation/audit capability
+  gates;
+- governed Pattern C list surfaces for cycles, reviews, goals, approvals,
+  outcomes, reports, and audit trail;
+- `/hr/performance-appraisals` thin App Router adapter; and
+- Vitest coverage for HRM-PER-001 through HRM-PER-031 and the 24 enterprise
+  acceptance criteria.
+
+Durable database schema is intentionally deferred because no appraisal tables or
+DB command primitives exist in `@afenda/db` yet. The current implementation
+follows the package-local store pattern used by LMS and CSF until a future DB
+promotion can add physical tables through the governed migration workflow.

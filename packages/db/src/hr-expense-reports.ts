@@ -3,7 +3,7 @@ import { runWithOrganizationContext } from "./client";
 import { formatEmployeeLabel } from "./hr-benefits.shared";
 import { HR_EXPENSE_REPORT_EXPORT_ROW_CAP } from "./hr-expense.shared";
 import type { HrExpenseReportFilter } from "./hr-expense-reports.shared";
-import { hrExpenseClaims } from "./schema/hr";
+import { hrExpenseClaims } from "./schema/hr-expense";
 import { hrDepartments, hrEmployees } from "./schema/hr";
 
 function escapeCsvCell(value: string) {
@@ -21,14 +21,18 @@ function buildCsv(headers: readonly string[], rows: readonly string[][]) {
   return lines.join("\n");
 }
 
-function formatCents(value: number | null, canViewSensitive: boolean) {
+function formatAmount(value: string | null, canViewSensitive: boolean) {
   if (value === null) {
     return "";
   }
   if (!canViewSensitive) {
     return "Restricted";
   }
-  return (value / 100).toFixed(2);
+  const amount = Number(value);
+  if (!Number.isFinite(amount)) {
+    return "";
+  }
+  return amount.toFixed(2);
 }
 
 export type HrExpenseReportResult = {
@@ -70,8 +74,8 @@ export async function buildHrExpenseClaimReport(input: {
     if (input.filter.claimStatus) {
       conditions.push(
         eq(
-          hrExpenseClaims.status,
-          input.filter.claimStatus as (typeof hrExpenseClaims.$inferSelect)["status"],
+          hrExpenseClaims.claimStatus,
+          input.filter.claimStatus as (typeof hrExpenseClaims.$inferSelect)["claimStatus"],
         ),
       );
     }
@@ -88,10 +92,10 @@ export async function buildHrExpenseClaimReport(input: {
     const rows = await db
       .select({
         claimId: hrExpenseClaims.id,
-        claimStatus: hrExpenseClaims.status,
+        claimStatus: hrExpenseClaims.claimStatus,
         categoryCode: hrExpenseClaims.categoryCode,
-        amountCents: hrExpenseClaims.amountCents,
-        currencyCode: hrExpenseClaims.currencyCode,
+        claimAmount: hrExpenseClaims.claimAmount,
+        claimCurrencyCode: hrExpenseClaims.claimCurrencyCode,
         legalEntityCode: hrExpenseClaims.legalEntityCode,
         costCenterCode: hrExpenseClaims.costCenterCode,
         projectCode: hrExpenseClaims.projectCode,
@@ -142,8 +146,8 @@ export async function buildHrExpenseClaimReport(input: {
         row.costCenterCode ?? "",
         row.projectCode ?? "",
         row.glReference ?? "",
-        formatCents(row.amountCents, input.canViewSensitive),
-        row.currencyCode,
+        formatAmount(row.claimAmount, input.canViewSensitive),
+        row.claimCurrencyCode,
         row.submittedAt?.toISOString() ?? "",
         row.paidAt?.toISOString() ?? "",
         groupBy,
@@ -164,7 +168,7 @@ export async function buildHrExpenseClaimReport(input: {
                     ? hrExpenseClaims.costCenterCode
                     : groupBy === "project"
                       ? hrExpenseClaims.projectCode
-                      : hrExpenseClaims.status,
+                      : hrExpenseClaims.claimStatus,
           claimCount: sql<number>`count(*)::int`,
         })
         .from(hrExpenseClaims)
@@ -180,7 +184,7 @@ export async function buildHrExpenseClaimReport(input: {
                   ? hrExpenseClaims.costCenterCode
                   : groupBy === "project"
                     ? hrExpenseClaims.projectCode
-                    : hrExpenseClaims.status,
+                    : hrExpenseClaims.claimStatus,
         );
     }
 

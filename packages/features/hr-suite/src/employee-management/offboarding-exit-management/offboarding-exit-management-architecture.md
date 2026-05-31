@@ -123,3 +123,7 @@
 |  22 | Sensitive exit information is hidden from unauthorized users.                                                      |
 |  23 | Overdue offboarding tasks generate alerts.                                                                         |
 |  24 | Every offboarding action creates an audit event.                                                                   |
+
+## As-built summary
+
+Shipped slice follows the compliance reference pattern under `employee-management/offboarding-exit-management/` with export doors, governed list surfaces, and `@afenda/db` offboarding commands.

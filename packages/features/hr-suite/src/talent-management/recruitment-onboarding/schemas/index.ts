@@ -1,5 +1,2 @@
-/**
- * @afenda-bucket schemas
- * Scaffold placeholder from packages/_template-definition.
- */
-export {};
+export * from "./hr.talent.ron-constants.shared";
+export * from "./hr.talent.ron.schema";

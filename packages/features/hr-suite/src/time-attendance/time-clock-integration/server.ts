@@ -1,4 +1,3 @@
-import "@afenda/kernel/server";
 import React from "react";
 
 export * from "./actions/hr.time.clock-integration.actions.server";

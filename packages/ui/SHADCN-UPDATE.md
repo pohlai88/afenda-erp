@@ -1,6 +1,6 @@
 # shadcn/ui update checklist (`@afenda/ui`)
 
-**Composition (agents):** [`COMPOSITION.md`](./COMPOSITION.md) · Cursor rule `.cursor/rules/afenda-ui-composition.mdc`  
+**Composition (agents):** [`composition.md`](./composition.md) · Cursor rule `.cursor/rules/afenda-ui-composition.mdc`  
 **Upstream shadcn skill:** `.agents/skills/shadcn/SKILL.md` (from [shadcn/ui skills](https://ui.shadcn.com/docs/skills))
 
 Afenda keeps shadcn components in [`packages/ui/src`](./src). Config: [`apps/erp/components.json`](../../apps/erp/components.json) (`"config": ""` — Tailwind v4 CSS-first).

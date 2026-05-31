@@ -29,6 +29,7 @@ export * from "./time-attendance/time-clock-integration/server";
 export * from "./time-attendance/overtime-management/server";
 export * from "./talent-management/learning-management-system-lms/server";
 export * from "./talent-management/performance-appraisals/server";
+export * from "./talent-management/recruitment-onboarding/server";
 export * from "./talent-management/career-pathing-development-plans/server";
 
 import {

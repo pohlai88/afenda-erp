@@ -2,7 +2,7 @@
 
 import type { ReactNode } from "react";
 
-import type { HrOrgChartNode } from "@afenda/db";
+import type { HrOrgChartNode } from "../contracts/hr.workforce.org-route.contract";
 import { SectionPanel } from "@afenda/ui";
 
 import { hrOrgUiCopy } from "../surface/hr.workforce.org-ui.copy.shared";

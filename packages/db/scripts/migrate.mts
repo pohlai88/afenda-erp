@@ -1,6 +1,6 @@
 import { config } from "dotenv";
 import { createHash } from "node:crypto";
-import { readdir, readFile } from "node:fs/promises";
+import { readFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { neon } from "@neondatabase/serverless";
@@ -87,13 +87,20 @@ async function applyMigration(name: string, contents: string) {
   `;
 }
 
+async function loadJournalMigrationFiles() {
+  const journalPath = resolve(migrationsDir, "meta/_journal.json");
+  const journal = JSON.parse(await readFile(journalPath, "utf8")) as {
+    entries: Array<{ tag: string }>;
+  };
+
+  return journal.entries.map((entry) => `${entry.tag}.sql`);
+}
+
 async function main() {
   await ensurePgVectorExtension();
   await ensureMigrationTable();
   const applied = await getAppliedMigrations();
-  const migrationFiles = (await readdir(migrationsDir))
-    .filter((name) => name.endsWith(".sql"))
-    .sort();
+  const migrationFiles = await loadJournalMigrationFiles();
 
   for (const migrationFile of migrationFiles) {
     if (applied.has(migrationFile)) {

@@ -97,3 +97,7 @@
 |  12 | Every employee record change creates an audit event.                                             |
 |  13 | Rehired employees retain previous employment history.                                            |
 |  14 | Separated employees remain available as read-only historical records.                            |
+
+## As-built summary
+
+Shipped slice follows the compliance reference pattern under `employee-management/employee-records-management/` with export doors, governed list surfaces, and `@afenda/db` employee record commands.

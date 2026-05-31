@@ -1,4 +1,3 @@
-import "@afenda/kernel/server";
 
 import { listHrLamPayrollReferencesForPeriod } from "@afenda/db";
 

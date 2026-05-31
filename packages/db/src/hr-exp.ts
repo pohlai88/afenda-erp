@@ -6,7 +6,7 @@ import {
   hrExpenseAuditEvents,
   hrExpenseClaims,
   hrExpenseExceptions,
-} from "./schema/hr";
+} from "./schema/hr-expense";
 
 export * from "./hr-exp.shared";
 
@@ -33,7 +33,7 @@ export async function appendHrExpenseAuditEvent(input: {
   claimId: string;
   employeeId?: string | null;
   action: (typeof hrExpenseAuditEvents.$inferSelect)["action"];
-  actorAuthUserId?: string | null;
+  actorUserId?: string | null;
   summary: string;
   metadata?: Record<string, unknown>;
 }): Promise<void> {
@@ -44,7 +44,7 @@ export async function appendHrExpenseAuditEvent(input: {
       claimId: input.claimId,
       employeeId: input.employeeId ?? null,
       action: input.action,
-      actorAuthUserId: input.actorAuthUserId ?? null,
+      actorUserId: input.actorUserId ?? null,
       summary: input.summary,
       metadata: input.metadata ?? null,
       occurredAt: new Date(),

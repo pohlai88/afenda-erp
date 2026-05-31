@@ -311,6 +311,101 @@ const permissionCatalog = [
       "Read performance appraisal audit events for review, approval, acknowledgment, calibration, and finalization.",
   },
   {
+    key: "hr.recruitment.read",
+    module: "hr",
+    label: "View recruitment and onboarding",
+    description:
+      "Read requisitions, postings, candidates, applications, offers, onboarding tasks, readiness, and reports.",
+  },
+  {
+    key: "hr.recruitment.write",
+    module: "hr",
+    label: "Manage recruitment and onboarding",
+    description:
+      "Create requisitions, publish postings, move candidates, manage offers, and maintain onboarding tasks.",
+  },
+  {
+    key: "hr.recruitment.approve",
+    module: "hr",
+    label: "Approve recruitment requisitions",
+    description:
+      "Approve or return job requisitions in the recruitment approval workflow.",
+  },
+  {
+    key: "hr.recruitment.interview.write",
+    module: "hr",
+    label: "Manage recruitment interviews",
+    description:
+      "Schedule interviews and submit scorecards for candidates in the hiring pipeline.",
+  },
+  {
+    key: "hr.recruitment.offer.read",
+    module: "hr",
+    label: "View recruitment offers",
+    description: "Read offer proposal terms, conditions, and acceptance state.",
+  },
+  {
+    key: "hr.recruitment.offer.write",
+    module: "hr",
+    label: "Manage recruitment offers",
+    description: "Create offer proposals, link offer letters, and send offers.",
+  },
+  {
+    key: "hr.recruitment.offer.approve",
+    module: "hr",
+    label: "Approve recruitment offers",
+    description:
+      "Approve or return offer proposals before they are sent to candidates.",
+  },
+  {
+    key: "hr.recruitment.onboarding.read",
+    module: "hr",
+    label: "View recruitment onboarding",
+    description:
+      "Read onboarding task, document, acknowledgment, and readiness state after offer acceptance.",
+  },
+  {
+    key: "hr.recruitment.onboarding.write",
+    module: "hr",
+    label: "Manage recruitment onboarding",
+    description:
+      "Generate, assign, complete, waive, or cancel recruitment onboarding tasks.",
+  },
+  {
+    key: "hr.recruitment.finance.read",
+    module: "hr",
+    label: "Read recruitment finance references",
+    description:
+      "Read budget, salary, and payroll readiness references for recruitment offers.",
+  },
+  {
+    key: "hr.recruitment.it.read",
+    module: "hr",
+    label: "Read recruitment IT readiness",
+    description: "Read IAM and IT readiness references for onboarding.",
+  },
+  {
+    key: "hr.recruitment.audit.read",
+    module: "hr",
+    label: "Read recruitment audit trail",
+    description:
+      "Read audit events for requisitions, applications, interviews, offers, conversion, and onboarding.",
+  },
+  {
+    key: "hr.recruitment.sensitive.read",
+    module: "hr",
+    label: "Read sensitive recruitment data",
+    description:
+      "Read restricted candidate, offer, and pre-employment check details.",
+  },
+  {
+    key: "hr.recruitment.convert",
+    module: "hr",
+    label: "Convert candidates",
+    description:
+      "Create governed conversion references from accepted candidates into employee records.",
+  },
+  {
     key: "hr.onboarding.read",
     module: "hr",
     label: "View HR onboarding",

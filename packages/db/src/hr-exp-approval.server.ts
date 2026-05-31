@@ -29,13 +29,15 @@ import {
 import {
   hrDepartments,
   hrEmployees,
+  hrPositions,
+} from "./schema/hr";
+import {
   hrExpenseApprovalRoutes,
   hrExpenseApprovals,
   hrExpenseClaims,
   hrExpenseExceptions,
   hrExpensePolicies,
-  hrPositions,
-} from "./schema/hr";
+} from "./schema/hr-expense";
 
 export type DecideHrExpenseClaimInput = {
   organizationId: string;
@@ -62,6 +64,64 @@ export type DecideHrExpenseExceptionInput = {
 };
 
 const ACTIONABLE_STATUSES = new Set(HRM_EXP_ACTIONABLE_STATUSES);
+
+async function loadHrExpenseApprovalState(input: {
+  organizationId: string;
+  claimId: string;
+}): Promise<{
+  snapshot: HrExpenseApprovalSnapshot;
+  approvalStage: HrExpenseApprovalStage;
+} | null> {
+  const rows = await runWithOrganizationContext(input.organizationId, async (db) =>
+    db
+      .select({ snapshot: hrExpenseApprovals.snapshot })
+      .from(hrExpenseApprovals)
+      .where(
+        and(
+          eq(hrExpenseApprovals.organizationId, input.organizationId),
+          eq(hrExpenseApprovals.claimId, input.claimId),
+        ),
+      )
+      .limit(1),
+  );
+
+  const row = rows[0];
+  if (!row) {
+    return null;
+  }
+
+  const snapshot = readApprovalSnapshot(row.snapshot as Record<string, unknown>);
+  return { snapshot, approvalStage: snapshot.approvalStage };
+}
+
+async function updateHrExpenseApprovalSnapshot(input: {
+  organizationId: string;
+  claimId: string;
+  snapshot: HrExpenseApprovalSnapshot;
+  status?: (typeof hrExpenseApprovals.$inferSelect)["status"];
+  decidedByAuthUserId?: string | null;
+  decidedAt?: Date;
+}): Promise<void> {
+  await runWithOrganizationContext(input.organizationId, async (db) => {
+    await db
+      .update(hrExpenseApprovals)
+      .set({
+        snapshot: input.snapshot as unknown as Record<string, unknown>,
+        ...(input.status ? { status: input.status } : {}),
+        ...(input.decidedByAuthUserId !== undefined
+          ? { decidedByAuthUserId: input.decidedByAuthUserId }
+          : {}),
+        ...(input.decidedAt ? { decidedAt: input.decidedAt } : {}),
+        updatedAt: new Date(),
+      })
+      .where(
+        and(
+          eq(hrExpenseApprovals.organizationId, input.organizationId),
+          eq(hrExpenseApprovals.claimId, input.claimId),
+        ),
+      );
+  });
+}
 
 function readApprovalSnapshot(
   value: Record<string, unknown> | null | undefined,
@@ -328,17 +388,17 @@ async function executeHrExpenseClaimApproval(input: {
     throw new HrExpCommandError("open_exceptions_block_approval");
   }
 
-  assertExpClaimStatusTransition(claim.status, "approved");
+  assertExpClaimStatusTransition(claim.claimStatus, "approved");
 
   await runWithOrganizationContext(input.organizationId, async (db) => {
+    const decidedAt = new Date();
     await db
       .update(hrExpenseClaims)
       .set({
-        status: "approved",
-        approvalStage: "complete",
-        decisionNote: input.decisionNote?.trim() || null,
-        decidedAt: new Date(),
-        currentApproverAuthUserId: null,
+        claimStatus: "approved",
+        approvedAt: decidedAt,
+        approvedByUserId: input.actorAuthUserId,
+        updatedAt: decidedAt,
       })
       .where(eq(hrExpenseClaims.id, input.claimId));
 
@@ -347,7 +407,8 @@ async function executeHrExpenseClaimApproval(input: {
       .set({
         status: "approved",
         decidedByAuthUserId: input.actorAuthUserId,
-        decidedAt: new Date(),
+        decidedAt,
+        updatedAt: decidedAt,
       })
       .where(
         and(
@@ -362,7 +423,7 @@ async function executeHrExpenseClaimApproval(input: {
     claimId: input.claimId,
     employeeId: claim.employeeId,
     action: "claim_approve",
-    actorAuthUserId: input.actorAuthUserId,
+    actorUserId: input.actorAuthUserId,
     summary: "Expense claim approved",
     metadata: input.decisionNote
       ? { decisionNote: input.decisionNote.trim() }
@@ -383,14 +444,16 @@ export async function decideHrExpenseClaim(
   if (!claim) {
     throw new HrExpCommandError("claim_not_found");
   }
-  if (!ACTIONABLE_STATUSES.has(claim.status as (typeof HRM_EXP_ACTIONABLE_STATUSES)[number])) {
+  if (!ACTIONABLE_STATUSES.has(claim.claimStatus as (typeof HRM_EXP_ACTIONABLE_STATUSES)[number])) {
     throw new HrExpCommandError("claim_not_actionable");
   }
 
-  const snapshot = readApprovalSnapshot(
-    (claim.approvalSnapshot as Record<string, unknown> | null) ?? undefined,
-  );
-  const approvalStage = claim.approvalStage ?? snapshot.approvalStage;
+  const approvalState = await loadHrExpenseApprovalState({
+    organizationId: input.organizationId,
+    claimId: input.claimId,
+  });
+  const snapshot = approvalState?.snapshot ?? readApprovalSnapshot(undefined);
+  const approvalStage = approvalState?.approvalStage ?? snapshot.approvalStage;
 
   assertExpApproverAuthorized({
     approvalStage,
@@ -410,17 +473,16 @@ export async function decideHrExpenseClaim(
       throw new HrExpCommandError("rejection_reason_required");
     }
 
-    assertExpClaimStatusTransition(claim.status, "rejected");
+    assertExpClaimStatusTransition(claim.claimStatus, "rejected");
 
     await runWithOrganizationContext(input.organizationId, async (db) => {
+      const decidedAt = new Date();
       await db
         .update(hrExpenseClaims)
         .set({
-          status: "rejected",
-          approvalStage: "complete",
+          claimStatus: "rejected",
           rejectionReason: input.rejectionReason?.trim() || null,
-          decidedAt: new Date(),
-          currentApproverAuthUserId: null,
+          updatedAt: decidedAt,
         })
         .where(eq(hrExpenseClaims.id, input.claimId));
 
@@ -429,7 +491,8 @@ export async function decideHrExpenseClaim(
         .set({
           status: "rejected",
           decidedByAuthUserId: input.actorAuthUserId,
-          decidedAt: new Date(),
+          decidedAt,
+          updatedAt: decidedAt,
         })
         .where(
           and(
@@ -444,7 +507,7 @@ export async function decideHrExpenseClaim(
       claimId: input.claimId,
       employeeId: claim.employeeId,
       action: "claim_reject",
-      actorAuthUserId: input.actorAuthUserId,
+      actorUserId: input.actorAuthUserId,
       summary: "Expense claim rejected",
       metadata: { rejectionReason: input.rejectionReason?.trim() },
     });
@@ -462,16 +525,16 @@ export async function decideHrExpenseClaim(
       throw new HrExpCommandError("return_reason_required");
     }
 
-    assertExpClaimStatusTransition(claim.status, "returned");
+    assertExpClaimStatusTransition(claim.claimStatus, "returned");
 
     await runWithOrganizationContext(input.organizationId, async (db) => {
+      const decidedAt = new Date();
       await db
         .update(hrExpenseClaims)
         .set({
-          status: "returned",
+          claimStatus: "returned",
           returnReason: input.returnReason?.trim() || null,
-          approvalStage: "manager",
-          currentApproverAuthUserId: null,
+          updatedAt: decidedAt,
         })
         .where(eq(hrExpenseClaims.id, input.claimId));
 
@@ -480,7 +543,12 @@ export async function decideHrExpenseClaim(
         .set({
           status: "returned",
           decidedByAuthUserId: input.actorAuthUserId,
-          decidedAt: new Date(),
+          decidedAt,
+          snapshot: {
+            ...snapshot,
+            approvalStage: "manager",
+          } as unknown as Record<string, unknown>,
+          updatedAt: decidedAt,
         })
         .where(
           and(
@@ -495,7 +563,7 @@ export async function decideHrExpenseClaim(
       claimId: input.claimId,
       employeeId: claim.employeeId,
       action: "claim_return",
-      actorAuthUserId: input.actorAuthUserId,
+      actorUserId: input.actorAuthUserId,
       summary: "Expense claim returned to employee",
       metadata: { returnReason: input.returnReason?.trim() },
     });
@@ -513,15 +581,15 @@ export async function decideHrExpenseClaim(
       throw new HrExpCommandError("clarification_reason_required");
     }
 
-    assertExpClaimStatusTransition(claim.status, "clarification_requested");
+    assertExpClaimStatusTransition(claim.claimStatus, "clarification_requested");
 
     await runWithOrganizationContext(input.organizationId, async (db) => {
+      const decidedAt = new Date();
       await db
         .update(hrExpenseClaims)
         .set({
-          status: "clarification_requested",
-          clarificationRequest: input.clarificationReason?.trim() || null,
-          currentApproverAuthUserId: null,
+          claimStatus: "clarification_requested",
+          updatedAt: decidedAt,
         })
         .where(eq(hrExpenseClaims.id, input.claimId));
 
@@ -530,7 +598,8 @@ export async function decideHrExpenseClaim(
         .set({
           status: "clarification_requested",
           decidedByAuthUserId: input.actorAuthUserId,
-          decidedAt: new Date(),
+          decidedAt,
+          updatedAt: decidedAt,
         })
         .where(
           and(
@@ -545,7 +614,7 @@ export async function decideHrExpenseClaim(
       claimId: input.claimId,
       employeeId: claim.employeeId,
       action: "claim_clarification_request",
-      actorAuthUserId: input.actorAuthUserId,
+      actorUserId: input.actorAuthUserId,
       summary: "Clarification requested on expense claim",
       metadata: { clarificationReason: input.clarificationReason?.trim() },
     });
@@ -569,12 +638,16 @@ export async function decideHrExpenseClaim(
       await db
         .update(hrExpenseClaims)
         .set({
-          status: "under_review",
-          approvalStage: nextStage,
-          approvalSnapshot: updatedSnapshot as unknown as Record<string, unknown>,
-          decisionNote: input.decisionNote?.trim() || null,
+          claimStatus: "under_review",
+          updatedAt: new Date(),
         })
         .where(eq(hrExpenseClaims.id, input.claimId));
+    });
+
+    await updateHrExpenseApprovalSnapshot({
+      organizationId: input.organizationId,
+      claimId: input.claimId,
+      snapshot: updatedSnapshot,
     });
 
     await appendHrExpenseAuditEvent({
@@ -582,7 +655,7 @@ export async function decideHrExpenseClaim(
       claimId: input.claimId,
       employeeId: claim.employeeId,
       action: "claim_approve",
-      actorAuthUserId: input.actorAuthUserId,
+      actorUserId: input.actorAuthUserId,
       summary: `Expense claim advanced to ${nextStage} approval`,
       metadata: { approvalStage: nextStage },
     });
@@ -643,7 +716,7 @@ export async function decideHrExpenseException(
     claimId: row.claimId,
     action:
       input.decision === "approve" ? "exception_approve" : "exception_reject",
-    actorAuthUserId: input.actorAuthUserId,
+    actorUserId: input.actorAuthUserId,
     summary: `Expense exception ${input.decision}d`,
     metadata: {
       exceptionId: input.exceptionId,
@@ -687,10 +760,9 @@ export async function createHrExpenseApprovalOnSubmit(input: {
     await db
       .update(hrExpenseClaims)
       .set({
-        status: "submitted",
-        approvalStage: route.initialStage,
-        approvalSnapshot: route.snapshot as unknown as Record<string, unknown>,
+        claimStatus: "submitted",
         submittedAt: new Date(),
+        updatedAt: new Date(),
       })
       .where(eq(hrExpenseClaims.id, input.claimId));
   });

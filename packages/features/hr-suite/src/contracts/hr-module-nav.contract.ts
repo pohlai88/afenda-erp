@@ -11,6 +11,7 @@ import { hrExpenseRoutePaths } from "../payroll-compensation/expenses-reimbursem
 import { hrCpmRoutePaths } from "../payroll-compensation/compensation-planning-modeling/contracts/hr.payroll.cpm-route.contract";
 import { hrCsfRoutePaths } from "../talent-management/competency-skills-framework/contracts/hr.talent.csf-route.contract";
 import { hrPerformanceRoutePaths } from "../talent-management/performance-appraisals/contracts/hr.talent.performance-route.contract";
+import { hrRonRoutePaths } from "../talent-management/recruitment-onboarding/contracts/hr.talent.ron-route.contract";
 import { hrPayrollProcessingRoutePaths } from "../payroll-compensation/payroll-processing/contracts/hr.payroll.processing-route.contract";
 import { hrAatRoutePaths } from "../time-attendance/absence-analytics-trends/contracts/hr.time.aat-route.contract";
 import { hrRecordsRoutePaths } from "../employee-management/employee-records-management/contracts/hr.workforce.records-route.contract";
@@ -88,6 +89,15 @@ export const hrModuleNavItems = [
     href: hrCsfRoutePaths.hub,
     label: "Competency & Skills",
     requiredCapabilities: ["hr.csf.read", "hr.csf.write"],
+  },
+  {
+    href: hrRonRoutePaths.hub,
+    label: "Recruitment & Onboarding",
+    requiredCapabilities: [
+      "hr.recruitment.read",
+      "hr.recruitment.write",
+      "hr.recruitment.approve",
+    ],
   },
   {
     href: hrPerformanceRoutePaths.hub,

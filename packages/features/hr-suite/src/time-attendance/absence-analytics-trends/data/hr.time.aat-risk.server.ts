@@ -1,4 +1,3 @@
-import "@afenda/kernel/server";
 
 import { and, eq, gte, inArray, isNull, lte, sql } from "drizzle-orm";
 import {

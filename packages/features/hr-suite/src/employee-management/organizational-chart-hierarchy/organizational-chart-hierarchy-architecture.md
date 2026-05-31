@@ -113,3 +113,7 @@
 |  18 | Unauthorized users cannot modify organization hierarchy data.                                                 |
 |  19 | Every organization hierarchy change creates an audit event.                                                   |
 |  20 | Organization chart data can be filtered by company, business unit, department, manager, location, and status. |
+
+## As-built summary
+
+Shipped slice follows the compliance reference pattern under `employee-management/organizational-chart-hierarchy/` with export doors, org chart client panel, and `@afenda/db` org hierarchy queries.

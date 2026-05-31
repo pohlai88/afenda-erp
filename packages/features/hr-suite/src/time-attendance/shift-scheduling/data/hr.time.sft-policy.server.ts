@@ -1,4 +1,3 @@
-import "@afenda/kernel/server";
 
 import { eq } from "drizzle-orm";
 import {

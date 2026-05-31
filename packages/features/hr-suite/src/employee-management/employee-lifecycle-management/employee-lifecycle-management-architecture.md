@@ -119,3 +119,7 @@
 |  18 | Automated notifications are sent for pending, overdue, and completed lifecycle actions.                                     |
 |  19 | Every lifecycle transition creates an audit event.                                                                          |
 |  20 | Separated or retired employees retain lifecycle history after record archival.                                              |
+
+## As-built summary
+
+Shipped slice follows the compliance reference pattern under `employee-management/employee-lifecycle-management/` with export doors, governed list surfaces, and `@afenda/db` lifecycle commands.

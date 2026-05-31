@@ -6,7 +6,7 @@ import { HrExpenseCommandError } from "./hr-expense.shared";
 import {
   hrExpenseClaims,
   hrExpensePaymentReferences,
-} from "./schema/hr";
+} from "./schema/hr-expense";
 
 export type HrExpensePaymentChannel = "payroll" | "accounts_payable";
 
@@ -15,8 +15,15 @@ function buildEarningsCode(categoryCode: string) {
   return `EXP_REIMB_${normalized.slice(0, 24)}`;
 }
 
-function formatAmountFromCents(amountCents: number) {
-  return (amountCents / 100).toFixed(2);
+function formatClaimAmount(value: string | null) {
+  if (!value) {
+    return "0.00";
+  }
+  const amount = Number(value);
+  if (!Number.isFinite(amount) || amount <= 0) {
+    return "0.00";
+  }
+  return amount.toFixed(2);
 }
 
 async function loadApprovedClaim(
@@ -27,9 +34,10 @@ async function loadApprovedClaim(
     .select({
       id: hrExpenseClaims.id,
       employeeId: hrExpenseClaims.employeeId,
-      status: hrExpenseClaims.status,
-      amountCents: hrExpenseClaims.amountCents,
-      currencyCode: hrExpenseClaims.currencyCode,
+      claimStatus: hrExpenseClaims.claimStatus,
+      claimAmount: hrExpenseClaims.claimAmount,
+      approvedAmount: hrExpenseClaims.approvedAmount,
+      claimCurrencyCode: hrExpenseClaims.claimCurrencyCode,
       categoryCode: hrExpenseClaims.categoryCode,
     })
     .from(hrExpenseClaims)
@@ -45,18 +53,20 @@ async function loadApprovedClaim(
     throw new HrExpenseCommandError("claim_not_found");
   }
 
-  if (claim.status !== "approved") {
+  if (claim.claimStatus !== "approved") {
     throw new HrExpenseCommandError("claim_not_approved");
   }
 
-  if (!claim.amountCents || claim.amountCents <= 0) {
+  const payableAmount = claim.approvedAmount ?? claim.claimAmount;
+  const amount = formatClaimAmount(payableAmount);
+  if (amount === "0.00") {
     throw new HrExpenseCommandError("claim_not_approved");
   }
 
   return {
     claim,
-    amount: formatAmountFromCents(claim.amountCents),
-    currencyCode: claim.currencyCode,
+    amount,
+    currencyCode: claim.claimCurrencyCode,
   };
 }
 
@@ -206,10 +216,10 @@ export async function recordHrExpensePaymentReferenceInTx(
     })
     .where(eq(hrExpensePaymentReferences.id, ref.id));
 
-  const [claim] = await db
+  const claim = await db
     .update(hrExpenseClaims)
     .set({
-      status: "paid",
+      claimStatus: "paid",
       paidAt,
       updatedAt: paidAt,
     })
@@ -222,12 +232,13 @@ export async function recordHrExpensePaymentReferenceInTx(
     .returning({
       id: hrExpenseClaims.id,
       employeeId: hrExpenseClaims.employeeId,
-    });
+    })
+    .then((rows) => rows[0]);
 
   await appendHrExpenseAuditEventInTx(db, {
     organizationId: input.organizationId,
     claimId: input.claimId,
-    employeeId: claim[0]?.employeeId ?? null,
+    employeeId: claim?.employeeId ?? null,
     actorUserId: input.actorUserId,
     action: input.auditAction,
     summary: "Reimbursement payment reference recorded.",

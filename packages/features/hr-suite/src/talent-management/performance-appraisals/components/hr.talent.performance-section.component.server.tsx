@@ -48,7 +48,7 @@ export function HrPerformanceAppraisalsSection({
   pageModel: HrPerformanceAppraisalsPageModel;
 }) {
   return (
-    <div className="@container flex flex-col gap-6">
+    <div className="@container flex flex-col gap-surface-2xl">
       <HrPerformanceListSection
         title={hrPerformanceAppraisalsUiCopy.cycles.surfaceHeaderTitle}
         description="Review cycle setup, periods, deadlines, and eligible population."

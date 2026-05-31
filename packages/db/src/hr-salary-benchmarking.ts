@@ -20,7 +20,6 @@ import {
 
 export {
   HrSbsCommandError,
-  parseNumeric,
   assertHrSalaryBenchmarkValuesPresent,
   formatHrSbsNumeric,
 } from "./hr-salary-benchmarking.shared";

@@ -4,12 +4,12 @@ import {
   appliesBenefitEligibilityRuleToEmployee,
   computeEmployeeTenureMonths,
   isEmployeeEligibleForBenefitPlan,
-} from "../data/hr.payroll.benefits-eligibility.shared";
-import { assertOpenEnrollmentChannelAllowed } from "../data/hr.payroll.benefits-open-enrollment.shared";
-import { upsertHrBenefitPlanFormSchema } from "../schemas/hr.payroll.benefits-plan.schema";
-import { upsertHrBenefitEligibilityRuleFormSchema } from "../schemas/hr.payroll.benefits-eligibility.schema";
-import { upsertHrBenefitOpenEnrollmentWindowFormSchema } from "../schemas/hr.payroll.benefits-open-enrollment.schema";
-import { createOpenEnrollmentBenefitEnrollmentFormSchema } from "../schemas/hr.payroll.benefits-enrollment.schema";
+} from "../../src/payroll-compensation/benefits-administration/data/hr.payroll.benefits-eligibility.shared";
+import { assertOpenEnrollmentChannelAllowed } from "../../src/payroll-compensation/benefits-administration/data/hr.payroll.benefits-open-enrollment.shared";
+import { upsertHrBenefitPlanFormSchema } from "../../src/payroll-compensation/benefits-administration/schemas/hr.payroll.benefits-plan.schema";
+import { upsertHrBenefitEligibilityRuleFormSchema } from "../../src/payroll-compensation/benefits-administration/schemas/hr.payroll.benefits-eligibility.schema";
+import { upsertHrBenefitOpenEnrollmentWindowFormSchema } from "../../src/payroll-compensation/benefits-administration/schemas/hr.payroll.benefits-open-enrollment.schema";
+import { createOpenEnrollmentBenefitEnrollmentFormSchema } from "../../src/payroll-compensation/benefits-administration/schemas/hr.payroll.benefits-enrollment.schema";
 
 describe("upsertHrBenefitPlanFormSchema", () => {
   it("accepts BEN-002 benefit categories", () => {

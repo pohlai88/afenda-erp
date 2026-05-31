@@ -5,7 +5,7 @@ import { clampPageSize } from "./hr-benefits.shared";
 import {
   hrExpenseAuditActionEnum,
   hrExpenseAuditEvents,
-} from "./schema/hr";
+} from "./schema/hr-expense";
 
 export type HrExpenseAuditTrailWindow = {
   rows: readonly {
@@ -71,7 +71,7 @@ export async function appendHrExpenseAuditEventInTx(
     claimId: input.claimId ?? null,
     employeeId: input.employeeId ?? null,
     action: resolveHrExpenseAuditAction(input.action),
-    actorAuthUserId: input.actorUserId ?? null,
+    actorUserId: input.actorUserId ?? null,
     summary: input.summary,
     metadata: input.metadata ?? null,
     occurredAt: input.occurredAt ?? new Date(),

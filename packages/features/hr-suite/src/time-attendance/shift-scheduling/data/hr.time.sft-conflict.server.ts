@@ -1,4 +1,3 @@
-import "@afenda/kernel/server";
 
 import { and, eq, gte, inArray, lte, ne } from "drizzle-orm";
 import {

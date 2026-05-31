@@ -21,6 +21,7 @@ export const SHIPPED_CAPABILITIES = [
   "employee-management/organizational-chart-hierarchy",
   "payroll-compensation/benefits-administration",
   "talent-management/performance-appraisals",
+  "talent-management/recruitment-onboarding",
   "time-attendance/leave-attendance-management",
   "time-attendance/time-clock-integration",
 ] as const;

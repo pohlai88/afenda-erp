@@ -1,4 +1,3 @@
-import "@afenda/kernel/server";
 
 export * from "./actions/hr.talent.career-pathing.actions.server";
 export * from "./contracts/hr.talent.career-pathing.contract";
