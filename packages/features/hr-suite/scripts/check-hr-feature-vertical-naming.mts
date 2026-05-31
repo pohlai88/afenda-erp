@@ -20,7 +20,9 @@ export const SHIPPED_CAPABILITIES = [
   "employee-management/employee-records-management",
   "employee-management/organizational-chart-hierarchy",
   "payroll-compensation/benefits-administration",
+  "talent-management/performance-appraisals",
   "time-attendance/leave-attendance-management",
+  "time-attendance/time-clock-integration",
 ] as const;
 
 /** Canonical slice agents must clone — do not delete while other slices ship. */

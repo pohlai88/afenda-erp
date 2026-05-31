@@ -1,5 +1,2 @@
-/**
- * @afenda-bucket schemas
- * Scaffold placeholder from packages/_template-definition.
- */
-export {};
+export * from "./hr.time.geo-admin.schema";
+export * from "./hr.time.geo-capture.schema";

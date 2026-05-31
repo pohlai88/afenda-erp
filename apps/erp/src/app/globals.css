@@ -1,5 +1,4 @@
 @import "tailwindcss";
-@import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
 @source "../../../../packages/ui/src/**/*.{tsx,ts}";
@@ -296,6 +295,38 @@
     var(--motion-ease-standard);
   --animate-material-resolving: material-resolving 1.4s
     var(--motion-ease-standard) infinite;
+  --animate-overlay-scrim-in: overlay-scrim-in var(--motion-duration-fast)
+    var(--motion-ease-standard);
+  --animate-overlay-scrim-out: overlay-scrim-out var(--motion-duration-fast)
+    var(--motion-ease-standard);
+  --animate-overlay-sheet-from-bottom: overlay-sheet-from-bottom
+    var(--motion-duration-base) var(--motion-ease-emphasis);
+  --animate-overlay-sheet-to-bottom: overlay-sheet-to-bottom
+    var(--motion-duration-fast) var(--motion-ease-standard);
+  --animate-overlay-sheet-from-top: overlay-sheet-from-top
+    var(--motion-duration-base) var(--motion-ease-emphasis);
+  --animate-overlay-sheet-to-top: overlay-sheet-to-top var(--motion-duration-fast)
+    var(--motion-ease-standard);
+  --animate-overlay-sheet-from-left: overlay-sheet-from-left
+    var(--motion-duration-base) var(--motion-ease-emphasis);
+  --animate-overlay-sheet-to-left: overlay-sheet-to-left var(--motion-duration-fast)
+    var(--motion-ease-standard);
+  --animate-overlay-sheet-from-right: overlay-sheet-from-right
+    var(--motion-duration-base) var(--motion-ease-emphasis);
+  --animate-overlay-sheet-to-right: overlay-sheet-to-right
+    var(--motion-duration-fast) var(--motion-ease-standard);
+  --animate-overlay-nav-viewport-in: overlay-nav-viewport-in
+    var(--motion-duration-fast) var(--motion-ease-standard);
+  --animate-overlay-nav-viewport-out: overlay-nav-viewport-out
+    var(--motion-duration-fast) var(--motion-ease-standard);
+  --animate-overlay-nav-from-end: overlay-nav-from-end var(--motion-duration-base)
+    var(--motion-ease-emphasis);
+  --animate-overlay-nav-from-start: overlay-nav-from-start
+    var(--motion-duration-base) var(--motion-ease-emphasis);
+  --animate-overlay-nav-to-end: overlay-nav-to-end var(--motion-duration-fast)
+    var(--motion-ease-standard);
+  --animate-overlay-nav-to-start: overlay-nav-to-start var(--motion-duration-fast)
+    var(--motion-ease-standard);
   --breakpoint-3xl: 120rem;
   --text-title-5: 1.125rem;
   --duration-fast: var(--motion-duration-fast);
@@ -359,6 +390,178 @@
       box-shadow:
         var(--shadow-elevation-2),
         0 0 0 3px color-mix(in oklab, var(--info) 16%, transparent);
+    }
+  }
+
+  @keyframes overlay-scrim-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes overlay-scrim-out {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
+    }
+  }
+
+  @keyframes overlay-sheet-from-bottom {
+    from {
+      opacity: 0;
+      transform: translateY(2.5rem);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes overlay-sheet-to-bottom {
+    from {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    to {
+      opacity: 0;
+      transform: translateY(2.5rem);
+    }
+  }
+
+  @keyframes overlay-sheet-from-top {
+    from {
+      opacity: 0;
+      transform: translateY(-2.5rem);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes overlay-sheet-to-top {
+    from {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    to {
+      opacity: 0;
+      transform: translateY(-2.5rem);
+    }
+  }
+
+  @keyframes overlay-sheet-from-left {
+    from {
+      opacity: 0;
+      transform: translateX(-2.5rem);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes overlay-sheet-to-left {
+    from {
+      opacity: 1;
+      transform: translateX(0);
+    }
+    to {
+      opacity: 0;
+      transform: translateX(-2.5rem);
+    }
+  }
+
+  @keyframes overlay-sheet-from-right {
+    from {
+      opacity: 0;
+      transform: translateX(2.5rem);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes overlay-sheet-to-right {
+    from {
+      opacity: 1;
+      transform: translateX(0);
+    }
+    to {
+      opacity: 0;
+      transform: translateX(2.5rem);
+    }
+  }
+
+  @keyframes overlay-nav-viewport-in {
+    from {
+      opacity: 0;
+      transform: scale(0.9);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  @keyframes overlay-nav-viewport-out {
+    from {
+      opacity: 1;
+      transform: scale(1);
+    }
+    to {
+      opacity: 0;
+      transform: scale(0.9);
+    }
+  }
+
+  @keyframes overlay-nav-from-end {
+    from {
+      opacity: 0;
+      transform: translateX(13rem);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes overlay-nav-from-start {
+    from {
+      opacity: 0;
+      transform: translateX(-13rem);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes overlay-nav-to-end {
+    from {
+      opacity: 1;
+      transform: translateX(0);
+    }
+    to {
+      opacity: 0;
+      transform: translateX(13rem);
+    }
+  }
+
+  @keyframes overlay-nav-to-start {
+    from {
+      opacity: 1;
+      transform: translateX(0);
+    }
+    to {
+      opacity: 0;
+      transform: translateX(-13rem);
     }
   }
 }

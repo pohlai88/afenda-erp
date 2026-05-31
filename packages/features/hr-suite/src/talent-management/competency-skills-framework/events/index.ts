@@ -1,5 +1,3 @@
-/**
- * @afenda-bucket events
- * Scaffold placeholder from packages/_template-definition.
- */
-export {};
+export * from "./hr.talent.csf-audit.event";
+export * from "./hr.talent.csf-assessment.event";
+export * from "./hr.talent.csf-gap.event";

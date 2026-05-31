@@ -2,17 +2,41 @@ import { and, count, desc, eq, ilike, inArray, or } from "drizzle-orm";
 import { runWithOrganizationContext } from "./client";
 import { createEntityId } from "./ids";
 import {
-  hrEmployees,
+  HrShiftCommandError,
+  assertValidTime,
+  clampPageSize,
+  computeHrShiftWorkingMinutes,
+  resolveShiftBounds,
+  toUtcDayStart,
+} from "./hr-shifts.shared";
+import { hrEmployees } from "./schema/hr";
+import {
   hrShiftAssignments,
   hrShiftTemplates,
-} from "./schema/hr";
+} from "./schema/hr-shift-scheduling";
+
+export {
+  HrShiftCommandError,
+  assertValidTime,
+  computeHrShiftWorkingMinutes,
+  resolveShiftBounds,
+  toUtcDayStart,
+} from "./hr-shifts.shared";
+
+export * from "./hr-shifts-scheduling";
 
 export type HrShiftTemplateRow = {
   id: string;
   code: string;
   name: string;
+  description: string | null;
   startTime: string;
   endTime: string;
+  breakStartTime: string | null;
+  breakEndTime: string | null;
+  workingHoursMinutes: number;
+  shiftCategory: (typeof hrShiftTemplates.$inferSelect)["shiftCategory"];
+  patternKind: (typeof hrShiftTemplates.$inferSelect)["patternKind"];
   status: (typeof hrShiftTemplates.$inferSelect)["status"];
 };
 
@@ -45,70 +69,6 @@ export type HrShiftAssignmentWindow = {
   totalCount: number;
   hasNextPage: boolean;
 };
-
-export class HrShiftCommandError extends Error {
-  readonly code:
-    | "employee_not_found"
-    | "template_not_found"
-    | "template_not_active"
-    | "template_code_exists"
-    | "assignment_not_found"
-    | "assignment_not_scheduled"
-    | "invalid_time_format";
-
-  constructor(code: HrShiftCommandError["code"], message?: string) {
-    super(message ?? code);
-    this.code = code;
-  }
-}
-
-const DEFAULT_PAGE_SIZE = 25;
-const MAX_PAGE_SIZE = 100;
-const TIME_PATTERN = /^([01]\d|2[0-3]):([0-5]\d)$/;
-
-function clampPageSize(limit: number | undefined): number {
-  if (limit === undefined || !Number.isFinite(limit)) {
-    return DEFAULT_PAGE_SIZE;
-  }
-  const size = Math.floor(limit);
-  if (size < 1) return DEFAULT_PAGE_SIZE;
-  return Math.min(size, MAX_PAGE_SIZE);
-}
-
-function assertValidTime(value: string): void {
-  if (!TIME_PATTERN.test(value)) {
-    throw new HrShiftCommandError("invalid_time_format");
-  }
-}
-
-function toUtcDayStart(date: Date): Date {
-  const copy = new Date(date);
-  copy.setUTCHours(0, 0, 0, 0);
-  return copy;
-}
-
-function combineDateAndTime(shiftDate: Date, timeHm: string): Date {
-  assertValidTime(timeHm);
-  const [hoursPart, minutesPart] = timeHm.split(":");
-  const hours = Number(hoursPart);
-  const minutes = Number(minutesPart);
-  const combined = toUtcDayStart(shiftDate);
-  combined.setUTCHours(hours, minutes, 0, 0);
-  return combined;
-}
-
-function resolveShiftBounds(input: {
-  shiftDate: Date;
-  startTime: string;
-  endTime: string;
-}): { shiftStart: Date; shiftEnd: Date } {
-  const shiftStart = combineDateAndTime(input.shiftDate, input.startTime);
-  let shiftEnd = combineDateAndTime(input.shiftDate, input.endTime);
-  if (shiftEnd.getTime() <= shiftStart.getTime()) {
-    shiftEnd = new Date(shiftEnd.getTime() + 86_400_000);
-  }
-  return { shiftStart, shiftEnd };
-}
 
 async function assertEmployeeInOrg(
   organizationId: string,
@@ -159,6 +119,26 @@ async function getActiveTemplate(
   });
 }
 
+function mapTemplateRow(
+  row: typeof hrShiftTemplates.$inferSelect,
+): HrShiftTemplateRow {
+  return {
+    id: row.id,
+    code: row.code,
+    name: row.name,
+    description: row.description,
+    startTime: row.startTime,
+    endTime: row.endTime,
+    breakStartTime: row.breakStartTime,
+    breakEndTime: row.breakEndTime,
+    workingHoursMinutes: row.workingHoursMinutes,
+    shiftCategory: row.shiftCategory,
+    patternKind: row.patternKind,
+    status: row.status,
+  };
+}
+
+/** HRM-SFT-001 — list shift templates (Pattern B window). */
 export async function listHrShiftTemplatesWindow(input: {
   organizationId: string;
   limit?: number;
@@ -197,14 +177,7 @@ export async function listHrShiftTemplatesWindow(input: {
       .where(whereClause);
 
     const rows = await db
-      .select({
-        id: hrShiftTemplates.id,
-        code: hrShiftTemplates.code,
-        name: hrShiftTemplates.name,
-        startTime: hrShiftTemplates.startTime,
-        endTime: hrShiftTemplates.endTime,
-        status: hrShiftTemplates.status,
-      })
+      .select()
       .from(hrShiftTemplates)
       .where(whereClause)
       .orderBy(hrShiftTemplates.code)
@@ -214,7 +187,7 @@ export async function listHrShiftTemplatesWindow(input: {
     const actualTotal = Number(totalRow?.total ?? 0);
 
     return {
-      rows,
+      rows: rows.map(mapTemplateRow),
       pageSize,
       totalCount: actualTotal,
       hasNextPage: offset + rows.length < actualTotal,
@@ -222,17 +195,54 @@ export async function listHrShiftTemplatesWindow(input: {
   });
 }
 
+/** HRM-SFT-001 — fetch one shift template. */
+export async function getHrShiftTemplate(input: {
+  organizationId: string;
+  templateId: string;
+}): Promise<HrShiftTemplateRow | null> {
+  return runWithOrganizationContext(input.organizationId, async (db) => {
+    const [row] = await db
+      .select()
+      .from(hrShiftTemplates)
+      .where(
+        and(
+          eq(hrShiftTemplates.organizationId, input.organizationId),
+          eq(hrShiftTemplates.id, input.templateId),
+        ),
+      )
+      .limit(1);
+
+    return row ? mapTemplateRow(row) : null;
+  });
+}
+
+/** HRM-SFT-001/002/003 — create shift template. */
 export async function createHrShiftTemplate(input: {
   organizationId: string;
   code: string;
   name: string;
+  description?: string | null;
   startTime: string;
   endTime: string;
+  breakStartTime?: string | null;
+  breakEndTime?: string | null;
+  workingHoursMinutes?: number;
+  shiftCategory?: (typeof hrShiftTemplates.$inferSelect)["shiftCategory"];
+  patternKind?: (typeof hrShiftTemplates.$inferSelect)["patternKind"];
 }): Promise<{ templateId: string }> {
   const code = input.code.trim();
   const name = input.name.trim();
   assertValidTime(input.startTime);
   assertValidTime(input.endTime);
+
+  const workingHoursMinutes =
+    input.workingHoursMinutes ??
+    computeHrShiftWorkingMinutes({
+      startTime: input.startTime,
+      endTime: input.endTime,
+      breakStartTime: input.breakStartTime,
+      breakEndTime: input.breakEndTime,
+    });
 
   return runWithOrganizationContext(input.organizationId, async (db) => {
     const [existing] = await db
@@ -256,14 +266,99 @@ export async function createHrShiftTemplate(input: {
       organizationId: input.organizationId,
       code,
       name,
+      description: input.description?.trim() || null,
       startTime: input.startTime,
       endTime: input.endTime,
+      breakStartTime: input.breakStartTime ?? null,
+      breakEndTime: input.breakEndTime ?? null,
+      workingHoursMinutes,
+      shiftCategory: input.shiftCategory ?? "day",
+      patternKind: input.patternKind ?? "fixed",
     });
 
     return { templateId };
   });
 }
 
+/** HRM-SFT-001/002 — update shift template. */
+export async function updateHrShiftTemplate(input: {
+  organizationId: string;
+  templateId: string;
+  name?: string;
+  description?: string | null;
+  startTime?: string;
+  endTime?: string;
+  breakStartTime?: string | null;
+  breakEndTime?: string | null;
+  workingHoursMinutes?: number;
+  shiftCategory?: (typeof hrShiftTemplates.$inferSelect)["shiftCategory"];
+  patternKind?: (typeof hrShiftTemplates.$inferSelect)["patternKind"];
+}): Promise<{ templateId: string }> {
+  return runWithOrganizationContext(input.organizationId, async (db) => {
+    const [existing] = await db
+      .select()
+      .from(hrShiftTemplates)
+      .where(
+        and(
+          eq(hrShiftTemplates.organizationId, input.organizationId),
+          eq(hrShiftTemplates.id, input.templateId),
+        ),
+      )
+      .limit(1);
+
+    if (!existing) {
+      throw new HrShiftCommandError("template_not_found");
+    }
+
+    const startTime = input.startTime ?? existing.startTime;
+    const endTime = input.endTime ?? existing.endTime;
+    if (input.startTime) assertValidTime(input.startTime);
+    if (input.endTime) assertValidTime(input.endTime);
+
+    const breakStartTime =
+      input.breakStartTime !== undefined
+        ? input.breakStartTime
+        : existing.breakStartTime;
+    const breakEndTime =
+      input.breakEndTime !== undefined
+        ? input.breakEndTime
+        : existing.breakEndTime;
+
+    const workingHoursMinutes =
+      input.workingHoursMinutes ??
+      computeHrShiftWorkingMinutes({
+        startTime,
+        endTime,
+        breakStartTime,
+        breakEndTime,
+      });
+
+    await db
+      .update(hrShiftTemplates)
+      .set({
+        ...(input.name !== undefined ? { name: input.name.trim() } : {}),
+        ...(input.description !== undefined
+          ? { description: input.description?.trim() || null }
+          : {}),
+        ...(input.startTime !== undefined ? { startTime: input.startTime } : {}),
+        ...(input.endTime !== undefined ? { endTime: input.endTime } : {}),
+        breakStartTime,
+        breakEndTime,
+        workingHoursMinutes,
+        ...(input.shiftCategory !== undefined
+          ? { shiftCategory: input.shiftCategory }
+          : {}),
+        ...(input.patternKind !== undefined
+          ? { patternKind: input.patternKind }
+          : {}),
+      })
+      .where(eq(hrShiftTemplates.id, input.templateId));
+
+    return { templateId: input.templateId };
+  });
+}
+
+/** HRM-SFT-001 — archive shift template. */
 export async function archiveHrShiftTemplate(input: {
   organizationId: string;
   templateId: string;
@@ -408,12 +503,14 @@ export async function listHrShiftAssignmentsWindow(input: {
   });
 }
 
+/** HRM-SFT-005 — assign one employee to a shift on a date. */
 export async function scheduleHrShiftAssignment(input: {
   organizationId: string;
   employeeId: string;
   templateId: string;
   shiftDate: Date;
   notes?: string | null;
+  assignedByAuthUserId?: string | null;
 }): Promise<{ assignmentId: string }> {
   await assertEmployeeInOrg(input.organizationId, input.employeeId);
   const template = await getActiveTemplate(
@@ -427,17 +524,58 @@ export async function scheduleHrShiftAssignment(input: {
     endTime: template.endTime,
   });
 
+  const scope = await runWithOrganizationContext(
+    input.organizationId,
+    async (db) => {
+      const [employee] = await db
+        .select({
+          departmentId: hrEmployees.currentDepartmentId,
+          positionId: hrEmployees.currentPositionId,
+          locationCode: hrEmployees.workLocationCode,
+        })
+        .from(hrEmployees)
+        .where(eq(hrEmployees.id, input.employeeId))
+        .limit(1);
+
+      return {
+        departmentId: employee?.departmentId ?? null,
+        positionId: employee?.positionId ?? null,
+        locationCode: employee?.locationCode ?? null,
+      };
+    },
+  );
+
   return runWithOrganizationContext(input.organizationId, async (db) => {
+    const [existing] = await db
+      .select({ id: hrShiftAssignments.id })
+      .from(hrShiftAssignments)
+      .where(
+        and(
+          eq(hrShiftAssignments.organizationId, input.organizationId),
+          eq(hrShiftAssignments.employeeId, input.employeeId),
+          eq(hrShiftAssignments.shiftDate, shiftDay),
+        ),
+      )
+      .limit(1);
+
+    if (existing) {
+      throw new HrShiftCommandError("assignment_date_conflict");
+    }
+
     const assignmentId = createEntityId("hr_sh_asg");
     await db.insert(hrShiftAssignments).values({
       id: assignmentId,
       organizationId: input.organizationId,
       employeeId: input.employeeId,
       templateId: input.templateId,
+      departmentId: scope.departmentId,
+      positionId: scope.positionId,
+      locationCode: scope.locationCode,
       shiftDate: shiftDay,
       shiftStart,
       shiftEnd,
       notes: input.notes?.trim() || null,
+      assignedByAuthUserId: input.assignedByAuthUserId ?? null,
     });
 
     return { assignmentId };

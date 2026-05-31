@@ -1,52 +1,12 @@
 /**
- * Layer 3 — per-file export and shadcn structure contract drift.
+ * Layer 3 — representative shadcn structure contract drift (exports owned by layer 1).
  */
 import type { AuditViolation } from "./shared.ts";
 import {
   getPrimitiveContract,
   listPrimitiveContracts,
 } from "./primitive-contracts.ts";
-import { extractNamedExports } from "./shared.ts";
 import type { UiSourceCache, UiSourceFile } from "./source-cache.ts";
-
-function auditContractExports(file: UiSourceFile): AuditViolation[] {
-  const contract = getPrimitiveContract(file.fileName);
-  if (!contract) return [];
-
-  const actual = extractNamedExports(file.content);
-  const actualSet = new Set(actual);
-  const violations: AuditViolation[] = [];
-
-  for (const expected of contract.exports) {
-    if (!actualSet.has(expected)) {
-      violations.push({
-        layer: "primitive-contract",
-        file: file.rel,
-        line: 0,
-        rule: "missing-export",
-        match: expected,
-        hint: "Expected primitive export disappeared — restore or run audit:shadcn-upstream:sync",
-        severity: "error",
-      });
-    }
-  }
-
-  for (const name of actual) {
-    if (!contract.exports.includes(name)) {
-      violations.push({
-        layer: "primitive-contract",
-        file: file.rel,
-        line: 0,
-        rule: "unexpected-export",
-        match: name,
-        hint: "New export not in upstream manifest — run audit:shadcn-upstream:sync if intentional",
-        severity: "warn",
-      });
-    }
-  }
-
-  return violations;
-}
 
 function auditRequiredPatterns(file: UiSourceFile): AuditViolation[] {
   const contract = getPrimitiveContract(file.fileName);
@@ -75,7 +35,6 @@ export function auditPrimitiveContractsFromCache(cache: UiSourceCache): AuditVio
 
   for (const file of cache.files) {
     seenFiles.add(file.fileName);
-    violations.push(...auditContractExports(file));
     violations.push(...auditRequiredPatterns(file));
   }
 

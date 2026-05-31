@@ -1,5 +1,16 @@
 # Expense Reimbursement
 
+## As-built summary (Receipts & Validation)
+
+| Area | Status | Notes |
+| ---- | ------ | ----- |
+| Policy tables | Shipped | `hr_expense_policies`, `hr_expense_policy_category_rules`, `hr_expense_eligibility_rules` |
+| Receipt attachments | Shipped | `hr_expense_claim_receipts` + `attachHrExpenseClaimReceipt` / blob + `registerTenantDocument` |
+| Policy validation | Shipped | `validateClaimPolicy` / `validateHrExpenseClaimPolicy` (HRM-EXP-004/006/008) |
+| Eligibility | Shipped | `validateEligibility` / `validateHrExpenseEligibilityForClaim` (HRM-EXP-007) |
+| Duplicate detection | Shipped | `detectDuplicateClaims` / `detectHrExpenseDuplicateClaims` (HRM-EXP-009) |
+| Unit tests | Shipped | `tests/hr.payroll.expense-validation.test.ts` |
+
 ## Definition
 
 **Expense Reimbursement is the HRM function that processes employee expense claims, including claim submission, receipt capture, expense categorization, policy validation, approval workflow, reimbursement calculation, payment integration, accounting allocation, and audit history.**

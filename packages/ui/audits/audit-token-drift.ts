@@ -6,11 +6,7 @@ import {
   buildRawPalettePattern,
 } from "../src/design-system.color-contract.shared.ts";
 import type { AuditViolation } from "./shared.ts";
-import {
-  ALLOWED_RAW_CLASSES,
-  FORBIDDEN_UI_PATTERNS,
-  getPrimitiveContract,
-} from "./primitive-contracts.ts";
+import { FORBIDDEN_UI_PATTERNS, getPrimitiveContract } from "./primitive-contracts.ts";
 import type { UiSourceCache, UiSourceFile } from "./source-cache.ts";
 
 const DESCRIPTION_SLOT_NAMES =
@@ -24,35 +20,27 @@ const DESCRIPTION_LINE_PATTERN = new RegExp(
     : `${UI_PRIMITIVE_DESCRIPTION_DRIFT_PATTERN.flags}g`,
 );
 
-function lineHasAllowedRawClass(line: string): boolean {
-  for (const token of ALLOWED_RAW_CLASSES) {
-    if (line.includes(token)) return true;
-  }
-  return false;
-}
-
+/** `allowedLinePatterns` must not use the `/g` flag — `.test()` is called per line. */
 function lineIsSuppressed(line: string, allowedLinePatterns: RegExp[]): boolean {
   return allowedLinePatterns.some((pattern) => pattern.test(line));
 }
 
-function auditDescriptionSlots(file: UiSourceFile): AuditViolation[] {
+function auditLine(
+  file: UiSourceFile,
+  line: string,
+  lineNo: number,
+  slotState: { inDescriptionSlot: boolean; descriptionDepth: number },
+): AuditViolation[] {
   const violations: AuditViolation[] = [];
-  let inDescriptionSlot = false;
-  let descriptionDepth = 0;
 
-  for (let i = 0; i < file.lines.length; i++) {
-    const line = file.lines[i]!;
-    const lineNo = i + 1;
+  if (DESCRIPTION_SLOT_NAMES.test(line)) {
+    slotState.inDescriptionSlot = true;
+    slotState.descriptionDepth = 0;
+  }
 
-    if (DESCRIPTION_SLOT_NAMES.test(line)) {
-      inDescriptionSlot = true;
-      descriptionDepth = 0;
-    }
-
-    if (!inDescriptionSlot) continue;
-
-    descriptionDepth += (line.match(/{/g) ?? []).length;
-    descriptionDepth -= (line.match(/}/g) ?? []).length;
+  if (slotState.inDescriptionSlot) {
+    slotState.descriptionDepth += (line.match(/{/g) ?? []).length;
+    slotState.descriptionDepth -= (line.match(/}/g) ?? []).length;
 
     if (
       !line.includes("uiTypography.muted") &&
@@ -73,52 +61,27 @@ function auditDescriptionSlots(file: UiSourceFile): AuditViolation[] {
       });
     }
 
-    if (descriptionDepth <= 0 && line.includes("}")) {
-      inDescriptionSlot = false;
+    if (slotState.descriptionDepth <= 0 && line.includes("}")) {
+      slotState.inDescriptionSlot = false;
     }
   }
 
-  return violations;
-}
-
-function auditPalette(file: UiSourceFile): AuditViolation[] {
-  const violations: AuditViolation[] = [];
-
-  for (let i = 0; i < file.lines.length; i++) {
-    const line = file.lines[i]!;
-    const lineNo = i + 1;
-    for (const paletteMatch of line.matchAll(PALETTE_LINE_PATTERN)) {
-      violations.push({
-        layer: "token-drift",
-        file: file.rel,
-        line: lineNo,
-        rule: "no-raw-palette-in-ui",
-        match: paletteMatch[0],
-        hint: "Use semantic ERP tokens — never add slate/gray/zinc/neutral/stone to @afenda/ui",
-        severity: "error",
-      });
-    }
+  for (const paletteMatch of line.matchAll(PALETTE_LINE_PATTERN)) {
+    violations.push({
+      layer: "token-drift",
+      file: file.rel,
+      line: lineNo,
+      rule: "no-raw-palette-in-ui",
+      match: paletteMatch[0],
+      hint: "Use semantic ERP tokens — never add slate/gray/zinc/neutral/stone to @afenda/ui",
+      severity: "error",
+    });
   }
 
-  return violations;
-}
-
-function auditForbiddenVisualTokens(file: UiSourceFile): AuditViolation[] {
-  const contract = getPrimitiveContract(file.fileName);
-  const allowedLinePatterns = contract?.allowedLinePatterns ?? [];
-  const violations: AuditViolation[] = [];
-
-  for (let i = 0; i < file.lines.length; i++) {
-    const line = file.lines[i]!;
-    const lineNo = i + 1;
-
-    if (lineIsSuppressed(line, allowedLinePatterns)) continue;
-
+  const allowedLinePatterns = getPrimitiveContract(file.fileName)?.allowedLinePatterns ?? [];
+  if (!lineIsSuppressed(line, allowedLinePatterns)) {
     for (const entry of FORBIDDEN_UI_PATTERNS) {
       for (const match of line.matchAll(entry.linePattern)) {
-        if (entry.rule === "no-inline-style" && file.fileName === "progress.tsx") continue;
-        if (lineHasAllowedRawClass(line) && entry.severity === "warn") continue;
-
         violations.push({
           layer: "token-drift",
           file: file.rel,
@@ -137,10 +100,13 @@ function auditForbiddenVisualTokens(file: UiSourceFile): AuditViolation[] {
 
 export function auditTokenDriftFromCache(cache: UiSourceCache): AuditViolation[] {
   const violations: AuditViolation[] = [];
+
   for (const file of cache.files) {
-    violations.push(...auditDescriptionSlots(file));
-    violations.push(...auditPalette(file));
-    violations.push(...auditForbiddenVisualTokens(file));
+    const slotState = { inDescriptionSlot: false, descriptionDepth: 0 };
+    for (let i = 0; i < file.lines.length; i++) {
+      violations.push(...auditLine(file, file.lines[i]!, i + 1, slotState));
+    }
   }
+
   return violations;
 }

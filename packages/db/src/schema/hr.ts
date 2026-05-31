@@ -305,6 +305,7 @@ export const hrAttendanceSourceEnum = pgEnum("hr_attendance_source", [
   "manual",
   "time_clock",
   "import",
+  "mobile",
 ]);
 
 export const hrAttendanceDayStatusEnum = pgEnum("hr_attendance_day_status", [
@@ -423,15 +424,64 @@ export const hrOvertimeAuditActionEnum = pgEnum("hr_overtime_audit_action", [
   "paid",
 ]);
 
-export const hrShiftTemplateStatusEnum = pgEnum("hr_shift_template_status", [
-  "active",
-  "archived",
+/** HRM-OTM-007 — day category for rate rule matching. */
+export const hrOvertimeDayCategoryEnum = pgEnum("hr_overtime_day_category", [
+  "weekday",
+  "rest_day",
+  "off_day",
+  "public_holiday",
 ]);
 
-export const hrShiftAssignmentStatusEnum = pgEnum("hr_shift_assignment_status", [
-  "scheduled",
-  "published",
-  "cancelled",
+/** HRM-OTM-011 — overtime rounding modes. */
+export const hrOvertimeRoundingModeEnum = pgEnum("hr_overtime_rounding_mode", [
+  "none",
+  "down",
+  "up",
+  "nearest",
+]);
+
+/** HRM-OTM-014/019 — policy violation kinds flagged on requests. */
+export const hrOvertimeExceptionKindEnum = pgEnum("hr_overtime_exception_kind", [
+  "shift_variance",
+  "daily_cap",
+  "weekly_cap",
+  "monthly_cap",
+  "statutory_cap",
+  "budget_cap",
+  "min_duration",
+  "attendance_mismatch",
+  "late_submission",
+  "unplanned",
+]);
+
+export const hrOvertimeExceptionStatusEnum = pgEnum(
+  "hr_overtime_exception_status",
+  ["open", "approved", "rejected"],
+);
+
+/** HRM-OTM-015 — manager / HR approval stages. */
+export const hrOvertimeApprovalStageEnum = pgEnum("hr_overtime_approval_stage", [
+  "manager",
+  "hr",
+  "complete",
+]);
+
+/** HRM-OTM-016 — routing matrix approver kinds. */
+export const hrOvertimeApproverKindEnum = pgEnum("hr_overtime_approver_kind", [
+  "direct_manager",
+  "manager_chain",
+  "department_head",
+  "hr_owner",
+  "hr_pool",
+  "specific_user",
+]);
+
+/** HRM-OTM-015 — overtime approval record lifecycle. */
+export const hrOvertimeApprovalStatusEnum = pgEnum("hr_overtime_approval_status", [
+  "pending",
+  "approved",
+  "rejected",
+  "returned",
 ]);
 
 export const hrDepartments = pgTable(
@@ -2084,15 +2134,32 @@ export const hrOvertimeRequests = pgTable(
       .notNull()
       .references(() => hrEmployees.id, { onDelete: "cascade" }),
     overtimeType: hrOvertimeTypeEnum("overtime_type").notNull(),
-    status: hrOvertimeRequestStatusEnum("status").notNull().default("pending"),
+    timingKind: hrOvertimeTimingKindEnum("timing_kind")
+      .notNull()
+      .default("planned"),
+    status: hrOvertimeRequestStatusEnum("status").notNull().default("submitted"),
+    policyGroupCode: text("policy_group_code").notNull().default("default"),
     workDate: timestamp("work_date", { withTimezone: true }).notNull(),
+    startTime: text("start_time"),
+    endTime: text("end_time"),
     hours: numeric("hours", { precision: 6, scale: 2 }).notNull(),
+    payableMinutes: integer("payable_minutes"),
+    amountCents: integer("amount_cents"),
+    earningCode: text("earning_code"),
     reason: text("reason"),
     decisionNote: text("decision_note"),
-    submittedAt: timestamp("submitted_at", { withTimezone: true })
+    returnReason: text("return_reason"),
+    eligibilityExceptionReason: text("eligibility_exception_reason"),
+    dayCategory: hrOvertimeDayCategoryEnum("day_category"),
+    approvalStage: hrOvertimeApprovalStageEnum("approval_stage")
       .notNull()
-      .defaultNow(),
+      .default("manager"),
+    currentApproverAuthUserId: text("current_approver_auth_user_id"),
+    approvalSnapshot: jsonb("approval_snapshot").$type<Record<string, unknown>>(),
+    submittedAt: timestamp("submitted_at", { withTimezone: true }),
     decidedAt: timestamp("decided_at", { withTimezone: true }),
+    payrollReadyAt: timestamp("payroll_ready_at", { withTimezone: true }),
+    paidAt: timestamp("paid_at", { withTimezone: true }),
     ...timestampColumns,
   },
   (table) => [
@@ -2108,67 +2175,375 @@ export const hrOvertimeRequests = pgTable(
       table.organizationId,
       table.submittedAt,
     ),
-  ],
-);
-
-export const hrShiftTemplates = pgTable(
-  "hr_shift_templates",
-  {
-    id: text("id").primaryKey(),
-    organizationId: organizationReference(),
-    code: text("code").notNull(),
-    name: text("name").notNull(),
-    startTime: text("start_time").notNull(),
-    endTime: text("end_time").notNull(),
-    status: hrShiftTemplateStatusEnum("status").notNull().default("active"),
-    archivedAt: timestamp("archived_at", { withTimezone: true }),
-    ...timestampColumns,
-  },
-  (table) => [
-    uniqueIndex("hr_shift_templates_org_code_uidx").on(
+    index("hr_overtime_requests_org_work_date_idx").on(
       table.organizationId,
-      table.code,
-    ),
-    index("hr_shift_templates_org_status_idx").on(
-      table.organizationId,
-      table.status,
+      table.workDate,
     ),
   ],
 );
 
-export const hrShiftAssignments = pgTable(
-  "hr_shift_assignments",
+/** HRM-OTM-004 — eligibility rules scoped by legal entity, location, policy group, and org attributes. */
+export const hrOvertimeEligibilityRules = pgTable(
+  "hr_overtime_eligibility_rules",
   {
     id: text("id").primaryKey(),
     organizationId: organizationReference(),
-    employeeId: text("employee_id")
+    policyGroupCode: text("policy_group_code").notNull().default("default"),
+    overtimeType: hrOvertimeTypeEnum("overtime_type"),
+    legalEntityCode: text("legal_entity_code"),
+    countryCode: text("country_code"),
+    workLocationCode: text("work_location_code"),
+    departmentId: text("department_id").references(() => hrDepartments.id, {
+      onDelete: "set null",
+    }),
+    roleCode: text("role_code"),
+    grade: text("grade"),
+    employmentType: text("employment_type"),
+    employeeCategory: text("employee_category"),
+    eligible: boolean("eligible").notNull().default(true),
+    requiresExceptionApproval: boolean("requires_exception_approval")
       .notNull()
-      .references(() => hrEmployees.id, { onDelete: "cascade" }),
-    templateId: text("template_id")
+      .default(false),
+    effectiveFrom: timestamp("effective_from", { withTimezone: true })
       .notNull()
-      .references(() => hrShiftTemplates.id, { onDelete: "restrict" }),
-    status: hrShiftAssignmentStatusEnum("status").notNull().default("scheduled"),
-    shiftDate: timestamp("shift_date", { withTimezone: true }).notNull(),
-    shiftStart: timestamp("shift_start", { withTimezone: true }).notNull(),
-    shiftEnd: timestamp("shift_end", { withTimezone: true }).notNull(),
-    notes: text("notes"),
-    publishedAt: timestamp("published_at", { withTimezone: true }),
-    cancelledAt: timestamp("cancelled_at", { withTimezone: true }),
+      .defaultNow(),
+    effectiveTo: timestamp("effective_to", { withTimezone: true }),
     ...timestampColumns,
   },
   (table) => [
-    index("hr_shift_assignments_org_status_idx").on(
+    index("hr_overtime_eligibility_rules_org_group_type_idx").on(
       table.organizationId,
-      table.status,
+      table.policyGroupCode,
+      table.overtimeType,
     ),
-    index("hr_shift_assignments_org_employee_date_idx").on(
+    index("hr_overtime_eligibility_rules_org_scope_idx").on(
+      table.organizationId,
+      table.legalEntityCode,
+      table.countryCode,
+      table.workLocationCode,
+    ),
+    index("hr_overtime_eligibility_rules_org_effective_idx").on(
+      table.organizationId,
+      table.effectiveFrom,
+      table.effectiveTo,
+    ),
+  ],
+);
+
+/** HRM-OTM-029 — overtime audit trail events. */
+export const hrOvertimeAuditEvents = pgTable(
+  "hr_overtime_audit_events",
+  {
+    id: text("id").primaryKey(),
+    organizationId: organizationReference(),
+    requestId: text("request_id").references(() => hrOvertimeRequests.id, {
+      onDelete: "set null",
+    }),
+    employeeId: text("employee_id").references(() => hrEmployees.id, {
+      onDelete: "set null",
+    }),
+    action: hrOvertimeAuditActionEnum("action").notNull(),
+    actorAuthUserId: text("actor_auth_user_id"),
+    actorEmployeeId: text("actor_employee_id"),
+    summary: text("summary").notNull(),
+    metadata: jsonb("metadata").$type<Record<string, unknown>>(),
+    occurredAt: timestamp("occurred_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    ...timestampColumns,
+  },
+  (table) => [
+    index("hr_overtime_audit_events_org_occurred_idx").on(
+      table.organizationId,
+      table.occurredAt,
+    ),
+    index("hr_overtime_audit_events_org_request_idx").on(
+      table.organizationId,
+      table.requestId,
+    ),
+    index("hr_overtime_audit_events_org_employee_idx").on(
       table.organizationId,
       table.employeeId,
-      table.shiftDate,
     ),
-    index("hr_shift_assignments_org_shift_start_idx").on(
+  ],
+);
+
+/** HRM-OTM-026 — overtime lifecycle notification kinds. */
+export const hrOvertimeNotificationKindEnum = pgEnum(
+  "hr_overtime_notification_kind",
+  [
+    "request_submitted",
+    "request_approved",
+    "request_rejected",
+    "request_returned",
+    "request_cancelled",
+    "request_overdue",
+    "payroll_ready",
+  ],
+);
+
+export const hrOvertimeNotifications = pgTable(
+  "hr_overtime_notifications",
+  {
+    id: text("id").primaryKey(),
+    organizationId: organizationReference(),
+    recipientAuthUserId: text("recipient_auth_user_id").notNull(),
+    kind: hrOvertimeNotificationKindEnum("kind").notNull(),
+    subjectType: text("subject_type").notNull(),
+    subjectId: text("subject_id").notNull(),
+    employeeId: text("employee_id").references(() => hrEmployees.id, {
+      onDelete: "set null",
+    }),
+    title: text("title").notNull(),
+    body: text("body").notNull(),
+    readAt: timestamp("read_at", { withTimezone: true }),
+    ...timestampColumns,
+  },
+  (table) => [
+    index("hr_overtime_notifications_org_recipient_idx").on(
       table.organizationId,
-      table.shiftStart,
+      table.recipientAuthUserId,
+    ),
+    index("hr_overtime_notifications_org_subject_idx").on(
+      table.organizationId,
+      table.subjectType,
+      table.subjectId,
+    ),
+  ],
+);
+
+/** HRM-OTM-011/012/013/010 — org overtime policy (caps, rounding, attendance compare). */
+export const hrOvertimePolicies = pgTable(
+  "hr_overtime_policies",
+  {
+    id: text("id").primaryKey(),
+    organizationId: organizationReference(),
+    policyGroupCode: text("policy_group_code").notNull().default("default"),
+    compareAttendanceEnabled: boolean("compare_attendance_enabled")
+      .notNull()
+      .default(false),
+    minOvertimeMinutes: integer("min_overtime_minutes").notNull().default(0),
+    roundingMode: hrOvertimeRoundingModeEnum("rounding_mode")
+      .notNull()
+      .default("none"),
+    roundingIntervalMinutes: integer("rounding_interval_minutes")
+      .notNull()
+      .default(15),
+    graceMinutesBeforeRounding: integer("grace_minutes_before_rounding")
+      .notNull()
+      .default(0),
+    dailyCapMinutes: integer("daily_cap_minutes"),
+    weeklyCapMinutes: integer("weekly_cap_minutes"),
+    monthlyCapMinutes: integer("monthly_cap_minutes"),
+    statutoryCapMinutes: integer("statutory_cap_minutes"),
+    budgetCapMinutes: integer("budget_cap_minutes"),
+    attendanceVarianceToleranceMinutes: integer(
+      "attendance_variance_tolerance_minutes",
+    )
+      .notNull()
+      .default(15),
+    shiftVarianceToleranceMinutes: integer("shift_variance_tolerance_minutes")
+      .notNull()
+      .default(15),
+    requireHrSecondApproval: boolean("require_hr_second_approval")
+      .notNull()
+      .default(false),
+    managerChainMaxDepth: integer("manager_chain_max_depth").notNull().default(3),
+    enforceClaimDeadlineOnSubmit: boolean("enforce_claim_deadline_on_submit")
+      .notNull()
+      .default(false),
+    claimDeadlineDays: integer("claim_deadline_days"),
+    allowCompensatoryTime: boolean("allow_compensatory_time")
+      .notNull()
+      .default(false),
+    compensatoryLeaveTypeCode: text("compensatory_leave_type_code"),
+    ...timestampColumns,
+  },
+  (table) => [
+    uniqueIndex("hr_overtime_policies_org_group_uidx").on(
+      table.organizationId,
+      table.policyGroupCode,
+    ),
+  ],
+);
+
+/** HRM-OTM-016 — dynamic approver routing matrix. */
+export const hrOvertimeApprovalRoutes = pgTable(
+  "hr_overtime_approval_routes",
+  {
+    id: text("id").primaryKey(),
+    organizationId: organizationReference(),
+    policyGroupCode: text("policy_group_code").notNull().default("default"),
+    name: text("name").notNull(),
+    priority: integer("priority").notNull().default(0),
+    departmentId: text("department_id").references(() => hrDepartments.id, {
+      onDelete: "set null",
+    }),
+    costCenterCode: text("cost_center_code"),
+    workLocationCode: text("work_location_code"),
+    grade: text("grade"),
+    minEstimatedAmountCents: integer("min_estimated_amount_cents"),
+    maxEstimatedAmountCents: integer("max_estimated_amount_cents"),
+    requiresEligibilityException: boolean("requires_eligibility_exception")
+      .notNull()
+      .default(false),
+    requiresPolicyException: boolean("requires_policy_exception")
+      .notNull()
+      .default(false),
+    approverKind: hrOvertimeApproverKindEnum("approver_kind").notNull(),
+    specificApproverAuthUserId: text("specific_approver_auth_user_id"),
+    managerChainMaxDepth: integer("manager_chain_max_depth"),
+    active: boolean("active").notNull().default(true),
+    effectiveFrom: timestamp("effective_from", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    effectiveTo: timestamp("effective_to", { withTimezone: true }),
+    ...timestampColumns,
+  },
+  (table) => [
+    index("hr_overtime_approval_routes_org_group_idx").on(
+      table.organizationId,
+      table.policyGroupCode,
+    ),
+    index("hr_overtime_approval_routes_org_priority_idx").on(
+      table.organizationId,
+      table.priority,
+    ),
+  ],
+);
+
+/** HRM-OTM-015 — approval workflow record (hrm_approval equivalent). */
+export const hrOvertimeApprovals = pgTable(
+  "hr_overtime_approvals",
+  {
+    id: text("id").primaryKey(),
+    organizationId: organizationReference(),
+    requestId: text("request_id")
+      .notNull()
+      .references(() => hrOvertimeRequests.id, { onDelete: "cascade" }),
+    status: hrOvertimeApprovalStatusEnum("status").notNull().default("pending"),
+    snapshot: jsonb("snapshot").$type<Record<string, unknown>>().notNull(),
+    assignedApproverAuthUserId: text("assigned_approver_auth_user_id"),
+    decidedByAuthUserId: text("decided_by_auth_user_id"),
+    decidedAt: timestamp("decided_at", { withTimezone: true }),
+    ...timestampColumns,
+  },
+  (table) => [
+    uniqueIndex("hr_overtime_approvals_org_request_uidx").on(
+      table.organizationId,
+      table.requestId,
+    ),
+    index("hr_overtime_approvals_org_status_idx").on(
+      table.organizationId,
+      table.status,
+    ),
+  ],
+);
+
+/** HRM-OTM-007 — pay rate multipliers by type, day, shift, employee group, country. */
+export const hrOvertimeRateRules = pgTable(
+  "hr_overtime_rate_rules",
+  {
+    id: text("id").primaryKey(),
+    organizationId: organizationReference(),
+    policyGroupCode: text("policy_group_code").notNull().default("default"),
+    name: text("name").notNull(),
+    overtimeType: hrOvertimeTypeEnum("overtime_type"),
+    dayCategory: hrOvertimeDayCategoryEnum("day_category"),
+    shiftCategory: text("shift_category"),
+    employeeCategory: text("employee_category"),
+    countryCode: text("country_code"),
+    multiplier: numeric("multiplier", { precision: 5, scale: 2 })
+      .notNull()
+      .default("1.50"),
+    earningCode: text("earning_code").notNull().default("OT"),
+    priority: integer("priority").notNull().default(0),
+    effectiveFrom: timestamp("effective_from", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    effectiveTo: timestamp("effective_to", { withTimezone: true }),
+    ...timestampColumns,
+  },
+  (table) => [
+    index("hr_overtime_rate_rules_org_group_idx").on(
+      table.organizationId,
+      table.policyGroupCode,
+    ),
+    index("hr_overtime_rate_rules_org_effective_idx").on(
+      table.organizationId,
+      table.effectiveFrom,
+      table.effectiveTo,
+    ),
+  ],
+);
+
+/** HRM-OTM-014 — policy violations requiring exception clearance before final approve. */
+export const hrOvertimeExceptions = pgTable(
+  "hr_overtime_exceptions",
+  {
+    id: text("id").primaryKey(),
+    organizationId: organizationReference(),
+    requestId: text("request_id")
+      .notNull()
+      .references(() => hrOvertimeRequests.id, { onDelete: "cascade" }),
+    kind: hrOvertimeExceptionKindEnum("kind").notNull(),
+    status: hrOvertimeExceptionStatusEnum("status").notNull().default("open"),
+    message: text("message").notNull(),
+    metadata: jsonb("metadata").$type<Record<string, unknown>>(),
+    resolvedAt: timestamp("resolved_at", { withTimezone: true }),
+    resolvedByAuthUserId: text("resolved_by_auth_user_id"),
+    ...timestampColumns,
+  },
+  (table) => [
+    index("hr_overtime_exceptions_org_request_idx").on(
+      table.organizationId,
+      table.requestId,
+    ),
+    index("hr_overtime_exceptions_org_status_idx").on(
+      table.organizationId,
+      table.status,
+    ),
+    uniqueIndex("hr_overtime_exceptions_org_request_kind_uidx").on(
+      table.organizationId,
+      table.requestId,
+      table.kind,
+    ),
+  ],
+);
+
+/** HRM-OTM-020/021 — calculation snapshot after approval. */
+export const hrOvertimeCalculationSnapshots = pgTable(
+  "hr_overtime_calculation_snapshots",
+  {
+    id: text("id").primaryKey(),
+    organizationId: organizationReference(),
+    requestId: text("request_id")
+      .notNull()
+      .references(() => hrOvertimeRequests.id, { onDelete: "cascade" }),
+    requestedMinutes: integer("requested_minutes").notNull(),
+    attendanceMinutes: integer("attendance_minutes"),
+    roundedMinutes: integer("rounded_minutes").notNull(),
+    cappedMinutes: integer("capped_minutes").notNull(),
+    payableMinutes: integer("payable_minutes").notNull(),
+    rateMultiplier: numeric("rate_multiplier", { precision: 5, scale: 2 })
+      .notNull(),
+    earningCode: text("earning_code").notNull(),
+    amountCents: integer("amount_cents"),
+    rateRuleId: text("rate_rule_id").references(() => hrOvertimeRateRules.id, {
+      onDelete: "set null",
+    }),
+    calculationDetail: jsonb("calculation_detail").$type<
+      Record<string, unknown>
+    >(),
+    calculatedAt: timestamp("calculated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    ...timestampColumns,
+  },
+  (table) => [
+    uniqueIndex("hr_overtime_calculation_snapshots_org_request_uidx").on(
+      table.organizationId,
+      table.requestId,
     ),
   ],
 );

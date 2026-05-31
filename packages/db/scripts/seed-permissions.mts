@@ -187,6 +187,62 @@ const permissionCatalog = [
       "Read employee and employer contribution amounts and payroll deduction values on benefit registers.",
   },
   {
+    key: "hr.bonus.read",
+    module: "hr",
+    label: "View HR bonus and incentives",
+    description:
+      "Read bonus plans, targets, achievements, and payout calculation results.",
+  },
+  {
+    key: "hr.bonus.write",
+    module: "hr",
+    label: "Manage HR bonus and incentives",
+    description:
+      "Record target achievements, configure payout formulas, tiers, accelerators, and run payout calculations.",
+  },
+  {
+    key: "hr.bonus.read",
+    module: "hr",
+    label: "View HR bonus and incentives",
+    description:
+      "Read bonus plans, cycles, payout registers, and eligibility status.",
+  },
+  {
+    key: "hr.bonus.write",
+    module: "hr",
+    label: "Manage HR bonus and incentives",
+    description:
+      "Configure plans, calculate payouts, route approvals, and lock approved payouts.",
+  },
+  {
+    key: "hr.bonus.sensitive.read",
+    module: "hr",
+    label: "View sensitive HR bonus amounts",
+    description:
+      "Read calculated, adjusted, and final payout amounts and variance detail.",
+  },
+  {
+    key: "hr.bonus.finance.read",
+    module: "hr",
+    label: "View HR bonus finance allocation",
+    description:
+      "Read and assign accounting allocation dimensions on bonus and incentive payouts.",
+  },
+  {
+    key: "hr.bonus.audit.read",
+    module: "hr",
+    label: "View HR bonus audit trail",
+    description:
+      "Read bonus and incentive audit history for compliance and auditor review.",
+  },
+  {
+    key: "hr.bonus.approve",
+    module: "hr",
+    label: "Approve HR bonus and incentive payouts",
+    description:
+      "Approve, reject, return, or adjust bonus and incentive payouts in the approval workflow.",
+  },
+  {
     key: "hr.leave.read",
     module: "hr",
     label: "View HR leave",
@@ -197,6 +253,62 @@ const permissionCatalog = [
     module: "hr",
     label: "Manage HR leave",
     description: "Submit, approve, reject, and cancel leave requests.",
+  },
+  {
+    key: "hr.talent.read",
+    module: "hr",
+    label: "View career pathing and development plans",
+    description:
+      "Read career frameworks, development plans, skill gaps, and readiness snapshots.",
+  },
+  {
+    key: "hr.talent.write",
+    module: "hr",
+    label: "Manage career pathing and development plans",
+    description:
+      "Create and update frameworks, plans, goals, mentoring, and readiness records.",
+  },
+  {
+    key: "hr.performance.read",
+    module: "hr",
+    label: "View performance appraisals",
+    description:
+      "Read performance review cycles, goals, evaluations, outcomes, reports, and authorized history.",
+  },
+  {
+    key: "hr.performance.write",
+    module: "hr",
+    label: "Manage performance appraisals",
+    description:
+      "Create cycles, assign employees, maintain goals, submit assessments, and update review workflow state.",
+  },
+  {
+    key: "hr.performance.approve",
+    module: "hr",
+    label: "Approve performance appraisals",
+    description:
+      "Approve, return, and finalize performance reviews through the appraisal workflow.",
+  },
+  {
+    key: "hr.performance.calibrate",
+    module: "hr",
+    label: "Calibrate performance ratings",
+    description:
+      "Record rating calibration references and leadership review outcomes for performance reviews.",
+  },
+  {
+    key: "hr.performance.compensation.read",
+    module: "hr",
+    label: "Read performance compensation references",
+    description:
+      "Read finalized rating and performance outcome references for compensation and bonus planning.",
+  },
+  {
+    key: "hr.performance.audit.read",
+    module: "hr",
+    label: "Read performance appraisal audit trail",
+    description:
+      "Read performance appraisal audit events for review, approval, acknowledgment, calibration, and finalization.",
   },
   {
     key: "hr.onboarding.read",

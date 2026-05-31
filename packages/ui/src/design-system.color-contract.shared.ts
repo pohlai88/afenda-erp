@@ -60,7 +60,7 @@ export function buildRawPalettePattern(): RegExp {
   );
 }
 
-/** tw-animate-css classes — allowed only in packages/ui overlay primitives. */
+/** tw-animate-css class strings — banned in @afenda/ui; use uiMotion.* and @theme --animate-* tokens. */
 export const UI_TW_ANIMATE_CLASS_PATTERN =
   /\b(?:animate-in|animate-out|fade-in-0|fade-out-0|fade-in|fade-out|zoom-in-95|zoom-out-95|zoom-in-90|zoom-out-90|slide-in-from-|slide-out-to-)/g;
 

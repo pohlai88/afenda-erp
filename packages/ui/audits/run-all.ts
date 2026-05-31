@@ -7,7 +7,7 @@ import { auditShadcnUpstreamFromCache } from "./audit-shadcn-boundary.ts";
 import { auditPrimitiveContractsFromCache } from "./audit-primitive-contracts.ts";
 import { auditTokenDriftFromCache } from "./audit-token-drift.ts";
 import { auditVisualBehavior } from "./audit-visual-behavior.ts";
-import { loadUpstreamManifest } from "./load-manifest.ts";
+import { loadUpstreamManifestState } from "./load-manifest.ts";
 import { loadUiSourceCache, type UiSourceCache } from "./source-cache.ts";
 import type { AuditViolation } from "./shared.ts";
 
@@ -28,7 +28,7 @@ export function runAllUiAudits(options?: {
 }): AuditRunResult {
   const t0 = performance.now();
   const cache = loadUiSourceCache();
-  const manifest = loadUpstreamManifest();
+  const manifestState = loadUpstreamManifestState();
   const loadMs = performance.now() - t0;
 
   const layers: AuditLayerResult[] = [];
@@ -40,7 +40,7 @@ export function runAllUiAudits(options?: {
   };
 
   runLayer("1. Shadcn upstream drift", () =>
-    auditShadcnUpstreamFromCache(cache, manifest),
+    auditShadcnUpstreamFromCache(cache, manifestState),
   );
   runLayer("2. Token drift", () => auditTokenDriftFromCache(cache));
   runLayer("3. Primitive contract drift", () => auditPrimitiveContractsFromCache(cache));

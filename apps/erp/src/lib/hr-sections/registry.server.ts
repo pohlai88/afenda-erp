@@ -1,9 +1,16 @@
 import {
   hrBenefitsRoutePaths,
+  hrBonusRoutePaths,
+  hrExpenseRoutePaths,
   hrComplianceRoutePaths,
   hrAatRoutePaths,
   hrLamRoutePaths,
   hrFwaRoutePaths,
+  hrGeoRoutePaths,
+  hrSftRoutePaths,
+  hrTimeClockRoutePaths,
+  hrCsfRoutePaths,
+  hrPerformanceRoutePaths,
 } from "@afenda/feature-hr-suite/metadata";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
@@ -25,19 +32,33 @@ type HrSectionModule = {
 const sectionLoaders = {
   compliance: () => import("./compliance.server"),
   benefits: () => import("./benefits.server"),
+  bonus: () => import("./bonus.server"),
+  expenses: () => import("./expenses.server"),
   "leave-attendance": () => import("./leave-attendance.server"),
   "absence-analytics-trends": () => import("./absence-analytics-trends.server"),
   leave: () => import("./leave.server"),
   attendance: () => import("./attendance.server"),
   "flexible-work-arrangement": () => import("./flexible-work-arrangement.server"),
+  "geolocation-remote-checkin": () => import("./geolocation-remote-checkin.server"),
+  "shift-scheduling": () => import("./shift-scheduling.server"),
+  "time-clock": () => import("./time-clock.server"),
+  "competency-skills": () => import("./competency-skills.server"),
+  "performance-appraisals": () => import("./performance-appraisals.server"),
 } satisfies Record<HrSectionSlug, () => Promise<HrSectionModule>>;
 
 const hrRoutePaths = [
   ...Object.values(hrComplianceRoutePaths),
   ...Object.values(hrBenefitsRoutePaths),
+  ...Object.values(hrBonusRoutePaths),
+  ...Object.values(hrExpenseRoutePaths),
   ...Object.values(hrLamRoutePaths),
   ...Object.values(hrAatRoutePaths),
   ...Object.values(hrFwaRoutePaths),
+  ...Object.values(hrGeoRoutePaths),
+  ...Object.values(hrSftRoutePaths),
+  ...Object.values(hrTimeClockRoutePaths),
+  ...Object.values(hrCsfRoutePaths),
+  ...Object.values(hrPerformanceRoutePaths),
 ] as const;
 
 const hrSectionHubPaths = new Set<string>([
@@ -45,6 +66,11 @@ const hrSectionHubPaths = new Set<string>([
   hrBenefitsRoutePaths.hub,
   hrAatRoutePaths.hub,
   hrFwaRoutePaths.hub,
+  hrGeoRoutePaths.hub,
+  hrSftRoutePaths.hub,
+  hrTimeClockRoutePaths.hub,
+  hrCsfRoutePaths.hub,
+  hrPerformanceRoutePaths.hub,
 ]);
 
 export const hrSectionSlugs = hrRoutePaths

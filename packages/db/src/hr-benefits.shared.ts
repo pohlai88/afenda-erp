@@ -1,5 +1,4 @@
-const DEFAULT_PAGE_SIZE = 25;
-const MAX_PAGE_SIZE = 100;
+export { buildPaginatedWindow, clampPageSize } from "./list-window.shared";
 
 export class HrBenefitsCommandError extends Error {
   readonly code:
@@ -37,29 +36,6 @@ export class HrBenefitsCommandError extends Error {
     this.name = "HrBenefitsCommandError";
     this.code = code;
   }
-}
-
-export function clampPageSize(limit: number | undefined): number {
-  if (limit === undefined || !Number.isFinite(limit)) {
-    return DEFAULT_PAGE_SIZE;
-  }
-  const size = Math.floor(limit);
-  if (size < 1) return DEFAULT_PAGE_SIZE;
-  return Math.min(size, MAX_PAGE_SIZE);
-}
-
-export function buildPaginatedWindow<T>(input: {
-  rows: readonly T[];
-  pageSize: number;
-  offset: number;
-  totalCount: number;
-}) {
-  return {
-    rows: input.rows,
-    pageSize: input.pageSize,
-    totalCount: input.totalCount,
-    hasNextPage: input.offset + input.rows.length < input.totalCount,
-  };
 }
 
 export function normalizeScopeCode(value: string | null | undefined): string | null {

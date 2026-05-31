@@ -1,6 +1,5 @@
 export {
   HrBenefitsCommandError,
-  clampPageSize,
   formatEmployeeLabel,
   normalizeScopeCode,
   normalizeScopeText,

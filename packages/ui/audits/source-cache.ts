@@ -23,7 +23,6 @@ export type UiSourceFile = {
 
 export type UiSourceCache = {
   files: UiSourceFile[];
-  byName: Map<string, UiSourceFile>;
   shadcnByName: Map<string, UiSourceFile>;
 };
 
@@ -41,10 +40,9 @@ export function loadUiSourceCache(): UiSourceCache {
     };
   });
 
-  const byName = new Map(files.map((file) => [file.fileName, file]));
   const shadcnByName = new Map(
     files.filter((file) => file.fingerprint != null).map((file) => [file.fileName, file]),
   );
 
-  return { files, byName, shadcnByName };
+  return { files, shadcnByName };
 }

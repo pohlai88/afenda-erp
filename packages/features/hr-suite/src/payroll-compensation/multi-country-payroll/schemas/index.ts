@@ -1,5 +1,14 @@
-/**
- * @afenda-bucket schemas
- * Scaffold placeholder from packages/_template-definition.
- */
-export {};
+export * from "./hr.payroll.mcp-constants.shared";
+export * from "./hr.payroll.mcp-form-fields.shared";
+export * from "./hr.payroll.mcp-country-config.schema";
+export * from "./hr.payroll.mcp-legal-entity.schema";
+export * from "./hr.payroll.mcp-tax-statutory.schema";
+export * from "./hr.payroll.mcp-pay-component.schema";
+export * from "./hr.payroll.mcp-currency-exchange.schema";
+export * from "./hr.payroll.mcp-calendar.schema";
+export * from "./hr.payroll.mcp-calculation-rules.schema";
+export * from "./hr.payroll.mcp-employee-classification.schema";
+export * from "./hr.payroll.mcp-mutation.schema";
+export * from "./hr.payroll.mcp-validation.schema";
+export * from "./hr.payroll.mcp-report.schema";
+export * from "./hr.payroll.mcp-export.schema";

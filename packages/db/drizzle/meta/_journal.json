@@ -253,6 +253,76 @@
       "when": 1780131144065,
       "tag": "0035_whole_machine_man",
       "breakpoints": true
+    },
+    {
+      "idx": 36,
+      "version": "7",
+      "when": 1780144894502,
+      "tag": "0036_unique_iron_patriot",
+      "breakpoints": true
+    },
+    {
+      "idx": 37,
+      "version": "7",
+      "when": 1780177099689,
+      "tag": "0037_common_vin_gonzales",
+      "breakpoints": true
+    },
+    {
+      "idx": 38,
+      "version": "7",
+      "when": 1780178209021,
+      "tag": "0038_giant_daimon_hellstrom",
+      "breakpoints": true
+    },
+    {
+      "idx": 39,
+      "version": "7",
+      "when": 1780178458838,
+      "tag": "0039_giant_deathstrike",
+      "breakpoints": true
+    },
+    {
+      "idx": 40,
+      "version": "7",
+      "when": 1780179103947,
+      "tag": "0040_clean_mockingbird",
+      "breakpoints": true
+    },
+    {
+      "idx": 41,
+      "version": "7",
+      "when": 1780179824267,
+      "tag": "0041_nappy_onslaught",
+      "breakpoints": true
+    },
+    {
+      "idx": 42,
+      "version": "7",
+      "when": 1780183110877,
+      "tag": "0042_pretty_elektra",
+      "breakpoints": true
+    },
+    {
+      "idx": 43,
+      "version": "7",
+      "when": 1780183314702,
+      "tag": "0043_freezing_karen_page",
+      "breakpoints": true
+    },
+    {
+      "idx": 44,
+      "version": "7",
+      "when": 1780183584846,
+      "tag": "0044_tired_ultimatum",
+      "breakpoints": true
+    },
+    {
+      "idx": 45,
+      "version": "7",
+      "when": 1780211374213,
+      "tag": "0045_hr_csf_foundation",
+      "breakpoints": true
     }
   ]
 }

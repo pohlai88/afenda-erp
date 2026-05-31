@@ -41,9 +41,14 @@ export {
   HrOffboardingListTrailingCell,
 } from "./employee-management/offboarding-exit-management/client";
 
+export { HrGeoRemoteCheckinCapturePanel } from "./time-attendance/geolocation-remote-checkin/client";
+export { HrGeoPendingExceptionsTrailingCell } from "./time-attendance/geolocation-remote-checkin/client";
+
 export { HrModuleNav } from "./components/hr-module-nav.component.client";
 
 export {
   HrBenefitsEnrollmentCreateForm,
   HrBenefitsEnrollmentsTrailingCell,
 } from "./payroll-compensation/benefits-administration/client";
+
+export { HrPayrollRunWorkflowTrailingCell } from "./payroll-compensation/payroll-processing/client";

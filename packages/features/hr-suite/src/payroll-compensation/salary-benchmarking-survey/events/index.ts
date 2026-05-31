@@ -1,5 +1,2 @@
-/**
- * @afenda-bucket events
- * Scaffold placeholder from packages/_template-definition.
- */
-export {};
+export * from "./hr.payroll.sbs-audit.event";
+export * from "./hr.payroll.sbs-mapping.event";

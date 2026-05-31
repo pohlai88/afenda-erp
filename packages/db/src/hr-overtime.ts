@@ -1,272 +1,143 @@
-import { and, count, desc, eq, ilike, or } from "drizzle-orm";
+import {
+  appendHrOvertimeAuditEvent,
+  HrOtmCommandError,
+  listHrOvertimeRequestsWindow,
+  submitHrOvertimeRequest as submitHrOvertimeRequestCommand,
+  type HrOvertimeRequestRow,
+  type HrOvertimeRequestWindow,
+} from "./hr-otm";
+import {
+  executeHrOvertimeRequestApproval,
+  type ExecuteHrOvertimeApprovalInput,
+} from "./hr-otm-approval.server";
 import { runWithOrganizationContext } from "./client";
-import { createEntityId } from "./ids";
-import { hrEmployees, hrOvertimeRequests } from "./schema/hr";
+import { hrOvertimeRequests } from "./schema/hr";
+import { and, eq } from "drizzle-orm";
 
-export type HrOvertimeRequestRow = {
-  id: string;
-  employeeId: string;
-  employeeNumber: string;
-  employeeDisplayName: string;
-  overtimeType: (typeof hrOvertimeRequests.$inferSelect)["overtimeType"];
-  status: (typeof hrOvertimeRequests.$inferSelect)["status"];
-  workDate: Date;
-  hours: string;
-  reason: string | null;
-  decisionNote: string | null;
-  submittedAt: Date;
-  decidedAt: Date | null;
-};
+export type { HrOvertimeRequestRow, HrOvertimeRequestWindow };
+export { listHrOvertimeRequestsWindow };
 
-export type HrOvertimeRequestWindow = {
-  rows: readonly HrOvertimeRequestRow[];
-  pageSize: number;
-  totalCount: number;
-  hasNextPage: boolean;
-};
+export class HrOvertimeCommandError extends HrOtmCommandError {}
+export { HrOtmCommandError };
 
-export class HrOvertimeCommandError extends Error {
-  readonly code:
-    | "employee_not_found"
-    | "request_not_found"
-    | "invalid_hours"
-    | "request_not_pending";
-
-  constructor(code: HrOvertimeCommandError["code"], message?: string) {
-    super(message ?? code);
-    this.code = code;
-  }
-}
-
-const DEFAULT_PAGE_SIZE = 25;
-const MAX_PAGE_SIZE = 100;
-const MAX_OVERTIME_HOURS = 24;
-
-function clampPageSize(limit: number | undefined): number {
-  if (limit === undefined || !Number.isFinite(limit)) {
-    return DEFAULT_PAGE_SIZE;
-  }
-  const size = Math.floor(limit);
-  if (size < 1) return DEFAULT_PAGE_SIZE;
-  return Math.min(size, MAX_PAGE_SIZE);
-}
-
-function normalizeHours(hours: number): string {
-  if (!Number.isFinite(hours) || hours <= 0 || hours > MAX_OVERTIME_HOURS) {
-    throw new HrOvertimeCommandError("invalid_hours");
-  }
-  return hours.toFixed(2);
-}
-
-async function assertEmployeeInOrg(
-  organizationId: string,
-  employeeId: string,
-): Promise<void> {
-  await runWithOrganizationContext(organizationId, async (db) => {
-    const [employee] = await db
-      .select({ id: hrEmployees.id })
-      .from(hrEmployees)
+async function rejectHrOvertimeRequestInternal(input: {
+  organizationId: string;
+  requestId: string;
+  decisionNote?: string | null;
+  actorAuthUserId?: string | null;
+}): Promise<{ requestId: string }> {
+  return runWithOrganizationContext(input.organizationId, async (db) => {
+    const [request] = await db
+      .select({
+        id: hrOvertimeRequests.id,
+        employeeId: hrOvertimeRequests.employeeId,
+        status: hrOvertimeRequests.status,
+      })
+      .from(hrOvertimeRequests)
       .where(
         and(
-          eq(hrEmployees.organizationId, organizationId),
-          eq(hrEmployees.id, employeeId),
+          eq(hrOvertimeRequests.organizationId, input.organizationId),
+          eq(hrOvertimeRequests.id, input.requestId),
         ),
       )
       .limit(1);
 
-    if (!employee) {
-      throw new HrOvertimeCommandError("employee_not_found");
+    if (!request) {
+      throw new HrOvertimeCommandError("request_not_found");
     }
-  });
-}
-
-export async function listHrOvertimeRequestsWindow(input: {
-  organizationId: string;
-  limit?: number;
-  offset?: number;
-  search?: string;
-  status?: (typeof hrOvertimeRequests.$inferSelect)["status"];
-  employeeId?: string;
-  pendingOnly?: boolean;
-}): Promise<HrOvertimeRequestWindow> {
-  const pageSize = clampPageSize(input.limit);
-  const offset = Math.max(0, input.offset ?? 0);
-
-  return runWithOrganizationContext(input.organizationId, async (db) => {
-    const conditions = [
-      eq(hrOvertimeRequests.organizationId, input.organizationId),
-    ];
-
-    if (input.pendingOnly) {
-      conditions.push(eq(hrOvertimeRequests.status, "pending"));
-    } else if (input.status) {
-      conditions.push(eq(hrOvertimeRequests.status, input.status));
+    if (request.status !== "pending" && request.status !== "submitted") {
+      throw new HrOvertimeCommandError("invalid_status_transition");
     }
 
-    if (input.employeeId) {
-      conditions.push(eq(hrOvertimeRequests.employeeId, input.employeeId));
-    }
-
-    const trimmedSearch = input.search?.trim();
-    if (trimmedSearch) {
-      const pattern = `%${trimmedSearch}%`;
-      conditions.push(
-        or(
-          ilike(hrOvertimeRequests.reason, pattern),
-          ilike(hrEmployees.employeeNumber, pattern),
-          ilike(hrEmployees.legalName, pattern),
-          ilike(hrEmployees.preferredName, pattern),
-        )!,
-      );
-    }
-
-    const whereClause = and(...conditions);
-
-    const [totalRow] = await db
-      .select({ total: count() })
-      .from(hrOvertimeRequests)
-      .innerJoin(hrEmployees, eq(hrOvertimeRequests.employeeId, hrEmployees.id))
-      .where(whereClause);
-
-    const rows = await db
-      .select({
-        id: hrOvertimeRequests.id,
-        employeeId: hrOvertimeRequests.employeeId,
-        employeeNumber: hrEmployees.employeeNumber,
-        legalName: hrEmployees.legalName,
-        preferredName: hrEmployees.preferredName,
-        overtimeType: hrOvertimeRequests.overtimeType,
-        status: hrOvertimeRequests.status,
-        workDate: hrOvertimeRequests.workDate,
-        hours: hrOvertimeRequests.hours,
-        reason: hrOvertimeRequests.reason,
-        decisionNote: hrOvertimeRequests.decisionNote,
-        submittedAt: hrOvertimeRequests.submittedAt,
-        decidedAt: hrOvertimeRequests.decidedAt,
+    await db
+      .update(hrOvertimeRequests)
+      .set({
+        status: "rejected",
+        decisionNote: input.decisionNote?.trim() || null,
+        decidedAt: new Date(),
+        payableMinutes: null,
+        amountCents: null,
       })
-      .from(hrOvertimeRequests)
-      .innerJoin(hrEmployees, eq(hrOvertimeRequests.employeeId, hrEmployees.id))
-      .where(whereClause)
-      .orderBy(desc(hrOvertimeRequests.submittedAt))
-      .limit(pageSize)
-      .offset(offset);
+      .where(eq(hrOvertimeRequests.id, input.requestId));
 
-    const actualTotal = Number(totalRow?.total ?? 0);
+    await appendHrOvertimeAuditEvent({
+      organizationId: input.organizationId,
+      requestId: input.requestId,
+      employeeId: request.employeeId,
+      action: "request_reject",
+      actorAuthUserId: input.actorAuthUserId ?? null,
+      summary: "Overtime request rejected",
+      metadata: input.decisionNote
+        ? { decisionNote: input.decisionNote.trim() }
+        : undefined,
+    });
 
-    return {
-      rows: rows.map((row) => ({
-        id: row.id,
-        employeeId: row.employeeId,
-        employeeNumber: row.employeeNumber,
-        employeeDisplayName: row.preferredName?.trim() || row.legalName,
-        overtimeType: row.overtimeType,
-        status: row.status,
-        workDate: row.workDate,
-        hours: row.hours,
-        reason: row.reason,
-        decisionNote: row.decisionNote,
-        submittedAt: row.submittedAt,
-        decidedAt: row.decidedAt,
-      })),
-      pageSize,
-      totalCount: actualTotal,
-      hasNextPage: offset + rows.length < actualTotal,
-    };
+    return { requestId: input.requestId };
   });
 }
 
 export async function submitHrOvertimeRequest(input: {
   organizationId: string;
   employeeId: string;
-  overtimeType: (typeof hrOvertimeRequests.$inferInsert)["overtimeType"];
+  overtimeType: Parameters<typeof submitHrOvertimeRequestCommand>[0]["overtimeType"];
+  timingKind?: Parameters<typeof submitHrOvertimeRequestCommand>[0]["timingKind"];
   workDate: Date;
-  hours: number;
+  startTime?: string | null;
+  endTime?: string | null;
+  hours?: number;
   reason?: string | null;
+  policyGroupCode?: string;
+  eligibilityExceptionReason?: string | null;
+  actorAuthUserId?: string | null;
 }): Promise<{ requestId: string }> {
-  await assertEmployeeInOrg(input.organizationId, input.employeeId);
-  const hours = normalizeHours(input.hours);
-
-  return runWithOrganizationContext(input.organizationId, async (db) => {
-    const requestId = createEntityId("hr_ot_req");
-    await db.insert(hrOvertimeRequests).values({
-      id: requestId,
-      organizationId: input.organizationId,
-      employeeId: input.employeeId,
-      overtimeType: input.overtimeType,
-      workDate: input.workDate,
-      hours,
-      reason: input.reason?.trim() || null,
-    });
-
-    return { requestId };
-  });
+  return submitHrOvertimeRequestCommand(input);
 }
 
-async function decideHrOvertimeRequest(input: {
-  organizationId: string;
+export async function approveHrOvertimeRequest(
+  input: ExecuteHrOvertimeApprovalInput,
+): Promise<{
   requestId: string;
-  status: "approved" | "rejected";
-  decisionNote?: string | null;
-}): Promise<{ requestId: string }> {
-  return runWithOrganizationContext(input.organizationId, async (db) => {
-    const [request] = await db
-      .select({
-        id: hrOvertimeRequests.id,
-        status: hrOvertimeRequests.status,
-      })
-      .from(hrOvertimeRequests)
-      .where(
-        and(
-          eq(hrOvertimeRequests.organizationId, input.organizationId),
-          eq(hrOvertimeRequests.id, input.requestId),
-        ),
-      )
-      .limit(1);
-
-    if (!request) {
-      throw new HrOvertimeCommandError("request_not_found");
+  payableMinutes: number;
+  amountCents: number;
+  earningCode: string;
+  compensatoryCredited: boolean;
+}> {
+  try {
+    return await executeHrOvertimeRequestApproval(input);
+  } catch (error) {
+    if (error instanceof HrOtmCommandError) {
+      throw new HrOvertimeCommandError(error.code);
     }
-    if (request.status !== "pending") {
-      throw new HrOvertimeCommandError("request_not_pending");
-    }
-
-    await db
-      .update(hrOvertimeRequests)
-      .set({
-        status: input.status,
-        decisionNote: input.decisionNote?.trim() || null,
-        decidedAt: new Date(),
-      })
-      .where(eq(hrOvertimeRequests.id, input.requestId));
-
-    return { requestId: input.requestId };
-  });
-}
-
-export async function approveHrOvertimeRequest(input: {
-  organizationId: string;
-  requestId: string;
-  decisionNote?: string | null;
-}): Promise<{ requestId: string }> {
-  return decideHrOvertimeRequest({ ...input, status: "approved" });
+    throw error;
+  }
 }
 
 export async function rejectHrOvertimeRequest(input: {
   organizationId: string;
   requestId: string;
   decisionNote?: string | null;
+  actorAuthUserId?: string | null;
 }): Promise<{ requestId: string }> {
-  return decideHrOvertimeRequest({ ...input, status: "rejected" });
+  try {
+    return await rejectHrOvertimeRequestInternal(input);
+  } catch (error) {
+    if (error instanceof HrOtmCommandError) {
+      throw new HrOvertimeCommandError(error.code);
+    }
+    throw error;
+  }
 }
 
 export async function cancelHrOvertimeRequest(input: {
   organizationId: string;
   requestId: string;
+  actorAuthUserId?: string | null;
 }): Promise<{ requestId: string }> {
   return runWithOrganizationContext(input.organizationId, async (db) => {
     const [request] = await db
       .select({
         id: hrOvertimeRequests.id,
+        employeeId: hrOvertimeRequests.employeeId,
         status: hrOvertimeRequests.status,
       })
       .from(hrOvertimeRequests)
@@ -281,8 +152,13 @@ export async function cancelHrOvertimeRequest(input: {
     if (!request) {
       throw new HrOvertimeCommandError("request_not_found");
     }
-    if (request.status !== "pending") {
-      throw new HrOvertimeCommandError("request_not_pending");
+    if (
+      request.status !== "pending" &&
+      request.status !== "submitted" &&
+      request.status !== "draft" &&
+      request.status !== "returned"
+    ) {
+      throw new HrOvertimeCommandError("invalid_status_transition");
     }
 
     await db
@@ -293,6 +169,130 @@ export async function cancelHrOvertimeRequest(input: {
       })
       .where(eq(hrOvertimeRequests.id, input.requestId));
 
+    await appendHrOvertimeAuditEvent({
+      organizationId: input.organizationId,
+      requestId: input.requestId,
+      employeeId: request.employeeId,
+      action: "request_cancel",
+      actorAuthUserId: input.actorAuthUserId ?? null,
+      summary: "Overtime request cancelled",
+    });
+
     return { requestId: input.requestId };
   });
 }
+
+export {
+  saveHrOvertimeDraft,
+  submitHrOvertimeDraft,
+  markHrOvertimePayrollReady,
+  markHrOvertimePaid,
+  evaluateHrOvertimeEmployeeEligibility,
+  validateHrOvertimeEligibilityForSubmit,
+  createHrOvertimeEligibilityRule,
+  listHrOvertimeEligibilityRules,
+  summarizeHrOvertimeReport,
+  buildHrOvertimeReportCsv,
+  enqueueHrOvertimeNotification,
+  listHrOvertimeNotificationsWindow,
+  getHrOvertimePolicy,
+  upsertHrOvertimePolicy,
+  listHrOvertimeRateRules,
+  createHrOvertimeRateRule,
+  syncHrOvertimeExceptions,
+  listHrOvertimeExceptions,
+  hasOpenHrOvertimeExceptions,
+  sumHrOvertimeApprovedMinutesForEmployee,
+  calculateAndPersistHrOvertimeApproval,
+} from "./hr-otm";
+
+export {
+  executeHrOvertimeRequestApproval,
+  decideHrOvertimeRequest,
+  bulkApproveHrOvertimeRequests,
+  createHrOvertimeApprovalOnSubmit,
+  decideHrOvertimeException,
+  resolveOtmSubmissionApproversForRequest,
+  type ExecuteHrOvertimeApprovalInput,
+  type DecideHrOvertimeRequestInput,
+} from "./hr-otm-approval.server";
+
+export {
+  assertOtmDecisionReason,
+  buildOtmManagerChain,
+  clampOtmManagerChainDepth,
+  matchesOtmApprovalRoute,
+  nextOtmStageAfterManagerApproval,
+  otmRouteSpecificityScore,
+  pickHighestPriorityOtmApprovalRoute,
+  resolveOtmApprovalRouteFromChain,
+  resolveOtmInitialApprovalStage,
+  resolveOtmSubmissionApprovers,
+  type HrOvertimeApprovalRouteRow,
+  type HrOvertimeApprovalSnapshot,
+  type HrOvertimeApprovalStage,
+  type HrOvertimeApproverKind,
+  type HrOvertimeDecisionKind,
+  type HrOvertimeResolvedApprovalRoute,
+} from "./hr-otm-approval.shared";
+
+export {
+  applyHrOvertimeCalculationSnapshot,
+  buildOtmCalculationSnapshot,
+  computeOtmAmountCents,
+  HRM_OTM_DEFAULT_HOURLY_RATE_CENTS,
+  HRM_OTM_MINUTES_PER_LEAVE_DAY,
+  resolveOtmEarningCode,
+  resolveOtmPayMultiplier,
+  roundOtmPayableMinutes,
+  calculateOtmPayableForApproval,
+  applyOtmRounding,
+  applyOtmCaps,
+  detectOtmShiftVariance,
+  detectOtmAttendanceMismatch,
+  enforceOtmMinDuration,
+  resolveOtmRateMultiplier,
+  resolveOtmRequestedMinutes,
+  resolveOtmMinutesFromAttendance,
+  deriveOtmDayCategoryFromType,
+  DEFAULT_HR_OVERTIME_POLICY,
+  type OtmCalculationSnapshot,
+  type HrOvertimeCalculationResult,
+  type HrOvertimePolicyConfig,
+  type HrOvertimeRateRuleRow,
+} from "./hr-otm-calculation.server";
+
+export {
+  creditHrOvertimeCompensatoryLeave,
+  otmPayableMinutesToCompensatoryLeaveDays,
+} from "./hr-otm-compensatory.server";
+
+export {
+  HRM_OTM_PAYROLL_EXPORTABLE_STATUS,
+  listApprovedOvertimeEarningsForEmployeePeriod,
+  listHrOvertimePayrollEarningsForEmployeePeriod,
+  recordHrOvertimePayrollExportAudit,
+  type HrOvertimePayrollEarningLine,
+} from "./hr-otm-payroll-export.server";
+
+export {
+  canTransitionOtmStatus,
+  computeOtmDurationMinutesFromTimeRange,
+  formatOtmDurationMinutes,
+  formatOtmStatusLabel,
+  HRM_OTM_DAY_CATEGORIES,
+  HRM_OTM_TIMING_KINDS,
+  HRM_OTM_VISIBLE_STATUSES,
+  otmMatchesEligibilityRule,
+  otmRuleSpecificityScore,
+  resolveOtmEligibilityForSubmit,
+  resolveOtmEligibilityFromRules,
+  type HrOvertimeEligibilityResult,
+  type HrOvertimeEligibilityRuleRow,
+  type HrOvertimeReportGroupBy,
+  type HrOvertimeRequestStatus,
+  type HrOvertimeTimingKind,
+  type HrOvertimeType,
+} from "./hr-otm.shared";
+
+export type { HrOvertimeReportRow } from "./hr-otm";

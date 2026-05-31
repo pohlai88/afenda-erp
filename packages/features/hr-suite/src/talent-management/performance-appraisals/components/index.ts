@@ -1,5 +1,1 @@
-/**
- * @afenda-bucket components
- * Scaffold placeholder from packages/_template-definition.
- */
-export {};
+export * from "./hr.talent.performance-section.component.server";

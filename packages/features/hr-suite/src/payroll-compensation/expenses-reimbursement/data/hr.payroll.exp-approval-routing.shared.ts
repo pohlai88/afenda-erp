@@ -1,0 +1,18 @@
+export {
+  assertExpDecisionReason,
+  buildExpManagerChain,
+  clampExpManagerChainDepth,
+  expRouteSpecificityScore,
+  matchesExpApprovalRoute,
+  nextExpStageAfterApproval,
+  pickHighestPriorityExpApprovalRoute,
+  resolveExpApprovalRouteFromChain,
+  resolveExpInitialApprovalStage,
+  resolveExpSubmissionApprovers,
+  type HrExpenseApprovalRouteRow,
+  type HrExpenseApprovalSnapshot,
+  type HrExpenseApprovalStage,
+  type HrExpenseApproverKind,
+  type HrExpenseDecisionKind,
+  type HrExpenseResolvedApprovalRoute,
+} from "@afenda/db";

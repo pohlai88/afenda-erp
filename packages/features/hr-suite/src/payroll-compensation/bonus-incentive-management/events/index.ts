@@ -1,5 +1,2 @@
-/**
- * @afenda-bucket events
- * Scaffold placeholder from packages/_template-definition.
- */
-export {};
+export * from "./hr.payroll.bonus.event";
+export { hrPayrollBonusAuditActions as hrPayrollBonusCalculationAuditActions } from "./hr.payroll.bonus.events";

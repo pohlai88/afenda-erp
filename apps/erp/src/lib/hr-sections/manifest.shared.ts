@@ -13,6 +13,18 @@ export const hrSectionManifest = {
     label: "Benefits",
     featureArea: "payroll-compensation/benefits-administration",
   },
+  bonus: {
+    label: "Bonus & Incentive",
+    featureArea: "payroll-compensation/bonus-incentive-management",
+  },
+  "payroll-processing": {
+    label: "Payroll Processing",
+    featureArea: "payroll-compensation/payroll-processing",
+  },
+  expenses: {
+    label: "Expense Reimbursement",
+    featureArea: "payroll-compensation/expenses-reimbursement",
+  },
   "leave-attendance": {
     label: "Leave & Attendance",
     featureArea: "time-attendance/leave-attendance-management",
@@ -32,6 +44,26 @@ export const hrSectionManifest = {
   "flexible-work-arrangement": {
     label: "Flexible Work",
     featureArea: "time-attendance/flexible-work-arrangement-tracking",
+  },
+  "geolocation-remote-checkin": {
+    label: "Geolocation",
+    featureArea: "time-attendance/geolocation-remote-checkin",
+  },
+  "shift-scheduling": {
+    label: "Shift Scheduling",
+    featureArea: "time-attendance/shift-scheduling",
+  },
+  "time-clock": {
+    label: "Time Clock",
+    featureArea: "time-attendance/time-clock-integration",
+  },
+  "competency-skills": {
+    label: "Competency & Skills",
+    featureArea: "talent-management/competency-skills-framework",
+  },
+  "performance-appraisals": {
+    label: "Performance Appraisals",
+    featureArea: "talent-management/performance-appraisals",
   },
 } as const;
 

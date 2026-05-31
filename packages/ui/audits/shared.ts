@@ -52,13 +52,16 @@ export function fileNameFromPath(filePath: string): string {
   return filePath.split(/[/\\]/).pop() ?? filePath;
 }
 
+/**
+ * Heuristic: first `export { … }` block only (no `export type`, re-exports, or split blocks).
+ */
 export function extractNamedExports(content: string): string[] {
   const block = /export\s*\{([^}]+)\}/s.exec(content);
-  if (!block) return [];
-  return block[1]!
+  if (!block?.[1]) return [];
+  return block[1]
     .split(",")
-    .map((part) => part.trim().split(/\s+/).pop()!)
-    .filter(Boolean);
+    .map((part) => part.trim().split(/\s+/).at(-1))
+    .filter((name): name is string => Boolean(name));
 }
 
 export function extractRootFunctions(content: string): string[] {
@@ -79,19 +82,12 @@ export function isShadcnPrimitiveFile(fileName: string): boolean {
   return fileName.endsWith(".tsx") && !SHADCN_EXCLUDED_FILES.has(fileName);
 }
 
-export function matchAllOnLine(line: string, pattern: RegExp): RegExpMatchArray[] {
-  const flags = pattern.flags.includes("g") ? pattern.flags : `${pattern.flags}g`;
-  if (flags === pattern.flags) {
-    pattern.lastIndex = 0;
-    return [...line.matchAll(pattern)];
-  }
-  return [...line.matchAll(new RegExp(pattern.source, flags))];
-}
+export const MAX_VIOLATIONS_SHOWN = 40;
 
 export function printViolations(
   title: string,
   violations: AuditViolation[],
-  maxShown = 40,
+  maxShown = MAX_VIOLATIONS_SHOWN,
 ): { errors: number; warnings: number } {
   console.log(`\n${title}`);
   console.log("-".repeat(40));
@@ -101,8 +97,14 @@ export function printViolations(
     return { errors: 0, warnings: 0 };
   }
 
-  const shown = violations.slice(0, maxShown);
-  for (const v of shown) {
+  let errors = 0;
+  let warnings = 0;
+  for (const v of violations) {
+    if (v.severity === "error") errors++;
+    else warnings++;
+  }
+
+  for (const v of violations.slice(0, maxShown)) {
     const prefix = v.severity === "warn" ? "⚠" : "✗";
     const loc = v.line > 0 ? `${v.file}:${v.line}` : v.file;
     console.log(`  ${prefix} ${loc}  [${v.rule}]  ${v.match}`);
@@ -113,8 +115,6 @@ export function printViolations(
     console.log(`  … ${violations.length - maxShown} more (truncated)`);
   }
 
-  const errors = violations.filter((v) => v.severity === "error").length;
-  const warnings = violations.filter((v) => v.severity === "warn").length;
   console.log(`\n  ${errors} error(s), ${warnings} warning(s)`);
   return { errors, warnings };
 }

@@ -36,7 +36,7 @@ Statuses: **Shipped** = production path in code · **Partial** = subset or schem
 | **001** | Shipped | `requestOwnOtmAction`, `applyOtmOnBehalfAction`, `OtmRequestForm` |
 | **002** | Shipped | Request schema + `hrm_overtime_request` columns; Pattern C lists |
 | **003** | Shipped | `HRM_OTM_TIMING_KINDS`, timing kind on submit form |
-| **004** | Partial | Eligibility rules: type, department, grade, employment type — not full legal-entity/location/policy-group matrix |
+| **004** | Shipped | `hrOvertimeEligibilityRules` + `evaluateHrOvertimeEmployeeEligibility` (`packages/db/src/hr-otm.ts`, `data/hr.time.otm-eligibility.server.ts`) |
 | **005** | Shipped | `validateOtmEligibilityForSubmit` + exception reason on submit |
 | **006** | Shipped | `HRM_OTM_DAY_CATEGORIES`, types seed, day category on request |
 | **007** | Shipped | `hrm_overtime_rate_rule`, `buildOtmRateRulesListSurfaceConfiguration` |
@@ -57,9 +57,9 @@ Statuses: **Shipped** = production path in code · **Partial** = subset or schem
 | **022** | Shipped | `otm-compensatory-leave.server.ts` on final approve |
 | **023** | Shipped | `listOtmPayrollEarningsForEmployeePeriod`, payroll-ready → paid |
 | **024** | Shipped | States gate export; only `payroll_ready` in payroll earnings query |
-| **025** | Partial | Draft save/submit + employee cancel (`saveOwnOtmDraftAction`, `submitOtmDraftAction`, `cancelOwnOtmRequestAction`); `paid` via payroll lock only |
+| **025** | Shipped | Draft/submit/cancel + `payroll_ready`/`paid` lifecycle (`saveHrOvertimeDraft`, `submitHrOvertimeDraft`, `markHrOvertimePayrollReady`, `markHrOvertimePaid`, `data/hr.time.otm-lifecycle.shared.ts`) |
 | **026** | Shipped | In-app + Resend email + Ably shell refresh + Web Push (`org_push_subscription`); locale-internal links `/o/{slug}/apps/hrm/overtime` |
-| **027** | Partial | CSV via `OtmExportReportButton` + org recent list; no dept/manager/cost-center report cubes |
+| **027** | Shipped | Report cubes via `summarizeHrOvertimeReport` + CSV (`data/hr.time.otm-report.server.ts`, `hrm:overtime:report` surface) |
 | **028** | Shipped | `resolveOtmSurfaceAccess`, ERP `hrm.overtime` permissions |
 | **029** | Shipped | `HRM_OTM_AUDIT` including `requestAdjust`, `requestCancel` on lifecycle mutations |
 
@@ -110,7 +110,7 @@ Policy admin uses `OtmPolicySection` (form card, not a list surface). Request su
 | `tests/unit/otm-calculation.test.ts` | Rounding, caps, multiplier |
 | `tests/unit/otm-display.test.ts` | Duration formatting |
 
-Run: `pnpm test:fast -- tests/unit/otm-*.test.ts` (19 tests, 5 files).
+Run: `pnpm test:fast -- tests/unit/otm-*.test.ts` (see `packages/features/hr-suite/tests/unit/otm-eligibility-lifecycle.test.ts`).
 
 ## Runtime map (three layers)
 

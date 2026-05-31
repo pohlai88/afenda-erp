@@ -1,5 +1,1 @@
-/**
- * @afenda-bucket policies
- * Scaffold placeholder from packages/_template-definition.
- */
-export {};
+export * from "./hr.time.sft-swap.policy.server";

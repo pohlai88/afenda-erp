@@ -1,4 +1,6 @@
 import { and, asc, desc, eq, gte, inArray, isNotNull, isNull, lt, lte, or, sql } from "drizzle-orm";
+
+export { buildPaginatedWindow } from "./list-window.shared";
 import type { hrComplianceWorkEligibility } from "./schema/hr";
 import { hrComplianceWorkAuthorizationDocuments } from "./schema/hr";
 
@@ -181,24 +183,6 @@ export function formatHrEmployeeDisplayName(input: {
   return input.preferredName?.trim() || input.legalName?.trim() || "—";
 }
 
-export function buildPaginatedWindow<T>(input: {
-  rows: readonly T[];
-  pageSize: number;
-  offset: number;
-  totalCount: number;
-}): {
-  rows: readonly T[];
-  pageSize: number;
-  totalCount: number;
-  hasNextPage: boolean;
-} {
-  return {
-    rows: input.rows,
-    pageSize: input.pageSize,
-    totalCount: input.totalCount,
-    hasNextPage: input.offset + input.rows.length < input.totalCount,
-  };
-}
 
 export function resolveWorkEligibilityVerifiedAt(input: {
   status: HrComplianceWorkEligibilityStatus;

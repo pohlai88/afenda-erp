@@ -1,5 +1,1 @@
-/**
- * @afenda-bucket actions
- * Scaffold placeholder from packages/_template-definition.
- */
-export {};
+export * from "./hr.time.geo.actions.server";

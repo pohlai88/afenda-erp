@@ -6,10 +6,17 @@ import { hrLifecycleRoutePaths } from "../employee-management/employee-lifecycle
 import { hrOffboardingRoutePaths } from "../employee-management/offboarding-exit-management/contracts/hr.workforce.offboarding-route.contract";
 import { hrOrgRoutePaths } from "../employee-management/organizational-chart-hierarchy/contracts/hr.workforce.org-route.contract";
 import { hrBenefitsRoutePaths } from "../payroll-compensation/benefits-administration/contracts/hr.payroll.benefits-route.contract";
+import { hrBonusRoutePaths } from "../payroll-compensation/bonus-incentive-management/contracts/hr.payroll.bonus-route.contract";
+import { hrExpenseRoutePaths } from "../payroll-compensation/expenses-reimbursement/contracts/hr.payroll.expense-route.contract";
+import { hrCpmRoutePaths } from "../payroll-compensation/compensation-planning-modeling/contracts/hr.payroll.cpm-route.contract";
+import { hrCsfRoutePaths } from "../talent-management/competency-skills-framework/contracts/hr.talent.csf-route.contract";
+import { hrPerformanceRoutePaths } from "../talent-management/performance-appraisals/contracts/hr.talent.performance-route.contract";
+import { hrPayrollProcessingRoutePaths } from "../payroll-compensation/payroll-processing/contracts/hr.payroll.processing-route.contract";
 import { hrAatRoutePaths } from "../time-attendance/absence-analytics-trends/contracts/hr.time.aat-route.contract";
 import { hrRecordsRoutePaths } from "../employee-management/employee-records-management/contracts/hr.workforce.records-route.contract";
 import { hrLamRoutePaths } from "../time-attendance/leave-attendance-management/contracts/hr.time.lam-route.contract";
 import { hrFwaRoutePaths } from "../time-attendance/flexible-work-arrangement-tracking/contracts/hr.time.fwa-route.contract";
+import { hrGeoRoutePaths } from "../time-attendance/geolocation-remote-checkin/contracts/hr.time.geo-route.contract";
 
 type HrNavCapability = Extract<AppCapability, `hr.${string}`>;
 
@@ -63,6 +70,40 @@ export const hrModuleNavItems = [
     requiredCapabilities: ["hr.benefits.read", "hr.benefits.write"],
   },
   {
+    href: hrBonusRoutePaths.bonus,
+    label: "Bonus & Incentive",
+    requiredCapabilities: ["hr.bonus.read", "hr.bonus.write"],
+  },
+  {
+    href: hrExpenseRoutePaths.expenses,
+    label: "Expenses",
+    requiredCapabilities: ["hr.expense.read", "hr.expense.write"],
+  },
+  {
+    href: hrCpmRoutePaths.compensationPlanning,
+    label: "Compensation Planning",
+    requiredCapabilities: ["hr.cpm.read", "hr.cpm.write", "hr.cpm.approve"],
+  },
+  {
+    href: hrCsfRoutePaths.hub,
+    label: "Competency & Skills",
+    requiredCapabilities: ["hr.csf.read", "hr.csf.write"],
+  },
+  {
+    href: hrPerformanceRoutePaths.hub,
+    label: "Performance Appraisals",
+    requiredCapabilities: [
+      "hr.performance.read",
+      "hr.performance.write",
+      "hr.performance.approve",
+    ],
+  },
+  {
+    href: hrPayrollProcessingRoutePaths.payrollProcessing,
+    label: "Payroll Processing",
+    requiredCapabilities: ["hr.payroll.read", "hr.payroll.write", "hr.payroll.approve"],
+  },
+  {
     href: hrLamRoutePaths.hub,
     label: "Leave & Attendance",
     requiredCapabilities: [
@@ -86,6 +127,11 @@ export const hrModuleNavItems = [
     href: hrFwaRoutePaths.hub,
     label: "Flexible Work",
     requiredCapabilities: ["hr.fwa.read", "hr.fwa.write"],
+  },
+  {
+    href: hrGeoRoutePaths.hub,
+    label: "Geolocation",
+    requiredCapabilities: ["hr.geo.read", "hr.geo.write"],
   },
   {
     href: hrAatRoutePaths.hub,

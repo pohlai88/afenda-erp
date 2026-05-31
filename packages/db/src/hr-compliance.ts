@@ -56,7 +56,6 @@ export {
 } from "./hr-compliance-calendar.shared";
 
 export {
-  buildPaginatedWindow,
   formatHrEmployeeDisplayName,
   HR_COMPLIANCE_AT_RISK_WINDOW_MS,
   HR_COMPLIANCE_WORK_AUTH_DOCUMENT_TYPES,

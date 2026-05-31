@@ -14,8 +14,28 @@ export * from "./employee-management/employee-records-management/server";
 export * from "./employee-management/organizational-chart-hierarchy/server";
 export * from "./time-attendance/leave-attendance-management/server";
 export * from "./time-attendance/flexible-work-arrangement-tracking/server";
+export * from "./time-attendance/geolocation-remote-checkin/server";
+export * from "./time-attendance/time-clock-integration/server";
 export * from "./payroll-compensation/benefits-administration/server";
+export * from "./payroll-compensation/bonus-incentive-management/server";
+export * from "./payroll-compensation/compensation-planning-modeling/server";
+export * from "./payroll-compensation/multi-country-payroll/server";
+export * from "./payroll-compensation/salary-benchmarking-survey/server";
+export * from "./payroll-compensation/payroll-processing/server";
+export * from "./payroll-compensation/expenses-reimbursement/server";
 export * from "./time-attendance/absence-analytics-trends/server";
+export * from "./time-attendance/shift-scheduling/server";
+export * from "./time-attendance/time-clock-integration/server";
+export * from "./time-attendance/overtime-management/server";
+export * from "./talent-management/learning-management-system-lms/server";
+export * from "./talent-management/performance-appraisals/server";
+export * from "./talent-management/career-pathing-development-plans/server";
+
+import {
+  buildHrTimeOtmPageModel,
+  requireHrTimeOtmRead,
+  resolveOtmSurfaceAccess,
+} from "./time-attendance/overtime-management/server";
 
 export { requireHrRead } from "./policies/hr-module-access.policy.server";
 
@@ -38,6 +58,13 @@ import {
   requireHrFwaRead,
 } from "./time-attendance/flexible-work-arrangement-tracking/server";
 
+import {
+  buildHrGeoPageModel,
+  HrGeoWorkbenchSection,
+  HrGeoAccessDeniedPanel,
+  requireHrGeoRead,
+} from "./time-attendance/geolocation-remote-checkin/server";
+
 export {
   buildHrLamPageModel,
   buildHrLeavePageModel,
@@ -51,6 +78,10 @@ export {
   HrFwaWorkbenchSection,
   HrFwaAccessDeniedPanel,
   requireHrFwaRead,
+  buildHrGeoPageModel,
+  HrGeoWorkbenchSection,
+  HrGeoAccessDeniedPanel,
+  requireHrGeoRead,
 };
 
 export { HrLamAccessDeniedPanel as HrAttendanceAccessDeniedPanel };
@@ -117,7 +148,7 @@ export function HrOnboardingAccessDenied() {
 export function HrOvertimeAccessDenied() {
   return React.createElement(EmptyState, {
     title: "Access restricted",
-    description: "Overtime is not available.",
+    description: "You do not have permission to view overtime management.",
   });
 }
 export function HrShiftsAccessDenied() {
@@ -139,9 +170,44 @@ export function HrOnboardingSection(_props: any) {
 export function HrOrgChartSection(_props: any) {
   return React.createElement(EmptyState, { title: "Org chart" });
 }
-export function HrOvertimeSection(_props: any) {
-  return React.createElement(EmptyState, { title: "Overtime" });
+export function HrOvertimeSection({
+  model,
+}: {
+  model: Awaited<ReturnType<typeof buildHrTimeOtmPageModel>>;
+}) {
+  return React.createElement(
+    "div",
+    { className: "flex flex-col gap-surface-2xl" },
+    React.createElement(
+      "p",
+      { className: "type-muted" },
+      `${model.pendingCount} pending · ${model.orgRecentCount} recent · report grouped by ${model.reportGroupBy}`,
+    ),
+  );
 }
+
+export async function requireHrOvertimeRead() {
+  return requireHrTimeOtmRead();
+}
+
+export async function buildHrOvertimePageModel(args: {
+  organizationId: string;
+  search?: string;
+  reportGroupBy?: string;
+}) {
+  const guard = await requireHrTimeOtmRead();
+  const visibleEmployeeIds = await guard.resolveVisibleEmployeeIds("org");
+  return buildHrTimeOtmPageModel({
+    organizationId: args.organizationId,
+    search: args.search,
+    reportGroupBy: args.reportGroupBy as
+      | import("./time-attendance/overtime-management/schemas/hr.time.otm.schema").HrTimeOtmReportGroupBy
+      | undefined,
+    visibleEmployeeIds,
+  });
+}
+
+export { resolveOtmSurfaceAccess };
 export function HrDepartmentsSection(_props: any) {
   return React.createElement(EmptyState, { title: "Departments" });
 }
@@ -156,10 +222,6 @@ export async function requireHrOnboardingRead() {
   denied();
   return { organization: { id: "" }, canWrite: false };
 }
-export async function requireHrOvertimeRead() {
-  denied();
-  return { organization: { id: "" }, canWrite: false };
-}
 export async function requireHrShiftsRead() {
   denied();
   return { organization: { id: "" }, canWrite: false };
@@ -168,10 +230,6 @@ export async function requireHrShiftsRead() {
 export async function buildHrOnboardingPageModel(_args: any) {
   denied();
   return { window: { rows: [] }, searchValue: "", checklistItems: [] };
-}
-export async function buildHrOvertimePageModel(_args: any) {
-  denied();
-  return { window: { rows: [] }, pendingWindow: { rows: [] }, searchValue: "" };
 }
 export async function buildHrShiftsPageModel(_args: any) {
   denied();

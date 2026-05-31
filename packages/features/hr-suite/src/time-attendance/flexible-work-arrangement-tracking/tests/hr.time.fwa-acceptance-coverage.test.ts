@@ -32,7 +32,7 @@ describe("FWA acceptance coverage matrix", () => {
     }
   });
 
-  it("assertFwaCoverageComplete throws when partial requirements remain", () => {
-    expect(() => assertFwaCoverageComplete()).toThrow(/fwa_acceptance_incomplete/);
+  it("assertFwaCoverageComplete passes when all requirements are shipped", () => {
+    expect(() => assertFwaCoverageComplete()).not.toThrow();
   });
 });

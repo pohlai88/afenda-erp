@@ -183,10 +183,10 @@ export const FWA_REQUIREMENT_COVERAGE: readonly FwaRequirementCoverage[] = [
   },
   {
     code: "HRM-FWA-023",
-    status: "partial",
+    status: "shipped",
     evidence: [
       "packages/features/hr-suite/src/time-attendance/flexible-work-arrangement-tracking/data/hr.time.fwa-remote-checkin-compare.server.ts (compareHrFwaRemoteScheduleWithCheckins)",
-      "packages/features/hr-suite/src/time-attendance/geolocation-remote-checkin/data/hr.time.geo-lam-integration.server (boundary — ships with HRM-GEO-024)",
+      "packages/features/hr-suite/src/time-attendance/geolocation-remote-checkin/data/hr.time.geo-lam-integration.server.ts",
     ],
   },
   {

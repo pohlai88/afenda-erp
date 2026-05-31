@@ -1,5 +1,6 @@
-/**
- * @afenda-bucket components
- * Scaffold placeholder from packages/_template-definition.
- */
-export {};
+export {
+  HrSbsAccessDeniedPanel,
+  HrSbsAuditSection,
+  HrSbsHubSection,
+  HrSbsReportsSection,
+} from "./hr.payroll.sbs-section.component.server";

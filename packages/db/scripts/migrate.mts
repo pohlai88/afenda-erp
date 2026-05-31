@@ -59,34 +59,7 @@ function checksum(contents: string) {
   return createHash("sha256").update(contents).digest("hex");
 }
 
-async function hasPartialSchemaState() {
-  const rows = await sql<{ object_name: string }[]>`
-    select object_name
-    from (
-      select table_name as object_name
-      from information_schema.tables
-      where table_schema = 'public'
-        and table_name in (
-          'audit_logs',
-          'user_profiles',
-          'organization_memberships',
-          'organizations'
-        )
-      union
-      select typname as object_name
-      from pg_type
-      where typname in ('audit_entity_type', 'organization_role')
-    ) objects
-  `;
-
-  return rows.length > 0;
-}
-
-async function applyMigration(
-  name: string,
-  contents: string,
-  allowExistingObjects: boolean,
-) {
+async function applyMigration(name: string, contents: string) {
   const statements = contents
     .split("--> statement-breakpoint")
     .map((statement) => statement.trim())
@@ -96,9 +69,13 @@ async function applyMigration(
     try {
       await sql.query(statement);
     } catch (error) {
-      if (!allowExistingObjects || !isDuplicateDdlError(error)) {
-        throw error;
+      if (isDuplicateDdlError(error)) {
+        process.stdout.write(
+          `Skipping existing object while applying ${name}.\n`,
+        );
+        continue;
       }
+      throw error;
     }
   }
 
@@ -114,8 +91,6 @@ async function main() {
   await ensurePgVectorExtension();
   await ensureMigrationTable();
   const applied = await getAppliedMigrations();
-  const allowExistingObjects =
-    applied.size === 0 && (await hasPartialSchemaState());
   const migrationFiles = (await readdir(migrationsDir))
     .filter((name) => name.endsWith(".sql"))
     .sort();
@@ -130,7 +105,7 @@ async function main() {
       resolve(migrationsDir, migrationFile),
       "utf8",
     );
-    await applyMigration(migrationFile, contents, allowExistingObjects);
+    await applyMigration(migrationFile, contents);
     process.stdout.write(`Applied ${migrationFile}.\n`);
   }
 

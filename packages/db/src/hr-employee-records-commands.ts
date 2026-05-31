@@ -169,6 +169,7 @@ export async function insertHrEmployeeRecordEventInTx(
     organizationId: string;
     employeeId: string;
     kind: (typeof hrEmployeeRecordEvents.$inferInsert)["kind"];
+    eventId?: string;
     fieldName?: string | null;
     previousValue?: string | null;
     newValue?: string | null;
@@ -177,9 +178,11 @@ export async function insertHrEmployeeRecordEventInTx(
     approvalReference?: string | null;
     actorUserId?: string | null;
   },
-) {
+): Promise<{ eventId: string }> {
+  const eventId = input.eventId ?? createEntityId("hr_rec_evt");
+
   await db.insert(hrEmployeeRecordEvents).values({
-    id: createEntityId("hr_rec_evt"),
+    id: eventId,
     organizationId: input.organizationId,
     employeeId: input.employeeId,
     kind: input.kind,
@@ -191,6 +194,8 @@ export async function insertHrEmployeeRecordEventInTx(
     approvalReference: input.approvalReference ?? null,
     actorUserId: input.actorUserId ?? null,
   });
+
+  return { eventId };
 }
 
 async function upsertEmployeeProfileInTx(

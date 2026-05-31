@@ -1,5 +1,2 @@
-/**
- * @afenda-bucket schemas
- * Scaffold placeholder from packages/_template-definition.
- */
-export {};
+export * from "./hr.talent.performance-constants.shared";
+export * from "./hr.talent.performance.schema";

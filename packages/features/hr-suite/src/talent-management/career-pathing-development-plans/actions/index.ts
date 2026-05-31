@@ -1,5 +1,2 @@
-/**
- * @afenda-bucket actions
- * Scaffold placeholder from packages/_template-definition.
- */
-export {};
+export * from "./hr.talent.career-pathing.actions.server";
+export * from "./hr.talent.career-pathing.mutation.shared.server";

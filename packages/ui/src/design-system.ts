@@ -478,7 +478,24 @@ export const uiMotion = {
     "transition-[background-color,border-color,box-shadow,transform] duration-fast ease-enterprise-standard",
   surfaceIn: "animate-surface-in",
   surfaceOut: "animate-surface-out",
+  commandIn: "animate-command-in",
   resolving: "animate-material-resolving",
+  overlayScrim:
+    "data-open:animate-overlay-scrim-in data-closed:animate-overlay-scrim-out",
+  overlaySurface:
+    "data-open:animate-surface-in data-closed:animate-surface-out",
+  overlayTooltip:
+    "data-[state=delayed-open]:animate-surface-in data-open:animate-surface-in data-closed:animate-surface-out",
+  overlaySheet:
+    "data-[side=bottom]:data-open:animate-overlay-sheet-from-bottom data-[side=bottom]:data-closed:animate-overlay-sheet-to-bottom data-[side=top]:data-open:animate-overlay-sheet-from-top data-[side=top]:data-closed:animate-overlay-sheet-to-top data-[side=left]:data-open:animate-overlay-sheet-from-left data-[side=left]:data-closed:animate-overlay-sheet-to-left data-[side=right]:data-open:animate-overlay-sheet-from-right data-[side=right]:data-closed:animate-overlay-sheet-to-right",
+  overlayNavViewport:
+    "data-open:animate-overlay-nav-viewport-in data-closed:animate-overlay-nav-viewport-out",
+  overlayNavMotion:
+    "data-[motion=from-end]:animate-overlay-nav-from-end data-[motion=from-start]:animate-overlay-nav-from-start data-[motion=to-end]:animate-overlay-nav-to-end data-[motion=to-start]:animate-overlay-nav-to-start data-[motion^=from-]:animate-overlay-scrim-in data-[motion^=to-]:animate-overlay-scrim-out",
+  overlayNavPanel:
+    "group-data-[viewport=false]/navigation-menu:data-open:animate-surface-in group-data-[viewport=false]/navigation-menu:data-closed:animate-surface-out",
+  overlayIndicator:
+    "data-[state=visible]:animate-overlay-scrim-in data-[state=hidden]:animate-overlay-scrim-out",
 } as const;
 
 export const uiOverlay = {

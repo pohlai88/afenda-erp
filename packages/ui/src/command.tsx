@@ -22,7 +22,7 @@ function Command({
     <CommandPrimitive
       data-slot="command"
       className={cn(
-        "flex size-full flex-col overflow-hidden rounded-xl bg-popover text-popover-foreground",
+        "flex size-full flex-col overflow-hidden rounded-section bg-popover text-popover-foreground",
         className,
       )}
       {...props}
@@ -54,7 +54,7 @@ function CommandDialog({
           // Position upper-center — comfortable reading position, not dead-center
           "top-[20%] max-h-[min(82vh,38rem)] w-[calc(100%-1.5rem)] max-w-xl translate-y-0",
           // Container: compact command surface with tokenized elevation.
-          "gap-0 overflow-hidden rounded-xl! border border-border p-0",
+          "gap-0 overflow-hidden rounded-section! border border-border p-0",
           "shadow-elevation-3",
           className,
         )}
@@ -163,7 +163,7 @@ function CommandItem({
     <CommandPrimitive.Item
       data-slot="command-item"
       className={cn(
-        "group/command-item relative flex cursor-default items-center gap-2 rounded-md px-2 py-1.5 text-sm outline-hidden select-none",
+        "group/command-item relative flex cursor-default items-center gap-2 rounded-control px-2 py-1.5 text-sm outline-hidden select-none",
         // Left indicator: always present as transparent, becomes primary on selection
         "border-l-[3px] border-l-transparent",
         "data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-40",

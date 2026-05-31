@@ -1,5 +1,2 @@
-/**
- * @afenda-bucket actions
- * Scaffold placeholder from packages/_template-definition.
- */
-export {};
+export * from "./hr.time.otm.actions.server";
+export * from "./hr.time.otm-approval.actions.server";

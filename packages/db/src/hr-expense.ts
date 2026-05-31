@@ -1,0 +1,76 @@
+export {
+  appendHrExpenseAuditEvent,
+  getHrExpenseClaimById,
+  hasOpenHrExpenseExceptions,
+  HrExpCommandError,
+  assertExpClaimStatusTransition,
+  canTransitionExpClaimStatus,
+  formatExpClaimStatusLabel,
+  HRM_EXP_ACTIONABLE_STATUSES,
+  HRM_EXP_VISIBLE_STATUSES,
+  type HrExpenseClaimStatus,
+} from "./hr-exp";
+
+export {
+  decideHrExpenseClaim,
+  decideHrExpenseException,
+  createHrExpenseApprovalOnSubmit,
+  resolveExpApprovalRouteForClaim,
+  type DecideHrExpenseClaimInput,
+  type DecideHrExpenseExceptionInput,
+} from "./hr-exp-approval.server";
+
+export {
+  assertExpDecisionReason,
+  buildExpManagerChain,
+  clampExpManagerChainDepth,
+  matchesExpApprovalRoute,
+  nextExpStageAfterApproval,
+  pickHighestPriorityExpApprovalRoute,
+  resolveExpApprovalRouteFromChain,
+  resolveExpInitialApprovalStage,
+  resolveExpSubmissionApprovers,
+  expRouteSpecificityScore,
+  type HrExpenseApprovalRouteRow,
+  type HrExpenseApprovalSnapshot,
+  type HrExpenseApprovalStage,
+  type HrExpenseApproverKind,
+  type HrExpenseDecisionKind,
+  type HrExpenseResolvedApprovalRoute,
+} from "./hr-exp-approval.shared";
+
+export {
+  attachHrExpenseClaimReceipt,
+  detectHrExpenseDuplicateClaims,
+  listHrExpenseEligibilityRules,
+  loadHrExpenseEmployeeContext,
+  loadHrExpensePolicyHeader,
+  upsertHrExpensePolicyCategoryRule,
+  validateHrExpenseClaimPolicy,
+  validateHrExpenseEligibilityForClaim,
+  buildExpenseReceiptFingerprint,
+  detectDuplicateClaims,
+  expenseMatchesEligibilityRule,
+  expenseRuleSpecificityScore,
+  HRM_EXP_CLAIM_CATEGORIES,
+  resolveExpenseEligibilityForSubmit,
+  resolveExpenseEligibilityFromRules,
+  sumExpenseClaimsForPeriod,
+  validateClaimPolicy,
+  validateEligibility,
+} from "./hr-expenses";
+
+export type {
+  HrExpenseClaimCategory,
+  HrExpenseClaimPolicyInput,
+  HrExpenseDuplicateCandidateRow,
+  HrExpenseDuplicateDetectionResult,
+  HrExpenseDuplicateMatch,
+  HrExpenseEligibilityContext,
+  HrExpenseEligibilityResult,
+  HrExpenseEligibilityRuleRow,
+  HrExpensePolicyCategoryRuleRow,
+  HrExpensePolicyHeaderRow,
+  HrExpensePolicyValidationResult,
+  HrExpensePolicyViolationCode,
+} from "./hr-expenses";

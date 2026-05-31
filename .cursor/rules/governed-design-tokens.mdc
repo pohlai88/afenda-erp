@@ -171,7 +171,7 @@ Exception: top-level page layout components (e.g. `GovernedSurface`) that are al
 |---|---|---|
 | Design system bundle | `pnpm design-system:check` | Parity, shadcn primitive boundary, or consumer token audit failure |
 | Token parity | `pnpm audit:tailwind-token-parity` | CSS ↔ `design-system.ts` drift, missing `@theme` fill, orphan `@utility` |
-| Shadcn primitive boundary | `pnpm audit:shadcn-primitives` | Description-slot drift or raw palette in `packages/ui` |
+| Shadcn primitive boundary | `pnpm audit:shadcn-primitives` | Four-layer contract drift: upstream manifest, tokens, exports/structure, interface-lab scaffold |
 | Build gate | `@afenda/governed-surface` `pnpm build` (runs `audit:design-tokens` first) | Any `error`-level violation in `governed-surface` |
 | CI / local | `pnpm audit:governed-design-tokens --strict` | Same as build gate |
 | Consumer scan | `pnpm audit:governed-design-tokens --scope=all --strict` | Errors and warnings in features/app/governed |

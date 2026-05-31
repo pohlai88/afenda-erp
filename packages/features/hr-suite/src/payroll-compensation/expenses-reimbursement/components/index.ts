@@ -1,5 +1,4 @@
-/**
- * @afenda-bucket components
- * Scaffold placeholder from packages/_template-definition.
- */
-export {};
+export {
+  HrExpenseAccessDeniedPanel,
+  HrExpenseWorkbenchSection,
+} from "./hr.payroll.expense-section.component.server";

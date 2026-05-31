@@ -3,17 +3,15 @@
  */
 import type { AuditViolation } from "./shared.ts";
 import { relPosix, upstreamManifestPath } from "./shared.ts";
-import {
-  compareFingerprints,
-  type ShadcnUpstreamManifest,
-} from "./fingerprint.ts";
+import { compareFingerprints } from "./fingerprint.ts";
+import type { UpstreamManifestState } from "./load-manifest.ts";
 import type { UiSourceCache } from "./source-cache.ts";
 
 export function auditShadcnUpstreamFromCache(
   cache: UiSourceCache,
-  manifest: ShadcnUpstreamManifest | null,
+  manifestState: UpstreamManifestState,
 ): AuditViolation[] {
-  if (!manifest) {
+  if (manifestState.status === "missing") {
     return [
       {
         layer: "shadcn-upstream",
@@ -27,6 +25,21 @@ export function auditShadcnUpstreamFromCache(
     ];
   }
 
+  if (manifestState.status === "invalid") {
+    return [
+      {
+        layer: "shadcn-upstream",
+        file: relPosix(upstreamManifestPath),
+        line: 0,
+        rule: "invalid-upstream-manifest",
+        match: manifestState.message,
+        hint: "Fix manifest JSON or regenerate with pnpm audit:shadcn-upstream:sync",
+        severity: "error",
+      },
+    ];
+  }
+
+  const { manifest } = manifestState;
   const violations: AuditViolation[] = [];
 
   for (const [fileName, baseline] of Object.entries(manifest.files)) {

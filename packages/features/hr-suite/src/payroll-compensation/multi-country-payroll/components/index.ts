@@ -1,5 +1,8 @@
-/**
- * @afenda-bucket components
- * Scaffold placeholder from packages/_template-definition.
- */
-export {};
+export {
+  HrMcpAccessDeniedPanel,
+  HrMcpStatutoryAccessDeniedPanel,
+  HrMcpHubSection,
+  HrMcpCountryDetailSection,
+  HrMcpCrossCountryReportsSection,
+  HrMcpAuditSection,
+} from "./hr.payroll.mcp-section.component.server";
