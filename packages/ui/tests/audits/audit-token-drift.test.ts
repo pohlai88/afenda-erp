@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
-import { auditTokenDriftFromCache } from "../../audits/audit-token-drift.ts";
-import type { UiSourceCache, UiSourceFile } from "../../audits/source-cache.ts";
+import { auditTokenDriftFromCache } from "../../audits/audit-token-drift";
+import type { UiSourceCache, UiSourceFile } from "../../audits/source-cache";
 
 function mockFile(
   fileName: string,
@@ -53,6 +53,25 @@ describe("auditTokenDriftFromCache", () => {
 
     expect(violations).toContainEqual(
       expect.objectContaining({ rule: "no-raw-palette-in-ui" }),
+    );
+  });
+
+  it("does not false-exit description slots when braces appear in template literals", () => {
+    const lines = [
+      "function CardDescription({ className }: { className?: string }) {",
+      '  const label = `{${"{not a block}"}}`;',
+      '  return <p className="text-sm text-muted-foreground">{label}</p>;',
+      "}",
+    ];
+    const violations = auditTokenDriftFromCache(
+      cacheWith(mockFile("card.tsx", lines, lines.join("\n"))),
+    );
+
+    expect(violations).toContainEqual(
+      expect.objectContaining({
+        rule: "primitive-description-drift",
+        line: 3,
+      }),
     );
   });
 });

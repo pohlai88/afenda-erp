@@ -4,7 +4,7 @@ import {
   compareFingerprints,
   fingerprintContent,
   type ShadcnFileFingerprint,
-} from "../../audits/fingerprint.ts";
+} from "../../audits/fingerprint";
 
 function emptyFingerprint(overrides: Partial<ShadcnFileFingerprint> = {}): ShadcnFileFingerprint {
   return {

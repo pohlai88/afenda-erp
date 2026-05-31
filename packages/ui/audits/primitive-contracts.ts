@@ -4,8 +4,8 @@
  * Export doors come from `.upstream/shadcn/manifest.json` (single source of truth).
  * Pattern rules live here as representative structure checks — not subjective design.
  */
-import { manifestExportMap } from "./load-manifest.ts";
-import { UI_TW_ANIMATE_CLASS_PATTERN } from "../src/design-system.color-contract.shared.ts";
+import { manifestExportMap } from "./load-manifest";
+import { UI_TW_ANIMATE_CLASS_PATTERN } from "../src/design-system.color-contract.shared";
 
 export type PrimitiveContract = {
   file: string;
@@ -84,10 +84,10 @@ const SLOT_FILES = new Set(["button.tsx", "breadcrumb.tsx", "item.tsx"]);
 
 const MINIMAL_FILES = new Set(["presence.tsx", "aspect-ratio.tsx"]);
 
-type ContractOverride = Pick<
+type ContractOverride = Partial<Pick<
   PrimitiveContract,
   "requiredPatterns" | "allowedLinePatterns"
->;
+>>;
 
 const CONTRACT_OVERRIDES: Partial<Record<string, ContractOverride>> = {
   "erp-shell.tsx": {
@@ -187,4 +187,9 @@ export function getPrimitiveContract(fileName: string): PrimitiveContract | unde
 
 export function listPrimitiveContracts(): PrimitiveContract[] {
   return [...ensureContractMap().values()];
+}
+
+/** Clears the in-process contract map (unit tests only). */
+export function resetPrimitiveContractCacheForTests(): void {
+  contractByName = undefined;
 }

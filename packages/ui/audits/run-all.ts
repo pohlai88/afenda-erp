@@ -3,13 +3,13 @@
  */
 import { performance } from "node:perf_hooks";
 
-import { auditShadcnUpstreamFromCache } from "./audit-shadcn-boundary.ts";
-import { auditPrimitiveContractsFromCache } from "./audit-primitive-contracts.ts";
-import { auditTokenDriftFromCache } from "./audit-token-drift.ts";
-import { auditVisualBehavior } from "./audit-visual-behavior.ts";
-import { loadUpstreamManifestState } from "./load-manifest.ts";
-import { loadUiSourceCache, type UiSourceCache } from "./source-cache.ts";
-import type { AuditViolation } from "./shared.ts";
+import { auditShadcnUpstreamFromCache } from "./audit-shadcn-boundary";
+import { auditPrimitiveContractsFromCache } from "./audit-primitive-contracts";
+import { auditTokenDriftFromCache } from "./audit-token-drift";
+import { auditVisualBehavior } from "./audit-visual-behavior";
+import { loadUpstreamManifestState } from "./load-manifest";
+import { loadUiSourceCache, type UiSourceCache } from "./source-cache";
+import type { AuditViolation } from "./shared";
 
 export type AuditLayerResult = {
   title: string;

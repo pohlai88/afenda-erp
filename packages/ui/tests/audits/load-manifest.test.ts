@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { parseUpstreamManifestJson } from "../../audits/load-manifest.ts";
+import { parseUpstreamManifestJson } from "../../audits/load-manifest";
 
 const validManifest = JSON.stringify({
   version: 1,

@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedAt": "2026-05-30T13:10:25.464Z",
+  "generatedAt": "2026-05-31T08:46:19.259Z",
   "note": "Approved shadcn structure snapshot for @afenda/ui. Regenerate only after intentional primitive changes.",
   "files": {
     "accordion.tsx": {
@@ -1581,8 +1581,12 @@
       "hasReactImport": true
     },
     "theme-provider.tsx": {
-      "exports": [],
-      "rootFunctions": [],
+      "exports": [
+        "AfendaThemeProvider"
+      ],
+      "rootFunctions": [
+        "AfendaThemeProvider"
+      ],
       "dataSlots": [],
       "displayNames": [],
       "hasCva": false,

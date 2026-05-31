@@ -4,10 +4,10 @@
 import {
   UI_PRIMITIVE_DESCRIPTION_DRIFT_PATTERN,
   buildRawPalettePattern,
-} from "../src/design-system.color-contract.shared.ts";
-import type { AuditViolation } from "./shared.ts";
-import { FORBIDDEN_UI_PATTERNS, getPrimitiveContract } from "./primitive-contracts.ts";
-import type { UiSourceCache, UiSourceFile } from "./source-cache.ts";
+} from "../src/design-system.color-contract.shared";
+import type { AuditViolation } from "./shared";
+import { FORBIDDEN_UI_PATTERNS, getPrimitiveContract } from "./primitive-contracts";
+import type { UiSourceCache, UiSourceFile } from "./source-cache";
 
 const DESCRIPTION_SLOT_NAMES =
   /function\s+(?:\w+Description|TableCaption|CommandEmpty|ComboboxEmpty|InputGroupText)\s*\(/;
@@ -25,23 +25,22 @@ function lineIsSuppressed(line: string, allowedLinePatterns: RegExp[]): boolean 
   return allowedLinePatterns.some((pattern) => pattern.test(line));
 }
 
+/** Ends a description/helper primitive — not nested JSX expression braces. */
+const DESCRIPTION_SLOT_END = /^\s*\}\s*;?\s*$/;
+
 function auditLine(
   file: UiSourceFile,
   line: string,
   lineNo: number,
-  slotState: { inDescriptionSlot: boolean; descriptionDepth: number },
+  slotState: { inDescriptionSlot: boolean },
 ): AuditViolation[] {
   const violations: AuditViolation[] = [];
 
   if (DESCRIPTION_SLOT_NAMES.test(line)) {
     slotState.inDescriptionSlot = true;
-    slotState.descriptionDepth = 0;
   }
 
   if (slotState.inDescriptionSlot) {
-    slotState.descriptionDepth += (line.match(/{/g) ?? []).length;
-    slotState.descriptionDepth -= (line.match(/}/g) ?? []).length;
-
     if (
       !line.includes("uiTypography.muted") &&
       DESCRIPTION_LINE_PATTERN.test(line)
@@ -61,7 +60,7 @@ function auditLine(
       });
     }
 
-    if (slotState.descriptionDepth <= 0 && line.includes("}")) {
+    if (DESCRIPTION_SLOT_END.test(line.trim())) {
       slotState.inDescriptionSlot = false;
     }
   }
@@ -102,7 +101,7 @@ export function auditTokenDriftFromCache(cache: UiSourceCache): AuditViolation[]
   const violations: AuditViolation[] = [];
 
   for (const file of cache.files) {
-    const slotState = { inDescriptionSlot: false, descriptionDepth: 0 };
+    const slotState = { inDescriptionSlot: false };
     for (let i = 0; i < file.lines.length; i++) {
       violations.push(...auditLine(file, file.lines[i]!, i + 1, slotState));
     }

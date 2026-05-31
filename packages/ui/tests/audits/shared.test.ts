@@ -3,8 +3,9 @@ import { describe, expect, it, vi } from "vitest";
 import {
   MAX_VIOLATIONS_SHOWN,
   extractNamedExports,
+  hasExportParserBlindSpot,
   printViolations,
-} from "../../audits/shared.ts";
+} from "../../audits/shared";
 
 describe("extractNamedExports", () => {
   it("parses a simple export block", () => {
@@ -21,9 +22,37 @@ describe("extractNamedExports", () => {
     expect(extractNamedExports(`export default function X() {}`)).toEqual([]);
   });
 
-  it("uses only the first export block", () => {
+  it("parses split export blocks", () => {
     const content = `export { Alpha }\nexport { Beta }`;
-    expect(extractNamedExports(content)).toEqual(["Alpha"]);
+    expect(extractNamedExports(content)).toEqual(["Alpha", "Beta"]);
+  });
+
+  it("parses named function declarations", () => {
+    const content = `export function AfendaThemeProvider() { return null }`;
+    expect(extractNamedExports(content)).toEqual(["AfendaThemeProvider"]);
+  });
+});
+
+describe("hasExportParserBlindSpot", () => {
+  it("detects export syntax that extractNamedExports misses", () => {
+    expect(
+      hasExportParserBlindSpot(`export default function X() {}`, []),
+    ).toBe(true);
+  });
+
+  it("returns false when exports were parsed", () => {
+    expect(hasExportParserBlindSpot(`export { Button }`, ["Button"])).toBe(
+      false,
+    );
+  });
+
+  it("returns false for parsed named function exports", () => {
+    expect(
+      hasExportParserBlindSpot(
+        `export function AfendaThemeProvider() { return null }`,
+        ["AfendaThemeProvider"],
+      ),
+    ).toBe(false);
   });
 });
 

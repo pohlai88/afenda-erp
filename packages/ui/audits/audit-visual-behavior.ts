@@ -6,8 +6,8 @@
  */
 import { existsSync } from "node:fs";
 import { join } from "node:path";
-import type { AuditViolation } from "./shared.ts";
-import { repoRoot, relPosix } from "./shared.ts";
+import type { AuditViolation } from "./shared";
+import { repoRoot, relPosix } from "./shared";
 
 const INTERFACE_LAB_ROOT = join(
   repoRoot,
@@ -31,11 +31,16 @@ const VISUAL_SPEC = join(
   "ui-primitives-visual.spec.ts",
 );
 
-export function auditVisualBehavior(options?: { strict?: boolean }): AuditViolation[] {
+export function auditVisualBehavior(options?: {
+  strict?: boolean;
+  /** Override for unit tests — defaults to fs.existsSync. */
+  exists?: (path: string) => boolean;
+}): AuditViolation[] {
   const strict = options?.strict ?? false;
+  const exists = options?.exists ?? existsSync;
   const violations: AuditViolation[] = [];
 
-  if (!existsSync(INTERFACE_LAB_ROOT)) {
+  if (!exists(INTERFACE_LAB_ROOT)) {
     violations.push({
       layer: "visual-behavior",
       file: relPosix(INTERFACE_LAB_ROOT),
@@ -50,7 +55,7 @@ export function auditVisualBehavior(options?: { strict?: boolean }): AuditViolat
 
   for (const route of REQUIRED_PREVIEW_ROUTES) {
     const path = join(INTERFACE_LAB_ROOT, route);
-    if (!existsSync(path)) {
+    if (!exists(path)) {
       violations.push({
         layer: "visual-behavior",
         file: relPosix(path),
@@ -63,7 +68,7 @@ export function auditVisualBehavior(options?: { strict?: boolean }): AuditViolat
     }
   }
 
-  if (!existsSync(VISUAL_SPEC)) {
+  if (!exists(VISUAL_SPEC)) {
     violations.push({
       layer: "visual-behavior",
       file: relPosix(VISUAL_SPEC),

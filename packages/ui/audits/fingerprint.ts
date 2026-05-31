@@ -1,14 +1,18 @@
 /**
  * Structural fingerprints for shadcn upstream contract snapshots.
+ *
+ * compareFingerprints is intentionally asymmetric: removals (exports, slots,
+ * structure flags) are errors; additions are warnings for exports only — new
+ * root functions, data-slots, and structure flags are not flagged.
  */
-import type { AuditViolation } from "./shared.ts";
+import type { AuditViolation } from "./shared";
 import {
   extractDataSlots,
   extractDisplayNames,
   extractNamedExports,
   extractRootFunctions,
   readUiFile,
-} from "./shared.ts";
+} from "./shared";
 
 export type ShadcnFileFingerprint = {
   exports: string[];

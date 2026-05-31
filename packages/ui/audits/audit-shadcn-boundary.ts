@@ -1,11 +1,11 @@
 /**
  * Layer 1 — shadcn upstream structure drift vs `.upstream/shadcn/manifest.json`.
  */
-import type { AuditViolation } from "./shared.ts";
-import { relPosix, upstreamManifestPath } from "./shared.ts";
-import { compareFingerprints } from "./fingerprint.ts";
-import type { UpstreamManifestState } from "./load-manifest.ts";
-import type { UiSourceCache } from "./source-cache.ts";
+import type { AuditViolation } from "./shared";
+import { hasExportParserBlindSpot, relPosix, upstreamManifestPath } from "./shared";
+import { compareFingerprints } from "./fingerprint";
+import type { UpstreamManifestState } from "./load-manifest";
+import type { UiSourceCache } from "./source-cache";
 
 export function auditShadcnUpstreamFromCache(
   cache: UiSourceCache,
@@ -63,6 +63,21 @@ export function auditShadcnUpstreamFromCache(
         baseline,
       ),
     );
+
+    if (
+      hasExportParserBlindSpot(currentFile.content, currentFile.fingerprint.exports)
+    ) {
+      violations.push({
+        layer: "shadcn-upstream",
+        file: `packages/ui/src/${fileName}`,
+        line: 0,
+        rule: "export-parser-blind-spot",
+        match: "export",
+        hint:
+          "Export syntax not captured by first export { } block — extend extractNamedExports or run audit:shadcn-upstream:sync",
+        severity: "warn",
+      });
+    }
   }
 
   for (const fileName of cache.shadcnByName.keys()) {

@@ -52,20 +52,47 @@ export function fileNameFromPath(filePath: string): string {
   return filePath.split(/[/\\]/).pop() ?? filePath;
 }
 
-/**
- * Heuristic: first `export { … }` block only (no `export type`, re-exports, or split blocks).
- */
+/** Extract runtime named exports that form the shadcn primitive surface. */
 export function extractNamedExports(content: string): string[] {
-  const block = /export\s*\{([^}]+)\}/s.exec(content);
-  if (!block?.[1]) return [];
-  return block[1]
-    .split(",")
-    .map((part) => part.trim().split(/\s+/).at(-1))
-    .filter((name): name is string => Boolean(name));
+  const names = new Set<string>();
+
+  for (const block of content.matchAll(/export\s*\{([^}]+)\}/gs)) {
+    for (const part of block[1]?.split(",") ?? []) {
+      const name = part.trim().split(/\s+/).at(-1);
+      if (name) names.add(name);
+    }
+  }
+
+  for (const declaration of content.matchAll(
+    /(?:^|\n)\s*export\s+(?:async\s+)?(?:function|class)\s+(\w+)/gm,
+  )) {
+    names.add(declaration[1]!);
+  }
+
+  for (const declaration of content.matchAll(
+    /(?:^|\n)\s*export\s+(?:const|let|var)\s+(\w+)/gm,
+  )) {
+    names.add(declaration[1]!);
+  }
+
+  return [...names];
+}
+
+/** True when source exports something our first-block heuristic cannot parse. */
+export function hasExportParserBlindSpot(
+  content: string,
+  parsedExports: readonly string[],
+): boolean {
+  if (parsedExports.length > 0) return false;
+  return /\bexport\b/.test(content);
 }
 
 export function extractRootFunctions(content: string): string[] {
-  return [...content.matchAll(/(?:^|\n)\s*function\s+(\w+)\s*\(/gm)].map((m) => m[1]!);
+  return [
+    ...content.matchAll(
+      /(?:^|\n)\s*(?:export\s+)?(?:async\s+)?function\s+(\w+)\s*\(/gm,
+    ),
+  ].map((m) => m[1]!);
 }
 
 export function extractDataSlots(content: string): string[] {

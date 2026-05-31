@@ -1,12 +1,12 @@
 /**
  * Layer 3 — representative shadcn structure contract drift (exports owned by layer 1).
  */
-import type { AuditViolation } from "./shared.ts";
+import type { AuditViolation } from "./shared";
 import {
   getPrimitiveContract,
   listPrimitiveContracts,
-} from "./primitive-contracts.ts";
-import type { UiSourceCache, UiSourceFile } from "./source-cache.ts";
+} from "./primitive-contracts";
+import type { UiSourceCache, UiSourceFile } from "./source-cache";
 
 function auditRequiredPatterns(file: UiSourceFile): AuditViolation[] {
   const contract = getPrimitiveContract(file.fileName);

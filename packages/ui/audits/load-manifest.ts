@@ -3,9 +3,9 @@
  */
 import { existsSync, readFileSync } from "node:fs";
 
-import type { ShadcnUpstreamManifest } from "./fingerprint.ts";
-import { normalizeManifest } from "./fingerprint.ts";
-import { upstreamManifestPath } from "./shared.ts";
+import type { ShadcnUpstreamManifest } from "./fingerprint";
+import { normalizeManifest } from "./fingerprint";
+import { upstreamManifestPath } from "./shared";
 
 export type UpstreamManifestState =
   | { status: "ok"; manifest: ShadcnUpstreamManifest }
@@ -38,9 +38,12 @@ export function loadUpstreamManifestState(): UpstreamManifestState {
   return cachedState;
 }
 
-/** Clears the in-process manifest cache (unit tests only). */
+import { resetPrimitiveContractCacheForTests } from "./primitive-contracts";
+
+/** Clears in-process manifest and primitive-contract caches (unit tests only). */
 export function resetUpstreamManifestCacheForTests(): void {
   cachedState = undefined;
+  resetPrimitiveContractCacheForTests();
 }
 
 export function loadUpstreamManifest(): ShadcnUpstreamManifest | null {

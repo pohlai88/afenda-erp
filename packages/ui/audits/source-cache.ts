@@ -1,15 +1,15 @@
 /**
  * Single-pass UI source loader — read each primitive file once per audit run.
  */
-import type { ShadcnFileFingerprint } from "./fingerprint.ts";
-import { fingerprintContent } from "./fingerprint.ts";
+import type { ShadcnFileFingerprint } from "./fingerprint";
+import { fingerprintContent } from "./fingerprint";
 import {
   fileNameFromPath,
   isShadcnPrimitiveFile,
   readUiFile,
   relPosix,
   walkUiTsxFiles,
-} from "./shared.ts";
+} from "./shared";
 
 export type UiSourceFile = {
   path: string;
