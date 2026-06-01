@@ -162,7 +162,7 @@ Date:
 Used by:
 
 ```txt
-AppShell
+Workspace navigation
 Reports
 Documents
 Exports

@@ -1,6 +1,7 @@
 import { systemAdminApprovalsUiCopy } from "@afenda/feature-system-admin/metadata";
 import {
   buildSystemAdminApprovalsPageModel,
+  reactivateDeprecatedSystemAdminApprovalRuleAction,
   requireSystemAdminApprovalsRead,
   SystemAdminApprovalsAccessDenied,
   SystemAdminApprovalsSection,
@@ -41,6 +42,10 @@ export default async function SystemAdminApprovalsPage({
   const canMutate =
     hasExecutionPermission(context, "system-admin.approvals.manage") ||
     hasExecutionPermission(context, "system-admin.settings.write");
+  const canReview = hasExecutionPermission(
+    context,
+    "system-admin.approvals.review",
+  );
 
   const {
     searchValue,
@@ -62,8 +67,12 @@ export default async function SystemAdminApprovalsPage({
         approvals={approvals}
         searchValue={searchValue}
         canMutate={canMutate}
+        canReview={canReview}
         approverRoleOptions={approverRoleOptions}
         updateApprovalRuleAction={updateSystemAdminApprovalRuleAction}
+        reactivateDeprecatedApprovalRuleAction={
+          reactivateDeprecatedSystemAdminApprovalRuleAction
+        }
         selectedApprovalKey={selectedApprovalKey}
         approvalDetail={approvalDetail}
         editorDefaults={editorDefaults}

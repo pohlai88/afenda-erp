@@ -3,6 +3,8 @@
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 import type { ComponentProps } from "react";
 
+import { TooltipProvider } from "./tooltip";
+
 export function AfendaThemeProvider({
   children,
   ...props
@@ -15,7 +17,7 @@ export function AfendaThemeProvider({
       disableTransitionOnChange
       {...props}
     >
-      {children}
+      <TooltipProvider delayDuration={0}>{children}</TooltipProvider>
     </NextThemesProvider>
   );
 }

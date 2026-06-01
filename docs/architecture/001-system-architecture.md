@@ -7,7 +7,7 @@
 | Status     | Active — aligned with `afenda-erp` repo as-built (May 2026)                                                        |
 | Authority  | Product-wide runtime, deployment, data, auth, AI, observability                                                    |
 | Supersedes | Informal root architecture draft (removed; do not add new copies)                                                  |
-| Related    | **ARCH-002** (platform, packages, execution §4) · **ARCH-005** (database) · **ARCH-006** (metadata UI) · **ARCH-008** (package discipline) · **ARCH-013** (AppShell) |
+| Related    | **ARCH-002** (platform, packages, execution §4) · **ARCH-005** (database) · **ARCH-006** (metadata UI) · **ARCH-008** (package discipline) |
 
 ## Executive Summary
 
@@ -76,7 +76,6 @@ extracted. Feature-package authority:
 apps/
   erp/                  # Next.js App Router ERP application
 packages/
-  appshell/             # Authenticated ERP AppShell chrome and contracts
   features/             # Target: ERP module packages when domains mature
     finance/
     sales/
@@ -108,12 +107,8 @@ and `dev`. The `@afenda/erp#build` task must cache `.next/**` and **exclude**
 
 Package ownership rules:
 
-- `apps/erp` owns routing, route handlers, page composition, layouts, session
-  and organization resolution, and AppShell mounting.
-- `packages/appshell` owns authenticated ERP AppShell chrome: L1 utility bar,
-  primary rail, command center, overlays, DTO schemas, geometry, and client
-  interaction state. See
-  [AppShell Package Architecture](013-appshell-package-architecture.md).
+- `apps/erp` owns routing, route handlers, page composition, layouts, workspace
+  chrome, and server-side session and organization resolution.
 - `packages/features/*` owns mature ERP module implementation: module-specific
   metadata, business commands, query services, page sections, schemas,
   workflow adapters, and tests. Feature packages cannot import from `apps/erp`.
@@ -166,7 +161,7 @@ apps/erp/src/app/
     sign-in/
     sign-up/
     forgot-password/
-  (app)/
+  (workspace)/
     layout.tsx
     dashboard/
     lynx/
@@ -784,7 +779,7 @@ catalog.
 - Add audit logging for all critical mutations.
 - Add Blob-backed attachment flows for business documents.
 
-Current status: module workspaces use dynamic `(app)/[moduleId]/` routes and
+Current status: module workspaces use dynamic `(workspace)/[moduleId]/` routes and
 metadata-driven list surfaces via `GovernedPatternCListSection` in
 `module-screen.tsx`, `dashboard-route.tsx`, and `lynx-console-route.tsx`
 (kernel builders in `packages/kernel/src/modules/list-surfaces.ts`).

@@ -1,4 +1,4 @@
-import { appBrandName, getAppShellSkeletonNavItemIds } from "@afenda/kernel";
+import { appBrandName, getWorkspaceSkeletonNavItemIds } from "@afenda/kernel";
 import { Skeleton } from "@afenda/ui/skeleton";
 import { ui } from "@afenda/ui/design-system";
 import { cn } from "@afenda/ui/utils";
@@ -175,8 +175,8 @@ export function SystemAdminLynxPageSkeleton() {
   );
 }
 
-export function AppShellSkeleton() {
-  const navigationSkeletonItems = getAppShellSkeletonNavItemIds();
+export function WorkspaceSkeleton() {
+  const navigationSkeletonItems = getWorkspaceSkeletonNavItemIds();
 
   return (
     <div className="min-h-screen bg-background">

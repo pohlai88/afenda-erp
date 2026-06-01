@@ -1,6 +1,6 @@
 export const appBrandName = "Afenda ERP";
 
-export const appShellSkeletonNavItemIds = [
+export const workspaceSkeletonNavItemIds = [
   "dashboard",
   "finance",
   "sales",
@@ -9,8 +9,8 @@ export const appShellSkeletonNavItemIds = [
   "lynx",
 ] as const;
 
-export function getAppShellSkeletonNavItemIds() {
-  return appShellSkeletonNavItemIds;
+export function getWorkspaceSkeletonNavItemIds() {
+  return workspaceSkeletonNavItemIds;
 }
 
 export const moduleScreenMetrics = [

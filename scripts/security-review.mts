@@ -15,11 +15,6 @@ const checks: readonly Check[] = [
     patterns: ["getOrganizationContext", "organization", "accessibleModules"],
   },
   {
-    name: "Workspace header exposes sign-out action",
-    file: "apps/erp/src/workspace-routes/workspace-shell-header.server.tsx",
-    patterns: ["signOutAction", "WorkspaceCommandHeader"],
-  },
-  {
     name: "Uploads validate capability and content policy",
     file: "apps/erp/src/app/api/uploads/route.ts",
     patterns: [

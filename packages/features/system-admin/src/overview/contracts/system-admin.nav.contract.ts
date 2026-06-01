@@ -86,6 +86,7 @@ export const systemAdminNavItems = [
     label: "Policies",
     requiredCapabilities: [
       "system-admin.policies.read",
+      "system-admin.policies.review",
       "system-admin.settings.read",
     ],
   },
@@ -94,6 +95,7 @@ export const systemAdminNavItems = [
     label: "Approvals",
     requiredCapabilities: [
       "system-admin.approvals.read",
+      "system-admin.approvals.review",
       "system-admin.settings.read",
     ],
   },

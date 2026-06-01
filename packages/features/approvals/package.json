@@ -26,16 +26,25 @@
     }
   },
   "dependencies": {
+    "@afenda/auth": "workspace:*",
+    "@afenda/db": "workspace:*",
+    "@afenda/governed-surface": "workspace:*",
     "@afenda/kernel": "workspace:*",
-    "@afenda/governed-surface": "workspace:*"
+    "@afenda/ui": "workspace:*",
+    "lucide-react": "^1.16.0",
+    "zod": "catalog:"
   },
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "lint": "tsc -p tsconfig.json --noEmit"
+    "lint": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run --config vitest.config.ts"
   },
   "devDependencies": {
-    "@afenda/config": "workspace:*"
+    "@afenda/config": "workspace:*",
+    "next": "catalog:",
+    "server-only": "^0.0.1",
+    "vitest": "catalog:"
   },
   "sideEffects": false
 }

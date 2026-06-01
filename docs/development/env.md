@@ -28,7 +28,7 @@ Turbo cache env keys: [`turbo.json`](../../turbo.json) `globalEnv` and `@afenda/
 
 ## Cursor MCP
 
-MCP is **operator-owned** in **`~/.cursor/mcp.json`** (global). This repo adds **project** [`.cursor/mcp.json`](../../.cursor/mcp.json) for **shadcn** only (`apps/erp/components.json`). Same global file is shared with other Afenda workspaces (e.g. `afenda-vercel`); do not duplicate a full MCP manifest in-repo.
+MCP is **operator-owned** in **`~/.cursor/mcp.json`** (global). This repo adds **project** [`.cursor/mcp.json`](../../.cursor/mcp.json) for **shadcn** (`apps/erp/components.json`) and **next-devtools** (`npx -y next-devtools-mcp@latest`). Same global file is shared with other Afenda workspaces (e.g. `afenda-vercel`); do not duplicate a full MCP manifest in-repo.
 
 After changing §L keys or global `mcp.json`, **fully quit and restart Cursor**.
 

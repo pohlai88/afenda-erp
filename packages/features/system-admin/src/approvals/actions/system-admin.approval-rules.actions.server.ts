@@ -15,6 +15,7 @@ import { dispatchSystemAdminWebhook } from "../../integrations/events/system-adm
 import {
   assertApprovalRuleChangeAllowed,
   requireSystemAdminApprovalsManage,
+  requireSystemAdminApprovalsReview,
 } from "../policies/system-admin.approval-rules.policy.server";
 import { assertApprovalRuleRolesAllowed } from "../policies/system-admin.approval-rules.roles.server";
 import {
@@ -35,6 +36,7 @@ import {
   type SystemAdminApprovalRuleAuditAction,
 } from "../events/system-admin.approval-rules.event";
 import type { SystemAdminApprovalRuleActionInput } from "../schemas/system-admin.approval-rule.schema";
+import { reactivateDeprecatedApprovalRuleInputSchema } from "../schemas/system-admin.approval-rule.schema";
 
 function resolveApprovalRuleAuditAction(input: {
   mode: "create" | "update";
@@ -290,6 +292,102 @@ export async function setSystemAdminApprovalRuleEnabledAction(input: {
       approvalKey: input.approvalKey,
       enabled: input.enabled,
       status: nextStatus,
+    },
+  });
+
+  return systemAdminActionSuccess(undefined);
+}
+
+export async function reactivateDeprecatedSystemAdminApprovalRuleAction(input: {
+  approvalKey: string;
+}): Promise<SystemAdminActionResult> {
+  const { context, organization, session } =
+    await requireSystemAdminApprovalsReview();
+
+  const parsed = reactivateDeprecatedApprovalRuleInputSchema.safeParse(input);
+  if (!parsed.success) {
+    return zodActionFailure(parsed.error);
+  }
+
+  const previous = await findTenantApprovalSetting({
+    organizationId: organization.id,
+    approvalKey: parsed.data.approvalKey,
+  });
+
+  if (!previous) {
+    return systemAdminActionFailure(
+      "Approval rule was not found for this organization.",
+    );
+  }
+
+  const configuration = readExecutionSettingConfiguration(previous.configuration);
+  const configuredStatus = readConfiguredApprovalRuleStatus(configuration);
+
+  if (configuredStatus !== "deprecated") {
+    return systemAdminActionFailure(
+      "Only deprecated approval rules can be reactivated through review.",
+    );
+  }
+
+  const previousRule = mapTenantApprovalSettingToRule(previous);
+
+  try {
+    await assertApprovalRuleRolesAllowed({
+      organizationId: organization.id,
+      approverRoleKeys: previousRule.approverRoleKeys,
+      delegateToRoleKeys: previousRule.delegateToRoleKeys,
+      escalationRoleKeys: previousRule.escalationRoleKeys,
+    });
+    if (previousRule.minApprovals > previousRule.approverRoleKeys.length) {
+      throw new Error(
+        "Minimum approvals cannot exceed the number of configured approver roles.",
+      );
+    }
+  } catch (error) {
+    return systemAdminActionFailure(
+      error instanceof Error
+        ? error.message
+        : "Approval rule reactivation rejected.",
+    );
+  }
+
+  await upsertTenantApprovalSettings({
+    organizationId: organization.id,
+    actorAuthUserId: session.id,
+    approvalKey: parsed.data.approvalKey,
+    label: previous.label,
+    enabled: true,
+    approverRole: previous.approverRole,
+    escalationMinutes: previous.escalationMinutes,
+    configuration: {
+      ...configuration,
+      status: "active",
+    },
+  });
+
+  await emitApprovalRuleMutationSideEffects({
+    organizationId: organization.id,
+    actorId: context.userId,
+    actorType: context.actorType,
+    sessionUserId: session.id,
+    approvalKey: parsed.data.approvalKey,
+    auditAction: systemAdminApprovalRuleAuditActionsByMode.reactivate,
+    auditMetadata: {
+      previous: {
+        enabled: previous.enabled,
+        status: configuredStatus,
+      },
+      next: {
+        enabled: true,
+        status: "active",
+      },
+      reactivationPath: "review",
+    },
+    webhookPayload: {
+      approvalKey: parsed.data.approvalKey,
+      enabled: true,
+      status: "active",
+      reactivationPath: "review",
     },
   });
 

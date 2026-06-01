@@ -32,7 +32,7 @@ export async function buildSystemAdminApprovalsPageModel(input: {
     input.searchParams,
   );
 
-  const [settings, policySettings] = await Promise.all([
+  const [settings, policySettings, approverRoleOptions] = await Promise.all([
     listTenantApprovalSettings({
       organizationId: input.organizationId,
       limit: SYSTEM_ADMIN_APPROVAL_RULES_QUERY_LIMIT,
@@ -40,6 +40,9 @@ export async function buildSystemAdminApprovalsPageModel(input: {
     listTenantPolicySettings({
       organizationId: input.organizationId,
       limit: SYSTEM_ADMIN_APPROVAL_RULES_QUERY_LIMIT,
+    }),
+    buildSystemAdminApproverRoleOptions({
+      organizationId: input.organizationId,
     }),
   ]);
 
@@ -82,9 +85,7 @@ export async function buildSystemAdminApprovalsPageModel(input: {
     approvals,
     selectedApprovalKey,
     approvalDetail,
-    approverRoleOptions: await buildSystemAdminApproverRoleOptions({
-      organizationId: input.organizationId,
-    }),
+    approverRoleOptions,
     editorDefaults: selectedSetting
       ? mapApprovalRuleToEditorDefaults(
           mapTenantApprovalSettingToRule(selectedSetting),

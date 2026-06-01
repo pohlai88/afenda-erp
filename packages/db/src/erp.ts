@@ -154,12 +154,36 @@ export type TenantErpWorkItem = {
   priority: ErpPriority;
   dueAt: Date;
   updatedAt: Date;
-};
-
-export type TenantErpWorkItemDetail = TenantErpWorkItem & {
   sourceRecordId: string | null;
   metadata: Record<string, unknown>;
 };
+
+export type TenantErpWorkItemDetail = TenantErpWorkItem;
+
+export type ApprovalWorkItemDecision = "approve" | "reject";
+
+export type ApprovalWorkItemCommandErrorCode =
+  | "work_item_not_found"
+  | "work_item_not_actionable"
+  | "wrong_module"
+  | "rejection_reason_required";
+
+export class ApprovalWorkItemCommandError extends Error {
+  readonly code: ApprovalWorkItemCommandErrorCode;
+
+  constructor(code: ApprovalWorkItemCommandErrorCode) {
+    super(code);
+    this.name = "ApprovalWorkItemCommandError";
+    this.code = code;
+  }
+}
+
+const approvalActionableWorkItemStatuses = [
+  "pending",
+  "in-review",
+  "escalated",
+  "scheduled",
+] as const satisfies readonly ErpWorkItemStatus[];
 
 export type TenantErpWorkItemWindow = {
   rows: readonly TenantErpWorkItem[];
@@ -648,6 +672,107 @@ export async function getTenantWorkItem(input: {
   });
 }
 
+export async function applyTenantApprovalWorkItemDecision(input: {
+  organizationId: string;
+  workItemId: string;
+  decision: ApprovalWorkItemDecision;
+  actorAuthUserId: string;
+  decisionNote?: string | null;
+  rejectionReason?: string | null;
+}): Promise<{
+  workItemId: string;
+  workItemStatus: ErpWorkItemStatus;
+  sourceRecordId: string | null;
+  recordStatus: ErpRecordStatus | null;
+}> {
+  const workItem = await getTenantWorkItem({
+    organizationId: input.organizationId,
+    moduleId: "approvals",
+    workItemId: input.workItemId,
+  });
+
+  if (!workItem) {
+    throw new ApprovalWorkItemCommandError("work_item_not_found");
+  }
+
+  if (workItem.moduleId !== "approvals") {
+    throw new ApprovalWorkItemCommandError("wrong_module");
+  }
+
+  if (
+    !approvalActionableWorkItemStatuses.includes(
+      workItem.status as (typeof approvalActionableWorkItemStatuses)[number],
+    )
+  ) {
+    throw new ApprovalWorkItemCommandError("work_item_not_actionable");
+  }
+
+  if (input.decision === "reject" && !input.rejectionReason?.trim()) {
+    throw new ApprovalWorkItemCommandError("rejection_reason_required");
+  }
+
+  const decidedAt = new Date();
+  const nextMetadata: Record<string, unknown> = {
+    ...workItem.metadata,
+    decision: input.decision === "approve" ? "approved" : "rejected",
+    decidedAt: decidedAt.toISOString(),
+    decidedByAuthUserId: input.actorAuthUserId,
+  };
+
+  const trimmedNote = input.decisionNote?.trim();
+  if (trimmedNote) {
+    nextMetadata.decisionNote = trimmedNote;
+  }
+
+  const trimmedRejectionReason = input.rejectionReason?.trim();
+  if (input.decision === "reject" && trimmedRejectionReason) {
+    nextMetadata.rejectionReason = trimmedRejectionReason;
+  }
+
+  let recordStatus: ErpRecordStatus | null = null;
+
+  await runWithOrganizationContext(input.organizationId, async (db) => {
+    await db
+      .update(erpWorkItems)
+      .set({
+        status: "completed",
+        metadata: nextMetadata,
+        updatedAt: decidedAt,
+        updatedByAuthUserId: input.actorAuthUserId,
+      })
+      .where(
+        and(
+          eq(erpWorkItems.organizationId, input.organizationId),
+          eq(erpWorkItems.id, input.workItemId),
+        ),
+      );
+
+    if (workItem.sourceRecordId) {
+      recordStatus = input.decision === "approve" ? "active" : "closed";
+      await db
+        .update(erpModuleRecords)
+        .set({
+          status: recordStatus,
+          updatedAt: decidedAt,
+          updatedByAuthUserId: input.actorAuthUserId,
+        })
+        .where(
+          and(
+            eq(erpModuleRecords.organizationId, input.organizationId),
+            eq(erpModuleRecords.id, workItem.sourceRecordId),
+          ),
+        );
+    }
+  });
+
+  return {
+    workItemId: input.workItemId,
+    workItemStatus: "completed",
+    sourceRecordId: workItem.sourceRecordId,
+    recordStatus,
+  };
+}
+
 export async function listTenantWorkItemWindow(input: {
   organizationId: string;
   moduleId?: ErpModuleId;
@@ -686,6 +811,8 @@ export async function listTenantWorkItemWindow(input: {
           priority: erpWorkItems.priority,
           dueAt: erpWorkItems.dueAt,
           updatedAt: erpWorkItems.updatedAt,
+          sourceRecordId: erpWorkItems.sourceRecordId,
+          metadata: erpWorkItems.metadata,
         })
         .from(erpWorkItems)
         .where(whereClause)

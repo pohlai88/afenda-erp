@@ -31,7 +31,6 @@ Search tip: every document has a stable **`ARCH-###`** ID and a matching
 | **ARCH-011 (supplement)** | [011-system-admin-capabilities-architecture.md](011-system-admin-capabilities-architecture.md) | Capabilities control domain — coverage, readiness, availability |
 | **ARCH-011 (supplement)** | [011-system-admin-data-management-architecture.md](011-system-admin-data-management-architecture.md) | Data Management control domain — import/export workbench, staged jobs, CSV boundaries |
 | **ARCH-011 (supplement)** | [011-system-admin-competitive-scorecard.md](011-system-admin-competitive-scorecard.md) | Competitive benchmark and gap scorecard for System Admin |
-| **ARCH-013** | [013-appshell-package-architecture.md](013-appshell-package-architecture.md)                 | First-class `@afenda/appshell` chrome package, DTOs, server-first AppShell flow |
 
 **ARCH-012** — *reserved* (no file; future product kernel / dual posture — not `@afenda/kernel` compat).
 
@@ -44,7 +43,6 @@ then update the other document in the same change.
 | Authority                              | Doc ID                          |
 | -------------------------------------- | ------------------------------- |
 | System admin control plane             | **ARCH-011**                    |
-| Authenticated ERP AppShell chrome      | **ARCH-013**                    |
 | Execution authority                    | **ARCH-002** §5                      |
 | Feature packages and extraction        | **ARCH-002**                    |
 | Product runtime, modules, deployment   | **ARCH-001**                    |
@@ -62,7 +60,6 @@ then update the other document in the same change.
 | ------------------------ | ----------------------------------------------------------------- | -------------------------------------------------------------- |
 | ERP modules              | Shared contracts in `@afenda/kernel`; routes in `apps/erp`        | `@afenda/feature-*` packages under `packages/features/*`       |
 | Feature packages on disk | Scaffolded `@afenda/feature-*` packages with public export doors  | One package per mature module with module-owned services       |
-| AppShell chrome          | Legacy workspace chrome still mounted by `apps/erp`               | `@afenda/appshell` owns chrome after explicit runtime adoption |
 | System Admin / kernel split | **ARCH-011** (control) + **ARCH-002** §4–5 (enforce) | Legacy kernel frozen (§3); execution law in §5 |
 | Module routes            | Dynamic `(workspace)/[moduleId]/…` via `apps/erp/src/workspace-routes/` | Same route shape; thinner adapters calling feature packages    |
 | Database schema          | Flat `packages/db/src/schema/*.ts` with shared ERP tables         | Module subdirs under `schema/<moduleId>/` as modules mature    |

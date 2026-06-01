@@ -7,6 +7,7 @@ export const systemAdminApprovalRuleAuditActions = [
   "system-admin.approval_rule.update",
   "system-admin.approval_rule.disable",
   "system-admin.approval_rule.deprecate",
+  "system-admin.approval_rule.reactivate",
 ] as const;
 
 export type SystemAdminApprovalRuleWebhookEvent =
@@ -20,4 +21,5 @@ export const systemAdminApprovalRuleAuditActionsByMode = {
   update: "system-admin.approval_rule.update",
   disable: "system-admin.approval_rule.disable",
   deprecate: "system-admin.approval_rule.deprecate",
+  reactivate: "system-admin.approval_rule.reactivate",
 } as const satisfies Record<string, SystemAdminApprovalRuleAuditAction>;

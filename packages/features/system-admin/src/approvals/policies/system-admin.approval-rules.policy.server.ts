@@ -3,6 +3,7 @@ import type { SystemAdminApprovalRuleStatus } from "../contracts/system-admin.ap
 export {
   requireSystemAdminApprovalsManage,
   requireSystemAdminApprovalsRead,
+  requireSystemAdminApprovalsReview,
 } from "../../overview/policies/system-admin.capability.policy.server";
 
 export function assertApprovalRuleChangeAllowed(input: {

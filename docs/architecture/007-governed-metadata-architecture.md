@@ -153,7 +153,7 @@ This directory is the **renderer kernel only**. It does not own Zod schemas, pre
 - `@afenda/ui/utils`
 - `react`, `lucide-react`
 
-**Forbidden in renderers:** app-shell imports, `@afenda/feature-*` module barrels, `react-jsx-parser`, runtime JSON-to-JSX, tenant/session in configuration.
+**Forbidden in renderers:** app route shell imports, `@afenda/feature-*` module barrels, `react-jsx-parser`, runtime JSON-to-JSX, tenant/session in configuration.
 
 ### 3.1 Render pipeline (today)
 

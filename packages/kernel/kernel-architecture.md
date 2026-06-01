@@ -442,7 +442,7 @@ Goal:
 The ERP Kernel is Afenda’s execution law.
 
 Feature modules own business behavior.
-The AppShell owns navigation and operating surfaces.
+The ERP workspace owns navigation and operating surfaces.
 The Kernel owns whether an action is valid, allowed, owned, governed, and auditable.
 
 A module without the kernel is only a feature.

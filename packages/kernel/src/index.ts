@@ -149,7 +149,7 @@ export {
   dashboardRouteMetrics,
   dashboardRouteSections,
   formatModuleObservabilityFooter,
-  getAppShellSkeletonNavItemIds,
+  getWorkspaceSkeletonNavItemIds,
   moduleScreenDetailListLabels,
   moduleScreenMetrics,
   moduleScreenSections,
@@ -273,6 +273,8 @@ export type ModuleWorkspaceItem = {
   priority: string;
   due: string;
   dueAt: string;
+  sourceRecordId: string | null;
+  metadata: Record<string, unknown>;
 };
 
 export type ModuleWorkspaceWorkItemDetail = ModuleWorkspaceItem & {
@@ -540,6 +542,8 @@ function serializeWorkItem(item: TenantErpWorkItem): ModuleWorkspaceItem {
     priority: item.priority,
     due: formatDate(item.dueAt),
     dueAt: item.dueAt.toISOString(),
+    sourceRecordId: item.sourceRecordId,
+    metadata: item.metadata,
   };
 }
 
@@ -604,6 +608,8 @@ function createMetadataWorkspace(
           priority: index === 0 ? "medium" : "low",
           due: "Roadmap",
           dueAt: new Date(0).toISOString(),
+          sourceRecordId: null,
+          metadata: { source: "module-metadata" },
         }));
 
   return {

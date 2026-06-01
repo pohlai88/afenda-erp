@@ -212,3 +212,7 @@ export const systemAdminApprovalRuleActionSchema = z.discriminatedUnion("mode", 
 export type SystemAdminApprovalRuleActionInput = z.infer<
   typeof systemAdminApprovalRuleActionSchema
 >;
+
+export const reactivateDeprecatedApprovalRuleInputSchema = z.object({
+  approvalKey: z.string().trim().min(1).max(APPROVAL_RULE_KEY_MAX_LENGTH),
+});

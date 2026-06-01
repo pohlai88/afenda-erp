@@ -26,8 +26,10 @@ export function SystemAdminApprovalsSection({
   approvals,
   searchValue,
   canMutate,
+  canReview,
   approverRoleOptions,
   updateApprovalRuleAction,
+  reactivateDeprecatedApprovalRuleAction,
   selectedApprovalKey,
   approvalDetail,
   editorDefaults,
@@ -35,8 +37,12 @@ export function SystemAdminApprovalsSection({
   approvals: readonly SystemAdminApprovalRuleListRow[];
   searchValue?: string;
   canMutate: boolean;
+  canReview: boolean;
   approverRoleOptions: readonly SystemAdminApproverRoleOption[];
   updateApprovalRuleAction: UpdateApprovalRuleAction;
+  reactivateDeprecatedApprovalRuleAction?: (
+    input: { approvalKey: string },
+  ) => Promise<SystemAdminActionResult>;
   selectedApprovalKey?: string;
   approvalDetail?: SystemAdminApprovalRuleDetail | null;
   editorDefaults?: SystemAdminApprovalRuleEditorDefaults;
@@ -56,6 +62,10 @@ export function SystemAdminApprovalsSection({
         <SystemAdminApprovalDetailPanel
           detail={approvalDetail}
           backHref={listBackHref}
+          canReview={canReview}
+          reactivateDeprecatedApprovalRuleAction={
+            reactivateDeprecatedApprovalRuleAction
+          }
         />
       ) : null}
 

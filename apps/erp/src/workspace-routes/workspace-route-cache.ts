@@ -57,9 +57,12 @@ import {
 import { cache } from "react";
 import { notFound } from "next/navigation";
 
+/** Request-scoped org/session context for workspace routes. */
+export const loadWorkspaceOrganizationContext = cache(getOrganizationContext);
+
 /** Shared shell navigation — one fetch for header + sidebar Suspense siblings. */
 export const loadWorkspaceShellNavigation = cache(async () => {
-  const { session, organization } = await getOrganizationContext();
+  const { session, organization } = await loadWorkspaceOrganizationContext();
   const [moduleSettings, capabilitySettings] = await Promise.all([
     listTenantModuleSettings({
       organizationId: organization.id,

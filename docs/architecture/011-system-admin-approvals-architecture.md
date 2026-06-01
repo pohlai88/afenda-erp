@@ -51,7 +51,7 @@ Approvals define the route, sequence, approver roles, escalation timing, delegat
 | **SUC-024** | System shall provide an approval rule detail view with governed metadata. |
 | **SUC-025** | System shall show related policies on the approval detail view. |
 | **SUC-026** | System shall show affected capability context on the approval detail view. |
-| **SUC-027** | System shall enforce `system-admin.approvals.read` and `system-admin.approvals.manage` server-side. |
+| **SUC-027** | System shall enforce `system-admin.approvals.read`, `system-admin.approvals.review`, and `system-admin.approvals.manage` server-side. |
 | **SUC-028** | System shall render the approval catalog through governed Pattern C list metadata. |
 | **SUC-029** | System shall load active approval rules into tenant execution rule bundles. |
 | **SUC-030** | System shall maintain audit evidence for catalog views and approval mutations. |

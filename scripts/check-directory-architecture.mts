@@ -56,13 +56,6 @@ const packageArchitectureRules: Record<string, PackageArchitectureRule> = {
     requiresPackageBuild: true,
     turboBuildOutputs: ["dist/**"],
   },
-  "@afenda/appshell": {
-    category: "runtime-library",
-    workspaceRoot: "packages",
-    requiresCompiledDistExports: true,
-    requiresPackageBuild: true,
-    turboBuildOutputs: ["dist/**"],
-  },
   "@afenda/auth": {
     category: "runtime-library",
     workspaceRoot: "packages",
@@ -299,7 +292,7 @@ function checkDocumentationNaming(filePath: string) {
     !isKernelLegacyArchitectureRedirect
   ) {
     problems.push(
-      `Architecture docs must live under docs/architecture/ or a feature vertical bucket: ${rel}`,
+      `Architecture docs must live under docs/architecture/, an allowed package architecture supplement, or a feature vertical bucket: ${rel}`,
     );
   }
 

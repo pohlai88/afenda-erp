@@ -59,23 +59,35 @@ Feature Modules
 ## Example Permission
 
 ```txt
-system_admin.approvals.manage
+system-admin.approvals.manage
 ```
 
 Recommended split:
 
 ```txt
-system_admin.approvals.read
-system_admin.approvals.manage
-system_admin.approvals.review
+system-admin.approvals.read
+system-admin.approvals.manage
+system-admin.approvals.review
 ```
 
-Phase 3 minimum:
+Phase 3 minimum (as-built):
 
 ```txt
-system_admin.approvals.read
-system_admin.approvals.manage
+system-admin.approvals.read
+system-admin.approvals.manage
 ```
+
+Phase 4 capability plumbing (shipped):
+
+```txt
+system-admin.approvals.review
+```
+
+`system-admin.approvals.review` grants read-path access to catalog and detail surfaces without `manage`. Deprecated rules reactivate only through `reactivateDeprecatedSystemAdminApprovalRuleAction`, which requires strict `system-admin.approvals.review` (mirrors `system-admin.audit.review`).
+
+## Deferred: runtime `/approvals` module
+
+Operator approval queues at `/approvals` are implemented in `@afenda/feature-approvals` (see `packages/features/approvals/src/approvals-architecture.md`). This control-plane vertical configures the routes those queue items follow.
 
 ## Approval Rule Model
 
@@ -134,7 +146,7 @@ Execution Kernel
 Route:
 
 ```txt
-/apps/system-admin/approvals
+/system-admin/approvals
 ```
 
 Purpose:
@@ -263,7 +275,7 @@ export async function listSystemAdminApprovals() {
 
   await requireExecutionPermission(
     context,
-    "system_admin.approvals.read",
+    "system-admin.approvals.read",
   )
 
   return listOrganizationApprovalRules({
@@ -282,7 +294,7 @@ export async function updateApprovalRule(
 
   await requireExecutionPermission(
     context,
-    "system_admin.approvals.manage",
+    "system-admin.approvals.manage",
   )
 
   const parsed = updateApprovalRuleInputSchema.parse(input)
@@ -297,7 +309,7 @@ export async function updateApprovalRule(
     organizationId: context.organizationId,
     actorId: context.userId,
     actorType: context.actorType,
-    action: "system_admin.approval_rule.update",
+    action: "system-admin.approval_rule.update",
     targetType: "approval_rule",
     targetId: parsed.approvalRuleId,
     metadata: {
@@ -458,7 +470,7 @@ Approvals is the authorization-routing configuration layer, not the workflow run
 | **SUC-024** | System shall provide an approval rule detail view with governed metadata. |
 | **SUC-025** | System shall show related policies on the approval detail view. |
 | **SUC-026** | System shall show affected capability context on the approval detail view. |
-| **SUC-027** | System shall enforce `system-admin.approvals.read` and `system-admin.approvals.manage` server-side. |
+| **SUC-027** | System shall enforce `system-admin.approvals.read`, `system-admin.approvals.review`, and `system-admin.approvals.manage` server-side. |
 | **SUC-028** | System shall render the approval catalog through governed Pattern C list metadata. |
 | **SUC-029** | System shall load active approval rules into tenant execution rule bundles. |
 | **SUC-030** | System shall maintain audit evidence for catalog views and approval mutations. |

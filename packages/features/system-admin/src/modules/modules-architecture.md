@@ -225,7 +225,7 @@ This becomes the ERP domain truth page.
 5. Server validates safety constraints
 6. Server updates organization module setting
 7. Server writes audit event
-8. AppShell / Nexus / command palette consume updated setting
+8. Workspace navigation / Nexus / command palette consume updated setting
 ```
 
 Audit action:
@@ -258,7 +258,7 @@ system_admin.module.disable
 Visibility controls whether the module appears in:
 
 ```txt
-AppShell
+Workspace navigation
 Nexus
 Command Palette
 Search
@@ -452,7 +452,7 @@ module disable writes audit event
 system-admin module cannot be disabled
 critical module disable requires confirmation
 deprecated module enable requires confirmation
-disabled module is hidden from AppShell
+disabled module is hidden from workspace navigation
 disabled module is hidden from command palette
 Execution Kernel still denies unauthorized direct access
 module readiness report is generated
@@ -492,4 +492,3 @@ Can this action execute safely right now?
 ```
 
 Modules is the ERP domain governance surface, not a generic settings page.
-

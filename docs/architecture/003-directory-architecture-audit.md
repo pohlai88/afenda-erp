@@ -7,7 +7,7 @@
 | Status      | Active — enforced by `pnpm architecture:check` (May 2026)                                                           |
 | Authority   | Monorepo layout, package categories, output locations, guard scripts                                                |
 | Enforced by | `scripts/check-directory-architecture.mts`                                                                          |
-| Related     | **ARCH-001** (deploy) · **ARCH-002** (feature packages) · **ARCH-004** (naming) · **ARCH-008** (package discipline) · **ARCH-013** (AppShell) |
+| Related     | **ARCH-001** (deploy) · **ARCH-002** (feature packages) · **ARCH-004** (naming) · **ARCH-008** (package discipline) |
 
 This document describes **what the repository enforces today**. The guard script is the
 source of truth when this file and code disagree — update both in the same change.
@@ -22,7 +22,7 @@ intended production build.
 | Root                 | Ownership                         | Contents                                                           |
 | -------------------- | --------------------------------- | ------------------------------------------------------------------ |
 | `apps/erp/`          | Deployable App Router application | routes, layouts, handlers, app-only composition, Playwright/Vitest |
-| `packages/`          | Workspace libraries               | appshell, kernel, db, auth, AI, UI, workflows, config, governed-surface |
+| `packages/`          | Workspace libraries               | kernel, db, auth, AI, UI, workflows, config, governed-surface |
 | `packages/features/` | ERP module packages               | scaffolded `@afenda/feature-*`; one workspace per canonical module |
 | `scripts/`           | Repo automation                   | architecture, artifacts, security, performance, env sync           |
 | `docs/architecture/` | Stable doctrine                   | `ARCH-###` + `00N-*.md` (see **ARCH-004**)                         |
@@ -39,7 +39,6 @@ intended production build.
 | -------------------------- | ----------------- | --------------------------------------------------------------------------------- |
 | `@afenda/erp`              | `next-app`        | No package `build`; Turborepo `@afenda/erp#build` → `.next/**`, `!.next/cache/**` |
 | `@afenda/ai`               | `runtime-library` | `tsc -p tsconfig.build.json` → `dist/**`                                          |
-| `@afenda/appshell`         | `runtime-library` | authenticated ERP AppShell chrome + contracts → `dist/**`                         |
 | `@afenda/auth`             | `runtime-library` | compiled `dist`; `client` / `server` subpaths                                     |
 | `@afenda/config`           | `config`          | compiled `dist`; Next/Vitest/env helpers                                          |
 | `@afenda/db`               | `database`        | schema, migrations, seeds → `dist/**`                                             |
@@ -59,7 +58,7 @@ Every workspace package must map to a category in
 | Category          | Applies to                                                   | Policy                                                                                                          |
 | ----------------- | ------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------- |
 | `next-app`        | `@afenda/erp`                                                | Owns deployable routes; Turborepo caches `.next/**` excluding `.next/cache/**` (Vercel `NEXTJS_NO_TURBO_CACHE`) |
-| `runtime-library` | ai, appshell, auth, kernel, governed-surface, observability, workflows | `src/` source; `build` = `tsc -p tsconfig.build.json`; runtime `default` exports → `./dist/*.js` |
+| `runtime-library` | ai, auth, kernel, governed-surface, observability, workflows | `src/` source; `build` = `tsc -p tsconfig.build.json`; runtime `default` exports → `./dist/*.js` |
 | `ui-primitives`   | `@afenda/ui`                                                 | Sole owner of reusable primitives; **forbidden:** `apps/erp/src/components/ui`                                  |
 | `config`          | `@afenda/config`                                             | Shared Next/env/Vitest; compiled subpaths where required                                                        |
 | `database`        | `@afenda/db`                                                 | Migrations and Drizzle source stay in package; emits `dist`                                                     |
@@ -196,7 +195,6 @@ Recorded for audit history — not open work.
 - **ARCH-004** [Naming Conventions](004-naming-conventions.md) — files, docs, packages
 - **ARCH-005** [Database Scale Architecture](005-database-scale-architecture.md) — schema ownership
 - **ARCH-008** [Workspace Package Discipline](008-workspace-package-discipline.md) — package classes and export doors
-- **ARCH-013** [AppShell Package Architecture](013-appshell-package-architecture.md) — AppShell chrome package boundaries
 
 ### External (Vercel monorepo)
 

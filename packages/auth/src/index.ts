@@ -1,5 +1,20 @@
 import { z } from "zod";
 
+import type { OrganizationOperatingContextLabels } from "./operating-context";
+import { organizationOperatingContextBrandingSchema } from "./operating-context";
+
+export {
+  OPERATING_CONTEXT_BRANDING_KEY,
+  buildOperatingContextSwitchOptions,
+  organizationOperatingContextBrandingSchema,
+  readOrganizationOperatingContextLabels,
+  resolveOrganizationOperatingContext,
+  type OperatingContextSwitchOption,
+  type OrganizationOperatingContextLabels,
+  type OrganizationOperatingContextSource,
+  type ResolvedOrganizationOperatingContext,
+} from "./operating-context";
+
 export const AFENDA_SESSION_COOKIE = "afenda-dev-session";
 export const DEV_SESSION_MAX_AGE_SECONDS = 60 * 60 * 12;
 
@@ -190,6 +205,7 @@ export const appCapabilities = [
   "crm.documents.read",
   "crm.documents.write",
   "approvals.view",
+  "approvals.decide",
   "approvals.documents.read",
   "approvals.documents.write",
   "reports.view",
@@ -221,6 +237,7 @@ export const appCapabilities = [
   "system-admin.policies.review",
   "system-admin.policies.manage",
   "system-admin.approvals.read",
+  "system-admin.approvals.review",
   "system-admin.approvals.manage",
   "system-admin.settings.read",
   "system-admin.settings.write",
@@ -283,6 +300,8 @@ export type OrganizationSummary = {
   locale: string;
   role: OrganizationRole;
   capabilities: AppCapability[];
+  /** Parsed from `tenant_settings.branding.operatingContext` when present. */
+  operatingContextLabels?: OrganizationOperatingContextLabels;
 };
 
 export type UserSession = {
@@ -305,6 +324,7 @@ export const organizationSummarySchema = z.object({
   locale: z.string().min(2).default("en-MY"),
   role: organizationRoleSchema,
   capabilities: z.array(capabilitySchema),
+  operatingContextLabels: organizationOperatingContextBrandingSchema.optional(),
 });
 
 export const userSessionSchema = z.object({
@@ -320,6 +340,10 @@ export const devSignInSchema = z.object({
   name: z.string().trim().min(1).max(80),
   email: z.email(),
   organizationName: z.string().trim().min(1).max(120),
+});
+
+export const switchOrganizationSchema = z.object({
+  organizationId: z.string().trim().min(1).max(128),
 });
 
 export const credentialsSignInSchema = z.object({
@@ -352,6 +376,7 @@ const roleCapabilities: Record<OrganizationRole, AppCapability[]> = {
     "reports.view",
     "reports.documents.read",
     "approvals.view",
+    "approvals.decide",
     "approvals.documents.read",
   ],
   "operations-manager": [
@@ -368,6 +393,7 @@ const roleCapabilities: Record<OrganizationRole, AppCapability[]> = {
     "crm.view",
     "crm.documents.read",
     "approvals.view",
+    "approvals.decide",
     "approvals.documents.read",
     "reports.view",
     "reports.documents.read",

@@ -4,11 +4,14 @@ import {
   isDevCookieAuthEnabled,
 } from "@afenda/config/env";
 import {
+  buildOperatingContextSwitchOptions,
   capabilitiesForRole,
   isAppCapability,
   normalizeCapabilities,
   normalizeOrganizationSlug,
   organizationSummarySchema,
+  readOrganizationOperatingContextLabels,
+  resolveOrganizationOperatingContext,
 } from "../../src/index";
 
 describe("auth capabilities", () => {
@@ -111,5 +114,100 @@ describe("auth capabilities", () => {
         NEON_AUTH_COOKIE_SECRET: "x".repeat(32),
       }),
     ).toBe(false);
+  });
+});
+
+describe("operating context labels", () => {
+  it("reads tenant branding labels from tenant_settings.branding", () => {
+    expect(
+      readOrganizationOperatingContextLabels({
+        operatingContext: {
+          tenantLabel: "DLB Group",
+          groupLabel: "DLBB",
+          companyLabel: "De Lettuce Bear Berhad",
+        },
+      }),
+    ).toEqual({
+      tenantLabel: "DLB Group",
+      groupLabel: "DLBB",
+      companyLabel: "De Lettuce Bear Berhad",
+    });
+  });
+
+  it("ignores invalid branding payloads", () => {
+    expect(
+      readOrganizationOperatingContextLabels({
+        operatingContext: { tenantLabel: "" },
+      }),
+    ).toBeUndefined();
+  });
+
+  it("resolves operating context with hierarchy fallbacks", () => {
+    expect(
+      resolveOrganizationOperatingContext(
+        {
+          name: "Afenda Operations",
+          slug: "afenda-operations",
+          operatingContextLabels: {
+            tenantLabel: "Footer Group",
+            companyLabel: "Footer Marketing Sdn Bhd",
+          },
+        },
+        "Dashboard",
+      ),
+    ).toEqual({
+      tenantLabel: "Footer Group",
+      companyLabel: "Footer Marketing Sdn Bhd",
+      organizationLabel: "afenda-operations",
+      workspaceLabel: "Dashboard",
+    });
+  });
+
+  it("falls back to organization name when branding labels are absent", () => {
+    expect(
+      resolveOrganizationOperatingContext({
+        name: "Afenda Operations",
+        slug: "afenda-operations",
+      }),
+    ).toEqual({
+      tenantLabel: "Afenda Operations",
+      organizationLabel: "afenda-operations",
+    });
+  });
+
+  it("builds switch options only when the user has multiple organizations", () => {
+    const organizations = [
+      {
+        id: "org_a",
+        name: "Org A",
+        slug: "org-a",
+        operatingContextLabels: {
+          tenantLabel: "Group A",
+          companyLabel: "Company A",
+        },
+      },
+      {
+        id: "org_b",
+        name: "Org B",
+        slug: "org-b",
+      },
+    ] as const;
+
+    expect(buildOperatingContextSwitchOptions(organizations, "org_a")).toEqual([
+      {
+        organizationId: "org_a",
+        tenantLabel: "Group A",
+        companyLabel: "Company A",
+        organizationLabel: "org-a",
+        isActive: true,
+      },
+      {
+        organizationId: "org_b",
+        tenantLabel: "Org B",
+        organizationLabel: "org-b",
+        isActive: false,
+      },
+    ]);
+    expect(buildOperatingContextSwitchOptions([organizations[0]], "org_a")).toBeUndefined();
   });
 });

@@ -2,6 +2,7 @@ import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 
 const mockRequireApprovalsManage = vi.fn();
 const mockRequireApprovalsRead = vi.fn();
+const mockRequireApprovalsReview = vi.fn();
 const mockUpsertApproval = vi.fn();
 const mockWriteAudit = vi.fn();
 const mockDispatchWebhook = vi.fn();
@@ -17,6 +18,7 @@ vi.mock(
       ...actual,
       requireSystemAdminApprovalsManage: () => mockRequireApprovalsManage(),
       requireSystemAdminApprovalsRead: () => mockRequireApprovalsRead(),
+      requireSystemAdminApprovalsReview: () => mockRequireApprovalsReview(),
     };
   },
 );
@@ -83,6 +85,7 @@ describe("system admin approvals", () => {
     vi.clearAllMocks();
     mockRequireApprovalsManage.mockResolvedValue(guardContext);
     mockRequireApprovalsRead.mockResolvedValue(guardContext);
+    mockRequireApprovalsReview.mockResolvedValue(guardContext);
     mockUpsertApproval.mockResolvedValue(undefined);
   });
 
@@ -351,5 +354,69 @@ describe("system admin approvals", () => {
         enabled: true,
       }).success,
     ).toBe(false);
+  });
+
+  it("requires approvals.review to reactivate deprecated rules", async () => {
+    mockRequireApprovalsReview.mockRejectedValue(new Error("Forbidden"));
+
+    const { reactivateDeprecatedSystemAdminApprovalRuleAction } = await import(
+      "../../src/approvals/actions/system-admin.approval-rules.actions.server"
+    );
+
+    await expect(
+      reactivateDeprecatedSystemAdminApprovalRuleAction({
+        approvalKey: "finance.payment",
+      }),
+    ).rejects.toThrow("Forbidden");
+    expect(mockUpsertApproval).not.toHaveBeenCalled();
+  });
+
+  it("reactivates deprecated approval rules after review", async () => {
+    const { listTenantApprovalSettings } = await import(
+      "../../src/tenant-execution/data/system-admin.execution-settings.repository.server"
+    );
+    vi.mocked(listTenantApprovalSettings).mockResolvedValueOnce([
+      {
+        id: "approval_deprecated",
+        organizationId: "org_1",
+        approvalKey: "finance.payment",
+        label: "Payment release",
+        enabled: false,
+        approverRole: "finance-manager",
+        escalationMinutes: null,
+        configuration: {
+          moduleKey: "finance",
+          action: "finance.documents.write",
+          targetType: "erp-record",
+          approvalMode: "parallel",
+          approverRoleKeys: ["finance-manager"],
+          minApprovals: 1,
+          status: "deprecated",
+        },
+      },
+    ]);
+
+    const { reactivateDeprecatedSystemAdminApprovalRuleAction } = await import(
+      "../../src/approvals/actions/system-admin.approval-rules.actions.server"
+    );
+
+    const result = await reactivateDeprecatedSystemAdminApprovalRuleAction({
+      approvalKey: "finance.payment",
+    });
+
+    expect(result.ok).toBe(true);
+    expect(mockUpsertApproval).toHaveBeenCalledWith(
+      expect.objectContaining({
+        approvalKey: "finance.payment",
+        enabled: true,
+        configuration: expect.objectContaining({ status: "active" }),
+      }),
+    );
+    expect(mockWriteAudit).toHaveBeenCalledWith(
+      expect.objectContaining({
+        action: "system-admin.approval_rule.reactivate",
+        targetId: "finance.payment",
+      }),
+    );
   });
 });

@@ -25,13 +25,23 @@ import {
   SystemAdminApprovalReadinessBadge,
   SystemAdminApprovalStatusBadge,
 } from "./system-admin.approvals-detail-badges.component.server";
+import { SystemAdminApprovalReactivateControl } from "./system-admin.approval-reactivate.component.client";
+import type { SystemAdminActionResult } from "../../tenant-execution/contracts/system-admin.action-result.contract";
+
+type ReactivateAction = (input: {
+  approvalKey: string;
+}) => Promise<SystemAdminActionResult>;
 
 export function SystemAdminApprovalDetailPanel({
   detail,
   backHref,
+  canReview,
+  reactivateDeprecatedApprovalRuleAction,
 }: {
   detail: SystemAdminApprovalRuleDetail;
   backHref: string;
+  canReview?: boolean;
+  reactivateDeprecatedApprovalRuleAction?: ReactivateAction;
 }) {
   const copy = systemAdminApprovalsUiCopy.detail;
   const fields = copy.fields;
@@ -163,8 +173,19 @@ export function SystemAdminApprovalDetailPanel({
           ) : null}
         </dl>
 
+        {detail.status === "deprecated" &&
+        canReview &&
+        reactivateDeprecatedApprovalRuleAction ? (
+          <SystemAdminApprovalReactivateControl
+            approvalKey={detail.approvalKey}
+            reactivateDeprecatedApprovalRuleAction={
+              reactivateDeprecatedApprovalRuleAction
+            }
+          />
+        ) : null}
+
         <div className="flex flex-col gap-surface-sm">
-          <h3 className="type-subheading">{copy.recentActivityTitle}</h3>
+          <h3 className="type-subtitle">{copy.recentActivityTitle}</h3>
           {detail.recentActivity.length > 0 ? (
             <Table>
               <TableHeader>

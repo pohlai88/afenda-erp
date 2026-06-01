@@ -1,7 +1,9 @@
 import "@afenda/kernel/server";
 
-/**
- * Server-only exports for @afenda/feature-approvals.
- * Safe to import database helpers, auth server modules, and Node-only SDKs.
- */
+export * from "./actions";
+export * from "./components";
+export * from "./contracts";
+export * from "./events";
 export * from "./metadata";
+export * from "./policies";
+export * from "./schemas";

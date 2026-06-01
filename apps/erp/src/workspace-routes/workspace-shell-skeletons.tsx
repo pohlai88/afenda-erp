@@ -1,10 +1,10 @@
-import { getAppShellSkeletonNavItemIds } from "@afenda/kernel";
+import { getWorkspaceSkeletonNavItemIds } from "@afenda/kernel";
 import { Skeleton } from "@afenda/ui/skeleton";
 import { ui } from "@afenda/ui/design-system";
 import { cn } from "@afenda/ui/utils";
 
 export function WorkspaceSidebarSkeleton() {
-  const navigationSkeletonItems = getAppShellSkeletonNavItemIds();
+  const navigationSkeletonItems = getWorkspaceSkeletonNavItemIds();
 
   return (
     <div

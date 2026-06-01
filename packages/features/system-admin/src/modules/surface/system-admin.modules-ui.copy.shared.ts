@@ -14,7 +14,7 @@ export const systemAdminModulesUiCopy = {
   settingsPanel: {
     title: "Update module settings",
     description:
-      "Changes are audited and enforced through tenant module settings consumed by AppShell navigation.",
+      "Changes are audited and enforced through tenant module settings consumed by workspace navigation.",
   },
   accessDenied: {
     title: "Access denied",

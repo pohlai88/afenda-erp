@@ -25,7 +25,6 @@
   },
   "dependencies": {
     "@afenda/ai": "workspace:*",
-    "@afenda/appshell": "workspace:*",
     "@afenda/auth": "workspace:*",
     "@afenda/billing": "workspace:*",
     "@afenda/db": "workspace:*",

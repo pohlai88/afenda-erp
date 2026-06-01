@@ -34,11 +34,61 @@ export const systemAdminApprovalsUiCopy = {
     updateTitle: "Update selected approval rule",
     description:
       "Approver roles are validated against organization roles. Disabled rules do not affect execution kernel verdicts.",
+    footnote:
+      "Approval law is configured here. Workflow runtime creates tasks; System Admin does not execute approvals directly.",
+    submitCreate: "Save approval rule",
+    submitUpdate: "Update approval rule",
+    fields: {
+      approvalKey: "Approval key",
+      name: "Display name",
+      moduleKey: "Module",
+      action: "Action",
+      targetType: "Target type",
+      approvalMode: "Approval mode",
+      approverRoleKeys: "Approver roles",
+      delegateToRoleKeys: "Delegation roles (optional)",
+      delegationValidDays: "Delegation valid days",
+      minApprovals: "Minimum approvals",
+      escalationAfterHours: "Escalation (hours)",
+      escalationBehavior: "Escalation behavior",
+      escalationRoleKeys: "Escalation roles",
+      status: "Status",
+      enabled: "Enabled",
+    },
+    placeholders: {
+      approvalKey: "purchasing.po.high-value",
+      name: "Purchase order above threshold",
+      moduleKey: "purchasing",
+      action: "purchasing.purchase-order.create",
+      approverRoleKeys: "finance-manager,owner",
+      delegateToRoleKeys: "operations-manager",
+      delegationValidDays: "30",
+      escalationAfterHours: "24",
+      escalationRoleKeys: "owner",
+    },
+    modes: {
+      sequential: "Sequential",
+      parallel: "Parallel",
+    },
+    escalationBehaviors: {
+      notify: "Notify",
+      reassign: "Reassign",
+      expire: "Expire",
+    },
+    statuses: {
+      active: "Active",
+      disabled: "Disabled",
+      deprecated: "Deprecated",
+    },
+    enabledOptions: {
+      true: "Enabled",
+      false: "Disabled",
+    },
   },
   accessDenied: {
     title: "Approval rules unavailable",
     description:
-      "You need system-admin.approvals.read or system-admin.settings.read to review approval configuration.",
+      "You need system-admin.approvals.read, system-admin.approvals.review, or system-admin.settings.read to review approval configuration.",
   },
   detail: {
     backLabel: "Back to catalog",
@@ -75,6 +125,11 @@ export const systemAdminApprovalsUiCopy = {
       actor: "Actor",
       action: "Action",
       summary: "Summary",
+    },
+    reactivate: {
+      actionLabel: "Reactivate after review",
+      description:
+        "Deprecated rules stay out of runtime until a reviewer with system-admin.approvals.review reactivates them.",
     },
   },
 } as const;

@@ -202,6 +202,13 @@ const defaultRecordToolbar = {
 
 const defaultExtensionSchema = z.record(z.string(), z.unknown());
 
+const approvalRequestExtensionSchema = z
+  .object({
+    approvalRoute: z.string().trim().min(1),
+    escalation: z.boolean().optional(),
+  })
+  .passthrough();
+
 const closeControlExtensionSchema = z
   .object({
     risk: z.string().trim().min(1),
@@ -371,6 +378,7 @@ export const recordTypeDefinitions = [
       "Approval records that need amount, owner, due date, and status visibility.",
     columns: monetaryOperationalColumns,
     defaultProfile: "erp-exception-table",
+    extensionSchema: approvalRequestExtensionSchema,
   }),
   defineRecordType({
     moduleId: "reports",

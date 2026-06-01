@@ -19,6 +19,7 @@ import type {
   SystemAdminApprovalRuleEditorDefaults,
   SystemAdminApproverRoleOption,
 } from "../contracts";
+import { systemAdminApprovalsUiCopy } from "../surface/system-admin.approvals-ui.copy.shared";
 
 type ApprovalRuleAction = (
   state: SystemAdminActionResult | undefined,
@@ -34,6 +35,9 @@ export function SystemAdminApprovalRuleEditor({
   approverRoleOptions: readonly SystemAdminApproverRoleOption[];
   editorDefaults?: SystemAdminApprovalRuleEditorDefaults;
 }) {
+  const copy = systemAdminApprovalsUiCopy.editor;
+  const fields = copy.fields;
+  const placeholders = copy.placeholders;
   const mode = editorDefaults?.mode ?? "create";
   const [state, formAction, pending] = useActionState<
     SystemAdminActionResult | undefined,
@@ -52,42 +56,42 @@ export function SystemAdminApprovalRuleEditor({
           />
         ) : (
           <Field className="@md:col-span-2">
-            <FieldLabel>Approval key</FieldLabel>
+            <FieldLabel>{fields.approvalKey}</FieldLabel>
             <Input
               name="approvalKey"
-              placeholder="purchasing.po.high-value"
+              placeholder={placeholders.approvalKey}
               required
             />
           </Field>
         )}
         <Field className="@md:col-span-2">
-          <FieldLabel>Display name</FieldLabel>
+          <FieldLabel>{fields.name}</FieldLabel>
           <Input
             name="name"
-            placeholder="Purchase order above threshold"
+            placeholder={placeholders.name}
             defaultValue={editorDefaults?.name}
             required
           />
         </Field>
         <Field>
-          <FieldLabel>Module</FieldLabel>
+          <FieldLabel>{fields.moduleKey}</FieldLabel>
           <Input
             name="moduleKey"
-            placeholder="purchasing"
+            placeholder={placeholders.moduleKey}
             defaultValue={editorDefaults?.moduleKey ?? APPROVAL_RULE_DEFAULT_MODULE_KEY}
           />
         </Field>
         <Field>
-          <FieldLabel>Action</FieldLabel>
+          <FieldLabel>{fields.action}</FieldLabel>
           <Input
             name="action"
-            placeholder="purchasing.purchase-order.create"
+            placeholder={placeholders.action}
             defaultValue={editorDefaults?.action}
             required
           />
         </Field>
         <Field>
-          <FieldLabel>Target type</FieldLabel>
+          <FieldLabel>{fields.targetType}</FieldLabel>
           <Input
             name="targetType"
             defaultValue={editorDefaults?.targetType ?? APPROVAL_RULE_DEFAULT_TARGET_TYPE}
@@ -95,20 +99,20 @@ export function SystemAdminApprovalRuleEditor({
           />
         </Field>
         <Field>
-          <FieldLabel>Approval mode</FieldLabel>
+          <FieldLabel>{fields.approvalMode}</FieldLabel>
           <NativeSelect
             name="approvalMode"
             defaultValue={editorDefaults?.approvalMode ?? "parallel"}
           >
-            <option value="sequential">Sequential</option>
-            <option value="parallel">Parallel</option>
+            <option value="sequential">{copy.modes.sequential}</option>
+            <option value="parallel">{copy.modes.parallel}</option>
           </NativeSelect>
         </Field>
         <Field>
-          <FieldLabel>Approver roles</FieldLabel>
+          <FieldLabel>{fields.approverRoleKeys}</FieldLabel>
           <Input
             name="approverRoleKeys"
-            placeholder="finance-manager,owner"
+            placeholder={placeholders.approverRoleKeys}
             defaultValue={
               editorDefaults?.approverRoleKeys ??
               approverRoleOptions[0]?.value ??
@@ -118,26 +122,26 @@ export function SystemAdminApprovalRuleEditor({
           />
         </Field>
         <Field>
-          <FieldLabel>Delegation roles (optional)</FieldLabel>
+          <FieldLabel>{fields.delegateToRoleKeys}</FieldLabel>
           <Input
             name="delegateToRoleKeys"
-            placeholder="operations-manager"
+            placeholder={placeholders.delegateToRoleKeys}
             defaultValue={editorDefaults?.delegateToRoleKeys}
           />
         </Field>
         <Field>
-          <FieldLabel>Delegation valid days</FieldLabel>
+          <FieldLabel>{fields.delegationValidDays}</FieldLabel>
           <Input
             name="delegationValidDays"
             type="number"
             min={APPROVAL_RULE_DELEGATION_VALID_DAYS_MIN}
             max={APPROVAL_RULE_DELEGATION_VALID_DAYS_MAX}
-            placeholder="30"
+            placeholder={placeholders.delegationValidDays}
             defaultValue={editorDefaults?.delegationValidDays}
           />
         </Field>
         <Field>
-          <FieldLabel>Minimum approvals</FieldLabel>
+          <FieldLabel>{fields.minApprovals}</FieldLabel>
           <Input
             name="minApprovals"
             type="number"
@@ -147,66 +151,63 @@ export function SystemAdminApprovalRuleEditor({
           />
         </Field>
         <Field>
-          <FieldLabel>Escalation (hours)</FieldLabel>
+          <FieldLabel>{fields.escalationAfterHours}</FieldLabel>
           <Input
             name="escalationAfterHours"
             type="number"
             min={APPROVAL_RULE_ESCALATION_HOURS_MIN}
             max={APPROVAL_RULE_ESCALATION_HOURS_MAX}
-            placeholder="24"
+            placeholder={placeholders.escalationAfterHours}
             defaultValue={editorDefaults?.escalationAfterHours}
           />
         </Field>
         <Field>
-          <FieldLabel>Escalation behavior</FieldLabel>
+          <FieldLabel>{fields.escalationBehavior}</FieldLabel>
           <NativeSelect
             name="escalationBehavior"
             defaultValue={editorDefaults?.escalationBehavior ?? "notify"}
           >
-            <option value="notify">Notify</option>
-            <option value="reassign">Reassign</option>
-            <option value="expire">Expire</option>
+            <option value="notify">{copy.escalationBehaviors.notify}</option>
+            <option value="reassign">{copy.escalationBehaviors.reassign}</option>
+            <option value="expire">{copy.escalationBehaviors.expire}</option>
           </NativeSelect>
         </Field>
         <Field>
-          <FieldLabel>Escalation roles</FieldLabel>
+          <FieldLabel>{fields.escalationRoleKeys}</FieldLabel>
           <Input
             name="escalationRoleKeys"
-            placeholder="owner"
+            placeholder={placeholders.escalationRoleKeys}
             defaultValue={editorDefaults?.escalationRoleKeys}
           />
         </Field>
         <Field>
-          <FieldLabel>Status</FieldLabel>
+          <FieldLabel>{fields.status}</FieldLabel>
           <NativeSelect
             name="status"
             defaultValue={editorDefaults?.status ?? "active"}
           >
-            <option value="active">Active</option>
-            <option value="disabled">Disabled</option>
-            <option value="deprecated">Deprecated</option>
+            <option value="active">{copy.statuses.active}</option>
+            <option value="disabled">{copy.statuses.disabled}</option>
+            <option value="deprecated">{copy.statuses.deprecated}</option>
           </NativeSelect>
         </Field>
         <Field>
-          <FieldLabel>Enabled</FieldLabel>
+          <FieldLabel>{fields.enabled}</FieldLabel>
           <NativeSelect
             name="enabled"
             defaultValue={editorDefaults?.enabled === false ? "false" : "true"}
           >
-            <option value="true">Enabled</option>
-            <option value="false">Disabled</option>
+            <option value="true">{copy.enabledOptions.true}</option>
+            <option value="false">{copy.enabledOptions.false}</option>
           </NativeSelect>
         </Field>
         <div className="@md:col-span-2">
-          <p className="type-muted">
-            Approval law is configured here. Workflow runtime creates tasks;
-            System Admin does not execute approvals directly.
-          </p>
+          <p className="type-muted">{copy.footnote}</p>
         </div>
         <div className="flex items-end @md:col-span-2">
           <Button type="submit" disabled={pending}>
             <GitPullRequestIcon data-icon="inline-start" />
-            {mode === "update" ? "Update approval rule" : "Save approval rule"}
+            {mode === "update" ? copy.submitUpdate : copy.submitCreate}
           </Button>
         </div>
         <div className="@md:col-span-2">

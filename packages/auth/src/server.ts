@@ -8,7 +8,9 @@ import {
   listPermissionKeysByRole,
   listRoleOverridesForOrganization,
   listOrganizationsForUser,
+  setDefaultOrganizationForUser,
   upsertUserProfile,
+  userHasOrganizationMembership,
 } from "@afenda/db";
 import {
   isDevAuthBypassEnabled,
@@ -28,6 +30,7 @@ import {
   appCapabilities,
   capabilitiesForRole,
   normalizeCapabilities,
+  readOrganizationOperatingContextLabels,
   userSessionSchema,
   type AppCapability,
   type OrganizationSummary,
@@ -221,10 +224,15 @@ async function hydrateOrganizationSummary(
     organization.role,
   );
 
+  const operatingContextLabels = readOrganizationOperatingContextLabels(
+    settings?.branding,
+  );
+
   return {
     ...organization,
     locale: settings?.locale ?? "en-MY",
     capabilities: normalizeCapabilities(permissionKeys, organization.role),
+    ...(operatingContextLabels ? { operatingContextLabels } : {}),
   };
 }
 
@@ -406,5 +414,54 @@ export async function bootstrapCurrentUserOrganization(
     email: session.email,
     name: session.name,
     organizationName,
+  });
+}
+
+export async function switchActiveOrganization(organizationId: string) {
+  const session = await requireSession();
+  const targetOrganization = session.organizations.find(
+    (organization) => organization.id === organizationId,
+  );
+
+  if (!targetOrganization) {
+    throw new Error("Organization is not available for this user.");
+  }
+
+  if (session.activeOrganizationId === organizationId) {
+    return;
+  }
+
+  if (session.source === "neon") {
+    const hasMembership = await userHasOrganizationMembership({
+      authUserId: session.id,
+      organizationId,
+    });
+
+    if (!hasMembership) {
+      throw new Error("Organization membership is required.");
+    }
+
+    await setDefaultOrganizationForUser({
+      authUserId: session.id,
+      organizationId,
+    });
+
+    return;
+  }
+
+  const nextSession: UserSession = {
+    ...session,
+    activeOrganizationId: organizationId,
+  };
+
+  const cookieStore = await cookies();
+  cookieStore.set(AFENDA_SESSION_COOKIE, createDevSessionCookie(nextSession), {
+    httpOnly: true,
+    sameSite: "lax",
+    secure:
+      process.env.NODE_ENV === "production" &&
+      process.env.AFENDA_E2E_DEV_AUTH !== "1",
+    path: "/",
+    maxAge: DEV_SESSION_MAX_AGE_SECONDS,
   });
 }

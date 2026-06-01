@@ -1,4 +1,6 @@
-/**
- * Client-safe exports for @afenda/feature-approvals.
- * Must not import database, server-auth, or Node-only modules.
- */
+export { ApprovalsQueueTrailingCell } from "./components/approvals-queue-trailing-cell.component.client";
+export {
+  approvalsQueueSurfaceKey,
+  approvalsUiCopy,
+  buildApprovalQueueListSurface,
+} from "./surface";

@@ -1,18 +1,18 @@
 import { describe, expect, it } from "vitest";
 import {
-  appShellSkeletonNavItemIds,
   dashboardRouteSections,
   documentWorkflowCopy,
   erpAssistantPanelCopy,
-  getAppShellSkeletonNavItemIds,
+  getWorkspaceSkeletonNavItemIds,
   moduleScreenSections,
   routeErrorCopy,
+  workspaceSkeletonNavItemIds,
 } from "../../src/shell/route-copy-metadata";
 
 describe("route copy metadata", () => {
-  it("exposes app shell skeleton nav ids", () => {
-    expect(getAppShellSkeletonNavItemIds()).toEqual(appShellSkeletonNavItemIds);
-    expect(appShellSkeletonNavItemIds).toContain("lynx");
+  it("exposes workspace skeleton nav ids", () => {
+    expect(getWorkspaceSkeletonNavItemIds()).toEqual(workspaceSkeletonNavItemIds);
+    expect(workspaceSkeletonNavItemIds).toContain("lynx");
   });
 
   it("defines section copy for module and dashboard routes", () => {

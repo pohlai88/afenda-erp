@@ -1,5 +1,11 @@
 import { createModuleFeatureMetadata } from "@afenda/kernel/feature-metadata";
 
+export {
+  approvalsQueueSurfaceKey,
+  buildApprovalQueueListSurface,
+  approvalsUiCopy,
+} from "./surface";
+
 export const {
   moduleId,
   buildRecordListSurface,

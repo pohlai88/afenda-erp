@@ -57,7 +57,7 @@ Lynx is the ERP machine layer — every machine-assisted modality routes through
    - Feature scaffold follows `packages/_template-definition`. Run `pnpm scaffold:feature <moduleId>`. Avoid catch-all folders (`_shared`, `common`, `lib`, `utils`, `helpers`, `misc`).
    - Feature server-only markers live at `src/server.ts` via `import "@afenda/kernel/server";`. Do not import `server-only` or `@afenda/kernel/server` from deep feature implementation files; local Vitest package tests import deep files without needing server-only stubs.
 6. **Governed UI** — Metadata declares intent; runtime owns authority. Lists use server windows and `GovernedPatternCListSection`; never ship full datasets to the client for pagination.
-   - **Shell viewport separation** — Treat desktop/tablet and mobile AppShell as separate views. Default shell previews and reviews to desktop/tablet only; do not care about, check, or optimize mobile in the same pass unless the user explicitly asks for a separate mobile AppShell view. Do not mix mobile-only controls into the desktop shell, or desktop-only chrome into the mobile shell.
+   - **Shell viewport separation** — Treat desktop/tablet and mobile workspace shell views separately. Default shell previews and reviews to desktop/tablet only; do not care about, check, or optimize mobile in the same pass unless the user explicitly asks for a separate mobile shell view. Do not mix mobile-only controls into the desktop shell, or desktop-only chrome into the mobile shell.
 7. **Lazy clients** — Use `getDb()` and package auth doors; do not create Neon pools or SDK clients at module scope in new app code.
 8. **Caching** — `cacheComponents: true` via `@afenda/config`. Cache only shared/non-tenant data. Tenant dashboards and org-scoped lists stay dynamic.
 9. **Cron** — `/api/cron/*` must validate `Authorization: Bearer ${CRON_SECRET}` (`src/lib/cron.ts`).
@@ -79,7 +79,7 @@ Do not extend generic `erp_module_records` for posting-grade, inventory-grade, o
 ```txt
 src/app/
   (auth)/sign-in, sign-up, …
-  (workspace)/layout.tsx          # ShellFrame + streaming sidebar/header Suspense
+  (workspace)/layout.tsx          # Authenticated route group layout; pages own workspace chrome
   (workspace)/loading.tsx         # Page-level fallback (layout stays mounted)
   (workspace)/dashboard/
   (workspace)/lynx/
@@ -97,12 +97,23 @@ Server Actions: internal mutations. Route Handlers: webhooks, uploads, AI stream
 
 Cursor hooks run drift checks on agent edits (`enforce-architecture-drift`, `guard-kernel-boundary-imports`, `guard-root-hygiene`); fix hook failures without asking the user to run commands. CI repeats the same guards on push.
 
+### Validation discipline
+
+Default to the smallest validation that proves the change. Do **not** run repo-wide `pnpm test`, `pnpm typecheck`, full lint, full build, or e2e suites unless the change scope actually requires it or the user explicitly asks for it.
+
+**STUPID AGENT behavior:** running a full test suite, full typecheck, full lint, or full build after a small text/doc/comment change. For docs-only edits, usually inspect the diff and stop.
+
+Use targeted checks instead:
+
 ```bash
-pnpm typecheck
-pnpm architecture:check
-pnpm lint:governed-renderers   # if governed-surface or list metadata changed
-pnpm test                      # and pnpm test:e2e when routes/flows change
+pnpm --filter <package> typecheck
+pnpm --filter <package> test
+pnpm architecture:check          # only when package boundaries, docs/architecture, guards, exports, or workspace structure changed
+pnpm lint:governed-renderers     # only when governed-surface or list metadata changed
+pnpm --filter @afenda/erp test:e2e:smoke  # only when routes/flows changed and browser verification is needed
 ```
+
+Escalate to broader checks only for cross-package API changes, shared config changes, DB/schema/auth/security changes, build pipeline changes, or when targeted checks cannot cover the risk. When running a broad command, state why it is necessary.
 
 DB changes: edit `packages/db/src/schema` only → `pnpm db:generate` → review SQL → `pnpm db:migrate`. Do not hand-write `packages/db/drizzle/*.sql` or run schema DDL via shell/MCP unless the user explicitly requires it (`.cursor/rules/afenda-database-migrations.mdc`). Security-sensitive paths: `pnpm security:review`.
 

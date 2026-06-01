@@ -238,7 +238,6 @@ const SYSTEM_ADMIN_AUDIT_VIEWER_SPEC = /system-admin-audit-viewer\.spec\.ts/;
 const SYSTEM_ADMIN_BILLING_SPEC = /system-admin-billing\.spec\.ts/;
 const SYSTEM_ADMIN_CAPABILITIES_SPEC = /system-admin-capabilities\.spec\.ts/;
 const SYSTEM_ADMIN_DATA_MANAGEMENT_SPEC = /system-admin-data-management\.spec\.ts/;
-
 function createProductionProjects() {
   return [
     createAuthSetupProject(),

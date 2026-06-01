@@ -10,6 +10,8 @@ import {
   type CoreModuleId,
   type ModuleWorkspaceSearchParams,
 } from "@afenda/kernel";
+import { hasExecutionPermission, requireExecutionContext } from "@afenda/kernel/execution";
+import { ApprovalsModuleQueueSection } from "@afenda/feature-approvals/server";
 import { loadModuleWorkspaceSession } from "@/workspace-routes/workspace-route-cache";
 import {
   BulletColumns,
@@ -190,6 +192,38 @@ export async function ModuleScreenPrimaryListsSection({
     searchParams,
   });
   const surfaceKeys = metadata.getListSurfaceKeys();
+
+  if (moduleId === "approvals") {
+    const context = await requireExecutionContext();
+    const canDecide = hasExecutionPermission(context, "approvals.decide");
+
+    return (
+      <div className="@container grid gap-surface-2xl @xl:grid-cols-[minmax(0,1.35fr)_minmax(340px,0.65fr)]">
+        <GovernedPatternCListSection
+          title={moduleScreenSections.tenantRecords.title}
+          description={moduleScreenSections.tenantRecords.description}
+          surfaceKey={surfaceKeys.records}
+          listConfiguration={metadata.buildRecordListSurface({
+            records: workspace.records,
+            window: workspace.recordWindow,
+            query: moduleQuery,
+          })}
+          parentAccessAllowed
+          layout="embedded"
+          trailingColumn={{
+            header: "Action",
+            cellId: "governed.metadata",
+            context: { surfaceKey: surfaceKeys.records, moduleId },
+          }}
+        />
+        <ApprovalsModuleQueueSection
+          workspace={workspace}
+          moduleQuery={moduleQuery}
+          canDecide={canDecide}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="@container grid gap-surface-2xl @xl:grid-cols-[minmax(0,1.35fr)_minmax(340px,0.65fr)]">

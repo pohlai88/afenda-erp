@@ -192,20 +192,6 @@ const permissionCatalog = [
     module: "hr",
     label: "View HR bonus and incentives",
     description:
-      "Read bonus plans, targets, achievements, and payout calculation results.",
-  },
-  {
-    key: "hr.bonus.write",
-    module: "hr",
-    label: "Manage HR bonus and incentives",
-    description:
-      "Record target achievements, configure payout formulas, tiers, accelerators, and run payout calculations.",
-  },
-  {
-    key: "hr.bonus.read",
-    module: "hr",
-    label: "View HR bonus and incentives",
-    description:
       "Read bonus plans, cycles, payout registers, and eligibility status.",
   },
   {
@@ -902,6 +888,12 @@ const permissionCatalog = [
     description: "Read approval queues, escalations, and decision trails.",
   },
   {
+    key: "approvals.decide",
+    module: "approvals",
+    label: "Decide approvals",
+    description: "Approve or reject items in the operator approval queue.",
+  },
+  {
     key: "reports.view",
     module: "reports",
     label: "View reports",
@@ -1071,6 +1063,13 @@ const permissionCatalog = [
     module: "system-admin",
     label: "Read approvals",
     description: "View approval configuration and escalation posture.",
+  },
+  {
+    key: "system-admin.approvals.review",
+    module: "system-admin",
+    label: "Review approvals",
+    description:
+      "Inspect approval readiness, policy linkage, and escalation posture without mutating rules.",
   },
   {
     key: "system-admin.approvals.manage",
@@ -1313,6 +1312,7 @@ const roleCapabilities = {
     "purchasing.view",
     "reports.view",
     "approvals.view",
+    "approvals.decide",
   ],
   "operations-manager": [
     "dashboard.view",
@@ -1321,6 +1321,7 @@ const roleCapabilities = {
     "inventory.view",
     "crm.view",
     "approvals.view",
+    "approvals.decide",
     "reports.view",
   ],
   staff: [

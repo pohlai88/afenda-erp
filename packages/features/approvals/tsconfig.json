@@ -1,3 +1,3 @@
 {
-  "extends": "../../config/tsconfig.feature.base.json"
+  "extends": "../../config/tsconfig.library.base.json"
 }

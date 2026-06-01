@@ -1,5 +1,6 @@
 export {
   createApprovalRuleInputSchema,
+  reactivateDeprecatedApprovalRuleInputSchema,
   systemAdminApprovalRuleActionSchema,
   updateApprovalRuleInputSchema,
   type SystemAdminApprovalRuleActionInput,

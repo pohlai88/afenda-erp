@@ -189,8 +189,13 @@ export function requireSystemAdminPoliciesManage() {
 export function requireSystemAdminApprovalsRead() {
   return requireSystemAdminAnyCapability([
     "system-admin.approvals.read",
+    "system-admin.approvals.review",
     "system-admin.settings.read",
   ]);
+}
+
+export function requireSystemAdminApprovalsReview() {
+  return requireSystemAdminCapability("system-admin.approvals.review");
 }
 
 export function requireSystemAdminApprovalsManage() {
