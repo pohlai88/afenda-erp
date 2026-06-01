@@ -10,6 +10,8 @@ const DOCUMENTS_COMMAND_ERROR_MESSAGES = {
   document_not_found: "Document was not found.",
   document_archived: "This document is already archived.",
   invalid_replacement: "Document replacement is not allowed for this record.",
+  sensitive_access_denied:
+    "Sensitive document access is required for this action.",
 } satisfies Record<HrDocumentCommandError["code"], string>;
 
 export function toDocumentsActionFailure(error: unknown): ActionResult {

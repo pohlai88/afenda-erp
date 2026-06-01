@@ -10,22 +10,11 @@ import type {
   SystemAdminPolicyRuleStatus,
 } from "../contracts/system-admin.policy-rule.contract";
 import { evaluatePolicyRuleReadiness } from "./system-admin.policy-rules.readiness.server";
-
-function readString(value: unknown, fallback: string) {
-  return typeof value === "string" && value.trim().length > 0
-    ? value.trim()
-    : fallback;
-}
-
-function readNumber(value: unknown, fallback: number) {
-  return typeof value === "number" && Number.isFinite(value) ? value : fallback;
-}
-
-function readRecord(value: unknown) {
-  return value && typeof value === "object" && !Array.isArray(value)
-    ? (value as Record<string, unknown>)
-    : {};
-}
+import {
+  readConfigurationNumber,
+  readConfigurationString,
+  readExecutionSettingConfiguration,
+} from "../../tenant-execution/contracts/system-admin.execution-settings.shared";
 
 function derivePolicyStatus(
   row: TenantPolicySettingRow,
@@ -60,7 +49,7 @@ function derivePolicyStatus(
 export function mapTenantPolicySettingToRule(
   row: TenantPolicySettingRow,
 ): SystemAdminPolicyRule {
-  const configuration = readRecord(row.configuration);
+  const configuration = readExecutionSettingConfiguration(row.configuration);
   const effectParse =
     typeof configuration.effect === "string" &&
     (executionPolicyEffects as readonly string[]).includes(configuration.effect)
@@ -72,13 +61,13 @@ export function mapTenantPolicySettingToRule(
     organizationId: row.organizationId,
     key: row.policyKey,
     name: row.label,
-    moduleKey: readString(configuration.moduleKey, "*"),
-    action: readString(configuration.action, row.policyKey),
-    targetType: readString(configuration.targetType, "erp-record"),
+    moduleKey: readConfigurationString(configuration.moduleKey, "*"),
+    action: readConfigurationString(configuration.action, row.policyKey),
+    targetType: readConfigurationString(configuration.targetType, "erp-record"),
     effect: effectParse.success ? effectParse.data : "deny",
-    condition: readRecord(configuration.condition),
+    condition: readExecutionSettingConfiguration(configuration.condition),
     status: derivePolicyStatus(row, configuration.status),
-    priority: readNumber(configuration.priority, 0),
+    priority: readConfigurationNumber(configuration.priority, 0),
     enabled: row.enabled,
     readiness: row.readiness,
   };

@@ -1,6 +1,7 @@
 import type { TenantApprovalSettingRow } from "@afenda/db";
 import { organizationRoles } from "@afenda/auth";
 import { listTenantApprovalSettings } from "../../tenant-execution/data/system-admin.execution-settings.repository.server";
+import { listDeprecatedOrganizationRoles } from "../policies/system-admin.approval-rules.roles.server";
 import { mapTenantApprovalSettingToListRow } from "./system-admin.approval-rules.mapper";
 
 export const SYSTEM_ADMIN_APPROVAL_RULES_QUERY_LIMIT = 200;
@@ -39,9 +40,17 @@ export async function findTenantApprovalSetting(input: {
   return settings.find((row) => row.approvalKey === input.approvalKey);
 }
 
-export function buildSystemAdminApproverRoleOptions() {
-  return organizationRoles.map((role) => ({
-    value: role,
-    label: role,
-  }));
+export async function buildSystemAdminApproverRoleOptions(input: {
+  organizationId: string;
+}) {
+  const deprecatedRoles = await listDeprecatedOrganizationRoles({
+    organizationId: input.organizationId,
+  });
+
+  return organizationRoles
+    .filter((role) => !deprecatedRoles.has(role))
+    .map((role) => ({
+      value: role,
+      label: role,
+    }));
 }

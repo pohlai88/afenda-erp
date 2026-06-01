@@ -4,10 +4,10 @@ Cross-cutting infrastructure — not a System Admin route or nav vertical.
 
 | Bucket | Role |
 | ------ | ---- |
-| `contracts/` | Shared Server Action result envelope (`SystemAdminActionResult`) |
+| `contracts/` | Shared Server Action result envelope (`SystemAdminActionResult`) and execution-settings configuration helpers |
 | `data/` | Organization-scoped execution settings persistence (`tenant_*` tables via `@afenda/db`) |
-| `policies/` | Execution Kernel registration and org rule loader |
-| `tests/` | Package tests for bridge and repository behavior |
+| `policies/` | Execution Kernel registration, org rule loader, and shared capability resolution |
+| `tests/` | Package tests for bridge, repository, and shared helper behavior |
 
 | Door | Exports |
 | ---- | ------- |

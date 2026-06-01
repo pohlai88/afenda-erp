@@ -11,3 +11,5 @@ export * from "./hr.workforce.compliance-work-auth-documents.schema";
 export * from "./hr.workforce.compliance-filing.schema";
 export * from "./hr.workforce.compliance-evidence-link.schema";
 export * from "./hr.workforce.compliance-workplace-safety.schema";
+export * from "./hr.workforce.compliance-requirement-trailing.schema";
+export * from "./hr.workforce.compliance-review-queue.schema";

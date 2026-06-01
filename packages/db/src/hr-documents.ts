@@ -238,7 +238,8 @@ export class HrDocumentCommandError extends Error {
     | "employee_not_found"
     | "document_not_found"
     | "document_archived"
-    | "invalid_replacement";
+    | "invalid_replacement"
+    | "sensitive_access_denied";
 
   constructor(code: HrDocumentCommandError["code"], message?: string) {
     super(message ?? code);
@@ -282,6 +283,7 @@ export async function registerHrEmployeeDocument(input: {
   classification?: (typeof hrEmployeeDocuments.$inferInsert)["classification"];
   effectiveFrom?: Date;
   effectiveTo?: Date | null;
+  actorUserId?: string | null;
 }): Promise<{ documentId: string }> {
   return runWithOrganizationContext(input.organizationId, async (db) => {
     const [employee] = await db
@@ -330,6 +332,7 @@ export async function registerHrEmployeeDocument(input: {
       documentId,
       employeeId: input.employeeId,
       action: "hr.document.upload",
+      actorUserId: input.actorUserId ?? null,
       summary: `Uploaded document ${input.title.trim()}`,
     });
 
@@ -340,11 +343,14 @@ export async function registerHrEmployeeDocument(input: {
 export async function archiveHrEmployeeDocument(input: {
   organizationId: string;
   documentId: string;
+  actorUserId?: string | null;
 }): Promise<{ documentId: string }> {
   return runWithOrganizationContext(input.organizationId, async (db) => {
     const [document] = await db
       .select({
         id: hrEmployeeDocuments.id,
+        employeeId: hrEmployeeDocuments.employeeId,
+        title: hrEmployeeDocuments.title,
         lifecycleStatus: hrEmployeeDocuments.lifecycleStatus,
       })
       .from(hrEmployeeDocuments)
@@ -372,6 +378,15 @@ export async function archiveHrEmployeeDocument(input: {
       })
       .where(eq(hrEmployeeDocuments.id, input.documentId));
 
+    await insertHrDocumentAuditEventInTx(db, {
+      organizationId: input.organizationId,
+      documentId: input.documentId,
+      employeeId: document.employeeId,
+      action: "hr.document.archive",
+      actorUserId: input.actorUserId ?? null,
+      summary: `Archived document ${document.title}`,
+    });
+
     return { documentId: input.documentId };
   });
 }
@@ -379,6 +394,7 @@ export async function archiveHrEmployeeDocument(input: {
 export async function verifyHrEmployeeDocument(input: {
   organizationId: string;
   documentId: string;
+  actorUserId?: string | null;
 }): Promise<{ documentId: string }> {
   return runWithOrganizationContext(input.organizationId, async (db) => {
     const [document] = await db
@@ -406,6 +422,7 @@ export async function verifyHrEmployeeDocument(input: {
       organizationId: input.organizationId,
       documentId: input.documentId,
       action: "hr.document.verify",
+      actorUserId: input.actorUserId ?? null,
       summary: "Document verified",
     });
 
@@ -417,6 +434,7 @@ export async function rejectHrEmployeeDocument(input: {
   organizationId: string;
   documentId: string;
   rejectionReason: string;
+  actorUserId?: string | null;
 }): Promise<{ documentId: string }> {
   return runWithOrganizationContext(input.organizationId, async (db) => {
     const [document] = await db
@@ -447,10 +465,80 @@ export async function rejectHrEmployeeDocument(input: {
       organizationId: input.organizationId,
       documentId: input.documentId,
       action: "hr.document.reject",
+      actorUserId: input.actorUserId ?? null,
       summary: `Document rejected: ${input.rejectionReason.trim()}`,
     });
 
     return { documentId: input.documentId };
+  });
+}
+
+export type HrEmployeeDocumentDownloadPayload = {
+  documentId: string;
+  employeeId: string;
+  title: string;
+  blobUrl: string;
+  mimeType: string;
+  sizeBytes: number;
+  classification: (typeof hrEmployeeDocuments.$inferSelect)["classification"];
+};
+
+export async function authorizeHrEmployeeDocumentDownload(input: {
+  organizationId: string;
+  documentId: string;
+  actorUserId?: string | null;
+  canViewSensitive: boolean;
+}): Promise<HrEmployeeDocumentDownloadPayload> {
+  return runWithOrganizationContext(input.organizationId, async (db) => {
+    const [document] = await db
+      .select({
+        id: hrEmployeeDocuments.id,
+        employeeId: hrEmployeeDocuments.employeeId,
+        title: hrEmployeeDocuments.title,
+        blobUrl: hrEmployeeDocuments.blobUrl,
+        mimeType: hrEmployeeDocuments.mimeType,
+        sizeBytes: hrEmployeeDocuments.sizeBytes,
+        classification: hrEmployeeDocuments.classification,
+      })
+      .from(hrEmployeeDocuments)
+      .where(
+        and(
+          eq(hrEmployeeDocuments.organizationId, input.organizationId),
+          eq(hrEmployeeDocuments.id, input.documentId),
+        ),
+      )
+      .limit(1);
+
+    if (!document) {
+      throw new HrDocumentCommandError("document_not_found");
+    }
+
+    if (
+      !input.canViewSensitive &&
+      (document.classification === "confidential" ||
+        document.classification === "restricted")
+    ) {
+      throw new HrDocumentCommandError("sensitive_access_denied");
+    }
+
+    await insertHrDocumentAuditEventInTx(db, {
+      organizationId: input.organizationId,
+      documentId: document.id,
+      employeeId: document.employeeId,
+      action: "hr.document.download",
+      actorUserId: input.actorUserId ?? null,
+      summary: `Authorized download for document ${document.title}`,
+    });
+
+    return {
+      documentId: document.id,
+      employeeId: document.employeeId,
+      title: document.title,
+      blobUrl: document.blobUrl,
+      mimeType: document.mimeType,
+      sizeBytes: document.sizeBytes,
+      classification: document.classification,
+    };
   });
 }
 
@@ -460,6 +548,7 @@ export async function upsertHrDocumentRequirement(input: {
   title: string;
   requiredForStatus?: (typeof hrEmployees.$inferSelect)["employmentStatus"] | null;
   graceDaysBeforeDue?: number;
+  actorUserId?: string | null;
 }): Promise<{ requirementId: string }> {
   return runWithOrganizationContext(input.organizationId, async (db) => {
     const documentType = input.documentType.trim();
@@ -488,6 +577,13 @@ export async function upsertHrDocumentRequirement(input: {
           active: true,
         })
         .where(eq(hrDocumentRequirements.id, existing.id));
+      await insertHrDocumentAuditEventInTx(db, {
+        organizationId: input.organizationId,
+        action: "hr.document.requirement.upsert",
+        actorUserId: input.actorUserId ?? null,
+        summary: `Updated document requirement ${input.title.trim()}`,
+        metadata: JSON.stringify({ requirementId: existing.id, documentType }),
+      });
       return { requirementId: existing.id };
     }
 
@@ -499,6 +595,14 @@ export async function upsertHrDocumentRequirement(input: {
       title: input.title.trim(),
       requiredForStatus,
       graceDaysBeforeDue: input.graceDaysBeforeDue ?? 0,
+    });
+
+    await insertHrDocumentAuditEventInTx(db, {
+      organizationId: input.organizationId,
+      action: "hr.document.requirement.upsert",
+      actorUserId: input.actorUserId ?? null,
+      summary: `Created document requirement ${input.title.trim()}`,
+      metadata: JSON.stringify({ requirementId, documentType }),
     });
 
     return { requirementId };
@@ -540,7 +644,11 @@ export async function runHrDocumentExpirySweep(input?: { withinDays?: number }) 
   for (const organization of organizations) {
     await runWithOrganizationContext(organization.id, async (db) => {
       const expired = await db
-        .select({ id: hrEmployeeDocuments.id })
+        .select({
+          id: hrEmployeeDocuments.id,
+          employeeId: hrEmployeeDocuments.employeeId,
+          title: hrEmployeeDocuments.title,
+        })
         .from(hrEmployeeDocuments)
         .where(
           and(
@@ -559,6 +667,13 @@ export async function runHrDocumentExpirySweep(input?: { withinDays?: number }) 
             archivedAt: now,
           })
           .where(eq(hrEmployeeDocuments.id, document.id));
+        await insertHrDocumentAuditEventInTx(db, {
+          organizationId: organization.id,
+          documentId: document.id,
+          employeeId: document.employeeId,
+          action: "hr.document.archive",
+          summary: `Archived expired document ${document.title}`,
+        });
         expiredArchivedCount += 1;
       }
 
@@ -594,6 +709,7 @@ export async function replaceHrEmployeeDocument(input: {
   mimeType: string;
   sizeBytes: number;
   effectiveTo?: Date | null;
+  actorUserId?: string | null;
 }): Promise<{ documentId: string; previousDocumentId: string }> {
   return runWithOrganizationContext(input.organizationId, async (db) => {
     const [existing] = await db
@@ -650,6 +766,7 @@ export async function replaceHrEmployeeDocument(input: {
       documentId: newDocumentId,
       employeeId: existing.employeeId,
       action: "hr.document.replace",
+      actorUserId: input.actorUserId ?? null,
       summary: `Replaced document ${existing.title} with version ${existing.versionNumber + 1}`,
       metadata: JSON.stringify({ previousDocumentId: existing.id }),
     });
@@ -805,6 +922,7 @@ export async function upsertHrDocumentRetentionPolicy(input: {
   documentGroup?: string | null;
   retentionDays: number;
   archiveOnSeparation?: boolean;
+  actorUserId?: string | null;
 }) {
   return runWithOrganizationContext(input.organizationId, async (db) => {
     const documentType = input.documentType?.trim() || null;
@@ -835,6 +953,17 @@ export async function upsertHrDocumentRetentionPolicy(input: {
           archiveOnSeparation: input.archiveOnSeparation ?? true,
         })
         .where(eq(hrDocumentRetentionPolicies.id, existing.id));
+      await insertHrDocumentAuditEventInTx(db, {
+        organizationId: input.organizationId,
+        action: "hr.document.retention.upsert",
+        actorUserId: input.actorUserId ?? null,
+        summary: "Updated document retention policy",
+        metadata: JSON.stringify({
+          policyId: existing.id,
+          documentType,
+          documentGroup,
+        }),
+      });
       return { policyId: existing.id };
     }
 
@@ -846,6 +975,13 @@ export async function upsertHrDocumentRetentionPolicy(input: {
       documentGroup,
       retentionDays: input.retentionDays,
       archiveOnSeparation: input.archiveOnSeparation ?? true,
+    });
+    await insertHrDocumentAuditEventInTx(db, {
+      organizationId: input.organizationId,
+      action: "hr.document.retention.upsert",
+      actorUserId: input.actorUserId ?? null,
+      summary: "Created document retention policy",
+      metadata: JSON.stringify({ policyId, documentType, documentGroup }),
     });
     return { policyId };
   });
@@ -875,6 +1011,7 @@ export async function recordHrDocumentAcknowledgment(input: {
   policyVersion: string;
   acknowledgmentMethod: string;
   employeeDocumentId?: string | null;
+  actorUserId?: string | null;
 }) {
   return runWithOrganizationContext(input.organizationId, async (db) => {
     const id = createEntityId("hr_doc_ack");
@@ -887,6 +1024,15 @@ export async function recordHrDocumentAcknowledgment(input: {
       policyVersion: input.policyVersion.trim(),
       acknowledgmentMethod: input.acknowledgmentMethod.trim(),
       acknowledgedAt: new Date(),
+    });
+    await insertHrDocumentAuditEventInTx(db, {
+      organizationId: input.organizationId,
+      documentId: input.employeeDocumentId ?? null,
+      employeeId: input.employeeId,
+      action: "hr.document.acknowledgment.record",
+      actorUserId: input.actorUserId ?? null,
+      summary: `Recorded acknowledgment for ${input.policyKey.trim()} ${input.policyVersion.trim()}`,
+      metadata: JSON.stringify({ acknowledgmentId: id }),
     });
     return { acknowledgmentId: id };
   });

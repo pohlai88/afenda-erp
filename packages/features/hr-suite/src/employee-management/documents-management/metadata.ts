@@ -27,6 +27,15 @@ export {
 } from "./surface/hr.workforce.documents-overview-stat.surface";
 
 export {
+  HR_WORKFORCE_DOCUMENTS_ACCEPTANCE_CRITERIA_COVERAGE,
+  HR_WORKFORCE_DOCUMENTS_REQUIREMENT_COVERAGE,
+  assertHrWorkforceDocumentsEnterpriseCoverage,
+  type HrDocumentsCoverageEntry,
+  type HrDocumentsCoverageStatus,
+  type HrDocumentsRequirementCode,
+} from "./data/hr.workforce.documents-coverage.shared";
+
+export {
   parseHrDocumentsSearchParams,
   toHrDocumentsPageModelInput,
   type HrDocumentsSearchParams,

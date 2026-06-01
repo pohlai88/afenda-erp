@@ -1,7 +1,8 @@
+import { resolveExecutionCapabilityForAction } from "../../tenant-execution/policies/system-admin.execution-capability.shared.server";
 import {
-  getExecutionCapability,
-  listExecutionCapabilities,
-} from "@afenda/kernel/execution-capabilities";
+  readConfigurationString,
+  readExecutionSettingConfiguration,
+} from "../../tenant-execution/contracts/system-admin.execution-settings.shared";
 import type { TenantPolicySettingRow } from "@afenda/db";
 import { systemAdminControlLinks } from "../../overview/contracts/system-admin.control-links.contract";
 import type { SystemAdminPolicyRuleDetail } from "../contracts/system-admin.policy-rule.contract";
@@ -9,19 +10,6 @@ import {
   mapTenantPolicySettingToRule,
 } from "./system-admin.policy-rules.mapper";
 import { evaluatePolicyRuleReadiness } from "./system-admin.policy-rules.readiness.server";
-
-function resolveCapabilityForAction(action: string) {
-  const direct = getExecutionCapability(action);
-  if (direct) {
-    return direct;
-  }
-
-  return (
-    listExecutionCapabilities().find(
-      (capability) => capability.requiredPermission === action,
-    ) ?? null
-  );
-}
 
 export function buildSystemAdminPolicyRuleDetail(input: {
   policyKey: string;
@@ -35,13 +23,13 @@ export function buildSystemAdminPolicyRuleDetail(input: {
 
   const rule = mapTenantPolicySettingToRule(row);
   const readinessVerdict = evaluatePolicyRuleReadiness(rule);
-  const capability = resolveCapabilityForAction(rule.action);
+  const capability = resolveExecutionCapabilityForAction(rule.action);
   const relatedApprovalKeys = input.approvalSettings
     .filter((approval) => {
-      const configuration = approval.configuration;
-      const action =
-        typeof configuration.action === "string" ? configuration.action : "";
-      return action === rule.action;
+      const configuration = readExecutionSettingConfiguration(
+        approval.configuration,
+      );
+      return readConfigurationString(configuration.action, "") === rule.action;
     })
     .map((approval) => approval.approvalKey);
 

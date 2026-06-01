@@ -20,8 +20,8 @@ export function SystemAdminApprovalTrailingCell({
 }: GovernedListTrailingCellProps) {
   const [result, setResult] = useState<SystemAdminActionResult>();
   const [isPending, startTransition] = useTransition();
+  const listCopy = systemAdminApprovalsUiCopy.list;
   const trailingAction = row.trailingAction;
-  const reviewLabel = systemAdminApprovalsUiCopy.list.reviewActionLabel;
   const enabled = row.cells["enabled"] === "true";
   const reviewHref =
     typeof row.rowHref === "string" && row.rowHref.length > 0
@@ -31,20 +31,23 @@ export function SystemAdminApprovalTrailingCell({
   if (!isListSurfaceTrailingActionRenderable(trailingAction)) {
     return reviewHref ? (
       <Button variant="outline" size="sm" asChild>
-        <Link href={reviewHref}>{reviewLabel}</Link>
+        <Link href={reviewHref}>{listCopy.reviewActionLabel}</Link>
       </Button>
     ) : null;
   }
 
   const disabled = trailingAction.state === "disabled" || isPending;
   const nextEnabled = !enabled;
+  const mutationLabel =
+    trailingAction.descriptor?.label ??
+    (nextEnabled ? listCopy.enableActionLabel : listCopy.disableActionLabel);
 
   return (
     <GovernedTrailingActionSlot trailingAction={trailingAction}>
       <div className="flex flex-wrap items-center gap-2">
         {reviewHref ? (
           <Button variant="outline" size="sm" asChild>
-            <Link href={reviewHref}>{reviewLabel}</Link>
+            <Link href={reviewHref}>{listCopy.reviewActionLabel}</Link>
           </Button>
         ) : null}
         <Button
@@ -68,7 +71,7 @@ export function SystemAdminApprovalTrailingCell({
           ) : (
             <BanIcon data-icon="inline-start" />
           )}
-          {trailingAction.descriptor?.label ?? (nextEnabled ? "Enable" : "Disable")}
+          {mutationLabel}
         </Button>
         <ActionFormErrors result={result} />
       </div>

@@ -12,10 +12,11 @@
 | Requirements + missing mandatory | Shipped | Requirement upsert form; derived missing register |
 | Version lineage | Shipped | `replaceHrEmployeeDocument`, `versionNumber`, `isLatestActive` |
 | Expiry posture | Shipped | Flag-first derivation at read; expiring watchlist surface |
-| Sensitive access | Shipped | `hr.documents.sensitive.read`; title masking on lists |
+| Sensitive access | Shipped | `hr.documents.sensitive.read`; title/payload masking on lists; server-side download authorization |
 | Retention policies | Shipped | Policy register + upsert action |
-| Audit trail + acknowledgments | Shipped | Audit events on upload/verify/reject/replace; ack register |
+| Audit trail + acknowledgments | Shipped | Audit events on upload/download/verify/reject/replace/archive plus requirement, retention, and acknowledgment actions |
 | Readiness API | Shipped | `getHrEmployeeDocumentReadiness` / server action |
+| Enterprise coverage | Shipped | `hr.workforce.documents-coverage.shared.ts` maps HRM-DOC-001..025 and AC-01..20 to shipped evidence |
 | E2E harness | Shipped | `apps/erp/tests/e2e/hr-documents.spec.ts` (serial, dev auth) |
 
 **Expiry decision (slice 6):** Option B — flag-first at read; `runHrDocumentExpirySweep` remains cron-only archive helper and does not drive workbench posture.
@@ -142,5 +143,4 @@
 | 18  | Employee record can display linked document readiness without owning the document workflow. |
 | 19  | Document records remain available after employee separation according to retention policy.  |
 | 20  | Every document action creates an audit event.                                               |
-
 

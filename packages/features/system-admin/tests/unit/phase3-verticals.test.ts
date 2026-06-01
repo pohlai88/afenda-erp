@@ -235,5 +235,30 @@ describe("system admin phase 3 rule mapping", () => {
 
     expect(rule.approverRoleKeys).toEqual(["owner", "admin"]);
     expect(rule.minApprovals).toBe(2);
+    expect(rule.approvalMode).toBe("parallel");
+  });
+
+  it("maps approval kernel records with approval mode for runtime resolution", () => {
+    const kernelRecord = mapTenantApprovalSettingToKernelRecord({
+      id: "approval_seq",
+      organizationId: "org_1",
+      approvalKey: "hr.salary.change",
+      label: "Salary change",
+      enabled: true,
+      approverRole: "admin",
+      escalationMinutes: 60,
+      configuration: {
+        moduleKey: "hr",
+        action: "hr.documents.write",
+        targetType: "erp-record",
+        approvalMode: "sequential",
+        approverRoleKeys: ["admin", "finance-manager"],
+        minApprovals: 2,
+        status: "active",
+      },
+    });
+
+    expect(kernelRecord?.approvalMode).toBe("sequential");
+    expect(kernelRecord?.minApprovals).toBe(2);
   });
 });

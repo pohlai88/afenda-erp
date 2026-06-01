@@ -233,11 +233,8 @@ export async function buildHrDocumentsPageModel(
 ): Promise<HrDocumentsPageModel> {
   const copy = hrDocumentsUiCopy;
 
-  const employeePickerOptions = await loadDocumentsEmployeePickerOptions(
-    input.organizationId,
-  );
-
   const [
+    employeePickerOptions,
     overviewResult,
     repositoryResult,
     requirementsResult,
@@ -247,6 +244,7 @@ export async function buildHrDocumentsPageModel(
     auditTrailResult,
     acknowledgmentsResult,
   ] = await Promise.all([
+    loadDocumentsEmployeePickerOptions(input.organizationId),
     settleDocumentsListLoad({
       sectionTitle: copy.overview.sectionTitle,
       load: () =>

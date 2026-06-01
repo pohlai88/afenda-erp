@@ -1,51 +1,54 @@
-import {
-  getExecutionCapability,
-  listExecutionCapabilities,
-} from "@afenda/kernel/execution-capabilities";
+import { listExecutionCapabilities } from "@afenda/kernel/execution-capabilities";
 import type {
   ApprovalReadinessVerdict,
   SystemAdminApprovalRule,
 } from "../contracts/system-admin.approval-rule.contract";
+import { resolveExecutionCapabilityForAction } from "../../tenant-execution/policies/system-admin.execution-capability.shared.server";
 
-function resolveCapabilityForAction(action: string) {
-  const direct = getExecutionCapability(action);
-  if (direct) {
-    return direct;
+function isInactiveApprovalRule(rule: SystemAdminApprovalRule) {
+  return (
+    rule.status === "deprecated" ||
+    rule.status === "disabled" ||
+    !rule.enabled
+  );
+}
+
+function hasInvalidApproverCount(rule: SystemAdminApprovalRule) {
+  return (
+    rule.approverRoleKeys.length === 0 ||
+    rule.minApprovals > rule.approverRoleKeys.length
+  );
+}
+
+function hasInvalidModuleCoverage(moduleKey: string) {
+  const normalizedModuleKey = moduleKey.trim();
+  if (normalizedModuleKey.length === 0 || normalizedModuleKey === "*") {
+    return false;
   }
 
   return (
-    listExecutionCapabilities().find(
-      (capability) => capability.requiredPermission === action,
-    ) ?? null
+    listExecutionCapabilities().filter(
+      (capability) => capability.moduleKey === normalizedModuleKey,
+    ).length === 0
   );
 }
 
 export function evaluateApprovalRuleReadiness(
   rule: SystemAdminApprovalRule,
 ): ApprovalReadinessVerdict {
-  if (rule.status === "deprecated" || !rule.enabled || rule.status === "disabled") {
+  if (isInactiveApprovalRule(rule)) {
     return "warning";
   }
 
-  if (rule.approverRoleKeys.length === 0) {
+  if (hasInvalidApproverCount(rule)) {
     return "blocked";
   }
 
-  if (rule.minApprovals > rule.approverRoleKeys.length) {
+  if (hasInvalidModuleCoverage(rule.moduleKey)) {
     return "blocked";
   }
 
-  const moduleKey = rule.moduleKey.trim();
-  if (moduleKey.length > 0 && moduleKey !== "*") {
-    const moduleCapabilities = listExecutionCapabilities().filter(
-      (capability) => capability.moduleKey === moduleKey,
-    );
-    if (moduleCapabilities.length === 0) {
-      return "blocked";
-    }
-  }
-
-  const actionCapability = resolveCapabilityForAction(rule.action);
+  const actionCapability = resolveExecutionCapabilityForAction(rule.action);
   if (!actionCapability) {
     return "blocked";
   }
@@ -55,8 +58,15 @@ export function evaluateApprovalRuleReadiness(
   }
 
   if (
-    rule.approvalMode === "sequential" &&
-    rule.minApprovals > rule.approverRoleKeys.length
+    rule.escalationBehavior === "reassign" &&
+    rule.escalationRoleKeys.length === 0
+  ) {
+    return "blocked";
+  }
+
+  if (
+    rule.delegateToRoleKeys.length > 0 &&
+    (!rule.delegationValidDays || rule.delegationValidDays < 1)
   ) {
     return "blocked";
   }

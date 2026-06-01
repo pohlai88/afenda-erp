@@ -43,6 +43,7 @@ export default async function SystemAdminApprovalsPage({
     approvals,
     approverRoleOptions,
     selectedApprovalKey,
+    approvalDetail,
     editorDefaults,
   } = await buildSystemAdminApprovalsPageModel({
     organizationId: organization.id,
@@ -59,6 +60,7 @@ export default async function SystemAdminApprovalsPage({
       approverRoleOptions={approverRoleOptions}
       updateApprovalRuleAction={updateSystemAdminApprovalRuleAction}
       selectedApprovalKey={selectedApprovalKey}
+      approvalDetail={approvalDetail}
       editorDefaults={editorDefaults}
     />
   );

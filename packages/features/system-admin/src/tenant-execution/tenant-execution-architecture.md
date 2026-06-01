@@ -93,8 +93,15 @@ Consumed by vertical page models and actions (policies, approvals, modules, capa
 | Artifact | Role |
 | -------- | ---- |
 | `system-admin.action-result.contract.ts` | `SystemAdminActionResult`, `systemAdminActionSuccess`, `systemAdminActionFailure`, `zodActionFailure` |
+| `system-admin.execution-settings.shared.ts` | Configuration record readers, form optional values, `MINUTES_PER_HOUR` |
 
-Shared by all System Admin Server Actions and client forms that display mutation errors. Not kernel-specific.
+Shared execution-settings helpers are environment-neutral and reused by policy/approval mappers and actions.
+
+### 4. Execution capability bridge (`policies/`)
+
+| Artifact | Role |
+| -------- | ---- |
+| `system-admin.execution-capability.shared.server.ts` | `resolveExecutionCapabilityForAction` — shared by policy/approval detail, readiness, and diagnostics |
 
 ## Package layout (as-built)
 
@@ -106,12 +113,14 @@ tenant-execution/
   contracts/
     index.ts
     system-admin.action-result.contract.ts
+    system-admin.execution-settings.shared.ts
   data/
     index.ts
     system-admin.execution-settings.repository.server.ts
   policies/
     index.ts
     register-tenant-execution-policies.server.ts
+    system-admin.execution-capability.shared.server.ts
     system-admin.tenant-execution-rules.loader.server.ts
   tests/
 ```

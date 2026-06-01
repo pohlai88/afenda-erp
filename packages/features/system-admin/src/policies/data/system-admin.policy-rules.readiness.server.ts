@@ -1,25 +1,11 @@
 import {
-  getExecutionCapability,
-  listExecutionCapabilities,
   listExecutionCapabilitiesForModule,
 } from "@afenda/kernel/execution-capabilities";
+import { resolveExecutionCapabilityForAction } from "../../tenant-execution/policies/system-admin.execution-capability.shared.server";
 import type {
   PolicyReadinessVerdict,
   SystemAdminPolicyRule,
 } from "../contracts/system-admin.policy-rule.contract";
-
-function resolveCapabilityForAction(action: string) {
-  const direct = getExecutionCapability(action);
-  if (direct) {
-    return direct;
-  }
-
-  return (
-    listExecutionCapabilities().find(
-      (capability) => capability.requiredPermission === action,
-    ) ?? null
-  );
-}
 
 export function evaluatePolicyRuleReadiness(
   rule: SystemAdminPolicyRule,
@@ -44,7 +30,7 @@ export function evaluatePolicyRuleReadiness(
     }
   }
 
-  const actionCapability = resolveCapabilityForAction(rule.action);
+  const actionCapability = resolveExecutionCapabilityForAction(rule.action);
   if (!actionCapability) {
     return "blocked";
   }

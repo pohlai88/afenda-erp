@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 
-import { parseHrComplianceSearchParams } from "../../src/employee-management/compliance-regulatory-tracking/data/hr.workforce.compliance-search-params.parse.shared";
+import {
+  parseHrComplianceSearchParams,
+  toHrCompliancePageModelInput,
+} from "../../src/employee-management/compliance-regulatory-tracking/data/hr.workforce.compliance-search-params.parse.shared";
 
 describe("parseHrComplianceSearchParams", () => {
   it("returns empty values when search params are missing", () => {
@@ -140,6 +143,30 @@ describe("parseHrComplianceSearchParams", () => {
       reviewQueueSearch: "legacy",
       evidenceLinksSearch: "legacy",
       auditTrailSearch: "legacy",
+    });
+  });
+
+  it("builds a full page-model input from registry-driven App Router params", () => {
+    expect(
+      toHrCompliancePageModelInput({
+        organizationId: "org-compliance",
+        canWrite: true,
+        canViewSensitive: false,
+        searchParams: {
+          complianceReviewQueueSearch: " pending ",
+          complianceStatutorySearch: " levy ",
+          complianceEvidenceLinksSearch: " document ",
+          complianceAuditTrailSearch: " approved ",
+        },
+      }),
+    ).toMatchObject({
+      organizationId: "org-compliance",
+      canWrite: true,
+      canViewSensitive: false,
+      reviewQueueSearch: "pending",
+      statutorySearch: "levy",
+      evidenceLinksSearch: "document",
+      auditTrailSearch: "approved",
     });
   });
 });

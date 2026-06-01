@@ -31,9 +31,14 @@ export type TenantApprovalRuleRecord = {
   moduleKey: string;
   action: string;
   targetType: string;
+  approvalMode: "sequential" | "parallel";
   approverRoleKeys: readonly string[];
   minApprovals: number;
   escalationAfterHours?: number;
+  escalationBehavior?: "notify" | "reassign" | "expire";
+  escalationRoleKeys?: readonly string[];
+  delegateToRoleKeys?: readonly string[];
+  delegationValidDays?: number;
   status: "active" | "disabled" | "deprecated";
 };
 

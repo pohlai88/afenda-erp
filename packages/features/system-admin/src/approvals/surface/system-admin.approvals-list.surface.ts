@@ -19,6 +19,7 @@ export function buildApprovalsListSurface(input: {
 }): ListSurfaceRendererConfigurationResolvedInput {
   const canMutate = input.canMutate ?? false;
   const copy = systemAdminApprovalsUiCopy.list;
+  const columns = copy.columns;
 
   return buildLinkedControlListSurface({
     key: systemAdminApprovalsSurfaceKey,
@@ -27,20 +28,24 @@ export function buildApprovalsListSurface(input: {
     columns: [
       {
         id: "name",
-        header: "Rule",
+        header: columns.name,
         priority: "primary",
         pin: "start",
         cellKind: { kind: "link" },
       },
-      { id: "moduleKey", header: "Module", cellKind: { kind: "link" } },
-      { id: "action", header: "Action" },
-      { id: "targetType", header: "Target" },
-      { id: "approvalMode", header: "Mode" },
-      { id: "approverRoles", header: "Approvers" },
-      { id: "minApprovals", header: "Min approvals" },
-      { id: "escalation", header: "Escalation" },
-      { id: "status", header: "Status", cellKind: { kind: "badge" } },
-      { id: "readinessVerdict", header: "Readiness", cellKind: { kind: "badge" } },
+      { id: "moduleKey", header: columns.moduleKey, cellKind: { kind: "link" } },
+      { id: "action", header: columns.action },
+      { id: "targetType", header: columns.targetType },
+      { id: "approvalMode", header: columns.approvalMode },
+      { id: "approverRoles", header: columns.approverRoles },
+      { id: "minApprovals", header: columns.minApprovals },
+      { id: "escalation", header: columns.escalation },
+      { id: "status", header: columns.status, cellKind: { kind: "badge" } },
+      {
+        id: "readinessVerdict",
+        header: columns.readinessVerdict,
+        cellKind: { kind: "badge" },
+      },
     ],
     rows: input.approvals.map((approval) => ({
       id: approval.key,
@@ -76,7 +81,9 @@ export function buildApprovalsListSurface(input: {
       },
     })),
     emptyTitle: copy.emptyTitle,
-    emptyDescription: copy.emptyDescription,
+    emptyDescription: canMutate
+      ? copy.emptyDescription
+      : copy.emptyDescriptionReadOnly,
     searchPlaceholder: copy.searchPlaceholder,
     searchValue: input.searchValue,
   });

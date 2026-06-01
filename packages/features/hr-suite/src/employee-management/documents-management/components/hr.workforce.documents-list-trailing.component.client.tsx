@@ -42,10 +42,6 @@ function DocumentsTrailingForm({
     <form
       action={formAction}
       className="flex flex-col gap-surface-sm"
-      onSubmit={(event) => {
-        event.preventDefault();
-        event.currentTarget.requestSubmit();
-      }}
     >
       <input type="hidden" name="documentId" value={rowId} />
       {children}
@@ -101,7 +97,6 @@ export function HrDocumentsRepositoryTrailingCell({
             <Input
               id={`replace-blob-${row.id}`}
               name="blobUrl"
-              defaultValue={String(row.cells.blobUrlValue ?? "")}
               required
             />
           </Field>

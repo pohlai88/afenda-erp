@@ -7,10 +7,10 @@ import type {
   TenantPolicySettingRow,
 } from "@afenda/db";
 import {
-  getExecutionCapability,
   listExecutionCapabilities,
   listExecutionCapabilitiesForModule,
 } from "@afenda/kernel/execution-capabilities";
+import { resolveExecutionCapabilityForAction } from "../../tenant-execution/policies/system-admin.execution-capability.shared.server";
 import { evaluateCapabilityCoverage } from "../../capabilities/data/system-admin.capabilities.coverage.server";
 import type { OrganizationSecuritySettings } from "../../security/contracts/system-admin.security-settings.contract";
 import { mapTenantApprovalSettingToRule } from "../../approvals/data/system-admin.approval-rules.mapper";
@@ -54,18 +54,6 @@ export function collectIntegrationDiagnosticIssues(
   );
 }
 
-function resolveCapabilityForAction(action: string) {
-  const direct = getExecutionCapability(action);
-  if (direct) {
-    return direct;
-  }
-
-  return (
-    listExecutionCapabilities().find(
-      (capability) => capability.requiredPermission === action,
-    ) ?? null
-  );
-}
 
 function moduleSettingsByKey(settings: readonly TenantModuleSettingRow[]) {
   return new Map(settings.map((setting) => [setting.moduleKey, setting]));
@@ -237,7 +225,7 @@ export function collectSystemAdminDiagnosticIssues(input: {
       );
     }
 
-    const actionCapability = resolveCapabilityForAction(rule.action);
+    const actionCapability = resolveExecutionCapabilityForAction(rule.action);
     if (!actionCapability) {
       issues.push(
         withHref({

@@ -30,14 +30,23 @@ import {
   buildLynxRecoveryPlaybookListSurface,
 } from "@afenda/feature-lynx/metadata";
 import {
+  buildApprovalsListSurface,
   buildMembersListSurface,
   buildUsersListSurface,
+  systemAdminApprovalDetailGalleryFixture,
+  systemAdminApprovalsGalleryRows,
+  systemAdminApprovalsSurfaceKey,
+  systemAdminApprovalsUiCopy,
   systemAdminMembersSurfaceKey,
   systemAdminMembershipsGalleryRows,
   systemAdminUsersGalleryRows,
   systemAdminUsersSurfaceKey,
 } from "@afenda/feature-system-admin/metadata";
-import { SystemAdminMembershipTrailingCell } from "@afenda/feature-system-admin/client";
+import {
+  SystemAdminApprovalTrailingCell,
+  SystemAdminMembershipTrailingCell,
+} from "@afenda/feature-system-admin/client";
+import { SystemAdminApprovalDetailPanel } from "@afenda/feature-system-admin/server";
 import {
   GovernedKanbanFooterSection,
   GovernedKanbanReadOnlyBoard,
@@ -383,6 +392,44 @@ export default function MetadataRendererGalleryPage() {
           })}
           parentAccessAllowed
           {...galleryPatternSection}
+        />
+      </GallerySection>
+
+      <GallerySection label="Pattern C — System admin approvals (ready)">
+        <GovernedPatternCListSection
+          title="Approval rules"
+          surfaceKey={systemAdminApprovalsSurfaceKey}
+          listConfiguration={buildApprovalsListSurface({
+            approvals: systemAdminApprovalsGalleryRows,
+            canMutate: true,
+          })}
+          parentAccessAllowed
+          {...galleryPatternSection}
+          trailingColumn={{
+            header: systemAdminApprovalsUiCopy.list.actionsHeader,
+            Cell: SystemAdminApprovalTrailingCell,
+            context: { surfaceKey: systemAdminApprovalsSurfaceKey },
+          }}
+        />
+      </GallerySection>
+
+      <GallerySection label="Pattern C — System admin approvals (empty)">
+        <GovernedPatternCListSection
+          title="Approval rules"
+          surfaceKey={`${systemAdminApprovalsSurfaceKey}.empty`}
+          listConfiguration={buildApprovalsListSurface({
+            approvals: [],
+            canMutate: true,
+          })}
+          parentAccessAllowed
+          {...galleryPatternSection}
+        />
+      </GallerySection>
+
+      <GallerySection label="System admin approval detail (fixture)">
+        <SystemAdminApprovalDetailPanel
+          detail={systemAdminApprovalDetailGalleryFixture}
+          backHref="/system-admin/approvals"
         />
       </GallerySection>
 

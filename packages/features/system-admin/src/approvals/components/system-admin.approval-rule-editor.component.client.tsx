@@ -5,6 +5,16 @@ import { Button, Field, FieldGroup, FieldLabel, Input, NativeSelect } from "@afe
 import { GitPullRequestIcon } from "lucide-react";
 import { useActionState } from "react";
 import type { SystemAdminActionResult } from "../../tenant-execution/contracts/system-admin.action-result.contract";
+import {
+  APPROVAL_RULE_DEFAULT_MODULE_KEY,
+  APPROVAL_RULE_DEFAULT_TARGET_TYPE,
+  APPROVAL_RULE_DELEGATION_VALID_DAYS_MAX,
+  APPROVAL_RULE_DELEGATION_VALID_DAYS_MIN,
+  APPROVAL_RULE_ESCALATION_HOURS_MAX,
+  APPROVAL_RULE_ESCALATION_HOURS_MIN,
+  APPROVAL_RULE_MIN_APPROVALS_MAX,
+  APPROVAL_RULE_MIN_APPROVALS_MIN,
+} from "../contracts/system-admin.approval-rule.limits.shared";
 import type {
   SystemAdminApprovalRuleEditorDefaults,
   SystemAdminApproverRoleOption,
@@ -64,7 +74,7 @@ export function SystemAdminApprovalRuleEditor({
           <Input
             name="moduleKey"
             placeholder="purchasing"
-            defaultValue={editorDefaults?.moduleKey ?? "*"}
+            defaultValue={editorDefaults?.moduleKey ?? APPROVAL_RULE_DEFAULT_MODULE_KEY}
           />
         </Field>
         <Field>
@@ -80,7 +90,7 @@ export function SystemAdminApprovalRuleEditor({
           <FieldLabel>Target type</FieldLabel>
           <Input
             name="targetType"
-            defaultValue={editorDefaults?.targetType ?? "erp-record"}
+            defaultValue={editorDefaults?.targetType ?? APPROVAL_RULE_DEFAULT_TARGET_TYPE}
             required
           />
         </Field>
@@ -116,13 +126,24 @@ export function SystemAdminApprovalRuleEditor({
           />
         </Field>
         <Field>
+          <FieldLabel>Delegation valid days</FieldLabel>
+          <Input
+            name="delegationValidDays"
+            type="number"
+            min={APPROVAL_RULE_DELEGATION_VALID_DAYS_MIN}
+            max={APPROVAL_RULE_DELEGATION_VALID_DAYS_MAX}
+            placeholder="30"
+            defaultValue={editorDefaults?.delegationValidDays}
+          />
+        </Field>
+        <Field>
           <FieldLabel>Minimum approvals</FieldLabel>
           <Input
             name="minApprovals"
             type="number"
-            min={1}
-            max={10}
-            defaultValue={editorDefaults?.minApprovals ?? 1}
+            min={APPROVAL_RULE_MIN_APPROVALS_MIN}
+            max={APPROVAL_RULE_MIN_APPROVALS_MAX}
+            defaultValue={editorDefaults?.minApprovals ?? APPROVAL_RULE_MIN_APPROVALS_MIN}
           />
         </Field>
         <Field>
@@ -130,10 +151,29 @@ export function SystemAdminApprovalRuleEditor({
           <Input
             name="escalationAfterHours"
             type="number"
-            min={1}
-            max={720}
+            min={APPROVAL_RULE_ESCALATION_HOURS_MIN}
+            max={APPROVAL_RULE_ESCALATION_HOURS_MAX}
             placeholder="24"
             defaultValue={editorDefaults?.escalationAfterHours}
+          />
+        </Field>
+        <Field>
+          <FieldLabel>Escalation behavior</FieldLabel>
+          <NativeSelect
+            name="escalationBehavior"
+            defaultValue={editorDefaults?.escalationBehavior ?? "notify"}
+          >
+            <option value="notify">Notify</option>
+            <option value="reassign">Reassign</option>
+            <option value="expire">Expire</option>
+          </NativeSelect>
+        </Field>
+        <Field>
+          <FieldLabel>Escalation roles</FieldLabel>
+          <Input
+            name="escalationRoleKeys"
+            placeholder="owner"
+            defaultValue={editorDefaults?.escalationRoleKeys}
           />
         </Field>
         <Field>

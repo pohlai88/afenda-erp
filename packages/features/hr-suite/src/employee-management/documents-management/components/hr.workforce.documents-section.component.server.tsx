@@ -113,9 +113,6 @@ function HrDocumentsGovernedListSection({
   TrailingCell: ComponentType<GovernedListTrailingCellProps>;
   sensitiveAccessDescription?: string;
 }) {
-  const effectiveWrite =
-    canWrite && (canViewSensitive || sensitiveAccessDescription === undefined);
-
   return (
     <div className="flex flex-col gap-surface-md">
       {!canViewSensitive && sensitiveAccessDescription ? (
@@ -133,7 +130,7 @@ function HrDocumentsGovernedListSection({
         layout="embedded"
         forbidden={documentsForbiddenState}
         trailingColumn={
-          effectiveWrite && !loadError
+          canWrite && !loadError
             ? {
                 header: actionsHeader,
                 Cell: TrailingCell,

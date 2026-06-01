@@ -3,9 +3,9 @@ import type { HrEmployeeDocumentWindow } from "@afenda/db";
 import { hrEmployeeDetailRoutePath } from "../contracts/hr.workforce.documents-route.contract";
 import { deriveHrDocumentEffectiveVerificationStatus } from "../data/hr.workforce.documents-status.shared";
 import {
+  isHrDocumentClassificationSensitive,
   maskHrDocumentSensitiveText,
 } from "../data/hr.workforce.documents-sensitive-access.shared";
-export const hrDocumentsRepositorySearchParam = "documentsRepositorySearch";
 import { formatDocumentsDateTimeLocalInput } from "../schemas/hr.workforce.documents-form.shared";
 import {
   buildDocumentsListSearchToolbar,
@@ -18,6 +18,8 @@ import {
 } from "./hr.workforce.documents-list.shared";
 import { hrDocumentsRepositoryColumnsId } from "./hr.workforce.documents-surface-columns.shared";
 import { hrDocumentsUiCopy } from "./hr.workforce.documents-ui.copy.shared";
+
+export const hrDocumentsRepositorySearchParam = "documentsRepositorySearch";
 
 export const hrDocumentsRepositorySurfaceKey =
   "hr.workforce.documents.repository.list";
@@ -98,6 +100,10 @@ export function buildHrDocumentsRepositoryListSurface(input: {
         verificationStatus: row.verificationStatus,
         effectiveTo: row.effectiveTo,
       });
+      const canExposeDocumentPayload =
+        canViewSensitive ||
+        !isHrDocumentClassificationSensitive(row.classification);
+      const title = maskHrDocumentSensitiveText(row.title, canViewSensitive);
 
       return {
         id: row.id,
@@ -110,9 +116,8 @@ export function buildHrDocumentsRepositoryListSurface(input: {
             employeeDisplayName: row.employeeDisplayName,
           }),
           documentType: formatDocumentsListEnumCell(row.documentType),
-          title: maskHrDocumentSensitiveText(row.title, canViewSensitive),
-          titleValue: row.title,
-          blobUrlValue: row.blobUrl,
+          title,
+          titleValue: canExposeDocumentPayload ? row.title : title,
           classification: formatDocumentsListEnumCell(row.classification),
           verification: formatDocumentsListEnumCell(effectiveVerification),
           verificationValue: row.verificationStatus,
@@ -125,8 +130,8 @@ export function buildHrDocumentsRepositoryListSurface(input: {
           isLatestActiveValue: row.isLatestActive ? "true" : "false",
           rejectionReasonValue: row.rejectionReason ?? "",
           employeeIdValue: row.employeeId,
-          mimeTypeValue: row.mimeType,
-          sizeBytesValue: String(row.sizeBytes),
+          mimeTypeValue: canExposeDocumentPayload ? row.mimeType : "",
+          sizeBytesValue: canExposeDocumentPayload ? String(row.sizeBytes) : "0",
         },
         cellKinds: {
           verification: {
@@ -135,7 +140,7 @@ export function buildHrDocumentsRepositoryListSurface(input: {
           },
         },
         trailingAction: resolveDocumentsRepositoryTrailingAction(
-          canWrite,
+          canWrite && canExposeDocumentPayload,
           effectiveVerification,
         ),
       };

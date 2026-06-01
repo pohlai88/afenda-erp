@@ -1,13 +1,19 @@
+export * from "./hr.workforce.documents-action-result.shared";
+export * from "./hr.workforce.documents-coverage.shared";
+export * from "./hr.workforce.documents-list-load.shared";
+export * from "./hr.workforce.documents-org-scope.shared";
 export {
   buildHrDocumentsPageModel,
   type HrDocumentsPageModel,
   type HrDocumentsPageModelInput,
 } from "./hr.workforce.documents.page-model.server";
+export * from "./hr.workforce.documents-sensitive-access.shared";
 export {
   parseHrDocumentsSearchParams,
   toHrDocumentsPageModelInput,
   type HrDocumentsSearchParams,
 } from "./hr.workforce.documents-search-params.parse.shared";
+export * from "./hr.workforce.documents-status.shared";
 export {
   type HrDocumentsListSurfaceKey,
   getHrDocumentsListSurfaceKeys,

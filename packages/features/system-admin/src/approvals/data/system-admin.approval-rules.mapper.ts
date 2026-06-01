@@ -2,55 +2,40 @@ import type { TenantApprovalSettingRow } from "@afenda/db";
 import { organizationRoles } from "@afenda/auth";
 import type { TenantApprovalRuleRecord } from "@afenda/kernel/execution";
 import type {
+  ApprovalEscalationBehavior,
   SystemAdminApprovalMode,
   SystemAdminApprovalRule,
   SystemAdminApprovalRuleListRow,
   SystemAdminApprovalRuleStatus,
 } from "../contracts/system-admin.approval-rule.contract";
 import { evaluateApprovalRuleReadiness } from "./system-admin.approval-rules.readiness.server";
-import { approvalModeSchema } from "../schemas/system-admin.approval-rule.schema";
-
-function readString(value: unknown, fallback: string) {
-  return typeof value === "string" && value.trim().length > 0
-    ? value.trim()
-    : fallback;
-}
-
-function readNumber(value: unknown, fallback: number) {
-  return typeof value === "number" && Number.isFinite(value) ? value : fallback;
-}
-
-function readRecord(value: unknown) {
-  return value && typeof value === "object" && !Array.isArray(value)
-    ? (value as Record<string, unknown>)
-    : {};
-}
+import {
+  formatApprovalEscalationSummary,
+} from "./system-admin.approval-rules.shared";
+import {
+  MINUTES_PER_HOUR,
+  readConfigurationNumber,
+  readConfigurationOptionalNumber,
+  readConfigurationString,
+  readExecutionSettingConfiguration,
+} from "../../tenant-execution/contracts/system-admin.execution-settings.shared";
+import {
+  APPROVAL_RULE_DEFAULT_MODULE_KEY,
+  APPROVAL_RULE_DEFAULT_TARGET_TYPE,
+  APPROVAL_RULE_MIN_ESCALATION_HOURS_FROM_MINUTES,
+} from "../contracts/system-admin.approval-rule.limits.shared";
+import {
+  approvalModeSchema,
+  escalationBehaviorSchema,
+} from "../schemas/system-admin.approval-rule.schema";
 
 type ApproverRole = NonNullable<TenantApprovalSettingRow["approverRole"]>;
 
-function readApproverRoles(
+function readRoleKeys(
   configuration: Record<string, unknown>,
-  fallbackRole: ApproverRole | null,
+  key: "approverRoleKeys" | "delegateToRoleKeys" | "escalationRoleKeys",
 ): readonly ApproverRole[] {
-  const configured = configuration.approverRoleKeys;
-  if (Array.isArray(configured)) {
-    const roles = configured.filter(
-      (role): role is ApproverRole =>
-        typeof role === "string" &&
-        (organizationRoles as readonly string[]).includes(role),
-    );
-    if (roles.length > 0) {
-      return roles;
-    }
-  }
-
-  return fallbackRole ? [fallbackRole] : [];
-}
-
-function readDelegateRoles(
-  configuration: Record<string, unknown>,
-): readonly ApproverRole[] {
-  const configured = configuration.delegateToRoleKeys;
+  const configured = configuration[key];
   if (!Array.isArray(configured)) {
     return [];
   }
@@ -62,11 +47,30 @@ function readDelegateRoles(
   );
 }
 
+function readApproverRoles(
+  configuration: Record<string, unknown>,
+  fallbackRole: ApproverRole | null,
+): readonly ApproverRole[] {
+  const configured = readRoleKeys(configuration, "approverRoleKeys");
+  if (configured.length > 0) {
+    return configured;
+  }
+
+  return fallbackRole ? [fallbackRole] : [];
+}
+
 function readApprovalMode(
   configuration: Record<string, unknown>,
 ): SystemAdminApprovalMode {
   const parsed = approvalModeSchema.safeParse(configuration.approvalMode);
   return parsed.success ? parsed.data : "parallel";
+}
+
+function readEscalationBehavior(
+  configuration: Record<string, unknown>,
+): ApprovalEscalationBehavior | undefined {
+  const parsed = escalationBehaviorSchema.safeParse(configuration.escalationBehavior);
+  return parsed.success ? parsed.data : undefined;
 }
 
 function deriveApprovalStatus(
@@ -90,12 +94,15 @@ function deriveApprovalStatus(
 export function mapTenantApprovalSettingToRule(
   row: TenantApprovalSettingRow,
 ): SystemAdminApprovalRule {
-  const configuration = readRecord(row.configuration);
+  const configuration = readExecutionSettingConfiguration(row.configuration);
   const escalationAfterHours =
     typeof configuration.escalationAfterHours === "number"
       ? configuration.escalationAfterHours
       : row.escalationMinutes
-        ? Math.max(1, Math.round(row.escalationMinutes / 60))
+        ? Math.max(
+            APPROVAL_RULE_MIN_ESCALATION_HOURS_FROM_MINUTES,
+            Math.round(row.escalationMinutes / MINUTES_PER_HOUR),
+          )
         : undefined;
 
   return {
@@ -103,14 +110,23 @@ export function mapTenantApprovalSettingToRule(
     organizationId: row.organizationId,
     key: row.approvalKey,
     name: row.label,
-    moduleKey: readString(configuration.moduleKey, "*"),
-    action: readString(configuration.action, row.approvalKey),
-    targetType: readString(configuration.targetType, "erp-record"),
+    moduleKey: readConfigurationString(
+      configuration.moduleKey,
+      APPROVAL_RULE_DEFAULT_MODULE_KEY,
+    ),
+    action: readConfigurationString(configuration.action, row.approvalKey),
+    targetType: readConfigurationString(
+      configuration.targetType,
+      APPROVAL_RULE_DEFAULT_TARGET_TYPE,
+    ),
     approvalMode: readApprovalMode(configuration),
     approverRoleKeys: readApproverRoles(configuration, row.approverRole),
-    minApprovals: readNumber(configuration.minApprovals, 1),
+    minApprovals: readConfigurationNumber(configuration.minApprovals, 1),
     escalationAfterHours,
-    delegateToRoleKeys: readDelegateRoles(configuration),
+    escalationBehavior: readEscalationBehavior(configuration),
+    escalationRoleKeys: readRoleKeys(configuration, "escalationRoleKeys"),
+    delegateToRoleKeys: readRoleKeys(configuration, "delegateToRoleKeys"),
+    delegationValidDays: readConfigurationOptionalNumber(configuration.delegationValidDays),
     status: deriveApprovalStatus(row, configuration.status),
     enabled: row.enabled,
   };
@@ -131,9 +147,7 @@ export function mapTenantApprovalSettingToListRow(
     approvalMode: rule.approvalMode,
     approverRoles: rule.approverRoleKeys.join(", "),
     minApprovals: rule.minApprovals,
-    escalation: rule.escalationAfterHours
-      ? `${rule.escalationAfterHours} hours`
-      : "Not configured",
+    escalation: formatApprovalEscalationSummary(rule),
     status: rule.status,
     enabled: rule.enabled,
     readinessVerdict: evaluateApprovalRuleReadiness(rule),
@@ -155,9 +169,16 @@ export function mapTenantApprovalSettingToKernelRecord(
     moduleKey: rule.moduleKey,
     action: rule.action,
     targetType: rule.targetType,
+    approvalMode: rule.approvalMode,
     approverRoleKeys: rule.approverRoleKeys,
     minApprovals: rule.minApprovals,
     escalationAfterHours: rule.escalationAfterHours,
+    escalationBehavior: rule.escalationBehavior,
+    escalationRoleKeys:
+      rule.escalationRoleKeys.length > 0 ? rule.escalationRoleKeys : undefined,
+    delegateToRoleKeys:
+      rule.delegateToRoleKeys.length > 0 ? rule.delegateToRoleKeys : undefined,
+    delegationValidDays: rule.delegationValidDays,
     status: "active",
   };
 }
@@ -172,7 +193,10 @@ export function serializeApprovalRuleConfiguration(
     | "approverRoleKeys"
     | "minApprovals"
     | "escalationAfterHours"
+    | "escalationBehavior"
+    | "escalationRoleKeys"
     | "delegateToRoleKeys"
+    | "delegationValidDays"
     | "status"
   >,
 ) {
@@ -183,8 +207,11 @@ export function serializeApprovalRuleConfiguration(
     approvalMode: rule.approvalMode,
     approverRoleKeys: rule.approverRoleKeys,
     delegateToRoleKeys: rule.delegateToRoleKeys,
+    delegationValidDays: rule.delegationValidDays,
     minApprovals: rule.minApprovals,
     escalationAfterHours: rule.escalationAfterHours,
+    escalationBehavior: rule.escalationBehavior,
+    escalationRoleKeys: rule.escalationRoleKeys,
     status: rule.status,
   };
 }

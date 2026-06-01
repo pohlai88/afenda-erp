@@ -1,6 +1,7 @@
 "use server";
 
 import {
+  authorizeHrEmployeeDocumentDownload,
   registerHrEmployeeDocument,
   rejectHrEmployeeDocument,
   replaceHrEmployeeDocument,
@@ -9,7 +10,10 @@ import {
   upsertHrDocumentRetentionPolicy,
   verifyHrEmployeeDocument,
 } from "@afenda/db";
-import { type ActionResult, zodActionFailure } from "@afenda/governed-surface/schemas";
+import {
+  type ActionResult,
+  zodActionFailure,
+} from "@afenda/governed-surface/schemas";
 
 import {
   requireHrDocumentsRead,
@@ -26,14 +30,19 @@ import {
   upsertHrDocumentRetentionPolicyFormSchema,
   verifyHrEmployeeDocumentFormSchema,
 } from "../schemas/hr.workforce.documents-repository.schema";
-import { isHrDocumentClassificationSensitive } from "../data/hr.workforce.documents-sensitive-access.shared";
-import { finalizeDocumentsMutation, toDocumentsActionFailure } from "./hr.workforce.documents.mutation.shared.server";
+import {
+  isHrDocumentClassificationSensitive,
+} from "../data/hr.workforce.documents-sensitive-access.shared";
+import {
+  finalizeDocumentsMutation,
+  toDocumentsActionFailure,
+} from "./hr.workforce.documents.mutation.shared.server";
 
 export async function registerHrEmployeeDocumentAction(
   _previous: ActionResult | undefined,
   formData: FormData,
 ): Promise<ActionResult> {
-  const { organization } = await requireHrDocumentsWrite();
+  const guard = await requireHrDocumentsWrite();
   const parsed = registerHrEmployeeDocumentFormSchema.safeParse({
     employeeId: readOptionalDocumentsFormField(formData, "employeeId"),
     documentType: readOptionalDocumentsFormField(formData, "documentType"),
@@ -60,8 +69,9 @@ export async function registerHrEmployeeDocumentAction(
 
   return finalizeDocumentsMutation(async () => {
     await registerHrEmployeeDocument({
-      organizationId: organization.id,
+      organizationId: guard.organization.id,
       ...parsed.data,
+      actorUserId: guard.session.id,
     });
   });
 }
@@ -70,7 +80,7 @@ export async function upsertHrDocumentRequirementAction(
   _previous: ActionResult | undefined,
   formData: FormData,
 ): Promise<ActionResult> {
-  const { organization } = await requireHrDocumentsWrite();
+  const guard = await requireHrDocumentsWrite();
   const parsed = upsertHrDocumentRequirementFormSchema.safeParse({
     documentType: readOptionalDocumentsFormField(formData, "documentType"),
     title: readOptionalDocumentsFormField(formData, "title"),
@@ -90,11 +100,12 @@ export async function upsertHrDocumentRequirementAction(
 
   return finalizeDocumentsMutation(async () => {
     await upsertHrDocumentRequirement({
-      organizationId: organization.id,
+      organizationId: guard.organization.id,
       documentType: parsed.data.documentType,
       title: parsed.data.title,
       requiredForStatus: parsed.data.requiredForStatus ?? null,
       graceDaysBeforeDue: parsed.data.graceDaysBeforeDue,
+      actorUserId: guard.session.id,
     });
   });
 }
@@ -103,7 +114,7 @@ export async function verifyHrEmployeeDocumentAction(
   _previous: ActionResult | undefined,
   formData: FormData,
 ): Promise<ActionResult> {
-  const { organization } = await requireHrDocumentsWrite();
+  const guard = await requireHrDocumentsWrite();
   const parsed = verifyHrEmployeeDocumentFormSchema.safeParse({
     documentId: readOptionalDocumentsFormField(formData, "documentId"),
   });
@@ -114,8 +125,9 @@ export async function verifyHrEmployeeDocumentAction(
 
   return finalizeDocumentsMutation(async () => {
     await verifyHrEmployeeDocument({
-      organizationId: organization.id,
+      organizationId: guard.organization.id,
       documentId: parsed.data.documentId,
+      actorUserId: guard.session.id,
     });
   });
 }
@@ -124,7 +136,7 @@ export async function rejectHrEmployeeDocumentAction(
   _previous: ActionResult | undefined,
   formData: FormData,
 ): Promise<ActionResult> {
-  const { organization } = await requireHrDocumentsWrite();
+  const guard = await requireHrDocumentsWrite();
   const parsed = rejectHrEmployeeDocumentFormSchema.safeParse({
     documentId: readOptionalDocumentsFormField(formData, "documentId"),
     rejectionReason: readOptionalDocumentsFormField(formData, "rejectionReason"),
@@ -136,9 +148,10 @@ export async function rejectHrEmployeeDocumentAction(
 
   return finalizeDocumentsMutation(async () => {
     await rejectHrEmployeeDocument({
-      organizationId: organization.id,
+      organizationId: guard.organization.id,
       documentId: parsed.data.documentId,
       rejectionReason: parsed.data.rejectionReason,
+      actorUserId: guard.session.id,
     });
   });
 }
@@ -147,7 +160,7 @@ export async function replaceHrEmployeeDocumentAction(
   _previous: ActionResult | undefined,
   formData: FormData,
 ): Promise<ActionResult> {
-  const { organization } = await requireHrDocumentsWrite();
+  const guard = await requireHrDocumentsWrite();
   const parsed = replaceHrEmployeeDocumentFormSchema.safeParse({
     documentId: readOptionalDocumentsFormField(formData, "documentId"),
     title: readOptionalDocumentsFormField(formData, "title"),
@@ -163,8 +176,9 @@ export async function replaceHrEmployeeDocumentAction(
 
   return finalizeDocumentsMutation(async () => {
     await replaceHrEmployeeDocument({
-      organizationId: organization.id,
+      organizationId: guard.organization.id,
       ...parsed.data,
+      actorUserId: guard.session.id,
     });
   });
 }
@@ -173,7 +187,7 @@ export async function upsertHrDocumentRetentionPolicyAction(
   _previous: ActionResult | undefined,
   formData: FormData,
 ): Promise<ActionResult> {
-  const { organization } = await requireHrDocumentsWrite();
+  const guard = await requireHrDocumentsWrite();
   const parsed = upsertHrDocumentRetentionPolicyFormSchema.safeParse({
     documentType: readOptionalDocumentsFormField(formData, "documentType"),
     documentGroup: readOptionalDocumentsFormField(formData, "documentGroup"),
@@ -190,11 +204,12 @@ export async function upsertHrDocumentRetentionPolicyAction(
 
   return finalizeDocumentsMutation(async () => {
     await upsertHrDocumentRetentionPolicy({
-      organizationId: organization.id,
+      organizationId: guard.organization.id,
       documentType: parsed.data.documentType ?? null,
       documentGroup: parsed.data.documentGroup ?? null,
       retentionDays: parsed.data.retentionDays,
       archiveOnSeparation: parsed.data.archiveOnSeparation,
+      actorUserId: guard.session.id,
     });
   });
 }
@@ -203,7 +218,7 @@ export async function recordHrDocumentAcknowledgmentAction(
   _previous: ActionResult | undefined,
   formData: FormData,
 ): Promise<ActionResult> {
-  const { organization } = await requireHrDocumentsWrite();
+  const guard = await requireHrDocumentsWrite();
   const parsed = recordHrDocumentAcknowledgmentFormSchema.safeParse({
     employeeId: readOptionalDocumentsFormField(formData, "employeeId"),
     policyKey: readOptionalDocumentsFormField(formData, "policyKey"),
@@ -224,10 +239,23 @@ export async function recordHrDocumentAcknowledgmentAction(
 
   return finalizeDocumentsMutation(async () => {
     await recordHrDocumentAcknowledgment({
-      organizationId: organization.id,
+      organizationId: guard.organization.id,
       ...parsed.data,
       employeeDocumentId: parsed.data.employeeDocumentId ?? null,
+      actorUserId: guard.session.id,
     });
+  });
+}
+
+export async function authorizeHrEmployeeDocumentDownloadAction(input: {
+  documentId: string;
+}) {
+  const guard = await requireHrDocumentsRead();
+  return authorizeHrEmployeeDocumentDownload({
+    organizationId: guard.organization.id,
+    documentId: input.documentId,
+    actorUserId: guard.session.id,
+    canViewSensitive: guard.canViewSensitive,
   });
 }
 

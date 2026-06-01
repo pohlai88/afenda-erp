@@ -39,6 +39,15 @@ export {
 } from "./surface/hr.workforce.compliance-overview-breakdown-list.surface";
 
 export {
+  HR_WORKFORCE_COMPLIANCE_ACCEPTANCE_CRITERIA_COVERAGE,
+  HR_WORKFORCE_COMPLIANCE_REQUIREMENT_COVERAGE,
+  assertHrWorkforceComplianceEnterpriseCoverage,
+  type HrComplianceCoverageEntry,
+  type HrComplianceCoverageStatus,
+  type HrComplianceRequirementCode,
+} from "./data/hr.workforce.compliance-coverage.shared";
+
+export {
   parseHrComplianceSearchParams,
   toHrCompliancePageModelInput,
   type HrComplianceSearchParams,

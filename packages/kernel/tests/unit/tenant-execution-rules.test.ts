@@ -44,6 +44,7 @@ describe("tenant execution policy rules", () => {
           moduleKey: "purchasing",
           action: "purchasing.purchase-order.create",
           targetType: "erp-record",
+          approvalMode: "parallel",
           approverRoleKeys: ["finance-manager"],
           minApprovals: 1,
           status: "active",

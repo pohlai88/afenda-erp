@@ -2,6 +2,8 @@ import { GovernedPatternCListSection } from "@afenda/governed-surface/server";
 import { SectionPanel } from "@afenda/ui";
 import type { SystemAdminActionResult } from "../../tenant-execution/contracts/system-admin.action-result.contract";
 import type {
+  SystemAdminApprovalRuleDetail,
+  SystemAdminApprovalRuleEditorDefaults,
   SystemAdminApprovalRuleListRow,
   SystemAdminApproverRoleOption,
 } from "../contracts";
@@ -10,9 +12,10 @@ import {
   systemAdminApprovalsSurfaceKey,
   systemAdminApprovalsUiCopy,
 } from "../surface";
+import { SystemAdminApprovalDetailPanel } from "./system-admin.approval-detail.component.server";
 import { SystemAdminApprovalRuleEditor } from "./system-admin.approval-rule-editor.component.client";
 import { SystemAdminApprovalTrailingCell } from "./system-admin.approvals-trailing-cells.component.client";
-import type { SystemAdminApprovalRuleEditorDefaults } from "../contracts";
+import { systemAdminControlLinks } from "../../overview/contracts/system-admin.control-links.contract";
 
 type UpdateApprovalRuleAction = (
   state: SystemAdminActionResult | undefined,
@@ -26,6 +29,7 @@ export function SystemAdminApprovalsSection({
   approverRoleOptions,
   updateApprovalRuleAction,
   selectedApprovalKey,
+  approvalDetail,
   editorDefaults,
 }: {
   approvals: readonly SystemAdminApprovalRuleListRow[];
@@ -34,17 +38,26 @@ export function SystemAdminApprovalsSection({
   approverRoleOptions: readonly SystemAdminApproverRoleOption[];
   updateApprovalRuleAction: UpdateApprovalRuleAction;
   selectedApprovalKey?: string;
+  approvalDetail?: SystemAdminApprovalRuleDetail | null;
   editorDefaults?: SystemAdminApprovalRuleEditorDefaults;
 }) {
   const copy = systemAdminApprovalsUiCopy;
+  const listBackHref = systemAdminControlLinks.approvals(searchValue);
 
   return (
-    <div className="flex flex-col gap-surface-2xl">
+    <div className="@container flex flex-col gap-surface-2xl">
       <SectionPanel
         headingLevel={1}
         title={copy.page.title}
         description={copy.page.description}
       />
+
+      {approvalDetail ? (
+        <SystemAdminApprovalDetailPanel
+          detail={approvalDetail}
+          backHref={listBackHref}
+        />
+      ) : null}
 
       <GovernedPatternCListSection
         title={copy.list.title}

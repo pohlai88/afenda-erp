@@ -43,6 +43,13 @@ vi.mock("next/cache", () => ({
   revalidatePath: vi.fn(),
 }));
 
+vi.mock(
+  "../../src/approvals/policies/system-admin.approval-rules.roles.server",
+  () => ({
+    assertApprovalRuleRolesAllowed: vi.fn(async () => undefined),
+  }),
+);
+
 const guardContext = {
   context: {
     userId: "actor_1",
@@ -250,6 +257,7 @@ describe("system admin approvals", () => {
     formData.set("approverRoleKeys", "finance-manager,owner");
     formData.set("minApprovals", "2");
     formData.set("escalationAfterHours", "24");
+    formData.set("escalationBehavior", "notify");
     formData.set("status", "active");
     formData.set("enabled", "true");
 
