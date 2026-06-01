@@ -42,7 +42,7 @@ describe("system admin phase 4 audit viewer", () => {
   });
 
   it("denies audit export without export capability", () => {
-    const capabilities = ["system-admin.audit.read"] as const;
+    const capabilities: readonly string[] = ["system-admin.audit.read"];
     expect(capabilities.includes("system-admin.audit.export")).toBe(false);
   });
 });
@@ -117,7 +117,7 @@ describe("system admin phase 4 security", () => {
   });
 
   it("denies security manage without manage capability", () => {
-    const capabilities = ["system-admin.security.read"] as const;
+    const capabilities: readonly string[] = ["system-admin.security.read"];
     expect(capabilities.includes("system-admin.security.manage")).toBe(false);
   });
 

@@ -55,6 +55,8 @@
     "test": "vitest run"
   },
   "devDependencies": {
+    "server-only": "^0.0.1",
     "vitest": "catalog:"
-  }
+  },
+  "sideEffects": false
 }

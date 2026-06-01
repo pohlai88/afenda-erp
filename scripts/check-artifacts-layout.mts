@@ -34,6 +34,7 @@ const allowedArtifactDirectories = new Set(
     `${ARTIFACTS_ROOT}/logs`,
     `${ARTIFACTS_ROOT}/playwright`,
     PLAYWRIGHT_TEST_RESULTS_DIR,
+    `${ARTIFACTS_ROOT}/playwright/blob-report`,
     `${ARTIFACTS_ROOT}/reports`,
     VITEST_BLOB_REPORTS_DIR,
   ].map(normalize),

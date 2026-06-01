@@ -1,11 +1,13 @@
 {
-  "extends": "../config/tsconfig.base.json",
+  "extends": "../config/tsconfig.library.base.json",
   "compilerOptions": {
-    "composite": false,
     "paths": {
-      "@afenda/ui": ["../ui/src/index.ts"],
-      "@afenda/ui/*": ["../ui/src/*"]
+      "@afenda/ui": [
+        "../ui/src/index.ts"
+      ],
+      "@afenda/ui/*": [
+        "../ui/src/*"
+      ]
     }
-  },
-  "include": ["src/**/*.ts", "src/**/*.tsx", "tests/**/*.ts", "tests/**/*.tsx"]
+  }
 }

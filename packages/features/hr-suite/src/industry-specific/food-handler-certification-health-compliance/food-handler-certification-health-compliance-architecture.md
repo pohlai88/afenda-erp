@@ -118,3 +118,22 @@
 |  21 | Reports can be generated for expired permits, expiring permits, missing certifications, overdue training, and outlet readiness.                                  |
 |  22 | Health certification records are hidden from unauthorized users.                                                                                                 |
 |  23 | Every requirement setup, certificate submission, verification, rejection, renewal, expiry alert, duty restriction, and compliance review creates an audit event. |
+
+---
+
+## As-built summary
+
+Status: shipped for `industry-specific/food-handler-certification-health-compliance`
+with domain key `hr.industry.fhc` and route
+`/hr/food-handler-certification-health-compliance`.
+
+| Area | Implementation |
+| --- | --- |
+| Domain model | `schemas/hr.industry.fhc.schema.ts` and `data/hr.industry.fhc-store.shared.ts` cover requirement rules, identified food handler employees, food handler permits, health certifications, food safety and allergen training, evidence submissions, renewal cases, alerts, duty restrictions, integration exposures, reports, eligibility resolution, and audit events. |
+| Governed UI | `surface/hr.industry.fhc-surface-metadata.shared.ts`, `surface/hr.industry.fhc-lists.surface.ts`, `surface/hr.industry.fhc-overview-stat.surface.ts`, and `components/hr.industry.fhc-section.component.server.tsx` expose Pattern B overview KPIs and Pattern C server-window lists for configuration, compliance, evidence, renewal, alerts, restrictions, integrations, reports, and audit. |
+| Access | `policies/hr.industry.fhc-access.policy.server.ts` uses `hr.fhc.read`, `hr.fhc.write`, `hr.fhc.approve`, `hr.fhc.audit.read`, `hr.fhc.restricted.read`, and `hr.fhc.integration.expose` with employee visibility scoped through HR Suite tenancy helpers. |
+| Sensitive health data | Page model redacts provider, screening, medical fitness, health document, and health rejection details unless `hr.fhc.restricted.read` is granted. |
+| Actions | `actions/hr.industry.fhc.actions.server.ts` gates evidence submission, verification, rejection, renewal, duty restriction, refresh, and downstream exports through server-side authorization and audit emission. |
+| Integrations | `data/hr.industry.fhc-store.shared.ts` exposes eligibility refs for Shift Scheduling, mandatory training completion refs for Compliance & Regulatory Tracking, and learning requirement refs for LMS / Training & Development only when integration exposure is authorized. |
+| App wiring | `apps/erp/src/lib/hr-sections/food-handler-certification-health-compliance.server.tsx`, HR section registry, HR nav, app capabilities, kernel route mapping, and permission seed catalog are wired for the route. |
+| Coverage | `data/hr.industry.fhc-coverage.shared.ts` marks `HRM-FHC-001..025` and the 23 enterprise acceptance criteria as shipped with package-level tests. |

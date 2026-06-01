@@ -56,15 +56,47 @@ const defaultSession: UserSession = {
   organizations: [defaultOrganization],
 };
 
+const compactDevSessionCapabilities: AppCapability[] = ["dashboard.view"];
+
 function encodeSession(session: UserSession) {
   return Buffer.from(JSON.stringify(session), "utf8").toString("base64url");
 }
 
+function compactDevSession(session: UserSession): UserSession {
+  if (session.source !== "dev") {
+    return session;
+  }
+
+  return {
+    ...session,
+    organizations: session.organizations.map((organization) => ({
+      ...organization,
+      capabilities: [...compactDevSessionCapabilities],
+    })),
+  };
+}
+
+function expandDevSession(session: UserSession): UserSession {
+  if (session.source !== "dev") {
+    return session;
+  }
+
+  return userSessionSchema.parse({
+    ...session,
+    organizations: session.organizations.map((organization) => ({
+      ...organization,
+      capabilities: capabilitiesForRole(organization.role),
+    })),
+  });
+}
+
 function decodeSession(value: string): UserSession | null {
   try {
-    return userSessionSchema.parse(
+    const session = userSessionSchema.parse(
       JSON.parse(Buffer.from(value, "base64url").toString("utf8")),
     );
+
+    return expandDevSession(session);
   } catch {
     return null;
   }
@@ -79,7 +111,7 @@ export {
 } from "./index";
 
 export function createDevSessionCookie(session: UserSession) {
-  return encodeSession(userSessionSchema.parse(session));
+  return encodeSession(compactDevSession(userSessionSchema.parse(session)));
 }
 
 export function getDevSessionCookieMaxAge() {

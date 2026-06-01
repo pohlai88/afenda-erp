@@ -1,0 +1,33 @@
+export const hrIndustryRwsAuditActions = {
+  scheduleDraftCreated: "hr.industry.rws.schedule.draft_created",
+  schedulePublished: "hr.industry.rws.schedule.published",
+  scheduleChanged: "hr.industry.rws.schedule.changed",
+  assignmentChanged: "hr.industry.rws.assignment.changed",
+  availabilityUpdated: "hr.industry.rws.availability.updated",
+  blockedDateUpdated: "hr.industry.rws.blocked_date.updated",
+  coverageRequirementChanged: "hr.industry.rws.coverage.requirement_changed",
+  coverageGapFlagged: "hr.industry.rws.coverage.gap_flagged",
+  openShiftCreated: "hr.industry.rws.open_shift.created",
+  openShiftClaimed: "hr.industry.rws.open_shift.claimed",
+  openShiftApproved: "hr.industry.rws.open_shift.approved",
+  openShiftRejected: "hr.industry.rws.open_shift.rejected",
+  swapRequested: "hr.industry.rws.swap.requested",
+  swapValidated: "hr.industry.rws.swap.validated",
+  swapApproved: "hr.industry.rws.swap.approved",
+  swapRejected: "hr.industry.rws.swap.rejected",
+  swapReturned: "hr.industry.rws.swap.returned",
+  swapOverridden: "hr.industry.rws.swap.overridden",
+  laborDemandReferenced: "hr.industry.rws.labor_demand.referenced",
+  budgetWarningRaised: "hr.industry.rws.budget.warning_raised",
+  overtimeRiskFlagged: "hr.industry.rws.overtime_risk.flagged",
+  complianceRuleFlagged: "hr.industry.rws.compliance.flagged",
+  restrictedWorkerRuleApplied: "hr.industry.rws.restricted_worker.applied",
+  notificationGenerated: "hr.industry.rws.notification.generated",
+  attendanceCompared: "hr.industry.rws.attendance.compared",
+  payrollReferenceExposed: "hr.industry.rws.payroll_reference.exposed",
+  integrationExposed: "hr.industry.rws.integration.exposed",
+  reportGenerated: "hr.industry.rws.report.generated",
+} as const;
+
+export type HrIndustryRwsAuditAction =
+  (typeof hrIndustryRwsAuditActions)[keyof typeof hrIndustryRwsAuditActions];

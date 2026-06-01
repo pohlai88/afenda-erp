@@ -37,9 +37,13 @@
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
+    "typecheck:tests": "tsc -p tsconfig.test.json --noEmit",
     "lint": "tsc -p tsconfig.json --noEmit",
     "check:vertical-naming": "tsx scripts/check-hr-feature-vertical-naming.mts",
-    "test": "vitest run --config vitest.config.ts"
+    "scaffold:hr-slice": "tsx scripts/scaffold-hr-slice.mts",
+    "wire:hr-slice": "tsx scripts/wire-hr-slice.mts",
+    "test": "vitest run --config vitest.config.ts --project unit",
+    "test:integration": "vitest run --config vitest.config.ts --project integration"
   },
   "devDependencies": {
     "@afenda/config": "workspace:*",

@@ -81,6 +81,9 @@ describe("Lynx outcome monitor setting actions", () => {
     );
 
     expect(result.ok).toBe(false);
+    if (result.ok) {
+      throw new Error("Expected monitor setting update to fail.");
+    }
     expect(result.fieldErrors).toMatchObject({
       "threshold.blockedRecordsWatchAbove":
         "Blocked records watch above must be zero or greater.",

@@ -1150,6 +1150,46 @@ function checkPackageBuildPolicy() {
       problems.push(
         `${packageName} has a build script but no tsconfig.build.json`,
       );
+      continue;
+    }
+
+    const tsconfigBuild = readJson(tsconfigBuildPath);
+    const buildExtends = tsconfigBuild.extends;
+    if (
+      typeof buildExtends !== "string" ||
+      !(
+        buildExtends.includes("tsconfig.build.base.json") ||
+        buildExtends.includes("tsconfig.build.library.base.json") ||
+        buildExtends.includes("tsconfig.build.react.base.json")
+      )
+    ) {
+      problems.push(
+        `${packageName} tsconfig.build.json must extend a packages/config/tsconfig.build.*.base.json profile`,
+      );
+    }
+
+    const tsconfigPath = path.join(
+      root,
+      workspacePackage.packageDirectory,
+      "tsconfig.json",
+    );
+    if (fs.existsSync(tsconfigPath)) {
+      const tsconfig = readJson(tsconfigPath);
+      const typecheckExtends = tsconfig.extends;
+      if (
+        typeof typecheckExtends === "string" &&
+        !(
+          typecheckExtends.includes("tsconfig.check.base.json") ||
+          typecheckExtends.includes("tsconfig.library.base.json") ||
+          typecheckExtends.includes("tsconfig.feature.base.json") ||
+          typecheckExtends.includes("tsconfig.next.base.json") ||
+          typecheckExtends.includes("tsconfig.test.base.json")
+        )
+      ) {
+        problems.push(
+          `${packageName} tsconfig.json must extend a packages/config/tsconfig.*.base.json typecheck profile`,
+        );
+      }
     }
 
     if (!rule.requiresCompiledDistExports) {
@@ -1265,6 +1305,80 @@ function checkTurboBuildOutputs() {
   }
 }
 
+function typecheckProfileIncludesVitestSources(tsconfigPath: string): boolean {
+  const visited = new Set<string>();
+  let currentPath = tsconfigPath;
+
+  while (!visited.has(currentPath)) {
+    visited.add(currentPath);
+    const tsconfig = readJson(currentPath);
+    const include = Array.isArray(tsconfig.include) ? tsconfig.include : [];
+    if (
+      include.some(
+        (pattern: unknown) =>
+          typeof pattern === "string" &&
+          (pattern.includes("tests/") || pattern.includes("*.test.")),
+      )
+    ) {
+      return true;
+    }
+
+    const extendsValue = tsconfig.extends;
+    if (typeof extendsValue !== "string") {
+      break;
+    }
+
+    currentPath = path.resolve(path.dirname(currentPath), extendsValue);
+  }
+
+  return false;
+}
+
+function checkTypecheckIncludesVitestSources() {
+  for (const workspaceRoot of ["packages", "apps"] as const) {
+    for (const workspacePackage of readWorkspacePackages(workspaceRoot)) {
+      const vitestConfigPath = path.join(
+        root,
+        workspacePackage.packageDirectory,
+        "vitest.config.ts",
+      );
+      if (!fs.existsSync(vitestConfigPath)) {
+        continue;
+      }
+
+      const packageName =
+        getPackageName(workspacePackage) ?? workspacePackage.packageDirectory;
+      const tsconfigPath = path.join(
+        root,
+        workspacePackage.packageDirectory,
+        "tsconfig.json",
+      );
+      if (!fs.existsSync(tsconfigPath)) {
+        problems.push(
+          `${packageName} has vitest.config.ts but no tsconfig.json`,
+        );
+        continue;
+      }
+
+      const includesTestsInPrimary =
+        typecheckProfileIncludesVitestSources(tsconfigPath);
+
+      const tsconfigTestPath = path.join(
+        root,
+        workspacePackage.packageDirectory,
+        "tsconfig.test.json",
+      );
+      const hasDedicatedTestProject = fs.existsSync(tsconfigTestPath);
+
+      if (!includesTestsInPrimary && !hasDedicatedTestProject) {
+        problems.push(
+          `${packageName} must typecheck Vitest sources via tsconfig.json (tests/**) or tsconfig.test.json`,
+        );
+      }
+    }
+  }
+}
+
 walk(root);
 checkRootHygiene();
 checkAppUiBoundary();
@@ -1272,6 +1386,7 @@ checkWorkspacePackageRegistry();
 checkFeatureWorkspaceDiscipline();
 checkFeatureBucketGrammar();
 checkPackageBuildPolicy();
+checkTypecheckIncludesVitestSources();
 checkTurboBuildOutputs();
 checkAppWorkspaceDependencySync();
 checkImportBoundaries();

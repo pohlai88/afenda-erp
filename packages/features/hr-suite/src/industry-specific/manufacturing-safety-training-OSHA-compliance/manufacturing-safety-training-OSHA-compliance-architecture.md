@@ -132,3 +132,37 @@ OSHA materials confirm that workplace safety training requirements vary by stand
 |  28 | Every safety requirement setup, training assignment, completion, renewal, incident, hazard assessment, corrective action, restriction, and compliance review creates an audit event. |
 
 [1]: https://www.osha.gov/sites/default/files/publications/OSHA2254.pdf?utm_source=chatgpt.com "Training Requirements in OSHA Standards"
+
+## As-built summary
+
+Manufacturing Safety Training & OSHA Compliance is implemented as a shipped HR
+Suite vertical slice at
+`src/industry-specific/manufacturing-safety-training-osha-compliance` with domain
+key `hr.industry.msc` and application capabilities `hr.msc.read`,
+`hr.msc.write`, `hr.msc.approve`, `hr.msc.audit.read`,
+`hr.msc.restricted.read`, and `hr.msc.integration.expose`.
+
+The slice owns typed safety requirement, employee obligation, training
+assignment, certification, hazard assessment, incident, OSHA recordkeeping,
+corrective action, work restriction, notification, evidence-link, integration,
+reporting, and audit-event contracts. Tenant-scoped seed data and derived
+eligibility functions model automatic obligation detection, missing or overdue
+training flags, expiring or expired certification flags, work restrictions,
+downstream integration references, and audit events for controlled safety
+actions.
+
+Governed UI is metadata-driven through server-window list surfaces, a KPI stat
+grid, search-param parsing, restricted-data redaction, and gated integration and
+audit sections. The App Router integration remains thin through
+`apps/erp/src/lib/hr-sections/manufacturing-safety-training-osha-compliance.server.tsx`,
+which derives organization and employee visibility from the HR execution guard.
+Route, navigation, permission seed, auth capability, kernel capability-route, and
+vertical naming guard wiring are registered for
+`/hr/manufacturing-safety-training-osha-compliance`.
+
+Coverage is tracked by `HR_INDUSTRY_MSC_REQUIREMENT_COVERAGE` for
+`HRM-MSC-001` through `HRM-MSC-031` and
+`HR_INDUSTRY_MSC_ACCEPTANCE_CRITERIA_COVERAGE` for all twenty-eight enterprise
+acceptance criteria. Package-level unit tests verify coverage, search-param
+normalization, governed list EUI contracts, gated sections, redaction, derived
+eligibility, and downstream references.

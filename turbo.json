@@ -3,6 +3,8 @@
   "globalDependencies": [
     "package.json",
     "packages/config/tsconfig.base.json",
+    "packages/config/tsconfig.build.base.json",
+    "packages/config/tsconfig.check.base.json",
     ".env.config",
     ".secret.config"
   ],
@@ -61,50 +63,65 @@
         "NEON_AUTH_COOKIE_SECRET"
       ]
     },
-    "@afenda/observability#build": {
-      "dependsOn": ["^build"],
-      "outputs": ["dist/**"]
-    },
-    "@afenda/kernel#build": {
-      "dependsOn": ["^build"],
-      "outputs": ["dist/**"]
-    },
-    "@afenda/ui#build": {
-      "dependsOn": ["^build"],
-      "outputs": ["dist/**"]
-    },
-    "@afenda/governed-surface#build": {
-      "dependsOn": ["^build"],
-      "outputs": ["dist/**"]
-    },
-    "@afenda/config#build": {
-      "outputs": ["dist/**"]
-    },
-    "@afenda/db#build": {
-      "dependsOn": ["^build"],
-      "outputs": ["dist/**"]
-    },
-    "@afenda/auth#build": {
-      "dependsOn": ["^build"],
-      "outputs": ["dist/**"]
-    },
-    "@afenda/ai#build": {
-      "dependsOn": ["^build"],
-      "outputs": ["dist/**"]
-    },
-    "@afenda/workflows#build": {
-      "dependsOn": ["^build"],
-      "outputs": ["dist/**"]
-    },
     "dev": {
       "cache": false,
       "persistent": true
     },
-    "lint": {},
-    "typecheck": {},
+    "lint": {
+      "dependsOn": ["^build"],
+      "inputs": ["$TURBO_DEFAULT$", "!**/*.md"]
+    },
+    "typecheck": {
+      "inputs": ["$TURBO_DEFAULT$", "tsconfig.json", "tsconfig.*.json"]
+    },
+    "//#typecheck:scripts": {
+      "inputs": [
+        "scripts/**/*.mts",
+        "scripts/**/*.ts",
+        "tsconfig.json",
+        "package.json"
+      ],
+      "outputs": []
+    },
+    "//#format": {
+      "inputs": [
+        "**/*.{ts,tsx,js,mjs,cjs,json,md,mdx,css,yml,yaml}",
+        "!**/.next/**",
+        "!**/dist/**",
+        "!**/.artifacts/**",
+        "!**/pnpm-lock.yaml"
+      ],
+      "outputs": []
+    },
+    "//#architecture:check": {
+      "cache": false
+    },
+    "//#performance:budget": {
+      "dependsOn": ["@afenda/erp#build"],
+      "cache": false
+    },
+    "//#knip:ci": {
+      "cache": false,
+      "inputs": ["knip.json", "packages/**", "apps/**", "pnpm-workspace.yaml"]
+    },
     "test": {
       "dependsOn": ["^build"],
-      "cache": false
+      "inputs": [
+        "tests/**",
+        "src/**",
+        "vitest.config.ts",
+        "scripts/**/*.mts"
+      ],
+      "outputs": [".artifacts/coverage/**"]
+    },
+    "test:integration": {
+      "dependsOn": ["^build"],
+      "cache": false,
+      "env": [
+        "DATABASE_URL",
+        "DATABASE_MIGRATION_URL",
+        "NEON_PREVIEW_DATABASE_URL"
+      ]
     },
     "test:e2e": {
       "dependsOn": ["@afenda/erp#build"],

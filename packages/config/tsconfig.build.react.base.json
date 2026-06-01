@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "./tsconfig.build.base.json",
+  "compilerOptions": {
+    "jsx": "react-jsx"
+  },
+  "include": ["${configDir}/src/**/*.ts", "${configDir}/src/**/*.tsx"],
+  "exclude": [
+    "${configDir}/tests/**/*.test.ts",
+    "${configDir}/tests/**/*.test.tsx",
+    "${configDir}/src/**/tests/**",
+    "${configDir}/src/**/*.test.ts",
+    "${configDir}/src/**/*.spec.ts"
+  ]
+}

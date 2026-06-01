@@ -90,7 +90,8 @@ const permissionCatalog = [
     key: "hr.documents.read",
     module: "hr",
     label: "View HR documents",
-    description: "Read employee document vault metadata and verification state.",
+    description:
+      "Read employee document vault metadata and verification state.",
   },
   {
     key: "hr.documents.write",
@@ -469,6 +470,377 @@ const permissionCatalog = [
       "Create governed conversion references from accepted candidates into employee records.",
   },
   {
+    key: "hr.succession.read",
+    module: "hr",
+    label: "View succession planning",
+    description:
+      "Read critical roles, successors, talent pools, readiness, bench strength, and succession reports.",
+  },
+  {
+    key: "hr.succession.write",
+    module: "hr",
+    label: "Manage succession planning",
+    description:
+      "Maintain critical roles, successors, readiness assessments, development references, and talent pools.",
+  },
+  {
+    key: "hr.succession.approve",
+    module: "hr",
+    label: "Approve succession decisions",
+    description:
+      "Approve succession reviews, planned replacements, and leadership continuity recommendations.",
+  },
+  {
+    key: "hr.succession.audit.read",
+    module: "hr",
+    label: "Read succession audit trail",
+    description:
+      "Read succession audit events for critical roles, nominations, readiness, calibration, review, and decisions.",
+  },
+  {
+    key: "hr.succession.restricted.read",
+    module: "hr",
+    label: "Read restricted succession data",
+    description:
+      "Read restricted potential, flight risk, readiness gap, and leadership continuity data.",
+  },
+  {
+    key: "hr.succession.lifecycle.expose",
+    module: "hr",
+    label: "Expose succession recommendations",
+    description:
+      "Expose approved succession recommendations to employee lifecycle promotion and movement workflows.",
+  },
+  {
+    key: "hr.training.read",
+    module: "hr",
+    label: "View training and development",
+    description:
+      "Read training catalog, assignments, enrollment, attendance, completion, skills, certifications, reports, and authorized readiness snapshots.",
+  },
+  {
+    key: "hr.training.write",
+    module: "hr",
+    label: "Manage training and development",
+    description:
+      "Maintain courses, providers, requirements, assignments, attendance, completions, assessments, certifications, feedback, and costs.",
+  },
+  {
+    key: "hr.training.approve",
+    module: "hr",
+    label: "Approve training enrollment",
+    description:
+      "Approve, reject, or waitlist training enrollment requests when course approval is required.",
+  },
+  {
+    key: "hr.training.audit.read",
+    module: "hr",
+    label: "Read training audit trail",
+    description:
+      "Read training audit events for course setup, assignment, enrollment, approval, attendance, completion, assessment, certification, renewal, expiry, and development plans.",
+  },
+  {
+    key: "hr.training.restricted.read",
+    module: "hr",
+    label: "Read restricted training data",
+    description:
+      "Read restricted assessment scores, certification evidence references, and employee-level training cost amounts.",
+  },
+  {
+    key: "hr.training.integration.expose",
+    module: "hr",
+    label: "Expose training readiness",
+    description:
+      "Expose mandatory training completion and skill or certification readiness references to Compliance, Performance, Lifecycle, and onboarding workflows.",
+  },
+  {
+    key: "hr.frm.read",
+    module: "hr",
+    label: "View field workforce",
+    description:
+      "Read field assignments, mobile attendance, GPS validation references, travel status, per diem references, compliance posture, notifications, reports, and authorized exports.",
+  },
+  {
+    key: "hr.frm.write",
+    module: "hr",
+    label: "Manage field workforce",
+    description:
+      "Maintain field assignments, mobile attendance captures, offline sync reconciliation, travel status, per diem references, exception handling, and safety confirmations.",
+  },
+  {
+    key: "hr.frm.approve",
+    module: "hr",
+    label: "Approve field workforce travel",
+    description:
+      "Approve travel-based field assignments, travel compliance decisions, and per diem references.",
+  },
+  {
+    key: "hr.frm.audit.read",
+    module: "hr",
+    label: "Read field workforce audit trail",
+    description:
+      "Read field assignment, mobile check-in, GPS validation, offline sync, travel, per diem, exception, approval, correction, and payroll reference audit events.",
+  },
+  {
+    key: "hr.frm.restricted.read",
+    module: "hr",
+    label: "Read restricted field workforce data",
+    description:
+      "Read restricted location references, GPS validation references, travel details, per diem amounts, safety contacts, and payroll-sensitive field data.",
+  },
+  {
+    key: "hr.frm.integration.expose",
+    module: "hr",
+    label: "Expose field workforce references",
+    description:
+      "Expose validated attendance, overtime work-hour, payroll, expense, travel allowance, and per diem references to authorized HR downstream modules.",
+  },
+  {
+    key: "hr.fhc.read",
+    module: "hr",
+    label: "View food handler compliance",
+    description:
+      "Read food handler requirement rules, permits, health certification status, training completion, alerts, renewal cases, duty restrictions, reports, and authorized exports.",
+  },
+  {
+    key: "hr.fhc.write",
+    module: "hr",
+    label: "Manage food handler compliance",
+    description:
+      "Maintain food handler requirement rules, certification evidence submissions, renewal cases, training references, and compliance review records.",
+  },
+  {
+    key: "hr.fhc.approve",
+    module: "hr",
+    label: "Verify food handler evidence",
+    description:
+      "Verify or reject submitted food handler permit, health certification, and training evidence, and apply temporary duty restrictions.",
+  },
+  {
+    key: "hr.fhc.audit.read",
+    module: "hr",
+    label: "Read food handler audit trail",
+    description:
+      "Read requirement setup, certificate submission, verification, rejection, renewal, expiry alert, duty restriction, integration, and compliance review audit events.",
+  },
+  {
+    key: "hr.fhc.restricted.read",
+    module: "hr",
+    label: "Read restricted food handler health data",
+    description:
+      "Read restricted medical fitness provider, screening, health certificate document, rejection reason, and related sensitive food handler compliance references.",
+  },
+  {
+    key: "hr.fhc.integration.expose",
+    module: "hr",
+    label: "Expose food handler compliance references",
+    description:
+      "Expose food handling eligibility, duty restrictions, mandatory training completion, and learning requirement references to authorized HR downstream modules.",
+  },
+  {
+    key: "hr.gpg.read",
+    module: "hr",
+    label: "View government classification pay grades",
+    description:
+      "Read public-sector classifications, pay grades, salary table versions, locality adjustments, assignments, step eligibility, reports, and authorized exports.",
+  },
+  {
+    key: "hr.gpg.write",
+    module: "hr",
+    label: "Manage government classification pay grades",
+    description:
+      "Maintain classification structures, pay grades, salary tables, locality rules, classification assignments, grade movements, and review references.",
+  },
+  {
+    key: "hr.gpg.approve",
+    module: "hr",
+    label: "Approve government grade movements",
+    description:
+      "Approve step increases, promotions, reclassifications, downgrades, retention references, and payroll-ready classification changes.",
+  },
+  {
+    key: "hr.gpg.audit.read",
+    module: "hr",
+    label: "Read government pay grade audit trail",
+    description:
+      "Read classification setup, salary table setup, grade assignment, step movement, locality adjustment, reclassification, retention, approval, and payroll integration audit events.",
+  },
+  {
+    key: "hr.gpg.restricted.read",
+    module: "hr",
+    label: "Read restricted government pay grade data",
+    description:
+      "Read salary rates, locality-adjusted pay, saved pay references, movement reasons, review outcomes, and payroll-sensitive classification data.",
+  },
+  {
+    key: "hr.gpg.integration.expose",
+    module: "hr",
+    label: "Expose government pay grade references",
+    description:
+      "Expose approved grade, step, salary table, locality adjustment, allowance, and grade movement references to Payroll Processing and Employee Lifecycle Management.",
+  },
+  {
+    key: "hr.msc.read",
+    module: "hr",
+    label: "View manufacturing safety compliance",
+    description:
+      "Read manufacturing safety training requirements, completion status, certifications, hazard assessments, incidents, restrictions, reports, and authorized exports.",
+  },
+  {
+    key: "hr.msc.write",
+    module: "hr",
+    label: "Manage manufacturing safety compliance",
+    description:
+      "Maintain safety training assignments, PPE acknowledgments, incident references, hazard assessments, corrective actions, evidence links, and notifications.",
+  },
+  {
+    key: "hr.msc.approve",
+    module: "hr",
+    label: "Approve manufacturing safety controls",
+    description:
+      "Approve certification renewals, work restrictions, corrective action closures, and safety compliance reviews.",
+  },
+  {
+    key: "hr.msc.audit.read",
+    module: "hr",
+    label: "Read manufacturing safety audit trail",
+    description:
+      "Read audit events for safety requirement setup, assignment, completion, renewal, incidents, hazard assessments, corrective actions, restrictions, reports, and compliance reviews.",
+  },
+  {
+    key: "hr.msc.restricted.read",
+    module: "hr",
+    label: "Read restricted manufacturing safety data",
+    description:
+      "Read sensitive incident, health-related, OSHA recordkeeping, certification evidence, document reference, and restriction details.",
+  },
+  {
+    key: "hr.msc.integration.expose",
+    module: "hr",
+    label: "Expose manufacturing safety references",
+    description:
+      "Expose safety training completion, learning requirements, eligibility, work restrictions, compliance, and document evidence references to authorized downstream modules.",
+  },
+  {
+    key: "hr.rws.read",
+    module: "hr",
+    label: "View retail workforce scheduling",
+    description:
+      "Read retail seasonal and hourly schedules, assignments, coverage, availability, open shifts, swaps, reports, and payroll references.",
+  },
+  {
+    key: "hr.rws.write",
+    module: "hr",
+    label: "Manage retail workforce scheduling",
+    description:
+      "Create and update draft schedules, assignments, availability, open shifts, swap requests, and scheduling notifications.",
+  },
+  {
+    key: "hr.rws.approve",
+    module: "hr",
+    label: "Approve retail workforce scheduling",
+    description:
+      "Publish schedules, approve or reject open-shift pickups, decide shift swaps, and approve schedule overrides.",
+  },
+  {
+    key: "hr.rws.audit.read",
+    module: "hr",
+    label: "View retail scheduling audit",
+    description:
+      "Read audit events for schedule creation, assignment, publication, changes, open shifts, swaps, budget warnings, and payroll references.",
+  },
+  {
+    key: "hr.rws.restricted.read",
+    module: "hr",
+    label: "View restricted retail scheduling data",
+    description:
+      "Read restricted availability, blocked-date, minor or student worker, override reason, and compliance finding details.",
+  },
+  {
+    key: "hr.rws.labor-cost.read",
+    module: "hr",
+    label: "View retail scheduling labor cost",
+    description:
+      "Read scheduled labor cost, budget amounts, employee cost references, and budget variance details.",
+  },
+  {
+    key: "hr.rws.integration.expose",
+    module: "hr",
+    label: "Expose retail scheduling integrations",
+    description:
+      "Expose open-shift eligibility, coverage gaps, attendance outcomes, payroll references, and retail scheduling integration references.",
+  },
+  {
+    key: "hr.ucb.read",
+    module: "hr",
+    label: "View union management",
+    description:
+      "Read union records, collective bargaining agreements, bargaining unit assignments, CBA rules, seniority references, grievances, disputes, alerts, and reports.",
+  },
+  {
+    key: "hr.ucb.write",
+    module: "hr",
+    label: "Manage union management",
+    description:
+      "Create and update union records, CBA records, bargaining unit assignments, membership updates, grievance cases, representatives, labor meetings, and alerts.",
+  },
+  {
+    key: "hr.ucb.approve",
+    module: "hr",
+    label: "Approve union management controls",
+    description:
+      "Approve CBA rule changes, dues references, grievance steps, dispute escalations, seniority updates, and controlled labor-relations changes.",
+  },
+  {
+    key: "hr.ucb.audit.read",
+    module: "hr",
+    label: "View union management audit",
+    description:
+      "Read audit events for union setup, membership updates, bargaining unit assignment, CBA setup, rule changes, grievance actions, dispute escalation, seniority updates, dues, renewals, and report exports.",
+  },
+  {
+    key: "hr.ucb.restricted.read",
+    module: "hr",
+    label: "View restricted union data",
+    description:
+      "Read restricted union membership, grievance, dispute, dues, seniority, and labor-relations data.",
+  },
+  {
+    key: "hr.ucb.grievance.manage",
+    module: "hr",
+    label: "Manage union grievances",
+    description:
+      "Create, classify, advance, escalate, resolve, withdraw, and close grievance cases and process steps.",
+  },
+  {
+    key: "hr.ucb.legal-reference.read",
+    module: "hr",
+    label: "View union legal references",
+    description:
+      "Read mediation, arbitration, legal, and external counsel references linked to union disputes.",
+  },
+  {
+    key: "hr.ucb.payroll.expose",
+    module: "hr",
+    label: "Expose union payroll references",
+    description:
+      "Expose approved CBA pay, deduction, and union dues references to Payroll Processing without calculating payroll.",
+  },
+  {
+    key: "hr.ucb.integration.expose",
+    module: "hr",
+    label: "Expose union integrations",
+    description:
+      "Expose approved CBA rule, seniority, grievance, dues, leave, overtime, scheduling, document, and legal references to authorized downstream modules.",
+  },
+  {
+    key: "hr.ucb.report.export",
+    module: "hr",
+    label: "Export union reports",
+    description:
+      "Export governed reports for union membership, bargaining units, CBA coverage, seniority, grievances, disputes, dues references, and agreement renewals.",
+  },
+  {
     key: "hr.onboarding.read",
     module: "hr",
     label: "View HR onboarding",
@@ -514,7 +886,8 @@ const permissionCatalog = [
     key: "hr.shifts.write",
     module: "hr",
     label: "Manage HR shifts",
-    description: "Create templates, schedule shifts, publish, and cancel assignments.",
+    description:
+      "Create templates, schedule shifts, publish, and cancel assignments.",
   },
   {
     key: "crm.view",
@@ -545,7 +918,8 @@ const permissionCatalog = [
     key: "system-admin.documents.read",
     module: "system-admin",
     label: "Read system admin documents",
-    description: "Read governance documents attached to the system-admin module.",
+    description:
+      "Read governance documents attached to the system-admin module.",
   },
   {
     key: "system-admin.documents.write",
@@ -617,7 +991,8 @@ const permissionCatalog = [
     key: "system-admin.modules.read",
     module: "system-admin",
     label: "Read modules",
-    description: "View module availability, readiness, and visibility settings.",
+    description:
+      "View module availability, readiness, and visibility settings.",
   },
   {
     key: "system-admin.modules.manage",
@@ -654,7 +1029,8 @@ const permissionCatalog = [
     key: "system-admin.policies.manage",
     module: "system-admin",
     label: "Manage policies",
-    description: "Update tenant policy rules evaluated by the execution kernel.",
+    description:
+      "Update tenant policy rules evaluated by the execution kernel.",
   },
   {
     key: "system-admin.approvals.read",
@@ -715,13 +1091,15 @@ const permissionCatalog = [
     key: "system-admin.organization.read",
     module: "system-admin",
     label: "Read organization settings",
-    description: "View organization profile, locale, calendar, and numbering defaults.",
+    description:
+      "View organization profile, locale, calendar, and numbering defaults.",
   },
   {
     key: "system-admin.organization.manage",
     module: "system-admin",
     label: "Manage organization settings",
-    description: "Update organization operating defaults and document prefixes.",
+    description:
+      "Update organization operating defaults and document prefixes.",
   },
   {
     key: "system-admin.integrations.read",
@@ -775,7 +1153,8 @@ const permissionCatalog = [
     key: "system-admin.diagnostics.read",
     module: "system-admin",
     label: "Read diagnostics",
-    description: "View configuration drift, coverage, reliability, and spend posture.",
+    description:
+      "View configuration drift, coverage, reliability, and spend posture.",
   },
 ] as const;
 

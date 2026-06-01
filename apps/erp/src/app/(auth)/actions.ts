@@ -77,7 +77,9 @@ export async function signInAction(formData: FormData) {
   cookieStore.set(AFENDA_SESSION_COOKIE, createDevSessionCookie(session), {
     httpOnly: true,
     sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
+    secure:
+      process.env.NODE_ENV === "production" &&
+      process.env.AFENDA_E2E_DEV_AUTH !== "1",
     path: "/",
     maxAge: DEV_SESSION_MAX_AGE_SECONDS,
   });

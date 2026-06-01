@@ -14,6 +14,7 @@ import {
   previewHrPayrollRun,
   submitHrPayrollRunForApproval,
   updateHrPayrollPaymentStatus,
+  type HrPayrollRunCalculationResult,
 } from "@afenda/db";
 
 import { importHrPayrollInputsForRun } from "../data/hr.payroll.processing-input-collection.server";
@@ -241,7 +242,9 @@ export async function validatePayrollRunAction(input: unknown) {
   });
 }
 
-export async function calculatePayrollRunAction(input: unknown) {
+export async function calculatePayrollRunAction(
+  input: unknown,
+): Promise<HrPayrollRunCalculationResult> {
   const guard = await requireHrPayrollWrite();
   const parsed = payrollCalculateSchema.parse(input);
   return calculateHrPayrollRun({

@@ -232,7 +232,7 @@ export async function buildHrGeoPageModel(
           value: search.geoReportGroupBy,
         }),
         window: {
-          pageSize: reportResult.data.length,
+          pageSize: reportResult.data.length || DEFAULT_PAGE_SIZE,
           totalCount: reportResult.data.length,
           hasNextPage: false,
         },

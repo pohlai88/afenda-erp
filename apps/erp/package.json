@@ -11,9 +11,16 @@
     "lint": "eslint .",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run",
-    "test:e2e": "playwright test --config=playwright.config.cjs",
-    "test:visual": "playwright test --config=playwright.config.cjs --grep @visual",
-    "test:visual:update": "playwright test --config=playwright.visual.config.cjs --grep @visual --update-snapshots"
+    "test:e2e": "playwright test --config=playwright.config.cjs --grep-invert \"@visual\"",
+    "test:e2e:ci": "playwright test --config=playwright.config.cjs",
+    "test:e2e:smoke": "playwright test --config=playwright.config.cjs --project=chromium-public-smoke --project=chromium-authenticated-smoke --project=chromium-dev-auth-flow",
+    "test:e2e:public": "playwright test --config=playwright.config.cjs --project=chromium-public-smoke",
+    "test:e2e:auth": "playwright test --config=playwright.config.cjs --project=chromium-authenticated-smoke",
+    "test:e2e:hr": "playwright test --config=playwright.config.cjs --project=chromium-hr-critical",
+    "test:e2e:neon": "playwright test --config=playwright.config.cjs --project=chromium-neon-smoke",
+    "test:e2e:shard": "playwright test --config=playwright.config.cjs --grep-invert \"@visual\"",
+    "test:visual": "playwright test --config=playwright.config.cjs --grep \"@visual\"",
+    "test:visual:update": "playwright test --config=playwright.visual.config.cjs --grep \"@visual\" --update-snapshots"
   },
   "dependencies": {
     "@afenda/ai": "workspace:*",

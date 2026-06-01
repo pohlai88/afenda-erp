@@ -1,5 +1,2 @@
-/**
- * @afenda-bucket contracts
- * Scaffold placeholder from packages/_template-definition.
- */
-export {};
+export * from "./hr.industry.msc-route.contract";
+export * from "./hr.industry.msc.contract";

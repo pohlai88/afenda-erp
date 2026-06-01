@@ -1,0 +1,10 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "./tsconfig.build.base.json",
+  "include": ["${configDir}/src/**/*.ts"],
+  "exclude": [
+    "${configDir}/tests/**/*.test.ts",
+    "${configDir}/src/**/*.test.ts",
+    "${configDir}/src/**/*.spec.ts"
+  ]
+}

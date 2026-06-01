@@ -23,5 +23,6 @@
   "devDependencies": {
     "@afenda/config": "workspace:*",
     "vitest": "catalog:"
-  }
+  },
+  "sideEffects": false
 }

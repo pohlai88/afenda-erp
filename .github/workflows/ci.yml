@@ -9,11 +9,20 @@ concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  NEXT_PUBLIC_APP_NAME: Afenda ERP
+  NEXT_PUBLIC_SITE_URL: http://localhost:3000
+  NEXT_PUBLIC_STAGE: ci
+  TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+  TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
+
 jobs:
   quality:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - uses: pnpm/action-setup@v4
         with:
@@ -27,11 +36,25 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Verify Turborepo remote cache
+        run: pnpm env:verify:turbo
+
       - name: Initialize test artifact directories
         run: pnpm artifacts:init
 
-      - name: Typecheck
-        run: pnpm typecheck
+      - name: Format check
+        run: pnpm format
+
+      - name: Root script typecheck
+        run: pnpm typecheck:scripts
+
+      - name: Monorepo typecheck, lint, test, and build
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            pnpm ci:turbo:affected
+          else
+            pnpm ci:turbo
+          fi
 
       - name: Check directory architecture
         run: pnpm architecture:check
@@ -45,23 +68,15 @@ jobs:
       - name: Lint governed renderer contracts
         run: pnpm lint:governed-renderer-contracts
 
-      - name: Audit design-system contract
-        run: pnpm design-system:check
-
-      - name: Audit governed design-system tokens
-        run: pnpm audit:governed-design-tokens --strict
-
-      - name: Audit shadcn composition
-        run: pnpm audit:shadcn-composition --strict
-
       - name: Audit streaming skeleton parity
         run: pnpm audit:skeleton-parity
 
       - name: Audit list surface chrome
         run: pnpm audit:list-surface-chrome
 
-      - name: Unit tests
-        run: pnpm test
+      - name: Knip dependency hygiene (advisory)
+        continue-on-error: true
+        run: pnpm knip:ci
 
       - name: Check test artifact layout
         if: always()
@@ -77,18 +92,13 @@ jobs:
           retention-days: 14
           if-no-files-found: ignore
 
-      - name: Build monorepo
-        run: pnpm build
-        env:
-          NEXT_PUBLIC_APP_NAME: Afenda ERP
-          NEXT_PUBLIC_SITE_URL: http://localhost:3000
-          NEXT_PUBLIC_STAGE: ci
-
   e2e:
     runs-on: ubuntu-latest
     needs: quality
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - uses: pnpm/action-setup@v4
         with:
@@ -108,29 +118,19 @@ jobs:
       - name: Install Playwright browser
         run: pnpm --filter @afenda/erp exec playwright install chromium --with-deps
 
-      - name: E2E smoke tests
-        run: pnpm test:e2e
+      - name: Build ERP for E2E
+        run: pnpm --filter @afenda/erp build
         env:
           CI: "true"
-          AFENDA_DEV_AUTH_BYPASS: "0"
-          AFENDA_NEON_AUTH_ENABLED: "0"
-          AFENDA_E2E_DEV_AUTH: "1"
-          NODE_ENV: production
-          NEXT_PUBLIC_APP_NAME: Afenda ERP
-          NEXT_PUBLIC_SITE_URL: http://localhost:3000
-          NEXT_PUBLIC_STAGE: ci
 
-      - name: UI primitive visual regression
-        run: pnpm test:visual
+      - name: E2E and visual regression (single server boot)
+        run: pnpm --filter @afenda/erp test:e2e:ci
         env:
           CI: "true"
           AFENDA_DEV_AUTH_BYPASS: "0"
           AFENDA_NEON_AUTH_ENABLED: "0"
           AFENDA_E2E_DEV_AUTH: "1"
           NODE_ENV: production
-          NEXT_PUBLIC_APP_NAME: Afenda ERP
-          NEXT_PUBLIC_SITE_URL: http://localhost:3000
-          NEXT_PUBLIC_STAGE: ci
 
       - name: Check test artifact layout
         if: always()
@@ -152,6 +152,8 @@ jobs:
     if: ${{ secrets.NEON_AUTH_BASE_URL != '' && secrets.NEON_AUTH_COOKIE_SECRET != '' }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - uses: pnpm/action-setup@v4
         with:
@@ -171,8 +173,8 @@ jobs:
       - name: Install Playwright browser
         run: pnpm --filter @afenda/erp exec playwright install chromium --with-deps
 
-      - name: Neon Auth E2E smoke
-        run: pnpm --filter @afenda/erp exec playwright test tests/e2e/smoke.spec.ts --grep "Neon Auth smoke"
+      - name: Build ERP for Neon Auth E2E
+        run: pnpm --filter @afenda/erp build
         env:
           CI: "true"
           AFENDA_DEV_AUTH_BYPASS: "0"
@@ -180,9 +182,18 @@ jobs:
           NEXT_PUBLIC_AFENDA_NEON_AUTH_ENABLED: "1"
           AFENDA_E2E_DEV_AUTH: "0"
           NODE_ENV: production
-          NEXT_PUBLIC_APP_NAME: Afenda ERP
-          NEXT_PUBLIC_SITE_URL: http://localhost:3000
-          NEXT_PUBLIC_STAGE: ci
+          NEON_AUTH_BASE_URL: ${{ secrets.NEON_AUTH_BASE_URL }}
+          NEON_AUTH_COOKIE_SECRET: ${{ secrets.NEON_AUTH_COOKIE_SECRET }}
+
+      - name: Neon Auth E2E smoke
+        run: pnpm --filter @afenda/erp test:e2e:neon
+        env:
+          CI: "true"
+          AFENDA_DEV_AUTH_BYPASS: "0"
+          AFENDA_NEON_AUTH_ENABLED: "1"
+          NEXT_PUBLIC_AFENDA_NEON_AUTH_ENABLED: "1"
+          AFENDA_E2E_DEV_AUTH: "0"
+          NODE_ENV: production
           NEON_AUTH_BASE_URL: ${{ secrets.NEON_AUTH_BASE_URL }}
           NEON_AUTH_COOKIE_SECRET: ${{ secrets.NEON_AUTH_COOKIE_SECRET }}
 

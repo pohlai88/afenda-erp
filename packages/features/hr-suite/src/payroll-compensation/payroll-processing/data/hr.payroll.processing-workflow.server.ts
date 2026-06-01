@@ -6,6 +6,7 @@ import {
   lockHrPayrollRun,
   previewHrPayrollRun,
   submitHrPayrollRunForApproval,
+  type HrPayrollRunCalculationResult,
 } from "@afenda/db";
 
 import { hrPayrollProcessingAuditActions } from "../events/hr.payroll.processing.event";
@@ -71,7 +72,7 @@ export async function calculatePayrollRun(input: {
   organizationId: string;
   actorUserId: string;
   payrollRunId: string;
-}) {
+}): Promise<HrPayrollRunCalculationResult> {
   return calculateHrPayrollRun(input);
 }
 

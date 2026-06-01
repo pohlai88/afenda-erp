@@ -41,6 +41,7 @@ import {
 } from "./hr-payroll-processing.shared";
 import {
   hasBlockingPayrollValidationFindings,
+  type HrPayrollRunCalculationResult,
   validatePayrollReadiness,
 } from "./hr-payroll-processing-validation.shared";
 import {
@@ -78,6 +79,7 @@ export {
   sumPayrollBreakdownTotals,
   validatePayrollReadiness,
   hasBlockingPayrollValidationFindings,
+  type HrPayrollRunCalculationResult,
   appendHrPayrollAuditEventInTx,
   listHrPayrollAuditTrailWindow,
   getHrPayrollRunSummaryInTx,

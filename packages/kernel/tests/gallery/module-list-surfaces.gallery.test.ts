@@ -1,10 +1,13 @@
 import {
   parseGovernedChartConfiguration,
+  parseGovernedComponentData,
   parseGovernedDetailTabsData,
   parseGovernedKanbanBoardConfiguration,
   parseGovernedMultiStepFormConfiguration,
   parseListSurfaceRendererConfiguration,
   parseStatCardConfiguration,
+  type GovernedDetailSection,
+  type GovernedDetailTabsInput,
 } from "@afenda/governed-surface/schemas";
 import { describe, expect, it } from "vitest";
 import { buildAuditPanelModel } from "../../src/index";
@@ -84,6 +87,35 @@ const workItemDetail = {
   updatedAt: "27 May 2026",
   auditPanel,
 };
+
+function expectDetailSectionRendererContract(section: GovernedDetailSection) {
+  const parsed = parseGovernedComponentData({
+    type: section.rendererKey,
+    serverType: section.rendererKey,
+    configuration: section.rendererProps,
+  });
+
+  expect(parsed.success).toBe(true);
+}
+
+function expectDetailTabsAndRendererContracts(
+  detailTabs: GovernedDetailTabsInput,
+) {
+  const parsed = parseGovernedDetailTabsData(detailTabs);
+
+  expect(parsed.success).toBe(true);
+  if (!parsed.success) {
+    return;
+  }
+
+  expectDetailSectionRendererContract(parsed.data.overview);
+  for (const section of [
+    ...(parsed.data.relations ?? []),
+    ...(parsed.data.referrers ?? []),
+  ]) {
+    expectDetailSectionRendererContract(section);
+  }
+}
 
 describe("module list surface gallery fixtures", () => {
   it.each([
@@ -196,7 +228,14 @@ describe("auxiliary list surface gallery fixtures", () => {
     [
       "saved views — ready",
       buildSavedViewsListSurface({
-        views: [{ id: "v1", name: "High priority", description: "Filtered.", visibility: "private" }],
+        views: [
+          {
+            id: "v1",
+            name: "High priority",
+            description: "Filtered.",
+            visibility: "private",
+          },
+        ],
         moduleId: "finance",
       }),
     ],
@@ -207,7 +246,15 @@ describe("auxiliary list surface gallery fixtures", () => {
     [
       "automation runs — ready",
       buildDashboardAutomationListSurface({
-        runs: [{ id: "a1", name: "Nightly sync", schedule: "0 2 * * *", status: "success", detail: "All records synced." }],
+        runs: [
+          {
+            id: "a1",
+            name: "Nightly sync",
+            schedule: "0 2 * * *",
+            status: "success",
+            detail: "All records synced.",
+          },
+        ],
       }),
     ],
     [
@@ -217,7 +264,15 @@ describe("auxiliary list surface gallery fixtures", () => {
     [
       "document registry — ready",
       buildDocumentRegistryListSurface({
-        documents: [{ id: "d1", title: "Invoice Q1", contentType: "PDF", size: "120 KB", access: "internal" }],
+        documents: [
+          {
+            id: "d1",
+            title: "Invoice Q1",
+            contentType: "PDF",
+            size: "120 KB",
+            access: "internal",
+          },
+        ],
         moduleId: "finance",
       }),
     ],
@@ -252,7 +307,14 @@ describe("stat grid gallery fixtures", () => {
       "module KPI stat grid",
       buildModuleWorkspaceStatGrid({
         moduleId: "finance",
-        metrics: [{ label: "Revenue", value: "MYR 4.8M", detail: "YTD", tone: "positive" }],
+        metrics: [
+          {
+            label: "Revenue",
+            value: "MYR 4.8M",
+            detail: "YTD",
+            tone: "positive",
+          },
+        ],
       }),
     ],
   ])("parses %s", (_name, statConfig) => {
@@ -262,24 +324,57 @@ describe("stat grid gallery fixtures", () => {
 
 describe("detail tab gallery fixtures", () => {
   it("parses record detail tabs — ready", () => {
-    const result = parseGovernedDetailTabsData(
+    expectDetailTabsAndRendererContracts(
       buildRecordDetailTabs({ moduleId: "finance", record: recordDetail }),
     );
-    expect(result.success).toBe(true);
   });
 
   it("parses record detail tabs — empty metadata", () => {
-    const result = parseGovernedDetailTabsData(
-      buildRecordDetailTabs({ moduleId: "finance", record: { ...recordDetail, metadata: {} } }),
+    expectDetailTabsAndRendererContracts(
+      buildRecordDetailTabs({
+        moduleId: "finance",
+        record: { ...recordDetail, metadata: {} },
+      }),
     );
-    expect(result.success).toBe(true);
+  });
+
+  it("parses record detail tabs — raw metadata values", () => {
+    expectDetailTabsAndRendererContracts(
+      buildRecordDetailTabs({
+        moduleId: "finance",
+        record: {
+          ...recordDetail,
+          metadata: {
+            amountCents: 12400000,
+            settlementDate: "2026-05-27",
+            sequence: "02",
+          },
+        },
+      }),
+    );
   });
 
   it("parses work-item detail tabs — ready", () => {
-    const result = parseGovernedDetailTabsData(
-      buildWorkItemDetailTabs({ moduleId: "finance", workItem: workItemDetail }),
+    expectDetailTabsAndRendererContracts(
+      buildWorkItemDetailTabs({
+        moduleId: "finance",
+        workItem: workItemDetail,
+      }),
     );
-    expect(result.success).toBe(true);
+  });
+
+  it("parses work-item detail tabs — source referrer", () => {
+    expectDetailTabsAndRendererContracts(
+      buildWorkItemDetailTabs({
+        moduleId: "finance",
+        workItem: {
+          ...workItemDetail,
+          metadata: { sequence: "02" },
+          sourceRecordId: "record-gallery-1",
+          sourceRecordHref: "/finance/records/record-gallery-1",
+        },
+      }),
+    );
   });
 });
 
@@ -315,14 +410,20 @@ describe("chart surface gallery fixtures", () => {
 describe("kanban surface gallery fixtures", () => {
   it("parses work-item kanban — ready", () => {
     const result = parseGovernedKanbanBoardConfiguration(
-      buildModuleWorkItemKanbanSurface({ moduleId: "approvals", workItems: [workItem] }),
+      buildModuleWorkItemKanbanSurface({
+        moduleId: "approvals",
+        workItems: [workItem],
+      }),
     );
     expect(result.success).toBe(true);
   });
 
   it("parses work-item kanban — empty board", () => {
     const result = parseGovernedKanbanBoardConfiguration(
-      buildModuleWorkItemKanbanSurface({ moduleId: "approvals", workItems: [] }),
+      buildModuleWorkItemKanbanSurface({
+        moduleId: "approvals",
+        workItems: [],
+      }),
     );
     expect(result.success).toBe(true);
   });
@@ -342,7 +443,11 @@ describe("dashboard auxiliary surface gallery fixtures", () => {
     const result = parseListSurfaceRendererConfiguration(
       buildDashboardHardeningChecklistSurface({
         items: [
-          { area: "RLS", status: "configured", detail: "Tenant isolation enforced." },
+          {
+            area: "RLS",
+            status: "configured",
+            detail: "Tenant isolation enforced.",
+          },
         ],
       }),
     );

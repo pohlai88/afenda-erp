@@ -138,3 +138,21 @@
 | Boarding task auto-complete on training | TRN → Lifecycle | `training-boarding-bridge.server.ts` (`metadata.trainingCourseCode`) |
 | Boarding task auto-complete on LMS course | LMS → Lifecycle | `boarding-lms-bridge.server.ts` (`metadata.lmsCourseCode`) |
 | Mandatory compliance export | LMS + TRN → Compliance | Compliance aggregates both engines; TRN does not own LMS rules |
+
+---
+
+## As-built summary
+
+Training & Development ships as `@afenda/feature-hr-suite` slice
+`talent-management/training-development` with the workspace route
+`/hr/training-development`.
+
+| Area | As-built implementation |
+| --- | --- |
+| Domain model | `schemas/hr.talent.training.schema.ts` and `data/hr.talent.training-store.shared.ts` cover course catalog, providers, mandatory requirements, assignments, enrollment/waitlist/approval, attendance, completion, assessments, skills, competencies, skill gaps, development plans, certifications, alerts, feedback, costs, reporting refs, and audit events. |
+| Governed UI | `surface/hr.talent.training-surface-metadata.shared.ts`, `surface/hr.talent.training-lists.surface.ts`, and `components/hr.talent.training-section.component.server.tsx` expose Pattern B overview KPIs and Pattern C server-window lists for all operational, exception, reporting, integration, and audit surfaces. |
+| Access | `policies/hr.talent.training-access.policy.server.ts` uses TRN-specific capabilities: `hr.training.read`, `write`, `approve`, `audit.read`, `restricted.read`, and `integration.expose`, with employee visibility scoped through HR Suite tenancy helpers. |
+| Actions | `actions/hr.talent.training.actions.server.ts` gates course setup, assignment, enrollment, approval, attendance, completion, assessment, certification, and export actions through server-side capability checks and emits audit events. |
+| Integrations | The page model exposes Compliance completion refs, Performance/Lifecycle readiness refs, and onboarding training completion refs only when `hr.training.integration.expose` is granted. LMS completion is represented as blended source data rather than LMS ownership. |
+| App wiring | `apps/erp/src/lib/hr-sections/training-development.server.tsx`, HR section registry, HR nav, app capabilities, kernel route mapping, and permission seed catalog are wired for `/hr/training-development`. |
+| Coverage | `data/hr.talent.training-coverage.shared.ts` marks `HRM-TRN-001..030` and the 25 enterprise acceptance criteria as shipped with package and slice tests. |

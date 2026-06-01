@@ -1,5 +1,4 @@
-/**
- * @afenda-bucket data
- * Scaffold placeholder from packages/_template-definition.
- */
-export {};
+export * from "./hr.talent.training-coverage.shared";
+export * from "./hr.talent.training-search-params.parse.shared";
+export * from "./hr.talent.training-store.shared";
+export * from "./hr.talent.training.page-model.server";

@@ -6,16 +6,24 @@ import { parseListSurfaceRendererConfiguration } from "@afenda/governed-surface/
 import { describe, expect, it } from "vitest";
 
 import {
+  buildHrListWindow,
+  buildHrStaticListWindow,
   defineHrSuiteErpPermission,
   defineHrSuiteReadPermission,
 } from "../../src/hr-suite-integration";
 import {
   buildHrSuiteListSearchToolbar,
+  buildHrSuiteListSearchToolbarFromRegistryEntry,
+  buildHrSuiteListSurfaceColumnsByKey,
+  buildHrSuiteListSurfaceKeys,
   buildHrSuiteOperationalListSurface,
+  buildHrSuiteReadOnlyListSurfaceKeys,
   buildHrSuiteSearchParamModelFields,
   buildHrSuiteSearchParamsBySurfaceKey,
   defineHrSuiteActionDescriptor,
+  defineHrSuiteListSurfaceRegistry,
   defineHrSuiteSearchParamRegistry,
+  readHrSuiteSearchParam,
   resolveHrSuiteListTrailingAction,
 } from "../../src/hr-suite-integration/metadata";
 import {
@@ -27,11 +35,7 @@ import {
 
 const testDir = path.dirname(fileURLToPath(import.meta.url));
 const packageRoot = path.resolve(testDir, "../..");
-const integrationRoot = path.join(
-  packageRoot,
-  "src",
-  "hr-suite-integration",
-);
+const integrationRoot = path.join(packageRoot, "src", "hr-suite-integration");
 
 describe("HR Suite integration contract", () => {
   it("keeps the integration root shape and package API closed", () => {
@@ -91,6 +95,29 @@ describe("HR Suite integration contract", () => {
     });
     expect(() => defineHrSuiteReadPermission(" ")).toThrow(
       "HR permission object must not be empty.",
+    );
+  });
+
+  it("normalizes reusable list windows", () => {
+    expect(
+      buildHrListWindow({
+        pageSize: 250,
+        totalCount: 101,
+        nextCursor: " cursor-2 ",
+      }),
+    ).toEqual({
+      pageSize: 100,
+      totalCount: 101,
+      hasNextPage: true,
+      nextCursor: "cursor-2",
+    });
+    expect(buildHrStaticListWindow({ rowCount: 0 })).toEqual({
+      pageSize: 1,
+      totalCount: 0,
+      hasNextPage: false,
+    });
+    expect(() => buildHrListWindow({ totalCount: -1 })).toThrow(
+      "HR list total count must be a non-negative integer.",
     );
   });
 
@@ -166,6 +193,64 @@ describe("HR Suite integration contract", () => {
       "applicationsSearch",
       "offersSearch",
     ]);
+    expect(
+      buildHrSuiteListSearchToolbarFromRegistryEntry(registry[0], "Ava"),
+    ).toEqual({
+      search: {
+        param: "applicationsSearch",
+        label: "Search applications",
+        placeholder: "Search candidate or requisition",
+        value: "Ava",
+      },
+    });
+  });
+
+  it("derives list registry metadata for scaffolded Pattern C surfaces", () => {
+    const registry = defineHrSuiteListSurfaceRegistry([
+      {
+        surfaceKey: "applications",
+        param: "applicationsSearch",
+        modelField: "applicationsSearch",
+        label: "Search applications",
+        placeholder: "Search candidate or requisition",
+        columns: [
+          { id: "candidate", header: "Candidate", priority: "primary" },
+        ],
+      },
+      {
+        surfaceKey: "audit",
+        param: "auditSearch",
+        modelField: "auditSearch",
+        label: "Search audit",
+        placeholder: "Search audit event",
+        columns: [{ id: "event", header: "Event", priority: "primary" }],
+        readOnly: true,
+      },
+    ] as const);
+
+    expect(buildHrSuiteListSurfaceKeys(registry)).toEqual([
+      "applications",
+      "audit",
+    ]);
+    expect(buildHrSuiteReadOnlyListSurfaceKeys(registry)).toEqual(["audit"]);
+    expect(buildHrSuiteListSurfaceColumnsByKey(registry)).toEqual({
+      applications: [
+        { id: "candidate", header: "Candidate", priority: "primary" },
+      ],
+      audit: [{ id: "event", header: "Event", priority: "primary" }],
+    });
+    expect(
+      readHrSuiteSearchParam(
+        { applicationsSearch: [" Ava ", "ignored"] },
+        "applicationsSearch",
+      ),
+    ).toBe("Ava");
+    expect(
+      readHrSuiteSearchParam(
+        new URLSearchParams("auditSearch=approved"),
+        "auditSearch",
+      ),
+    ).toBe("approved");
   });
 
   it("builds governed trailing action descriptors", () => {
@@ -212,13 +297,13 @@ describe("HR Suite integration contract", () => {
         exposeUnexpectedErrorMessage: true,
       }),
     ).toEqual({ ok: false, error: "Visible detail" });
-    expect(
-      hrSuiteActionFailure("Mapped failure.", { code: "mapped" }),
-    ).toEqual({
-      ok: false,
-      error: "Mapped failure.",
-      code: "mapped",
-    });
+    expect(hrSuiteActionFailure("Mapped failure.", { code: "mapped" })).toEqual(
+      {
+        ok: false,
+        error: "Mapped failure.",
+        code: "mapped",
+      },
+    );
 
     const successResultAction = toHrSuiteResultFormAction(async () => ({
       ok: true,

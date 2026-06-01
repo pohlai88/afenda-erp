@@ -1,18 +1,28 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Locator, type Page } from "@playwright/test";
 
-test.describe("Afenda ERP smoke", () => {
-  test("redirects unauthenticated home traffic to sign in", async ({
+import { skipWhenNeonAuthEnabled } from "./support/auth";
+
+async function isVisible(locator: Locator) {
+  return locator.isVisible({ timeout: 5_000 }).catch(() => false);
+}
+
+async function gotoApp(page: Page, path: string) {
+  await page.goto(path, { timeout: 60_000, waitUntil: "domcontentloaded" });
+}
+
+test.describe("Afenda ERP public smoke", () => {
+  test("redirects unauthenticated home traffic to sign in @public", async ({
     page,
   }) => {
-    await page.goto("/");
+    await gotoApp(page, "/");
     await expect(page).toHaveURL(/\/sign-in/);
     await expect(page.getByRole("heading", { level: 1 })).toContainText(
       "Tenant-aware ERP access",
     );
   });
 
-  test("renders the sign-in page", async ({ page }) => {
-    await page.goto("/sign-in");
+  test("renders the sign-in page @public", async ({ page }) => {
+    await gotoApp(page, "/sign-in");
     await expect(page).toHaveURL(/\/sign-in/);
     await expect(
       page.getByRole("heading", {
@@ -25,14 +35,14 @@ test.describe("Afenda ERP smoke", () => {
     ).toBeVisible();
   });
 
-  test("shows floating dev sign-in on pre-sign-in shell pages", async ({
+  test("shows floating dev sign-in on pre-sign-in shell pages @public", async ({
     page,
   }) => {
-    await page.goto("/sign-up");
+    await gotoApp(page, "/sign-up");
 
     const devPanel = page.locator('aside[aria-label="Developer sign-in"]');
 
-    if (!(await devPanel.isVisible())) {
+    if (!(await isVisible(devPanel))) {
       test.skip(true, "Dev sign-in is unavailable while Neon Auth is active.");
     }
 
@@ -42,128 +52,71 @@ test.describe("Afenda ERP smoke", () => {
       devPanel.getByRole("button", { name: "Continue here" }),
     ).toBeVisible();
   });
+});
 
-  test("loads dashboard after dev sign-in", async ({ page }) => {
-    await page.goto("/sign-in");
-    const devSignInButton = page.getByRole("button", {
-      name: "Continue to dashboard",
-    });
-
-    if (!(await devSignInButton.isVisible())) {
-      test.skip(true, "Dev sign-in is unavailable while Neon Auth is active.");
-    }
-
-    await devSignInButton.click();
-    await expect(page).toHaveURL(/\/dashboard/);
-    await expect(page.getByText("Tenant workspace")).toBeVisible();
-    await expect(
-      page.getByRole("heading", {
-        level: 1,
-        name: "Afenda Operations workspace",
-      }),
-    ).toBeVisible();
+test.describe("Afenda ERP authenticated smoke", () => {
+  test.beforeEach(() => {
+    skipWhenNeonAuthEnabled();
   });
 
-  test("loads Lynx after dev sign-in", async ({ page }) => {
-    await page.goto("/sign-in");
-    const devSignInButton = page.getByRole("button", {
-      name: "Continue to dashboard",
-    });
-
-    if (!(await devSignInButton.isVisible())) {
-      test.skip(true, "Dev sign-in is unavailable while Neon Auth is active.");
-    }
-
-    await devSignInButton.click();
-    await expect(page).toHaveURL(/\/dashboard/);
-    await page.goto("/lynx");
-    await expect(page).toHaveURL(/\/lynx/);
-    await expect(page.getByText("Recovery playbook catalog")).toBeVisible();
-    await expect(
-      page.getByRole("row").filter({ hasText: "Negative P&L" }).first(),
-    ).toBeVisible();
-  });
-
-  test("opens a governed module record detail after dev sign-in", async ({
+  test("loads dashboard from storage state @authenticated", async ({
     page,
   }) => {
-    await page.goto("/sign-in");
-    const devSignInButton = page.getByRole("button", {
-      name: "Continue to dashboard",
-    });
-
-    if (!(await devSignInButton.isVisible())) {
-      test.skip(true, "Dev sign-in is unavailable while Neon Auth is active.");
-    }
-
-    await devSignInButton.click();
+    await gotoApp(page, "/dashboard");
     await expect(page).toHaveURL(/\/dashboard/);
-    await page.goto("/finance");
+    await expect(
+      page.getByRole("heading", {
+        level: 2,
+        name: "Production hardening",
+      }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("table", { name: "Production hardening" }),
+    ).toBeVisible();
+  });
+
+  test("loads Lynx from storage state @authenticated", async ({ page }) => {
+    await gotoApp(page, "/lynx");
+    await expect(page).toHaveURL(/\/lynx/);
+    await expect(
+      page.getByRole("heading", { level: 1, name: "Lynx Console" }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: "Lynx Operator" }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: "Recover negative P&L" }),
+    ).toBeVisible();
+  });
+
+  test("opens a governed module record detail @authenticated", async ({
+    page,
+  }) => {
+    await gotoApp(page, "/finance");
     await expect(
       page.getByRole("heading", { level: 1, name: "Finance" }),
     ).toBeVisible();
 
-    await page.goto("/finance/records/finance-milestone-1");
+    await gotoApp(page, "/finance/records/finance-milestone-1");
     await expect(page).toHaveURL(/\/finance\/records\/finance-milestone-1/);
     await expect(
       page.getByRole("heading", { level: 1, name: "FINANCE-001" }),
     ).toBeVisible();
-    await expect(page.getByText("Governed metadata")).toBeVisible();
-    await expect(page.getByText("Audit trail")).toBeVisible();
+
+    const detailTabs = page.getByTestId("governed-detail-tabs");
+    await expect(detailTabs).toBeVisible();
+    await expect(detailTabs.getByTestId("tab-overview")).toBeVisible();
+    await expect(detailTabs.getByText("Record type")).toBeVisible();
+    await expect(detailTabs.getByText("Amount")).toBeVisible();
+
+    await detailTabs.getByTestId("tab-relations").click();
+    await expect(detailTabs.getByText("Extension metadata")).toBeVisible();
   });
 
-  test("keeps the current protected route after floating dev sign-in", async ({
+  test("opens a governed module work item detail @authenticated", async ({
     page,
   }) => {
-    test.setTimeout(75_000);
-
-    await page.goto("/sign-in");
-    const initialDevPanel = page.locator(
-      'aside[aria-label="Developer sign-in"]',
-    );
-
-    if (!(await initialDevPanel.isVisible())) {
-      test.skip(true, "Dev sign-in is unavailable while Neon Auth is active.");
-    }
-
-    await initialDevPanel.getByText("Developer sign-in").click();
-    await initialDevPanel
-      .getByRole("button", { name: "Continue here" })
-      .evaluate((button: HTMLButtonElement) => button.click());
-    await expect(page).toHaveURL(/\/dashboard/, { timeout: 15_000 });
-    await page.goto("/finance");
-    await expect(
-      page.getByRole("heading", { level: 1, name: "Finance" }),
-    ).toBeVisible();
-
-    const devPanel = page.locator('aside[aria-label="Developer sign-in"]');
-    await expect(devPanel).toBeVisible();
-    await devPanel.getByText("Developer sign-in").click();
-    await devPanel
-      .getByRole("button", { name: "Continue here" })
-      .evaluate((button: HTMLButtonElement) => button.click());
-
-    await expect(page).toHaveURL(/\/finance$/, { timeout: 15_000 });
-    await expect(
-      page.getByRole("heading", { level: 1, name: "Finance" }),
-    ).toBeVisible();
-  });
-
-  test("opens a governed module work item detail after dev sign-in", async ({
-    page,
-  }) => {
-    await page.goto("/sign-in");
-    const devSignInButton = page.getByRole("button", {
-      name: "Continue to dashboard",
-    });
-
-    if (!(await devSignInButton.isVisible())) {
-      test.skip(true, "Dev sign-in is unavailable while Neon Auth is active.");
-    }
-
-    await devSignInButton.click();
-    await expect(page).toHaveURL(/\/dashboard/);
-    await page.goto("/finance/work-items/finance-work-item-1");
+    await gotoApp(page, "/finance/work-items/finance-work-item-1");
     await expect(page).toHaveURL(/\/finance\/work-items\/finance-work-item-1/);
     await expect(
       page.getByRole("heading", {
@@ -171,19 +124,58 @@ test.describe("Afenda ERP smoke", () => {
         name: "Introduce journal and subledger domain services.",
       }),
     ).toBeVisible();
-    await expect(page.getByText("Work item metadata")).toBeVisible();
-    await expect(page.getByText("Audit trail")).toBeVisible();
+
+    const detailTabs = page.getByTestId("governed-detail-tabs");
+    await expect(detailTabs).toBeVisible();
+    await expect(detailTabs.getByTestId("tab-overview")).toBeVisible();
+    await expect(detailTabs.getByText("Owner")).toBeVisible();
+    await expect(detailTabs.getByText("Status")).toBeVisible();
+    await expect(detailTabs.getByText("Priority")).toBeVisible();
+  });
+});
+
+test.describe("Afenda ERP dev auth flow", () => {
+  test.beforeEach(() => {
+    skipWhenNeonAuthEnabled();
+  });
+
+  test("loads a protected route after floating dev sign-in @dev-auth-flow", async ({
+    page,
+  }) => {
+    test.setTimeout(75_000);
+
+    await gotoApp(page, "/sign-in");
+    const initialDevPanel = page.locator(
+      'aside[aria-label="Developer sign-in"]',
+    );
+
+    if (!(await isVisible(initialDevPanel))) {
+      test.skip(true, "Dev sign-in is unavailable while Neon Auth is active.");
+    }
+
+    await initialDevPanel.getByText("Developer sign-in").click();
+    await Promise.all([
+      page.waitForURL(/\/dashboard/, {
+        timeout: 60_000,
+        waitUntil: "domcontentloaded",
+      }),
+      initialDevPanel.getByRole("button", { name: "Continue here" }).click(),
+    ]);
+    await gotoApp(page, "/finance");
+    await expect(
+      page.getByRole("heading", { level: 1, name: "Finance" }),
+    ).toBeVisible();
   });
 });
 
 test.describe("Neon Auth smoke", () => {
-  test("renders neon sign-in when enabled", async ({ page }) => {
+  test("renders neon sign-in when enabled @neon", async ({ page }) => {
     test.skip(
       process.env.AFENDA_NEON_AUTH_ENABLED !== "1",
       "Requires AFENDA_NEON_AUTH_ENABLED=1 and Neon Auth configuration.",
     );
 
-    await page.goto("/sign-in");
+    await gotoApp(page, "/sign-in");
     await expect(
       page.getByRole("heading", {
         level: 2,

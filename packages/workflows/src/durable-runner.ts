@@ -6,7 +6,7 @@ export type DurableWorkflowRunResult<TResult> = {
 
 export class DurableWorkflowRetryError extends Error {
   readonly attempts: number;
-  readonly cause?: unknown;
+  override readonly cause?: unknown;
 
   constructor(message: string, attempts: number, cause?: unknown) {
     super(message);

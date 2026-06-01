@@ -49,7 +49,7 @@ describe("system admin phase 3 policy schemas", () => {
 
 describe("system admin phase 3 execution kernel integration", () => {
   it("denies non-admin users from managing policies", () => {
-    const capabilities = ["system-admin.policies.read"] as const;
+    const capabilities: readonly string[] = ["system-admin.policies.read"];
     expect(capabilities.includes("system-admin.policies.manage")).toBe(false);
   });
 

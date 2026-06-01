@@ -202,8 +202,8 @@ describe("system admin integrations", () => {
       canMutate: true,
     });
 
-    expect(revoke?.descriptor.label).toBe("Revoke");
-    expect(disable?.descriptor.label).toBe("Disable");
+    expect(revoke?.descriptor?.label).toBe("Revoke");
+    expect(disable?.descriptor?.label).toBe("Disable");
   });
 
   it("uses stable integrations audit action identifiers", () => {

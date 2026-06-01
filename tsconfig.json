@@ -1,12 +1,13 @@
 {
-  "extends": "./packages/config/tsconfig.base.json",
+  "extends": "./packages/config/tsconfig.check.base.json",
   "compilerOptions": {
     "allowImportingTsExtensions": true,
     "types": ["node"]
   },
   "include": [
     "scripts/**/*.mts",
-    "packages/_template-definition/scripts/**/*.mts"
+    "packages/_template-definition/scripts/**/*.mts",
+    "packages/features/hr-suite/scripts/**/*.mts"
   ],
   "exclude": ["node_modules"]
 }

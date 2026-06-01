@@ -2,28 +2,10 @@ import { expect, test } from "@playwright/test";
 
 import { hrRecordsDirectorySurfaceKey } from "@afenda/feature-hr-suite/metadata";
 
-async function devSignIn(page: import("@playwright/test").Page) {
-  await page.context().clearCookies();
-  await page.goto("/sign-in");
-  const devSignInButton = page.getByRole("button", {
-    name: "Continue to dashboard",
-  });
-
-  if (!(await devSignInButton.isVisible({ timeout: 5_000 }).catch(() => false))) {
-    test.skip(true, "Dev sign-in is unavailable while Neon Auth is active.");
-  }
-
-  await devSignInButton.click();
-  await expect(page).toHaveURL(/\/dashboard/, { timeout: 15_000 });
-}
-
-async function dismissDevSignInPanel(page: import("@playwright/test").Page) {
-  await page.evaluate(() => {
-    document
-      .querySelector('aside[aria-label="Developer sign-in"]')
-      ?.remove();
-  });
-}
+import {
+  dismissDevSignInPanel,
+  skipWhenNeonAuthEnabled,
+} from "./support/auth";
 
 async function gotoEmployeesWorkbench(page: import("@playwright/test").Page) {
   await page.goto("/hr/employees", {
@@ -43,9 +25,12 @@ async function gotoEmployeesWorkbench(page: import("@playwright/test").Page) {
 test.describe("HR employee records", () => {
   test.describe.configure({ mode: "serial" });
 
+  test.beforeEach(() => {
+    skipWhenNeonAuthEnabled();
+  });
+
   test("renders the employee records workbench", async ({ page }) => {
     test.setTimeout(360_000);
-    await devSignIn(page);
     await gotoEmployeesWorkbench(page);
     await expect(
       page.locator('[data-testid^="governed-list-section:"]').first(),
@@ -56,7 +41,6 @@ test.describe("HR employee records", () => {
     page,
   }) => {
     test.setTimeout(360_000);
-    await devSignIn(page);
     await gotoEmployeesWorkbench(page);
 
     const directory = page.getByTestId(

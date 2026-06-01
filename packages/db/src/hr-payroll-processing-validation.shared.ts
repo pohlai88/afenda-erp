@@ -81,3 +81,10 @@ export function hasBlockingPayrollValidationFindings(
 ): boolean {
   return findings.some((finding) => finding.severity === "blocking");
 }
+
+export type HrPayrollRunCalculationResult = {
+  payrollRunId: string;
+  lineCount: number;
+  findings: PayrollValidationFinding[];
+  hasBlockingFindings: boolean;
+};

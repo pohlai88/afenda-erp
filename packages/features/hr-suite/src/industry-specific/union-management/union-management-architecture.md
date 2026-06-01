@@ -125,3 +125,20 @@
 |  23 | Reports can be generated for union membership, bargaining units, CBA coverage, seniority, grievances, disputes, dues references, and renewals.                                                                   |
 |  24 | Unauthorized users cannot view or modify restricted union, grievance, dispute, or labor-relations records.                                                                                                       |
 |  25 | Every union setup, membership update, bargaining unit assignment, CBA rule reference, grievance action, dispute escalation, seniority update, dues reference, renewal, and report export creates an audit event. |
+
+## As-built summary
+
+The shipped slice lives under
+`src/industry-specific/union-management` with domain key `hr.industry.ucb`,
+route `/hr/union-management`, and capability prefix `hr.ucb.*`.
+
+The implementation covers `HRM-UCB-001` through `HRM-UCB-030` with typed
+schemas, tenant-scoped seeded stores, governed list surfaces, overview KPI
+metadata, access policies, server actions, integration reference exports, and
+audit events.
+
+The runtime owns authorization and data visibility. Restricted membership,
+grievance, dispute, legal reference, payroll exposure, integration exposure,
+report export, and audit sections are gated by granular capabilities. Metadata
+declares the surfaces; page models produce bounded server-window rows for
+Pattern C lists and never ship full datasets for pagination.

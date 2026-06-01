@@ -12,6 +12,22 @@ function createWorkspace() {
   };
 }
 
+async function executeTool<TInput>(
+  toolValue: { execute?: unknown },
+  input: TInput,
+) {
+  if (typeof toolValue.execute !== "function") {
+    throw new Error("Tool is missing execute.");
+  }
+
+  const execute = toolValue.execute as (
+    input: TInput,
+    options: never,
+  ) => Promise<unknown>;
+
+  return execute(input, undefined as never);
+}
+
 function createAssistantTools(approvalToolEnabled: boolean) {
   return createErpAssistantTools({
     organization: {
@@ -38,6 +54,7 @@ function createAssistantTools(approvalToolEnabled: boolean) {
       workItemCount: 0,
       highPriorityWorkItemCount: 0,
       documentCount: 0,
+      savedViewCount: 0,
     }),
     isApprovalToolEnabled: () => approvalToolEnabled,
     registerApprovalProposal: async () => "proposal_1",
@@ -73,6 +90,7 @@ function createProviderTools(approvalToolEnabled: boolean) {
       workItemCount: 0,
       highPriorityWorkItemCount: 0,
       documentCount: 0,
+      savedViewCount: 0,
     }),
     isApprovalToolEnabled: () => approvalToolEnabled,
     registerSolutionActionProposal: async () => "proposal_1",
@@ -85,7 +103,7 @@ describe("approval-tool entitlement guards", () => {
     const tools = createAssistantTools(false);
 
     await expect(
-      tools.proposeApprovalDecision.execute({
+      executeTool(tools.proposeApprovalDecision, {
         moduleId: "approvals",
         proposedAction: "approve",
         rationale: "Manual review completed and requirements are satisfied.",
@@ -99,7 +117,7 @@ describe("approval-tool entitlement guards", () => {
     const tools = createAssistantTools(true);
 
     await expect(
-      tools.proposeApprovalDecision.execute({
+      executeTool(tools.proposeApprovalDecision, {
         moduleId: "approvals",
         proposedAction: "approve",
         rationale: "Manual review completed and requirements are satisfied.",
@@ -117,7 +135,7 @@ describe("approval-tool entitlement guards", () => {
     const tools = createProviderTools(false);
 
     await expect(
-      tools.proposeHumanApprovedAction.execute({
+      executeTool(tools.proposeHumanApprovedAction, {
         moduleId: "finance",
         title: "Stabilize gross margin variance",
         rationale:

@@ -5,6 +5,30 @@
  * resolves a slug here, then loads the matching `*.server.tsx` adapter.
  */
 export const hrSectionManifest = {
+  lifecycle: {
+    label: "Lifecycle",
+    featureArea: "employee-management/employee-lifecycle-management",
+  },
+  documents: {
+    label: "Documents",
+    featureArea: "employee-management/documents-management",
+  },
+  offboarding: {
+    label: "Offboarding",
+    featureArea: "employee-management/offboarding-exit-management",
+  },
+  records: {
+    label: "Records",
+    featureArea: "employee-management/employee-records-management",
+  },
+  employees: {
+    label: "Employees",
+    featureArea: "employee-management/employee-records-management",
+  },
+  org: {
+    label: "Organization",
+    featureArea: "employee-management/organizational-chart-hierarchy",
+  },
   compliance: {
     label: "Compliance",
     featureArea: "employee-management/compliance-regulatory-tracking",
@@ -68,6 +92,41 @@ export const hrSectionManifest = {
   "recruitment-onboarding": {
     label: "Recruitment & Onboarding",
     featureArea: "talent-management/recruitment-onboarding",
+  },
+  "succession-planning": {
+    label: "Succession Planning",
+    featureArea: "talent-management/succession-planning",
+  },
+  "training-development": {
+    label: "Training & Development",
+    featureArea: "talent-management/training-development",
+  },
+  "field-worker-remote-workforce-management": {
+    label: "Field Workforce",
+    featureArea: "industry-specific/field-worker-remote-workforce-management",
+  },
+  "food-handler-certification-health-compliance": {
+    label: "Food Handler Compliance",
+    featureArea:
+      "industry-specific/food-handler-certification-health-compliance",
+  },
+  "government-classification-pay-grades": {
+    label: "Government Pay Grades",
+    featureArea: "industry-specific/government-classification-pay-grades",
+  },
+  "manufacturing-safety-training-osha-compliance": {
+    label: "Manufacturing Safety",
+    featureArea:
+      "industry-specific/manufacturing-safety-training-osha-compliance",
+  },
+  "retail-seasonal-hourly-workforce-scheduling": {
+    label: "Retail Scheduling",
+    featureArea:
+      "industry-specific/retail-seasonal-hourly-workforce-scheduling",
+  },
+  "union-management": {
+    label: "Union Management",
+    featureArea: "industry-specific/union-management",
   },
 } as const;
 

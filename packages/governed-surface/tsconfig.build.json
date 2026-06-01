@@ -1,15 +1,13 @@
 {
-  "extends": "./tsconfig.json",
+  "extends": "../config/tsconfig.build.react.base.json",
   "compilerOptions": {
-    "noEmit": false,
-    "declaration": true,
-    "declarationMap": true,
-    "outDir": "dist",
-    "rootDir": "src",
     "paths": {
-      "@afenda/ui": ["../ui/dist/index.d.ts"],
-      "@afenda/ui/*": ["../ui/dist/*.d.ts"]
+      "@afenda/ui": [
+        "../ui/dist/index.d.ts"
+      ],
+      "@afenda/ui/*": [
+        "../ui/dist/*.d.ts"
+      ]
     }
-  },
-  "exclude": ["tests/**/*.test.ts", "tests/**/*.test.tsx"]
+  }
 }

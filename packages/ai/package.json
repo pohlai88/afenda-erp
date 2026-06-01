@@ -41,6 +41,8 @@
     "zod": "catalog:"
   },
   "devDependencies": {
+    "@vscode/ripgrep": "^1.15.11",
     "vitest": "catalog:"
-  }
+  },
+  "sideEffects": false
 }

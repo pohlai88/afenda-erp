@@ -8,28 +8,10 @@ import {
 } from "@afenda/feature-hr-suite/metadata";
 import { governedListSectionTestId } from "@afenda/governed-surface";
 
-async function devSignIn(page: import("@playwright/test").Page) {
-  await page.context().clearCookies();
-  await page.goto("/sign-in");
-  const devSignInButton = page.getByRole("button", {
-    name: "Continue to dashboard",
-  });
-
-  if (!(await devSignInButton.isVisible({ timeout: 5_000 }).catch(() => false))) {
-    test.skip(true, "Dev sign-in is unavailable while Neon Auth is active.");
-  }
-
-  await devSignInButton.click();
-  await expect(page).toHaveURL(/\/dashboard/, { timeout: 15_000 });
-}
-
-async function dismissDevSignInPanel(page: import("@playwright/test").Page) {
-  await page.evaluate(() => {
-    document
-      .querySelector('aside[aria-label="Developer sign-in"]')
-      ?.remove();
-  });
-}
+import {
+  dismissDevSignInPanel,
+  skipWhenNeonAuthEnabled,
+} from "./support/auth";
 
 async function gotoDocumentsWorkbench(
   page: import("@playwright/test").Page,
@@ -73,12 +55,15 @@ function sectionSearchInput(
 test.describe("HR documents workbench", () => {
   test.describe.configure({ mode: "serial" });
 
+  test.beforeEach(() => {
+    skipWhenNeonAuthEnabled();
+  });
+
   test("renders documents overview and repository without access denied", async ({
     page,
   }) => {
     test.setTimeout(360_000);
 
-    await devSignIn(page);
     await gotoDocumentsWorkbench(page);
 
     await expect(
@@ -105,7 +90,6 @@ test.describe("HR documents workbench", () => {
   test("preserves repository search in the URL", async ({ page }) => {
     test.setTimeout(360_000);
 
-    await devSignIn(page);
     const query = "passport-scan";
     await gotoDocumentsWorkbench(
       page,

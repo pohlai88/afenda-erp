@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 import {
   buildSystemAdminCapabilityCoverageRows,
   evaluateCapabilityCoverage,
@@ -205,4 +205,3 @@ describe("system admin phase 2 module guard", () => {
     expect(parsed.enabled).toBe(false);
   });
 });
-

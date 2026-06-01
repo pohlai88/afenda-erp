@@ -1,4 +1,5 @@
 import type { ModuleId } from "@afenda/config/module-ids";
+import { GOVERNED_METADATA_SCHEMA_VERSION } from "@afenda/governed-surface";
 import type { AuditPanelModel } from "@afenda/governed-surface/schemas";
 import type { GovernedDetailTabsInput } from "@afenda/governed-surface/schemas";
 
@@ -6,6 +7,53 @@ import type {
   ModuleWorkspaceRecordDetail,
   ModuleWorkspaceWorkItemDetail,
 } from "../index";
+
+const metadataNumberFormatter = new Intl.NumberFormat("en-MY", {
+  maximumFractionDigits: 2,
+});
+
+const ISO_DATE_ONLY = /^\d{4}-\d{2}-\d{2}$/;
+const RAW_NUMBER = /^-?\d+(?:\.\d+)?$/;
+
+function formatMetadataStatValue(value: unknown) {
+  if (value == null) {
+    return "Not set";
+  }
+
+  if (typeof value === "boolean") {
+    return value ? "Yes" : "No";
+  }
+
+  if (typeof value === "number" && Number.isFinite(value)) {
+    return `${metadataNumberFormatter.format(value)} units`;
+  }
+
+  const text = String(value).trim();
+  if (text.length === 0) {
+    return "Not set";
+  }
+
+  if (ISO_DATE_ONLY.test(text)) {
+    const parsedDate = new Date(`${text}T00:00:00.000Z`);
+
+    if (!Number.isNaN(parsedDate.getTime())) {
+      return new Intl.DateTimeFormat("en-MY", {
+        dateStyle: "medium",
+        timeZone: "UTC",
+      }).format(parsedDate);
+    }
+  }
+
+  if (RAW_NUMBER.test(text)) {
+    const parsedNumber = Number(text);
+
+    if (Number.isFinite(parsedNumber)) {
+      return `${metadataNumberFormatter.format(parsedNumber)} units`;
+    }
+  }
+
+  return text;
+}
 
 /**
  * Builds a governed detail-tabs model for a module record.
@@ -37,21 +85,15 @@ export function buildRecordDetailTabs(input: {
       rendererKey: "governed:stat-card",
       rendererProps: {
         dataNature: "kpi",
-        __schemaVersion: "2024-09-01",
+        __schemaVersion: GOVERNED_METADATA_SCHEMA_VERSION,
         stats: [
           { label: "Record type", value: record.recordType, tone: "default" },
           { label: "Owner", value: record.owner, tone: "default" },
           { label: "Amount", value: record.amount, tone: "default" },
-          { label: "Due", value: record.due, tone: "default" },
           {
             label: "Extension",
             value: record.extensionValid ? "Valid" : "Needs review",
             tone: record.extensionValid ? "positive" : "attention",
-          },
-          {
-            label: "Updated",
-            value: record.updatedAt,
-            tone: "default",
           },
         ],
       },
@@ -68,10 +110,10 @@ export function buildRecordDetailTabs(input: {
             rendererKey: "governed:stat-card",
             rendererProps: {
               dataNature: "snapshot-summary",
-              __schemaVersion: "2024-09-01",
+              __schemaVersion: GOVERNED_METADATA_SCHEMA_VERSION,
               stats: metadataEntries.slice(0, 6).map(([key, value]) => ({
                 label: key,
-                value: String(value),
+                value: formatMetadataStatValue(value),
                 tone: "default" as const,
               })),
             },
@@ -95,20 +137,24 @@ export function buildWorkItemDetailTabs(input: {
   const hasMetadata = metadataEntries.length > 0;
 
   const overviewStats = [
-    { label: "Subject", value: workItem.subject, tone: "default" as const },
     { label: "Owner", value: workItem.owner, tone: "default" as const },
     {
       label: "Status",
       value: workItem.status,
-      tone: workItem.status === "escalated" ? ("attention" as const) : ("default" as const),
+      tone:
+        workItem.status === "escalated"
+          ? ("attention" as const)
+          : ("default" as const),
     },
     {
       label: "Priority",
       value: workItem.priority,
-      tone: workItem.priority === "high" ? ("critical" as const) : ("default" as const),
+      tone:
+        workItem.priority === "high"
+          ? ("critical" as const)
+          : ("default" as const),
     },
     { label: "Due", value: workItem.due, tone: "default" as const },
-    { label: "Updated", value: workItem.updatedAt, tone: "default" as const },
   ];
 
   return {
@@ -125,7 +171,7 @@ export function buildWorkItemDetailTabs(input: {
       rendererKey: "governed:stat-card",
       rendererProps: {
         dataNature: "kpi",
-        __schemaVersion: "2024-09-01",
+        __schemaVersion: GOVERNED_METADATA_SCHEMA_VERSION,
         stats: overviewStats,
       },
     },
@@ -140,10 +186,10 @@ export function buildWorkItemDetailTabs(input: {
             rendererKey: "governed:stat-card",
             rendererProps: {
               dataNature: "snapshot-summary",
-              __schemaVersion: "2024-09-01",
+              __schemaVersion: GOVERNED_METADATA_SCHEMA_VERSION,
               stats: metadataEntries.slice(0, 6).map(([key, value]) => ({
                 label: key,
-                value: String(value),
+                value: formatMetadataStatValue(value),
                 tone: "default" as const,
               })),
             },
@@ -161,13 +207,11 @@ export function buildWorkItemDetailTabs(input: {
             rendererKey: "governed:action-bar",
             rendererProps: {
               dataNature: "actions",
-              __schemaVersion: "2024-09-01",
               actions: [
                 {
-                  actionId: "view-source-record",
+                  id: "view-source-record",
                   label: "View source record",
-                  href: workItem.sourceRecordHref ?? undefined,
-                  tone: "primary",
+                  intent: "default",
                 },
               ],
             },

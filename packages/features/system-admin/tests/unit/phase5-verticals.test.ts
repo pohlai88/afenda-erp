@@ -51,6 +51,7 @@ function baseModule(
     visible: true,
     readiness: "active",
     configuration: {},
+    updatedAt: new Date("2026-01-01T00:00:00.000Z"),
     ...overrides,
   };
 }
@@ -92,7 +93,7 @@ function baseApproval(
     approvalKey,
     label: approvalKey,
     enabled: true,
-    approverRole: "manager",
+    approverRole: "operations-manager",
     escalationMinutes: null,
     configuration,
   };
@@ -100,7 +101,7 @@ function baseApproval(
 
 describe("system admin phase 5 diagnostics access", () => {
   it("denies diagnostics read without diagnostics capability", () => {
-    const capabilities = ["system-admin.modules.read"] as const;
+    const capabilities: readonly string[] = ["system-admin.modules.read"];
     expect(capabilities.includes("system-admin.diagnostics.read")).toBe(false);
   });
 });

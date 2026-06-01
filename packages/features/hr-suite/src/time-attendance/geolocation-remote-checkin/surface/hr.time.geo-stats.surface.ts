@@ -19,22 +19,22 @@ export function buildHrGeoOverviewStatGrid(input: {
     stats: [
       {
         label: hrGeoUiCopy.stats.verifiedToday,
-        value: input.verifiedToday.toLocaleString("en-US"),
+        value: `${input.verifiedToday.toLocaleString("en-US")} today`,
         tone: "default",
       },
       {
         label: hrGeoUiCopy.stats.pendingExceptions,
-        value: input.pendingExceptions.toLocaleString("en-US"),
+        value: `${input.pendingExceptions.toLocaleString("en-US")} pending`,
         tone: input.pendingExceptions > 0 ? "attention" : "default",
       },
       {
         label: hrGeoUiCopy.stats.outsideGeofence,
-        value: input.outsideGeofenceFlags.toLocaleString("en-US"),
+        value: `${input.outsideGeofenceFlags.toLocaleString("en-US")} flags`,
         tone: input.outsideGeofenceFlags > 0 ? "critical" : "default",
       },
       {
         label: hrGeoUiCopy.stats.weakGps,
-        value: input.weakGpsFlags.toLocaleString("en-US"),
+        value: `${input.weakGpsFlags.toLocaleString("en-US")} flags`,
         tone: input.weakGpsFlags > 0 ? "attention" : "default",
       },
     ],

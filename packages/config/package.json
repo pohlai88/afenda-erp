@@ -2,12 +2,18 @@
   "name": "@afenda/config",
   "version": "0.1.0",
   "private": true,
+  "sideEffects": false,
   "type": "module",
   "exports": {
     "./env": {
       "types": "./src/env.ts",
       "development": "./src/env.ts",
       "default": "./dist/env.js"
+    },
+    "./env/build": {
+      "types": "./src/env.build.ts",
+      "development": "./src/env.build.ts",
+      "default": "./dist/env.build.js"
     },
     "./next": {
       "types": "./src/next.ts",
@@ -21,6 +27,15 @@
       "default": "./dist/module-ids.js"
     },
     "./prettier": "./prettier.config.mjs",
+    "./tsconfig/base": "./tsconfig.base.json",
+    "./tsconfig/build-base": "./tsconfig.build.base.json",
+    "./tsconfig/build-library-base": "./tsconfig.build.library.base.json",
+    "./tsconfig/build-react-base": "./tsconfig.build.react.base.json",
+    "./tsconfig/check-base": "./tsconfig.check.base.json",
+    "./tsconfig/feature-base": "./tsconfig.feature.base.json",
+    "./tsconfig/library-base": "./tsconfig.library.base.json",
+    "./tsconfig/next-base": "./tsconfig.next.base.json",
+    "./tsconfig/test-base": "./tsconfig.test.base.json",
     "./vitest": {
       "types": "./src/vitest.ts",
       "development": "./src/vitest.ts",

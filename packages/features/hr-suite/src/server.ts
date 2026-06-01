@@ -30,8 +30,16 @@ export * from "./time-attendance/overtime-management/server";
 export * from "./talent-management/learning-management-system-lms/server";
 export * from "./talent-management/performance-appraisals/server";
 export * from "./talent-management/recruitment-onboarding/server";
+export * from "./talent-management/succession-planning/server";
+export * from "./talent-management/training-development/server";
 export * from "./talent-management/competency-skills-framework/server";
 export * from "./talent-management/career-pathing-development-plans/server";
+export * from "./industry-specific/field-worker-remote-workforce-management/server";
+export * from "./industry-specific/food-handler-certification-health-compliance/server";
+export * from "./industry-specific/government-classification-pay-grades/server";
+export * from "./industry-specific/manufacturing-safety-training-osha-compliance/server";
+export * from "./industry-specific/retail-seasonal-hourly-workforce-scheduling/server";
+export * from "./industry-specific/union-management/server";
 
 import {
   buildHrTimeOtmPageModel,

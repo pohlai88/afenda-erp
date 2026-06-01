@@ -1,0 +1,7 @@
+{
+  "extends": "../../config/tsconfig.test.base.json",
+  "compilerOptions": {
+    "noEmit": true
+  },
+  "exclude": ["templates/**"]
+}

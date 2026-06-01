@@ -16,6 +16,7 @@ import {
 } from "./hr-payroll-processing.shared";
 import {
   hasBlockingPayrollValidationFindings,
+  type HrPayrollRunCalculationResult,
   validatePayrollReadiness,
 } from "./hr-payroll-processing-validation.shared";
 import {
@@ -131,7 +132,7 @@ export async function calculateHrPayrollRunInTx(
     actorUserId: string;
     payrollRunId: string;
   },
-) {
+): Promise<HrPayrollRunCalculationResult> {
   const run = await loadRunOrThrow(
     db,
     input.organizationId,

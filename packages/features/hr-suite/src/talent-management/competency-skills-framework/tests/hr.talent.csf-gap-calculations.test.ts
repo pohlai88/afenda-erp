@@ -6,7 +6,7 @@ import {
   computeSkillGap,
   recommendDevelopmentActions,
   buildDefaultDevelopmentLinks,
-} from "../../../../../../db/src/hr-competency-skills-gap-calculations.shared";
+} from "@afenda/db";
 
 describe("hr.talent.csf-gap-calculations", () => {
   it("CSF-018 — computes skill gap as required minus current level order", () => {

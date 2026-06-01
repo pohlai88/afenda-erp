@@ -222,6 +222,9 @@ describe("system admin permissions", () => {
     const result = await setRoleOverride(formData);
 
     expect(result.ok).toBe(false);
+    if (result.ok) {
+      throw new Error("Expected protected permission removal to fail.");
+    }
     expect(result.error).toMatch(/protected admin authority/i);
     expect(mockUpsertRoleOverride).not.toHaveBeenCalled();
   });

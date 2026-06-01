@@ -134,3 +134,22 @@
 |  28 | System does not continuously track employee location outside explicit check-in, check-out, travel, or safety confirmation events.                                                               |
 |  29 | Notifications are sent for field assignment changes, attendance exceptions, travel non-compliance, and overdue check-ins.                                                                       |
 |  30 | Every field assignment, mobile check-in, GPS validation reference, offline sync, travel status, per diem reference, exception, correction, and payroll reference action creates an audit event. |
+
+---
+
+## As-built summary
+
+Field Worker & Remote Workforce Management ships as the HR Suite slice
+`industry-specific/field-worker-remote-workforce-management` with the workspace
+route `/hr/field-worker-remote-workforce-management`.
+
+| Area | As-built implementation |
+| --- | --- |
+| Domain model | `schemas/hr.industry.frm.schema.ts` and `data/hr.industry.frm-store.shared.ts` cover worksites, field assignments, mobile attendance, GPS validation references, exceptions, offline sync, schedules, travel status, per diem rates/references, travel compliance, safety confirmations, notifications, integration exports, reports, and audit events. |
+| Governed UI | `surface/hr.industry.frm-surface-metadata.shared.ts`, `surface/hr.industry.frm-lists.surface.ts`, and `components/hr.industry.frm-section.component.server.tsx` expose Pattern B overview KPIs and Pattern C server-window lists for operational, exception, reporting, integration, and audit surfaces. |
+| Access | `policies/hr.industry.frm-access.policy.server.ts` uses `hr.frm.read`, `hr.frm.write`, `hr.frm.approve`, `hr.frm.audit.read`, `hr.frm.restricted.read`, and `hr.frm.integration.expose` with employee visibility scoped by HR Suite tenancy helpers. |
+| Privacy | The store and page model keep GPS data as explicit check-in, check-out, travel, or safety-confirmation references only; no continuous location stream is modeled or exposed. |
+| Actions | `actions/hr.industry.frm.actions.server.ts` gates assignment creation, mobile attendance capture, offline reconciliation, travel approval, per diem approval, and downstream export through server-side authorization and audit emission. |
+| Integrations | Validated attendance outcomes, actual work-hour references, and payroll/expense references are exposed only when `hr.frm.integration.expose` is granted. |
+| App wiring | `apps/erp/src/lib/hr-sections/field-worker-remote-workforce-management.server.tsx`, HR section registry, HR nav, app capabilities, kernel route mapping, and permission seed catalog are wired for the route. |
+| Coverage | `data/hr.industry.frm-coverage.shared.ts` marks `HRM-FRM-001..031` and the 30 enterprise acceptance criteria as shipped with package-level tests. |

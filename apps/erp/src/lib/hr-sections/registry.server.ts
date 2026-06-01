@@ -3,6 +3,11 @@ import {
   hrBonusRoutePaths,
   hrExpenseRoutePaths,
   hrComplianceRoutePaths,
+  hrDocumentsRoutePaths,
+  hrLifecycleRoutePaths,
+  hrOffboardingRoutePaths,
+  hrOrgRoutePaths,
+  hrRecordsRoutePaths,
   hrAatRoutePaths,
   hrLamRoutePaths,
   hrFwaRoutePaths,
@@ -12,6 +17,14 @@ import {
   hrCsfRoutePaths,
   hrPerformanceRoutePaths,
   hrRonRoutePaths,
+  hrSuccessionRoutePaths,
+  hrTrainingRoutePaths,
+  hrIndustryFhcRoutePaths,
+  hrIndustryFrmRoutePaths,
+  hrIndustryGpgRoutePaths,
+  hrIndustryMscRoutePaths,
+  hrIndustryRwsRoutePaths,
+  hrIndustryUcbRoutePaths,
 } from "@afenda/feature-hr-suite/metadata";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
@@ -31,6 +44,12 @@ type HrSectionModule = {
 };
 
 const sectionLoaders = {
+  lifecycle: () => import("./lifecycle.server"),
+  documents: () => import("./documents.server"),
+  offboarding: () => import("./offboarding.server"),
+  records: () => import("./records.server"),
+  employees: () => import("./employees.server"),
+  org: () => import("./org.server"),
   compliance: () => import("./compliance.server"),
   benefits: () => import("./benefits.server"),
   bonus: () => import("./bonus.server"),
@@ -40,16 +59,36 @@ const sectionLoaders = {
   "absence-analytics-trends": () => import("./absence-analytics-trends.server"),
   leave: () => import("./leave.server"),
   attendance: () => import("./attendance.server"),
-  "flexible-work-arrangement": () => import("./flexible-work-arrangement.server"),
-  "geolocation-remote-checkin": () => import("./geolocation-remote-checkin.server"),
+  "flexible-work-arrangement": () =>
+    import("./flexible-work-arrangement.server"),
+  "geolocation-remote-checkin": () =>
+    import("./geolocation-remote-checkin.server"),
   "shift-scheduling": () => import("./shift-scheduling.server"),
   "time-clock": () => import("./time-clock.server"),
   "competency-skills": () => import("./competency-skills.server"),
   "performance-appraisals": () => import("./performance-appraisals.server"),
   "recruitment-onboarding": () => import("./recruitment-onboarding.server"),
+  "succession-planning": () => import("./succession-planning.server"),
+  "training-development": () => import("./training-development.server"),
+  "field-worker-remote-workforce-management": () =>
+    import("./field-worker-remote-workforce-management.server"),
+  "food-handler-certification-health-compliance": () =>
+    import("./food-handler-certification-health-compliance.server"),
+  "government-classification-pay-grades": () =>
+    import("./government-classification-pay-grades.server"),
+  "manufacturing-safety-training-osha-compliance": () =>
+    import("./manufacturing-safety-training-osha-compliance.server"),
+  "retail-seasonal-hourly-workforce-scheduling": () =>
+    import("./retail-seasonal-hourly-workforce-scheduling.server"),
+  "union-management": () => import("./union-management.server"),
 } satisfies Record<HrSectionSlug, () => Promise<HrSectionModule>>;
 
 const hrRoutePaths = [
+  ...Object.values(hrDocumentsRoutePaths),
+  ...Object.values(hrLifecycleRoutePaths),
+  ...Object.values(hrOffboardingRoutePaths),
+  ...Object.values(hrOrgRoutePaths),
+  ...Object.values(hrRecordsRoutePaths),
   ...Object.values(hrComplianceRoutePaths),
   ...Object.values(hrBenefitsRoutePaths),
   ...Object.values(hrBonusRoutePaths),
@@ -63,9 +102,21 @@ const hrRoutePaths = [
   ...Object.values(hrCsfRoutePaths),
   ...Object.values(hrPerformanceRoutePaths),
   ...Object.values(hrRonRoutePaths),
+  ...Object.values(hrSuccessionRoutePaths),
+  ...Object.values(hrTrainingRoutePaths),
+  ...Object.values(hrIndustryFhcRoutePaths),
+  ...Object.values(hrIndustryFrmRoutePaths),
+  ...Object.values(hrIndustryGpgRoutePaths),
+  ...Object.values(hrIndustryMscRoutePaths),
+  ...Object.values(hrIndustryRwsRoutePaths),
+  ...Object.values(hrIndustryUcbRoutePaths),
 ] as const;
 
 const hrSectionHubPaths = new Set<string>([
+  hrDocumentsRoutePaths.hub,
+  hrLifecycleRoutePaths.hub,
+  hrOrgRoutePaths.hub,
+  hrRecordsRoutePaths.hub,
   hrComplianceRoutePaths.hub,
   hrBenefitsRoutePaths.hub,
   hrAatRoutePaths.hub,
@@ -76,6 +127,14 @@ const hrSectionHubPaths = new Set<string>([
   hrCsfRoutePaths.hub,
   hrPerformanceRoutePaths.hub,
   hrRonRoutePaths.hub,
+  hrSuccessionRoutePaths.hub,
+  hrTrainingRoutePaths.hub,
+  hrIndustryFhcRoutePaths.hub,
+  hrIndustryFrmRoutePaths.hub,
+  hrIndustryGpgRoutePaths.hub,
+  hrIndustryMscRoutePaths.hub,
+  hrIndustryRwsRoutePaths.hub,
+  hrIndustryUcbRoutePaths.hub,
 ]);
 
 export const hrSectionSlugs = hrRoutePaths

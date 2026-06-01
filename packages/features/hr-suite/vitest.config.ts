@@ -1,16 +1,46 @@
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { createVitestConfig } from "@afenda/config/vitest";
+import { defineConfig } from "vitest/config";
+import {
+  createVitestConfig,
+  INTEGRATION_TEST_GLOB,
+  integrationTestOptions,
+} from "@afenda/config/vitest";
 
 const packageRoot = path.dirname(fileURLToPath(import.meta.url));
 
-export default createVitestConfig("@afenda/feature-hr-suite", {
-  test: {
-    include: ["tests/**/*.test.ts", "src/**/tests/**/*.test.ts"],
-  },
+const shared = createVitestConfig("@afenda/feature-hr-suite", {
   resolve: {
     alias: {
       "server-only": path.join(packageRoot, "tests/stubs/server-only.ts"),
     },
+  },
+});
+
+const testInclude = ["tests/**/*.test.ts", "src/**/tests/**/*.test.ts"];
+
+export default defineConfig({
+  ...shared,
+  test: {
+    ...shared.test,
+    projects: [
+      {
+        extends: true,
+        test: {
+          name: "unit",
+          include: testInclude,
+          exclude: [...INTEGRATION_TEST_GLOB],
+          testTimeout: 30_000,
+        },
+      },
+      {
+        extends: true,
+        test: {
+          name: "integration",
+          include: [...INTEGRATION_TEST_GLOB],
+          ...integrationTestOptions,
+        },
+      },
+    ],
   },
 });

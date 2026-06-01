@@ -120,7 +120,7 @@ describe("system admin roles", () => {
     );
 
     const deprecatedRoles = systemAdminSeedRoles.filter(
-      (role) => role.status === "deprecated",
+      (role) => String(role.status) === "deprecated",
     );
     if (deprecatedRoles.length === 0) {
       await expect(

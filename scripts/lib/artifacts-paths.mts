@@ -10,6 +10,8 @@ export const ARTIFACTS_LOGS_DIR = `${ARTIFACTS_ROOT}/logs`;
 export const ARTIFACTS_REPORTS_DIR = `${ARTIFACTS_ROOT}/reports`;
 
 export const PLAYWRIGHT_DIR = `${ARTIFACTS_ROOT}/playwright`;
+export const PLAYWRIGHT_AUTH_DIR = `${PLAYWRIGHT_DIR}/.auth`;
+export const PLAYWRIGHT_BLOB_REPORT_DIR = `${PLAYWRIGHT_DIR}/blob-report`;
 export const PLAYWRIGHT_JUNIT_PATH = `${PLAYWRIGHT_DIR}/junit.xml`;
 export const PLAYWRIGHT_TEST_RESULTS_DIR = `${PLAYWRIGHT_DIR}/test-results`;
 
@@ -44,6 +46,8 @@ export function ensureArtifactsSubdirs(root: string) {
     ARTIFACTS_LOGS_DIR,
     ARTIFACTS_REPORTS_DIR,
     PLAYWRIGHT_DIR,
+    PLAYWRIGHT_AUTH_DIR,
+    PLAYWRIGHT_BLOB_REPORT_DIR,
     PLAYWRIGHT_TEST_RESULTS_DIR,
     VITEST_COVERAGE_DIR,
     VITEST_BLOB_REPORTS_DIR,

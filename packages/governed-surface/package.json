@@ -66,5 +66,6 @@
     "react-dom": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:"
-  }
+  },
+  "sideEffects": false
 }

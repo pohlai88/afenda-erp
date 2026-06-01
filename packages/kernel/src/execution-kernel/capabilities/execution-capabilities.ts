@@ -72,6 +72,65 @@ const routeByCapability: Partial<Record<AppCapability, `/${string}`>> = {
   "hr.recruitment.audit.read": "/hr/recruitment-onboarding",
   "hr.recruitment.sensitive.read": "/hr/recruitment-onboarding",
   "hr.recruitment.convert": "/hr/recruitment-onboarding",
+  "hr.succession.read": "/hr/succession-planning",
+  "hr.succession.write": "/hr/succession-planning",
+  "hr.succession.approve": "/hr/succession-planning",
+  "hr.succession.audit.read": "/hr/succession-planning",
+  "hr.succession.restricted.read": "/hr/succession-planning",
+  "hr.succession.lifecycle.expose": "/hr/succession-planning",
+  "hr.training.read": "/hr/training-development",
+  "hr.training.write": "/hr/training-development",
+  "hr.training.approve": "/hr/training-development",
+  "hr.training.audit.read": "/hr/training-development",
+  "hr.training.restricted.read": "/hr/training-development",
+  "hr.training.integration.expose": "/hr/training-development",
+  "hr.frm.read": "/hr/field-worker-remote-workforce-management",
+  "hr.frm.write": "/hr/field-worker-remote-workforce-management",
+  "hr.frm.approve": "/hr/field-worker-remote-workforce-management",
+  "hr.frm.audit.read": "/hr/field-worker-remote-workforce-management",
+  "hr.frm.restricted.read": "/hr/field-worker-remote-workforce-management",
+  "hr.frm.integration.expose": "/hr/field-worker-remote-workforce-management",
+  "hr.fhc.read": "/hr/food-handler-certification-health-compliance",
+  "hr.fhc.write": "/hr/food-handler-certification-health-compliance",
+  "hr.fhc.approve": "/hr/food-handler-certification-health-compliance",
+  "hr.fhc.audit.read": "/hr/food-handler-certification-health-compliance",
+  "hr.fhc.restricted.read": "/hr/food-handler-certification-health-compliance",
+  "hr.fhc.integration.expose":
+    "/hr/food-handler-certification-health-compliance",
+  "hr.gpg.read": "/hr/government-classification-pay-grades",
+  "hr.gpg.write": "/hr/government-classification-pay-grades",
+  "hr.gpg.approve": "/hr/government-classification-pay-grades",
+  "hr.gpg.audit.read": "/hr/government-classification-pay-grades",
+  "hr.gpg.restricted.read": "/hr/government-classification-pay-grades",
+  "hr.gpg.integration.expose": "/hr/government-classification-pay-grades",
+  "hr.msc.read": "/hr/manufacturing-safety-training-osha-compliance",
+  "hr.msc.write": "/hr/manufacturing-safety-training-osha-compliance",
+  "hr.msc.approve": "/hr/manufacturing-safety-training-osha-compliance",
+  "hr.msc.audit.read": "/hr/manufacturing-safety-training-osha-compliance",
+  "hr.msc.restricted.read":
+    "/hr/manufacturing-safety-training-osha-compliance",
+  "hr.msc.integration.expose":
+    "/hr/manufacturing-safety-training-osha-compliance",
+  "hr.rws.read": "/hr/retail-seasonal-hourly-workforce-scheduling",
+  "hr.rws.write": "/hr/retail-seasonal-hourly-workforce-scheduling",
+  "hr.rws.approve": "/hr/retail-seasonal-hourly-workforce-scheduling",
+  "hr.rws.audit.read": "/hr/retail-seasonal-hourly-workforce-scheduling",
+  "hr.rws.restricted.read":
+    "/hr/retail-seasonal-hourly-workforce-scheduling",
+  "hr.rws.labor-cost.read":
+    "/hr/retail-seasonal-hourly-workforce-scheduling",
+  "hr.rws.integration.expose":
+    "/hr/retail-seasonal-hourly-workforce-scheduling",
+  "hr.ucb.read": "/hr/union-management",
+  "hr.ucb.write": "/hr/union-management",
+  "hr.ucb.approve": "/hr/union-management",
+  "hr.ucb.audit.read": "/hr/union-management",
+  "hr.ucb.restricted.read": "/hr/union-management",
+  "hr.ucb.grievance.manage": "/hr/union-management",
+  "hr.ucb.legal-reference.read": "/hr/union-management",
+  "hr.ucb.payroll.expose": "/hr/union-management",
+  "hr.ucb.integration.expose": "/hr/union-management",
+  "hr.ucb.report.export": "/hr/union-management",
   "hr.payroll.read": "/hr/payroll-processing",
   "hr.payroll.write": "/hr/payroll-processing",
   "hr.payroll.approve": "/hr/payroll-processing",
@@ -180,7 +239,10 @@ const builtinExecutionCapabilities = appCapabilities.map(
 );
 
 const builtinCapabilityMap = new Map<string, ExecutionCapability>(
-  builtinExecutionCapabilities.map((capability) => [capability.key, capability]),
+  builtinExecutionCapabilities.map((capability) => [
+    capability.key,
+    capability,
+  ]),
 );
 
 const customExecutionCapabilities = new Map<string, ExecutionCapability>();
@@ -219,7 +281,9 @@ export function resetExecutionCapabilityRegistryForTest() {
 
 export function getExecutionCapability(key: string) {
   return (
-    customExecutionCapabilities.get(key) ?? builtinCapabilityMap.get(key) ?? null
+    customExecutionCapabilities.get(key) ??
+    builtinCapabilityMap.get(key) ??
+    null
   );
 }
 
@@ -234,7 +298,10 @@ export function requireExecutionCapability(key: string) {
 }
 
 export function listExecutionCapabilities() {
-  return [...builtinExecutionCapabilities, ...customExecutionCapabilities.values()];
+  return [
+    ...builtinExecutionCapabilities,
+    ...customExecutionCapabilities.values(),
+  ];
 }
 
 export function listExecutionCapabilitiesForModule(moduleKey: string) {

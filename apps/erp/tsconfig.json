@@ -1,16 +1,9 @@
 {
-  "extends": "../../packages/config/tsconfig.base.json",
+  "extends": "../../packages/config/tsconfig.next.base.json",
   "compilerOptions": {
     "baseUrl": ".",
     "noEmit": true,
-    "jsx": "react-jsx",
-    "incremental": true,
     "tsBuildInfoFile": ".next/cache/tsconfig.tsbuildinfo",
-    "plugins": [
-      {
-        "name": "next"
-      }
-    ],
     "paths": {
       "@/*": ["./src/*"],
       "@afenda/ui": ["../../packages/ui/src/index.ts"],

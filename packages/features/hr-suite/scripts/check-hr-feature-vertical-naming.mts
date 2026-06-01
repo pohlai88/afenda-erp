@@ -61,9 +61,16 @@ export const SHIPPED_CAPABILITIES = [
   "employee-management/offboarding-exit-management",
   "employee-management/employee-records-management",
   "employee-management/organizational-chart-hierarchy",
+  "industry-specific/field-worker-remote-workforce-management",
+  "industry-specific/food-handler-certification-health-compliance",
+  "industry-specific/government-classification-pay-grades",
+  "industry-specific/manufacturing-safety-training-osha-compliance",
+  "industry-specific/retail-seasonal-hourly-workforce-scheduling",
+  "industry-specific/union-management",
   "payroll-compensation/benefits-administration",
   "talent-management/performance-appraisals",
   "talent-management/recruitment-onboarding",
+  "talent-management/training-development",
   "time-attendance/leave-attendance-management",
   "time-attendance/time-clock-integration",
 ] as const;
@@ -161,9 +168,13 @@ function validateCapability(capabilityRel: string) {
   if (fs.existsSync(surfaceDir)) {
     const surfaceFiles = fs
       .readdirSync(surfaceDir)
-      .filter((name) => name.endsWith(".surface.ts") || name.endsWith(".shared.ts"));
+      .filter(
+        (name) => name.endsWith(".surface.ts") || name.endsWith(".shared.ts"),
+      );
     if (surfaceFiles.length === 0) {
-      problems.push(`${capabilityRel}: surface/ bucket has no surface or copy files`);
+      problems.push(
+        `${capabilityRel}: surface/ bucket has no surface or copy files`,
+      );
     }
   }
 
@@ -214,7 +225,9 @@ function validateHrSuiteIntegrationDoors() {
 
   for (const door of HR_SUITE_INTEGRATION_DOORS) {
     if (!fs.existsSync(path.join(integrationDir, door))) {
-      problems.push(`src/hr-suite-integration/${door}: missing integration door`);
+      problems.push(
+        `src/hr-suite-integration/${door}: missing integration door`,
+      );
     }
   }
 

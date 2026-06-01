@@ -1,5 +1,7 @@
 import type { NextConfig } from "next";
 
+import { assertCiBuildEnv } from "./env.build.js";
+
 /**
  * Workspace packages compiled by Next during `apps/erp` build.
  * When adding `@afenda/feature-<moduleId>`, append it here (ARCH-002).
@@ -49,6 +51,8 @@ export const afendaSecurityHeaders = [
 ] as const;
 
 export function createAfendaNextConfig(overrides: NextConfig = {}): NextConfig {
+  assertCiBuildEnv();
+
   return {
     cacheComponents: true,
     transpilePackages: [...afendaTranspilePackages],

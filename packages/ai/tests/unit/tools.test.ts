@@ -30,6 +30,14 @@ const baseModuleDef = {
   requiredCapability: "finance.view" as const,
 };
 
+const emptyWorkspaceStats = {
+  recordCount: 0,
+  workItemCount: 0,
+  highPriorityWorkItemCount: 0,
+  documentCount: 0,
+  savedViewCount: 0,
+};
+
 describe("ERP assistant tools — needsApproval contracts", () => {
   const toolset = createErpAssistantTools({
     organization: baseOrg,
@@ -45,7 +53,7 @@ describe("ERP assistant tools — needsApproval contracts", () => {
         documents: [],
       },
     }),
-    getWorkspaceStats: () => ({ recordCount: 0 }),
+    getWorkspaceStats: () => emptyWorkspaceStats,
     registerApprovalProposal: async () => "proposal_test",
   });
 
@@ -91,7 +99,7 @@ describe("Solution provider tools — needsApproval contracts", () => {
         documents: [],
       },
     }),
-    getWorkspaceStats: () => ({ recordCount: 0 }),
+    getWorkspaceStats: () => emptyWorkspaceStats,
     registerSolutionActionProposal: async () => "proposal_sp",
   });
 
@@ -279,14 +287,16 @@ describe("Runtime governed tool registry", () => {
       capabilities: baseOrg.capabilities,
       organizationId: baseOrg.id,
       userAuthId: baseSession.id,
-      logger: (event) => events.push(event),
+      logger: (event) => {
+        events.push(event);
+      },
     });
 
     await (
       tools.safeTool as {
-        execute: (input: unknown) => Promise<unknown>;
+        execute: (input: unknown, options?: unknown) => Promise<unknown>;
       }
-    ).execute({ token: "raw-token", value: "ok" });
+    ).execute({ token: "raw-token", value: "ok" }, undefined);
 
     expect(events).toHaveLength(1);
     expect(events[0]).toMatchObject({

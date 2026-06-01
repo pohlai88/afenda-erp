@@ -1,5 +1,2 @@
-/**
- * @afenda-bucket schemas
- * Scaffold placeholder from packages/_template-definition.
- */
-export {};
+export * from "./hr.industry.frm-constants.shared";
+export * from "./hr.industry.frm.schema";

@@ -1,7 +1,11 @@
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import type { LynxReadinessSnapshot } from "../../src/contracts/lynx.readiness.contract";
-import type { ModuleWorkspace } from "@afenda/kernel";
+import {
+  moduleById,
+  type ModuleWorkspace,
+} from "@afenda/kernel";
+import type { EvaluateLynxOutcomeMonitorsInput } from "../../src/workflows/lynx.outcome-monitor.workflow.server";
 
 const { evaluateLynxOutcomeMonitors } =
   await import("../../src/workflows/lynx.outcome-monitor.workflow.server");
@@ -25,15 +29,13 @@ function workspace(input: {
   savedViewCount?: number;
   persisted?: boolean;
 }): ModuleWorkspace {
+  const moduleDefinition = moduleById.get(input.moduleId);
+  if (!moduleDefinition) {
+    throw new Error(`Missing test module definition for ${input.moduleId}.`);
+  }
+
   return {
-    module: {
-      id: input.moduleId,
-      label: input.moduleId,
-      href: `/${input.moduleId}`,
-      summary: input.moduleId,
-      requiredCapability: `${input.moduleId}.view`,
-      status: { label: "Ready", tone: "positive" },
-    },
+    module: moduleDefinition,
     dataMode: input.persisted === false ? "metadata" : "persisted",
     fallbackApplied: input.persisted === false,
     records: (input.records ?? []).map((record) => ({
@@ -124,7 +126,7 @@ function readinessSnapshot(input?: {
   };
 }
 
-function baseInput() {
+function baseInput(): EvaluateLynxOutcomeMonitorsInput {
   return {
     organizationId: "org_1",
     readinessSnapshot: readinessSnapshot(),

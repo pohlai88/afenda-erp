@@ -44,6 +44,14 @@ export type HrSuiteSearchParamRegistryEntry<
   readonly placeholder: string;
 };
 
+export type HrSuiteListSurfaceRegistryEntry<
+  SurfaceKey extends string = string,
+  ModelField extends string = string,
+> = HrSuiteSearchParamRegistryEntry<SurfaceKey, ModelField> & {
+  readonly columns: readonly HrSuiteListColumn[];
+  readonly readOnly?: boolean;
+};
+
 export type BuildHrSuiteOperationalListSurfaceInput = {
   readonly primaryColumnId: string;
   readonly readPermission: HrSuiteErpPermissionDescriptor;
@@ -85,10 +93,52 @@ export function buildHrSuiteListSearchToolbar(
   };
 }
 
+export function buildHrSuiteListSearchToolbarFromRegistryEntry(
+  entry: HrSuiteSearchParamRegistryEntry,
+  value?: string | null,
+): Pick<ListSurfaceToolbar, "search"> {
+  return buildHrSuiteListSearchToolbar({
+    param: entry.param,
+    label: entry.label,
+    placeholder: entry.placeholder,
+    value,
+  });
+}
+
 export function defineHrSuiteSearchParamRegistry<
   const Registry extends readonly HrSuiteSearchParamRegistryEntry[],
 >(registry: Registry): Registry {
   return registry;
+}
+
+export function defineHrSuiteListSurfaceRegistry<
+  const Registry extends readonly HrSuiteListSurfaceRegistryEntry[],
+>(registry: Registry): Registry {
+  return registry;
+}
+
+export function buildHrSuiteListSurfaceKeys<
+  const Registry extends readonly HrSuiteListSurfaceRegistryEntry[],
+>(registry: Registry): readonly Registry[number]["surfaceKey"][] {
+  return registry.map((entry) => entry.surfaceKey);
+}
+
+export function buildHrSuiteReadOnlyListSurfaceKeys<
+  const Registry extends readonly HrSuiteListSurfaceRegistryEntry[],
+>(registry: Registry): readonly Registry[number]["surfaceKey"][] {
+  return registry
+    .filter((entry) => entry.readOnly)
+    .map((entry) => entry.surfaceKey);
+}
+
+export function buildHrSuiteListSurfaceColumnsByKey<
+  const Registry extends readonly HrSuiteListSurfaceRegistryEntry[],
+>(
+  registry: Registry,
+): Record<Registry[number]["surfaceKey"], readonly HrSuiteListColumn[]> {
+  return Object.fromEntries(
+    registry.map((entry) => [entry.surfaceKey, entry.columns]),
+  ) as Record<Registry[number]["surfaceKey"], readonly HrSuiteListColumn[]>;
 }
 
 export function buildHrSuiteSearchParamsBySurfaceKey<
@@ -103,6 +153,27 @@ export function buildHrSuiteSearchParamModelFields<
   const Registry extends readonly HrSuiteSearchParamRegistryEntry[],
 >(registry: Registry): readonly Registry[number]["modelField"][] {
   return registry.map((entry) => entry.modelField);
+}
+
+export type HrSuiteSearchParamSource =
+  | URLSearchParams
+  | Record<string, string | readonly string[] | undefined>;
+
+export function readHrSuiteSearchParam(
+  searchParams: HrSuiteSearchParamSource | undefined,
+  key: string,
+): string {
+  if (!searchParams) {
+    return "";
+  }
+
+  const rawValue =
+    searchParams instanceof URLSearchParams
+      ? searchParams.get(key)
+      : searchParams[key];
+
+  const value = Array.isArray(rawValue) ? rawValue[0] : rawValue;
+  return typeof value === "string" ? value.trim() : "";
 }
 
 export function buildHrSuiteOperationalListSurface(
@@ -164,4 +235,3 @@ export function resolveHrSuiteListTrailingAction(
 ): ListSurfaceRowTrailingAction | undefined {
   return resolveListSurfaceRowTrailingAction(input);
 }
-

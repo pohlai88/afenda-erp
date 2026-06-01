@@ -12,6 +12,14 @@ import { hrCpmRoutePaths } from "../../payroll-compensation/compensation-plannin
 import { hrCsfRoutePaths } from "../../talent-management/competency-skills-framework/contracts/hr.talent.csf-route.contract";
 import { hrPerformanceRoutePaths } from "../../talent-management/performance-appraisals/contracts/hr.talent.performance-route.contract";
 import { hrRonRoutePaths } from "../../talent-management/recruitment-onboarding/contracts/hr.talent.ron-route.contract";
+import { hrSuccessionRoutePaths } from "../../talent-management/succession-planning/contracts/hr.talent.succession-route.contract";
+import { hrTrainingRoutePaths } from "../../talent-management/training-development/contracts/hr.talent.training-route.contract";
+import { hrIndustryFhcRoutePaths } from "../../industry-specific/food-handler-certification-health-compliance/contracts/hr.industry.fhc-route.contract";
+import { hrIndustryFrmRoutePaths } from "../../industry-specific/field-worker-remote-workforce-management/contracts/hr.industry.frm-route.contract";
+import { hrIndustryGpgRoutePaths } from "../../industry-specific/government-classification-pay-grades/contracts/hr.industry.gpg-route.contract";
+import { hrIndustryMscRoutePaths } from "../../industry-specific/manufacturing-safety-training-osha-compliance/contracts/hr.industry.msc-route.contract";
+import { hrIndustryRwsRoutePaths } from "../../industry-specific/retail-seasonal-hourly-workforce-scheduling/contracts/hr.industry.rws-route.contract";
+import { hrIndustryUcbRoutePaths } from "../../industry-specific/union-management/contracts/hr.industry.ucb-route.contract";
 import { hrPayrollProcessingRoutePaths } from "../../payroll-compensation/payroll-processing/contracts/hr.payroll.processing-route.contract";
 import { hrAatRoutePaths } from "../../time-attendance/absence-analytics-trends/contracts/hr.time.aat-route.contract";
 import { hrRecordsRoutePaths } from "../../employee-management/employee-records-management/contracts/hr.workforce.records-route.contract";
@@ -109,9 +117,61 @@ export const hrModuleNavItems = [
     ],
   },
   {
+    href: hrSuccessionRoutePaths.hub,
+    label: "Succession Planning",
+    requiredCapabilities: [
+      "hr.succession.read",
+      "hr.succession.write",
+      "hr.succession.approve",
+    ],
+  },
+  {
+    href: hrTrainingRoutePaths.hub,
+    label: "Training & Development",
+    requiredCapabilities: [
+      "hr.training.read",
+      "hr.training.write",
+      "hr.training.approve",
+    ],
+  },
+  {
+    href: hrIndustryFrmRoutePaths.hub,
+    label: "Field Workforce",
+    requiredCapabilities: ["hr.frm.read", "hr.frm.write", "hr.frm.approve"],
+  },
+  {
+    href: hrIndustryFhcRoutePaths.hub,
+    label: "Food Handler Compliance",
+    requiredCapabilities: ["hr.fhc.read", "hr.fhc.write", "hr.fhc.approve"],
+  },
+  {
+    href: hrIndustryGpgRoutePaths.hub,
+    label: "Government Pay Grades",
+    requiredCapabilities: ["hr.gpg.read", "hr.gpg.write", "hr.gpg.approve"],
+  },
+  {
+    href: hrIndustryMscRoutePaths.hub,
+    label: "Manufacturing Safety",
+    requiredCapabilities: ["hr.msc.read", "hr.msc.write", "hr.msc.approve"],
+  },
+  {
+    href: hrIndustryRwsRoutePaths.hub,
+    label: "Retail Scheduling",
+    requiredCapabilities: ["hr.rws.read", "hr.rws.write", "hr.rws.approve"],
+  },
+  {
+    href: hrIndustryUcbRoutePaths.hub,
+    label: "Union Management",
+    requiredCapabilities: ["hr.ucb.read", "hr.ucb.write", "hr.ucb.approve"],
+  },
+  {
     href: hrPayrollProcessingRoutePaths.payrollProcessing,
     label: "Payroll Processing",
-    requiredCapabilities: ["hr.payroll.read", "hr.payroll.write", "hr.payroll.approve"],
+    requiredCapabilities: [
+      "hr.payroll.read",
+      "hr.payroll.write",
+      "hr.payroll.approve",
+    ],
   },
   {
     href: hrLamRoutePaths.hub,

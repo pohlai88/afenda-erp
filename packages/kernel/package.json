@@ -80,5 +80,6 @@
   },
   "devDependencies": {
     "vitest": "catalog:"
-  }
+  },
+  "sideEffects": false
 }

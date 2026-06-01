@@ -42,6 +42,22 @@ const { createLynxKnowledgeTools } = await import(
   "../../src/tools/lynx.knowledge.tool.server"
 );
 
+async function executeTool<TInput>(
+  toolValue: { execute?: unknown },
+  input: TInput,
+) {
+  if (typeof toolValue.execute !== "function") {
+    throw new Error("Tool is missing execute.");
+  }
+
+  const execute = toolValue.execute as (
+    input: TInput,
+    options: never,
+  ) => Promise<unknown>;
+
+  return execute(input, undefined as never);
+}
+
 describe("Lynx knowledge tools", () => {
   it("returns retrieval diagnostics in audit-safe output", async () => {
     const tools = createLynxKnowledgeTools({
@@ -49,7 +65,7 @@ describe("Lynx knowledge tools", () => {
       userAuthId: "user_1",
     });
 
-    const output = await tools.searchKnowledge.execute({
+    const output = await executeTool(tools.searchKnowledge, {
       query: "policy",
     });
 

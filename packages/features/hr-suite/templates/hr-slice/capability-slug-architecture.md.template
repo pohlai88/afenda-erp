@@ -1,0 +1,38 @@
+# __CAPABILITY_TITLE__
+
+> Parent doctrine: `docs/architecture/010-hr-feature-package-architecture.md`, `docs/architecture/006-metadata-driven-ui-architecture.md`, and `docs/architecture/007-governed-metadata-architecture.md`.
+
+## Definition
+
+`__CAPABILITY_TITLE__` is scaffolded as an HR Suite capability slice for `__DOMAIN_KEY__`.
+
+## Enterprise Functional Requirements
+
+| Code | Requirement |
+| ---- | ----------- |
+| TBD | Replace this row with the architecture-approved HRM requirement set before shipping. |
+
+## Enterprise Acceptance Criteria
+
+| No. | Acceptance Criteria |
+| --: | ------------------- |
+| TBD | Replace this row with the architecture-approved acceptance criteria before shipping. |
+
+## As-built summary
+
+**Status:** Not shipped.
+
+This scaffold creates the slice boundary, constants, typed seed store,
+metadata-safe governed list skeletons, overview KPI metadata, search-param
+contract, page-model placeholder, action/policy doors, and package-level tests
+that assert no shipped requirement coverage is claimed yet.
+
+Before moving to `shipped`:
+
+- implement all functional requirements and enterprise acceptance criteria;
+- replace scaffold-only coverage with requirement evidence;
+- wire app route manifest/registry and package metadata/server doors;
+- add permissions to auth/kernel/seed catalogs where required;
+- replace scaffold `hr.view` access with granular `hr.<capability>.*`
+  capabilities after those keys are registered;
+- add the slice to `SHIPPED_CAPABILITIES` only after focused tests and architecture checks pass.

@@ -23,6 +23,12 @@ import {
   verifyAiGatewayModels,
 } from "../../src/data/ai.gateway.data.server";
 
+function createTestEnv(
+  env: Record<string, string | undefined> = {},
+): NodeJS.ProcessEnv {
+  return { NODE_ENV: "development", ...env } as NodeJS.ProcessEnv;
+}
+
 describe("aiGatewayFeatures", () => {
   it("includes all expected feature identifiers", () => {
     const expected = [
@@ -41,27 +47,43 @@ describe("aiGatewayFeatures", () => {
 
 describe("getAiModelForFeature", () => {
   it("returns high-confidence model for solution-provider", () => {
-    const model = getAiModelForFeature("solution-provider", "high", {});
+    const model = getAiModelForFeature(
+      "solution-provider",
+      "high",
+      createTestEnv(),
+    );
     expect(model).toMatch(/claude|gpt/i);
   });
 
   it("returns fast model for record-search", () => {
-    const model = getAiModelForFeature("record-search", "low", {});
+    const model = getAiModelForFeature(
+      "record-search",
+      "low",
+      createTestEnv(),
+    );
     expect(model).toMatch(/gpt|claude/i);
   });
 
   it("respects AFENDA_AI_MODEL override", () => {
-    const model = getAiModelForFeature("erp-assistant", "medium", {
-      AFENDA_AI_MODEL: "openai/custom-model",
-    });
+    const model = getAiModelForFeature(
+      "erp-assistant",
+      "medium",
+      createTestEnv({
+        AFENDA_AI_MODEL: "openai/custom-model",
+      }),
+    );
     expect(model).toBe("openai/custom-model");
   });
 
   it("ignores blank optional env overrides", () => {
-    const model = getAiModelForFeature("record-search", "low", {
-      AFENDA_AI_FAST_MODEL: "",
-      RERANK_MODEL: "",
-    });
+    const model = getAiModelForFeature(
+      "record-search",
+      "low",
+      createTestEnv({
+        AFENDA_AI_FAST_MODEL: "",
+        RERANK_MODEL: "",
+      }),
+    );
 
     expect(model).toMatch(/gpt|claude/i);
   });
@@ -133,18 +155,26 @@ describe("createGatewayOptions", () => {
 describe("AI Gateway runtime credentials", () => {
   it("accepts API key or OIDC credentials", () => {
     expect(
-      hasAiGatewayRuntimeCredentials({ AI_GATEWAY_API_KEY: "gateway-key" }),
+      hasAiGatewayRuntimeCredentials(
+        createTestEnv({ AI_GATEWAY_API_KEY: "gateway-key" }),
+      ),
     ).toBe(true);
     expect(
-      hasAiGatewayRuntimeCredentials({ VERCEL_OIDC_TOKEN: "oidc-token" }),
+      hasAiGatewayRuntimeCredentials(
+        createTestEnv({ VERCEL_OIDC_TOKEN: "oidc-token" }),
+      ),
     ).toBe(true);
   });
 
   it("does not treat Vercel management tokens as runtime credentials", () => {
-    expect(hasAiGatewayRuntimeCredentials({ VERCEL_API_TOKEN: "token" })).toBe(
+    expect(
+      hasAiGatewayRuntimeCredentials(
+        createTestEnv({ VERCEL_API_TOKEN: "token" }),
+      ),
+    ).toBe(false);
+    expect(hasAiGatewayCredentials(createTestEnv({ VERCEL_TOKEN: "token" }))).toBe(
       false,
     );
-    expect(hasAiGatewayCredentials({ VERCEL_TOKEN: "token" })).toBe(false);
   });
 });
 
@@ -161,10 +191,10 @@ describe("verifyAiGatewayModels", () => {
 
   it("checks default models, env overrides, and fallback models", async () => {
     const result = await verifyAiGatewayModels({
-      env: {
+      env: createTestEnv({
         AFENDA_AI_MODEL: "openai/custom-model",
         RERANK_MODEL: "cohere/rerank-v3.5",
-      },
+      }),
       fallbackModels: ["google/gemini-3.1-pro-preview"],
       fetch: createModelsFetch([
         "openai/gpt-5.5",
@@ -184,9 +214,9 @@ describe("verifyAiGatewayModels", () => {
 
   it("reports invalid env overrides without mutating state", async () => {
     const result = await verifyAiGatewayModels({
-      env: {
+      env: createTestEnv({
         AFENDA_AI_HIGH_CONFIDENCE_MODEL: "anthropic/missing-model",
-      },
+      }),
       fetch: createModelsFetch(["openai/gpt-5.5", "anthropic/claude-opus-4.7"]),
     });
 
@@ -239,12 +269,14 @@ describe("getGatewaySpendReport", () => {
 
 describe("getAiGatewayEnvironment", () => {
   it("falls back to development when VERCEL_ENV is absent", () => {
-    const env = getAiGatewayEnvironment({});
+    const env = getAiGatewayEnvironment(createTestEnv());
     expect(env).toBe("development");
   });
 
   it("returns production for VERCEL_ENV=production", () => {
-    const env = getAiGatewayEnvironment({ VERCEL_ENV: "production" });
+    const env = getAiGatewayEnvironment(
+      createTestEnv({ VERCEL_ENV: "production" }),
+    );
     expect(env).toBe("production");
   });
 });
