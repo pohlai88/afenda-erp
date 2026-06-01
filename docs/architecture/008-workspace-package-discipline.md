@@ -39,7 +39,7 @@ edges. Do not use packages to create deployment fragmentation.
 | Feature package    | `packages/features/<moduleId>`    | Module-specific commands, queries, metadata, components, schemas, tests         |
 | Domain contracts   | `packages/kernel`                 | Module IDs, shared contracts, registry contracts, compatibility adapters        |
 | Platform packages  | `packages/db`, `auth`, `ai`, ...  | Database, auth, AI, workflows, observability, config                            |
-| UI/runtime package | `packages/ui`, `governed-surface` | Reusable primitives and governed renderer kernel; no durable ERP business rules |
+| UI/runtime package | `packages/appshell`, `packages/ui`, `governed-surface` | Workspace shell chrome, reusable primitives, and governed renderer kernel; no durable ERP business rules |
 
 All package classes are enforced by `pnpm architecture:check`
 (`scripts/check-directory-architecture.mts`). New package classes require a doc
@@ -126,6 +126,11 @@ a proven dependency-cycle problem that cannot be solved by internal folders.
 | Feature packages  | Import kernel, db, auth, governed-surface, UI, workflows, observability as needed  |
 | Platform packages | Do not import from `apps/erp` or feature implementations unless explicitly allowed |
 | `@afenda/ui`      | Primitive UI only; no DB, auth server, AI, governed metadata registry, or routes   |
+
+`@afenda/appshell` owns authenticated workspace chrome contracts and shell UI
+runtime. It may render navigation, utility, context, and command metadata passed
+from `apps/erp`; it must not resolve tenant authority, fetch ERP records, own
+business rules, or import from `apps/erp`.
 
 Feature-to-feature imports are discouraged. Prefer shared contracts in
 `@afenda/kernel` or cross-module processes in `@afenda/workflows`. If a direct

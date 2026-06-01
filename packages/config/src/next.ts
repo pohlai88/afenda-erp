@@ -9,13 +9,13 @@ import { assertCiBuildEnv } from "./env.build.js";
  */
 export const afendaTranspilePackages = [
   "@afenda/ai",
+  "@afenda/appshell",
   "@afenda/auth",
   "@afenda/billing",
   "@afenda/config",
   "@afenda/db",
   "@afenda/kernel",
   "@afenda/feature-system-admin",
-  "@afenda/feature-approvals",
   "@afenda/feature-crm",
   "@afenda/feature-dashboard",
   "@afenda/feature-finance",

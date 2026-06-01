@@ -1,5 +1,8 @@
 import { DevSignInFloatingPanel } from "@/app/(auth)/_components/dev-sign-in-floating-panel";
+import { WorkspaceSkeleton } from "@/app-route-state/route-states";
+import { WorkspaceAppShell } from "@/workspace-routes/workspace-appshell.server";
 import { Toaster } from "@afenda/ui/sonner";
+import { Suspense } from "react";
 
 export const unstable_instant = {
   prefetch: "static",
@@ -8,7 +11,7 @@ export const unstable_instant = {
 
 /**
  * Authenticated ERP shell (Next.js route group — URL unchanged).
- * Workspace pages own their route chrome directly.
+ * The shell streams after server session and organization resolution.
  */
 export default function WorkspaceLayout({
   children,
@@ -17,7 +20,9 @@ export default function WorkspaceLayout({
 }>) {
   return (
     <>
-      {children}
+      <Suspense fallback={<WorkspaceSkeleton />}>
+        <WorkspaceAppShell>{children}</WorkspaceAppShell>
+      </Suspense>
       <Toaster richColors />
       <DevSignInFloatingPanel />
     </>

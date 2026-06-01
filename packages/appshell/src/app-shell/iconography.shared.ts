@@ -1,0 +1,46 @@
+import { z } from "zod";
+
+export const appShellIconKeys = [
+  "activity",
+  "bell",
+  "briefcase",
+  "building",
+  "building-2",
+  "calendar",
+  "camera",
+  "chevron-left",
+  "chevron-right",
+  "circle-help",
+  "clipboard-check",
+  "command",
+  "database",
+  "file-text",
+  "file-up",
+  "grid-3x3",
+  "home",
+  "keyboard",
+  "key-round",
+  "layout-dashboard",
+  "layout-grid",
+  "list",
+  "message-circle",
+  "message-square",
+  "panel-left",
+  "pen-line",
+  "scan-search",
+  "search",
+  "settings",
+  "shield",
+  "shield-check",
+  "shopping-bag",
+  "sparkles",
+  "store",
+  "sun",
+  "user-round",
+  "users",
+  "wifi",
+] as const;
+
+export const appShellIconKeySchema = z.enum(appShellIconKeys);
+
+export type AppShellIconKey = z.infer<typeof appShellIconKeySchema>;

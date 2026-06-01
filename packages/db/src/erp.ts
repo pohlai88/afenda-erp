@@ -431,8 +431,9 @@ const moduleSeedWorkItems: readonly ModuleSeedWorkItem[] = [
   },
 ];
 
-const moduleSeedViews: readonly ModuleSeedView[] = erpModuleIds.flatMap(
-  (moduleId) => [
+const moduleSeedViews: readonly ModuleSeedView[] = erpModuleIds
+  .filter((moduleId) => moduleId !== "system-admin")
+  .flatMap((moduleId) => [
     {
       moduleId,
       name: "Action queue",
@@ -448,8 +449,7 @@ const moduleSeedViews: readonly ModuleSeedView[] = erpModuleIds.flatMap(
       visibility: "tenant",
       filter: { risk: true, includeAuditRequired: true },
     },
-  ],
-);
+  ]);
 
 function addDays(days: number) {
   const date = new Date();
@@ -1014,11 +1014,15 @@ export async function seedCoreErpModuleData(input: {
   organizationId: string;
   actorAuthUserId: string;
 }) {
+  const seedRecords = moduleSeedRecords.filter(
+    (record) => record.moduleId !== "system-admin",
+  );
+
   return runWithOrganizationContext(input.organizationId, async (db) => {
     await db
       .insert(erpModuleRecords)
       .values(
-        moduleSeedRecords.map((record) => ({
+        seedRecords.map((record) => ({
           id: createEntityId("erp"),
           organizationId: input.organizationId,
           moduleId: record.moduleId,

@@ -1,3 +1,4 @@
+import { GOVERNED_METADATA_SCHEMA_VERSION } from "../schemas/schema-version.shared";
 import { resolveGovernedChartPresentation } from "../resolvers/resolve-governed-presentation";
 import type {
   ChartDataNature,
@@ -18,12 +19,10 @@ export type BuildGovernedChartSurfaceInput = Omit<
 };
 
 /**
- * Profile-first builder for chart surfaces (ARCH-007 §4.2).
+ * Profile-first builder for governed chart surfaces.
  *
- * Selects `chartKind` and `dataNature` from the profile and merges with
- * caller-supplied series/heatmap/annotation data. Builders in domain/feature
- * packages call this rather than constructing `GovernedChartConfigurationInput`
- * directly, ensuring consistent presentation defaults across the ERP surface.
+ * Feature/domain packages pass business data and intent; presentation profile
+ * owns the repeated ERP chart defaults.
  */
 export function buildGovernedChartSurface(
   input: BuildGovernedChartSurfaceInput,
@@ -34,7 +33,9 @@ export function buildGovernedChartSurface(
     chartKind,
     dataNature,
   });
+
   return {
+    __schemaVersion: rest.__schemaVersion ?? GOVERNED_METADATA_SCHEMA_VERSION,
     ...rest,
     chartKind: resolved.chartKind,
     dataNature: resolved.dataNature,

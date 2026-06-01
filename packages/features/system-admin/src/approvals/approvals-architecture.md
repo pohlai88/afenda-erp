@@ -85,9 +85,13 @@ system-admin.approvals.review
 
 `system-admin.approvals.review` grants read-path access to catalog and detail surfaces without `manage`. Deprecated rules reactivate only through `reactivateDeprecatedSystemAdminApprovalRuleAction`, which requires strict `system-admin.approvals.review` (mirrors `system-admin.audit.review`).
 
-## Deferred: runtime `/approvals` module
+## Operator queue (same page)
 
-Operator approval queues at `/approvals` are implemented in `@afenda/feature-approvals` (see `packages/features/approvals/src/approvals-architecture.md`). This control-plane vertical configures the routes those queue items follow.
+The unified route `/system-admin/approvals` also hosts the **operator approval queue** for tenant work items (`approvals.view` / `approvals.decide`). Rule configuration requires `system-admin.approvals.read` or stronger; operators with only `approvals.view` see the queue without the rules catalog or editor.
+
+Legacy `/approvals` redirects to `/system-admin/approvals`. Work-item detail routes remain at `/approvals/work-items/[workItemId]`.
+
+Surface key: `system-admin.approvals.queue.list`. Decision actions: `decideSystemAdminApprovalWorkItemAction`.
 
 ## Approval Rule Model
 

@@ -1,13 +1,19 @@
 import { systemAdminApprovalsUiCopy } from "@afenda/feature-system-admin/metadata";
 import {
   buildSystemAdminApprovalsPageModel,
+  buildSystemAdminApprovalsQueuePageModel,
+  hasSystemAdminApprovalsQueueView,
+  hasSystemAdminApprovalsRulesRead,
   reactivateDeprecatedSystemAdminApprovalRuleAction,
-  requireSystemAdminApprovalsRead,
+  requireSystemAdminApprovalsPageAccess,
   SystemAdminApprovalsAccessDenied,
   SystemAdminApprovalsSection,
   updateSystemAdminApprovalRuleAction,
 } from "@afenda/feature-system-admin/server";
-import { hasExecutionPermission } from "@afenda/kernel/execution";
+import {
+  hasExecutionPermission,
+} from "@afenda/kernel/execution";
+import { resolveWorkspaceDataMode } from "@afenda/kernel";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -23,14 +29,14 @@ export default async function SystemAdminApprovalsPage({
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
 
   let organization: Awaited<
-    ReturnType<typeof requireSystemAdminApprovalsRead>
+    ReturnType<typeof requireSystemAdminApprovalsPageAccess>
   >["organization"];
   let context: Awaited<
-    ReturnType<typeof requireSystemAdminApprovalsRead>
+    ReturnType<typeof requireSystemAdminApprovalsPageAccess>
   >["context"];
 
   try {
-    ({ organization, context } = await requireSystemAdminApprovalsRead());
+    ({ organization, context } = await requireSystemAdminApprovalsPageAccess());
   } catch {
     return (
       <div data-testid="system-admin-approvals-access-denied" className="contents">
@@ -39,6 +45,8 @@ export default async function SystemAdminApprovalsPage({
     );
   }
 
+  const canViewRules = hasSystemAdminApprovalsRulesRead(context);
+  const canViewQueue = hasSystemAdminApprovalsQueueView(context);
   const canMutate =
     hasExecutionPermission(context, "system-admin.approvals.manage") ||
     hasExecutionPermission(context, "system-admin.settings.write");
@@ -46,36 +54,47 @@ export default async function SystemAdminApprovalsPage({
     context,
     "system-admin.approvals.review",
   );
+  const canDecide = hasExecutionPermission(context, "approvals.decide");
+  const dataMode = resolveWorkspaceDataMode(context.sessionSource);
 
-  const {
-    searchValue,
-    approvals,
-    approverRoleOptions,
-    selectedApprovalKey,
-    approvalDetail,
-    editorDefaults,
-  } = await buildSystemAdminApprovalsPageModel({
-    organizationId: organization.id,
-    actorId: context.userId,
-    actorType: context.actorType,
-    searchParams: resolvedSearchParams,
-  });
+  const [rulesPageModel, queuePageModel] = await Promise.all([
+    canViewRules
+      ? buildSystemAdminApprovalsPageModel({
+          organizationId: organization.id,
+          actorId: context.userId,
+          actorType: context.actorType,
+          searchParams: resolvedSearchParams,
+        })
+      : Promise.resolve(null),
+    canViewQueue
+      ? buildSystemAdminApprovalsQueuePageModel({
+          organizationId: organization.id,
+          dataMode,
+          searchParams: resolvedSearchParams,
+        })
+      : Promise.resolve(null),
+  ]);
 
   return (
     <div data-testid="system-admin-approvals-page" className="contents">
       <SystemAdminApprovalsSection
-        approvals={approvals}
-        searchValue={searchValue}
+        approvals={rulesPageModel?.approvals ?? []}
+        searchValue={rulesPageModel?.searchValue}
         canMutate={canMutate}
         canReview={canReview}
-        approverRoleOptions={approverRoleOptions}
+        canViewRules={canViewRules}
+        canViewQueue={canViewQueue}
+        canDecide={canDecide}
+        queueWorkspace={queuePageModel?.workspace}
+        queueModuleQuery={queuePageModel?.moduleQuery}
+        approverRoleOptions={rulesPageModel?.approverRoleOptions ?? []}
         updateApprovalRuleAction={updateSystemAdminApprovalRuleAction}
         reactivateDeprecatedApprovalRuleAction={
           reactivateDeprecatedSystemAdminApprovalRuleAction
         }
-        selectedApprovalKey={selectedApprovalKey}
-        approvalDetail={approvalDetail}
-        editorDefaults={editorDefaults}
+        selectedApprovalKey={rulesPageModel?.selectedApprovalKey}
+        approvalDetail={rulesPageModel?.approvalDetail}
+        editorDefaults={rulesPageModel?.editorDefaults}
       />
     </div>
   );

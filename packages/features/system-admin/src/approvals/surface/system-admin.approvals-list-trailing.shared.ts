@@ -1,26 +1,76 @@
 import { resolveListSurfaceRowTrailingAction } from "@afenda/governed-surface";
+import type { ActionDescriptor } from "@afenda/governed-surface/schemas";
+
+import type { SystemAdminApprovalRuleStatus } from "../contracts/system-admin.approval-rule.contract";
 import { systemAdminApprovalsUiCopy } from "./system-admin.approvals-ui.copy.shared";
 
+export {
+  SYSTEM_ADMIN_APPROVALS_MANAGE_CAPABILITY,
+} from "../schemas/system-admin.approvals-capability.shared";
+
 export const SYSTEM_ADMIN_APPROVALS_MANAGE_DENIED =
-  "Requires system-admin.approvals.manage.";
+  systemAdminApprovalsUiCopy.permissions.requiresManage;
+
+export const SYSTEM_ADMIN_APPROVAL_ROW_TRAILING_ACTION_IDS = {
+  enable: "system-admin.approval.enable",
+  disable: "system-admin.approval.disable",
+} as const;
+
+function buildApprovalDisableDescriptor(): ActionDescriptor {
+  const copy = systemAdminApprovalsUiCopy.list;
+
+  return {
+    id: SYSTEM_ADMIN_APPROVAL_ROW_TRAILING_ACTION_IDS.disable,
+    label: copy.disableActionLabel,
+    intent: "destructive",
+    confirm: copy.trailingConfirms.disable,
+  };
+}
+
+function buildApprovalEnableDescriptor(): ActionDescriptor {
+  const copy = systemAdminApprovalsUiCopy.list;
+
+  return {
+    id: SYSTEM_ADMIN_APPROVAL_ROW_TRAILING_ACTION_IDS.enable,
+    label: copy.enableActionLabel,
+    intent: "default",
+  };
+}
+
+function buildApprovalToggleDescriptor(enabled: boolean): ActionDescriptor {
+  return enabled
+    ? buildApprovalDisableDescriptor()
+    : buildApprovalEnableDescriptor();
+}
 
 export function resolveSystemAdminApprovalRowTrailingAction(input: {
+  status: SystemAdminApprovalRuleStatus;
   enabled: boolean;
   canMutate: boolean;
 }) {
   const copy = systemAdminApprovalsUiCopy.list;
-  const nextEnabled = !input.enabled;
+
+  if (input.status === "deprecated") {
+    if (input.enabled) {
+      return resolveListSurfaceRowTrailingAction({
+        visible: true,
+        allowed: input.canMutate,
+        disabledReason: SYSTEM_ADMIN_APPROVALS_MANAGE_DENIED,
+        descriptor: buildApprovalDisableDescriptor(),
+      });
+    }
+
+    return resolveListSurfaceRowTrailingAction({
+      visible: false,
+      allowed: false,
+      disabledReason: copy.trailingDisabledReasons.deprecatedReactivate,
+    });
+  }
 
   return resolveListSurfaceRowTrailingAction({
     visible: true,
     allowed: input.canMutate,
     disabledReason: SYSTEM_ADMIN_APPROVALS_MANAGE_DENIED,
-    descriptor: {
-      id: nextEnabled
-        ? "system-admin.approval.enable"
-        : "system-admin.approval.disable",
-      label: nextEnabled ? copy.enableActionLabel : copy.disableActionLabel,
-      intent: nextEnabled ? "default" : "destructive",
-    },
+    descriptor: buildApprovalToggleDescriptor(input.enabled),
   });
 }

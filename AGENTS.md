@@ -25,6 +25,7 @@ You are working in the **deployable Next.js 16 App Router application** for Afen
 | **ARCH-007** | `docs/architecture/007-governed-metadata-architecture.md`  | Renderer kernel, profiles, builders                     |
 | **ARCH-008** | `docs/architecture/008-workspace-package-discipline.md`    | Package classes, export doors, split discipline         |
 | **ARCH-009** | `docs/architecture/009-machine-layer-doctrine.md`          | Lynx machine layer, Knowledge substrate, brand contract |
+| **ARCH-013** | `docs/architecture/013-appshell-package-architecture.md`   | Workspace shell chrome package and command contracts    |
 
 Feature scaffold default: `packages/_template-definition`.
 
@@ -79,7 +80,7 @@ Do not extend generic `erp_module_records` for posting-grade, inventory-grade, o
 ```txt
 src/app/
   (auth)/sign-in, sign-up, …
-  (workspace)/layout.tsx          # Authenticated route group layout; pages own workspace chrome
+  (workspace)/layout.tsx          # @afenda/appshell + server-composed workspace chrome Suspense fallback
   (workspace)/loading.tsx         # Page-level fallback (layout stays mounted)
   (workspace)/dashboard/
   (workspace)/lynx/

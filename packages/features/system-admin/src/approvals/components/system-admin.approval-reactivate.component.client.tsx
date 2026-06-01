@@ -1,9 +1,10 @@
 "use client";
 
 import { ActionFormErrors } from "@afenda/governed-surface/client";
-import { Button } from "@afenda/ui/button";
+import { Alert, AlertDescription } from "@afenda/ui";
 import { GitPullRequestIcon } from "lucide-react";
 import { useState, useTransition } from "react";
+import { SystemAdminDestructiveConfirmButton } from "../../overview/components/system-admin.destructive-confirm-button.component.client";
 import type { SystemAdminActionResult } from "../../tenant-execution/contracts/system-admin.action-result.contract";
 import { systemAdminApprovalsUiCopy } from "../surface/system-admin.approvals-ui.copy.shared";
 
@@ -23,15 +24,23 @@ export function SystemAdminApprovalReactivateControl({
   const [isPending, startTransition] = useTransition();
 
   return (
-    <div className="flex flex-col gap-surface-sm">
-      <p className="type-muted">{copy.description}</p>
+    <div
+      className="@container flex flex-col gap-surface-sm"
+      data-testid={`system-admin-approval-reactivate:${approvalKey}`}
+    >
+      <Alert>
+        <AlertDescription>{copy.description}</AlertDescription>
+      </Alert>
       <div className="flex flex-wrap items-center gap-2">
-        <Button
-          type="button"
-          size="sm"
+        <SystemAdminDestructiveConfirmButton
+          confirm={{
+            title: copy.confirmTitle,
+            description: copy.confirmDescription,
+            confirmLabel: copy.confirmLabel,
+          }}
           variant="outline"
           disabled={isPending}
-          onClick={() =>
+          onConfirm={() =>
             startTransition(async () => {
               setResult(
                 await reactivateDeprecatedApprovalRuleAction({ approvalKey }),
@@ -41,7 +50,7 @@ export function SystemAdminApprovalReactivateControl({
         >
           <GitPullRequestIcon data-icon="inline-start" />
           {copy.actionLabel}
-        </Button>
+        </SystemAdminDestructiveConfirmButton>
         <ActionFormErrors result={result} />
       </div>
     </div>

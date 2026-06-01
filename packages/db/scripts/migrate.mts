@@ -36,6 +36,16 @@ async function ensurePgVectorExtension() {
   await sql.query(`create extension if not exists vector`);
 }
 
+async function ensureErpModuleIdEnumValues() {
+  const requiredValues = ["system-admin"] as const;
+
+  for (const value of requiredValues) {
+    await sql.query(
+      `ALTER TYPE erp_module_id ADD VALUE IF NOT EXISTS '${value}'`,
+    );
+  }
+}
+
 async function ensureMigrationTable() {
   await sql.query(`
     create table if not exists afenda_schema_migrations (
@@ -98,6 +108,7 @@ async function loadJournalMigrationFiles() {
 
 async function main() {
   await ensurePgVectorExtension();
+  await ensureErpModuleIdEnumValues();
   await ensureMigrationTable();
   const applied = await getAppliedMigrations();
   const migrationFiles = await loadJournalMigrationFiles();

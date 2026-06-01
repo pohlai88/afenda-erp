@@ -6,13 +6,16 @@ import {
   isListSurfaceTrailingActionRenderable,
   type GovernedListTrailingCellProps,
 } from "@afenda/governed-surface/client";
-import { Button } from "@afenda/ui/button";
-import { BanIcon, PowerIcon } from "lucide-react";
+import { Button } from "@afenda/ui";
+import { ArrowUpRightIcon, BanIcon, PowerIcon } from "lucide-react";
 import Link from "next/link";
 import { useState, useTransition } from "react";
+
+import { SystemAdminDestructiveConfirmButton } from "../../overview/components/system-admin.destructive-confirm-button.component.client";
+import { SystemAdminTrailingActionStack } from "../../overview/components/system-admin.trailing-action-stack.component.client";
 import type { SystemAdminActionResult } from "../../tenant-execution/contracts/system-admin.action-result.contract";
-import { systemAdminApprovalsUiCopy } from "../surface/system-admin.approvals-ui.copy.shared";
 import { setSystemAdminApprovalRuleEnabledAction } from "../actions/system-admin.approval-rules.actions.server";
+import { systemAdminApprovalsUiCopy } from "../surface/system-admin.approvals-ui.copy.shared";
 
 export function SystemAdminApprovalTrailingCell({
   row,
@@ -30,8 +33,16 @@ export function SystemAdminApprovalTrailingCell({
 
   if (!isListSurfaceTrailingActionRenderable(trailingAction)) {
     return reviewHref ? (
-      <Button variant="outline" size="sm" asChild>
-        <Link href={reviewHref}>{listCopy.reviewActionLabel}</Link>
+      <Button
+        variant="outline"
+        size="sm"
+        asChild
+        data-testid={`system-admin-approval-trailing-review:${row.id}`}
+      >
+        <Link href={reviewHref}>
+          <ArrowUpRightIcon data-icon="inline-start" />
+          {listCopy.reviewActionLabel}
+        </Link>
       </Button>
     ) : null;
   }
@@ -41,39 +52,67 @@ export function SystemAdminApprovalTrailingCell({
   const mutationLabel =
     trailingAction.descriptor?.label ??
     (nextEnabled ? listCopy.enableActionLabel : listCopy.disableActionLabel);
+  const confirm = trailingAction.descriptor?.confirm;
+  const mutationVariant = nextEnabled ? "outline" : "destructive";
+  const mutationIcon = nextEnabled ? (
+    <PowerIcon data-icon="inline-start" />
+  ) : (
+    <BanIcon data-icon="inline-start" />
+  );
+
+  function runMutation() {
+    startTransition(async () => {
+      setResult(
+        await setSystemAdminApprovalRuleEnabledAction({
+          approvalKey: row.id,
+          enabled: nextEnabled,
+        }),
+      );
+    });
+  }
+
+  const mutationControl = confirm ? (
+    <SystemAdminDestructiveConfirmButton
+      confirm={confirm}
+      disabled={disabled}
+      variant={mutationVariant}
+      onConfirm={runMutation}
+    >
+      {mutationIcon}
+      {mutationLabel}
+    </SystemAdminDestructiveConfirmButton>
+  ) : (
+    <Button
+      type="button"
+      size="sm"
+      variant={mutationVariant}
+      disabled={disabled}
+      aria-busy={isPending}
+      data-testid={`system-admin-approval-trailing-toggle:${row.id}`}
+      onClick={runMutation}
+    >
+      {mutationIcon}
+      {mutationLabel}
+    </Button>
+  );
 
   return (
     <GovernedTrailingActionSlot trailingAction={trailingAction}>
-      <div className="flex flex-wrap items-center gap-2">
-        {reviewHref ? (
-          <Button variant="outline" size="sm" asChild>
-            <Link href={reviewHref}>{listCopy.reviewActionLabel}</Link>
-          </Button>
-        ) : null}
-        <Button
-          type="button"
-          size="sm"
-          variant={nextEnabled ? "outline" : "destructive"}
-          disabled={disabled}
-          onClick={() =>
-            startTransition(async () => {
-              setResult(
-                await setSystemAdminApprovalRuleEnabledAction({
-                  approvalKey: row.id,
-                  enabled: nextEnabled,
-                }),
-              );
-            })
-          }
-        >
-          {nextEnabled ? (
-            <PowerIcon data-icon="inline-start" />
-          ) : (
-            <BanIcon data-icon="inline-start" />
-          )}
-          {mutationLabel}
-        </Button>
-        <ActionFormErrors result={result} />
+      <div
+        className="@container min-w-40"
+        data-testid={`system-admin-approval-trailing:${row.id}`}
+      >
+        <SystemAdminTrailingActionStack footer={<ActionFormErrors result={result} />}>
+          {reviewHref ? (
+            <Button variant="outline" size="sm" asChild>
+              <Link href={reviewHref}>
+                <ArrowUpRightIcon data-icon="inline-start" />
+                {listCopy.reviewActionLabel}
+              </Link>
+            </Button>
+          ) : null}
+          {mutationControl}
+        </SystemAdminTrailingActionStack>
       </div>
     </GovernedTrailingActionSlot>
   );

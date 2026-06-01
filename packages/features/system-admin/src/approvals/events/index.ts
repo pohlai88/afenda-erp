@@ -1,4 +1,8 @@
 export {
+  systemAdminApprovalQueueAuditActions,
+  type SystemAdminApprovalQueueAuditAction,
+} from "./system-admin.approvals-queue.event";
+export {
   systemAdminApprovalRuleAuditActions,
   systemAdminApprovalRuleAuditActionsByMode,
   systemAdminApprovalRuleWebhookEvents,

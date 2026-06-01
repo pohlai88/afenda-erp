@@ -1,0 +1,62 @@
+{
+  "name": "@afenda/appshell",
+  "version": "0.1.0",
+  "description": "Afenda ERP authenticated workspace shell contracts and chrome.",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./src/index.tsx",
+  "types": "./src/index.tsx",
+  "exports": {
+    ".": {
+      "types": "./src/index.tsx",
+      "development": "./src/index.tsx",
+      "import": "./src/index.tsx",
+      "default": "./dist/index.js"
+    },
+    "./client": {
+      "types": "./src/client.tsx",
+      "development": "./src/client.tsx",
+      "import": "./src/client.tsx",
+      "default": "./dist/client.js"
+    },
+    "./server": {
+      "types": "./src/server.ts",
+      "development": "./src/server.ts",
+      "import": "./src/server.ts",
+      "default": "./dist/server.js"
+    },
+    "./styles.css": "./src/styles.css"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "lint": "tsc -p tsconfig.json --noEmit",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@afenda/ui": "workspace:*",
+    "lucide-react": "^1.16.0",
+    "server-only": "^0.0.1",
+    "zod": "catalog:"
+  },
+  "peerDependencies": {
+    "next": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:"
+  },
+  "devDependencies": {
+    "@afenda/config": "workspace:*",
+    "@testing-library/react": "^16.3.0",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "jsdom": "^26.1.0",
+    "next": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "vitest": "catalog:"
+  },
+  "sideEffects": [
+    "./src/styles.css"
+  ]
+}

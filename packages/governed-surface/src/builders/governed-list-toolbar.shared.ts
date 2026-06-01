@@ -8,33 +8,40 @@ export type GovernedWorkbenchFocusSearchInput = {
   value?: string | null;
 };
 
-function mergeListToolbar(
+function mergeToolbarSection<TSection extends object>(
+  base: TSection | undefined,
+  override: TSection | undefined,
+): TSection | undefined {
+  if (!base && !override) return undefined;
+  if (!base) return override;
+  if (!override) return base;
+  return { ...base, ...override };
+}
+
+export function mergeListToolbar(
   base: ListSurfaceToolbar | undefined,
   override: ListSurfaceToolbar | undefined,
 ): ListSurfaceToolbar | undefined {
   if (!base && !override) return undefined;
   if (!base) return override;
   if (!override) return base;
+
   return {
     ...base,
     ...override,
-    export: override.export ?? base.export,
-    search: override.search ?? base.search,
-    filters: override.filters ?? base.filters,
-    sort: override.sort ?? base.sort,
-    savedView: override.savedView ?? base.savedView,
-    bulkActions: override.bulkActions ?? base.bulkActions,
-    densityToggle: override.densityToggle ?? base.densityToggle,
-    columnPicker: override.columnPicker ?? base.columnPicker,
-    resetParams: override.resetParams ?? base.resetParams,
+    export: mergeToolbarSection(base.export, override.export),
+    search: mergeToolbarSection(base.search, override.search),
+    filters: mergeToolbarSection(base.filters, override.filters),
+    sort: mergeToolbarSection(base.sort, override.sort),
+    savedView: mergeToolbarSection(base.savedView, override.savedView),
+    bulkActions: mergeToolbarSection(base.bulkActions, override.bulkActions),
+    densityToggle: mergeToolbarSection(base.densityToggle, override.densityToggle),
+    columnPicker: mergeToolbarSection(base.columnPicker, override.columnPicker),
+    resetParams: mergeToolbarSection(base.resetParams, override.resetParams),
   };
 }
 
-/**
- * Bookmarkable list filter via `?focus=` (nuqs + ListSurfaceToolbarClient).
- * Server builders pass the loaded search param value; the client writes URL updates.
- */
-/** Merges focus search with existing builder presentation (e.g. export toolbar). */
+/** Merges focus search with existing builder presentation, preserving other toolbar sections. */
 export function governedWorkbenchFocusPresentationPatch(
   input: GovernedWorkbenchFocusSearchInput,
   base?: Partial<ListSurfacePresentation>,
@@ -65,6 +72,7 @@ export function buildGovernedWorkbenchFocusSearchPresentation(
 export type GovernedListExportToolbarInput = {
   actionId: string;
   label: string;
+  formats?: readonly ["csv", ...string[]];
 };
 
 /** CSV export affordance for operational/exception list builders. */
@@ -76,7 +84,7 @@ export function buildGovernedListExportToolbarPresentation(
       export: {
         actionId: input.actionId,
         label: input.label,
-        formats: ["csv"],
+        formats: input.formats ?? ["csv"],
       },
     },
   };
@@ -98,9 +106,7 @@ export function matchesGovernedWorkbenchFocus(
   ...haystacks: readonly (string | null | undefined)[]
 ): boolean {
   const needle = focus?.trim().toLowerCase() ?? "";
-  if (needle.length === 0) {
-    return true;
-  }
+  if (needle.length === 0) return true;
   return haystacks.some((value) =>
     (value ?? "").toLowerCase().includes(needle),
   );

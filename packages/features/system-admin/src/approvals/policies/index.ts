@@ -5,6 +5,12 @@ export {
   requireSystemAdminApprovalsReview,
 } from "./system-admin.approval-rules.policy.server";
 export {
+  hasSystemAdminApprovalsQueueView,
+  hasSystemAdminApprovalsRulesRead,
+  requireSystemAdminApprovalsPageAccess,
+  requireSystemAdminApprovalsQueueDecide,
+} from "./system-admin.approvals-queue.policy.server";
+export {
   assertApprovalRuleRolesAllowed,
   findDeprecatedRolesInSelection,
   listDeprecatedOrganizationRoles,

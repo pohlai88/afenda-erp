@@ -14,7 +14,7 @@ import {
   type ModuleWorkspaceSearchParams,
 } from "@afenda/kernel";
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { Suspense } from "react";
 
 export const unstable_instant = {
@@ -71,6 +71,10 @@ export default function DynamicModulePage({
       {params.then(async ({ moduleId }) => {
         if (moduleId === SYSTEM_ADMIN_MODULE_ID) {
           return <SystemAdminModuleHubSection />;
+        }
+
+        if (moduleId === "approvals") {
+          redirect("/system-admin/approvals");
         }
 
         return (

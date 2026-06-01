@@ -205,9 +205,9 @@ Afenda ERP v1 targets SME core ERP modules:
 | Inventory    | Items, stock ledger, locations, adjustments           | `features/inventory`, `db`                  |
 | HR           | Employees, leave, time, payroll inputs, workforce ops | `features/hr`, `db` (moduleId: `hr`)        |
 | CRM          | Leads, accounts, contacts, activities                 | `features/crm`, `db`                        |
-| Approvals    | Approval rules, tasks, escalations, comments          | `features/approvals`, `workflows`, `db`     |
+| Approvals    | Operator queue, work-item decisions (unified at `/system-admin/approvals`) | `features/system-admin`, `workflows`, `db` |
 | Reports      | Operational reports, exports, saved views             | `features/reports`, `observability`, `db`   |
-| System admin | Organization defaults, users, roles, audit log        | `features/system-admin`, `auth`, `db`       |
+| System admin | Organization defaults, users, roles, audit log, **approval rules and operator queue** | `features/system-admin`, `auth`, `db`       |
 
 Business rules live in feature packages once a module becomes real; they do not
 live in React route components. `packages/kernel` remains the cross-module

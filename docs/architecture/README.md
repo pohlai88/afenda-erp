@@ -31,6 +31,7 @@ Search tip: every document has a stable **`ARCH-###`** ID and a matching
 | **ARCH-011 (supplement)** | [011-system-admin-capabilities-architecture.md](011-system-admin-capabilities-architecture.md) | Capabilities control domain — coverage, readiness, availability |
 | **ARCH-011 (supplement)** | [011-system-admin-data-management-architecture.md](011-system-admin-data-management-architecture.md) | Data Management control domain — import/export workbench, staged jobs, CSV boundaries |
 | **ARCH-011 (supplement)** | [011-system-admin-competitive-scorecard.md](011-system-admin-competitive-scorecard.md) | Competitive benchmark and gap scorecard for System Admin |
+| **ARCH-013** | [013-appshell-package-architecture.md](013-appshell-package-architecture.md) | Authenticated workspace shell package, chrome contracts, command-center runtime |
 
 **ARCH-012** — *reserved* (no file; future product kernel / dual posture — not `@afenda/kernel` compat).
 
@@ -43,6 +44,7 @@ then update the other document in the same change.
 | Authority                              | Doc ID                          |
 | -------------------------------------- | ------------------------------- |
 | System admin control plane             | **ARCH-011**                    |
+| Workspace shell chrome                 | **ARCH-013**                    |
 | Execution authority                    | **ARCH-002** §5                      |
 | Feature packages and extraction        | **ARCH-002**                    |
 | Product runtime, modules, deployment   | **ARCH-001**                    |

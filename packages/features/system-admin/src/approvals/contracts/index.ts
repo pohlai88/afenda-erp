@@ -1,3 +1,4 @@
+export type { SystemAdminApprovalQueueListRow } from "./system-admin.approvals-queue.contract";
 export type {
   ApprovalReadinessVerdict,
   SystemAdminApprovalMode,

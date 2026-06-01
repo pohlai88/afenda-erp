@@ -1,73 +1,69 @@
 import { Badge } from "@afenda/ui";
+
+import type {
+  ApprovalReadinessVerdict,
+  SystemAdminApprovalRuleStatus,
+} from "../contracts/system-admin.approval-rule.contract";
 import {
-  catalogStatusBadge,
-  moduleReadinessVerdictBadge,
-} from "../../overview/surfaces/system-admin.control-list.shared";
+  resolveSystemAdminApprovalEnabledBadgePresentation,
+  resolveSystemAdminApprovalReadinessBadgePresentation,
+  resolveSystemAdminApprovalStatusBadgePresentation,
+  systemAdminApprovalEnabledBadgeAriaLabel,
+  systemAdminApprovalReadinessBadgeAriaLabel,
+  systemAdminApprovalStatusBadgeAriaLabel,
+} from "../surface/system-admin.approvals-detail-badges.shared";
 
-type ApprovalDetailBadgeTone = "positive" | "attention" | "critical" | "default";
-
-const LIST_CELL_TONE_TO_BADGE_VARIANT = {
-  positive: "success",
-  attention: "warning",
-  critical: "critical",
-  default: "secondary",
-} as const satisfies Record<
-  ApprovalDetailBadgeTone,
-  "success" | "warning" | "critical" | "secondary"
->;
-
-function resolveBadgeTone(
-  cellKind: ReturnType<typeof catalogStatusBadge>,
-): ApprovalDetailBadgeTone {
-  return cellKind.kind === "badge" ? (cellKind.tone ?? "default") : "default";
-}
-
-function GovernedToneBadge({
-  value,
-  tone,
+export function SystemAdminApprovalStatusBadge({
+  status,
 }: {
-  value: string;
-  tone: ApprovalDetailBadgeTone;
+  status: SystemAdminApprovalRuleStatus;
 }) {
-  return (
-    <Badge variant={LIST_CELL_TONE_TO_BADGE_VARIANT[tone]}>{value}</Badge>
-  );
-}
+  const presentation = resolveSystemAdminApprovalStatusBadgePresentation(status);
 
-export function SystemAdminApprovalStatusBadge({ status }: { status: string }) {
   return (
-    <GovernedToneBadge
-      value={status}
-      tone={resolveBadgeTone(catalogStatusBadge(status))}
-    />
+    <Badge
+      variant={presentation.variant}
+      aria-label={systemAdminApprovalStatusBadgeAriaLabel(status)}
+      data-testid={`system-admin-approval-status-badge:${status}`}
+    >
+      {presentation.label}
+    </Badge>
   );
 }
 
 export function SystemAdminApprovalReadinessBadge({
   verdict,
 }: {
-  verdict: string;
+  verdict: ApprovalReadinessVerdict;
 }) {
+  const presentation =
+    resolveSystemAdminApprovalReadinessBadgePresentation(verdict);
+
   return (
-    <GovernedToneBadge
-      value={verdict}
-      tone={resolveBadgeTone(moduleReadinessVerdictBadge(verdict))}
-    />
+    <Badge
+      variant={presentation.variant}
+      aria-label={systemAdminApprovalReadinessBadgeAriaLabel(verdict)}
+      data-testid={`system-admin-approval-readiness-badge:${verdict}`}
+    >
+      {presentation.label}
+    </Badge>
   );
 }
 
 export function SystemAdminApprovalEnabledBadge({
   enabled,
-  enabledLabel,
-  disabledLabel,
 }: {
   enabled: boolean;
-  enabledLabel: string;
-  disabledLabel: string;
 }) {
+  const presentation = resolveSystemAdminApprovalEnabledBadgePresentation(enabled);
+
   return (
-    <Badge variant={enabled ? "success" : "secondary"}>
-      {enabled ? enabledLabel : disabledLabel}
+    <Badge
+      variant={presentation.variant}
+      aria-label={systemAdminApprovalEnabledBadgeAriaLabel(enabled)}
+      data-testid={`system-admin-approval-enabled-badge:${enabled ? "true" : "false"}`}
+    >
+      {presentation.label}
     </Badge>
   );
 }

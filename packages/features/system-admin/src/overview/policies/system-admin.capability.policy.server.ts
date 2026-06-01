@@ -23,7 +23,7 @@ export type SystemAdminExecutionGuard = {
   };
 };
 
-function toSystemAdminExecutionGuard(
+export function toSystemAdminExecutionGuard(
   context: ExecutionContext,
 ): SystemAdminExecutionGuard {
   return {

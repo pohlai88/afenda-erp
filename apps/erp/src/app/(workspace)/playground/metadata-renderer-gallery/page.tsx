@@ -32,11 +32,15 @@ import {
 import {
   buildApprovalsListSurface,
   buildMembersListSurface,
+  buildSystemAdminApprovalQueueListSurface,
   buildSystemAdminAuditViewerListSurface,
   buildUsersListSurface,
+  systemAdminApprovalDetailDeprecatedGalleryFixture,
   systemAdminApprovalDetailGalleryFixture,
   systemAdminApprovalsGalleryRows,
+  systemAdminApprovalsQueueGalleryRows,
   systemAdminApprovalsSurfaceKey,
+  systemAdminApprovalsQueueSurfaceKey,
   systemAdminApprovalsUiCopy,
   systemAdminAuditCoverageGalleryGaps,
   systemAdminAuditDetailGalleryFixture,
@@ -49,6 +53,7 @@ import {
   systemAdminUsersSurfaceKey,
 } from "@afenda/feature-system-admin/metadata";
 import {
+  SystemAdminApprovalQueueTrailingCell,
   SystemAdminApprovalTrailingCell,
   SystemAdminMembershipTrailingCell,
 } from "@afenda/feature-system-admin/client";
@@ -423,6 +428,24 @@ export default function MetadataRendererGalleryPage() {
         />
       </GallerySection>
 
+      <GallerySection label="Pattern C — System admin approvals (read only)">
+        <GovernedPatternCListSection
+          title="Approval rules"
+          surfaceKey={`${systemAdminApprovalsSurfaceKey}.read-only`}
+          listConfiguration={buildApprovalsListSurface({
+            approvals: systemAdminApprovalsGalleryRows,
+            canMutate: false,
+          })}
+          parentAccessAllowed
+          {...galleryPatternSection}
+          trailingColumn={{
+            header: systemAdminApprovalsUiCopy.list.actionsHeader,
+            Cell: SystemAdminApprovalTrailingCell,
+            context: { surfaceKey: systemAdminApprovalsSurfaceKey },
+          }}
+        />
+      </GallerySection>
+
       <GallerySection label="Pattern C — System admin approvals (empty)">
         <GovernedPatternCListSection
           title="Approval rules"
@@ -436,9 +459,65 @@ export default function MetadataRendererGalleryPage() {
         />
       </GallerySection>
 
+      <GallerySection label="Pattern C — System admin approval queue (decide ready)">
+        <GovernedPatternCListSection
+          title={systemAdminApprovalsUiCopy.queue.title}
+          surfaceKey={systemAdminApprovalsQueueSurfaceKey}
+          listConfiguration={buildSystemAdminApprovalQueueListSurface({
+            rows: systemAdminApprovalsQueueGalleryRows,
+            canDecide: true,
+          })}
+          parentAccessAllowed
+          {...galleryPatternSection}
+          trailingColumn={{
+            header: systemAdminApprovalsUiCopy.queue.actionsHeader,
+            Cell: SystemAdminApprovalQueueTrailingCell,
+            context: { surfaceKey: systemAdminApprovalsQueueSurfaceKey },
+          }}
+        />
+      </GallerySection>
+
+      <GallerySection label="Pattern C — System admin approval queue (read only)">
+        <GovernedPatternCListSection
+          title={systemAdminApprovalsUiCopy.queue.title}
+          surfaceKey={`${systemAdminApprovalsQueueSurfaceKey}.read-only`}
+          listConfiguration={buildSystemAdminApprovalQueueListSurface({
+            rows: systemAdminApprovalsQueueGalleryRows,
+            canDecide: false,
+          })}
+          parentAccessAllowed
+          {...galleryPatternSection}
+          trailingColumn={{
+            header: systemAdminApprovalsUiCopy.queue.actionsHeader,
+            Cell: SystemAdminApprovalQueueTrailingCell,
+            context: { surfaceKey: systemAdminApprovalsQueueSurfaceKey },
+          }}
+        />
+      </GallerySection>
+
+      <GallerySection label="Pattern C — System admin approval queue (empty)">
+        <GovernedPatternCListSection
+          title={systemAdminApprovalsUiCopy.queue.title}
+          surfaceKey={`${systemAdminApprovalsQueueSurfaceKey}.empty`}
+          listConfiguration={buildSystemAdminApprovalQueueListSurface({
+            rows: [],
+            canDecide: true,
+          })}
+          parentAccessAllowed
+          {...galleryPatternSection}
+        />
+      </GallerySection>
+
       <GallerySection label="System admin approval detail (fixture)">
         <SystemAdminApprovalDetailPanel
           detail={systemAdminApprovalDetailGalleryFixture}
+          backHref="/system-admin/approvals"
+        />
+      </GallerySection>
+
+      <GallerySection label="System admin approval detail (deprecated)">
+        <SystemAdminApprovalDetailPanel
+          detail={systemAdminApprovalDetailDeprecatedGalleryFixture}
           backHref="/system-admin/approvals"
         />
       </GallerySection>

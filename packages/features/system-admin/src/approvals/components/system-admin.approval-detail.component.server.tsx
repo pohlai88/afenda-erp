@@ -1,3 +1,5 @@
+import type { ReactNode } from "react";
+
 import {
   Button,
   Card,
@@ -8,6 +10,7 @@ import {
   EmptyDescription,
   EmptyHeader,
   EmptyTitle,
+  Separator,
   Table,
   TableBody,
   TableCell,
@@ -17,8 +20,11 @@ import {
 } from "@afenda/ui";
 import Link from "next/link";
 import { systemAdminControlLinks } from "../../overview/contracts/system-admin.control-links.contract";
-import type { SystemAdminApprovalRuleDetail } from "../contracts/system-admin.approval-rule.contract";
-import { formatApprovalEscalationSummary } from "../data/system-admin.approval-rules.shared";
+import type {
+  ApprovalEscalationBehavior,
+  SystemAdminApprovalMode,
+  SystemAdminApprovalRuleDetail,
+} from "../contracts/system-admin.approval-rule.contract";
 import { systemAdminApprovalsUiCopy } from "../surface/system-admin.approvals-ui.copy.shared";
 import {
   SystemAdminApprovalEnabledBadge,
@@ -31,6 +37,36 @@ import type { SystemAdminActionResult } from "../../tenant-execution/contracts/s
 type ReactivateAction = (input: {
   approvalKey: string;
 }) => Promise<SystemAdminActionResult>;
+
+const APPROVAL_MODE_LABELS = {
+  sequential: systemAdminApprovalsUiCopy.editor.modes.sequential,
+  parallel: systemAdminApprovalsUiCopy.editor.modes.parallel,
+} as const satisfies Record<SystemAdminApprovalMode, string>;
+
+const ESCALATION_BEHAVIOR_LABELS = {
+  notify: systemAdminApprovalsUiCopy.editor.escalationBehaviors.notify,
+  reassign: systemAdminApprovalsUiCopy.editor.escalationBehaviors.reassign,
+  expire: systemAdminApprovalsUiCopy.editor.escalationBehaviors.expire,
+} as const satisfies Record<ApprovalEscalationBehavior, string>;
+
+function SystemAdminApprovalDetailField({
+  label,
+  value,
+  span = 1,
+  mono = false,
+}: {
+  label: string;
+  value: ReactNode;
+  span?: 1 | 2;
+  mono?: boolean;
+}) {
+  return (
+    <div className={span === 2 ? "@sm:col-span-2" : undefined}>
+      <dt className="type-label">{label}</dt>
+      <dd className={mono ? "type-mono-cell" : "type-body"}>{value}</dd>
+    </div>
+  );
+}
 
 export function SystemAdminApprovalDetailPanel({
   detail,
@@ -45,90 +81,113 @@ export function SystemAdminApprovalDetailPanel({
 }) {
   const copy = systemAdminApprovalsUiCopy.detail;
   const fields = copy.fields;
+  const activitySectionId = `system-admin-approval-activity-${detail.approvalKey}`;
+  const hasEscalation = Boolean(detail.escalationAfterHours);
+  const escalationBehavior =
+    detail.escalationBehavior && hasEscalation
+      ? ESCALATION_BEHAVIOR_LABELS[detail.escalationBehavior]
+      : null;
 
   return (
-    <Card data-testid={`system-admin-approval-detail:${detail.approvalKey}`}>
-      <CardHeader className="flex flex-row items-center justify-between gap-surface-md">
-        <CardTitle>{detail.name}</CardTitle>
-        <Button variant="outline" size="sm" asChild>
-          <Link href={backHref}>{copy.backLabel}</Link>
-        </Button>
-      </CardHeader>
-      <CardContent className="@container flex flex-col gap-surface-md type-body">
-        <dl className="grid gap-2 @sm:grid-cols-2">
-          <div>
-            <dt className="type-muted">{fields.approvalKey}</dt>
-            <dd className="type-mono-cell">{detail.approvalKey}</dd>
+    <Card
+      className="@container"
+      data-testid={`system-admin-approval-detail:${detail.approvalKey}`}
+    >
+      <CardHeader className="flex flex-col gap-surface-md">
+        <div className="flex flex-row items-start justify-between gap-surface-md">
+          <div className="flex min-w-0 flex-col gap-surface-xs">
+            <CardTitle>{detail.name}</CardTitle>
+            <p className="type-mono-muted truncate">{detail.approvalKey}</p>
           </div>
-          <div>
-            <dt className="type-muted">{fields.module}</dt>
-            <dd>
+          <Button variant="outline" size="sm" asChild>
+            <Link href={backHref}>{copy.backLabel}</Link>
+          </Button>
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <SystemAdminApprovalStatusBadge status={detail.status} />
+          <SystemAdminApprovalReadinessBadge verdict={detail.readinessVerdict} />
+          <SystemAdminApprovalEnabledBadge enabled={detail.enabled} />
+        </div>
+      </CardHeader>
+
+      <Separator />
+
+      <CardContent className="flex flex-col gap-surface-lg type-body">
+        <dl className="grid gap-surface-sm @sm:grid-cols-2">
+          <SystemAdminApprovalDetailField
+            label={fields.module}
+            value={
               <Link
                 href={systemAdminControlLinks.modules(detail.moduleKey)}
                 className="underline-offset-4 hover:underline"
               >
                 {detail.moduleKey}
               </Link>
-            </dd>
-          </div>
-          <div>
-            <dt className="type-muted">{fields.approvalMode}</dt>
-            <dd>{detail.approvalMode}</dd>
-          </div>
-          <div>
-            <dt className="type-muted">{fields.status}</dt>
-            <dd>
-              <SystemAdminApprovalStatusBadge status={detail.status} />
-            </dd>
-          </div>
-          <div>
-            <dt className="type-muted">{fields.minApprovals}</dt>
-            <dd>{detail.minApprovals}</dd>
-          </div>
-          <div>
-            <dt className="type-muted">{fields.readiness}</dt>
-            <dd>
-              <SystemAdminApprovalReadinessBadge verdict={detail.readinessVerdict} />
-            </dd>
-          </div>
-          <div className="@sm:col-span-2">
-            <dt className="type-muted">{fields.escalation}</dt>
-            <dd>{formatApprovalEscalationSummary(detail)}</dd>
-          </div>
-          <div>
-            <dt className="type-muted">{fields.enabled}</dt>
-            <dd>
-              <SystemAdminApprovalEnabledBadge
-                enabled={detail.enabled}
-                enabledLabel={copy.enabledYes}
-                disabledLabel={copy.enabledNo}
-              />
-            </dd>
-          </div>
-          <div className="@sm:col-span-2">
-            <dt className="type-muted">{fields.action}</dt>
-            <dd className="type-mono-cell">{detail.action}</dd>
-          </div>
-          <div className="@sm:col-span-2">
-            <dt className="type-muted">{fields.approverRoles}</dt>
-            <dd>{detail.approverRoleKeys.join(", ")}</dd>
-          </div>
+            }
+          />
+          <SystemAdminApprovalDetailField
+            label={fields.approvalMode}
+            value={APPROVAL_MODE_LABELS[detail.approvalMode]}
+          />
+          <SystemAdminApprovalDetailField
+            label={fields.minApprovals}
+            value={detail.minApprovals}
+          />
+          <SystemAdminApprovalDetailField
+            label={fields.targetType}
+            value={detail.targetType}
+            mono
+          />
+          <SystemAdminApprovalDetailField
+            label={fields.action}
+            value={detail.action}
+            span={2}
+            mono
+          />
+          <SystemAdminApprovalDetailField
+            label={fields.approverRoles}
+            value={detail.approverRoleKeys.join(", ")}
+            span={2}
+          />
           {detail.delegateToRoleKeys.length > 0 ? (
-            <div className="@sm:col-span-2">
-              <dt className="type-muted">{fields.delegationRoles}</dt>
-              <dd>{detail.delegateToRoleKeys.join(", ")}</dd>
-            </div>
+            <SystemAdminApprovalDetailField
+              label={fields.delegationRoles}
+              value={detail.delegateToRoleKeys.join(", ")}
+              span={2}
+            />
           ) : null}
           {detail.delegationValidDays ? (
-            <div>
-              <dt className="type-muted">{fields.delegationValidDays}</dt>
-              <dd>{detail.delegationValidDays}</dd>
-            </div>
+            <SystemAdminApprovalDetailField
+              label={fields.delegationValidDays}
+              value={detail.delegationValidDays}
+            />
           ) : null}
-          <div className="@sm:col-span-2">
-            <dt className="type-muted">{fields.capability}</dt>
-            <dd>
-              {detail.capabilityKey ? (
+          <SystemAdminApprovalDetailField
+            label={fields.escalation}
+            value={
+              hasEscalation
+                ? `${detail.escalationAfterHours}h`
+                : copy.notConfigured
+            }
+          />
+          {escalationBehavior ? (
+            <SystemAdminApprovalDetailField
+              label={fields.escalationBehavior}
+              value={escalationBehavior}
+            />
+          ) : null}
+          {detail.escalationRoleKeys.length > 0 ? (
+            <SystemAdminApprovalDetailField
+              label={fields.escalationRoles}
+              value={detail.escalationRoleKeys.join(", ")}
+              span={2}
+            />
+          ) : null}
+          <SystemAdminApprovalDetailField
+            label={fields.capability}
+            span={2}
+            value={
+              detail.capabilityKey ? (
                 <Link
                   href={systemAdminControlLinks.capabilities(detail.capabilityKey)}
                   className="underline-offset-4 hover:underline"
@@ -137,76 +196,98 @@ export function SystemAdminApprovalDetailPanel({
                 </Link>
               ) : (
                 copy.noCapability
-              )}
-            </dd>
-          </div>
+              )
+            }
+          />
           {detail.requiredPermission ? (
-            <div className="@sm:col-span-2">
-              <dt className="type-muted">{fields.requiredPermission}</dt>
-              <dd>
+            <SystemAdminApprovalDetailField
+              label={fields.requiredPermission}
+              span={2}
+              mono
+              value={
                 <Link
                   href={systemAdminControlLinks.permissions(
                     detail.requiredPermission,
                   )}
-                  className="type-mono-cell underline-offset-4 hover:underline"
+                  className="underline-offset-4 hover:underline"
                 >
                   {detail.requiredPermission}
                 </Link>
-              </dd>
-            </div>
+              }
+            />
           ) : null}
           {detail.relatedPolicyKeys.length > 0 ? (
-            <div className="@sm:col-span-2">
-              <dt className="type-muted">{fields.relatedPolicies}</dt>
-              <dd className="flex flex-col gap-1">
-                {detail.relatedPolicyKeys.map((policyKey) => (
-                  <Link
-                    key={policyKey}
-                    href={systemAdminControlLinks.policy(policyKey)}
-                    className="type-mono-cell underline-offset-4 hover:underline"
-                  >
-                    {policyKey}
-                  </Link>
-                ))}
-              </dd>
-            </div>
+            <SystemAdminApprovalDetailField
+              label={fields.relatedPolicies}
+              span={2}
+              value={
+                <ul className="flex flex-col gap-surface-xs">
+                  {detail.relatedPolicyKeys.map((policyKey) => (
+                    <li key={policyKey}>
+                      <Link
+                        href={systemAdminControlLinks.policy(policyKey)}
+                        className="type-mono-cell underline-offset-4 hover:underline"
+                      >
+                        {policyKey}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              }
+            />
           ) : null}
         </dl>
 
         {detail.status === "deprecated" &&
         canReview &&
         reactivateDeprecatedApprovalRuleAction ? (
-          <SystemAdminApprovalReactivateControl
-            approvalKey={detail.approvalKey}
-            reactivateDeprecatedApprovalRuleAction={
-              reactivateDeprecatedApprovalRuleAction
-            }
-          />
+          <>
+            <Separator />
+            <SystemAdminApprovalReactivateControl
+              approvalKey={detail.approvalKey}
+              reactivateDeprecatedApprovalRuleAction={
+                reactivateDeprecatedApprovalRuleAction
+              }
+            />
+          </>
         ) : null}
 
-        <div className="flex flex-col gap-surface-sm">
-          <h3 className="type-subtitle">{copy.recentActivityTitle}</h3>
+        <Separator />
+
+        <section
+          aria-labelledby={activitySectionId}
+          className="flex flex-col gap-surface-sm"
+        >
+          <h3 id={activitySectionId} className="type-section-title">
+            {copy.recentActivityTitle}
+          </h3>
           {detail.recentActivity.length > 0 ? (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>{copy.activityColumns.when}</TableHead>
-                  <TableHead>{copy.activityColumns.actor}</TableHead>
-                  <TableHead>{copy.activityColumns.action}</TableHead>
-                  <TableHead>{copy.activityColumns.summary}</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {detail.recentActivity.map((event) => (
-                  <TableRow key={event.id}>
-                    <TableCell>{event.occurredAt}</TableCell>
-                    <TableCell className="type-mono-cell">{event.actorId}</TableCell>
-                    <TableCell className="type-mono-cell">{event.action}</TableCell>
-                    <TableCell>{event.summary}</TableCell>
+            <div className="overflow-x-auto rounded-control border border-border">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>{copy.activityColumns.when}</TableHead>
+                    <TableHead>{copy.activityColumns.actor}</TableHead>
+                    <TableHead>{copy.activityColumns.action}</TableHead>
+                    <TableHead>{copy.activityColumns.summary}</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {detail.recentActivity.map((event) => (
+                    <TableRow key={event.id}>
+                      <TableCell>{event.occurredAt}</TableCell>
+                      <TableCell className="type-mono-cell">
+                        {event.actorId}
+                      </TableCell>
+                      <TableCell className="type-mono-cell">
+                        {event.action}
+                      </TableCell>
+                      <TableCell>{event.summary}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
           ) : (
             <Empty>
               <EmptyHeader>
@@ -217,9 +298,11 @@ export function SystemAdminApprovalDetailPanel({
               </EmptyHeader>
             </Empty>
           )}
-        </div>
+        </section>
 
-        <div>
+        <Separator />
+
+        <div className="flex flex-wrap items-center gap-2">
           <Button variant="outline" size="sm" asChild>
             <Link href={detail.auditHref}>{copy.auditHistoryLabel}</Link>
           </Button>

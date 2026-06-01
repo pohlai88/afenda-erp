@@ -1,0 +1,456 @@
+.af-appshell {
+  min-height: 100vh;
+  background: var(--background);
+  color: var(--foreground);
+}
+
+.af-appshell__utility {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  display: grid;
+  min-height: 3rem;
+  grid-template-columns: minmax(0, 1fr) minmax(20rem, 34rem) minmax(0, 1fr);
+  align-items: center;
+  gap: 0.75rem;
+  border-bottom: 1px solid var(--line);
+  background: color-mix(in oklab, var(--surface-strong) 94%, transparent);
+  padding: 0.375rem 0.75rem;
+  backdrop-filter: blur(12px);
+}
+
+.af-appshell__utility-zone,
+.af-appshell__utility-center {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.af-appshell__utility-zone--right {
+  justify-content: flex-end;
+}
+
+.af-appshell__brand,
+.af-appshell__account,
+.af-appshell__account-button,
+.af-appshell__icon-button {
+  display: inline-flex;
+  height: 2rem;
+  min-width: 2rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.5rem;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--foreground);
+  text-decoration: none;
+}
+
+.af-appshell__brand {
+  border-color: var(--foreground);
+  background: var(--foreground);
+  color: var(--background);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.af-appshell__icon-button {
+  cursor: pointer;
+  transition:
+    background-color 120ms ease,
+    border-color 120ms ease;
+}
+
+.af-appshell__icon-button--sm {
+  height: 1.75rem;
+  min-width: 1.75rem;
+}
+
+.af-appshell__account-button {
+  background: transparent;
+  padding: 0;
+}
+
+.af-appshell__icon-button:hover,
+.af-appshell__command-trigger:hover,
+.af-appshell__nav-link:hover {
+  border-color: var(--border);
+  background: var(--surface-hover);
+}
+
+.af-appshell__command-trigger {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  padding: 0.375rem 0.625rem;
+  color: var(--muted-foreground);
+  text-align: left;
+}
+
+.af-appshell__command-trigger span {
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.af-appshell kbd {
+  border-radius: 0.375rem;
+  border: 1px solid var(--line);
+  background: var(--surface-strong);
+  padding: 0.0625rem 0.375rem;
+  font-size: 0.6875rem;
+  color: var(--muted-foreground);
+}
+
+.af-appshell__body {
+  display: grid;
+  min-height: calc(100vh - 3rem);
+  grid-template-columns: 17.5rem minmax(0, 1fr);
+}
+
+.af-appshell--rail-collapsed .af-appshell__body {
+  grid-template-columns: 4rem minmax(0, 1fr);
+}
+
+.af-appshell__rail {
+  position: sticky;
+  top: 3rem;
+  height: calc(100vh - 3rem);
+  overflow: hidden auto;
+  border-right: 1px solid var(--line);
+  background: var(--surface-strong);
+  padding: 0.75rem;
+}
+
+.af-appshell__identity {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 0.625rem;
+  border-radius: 0.625rem;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  padding: 0.625rem;
+}
+
+.af-appshell__identity-mark {
+  display: inline-flex;
+  height: 2.25rem;
+  min-width: 2.25rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: var(--foreground);
+  color: var(--background);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.af-appshell__identity-copy {
+  min-width: 0;
+}
+
+.af-appshell__identity-primary,
+.af-appshell__identity-secondary,
+.af-appshell__nav-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.af-appshell__identity-primary {
+  font-size: 0.875rem;
+  font-weight: 650;
+}
+
+.af-appshell__identity-secondary {
+  margin-top: 0.125rem;
+  font-size: 0.75rem;
+  color: var(--muted-foreground);
+}
+
+.af-appshell--rail-collapsed .af-appshell__identity {
+  justify-content: center;
+  padding: 0.5rem 0;
+}
+
+.af-appshell--rail-collapsed .af-appshell__identity-copy,
+.af-appshell--rail-collapsed .af-appshell__nav-heading,
+.af-appshell--rail-collapsed .af-appshell__nav-label,
+.af-appshell--rail-collapsed .af-appshell__nav-badge {
+  display: none;
+}
+
+.af-appshell__nav {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding-top: 1rem;
+}
+
+.af-appshell__rail-search {
+  padding-top: 0.75rem;
+}
+
+.af-appshell__rail-search input {
+  width: 100%;
+  border-radius: 0.5rem;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  padding: 0.5rem 0.625rem;
+  font: inherit;
+}
+
+.af-appshell__nav-heading {
+  padding: 0 0.5rem 0.375rem;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+}
+
+.af-appshell__nav-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.af-appshell__nav-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.af-appshell__nav-link {
+  display: flex;
+  min-height: 2.375rem;
+  min-width: 0;
+  align-items: center;
+  gap: 0.625rem;
+  border-radius: 0.5rem;
+  border: 1px solid transparent;
+  color: var(--muted-foreground);
+  padding: 0.4375rem 0.5rem;
+  text-decoration: none;
+}
+
+.af-appshell__nav-link.is-active {
+  border-color: var(--border);
+  background: var(--surface);
+  color: var(--foreground);
+}
+
+.af-appshell__nav-icon {
+  flex: 0 0 auto;
+}
+
+.af-appshell__nav-children {
+  display: grid;
+  gap: 0.125rem;
+  padding-left: 2rem;
+}
+
+.af-appshell__nav-child-link {
+  border-radius: 0.375rem;
+  color: var(--muted-foreground);
+  padding: 0.25rem 0.5rem;
+  text-decoration: none;
+}
+
+.af-appshell__nav-child-link.is-active,
+.af-appshell__nav-child-link:hover {
+  background: var(--surface);
+  color: var(--foreground);
+}
+
+.af-appshell__rail-empty {
+  border-radius: 0.5rem;
+  border: 1px dashed var(--line);
+  color: var(--muted-foreground);
+  padding: 0.75rem;
+  text-align: center;
+}
+
+.af-appshell__nav-badge {
+  margin-left: auto;
+  border-radius: 999px;
+  background: var(--surface-strong);
+  padding: 0.0625rem 0.375rem;
+  font-size: 0.6875rem;
+  color: var(--muted-foreground);
+}
+
+.af-appshell__nav-badge[data-tone="attention"] {
+  color: var(--warning-foreground);
+}
+
+.af-appshell__nav-badge[data-tone="critical"] {
+  color: var(--destructive);
+}
+
+.af-appshell__nav-badge[data-tone="positive"] {
+  color: var(--success-foreground);
+}
+
+.af-appshell__main {
+  min-width: 0;
+  padding: 1.5rem;
+}
+
+.af-appshell__command-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: start center;
+  padding-top: 10vh;
+}
+
+.af-appshell__command-scrim {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  background: color-mix(in oklab, var(--background) 62%, transparent);
+}
+
+.af-appshell__command-panel {
+  position: relative;
+  z-index: 1;
+  width: min(42rem, calc(100vw - 2rem));
+  overflow: hidden;
+  border-radius: 0.75rem;
+  border: 1px solid var(--line);
+  background: var(--surface-strong);
+  box-shadow: 0 24px 80px color-mix(in oklab, var(--foreground) 18%, transparent);
+}
+
+.af-appshell__command-search {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  border-bottom: 1px solid var(--line);
+  padding: 0.75rem;
+}
+
+.af-appshell__command-search input {
+  min-width: 0;
+  flex: 1;
+  border: 0;
+  background: transparent;
+  color: var(--foreground);
+  font: inherit;
+  outline: 0;
+}
+
+.af-appshell__context-strip {
+  display: flex;
+  gap: 0.375rem;
+  overflow-x: auto;
+  border-bottom: 1px solid var(--line);
+  padding: 0.625rem 0.75rem;
+}
+
+.af-appshell__context-pill {
+  flex: 0 0 auto;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  color: var(--muted-foreground);
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+  text-decoration: none;
+}
+
+.af-appshell__context-pill span {
+  margin-right: 0.375rem;
+  color: var(--foreground);
+  font-weight: 650;
+}
+
+.af-appshell__command-results {
+  max-height: min(28rem, 60vh);
+  overflow: auto;
+  padding: 0.5rem;
+}
+
+.af-appshell__command-results h2 {
+  margin: 0;
+  padding: 0.5rem 0.5rem 0.375rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--muted-foreground);
+}
+
+.af-appshell__command-row {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 0.625rem;
+  border-radius: 0.5rem;
+  border: 0;
+  background: transparent;
+  color: var(--foreground);
+  padding: 0.625rem;
+  text-align: left;
+  text-decoration: none;
+}
+
+.af-appshell__command-row:hover {
+  background: var(--surface-hover);
+}
+
+.af-appshell__command-row:disabled {
+  cursor: not-allowed;
+  opacity: 0.52;
+}
+
+.af-appshell__command-copy {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.af-appshell__command-copy span,
+.af-appshell__command-copy small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.af-appshell__command-copy small,
+.af-appshell__command-empty {
+  color: var(--muted-foreground);
+}
+
+.af-appshell__command-empty {
+  margin: 0;
+  padding: 1rem 0.5rem;
+}
+
+@media (max-width: 767px) {
+  .af-appshell__utility {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+  }
+
+  .af-appshell__body,
+  .af-appshell--rail-collapsed .af-appshell__body {
+    grid-template-columns: 1fr;
+  }
+
+  .af-appshell__rail {
+    display: none;
+  }
+
+  .af-appshell__main {
+    padding: 1rem;
+  }
+}

@@ -350,7 +350,7 @@ Workspace discipline: [ARCH-008](008-workspace-package-discipline.md).
 | Stock movements, reservations, valuation    | `features/inventory` command services   |
 | Order-to-cash / procure-to-pay              | `features/sales`, `features/purchasing` |
 | Payroll-sensitive and statutory HR data     | `features/hr`                           |
-| Cross-module approval and scheduled jobs    | `features/approvals`, `@afenda/workflows` |
+| Cross-module approval and scheduled jobs    | `features/system-admin` (approvals vertical), `@afenda/workflows` |
 | Physical tables, migrations, tenancy        | `@afenda/db`                            |
 | Module IDs, execution contracts, registry   | `@afenda/kernel`                        |
 | Metadata renderers and list-window UI       | `@afenda/governed-surface`              |

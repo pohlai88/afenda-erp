@@ -71,9 +71,10 @@ permissions, and database promotion use the same slug.
 | `inventory`    | `/inventory`                | `packages/features/inventory`    | `@afenda/feature-inventory`    |
 | `hr`           | `/hr`                       | `packages/features/hr-suite`           | `@afenda/feature-hr-suite`           |
 | `crm`          | `/crm`                      | `packages/features/crm`          | `@afenda/feature-crm`          |
-| `approvals`    | `/approvals`                | `packages/features/approvals`    | `@afenda/feature-approvals`    |
 | `reports`      | `/reports`                  | `packages/features/reports`      | `@afenda/feature-reports`      |
 | `system-admin` | `/system-admin`             | `packages/features/system-admin` | `@afenda/feature-system-admin` |
+
+The `approvals` module id remains in ERP data and work-item routes (`/approvals/work-items/…`), but the operator surface lives at `/system-admin/approvals` inside `@afenda/feature-system-admin` (legacy `/approvals` redirects).
 
 Core ERP modules share one dynamic route tree:
 `apps/erp/src/app/(app)/[moduleId]/…`. Do not create per-module route folders

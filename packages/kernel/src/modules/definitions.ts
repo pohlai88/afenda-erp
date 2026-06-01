@@ -41,7 +41,7 @@ const modules = [
       "Performance health",
     ],
     actions: [
-      { label: "Review approvals", href: "/approvals" },
+      { label: "Review approvals", href: "/system-admin/approvals" },
       { label: "Inspect reports", href: "/reports" },
     ],
     focusAreas: [
@@ -105,7 +105,7 @@ const modules = [
     ],
     defaultViews: ["Close checklist", "AR aging", "AP exceptions"],
     actions: [
-      { label: "Open approvals", href: "/approvals" },
+      { label: "Open approvals", href: "/system-admin/approvals" },
       { label: "Review reports", href: "/reports" },
     ],
     focusAreas: [
@@ -235,7 +235,7 @@ const modules = [
     defaultViews: ["PO release", "Inbound receipts", "Supplier issues"],
     actions: [
       { label: "Open inventory", href: "/inventory" },
-      { label: "Review approvals", href: "/approvals" },
+      { label: "Review approvals", href: "/system-admin/approvals" },
     ],
     focusAreas: [
       {
@@ -364,7 +364,7 @@ const modules = [
     defaultViews: ["Workforce changes", "Leave pressure", "Record quality"],
     actions: [
       { label: "Compliance obligations", href: "/hr/compliance" },
-      { label: "Open approvals", href: "/approvals" },
+      { label: "Open approvals", href: "/system-admin/approvals" },
       { label: "Check system admin", href: "/system-admin" },
     ],
     focusAreas: [
@@ -463,7 +463,7 @@ const modules = [
   },
   {
     id: "approvals",
-    href: "/approvals",
+    href: "/system-admin/approvals",
     label: "Approvals",
     navigationLabel: "Approvals",
     description:
