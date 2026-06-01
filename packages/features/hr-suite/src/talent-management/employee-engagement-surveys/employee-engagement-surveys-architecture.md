@@ -313,3 +313,29 @@ Not required for v1 functional completeness; documented to align with [time-cloc
 - **Portal `/p`** distribution surface with deep links from notifications.
 - **Dedicated E2E** spec — `pnpm e2e:preflight:*` + targeted Playwright (human pre-PR).
 - **Audit:** emit `invitation.create` per batch or document contract deprecation of duplicate string.
+
+## As-built summary
+
+Current Afenda HR Suite implementation ships this capability as the
+`talent-management/employee-engagement-surveys` vertical slice under
+`@afenda/feature-hr-suite`.
+
+| Concern | As-built implementation |
+| --- | --- |
+| Route | `/hr/employee-engagement-surveys` via `apps/erp/src/lib/hr-sections/employee-engagement-surveys.server.tsx` |
+| Domain key | `hr.talent.eng` |
+| Capabilities | `hr.eng.read`, `hr.eng.write`, `hr.eng.approve`, `hr.eng.audit.read`, `hr.eng.restricted.read`, `hr.eng.integration.expose` |
+| Server authority | `policies/hr.talent.eng-access.policy.server.ts`, `actions/hr.talent.eng.actions.server.ts`, and tenant-scoped store helpers |
+| Metadata UI | Governed Pattern B KPI surface plus Pattern C list surfaces for templates, questions, surveys, audience, invitations, responses, completion tracking, analytics, comments, benchmarks, cycles, actions, notifications, reports, and audit |
+| Privacy | Anonymous invitations and responses are sanitized before page-model rows are built; segmented anonymous results use minimum threshold and complementary suppression checks |
+| Reporting | `buildHrTalentEngReportRows` supports survey, category, department, location, manager, and period groupings with suppression-aware output |
+| Audit | Events are emitted for template creation, survey creation/publish, invitation batch publish, draft/submit response, analytics generation, report export, comment tagging, improvement action lifecycle, overdue notifications, and integration exposure |
+| Tests | `employeeengagementsurveys-acceptance-coverage.test.ts`, `employeeengagementsurveys-list-eui-contract.test.ts`, and `employeeengagementsurveys-search-params.test.ts` validate coverage, governed list metadata, access-gated sections, suppression behavior, and search defaults |
+
+Shipment matrix:
+
+| Coverage | Status |
+| --- | --- |
+| HRM-ENG-001 through HRM-ENG-034 | Shipped |
+| Enterprise acceptance criteria 1 through 27 | Shipped |
+| Vertical naming guard | Listed in `SHIPPED_CAPABILITIES` |

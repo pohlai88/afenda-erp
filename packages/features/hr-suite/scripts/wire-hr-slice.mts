@@ -255,7 +255,7 @@ function resolveRoutePathExport(tokens: WireTokens): string {
 
   return routePathCandidates.includes(tokens.routePathsExport)
     ? tokens.routePathsExport
-    : routePathCandidates[0];
+    : (routePathCandidates[0] ?? tokens.routePathsExport);
 }
 
 function parseArgs(argv: readonly string[]): WireArgs {

@@ -8,6 +8,7 @@ export * from "./approvals/server";
 export * from "./audit-viewer/server";
 export * from "./billing/server";
 export * from "./capabilities/server";
+export * from "./data-management/server";
 export * from "./diagnostics/server";
 export * from "./integrations/server";
 export * from "./lynx/server";

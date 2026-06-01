@@ -22,6 +22,7 @@ export * from "./approvals/metadata";
 export * from "./audit-viewer/metadata";
 export * from "./billing/metadata";
 export * from "./capabilities/metadata";
+export * from "./data-management/metadata";
 export * from "./diagnostics/metadata";
 export * from "./integrations/metadata";
 export * from "./lynx/metadata";

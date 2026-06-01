@@ -1094,3 +1094,8 @@ export {
 
 
 export * from "./talent-management/candidate-selfservice-portal/metadata";
+
+export * from "./employee-management/employee-selfservice-portal/metadata";
+
+
+export * from "./talent-management/employee-engagement-surveys/metadata";

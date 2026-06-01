@@ -25,6 +25,10 @@ export const systemAdminSectionManifest = {
     label: "Capabilities",
     featureArea: "capabilities",
   },
+  "data-management": {
+    label: "Data management",
+    featureArea: "data-management",
+  },
   diagnostics: {
     label: "Diagnostics hub",
     featureArea: "diagnostics",

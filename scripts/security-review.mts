@@ -10,9 +10,14 @@ type Check = {
 const root = process.cwd();
 const checks: readonly Check[] = [
   {
-    name: "Protected app layout enforces organization context",
-    file: "apps/erp/src/app/(app)/layout.tsx",
-    patterns: ["getOrganizationContext", "signOutAction"],
+    name: "Workspace shell resolves organization context",
+    file: "apps/erp/src/workspace-routes/workspace-route-cache.ts",
+    patterns: ["getOrganizationContext", "organization", "accessibleModules"],
+  },
+  {
+    name: "Workspace header exposes sign-out action",
+    file: "apps/erp/src/workspace-routes/workspace-shell-header.server.tsx",
+    patterns: ["signOutAction", "WorkspaceCommandHeader"],
   },
   {
     name: "Uploads validate capability and content policy",

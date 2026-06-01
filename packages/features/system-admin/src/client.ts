@@ -6,6 +6,7 @@ export * from "./approvals/client";
 export * from "./audit-viewer/client";
 export * from "./billing/client";
 export * from "./capabilities/client";
+export * from "./data-management/client";
 export * from "./diagnostics/client";
 export * from "./integrations/client";
 export * from "./lynx/client";

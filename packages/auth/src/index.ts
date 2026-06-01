@@ -212,6 +212,11 @@ export const appCapabilities = [
   "system-admin.modules.manage",
   "system-admin.capabilities.read",
   "system-admin.capabilities.manage",
+  "system-admin.data-management.read",
+  "system-admin.data-management.manage",
+  "system-admin.data-management.run",
+  "system-admin.data-management.cancel",
+  "system-admin.data-management.export",
   "system-admin.policies.read",
   "system-admin.policies.review",
   "system-admin.policies.manage",
@@ -242,6 +247,20 @@ export const appCapabilities = [
   "hr.rss.audit.read",
   "hr.rss.restricted.read",
   "hr.rss.integration.expose",
+
+  "hr.ess.read",
+  "hr.ess.write",
+  "hr.ess.approve",
+  "hr.ess.audit.read",
+  "hr.ess.restricted.read",
+  "hr.ess.integration.expose",
+
+  "hr.eng.read",
+  "hr.eng.write",
+  "hr.eng.approve",
+  "hr.eng.audit.read",
+  "hr.eng.restricted.read",
+  "hr.eng.integration.expose",
 ] as const;
 
 export const organizationRoles = [

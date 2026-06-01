@@ -53,8 +53,6 @@ function normalizeDevelopmentPriority(
   return priority === "critical" ? "high" : priority;
 }
 
-export type { HrCareerReadinessComputeResult };
-
 export type ExportCareerPathReadinessCsvResult = {
   content: string;
   mimeType: "text/csv;charset=utf-8";

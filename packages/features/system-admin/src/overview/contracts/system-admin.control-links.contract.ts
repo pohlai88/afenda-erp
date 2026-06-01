@@ -25,6 +25,12 @@ export const systemAdminControlLinks = {
       "capabilities",
       query,
     ),
+  dataManagement: (query?: string) =>
+    systemAdminListHref(
+      systemAdminRoutePaths.dataManagement,
+      "importJobs",
+      query,
+    ),
   policies: (query?: string) =>
     systemAdminListHref(systemAdminRoutePaths.policies, "policies", query),
   policy: (policyKey: string, query?: string) => {

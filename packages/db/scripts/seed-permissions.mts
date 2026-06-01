@@ -1013,6 +1013,40 @@ const permissionCatalog = [
     description: "Configure tenant capability visibility and availability.",
   },
   {
+    key: "system-admin.data-management.read",
+    module: "system-admin",
+    label: "Read data management",
+    description: "View import jobs, templates, row failures, and export evidence.",
+  },
+  {
+    key: "system-admin.data-management.manage",
+    module: "system-admin",
+    label: "Manage data imports",
+    description:
+      "Create and validate staged import jobs from approved data templates.",
+  },
+  {
+    key: "system-admin.data-management.run",
+    module: "system-admin",
+    label: "Run data imports",
+    description:
+      "Apply validated import rows through approved adapters and domain service boundaries.",
+  },
+  {
+    key: "system-admin.data-management.cancel",
+    module: "system-admin",
+    label: "Cancel data imports",
+    description:
+      "Cancel queued or running import jobs without silently reversing applied domain commands.",
+  },
+  {
+    key: "system-admin.data-management.export",
+    module: "system-admin",
+    label: "Export data-management evidence",
+    description:
+      "Download audit-backed data-management job and row-failure evidence.",
+  },
+  {
     key: "system-admin.policies.read",
     module: "system-admin",
     label: "Read policies",
@@ -1192,6 +1226,80 @@ const permissionCatalog = [
     module: "hr",
     label: "Integration Expose Candidate Self-Service Portal",
     description: "Allows integration expose access for Candidate Self-Service Portal.",
+  },
+
+  {
+    key: "hr.ess.read",
+    module: "hr",
+    label: "Read Employee Self-Service Portal",
+    description: "Allows read access for Employee Self-Service Portal.",
+  },
+  {
+    key: "hr.ess.write",
+    module: "hr",
+    label: "Write Employee Self-Service Portal",
+    description: "Allows write access for Employee Self-Service Portal.",
+  },
+  {
+    key: "hr.ess.approve",
+    module: "hr",
+    label: "Approve Employee Self-Service Portal",
+    description: "Allows approve access for Employee Self-Service Portal.",
+  },
+  {
+    key: "hr.ess.audit.read",
+    module: "hr",
+    label: "Audit Read Employee Self-Service Portal",
+    description: "Allows audit read access for Employee Self-Service Portal.",
+  },
+  {
+    key: "hr.ess.restricted.read",
+    module: "hr",
+    label: "Restricted Read Employee Self-Service Portal",
+    description: "Allows restricted read access for Employee Self-Service Portal.",
+  },
+  {
+    key: "hr.ess.integration.expose",
+    module: "hr",
+    label: "Integration Expose Employee Self-Service Portal",
+    description: "Allows integration expose access for Employee Self-Service Portal.",
+  },
+
+  {
+    key: "hr.eng.read",
+    module: "hr",
+    label: "Read Employee Engagement Surveys",
+    description: "Allows read access for Employee Engagement Surveys.",
+  },
+  {
+    key: "hr.eng.write",
+    module: "hr",
+    label: "Write Employee Engagement Surveys",
+    description: "Allows write access for Employee Engagement Surveys.",
+  },
+  {
+    key: "hr.eng.approve",
+    module: "hr",
+    label: "Approve Employee Engagement Surveys",
+    description: "Allows approve access for Employee Engagement Surveys.",
+  },
+  {
+    key: "hr.eng.audit.read",
+    module: "hr",
+    label: "Audit Read Employee Engagement Surveys",
+    description: "Allows audit read access for Employee Engagement Surveys.",
+  },
+  {
+    key: "hr.eng.restricted.read",
+    module: "hr",
+    label: "Restricted Read Employee Engagement Surveys",
+    description: "Allows restricted read access for Employee Engagement Surveys.",
+  },
+  {
+    key: "hr.eng.integration.expose",
+    module: "hr",
+    label: "Integration Expose Employee Engagement Surveys",
+    description: "Allows integration expose access for Employee Engagement Surveys.",
   },
 ] as const;
 

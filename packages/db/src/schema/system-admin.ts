@@ -57,6 +57,21 @@ export const cronRunStatusEnum = pgEnum("cron_run_status", [
   "rejected",
 ]);
 
+export const systemAdminImportJobStatusEnum = pgEnum(
+  "system_admin_import_job_status",
+  ["uploaded", "validating", "ready", "running", "completed", "failed", "cancelled"],
+);
+
+export const systemAdminImportRowStatusEnum = pgEnum(
+  "system_admin_import_row_status",
+  ["pending", "validated", "applied", "failed", "skipped"],
+);
+
+export const systemAdminExportJobStatusEnum = pgEnum(
+  "system_admin_export_job_status",
+  ["ready", "failed", "expired"],
+);
+
 export const tenantSettings = pgTable(
   "tenant_settings",
   {
@@ -385,6 +400,121 @@ export const ssoConnections = pgTable(
     uniqueIndex("sso_connections_org_provider_idx").on(
       table.organizationId,
       table.provider,
+    ),
+  ],
+);
+
+export const systemAdminDataImportJobs = pgTable(
+  "system_admin_data_import_jobs",
+  {
+    id: text("id").primaryKey(),
+    organizationId: organizationIdColumn()
+      .notNull()
+      .references(() => organizations.id, { onDelete: "cascade" }),
+    adapterId: text("adapter_id").notNull(),
+    templateId: text("template_id").notNull(),
+    sourceLabel: text("source_label").notNull(),
+    filename: text("filename"),
+    inputDigest: text("input_digest").notNull(),
+    status: systemAdminImportJobStatusEnum("status").notNull().default("uploaded"),
+    totalRows: integer("total_rows").notNull().default(0),
+    validatedRows: integer("validated_rows").notNull().default(0),
+    appliedRows: integer("applied_rows").notNull().default(0),
+    failedRows: integer("failed_rows").notNull().default(0),
+    skippedRows: integer("skipped_rows").notNull().default(0),
+    createdByAuthUserId: text("created_by_auth_user_id").notNull(),
+    startedAt: timestamp("started_at", { withTimezone: true }),
+    completedAt: timestamp("completed_at", { withTimezone: true }),
+    cancelledAt: timestamp("cancelled_at", { withTimezone: true }),
+    errorSummary: text("error_summary"),
+    metadata: jsonb("metadata")
+      .$type<Record<string, unknown>>()
+      .notNull()
+      .default({}),
+    ...timestampColumns,
+  },
+  (table) => [
+    index("system_admin_data_import_jobs_org_created_idx").on(
+      table.organizationId,
+      table.createdAt,
+    ),
+    index("system_admin_data_import_jobs_org_status_idx").on(
+      table.organizationId,
+      table.status,
+    ),
+    index("system_admin_data_import_jobs_org_adapter_idx").on(
+      table.organizationId,
+      table.adapterId,
+    ),
+  ],
+);
+
+export const systemAdminDataImportRows = pgTable(
+  "system_admin_data_import_rows",
+  {
+    id: text("id").primaryKey(),
+    organizationId: organizationIdColumn()
+      .notNull()
+      .references(() => organizations.id, { onDelete: "cascade" }),
+    jobId: text("job_id")
+      .notNull()
+      .references(() => systemAdminDataImportJobs.id, { onDelete: "cascade" }),
+    rowNumber: integer("row_number").notNull(),
+    status: systemAdminImportRowStatusEnum("status").notNull().default("pending"),
+    rowDigest: text("row_digest").notNull(),
+    validationCode: text("validation_code"),
+    validationMessage: text("validation_message"),
+    redactedPreview: jsonb("redacted_preview")
+      .$type<Record<string, string>>()
+      .notNull()
+      .default({}),
+    appliedTargetType: text("applied_target_type"),
+    appliedTargetId: text("applied_target_id"),
+    ...timestampColumns,
+  },
+  (table) => [
+    uniqueIndex("system_admin_data_import_rows_job_number_idx").on(
+      table.jobId,
+      table.rowNumber,
+    ),
+    index("system_admin_data_import_rows_org_job_idx").on(
+      table.organizationId,
+      table.jobId,
+    ),
+    index("system_admin_data_import_rows_org_status_idx").on(
+      table.organizationId,
+      table.status,
+    ),
+  ],
+);
+
+export const systemAdminDataExportJobs = pgTable(
+  "system_admin_data_export_jobs",
+  {
+    id: text("id").primaryKey(),
+    organizationId: organizationIdColumn()
+      .notNull()
+      .references(() => organizations.id, { onDelete: "cascade" }),
+    exportType: text("export_type").notNull(),
+    sourceLabel: text("source_label").notNull(),
+    status: systemAdminExportJobStatusEnum("status").notNull().default("ready"),
+    rowCount: integer("row_count").notNull().default(0),
+    packageDigest: text("package_digest").notNull(),
+    createdByAuthUserId: text("created_by_auth_user_id").notNull(),
+    metadata: jsonb("metadata")
+      .$type<Record<string, unknown>>()
+      .notNull()
+      .default({}),
+    ...timestampColumns,
+  },
+  (table) => [
+    index("system_admin_data_export_jobs_org_created_idx").on(
+      table.organizationId,
+      table.createdAt,
+    ),
+    index("system_admin_data_export_jobs_org_type_idx").on(
+      table.organizationId,
+      table.exportType,
     ),
   ],
 );

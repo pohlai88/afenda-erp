@@ -25,6 +25,9 @@ describe("system admin catalogs", () => {
     expect(isSystemAdminPermissionKey("system-admin.diagnostics.read")).toBe(
       true,
     );
+    expect(isSystemAdminPermissionKey("system-admin.data-management.run")).toBe(
+      true,
+    );
     expect(isSystemAdminPermissionKey("free.form.permission")).toBe(false);
   });
 

@@ -1,170 +1,209 @@
-# ARCH-011 supplement · System Admin competitive scorecard
+# ARCH-011 supplement - System Admin Enterprise Scorecard
 
-**Doc ID:** `ARCH-011-SCORECARD` · **File:** `011-system-admin-competitive-scorecard.md`
+**Doc ID:** `ARCH-011-SCORECARD`  
+**File:** `011-system-admin-competitive-scorecard.md`
 
-| Field     | Value |
-| --------- | ----- |
-| Status    | Active — living benchmark; refresh quarterly or after vertical DoD changes |
-| Authority | Competitive positioning and gap prioritization for `@afenda/feature-system-admin` |
-| Defers to | **ARCH-011** (control plane doctrine) · **ARCH-002** §4 (execution enforcement) |
-| Related   | Vertical supplements under `packages/features/system-admin/src/*/*-architecture.md` |
+| Field | Value |
+| ----- | ----- |
+| Status | Active - enterprise ERP benchmark; refresh quarterly or after vertical DoD changes |
+| Authority | Enterprise gap prioritization for `@afenda/feature-system-admin` |
+| Defers to | **ARCH-011** control-plane doctrine, **ARCH-002** execution enforcement |
+| Related | Package-local architecture at `packages/features/system-admin/architecture.md` |
 
-This document compares Afenda System Admin to representative **open-source** and **SaaS** admin consoles. It is not a product roadmap; use gap priority scores to inform roadmap waves in `docs/roadmap/`.
+This document benchmarks Afenda System Admin against enterprise ERP
+administration patterns. It is not a product roadmap. Use the gaps and scores
+to prioritize roadmap items in `docs/roadmap/` and vertical architecture docs.
 
-**Last validated:** 2026-05-29 (code + vertical Definition-of-Done checklists)
+**Last validated:** 2026-06-01, against current repo shape and vendor
+documentation listed below.
 
----
+## Enterprise Comparators
 
-## Competitor archetypes
+| Comparator | Enterprise pattern | Reference |
+| ---------- | ------------------ | --------- |
+| SAP S/4HANA Cloud | Business users, business roles, authorizations, IAM reporting | [SAP Identity and Access Management](https://help.sap.com/docs/SAP_S4HANA_CLOUD/53e36b5493804bcdb3f6f14de8b487dd/12032b657e104bb7ac4da02b2d3b3313.html) |
+| Oracle ERP Cloud | Security Console, role review, data access control, audit reports | [Oracle ERP security](https://docs.oracle.com/en/cloud/saas/applications-common/25d/faser/securing-oracle-erp-cloud-overview.html), [Oracle audit reports](https://docs.oracle.com/en/cloud/saas/applications-common/24b/oacpr/audit-reports.html) |
+| Microsoft Dynamics 365 | Role-based security, segregation of duties, Data Management import/export | [Dynamics role security](https://learn.microsoft.com/en-us/dynamics365/fin-ops-core/dev-itpro/sysadmin/role-based-security), [Dynamics data management](https://learn.microsoft.com/en-us/dynamics365/fin-ops-core/dev-itpro/data-entities/data-management-integration-data-entity) |
+| NetSuite | CSV Import Assistant gated by import permission | [NetSuite CSV Import Assistant](https://docs.oracle.com/en/cloud/saas/netsuite/ns-online-help/chapter_N343158.html) |
 
-| Archetype | Benchmark | Why included |
-| --------- | --------- | ------------ |
-| OSS IAM | [Keycloak Admin](https://www.keycloak.org/) | SSO, federation, session/MFA policy reference |
-| OSS ERP | [ERPNext](https://docs.frappe.io/erpnext), [Odoo](https://www.odoo.com/documentation) | Module + role-permission matrix patterns |
-| SaaS IAM | [Okta](https://help.okta.com/), [Auth0](https://auth0.com/docs), [WorkOS](https://workos.com/docs) | Directory sync, B2B identity lifecycle |
-| SaaS ERP | [NetSuite Setup](https://docs.oracle.com/en/cloud/saas/netsuite/) | ERP-grade RBAC, SoD, audit, licensing |
+Afenda's differentiation is the configure-vs-enforce split:
 
-Afenda is an **ERP-native control plane** with configure-vs-enforce split (**ARCH-011** / **ARCH-002** §4). Competitors are grouped by archetype; not every dimension applies equally.
+```txt
+System Admin configures law.
+Execution Kernel enforces law.
+Feature modules execute business behavior.
+```
 
----
+That split is stronger than a generic settings console, but the enterprise
+surface still needs deeper access governance, data-management, operations, and
+commercial-impact workflows.
 
-## Scoring methodology
-
-### Scale (1–5)
+## Scoring Method
 
 | Score | Label | Meaning |
 | ----- | ----- | ------- |
-| 1 | Absent | No surface; manual workaround only |
-| 2 | Scaffold | UI or schema exists; core workflow incomplete |
-| 3 | Baseline | Phase-minimum usable; documented gaps remain |
-| 4 | Mature | Meets vertical Definition of Done |
-| 5 | Leader | Market reference or Afenda differentiator |
-
-### Gap formula
+| 1 | Absent | No meaningful local surface |
+| 2 | Scaffold | Partial UI or schema exists; enterprise workflow incomplete |
+| 3 | Baseline | Usable local workflow; enterprise gaps remain |
+| 4 | Mature | Production-grade ERP admin pattern |
+| 5 | Leader | Clear market-reference or Afenda differentiator |
 
 ```txt
-Gap(d) = Target(d) − Afenda(d)
-Priority(d) = Gap(d) × Weight(d)
+Gap(d) = Target(d) - Afenda(d)
+Priority(d) = Gap(d) * Weight(d)
 ```
 
-- **Target** defaults to **4** (production DoD); **5** only for claimed differentiators (Lynx, control/enforce architecture).
-- **Weights** sum to 100 (ERP-admin lens).
+Target defaults to 4. Use 5 only for strategic differentiators such as Lynx
+governance or the control/enforce architecture.
 
-### Thresholds
+## Gap Scorecard
 
-| Gap | Status | Action |
-| --- | ------ | ------ |
-| ≥ 1.5 | Red | Roadmap item; may block enterprise narrative |
-| 0.5–1.4 | Amber | Next phase in existing vertical |
-| < 0.5 | Green | Maintain; benchmark only |
+| Dimension | Afenda | Target | Gap | Weight | Priority | Current evidence |
+| --------- | ------ | ------ | --- | ------ | -------- | ---------------- |
+| Access governance | 3.0 | 4.5 | 1.5 | 13 | 19.5 | Roles, permissions, capabilities, policies exist; no SoD engine, role diff, certification campaign, or dormant-access cleanup. |
+| Data management / import workbench | 1.0 | 4.0 | 3.0 | 14 | 42.0 | No local `data-management/` vertical or import-job pipeline. |
+| Configuration change governance | 2.5 | 4.0 | 1.5 | 10 | 15.0 | Settings actions write audit, but no before/after diff, scheduled activation, rollback history, or change approval flow. |
+| Operational exception center | 2.5 | 4.0 | 1.5 | 10 | 15.0 | Diagnostics, reliability, recent changes exist separately; no single "what needs attention now" queue. |
+| Integration operations | 3.0 | 4.0 | 1.0 | 10 | 10.0 | API credentials, webhooks, delivery rows, SSO exist; ping/resend/rotate/test payload/SLA controls incomplete. |
+| Support / break-glass governance | 1.5 | 4.0 | 2.5 | 8 | 20.0 | Security posture exists; no just-in-time support, impersonation review, or emergency access expiry. |
+| License / feature / module impact | 2.5 | 4.0 | 1.5 | 8 | 12.0 | Billing, modules, capabilities exist; no license impact by role/module/capability. |
+| Audit and evidence | 3.5 | 4.0 | 0.5 | 9 | 4.5 | Search/export/retention/coverage exist; evidence packages and WORM posture are incomplete. |
+| Reliability and platform health | 2.5 | 4.0 | 1.5 | 7 | 10.5 | Cron/repo/migration/workflow visibility exists; queue/storage/cache health remain shallow. |
+| Lynx governance | 4.5 | 5.0 | 0.5 | 4 | 2.0 | Lynx admin surface exists; keep aligned with ARCH-009 vocabulary and tool governance. |
+| Architecture quality | 4.5 | 5.0 | 0.5 | 7 | 3.5 | ARCH-011 + ARCH-002 split and vertical package shape are strong. |
+| **Weighted composite** | **2.85** | - | - | 100 | - | Enterprise gaps are now explicit. |
 
----
+## Priority Order
 
-## DoD validation evidence (May 2026)
+1. Data management / import workbench - highest gap; implement as
+   `data-management/` vertical, not as generic utilities.
+2. Support / break-glass governance - security-sensitive enterprise trust
+   requirement.
+3. Access governance - SoD, toxic combinations, access explanation, dormant
+   access, certification.
+4. Configuration change governance - diff, approval, scheduled activation, and
+   rollback evidence.
+5. Operational exception center - unify attention signals across diagnostics,
+   reliability, integrations, data management, users, and security.
+6. License / feature / module impact - commercial and entitlement clarity.
+7. Integration operations - ping, rotate, resend, test payload, retry policy,
+   SLA indicators.
 
-Scores below are tied to vertical DoD checklists and as-built code.
+## Enterprise Gap Definitions
 
-| Dimension | Score | Target | Gap | Weight | Priority | DoD evidence |
-| --------- | ----- | ------ | --- | ------ | -------- | ------------ |
-| Identity & lifecycle | 3.5 | 4 | 0.5 | 8 | 4.0 | Users Phase 1 done: invite/suspend/remove in `users/actions/`; no SCIM/directory sync |
-| Membership & teams | 2.5 | 4 | 1.5 | 5 | 7.5 | Phase 1 done; teams/employment deferred in `membership-architecture.md` |
-| Roles & RBAC | 3.0 | 4 | 1.0 | 9 | 9.0 | Tenant role catalog edit/deprecate via `tenant_role_catalog`; assign/remove; custom role **keys** still enum-bound |
-| Permissions & capabilities | 3.5 | 4 | 0.5 | 10 | 5.0 | Catalog + overrides; per-role capability matrix shipped (Phase 2); direct user grants deferred |
-| Module governance | 4.0 | 4 | 0.0 | 8 | 0.0 | Phase 2 minimum met: `modules/actions/` |
-| Policy engine | 3.5 | 4 | 0.5 | 8 | 4.0 | Rules + kernel bridge; full DoD checklist partially aspirational |
-| Approval workflows | 3.5 | 4 | 0.5 | 7 | 3.5 | Chains + enable/disable; execution in Orbit/workflows |
-| Audit & compliance | 3.5 | 4 | 0.5 | 9 | 4.5 | Search/export/retention in `audit-viewer/`; no WORM/SoD packs |
-| Security posture | 3.5 | 4 | 0.5 | 7 | 3.5 | MFA domains, session, lockout in `security/` |
-| Organization settings | 4.0 | 4 | 0.0 | 4 | 0.0 | `organization/actions/` complete |
-| Integrations & SSO | 3.0 | 4 | 1.0 | 7 | 7.0 | API creds, webhooks, SSO; catalog breadth partial |
-| Diagnostics / gov health | 3.5 | 4 | 0.5 | 6 | 3.0 | Engine + drift detectors; audited export added |
-| Operational reliability | 2.5 | 4 | 1.5 | 5 | 7.5 | Cron/repo/migration/webhook + workflow probe; queue/storage/cache still info-level |
-| Commercial / billing | 3.0 | 4 | 1.0 | 4 | 4.0 | Stripe posture; invoices/payments incomplete per billing DoD |
-| AI / machine governance (Lynx) | 4.5 | 5 | 0.5 | 4 | 2.0 | `lynx/` admin surface; ARCH-009 adjunct |
-| Architecture (control vs enforce) | 4.5 | 5 | 0.5 | 5 | 2.5 | ARCH-011 + ARCH-002 §4 + `tenant-execution/` |
-| **Weighted composite** | **3.48** | — | — | 100 | — | ↑ from 3.35 pre-Wave 1/3 |
+### Access Governance
 
-**Priority ranking (post Wave 1/3):**
+Target capabilities:
 
-1. Membership & teams — 7.5
-2. Operational reliability — 7.5
-3. Integrations & SSO — 7.0
-4. Permissions & capabilities — 5.0
-5. Audit & compliance — 4.5
-6. Identity & lifecycle — 4.0
-7. Commercial / billing — 4.0
-8. Policy engine — 4.0
-9. Roles & RBAC — 9.0 → **3.0 effective after tenant catalog** (was red, now amber)
+- segregation-of-duties conflict rules;
+- toxic-combination detection;
+- role diff and permission impact review;
+- "why does this user have access?" explanation;
+- access certification campaigns;
+- dormant-access cleanup.
 
----
+Owning verticals: `users/`, `memberships/`, `roles/`, `permissions/`,
+`capabilities/`, `security/`, `audit-viewer/`.
 
-## Scorecard matrix (competitors)
+### Data Management / Import Workbench
 
-| Dimension | Afenda | Keycloak | ERPNext | Odoo | Okta | NetSuite | WorkOS |
-| --------- | ------ | -------- | ------- | ---- | ---- | -------- | ------ |
-| Identity & lifecycle | **3.5** | 4.5 | 3.0 | 3.0 | **5.0** | 4.0 | 4.5 |
-| Membership & teams | **2.5** | 3.0 | 3.5 | 4.0 | 4.0 | 4.5 | 3.5 |
-| Roles & RBAC | **3.0** | 4.0 | 4.0 | 4.0 | 4.5 | **5.0** | 3.0 |
-| Permissions & capabilities | **3.5** | 3.5 | 4.0 | 4.5 | 3.5 | **5.0** | 2.5 |
-| Module governance | **4.0** | 1.0 | 4.0 | 4.5 | 1.0 | **5.0** | 1.0 |
-| Policy engine | **3.5** | 4.0 | 2.0 | 2.5 | 4.0 | 4.5 | 2.0 |
-| Approval workflows | **3.5** | 1.5 | 3.0 | 3.5 | 2.0 | **4.5** | 1.5 |
-| Audit & compliance | **3.5** | 3.0 | 2.5 | 2.5 | 4.0 | **4.5** | 2.5 |
-| Security posture | **3.5** | 4.5 | 2.5 | 2.5 | **5.0** | 4.0 | 4.0 |
-| Organization settings | **4.0** | 1.5 | 4.0 | 4.5 | 2.0 | **5.0** | 2.0 |
-| Integrations & SSO | **3.0** | **5.0** | 2.5 | 3.0 | **5.0** | 4.0 | **5.0** |
-| Diagnostics / gov health | **3.5** | 2.0 | 2.0 | 2.5 | 3.5 | 3.5 | 2.0 |
-| Operational reliability | **2.5** | 2.5 | 2.0 | 2.0 | 3.5 | 3.5 | 2.5 |
-| Commercial / billing | **3.0** | 1.0 | 1.5 | 2.0 | 2.0 | 4.0 | 3.0 |
-| AI / machine governance | **4.5** | 1.0 | 1.0 | 1.0 | 1.5 | 2.0 | 1.0 |
-| Architecture quality | **4.5** | 4.0 | 3.0 | 3.0 | 4.0 | 3.5 | 3.5 |
-| **Weighted total** | **3.48** | 3.08 | 3.01 | 3.24 | 3.56 | **4.19** | 2.98 |
+Target capabilities:
 
----
+- import templates;
+- CSV/spreadsheet validation;
+- staged rows and row-level failures;
+- retryable jobs and cancellation;
+- import history and operator evidence;
+- dedicated import/export permissions;
+- audit events for create, run, cancel, complete, fail, row reject, and export.
 
-## Where Afenda wins
+Owning vertical: `data-management/`. Canonical supplement:
+[011-system-admin-data-management-architecture.md](011-system-admin-data-management-architecture.md).
 
-| Area | Score | vs market |
-| ---- | ----- | --------- |
-| Control vs enforce split (ARCH-011 / ARCH-002 §4) | 4.5 | Clearer than Odoo/ERPNext monolith |
-| Module + capability + policy + approval stack | 3.5–4.0 | NetSuite direction; beats IAM-only tools |
-| Lynx governance | 4.5 | No OSS/SaaS ERP peer at same depth |
-| Governed admin UI (Pattern C) | 4.0 | Consistent metadata-driven lists |
-| Diagnostics as governance health center | 3.5 | Concept ahead of ERPNext/Odoo |
+### Configuration Change Governance
 
----
+Target capabilities:
 
-## Roadmap waves (gap closure)
+- before/after config diffs;
+- approval gates for high-risk settings;
+- scheduled activation;
+- rollback history;
+- environment drift review;
+- "who changed what from what to what" evidence.
 
-### Wave 1 — Authorization depth (implemented 2026-05-29)
+Owning verticals: `policies/`, `approvals/`, `modules/`, `capabilities/`,
+`security/`, `organization/`, `integrations/`, `audit-viewer/`.
 
-- Tenant role catalog: edit display metadata, deprecate/reactivate seeded roles (`tenant_role_catalog`)
-- Per-role capability matrix on `/system-admin/capabilities`
-- **Remaining:** custom role keys require `organization_role` enum extension (ARCH-005)
+### Operational Exception Center
 
-### Wave 2 — Enterprise identity
+Target capabilities:
 
-- SCIM / directory sync adapter (platform/auth; surface in Integrations)
-- Teams and employment columns in Memberships
+- failed webhooks;
+- stale invitations;
+- failed imports;
+- disabled or blocked modules;
+- security posture gaps;
+- missing audit coverage;
+- open reliability failures.
 
-### Wave 3 — Ops trust (partial 2026-05-29)
+Owning verticals: `overview/`, `diagnostics/`, `reliability/`,
+`integrations/`, `data-management/`, `users/`, `security/`.
 
-- Lynx workflow health probe in Reliability
-- Diagnostics governance export with audit trail
-- **Remaining:** queue, storage, cache platform telemetry
+### Integration Operations
 
-### Wave 4 — Commercial & connectors
+Target capabilities:
 
-- Billing invoice/payment surfaces per `billing-architecture.md`
-- Integrations marketplace categories beyond API/webhook/SSO
+- endpoint ping;
+- delivery resend;
+- dead-letter queue review;
+- signing-key rotation;
+- inbound signature verification;
+- retry policy controls;
+- webhook event test payloads;
+- delivery SLA indicators.
 
----
+Owning verticals: `integrations/`, `reliability/`, `audit-viewer/`.
 
-## Update cadence
+### Support / Break-Glass Governance
 
-1. Re-run `pnpm system-admin:scorecard-audit` (partial automation).
-2. Re-score dimensions when a vertical DoD checklist is fully checked off.
-3. Update competitor columns quarterly or before major release notes.
-4. Link evidence to unit tests in `packages/features/system-admin/tests/unit/`.
+Target capabilities:
 
-When control vs execution boundary changes, update this doc together with **ARCH-011** and **ARCH-002** §§3–4.
+- just-in-time support access;
+- emergency break-glass role;
+- impersonation/session review;
+- emergency access expiry;
+- mandatory audit evidence and review.
+
+Owning verticals: `security/`, `users/`, `roles/`, `audit-viewer/`.
+
+### License / Feature / Module Impact
+
+Target capabilities:
+
+- license impact by role;
+- module and capability commercial impact;
+- plan/entitlement coverage;
+- cost exposure when enabling features;
+- billing and feature usage evidence.
+
+Owning verticals: `billing/`, `modules/`, `capabilities/`, `roles/`.
+
+## Roadmap Waves
+
+| Wave | Theme | Primary verticals |
+| ---- | ----- | ----------------- |
+| 1 | Data management foundation | `data-management/`, `integrations/`, `audit-viewer/`, `reliability/` |
+| 2 | Access governance | `roles/`, `permissions/`, `capabilities/`, `users/`, `memberships/` |
+| 3 | Change governance | `policies/`, `approvals/`, `organization/`, `security/`, `audit-viewer/` |
+| 4 | Operational exception center | `overview/`, `diagnostics/`, `reliability/`, `integrations/` |
+| 5 | Break-glass and support | `security/`, `users/`, `roles/`, `audit-viewer/` |
+| 6 | Commercial impact | `billing/`, `modules/`, `capabilities/`, `roles/` |
+
+## Update Cadence
+
+1. Re-score after each vertical Definition of Done changes.
+2. Refresh vendor references quarterly or before enterprise release planning.
+3. Link shipped evidence to tests under
+   `packages/features/system-admin/tests/unit/`.
+4. When control-vs-execution boundaries change, update this doc, **ARCH-011**,
+   and **ARCH-002** sections 4 and 5 together.

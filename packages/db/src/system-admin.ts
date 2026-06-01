@@ -17,6 +17,9 @@ import {
   organizations,
   retentionPolicies,
   ssoConnections,
+  systemAdminDataExportJobs,
+  systemAdminDataImportJobs,
+  systemAdminDataImportRows,
   tenantApprovalSettings,
   tenantCapabilitySettings,
   tenantModuleSettings,
@@ -122,6 +125,24 @@ export type RoleOverrideRow = {
 
 export type CronRunStatus = "started" | "success" | "failed" | "rejected";
 
+export type SystemAdminDataImportJobStatus =
+  | "uploaded"
+  | "validating"
+  | "ready"
+  | "running"
+  | "completed"
+  | "failed"
+  | "cancelled";
+
+export type SystemAdminDataImportRowStatus =
+  | "pending"
+  | "validated"
+  | "applied"
+  | "failed"
+  | "skipped";
+
+export type SystemAdminDataExportJobStatus = "ready" | "failed" | "expired";
+
 export type CronRunHistoryRow = {
   id: string;
   jobName: string;
@@ -134,6 +155,60 @@ export type CronRunHistoryRow = {
   durationMs: number | null;
   result: Record<string, unknown>;
   errorMessage: string | null;
+};
+
+export type SystemAdminDataImportJobRow = {
+  id: string;
+  organizationId: string;
+  adapterId: string;
+  templateId: string;
+  sourceLabel: string;
+  filename: string | null;
+  inputDigest: string;
+  status: SystemAdminDataImportJobStatus;
+  totalRows: number;
+  validatedRows: number;
+  appliedRows: number;
+  failedRows: number;
+  skippedRows: number;
+  createdByAuthUserId: string;
+  startedAt: Date | null;
+  completedAt: Date | null;
+  cancelledAt: Date | null;
+  errorSummary: string | null;
+  metadata: Record<string, unknown>;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+export type SystemAdminDataImportRowEvidence = {
+  id: string;
+  organizationId: string;
+  jobId: string;
+  rowNumber: number;
+  status: SystemAdminDataImportRowStatus;
+  rowDigest: string;
+  validationCode: string | null;
+  validationMessage: string | null;
+  redactedPreview: Record<string, string>;
+  appliedTargetType: string | null;
+  appliedTargetId: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+export type SystemAdminDataExportJobRow = {
+  id: string;
+  organizationId: string;
+  exportType: string;
+  sourceLabel: string;
+  status: SystemAdminDataExportJobStatus;
+  rowCount: number;
+  packageDigest: string;
+  createdByAuthUserId: string;
+  metadata: Record<string, unknown>;
+  createdAt: Date;
+  updatedAt: Date;
 };
 
 export type ApiCredentialAuthenticationResult =
@@ -1497,6 +1572,408 @@ export async function authenticateApiCredential(input: {
     label: credential.label,
     scopes: credential.scopes,
   };
+}
+
+export async function listSystemAdminDataImportJobs(input: {
+  organizationId: string;
+  limit?: number;
+}): Promise<SystemAdminDataImportJobRow[]> {
+  return runWithOrganizationContext(input.organizationId, async (db) =>
+    db
+      .select()
+      .from(systemAdminDataImportJobs)
+      .where(eq(systemAdminDataImportJobs.organizationId, input.organizationId))
+      .orderBy(desc(systemAdminDataImportJobs.createdAt))
+      .limit(normalizeSystemAdminListLimit(input.limit, 100)),
+  );
+}
+
+export async function getSystemAdminDataImportJob(input: {
+  organizationId: string;
+  jobId: string;
+}): Promise<SystemAdminDataImportJobRow | null> {
+  return runWithOrganizationContext(input.organizationId, async (db) => {
+    const [job] = await db
+      .select()
+      .from(systemAdminDataImportJobs)
+      .where(
+        and(
+          eq(systemAdminDataImportJobs.organizationId, input.organizationId),
+          eq(systemAdminDataImportJobs.id, input.jobId),
+        ),
+      )
+      .limit(1);
+
+    return job ?? null;
+  });
+}
+
+export async function listSystemAdminDataImportRows(input: {
+  organizationId: string;
+  jobId?: string;
+  status?: SystemAdminDataImportRowStatus;
+  limit?: number;
+}): Promise<SystemAdminDataImportRowEvidence[]> {
+  return runWithOrganizationContext(input.organizationId, async (db) =>
+    db
+      .select()
+      .from(systemAdminDataImportRows)
+      .where(
+        and(
+          eq(systemAdminDataImportRows.organizationId, input.organizationId),
+          input.jobId
+            ? eq(systemAdminDataImportRows.jobId, input.jobId)
+            : sql`true`,
+          input.status
+            ? eq(systemAdminDataImportRows.status, input.status)
+            : sql`true`,
+        ),
+      )
+      .orderBy(asc(systemAdminDataImportRows.rowNumber))
+      .limit(normalizeSystemAdminListLimit(input.limit, 100)),
+  );
+}
+
+export async function createSystemAdminDataImportJob(input: {
+  organizationId: string;
+  adapterId: string;
+  templateId: string;
+  sourceLabel: string;
+  filename?: string | null;
+  inputDigest: string;
+  createdByAuthUserId: string;
+  metadata?: Record<string, unknown>;
+  rows: readonly {
+    rowNumber: number;
+    status: Extract<SystemAdminDataImportRowStatus, "validated" | "failed" | "skipped">;
+    rowDigest: string;
+    validationCode?: string | null;
+    validationMessage?: string | null;
+    redactedPreview?: Record<string, string>;
+  }[];
+}): Promise<SystemAdminDataImportJobRow> {
+  const id = createEntityId("dmjob");
+  const now = new Date();
+  const totalRows = input.rows.length;
+  const validatedRows = input.rows.filter((row) => row.status === "validated").length;
+  const failedRows = input.rows.filter((row) => row.status === "failed").length;
+  const skippedRows = input.rows.filter((row) => row.status === "skipped").length;
+  const status: SystemAdminDataImportJobStatus =
+    totalRows === 0 || validatedRows === 0 ? "failed" : "ready";
+
+  return runWithOrganizationContext(input.organizationId, async (db) =>
+    db.transaction(async (tx) => {
+      const [job] = await tx
+        .insert(systemAdminDataImportJobs)
+        .values({
+          id,
+          organizationId: input.organizationId,
+          adapterId: input.adapterId,
+          templateId: input.templateId,
+          sourceLabel: input.sourceLabel,
+          filename: input.filename ?? null,
+          inputDigest: input.inputDigest,
+          status,
+          totalRows,
+          validatedRows,
+          appliedRows: 0,
+          failedRows,
+          skippedRows,
+          createdByAuthUserId: input.createdByAuthUserId,
+          errorSummary:
+            status === "failed"
+              ? "No valid rows were available for import execution."
+              : null,
+          metadata: input.metadata ?? {},
+          createdAt: now,
+          updatedAt: now,
+        })
+        .returning();
+
+      if (input.rows.length > 0) {
+        await tx.insert(systemAdminDataImportRows).values(
+          input.rows.map((row) => ({
+            id: createEntityId("dmrow"),
+            organizationId: input.organizationId,
+            jobId: id,
+            rowNumber: row.rowNumber,
+            status: row.status,
+            rowDigest: row.rowDigest,
+            validationCode: row.validationCode ?? null,
+            validationMessage: row.validationMessage ?? null,
+            redactedPreview: row.redactedPreview ?? {},
+            createdAt: now,
+            updatedAt: now,
+          })),
+        );
+      }
+
+      if (!job) {
+        throw new Error("Failed to create data import job.");
+      }
+
+      return job;
+    }),
+  );
+}
+
+export async function runSystemAdminDataImportJob(input: {
+  organizationId: string;
+  jobId: string;
+}): Promise<SystemAdminDataImportJobRow> {
+  const now = new Date();
+
+  return runWithOrganizationContext(input.organizationId, async (db) =>
+    db.transaction(async (tx) => {
+      const [job] = await tx
+        .select()
+        .from(systemAdminDataImportJobs)
+        .where(
+          and(
+            eq(systemAdminDataImportJobs.organizationId, input.organizationId),
+            eq(systemAdminDataImportJobs.id, input.jobId),
+          ),
+        )
+        .limit(1);
+
+      if (!job) {
+        throw new Error("Data import job was not found for this tenant.");
+      }
+
+      if (job.status !== "ready" && job.status !== "running") {
+        throw new Error(`Data import job cannot run from ${job.status} state.`);
+      }
+
+      const eligibleRows = await tx
+        .select({ id: systemAdminDataImportRows.id })
+        .from(systemAdminDataImportRows)
+        .where(
+          and(
+            eq(systemAdminDataImportRows.organizationId, input.organizationId),
+            eq(systemAdminDataImportRows.jobId, input.jobId),
+            inArray(systemAdminDataImportRows.status, ["pending", "validated"]),
+          ),
+        );
+
+      if (eligibleRows.length > 0) {
+        await tx
+          .update(systemAdminDataImportRows)
+          .set({
+            status: "applied",
+            appliedTargetType: "data-management-import-evidence",
+            appliedTargetId: input.jobId,
+            updatedAt: now,
+          })
+          .where(
+            inArray(
+              systemAdminDataImportRows.id,
+              eligibleRows.map((row) => row.id),
+            ),
+          );
+      }
+
+      const appliedRows = job.appliedRows + eligibleRows.length;
+      const finalStatus: SystemAdminDataImportJobStatus =
+        eligibleRows.length === 0 && job.failedRows > 0 ? "failed" : "completed";
+
+      const [updated] = await tx
+        .update(systemAdminDataImportJobs)
+        .set({
+          status: finalStatus,
+          startedAt: job.startedAt ?? now,
+          completedAt: now,
+          appliedRows,
+          errorSummary:
+            finalStatus === "failed"
+              ? "No retry-safe validated rows were available to apply."
+              : null,
+          updatedAt: now,
+        })
+        .where(
+          and(
+            eq(systemAdminDataImportJobs.organizationId, input.organizationId),
+            eq(systemAdminDataImportJobs.id, input.jobId),
+          ),
+        )
+        .returning();
+
+      if (!updated) {
+        throw new Error("Failed to update data import job.");
+      }
+
+      return updated;
+    }),
+  );
+}
+
+export async function cancelSystemAdminDataImportJob(input: {
+  organizationId: string;
+  jobId: string;
+}): Promise<SystemAdminDataImportJobRow> {
+  const now = new Date();
+
+  return runWithOrganizationContext(input.organizationId, async (db) => {
+    const [updated] = await db
+      .update(systemAdminDataImportJobs)
+      .set({
+        status: "cancelled",
+        cancelledAt: now,
+        updatedAt: now,
+      })
+      .where(
+        and(
+          eq(systemAdminDataImportJobs.organizationId, input.organizationId),
+          eq(systemAdminDataImportJobs.id, input.jobId),
+          inArray(systemAdminDataImportJobs.status, [
+            "uploaded",
+            "validating",
+            "ready",
+            "running",
+          ]),
+        ),
+      )
+      .returning();
+
+    if (!updated) {
+      throw new Error("Cancellable data import job was not found.");
+    }
+
+    return updated;
+  });
+}
+
+export async function retrySystemAdminDataImportJob(input: {
+  organizationId: string;
+  jobId: string;
+}): Promise<SystemAdminDataImportJobRow> {
+  const now = new Date();
+
+  return runWithOrganizationContext(input.organizationId, async (db) =>
+    db.transaction(async (tx) => {
+      const [job] = await tx
+        .select()
+        .from(systemAdminDataImportJobs)
+        .where(
+          and(
+            eq(systemAdminDataImportJobs.organizationId, input.organizationId),
+            eq(systemAdminDataImportJobs.id, input.jobId),
+          ),
+        )
+        .limit(1);
+
+      if (!job) {
+        throw new Error("Data import job was not found for retry.");
+      }
+
+      if (job.status !== "failed" && job.status !== "cancelled") {
+        throw new Error(`Data import job cannot retry from ${job.status} state.`);
+      }
+
+      const failedRows = await tx
+        .select({ id: systemAdminDataImportRows.id })
+        .from(systemAdminDataImportRows)
+        .where(
+          and(
+            eq(systemAdminDataImportRows.organizationId, input.organizationId),
+            eq(systemAdminDataImportRows.jobId, input.jobId),
+            eq(systemAdminDataImportRows.status, "failed"),
+          ),
+        );
+
+      if (failedRows.length > 0) {
+        await tx
+          .update(systemAdminDataImportRows)
+          .set({
+            status: "validated",
+            validationCode: null,
+            validationMessage: null,
+            updatedAt: now,
+          })
+          .where(
+            inArray(
+              systemAdminDataImportRows.id,
+              failedRows.map((row) => row.id),
+            ),
+          );
+      }
+
+      const [updated] = await tx
+        .update(systemAdminDataImportJobs)
+        .set({
+          status: "ready",
+          validatedRows: job.validatedRows + failedRows.length,
+          failedRows: Math.max(0, job.failedRows - failedRows.length),
+          errorSummary: null,
+          cancelledAt: null,
+          completedAt: null,
+          updatedAt: now,
+        })
+        .where(
+          and(
+            eq(systemAdminDataImportJobs.organizationId, input.organizationId),
+            eq(systemAdminDataImportJobs.id, input.jobId),
+          ),
+        )
+        .returning();
+
+      if (!updated) {
+        throw new Error("Failed to retry data import job.");
+      }
+
+      return updated;
+    }),
+  );
+}
+
+export async function listSystemAdminDataExportJobs(input: {
+  organizationId: string;
+  limit?: number;
+}): Promise<SystemAdminDataExportJobRow[]> {
+  return runWithOrganizationContext(input.organizationId, async (db) =>
+    db
+      .select()
+      .from(systemAdminDataExportJobs)
+      .where(eq(systemAdminDataExportJobs.organizationId, input.organizationId))
+      .orderBy(desc(systemAdminDataExportJobs.createdAt))
+      .limit(normalizeSystemAdminListLimit(input.limit, 100)),
+  );
+}
+
+export async function recordSystemAdminDataExportJob(input: {
+  organizationId: string;
+  exportType: string;
+  sourceLabel: string;
+  rowCount: number;
+  packageDigest: string;
+  createdByAuthUserId: string;
+  metadata?: Record<string, unknown>;
+}): Promise<SystemAdminDataExportJobRow> {
+  const now = new Date();
+
+  return runWithOrganizationContext(input.organizationId, async (db) => {
+    const [row] = await db
+      .insert(systemAdminDataExportJobs)
+      .values({
+        id: createEntityId("dmexp"),
+        organizationId: input.organizationId,
+        exportType: input.exportType,
+        sourceLabel: input.sourceLabel,
+        status: "ready",
+        rowCount: input.rowCount,
+        packageDigest: input.packageDigest,
+        createdByAuthUserId: input.createdByAuthUserId,
+        metadata: input.metadata ?? {},
+        createdAt: now,
+        updatedAt: now,
+      })
+      .returning();
+
+    if (!row) {
+      throw new Error("Failed to record data export job.");
+    }
+
+    return row;
+  });
 }
 
 export async function listWebhooks(input: {

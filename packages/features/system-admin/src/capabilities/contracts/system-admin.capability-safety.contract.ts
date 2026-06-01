@@ -5,6 +5,8 @@ const SENSITIVE_CAPABILITY_SUFFIXES = [
   ".write",
   ".export",
   ".approve",
+  ".run",
+  ".cancel",
 ] as const;
 
 export function isCriticalExecutionCapability(capability: ExecutionCapability) {

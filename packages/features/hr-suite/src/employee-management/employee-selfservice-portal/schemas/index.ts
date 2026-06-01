@@ -1,5 +1,2 @@
-/**
- * @afenda-bucket schemas
- * Scaffold placeholder from packages/_template-definition.
- */
-export {};
+export * from "./hr.workforce.ess-constants.shared";
+export * from "./hr.workforce.ess.schema";

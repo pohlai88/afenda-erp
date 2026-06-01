@@ -38,6 +38,11 @@ const overviewLinks = [
     description: "Define approver roles and minimum approvals for governed actions.",
   },
   {
+    href: systemAdminRoutePaths.dataManagement,
+    title: "Data Management",
+    description: "Stage imports, review row failures, and export data movement evidence.",
+  },
+  {
     href: systemAdminRoutePaths.audit,
     title: "Audit viewer",
     description: "Search administrative evidence with redacted metadata detail.",

@@ -27,6 +27,8 @@ import { hrLamRoutePaths } from "../../time-attendance/leave-attendance-manageme
 import { hrFwaRoutePaths } from "../../time-attendance/flexible-work-arrangement-tracking/contracts/hr.time.fwa-route.contract";
 import { hrGeoRoutePaths } from "../../time-attendance/geolocation-remote-checkin/contracts/hr.time.geo-route.contract";
 import { hrTalentRssRoutePaths } from "../../talent-management/candidate-selfservice-portal/contracts/hr.talent.rss-route.contract";
+import { hrWorkforceEssRoutePaths } from "../../employee-management/employee-selfservice-portal/contracts/hr.workforce.ess-route.contract";
+import { hrTalentEngRoutePaths } from "../../talent-management/employee-engagement-surveys/contracts/hr.talent.eng-route.contract";
 
 type HrNavCapability = Extract<AppCapability, `hr.${string}`>;
 
@@ -220,6 +222,18 @@ export const hrModuleNavItems = [
     href: hrTalentRssRoutePaths.hub,
     label: "Candidate Self-Service Portal",
     requiredCapabilities: ["hr.rss.read", "hr.rss.write", "hr.rss.approve"],
+  },
+
+  {
+    href: hrWorkforceEssRoutePaths.hub,
+    label: "Employee Self-Service Portal",
+    requiredCapabilities: ["hr.ess.read", "hr.ess.write", "hr.ess.approve"],
+  },
+
+  {
+    href: hrTalentEngRoutePaths.hub,
+    label: "Employee Engagement Surveys",
+    requiredCapabilities: ["hr.eng.read", "hr.eng.write", "hr.eng.approve"],
   },
 ] as const satisfies readonly HrModuleNavItem[];
 

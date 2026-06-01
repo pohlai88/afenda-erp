@@ -7,6 +7,7 @@ export const systemAdminRoutePaths = {
   permissions: "/system-admin/permissions",
   modules: "/system-admin/modules",
   capabilities: "/system-admin/capabilities",
+  dataManagement: "/system-admin/data-management",
   policies: "/system-admin/policies",
   approvals: "/system-admin/approvals",
   audit: "/system-admin/audit",

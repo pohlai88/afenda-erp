@@ -132,6 +132,14 @@ export const hrSectionManifest = {
   "candidate-selfservice-portal": {
     label: "Candidate Self-Service Portal",
     featureArea: "talent-management/candidate-selfservice-portal",
+  },
+  "employee-selfservice-portal": {
+    label: "Employee Self-Service Portal",
+    featureArea: "employee-management/employee-selfservice-portal",
+  },
+  "employee-engagement-surveys": {
+    label: "Employee Engagement Surveys",
+    featureArea: "talent-management/employee-engagement-surveys",
   },} as const;
 
 export type HrSectionSlug = keyof typeof hrSectionManifest;

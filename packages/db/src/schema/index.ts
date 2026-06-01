@@ -6,6 +6,8 @@ export * from "./hr-compensation-planning";
 export * from "./hr-salary-benchmarking";
 export * from "./hr-payroll-processing";
 export * from "./hr-career-pathing";
+export * from "./hr-competency-skills";
+export * from "./hr-lms";
 export * from "./hr-multi-country-payroll";
 export * from "./hr-bonus";
 export * from "./hr-expense";

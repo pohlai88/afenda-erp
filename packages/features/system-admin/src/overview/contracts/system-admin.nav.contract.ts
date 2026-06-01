@@ -74,6 +74,14 @@ export const systemAdminNavItems = [
     ],
   },
   {
+    href: systemAdminRoutePaths.dataManagement,
+    label: "Data Management",
+    requiredCapabilities: [
+      "system-admin.data-management.read",
+      "system-admin.diagnostics.read",
+    ],
+  },
+  {
     href: systemAdminRoutePaths.policies,
     label: "Policies",
     requiredCapabilities: [

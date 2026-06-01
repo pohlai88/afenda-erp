@@ -115,3 +115,47 @@
 |  18 | Portal remains usable on desktop, tablet, and mobile screen sizes.                                          |
 |  19 | Downloaded HR documents are limited to authorized document types.                                           |
 |  20 | Rejected requests show rejection reason and correction guidance.                                            |
+
+## As-built summary (code-verified)
+
+The employee self-service portal is implemented as the `hr.workforce.ess`
+feature slice at `/hr/employee-selfservice-portal`. The shipped slice uses
+granular `hr.ess.*` capabilities for read, write, approve, audit, restricted
+read, and integration exposure.
+
+The metadata-driven UI includes governed server-window list surfaces for
+employee profile, profile update requests, leave balances and requests, pay
+documents, attendance, shifts, expense claims, HR documents, resource center
+items, acknowledgements, assigned tasks, request tracking, notifications,
+manager approvals, benefits, training, onboarding/offboarding tasks, consent
+records, restricted access logs, reports, and audit trail.
+
+Authority is resolved server-side from the HR execution guard. The page model
+uses visible employee IDs for self and manager scope, masks payroll-sensitive,
+identity-sensitive, and restricted personal/document fields without restricted
+read access, and hides approval, access-log, and audit surfaces unless matching
+capabilities are present.
+
+Server actions cover profile update requests, leave submission/amend/cancel,
+claim submission, supporting document upload, authorized document access,
+policy acknowledgement, task completion, notification read status, approval
+decisions, consent capture, and governed integration reference export. These
+actions emit ESS audit events and do not directly mutate employee master data.
+
+Coverage is tracked in `data/hr.workforce.ess-coverage.shared.ts` for
+HRM-ESS-001 through HRM-ESS-025 and AC-01 through AC-20, with focused unit
+tests for coverage, search-param normalization, Pattern C list contracts,
+masking, and gated section behavior.
+
+**Route:** `/hr/employee-selfservice-portal` · **Module:**
+`@afenda/feature-hr-suite` · **Capabilities:** `hr.ess.read`,
+`hr.ess.write`, `hr.ess.approve`, `hr.ess.audit.read`,
+`hr.ess.restricted.read`, `hr.ess.integration.expose`
+
+| Layer | Location |
+| ----- | -------- |
+| App adapter | `apps/erp/src/lib/hr-sections/employee-selfservice-portal.server.tsx` |
+| Workbench | `components/hr.workforce.ess-section.component.server.tsx` |
+| Page model | `data/hr.workforce.ess.page-model.server.ts` |
+| Surface registry | `surface/hr.workforce.ess-surface-metadata.shared.ts` |
+| Export doors | `server.ts` (I/O), `client.ts` (components), `metadata.ts` (keys, copy, search params) |

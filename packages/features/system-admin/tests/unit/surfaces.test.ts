@@ -20,6 +20,11 @@ import {
   buildSystemAdminAiSandboxesListSurface,
   buildSystemAdminAiUsageListSurface,
 } from "../../src/lynx/data/system-admin.lynx.surface";
+import {
+  buildSystemAdminImportJobsListSurface,
+  buildSystemAdminImportTemplatesListSurface,
+} from "../../src/data-management/surface/system-admin.import-jobs-list.surface";
+import { listSystemAdminImportTemplates } from "../../src/data-management/data/system-admin.import-adapter.registry.server";
 import { buildUsersListSurface } from "../../src/users/surface/system-admin.users-list.surface";
 import { systemAdminUsersGalleryRows } from "../../src/users/surface/system-admin.users-gallery.fixtures.shared";
 
@@ -457,6 +462,14 @@ describe("system admin governed surfaces", () => {
       buildOrganizationDefaultsListSurface({
         settings: null,
         organizationName: "Afenda",
+      }),
+      buildSystemAdminImportTemplatesListSurface({
+        templates: listSystemAdminImportTemplates(),
+      }),
+      buildSystemAdminImportJobsListSurface({
+        jobs: [],
+        canRun: false,
+        canCancel: false,
       }),
       buildSystemAdminDiagnosticsIssuesListSurface({ issues: [] }),
     ];

@@ -160,6 +160,11 @@ const routeByCapability: Partial<Record<AppCapability, `/${string}`>> = {
   "system-admin.modules.manage": "/system-admin/modules",
   "system-admin.capabilities.read": "/system-admin/capabilities",
   "system-admin.capabilities.manage": "/system-admin/capabilities",
+  "system-admin.data-management.read": "/system-admin/data-management",
+  "system-admin.data-management.manage": "/system-admin/data-management",
+  "system-admin.data-management.run": "/system-admin/data-management",
+  "system-admin.data-management.cancel": "/system-admin/data-management",
+  "system-admin.data-management.export": "/system-admin/data-management",
   "system-admin.policies.read": "/system-admin/policies",
   "system-admin.policies.review": "/system-admin/policies",
   "system-admin.policies.manage": "/system-admin/policies",
@@ -190,6 +195,20 @@ const routeByCapability: Partial<Record<AppCapability, `/${string}`>> = {
   "hr.rss.audit.read": "/hr/candidate-selfservice-portal",
   "hr.rss.restricted.read": "/hr/candidate-selfservice-portal",
   "hr.rss.integration.expose": "/hr/candidate-selfservice-portal",
+
+  "hr.ess.read": "/hr/employee-selfservice-portal",
+  "hr.ess.write": "/hr/employee-selfservice-portal",
+  "hr.ess.approve": "/hr/employee-selfservice-portal",
+  "hr.ess.audit.read": "/hr/employee-selfservice-portal",
+  "hr.ess.restricted.read": "/hr/employee-selfservice-portal",
+  "hr.ess.integration.expose": "/hr/employee-selfservice-portal",
+
+  "hr.eng.read": "/hr/employee-engagement-surveys",
+  "hr.eng.write": "/hr/employee-engagement-surveys",
+  "hr.eng.approve": "/hr/employee-engagement-surveys",
+  "hr.eng.audit.read": "/hr/employee-engagement-surveys",
+  "hr.eng.restricted.read": "/hr/employee-engagement-surveys",
+  "hr.eng.integration.expose": "/hr/employee-engagement-surveys",
 };
 
 function titleCase(value: string) {

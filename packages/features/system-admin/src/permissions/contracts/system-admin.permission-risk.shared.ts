@@ -31,6 +31,14 @@ export function resolveSystemAdminPermissionRiskLevel(
   permission: string,
 ): SystemAdminPermissionRiskLevel {
   if (
+    permission === "system-admin.data-management.manage" ||
+    permission === "system-admin.data-management.run" ||
+    permission === "system-admin.data-management.cancel"
+  ) {
+    return "critical";
+  }
+
+  if (
     permission.startsWith("system-admin.") &&
     (permission.endsWith(".manage") ||
       permission.includes(".security.") ||

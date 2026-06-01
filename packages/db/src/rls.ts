@@ -111,6 +111,24 @@ export const rlsEvaluation: readonly RlsEvaluationItem[] = [
     reason: "Extraction outputs are tenant scoped and reviewable.",
   },
   {
+    table: "system_admin_data_import_jobs",
+    tenantColumn: "organization_id",
+    recommendation: "candidate",
+    reason: "System Admin import job evidence is organization scoped.",
+  },
+  {
+    table: "system_admin_data_import_rows",
+    tenantColumn: "organization_id",
+    recommendation: "candidate",
+    reason: "System Admin import row validation evidence is organization scoped.",
+  },
+  {
+    table: "system_admin_data_export_jobs",
+    tenantColumn: "organization_id",
+    recommendation: "candidate",
+    reason: "System Admin export evidence is organization scoped.",
+  },
+  {
     table: "permissions",
     tenantColumn: "none",
     recommendation: "blocked",

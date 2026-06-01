@@ -28,6 +28,7 @@ const sectionLoaders = {
   audit: () => import("./audit.server"),
   billing: () => import("./billing.server"),
   capabilities: () => import("./capabilities.server"),
+  "data-management": () => import("./data-management.server"),
   diagnostics: () => import("./diagnostics.server"),
   identity: () => import("./identity.server"),
   integrations: () => import("./integrations.server"),

@@ -22,13 +22,14 @@ Search tip: every document has a stable **`ARCH-###`** ID and a matching
 | **ARCH-008** | [008-workspace-package-discipline.md](008-workspace-package-discipline.md)                 | Workspace package classes, export doors, split policy, guard policy            |
 | **ARCH-009** | [009-machine-layer-doctrine.md](009-machine-layer-doctrine.md)                             | Lynx machine layer, four product layers, Knowledge substrate, brand contract   |
 | **ARCH-010** | [010-hr-feature-package-architecture.md](010-hr-feature-package-architecture.md)           | `@afenda/feature-hr-suite` foundation, integration doors, slice lifecycle, scaffold gates |
-| **ARCH-011** | [011-system-admin-enterprise-architecture.md](011-system-admin-enterprise-architecture.md) | System Admin control module, control domains, package boundary, kernel linkage |
+| **ARCH-011** | [011-system-admin-enterprise-architecture.md](011-system-admin-enterprise-architecture.md) | Enterprise System Admin control plane, ERP benchmark, control domains, kernel linkage |
 | **ARCH-011 (supplement)** | [011-system-admin-users-architecture.md](011-system-admin-users-architecture.md) | Users control domain — invitation, lifecycle, access review |
 | **ARCH-011 (supplement)** | [011-system-admin-memberships-architecture.md](011-system-admin-memberships-architecture.md) | Memberships control domain — participation lifecycle, role coverage |
 | **ARCH-011 (supplement)** | [011-system-admin-roles-architecture.md](011-system-admin-roles-architecture.md) | Roles control domain — catalog, assignment, deprecation |
 | **ARCH-011 (supplement)** | [011-system-admin-permissions-architecture.md](011-system-admin-permissions-architecture.md) | Permissions control domain — catalog, grouping, coverage |
 | **ARCH-011 (supplement)** | [011-system-admin-modules-architecture.md](011-system-admin-modules-architecture.md) | Modules control domain — enablement, readiness, rollout |
 | **ARCH-011 (supplement)** | [011-system-admin-capabilities-architecture.md](011-system-admin-capabilities-architecture.md) | Capabilities control domain — coverage, readiness, availability |
+| **ARCH-011 (supplement)** | [011-system-admin-data-management-architecture.md](011-system-admin-data-management-architecture.md) | Data Management control domain — import/export workbench, staged jobs, CSV boundaries |
 | **ARCH-011 (supplement)** | [011-system-admin-competitive-scorecard.md](011-system-admin-competitive-scorecard.md) | Competitive benchmark and gap scorecard for System Admin |
 
 **ARCH-012** — *reserved* (no file; future product kernel / dual posture — not `@afenda/kernel` compat).
