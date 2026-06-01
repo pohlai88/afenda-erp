@@ -125,3 +125,42 @@
 |  24 | Candidate consent is captured where required.                                                                                                              |
 |  25 | Candidate account closure or retention action follows configured policy.                                                                                   |
 |  26 | Every profile, application, document, interview, assessment, scorecard, offer, approval, rejection, withdrawal, and account action creates an audit event. |
+
+---
+
+## As-built summary
+
+The Candidate Self-Service Portal is implemented as the governed HR Suite slice
+`talent-management/candidate-selfservice-portal` with domain key
+`hr.talent.rss` and route `/hr/candidate-selfservice-portal`.
+
+Implemented production-facing surfaces and contracts:
+
+- Candidate profiles, job postings, applications, candidate documents,
+  interviews, assessments, pre-employment forms, offers, internal applications,
+  requisition requests, candidate reviews, scorecards, approvals, role tasks,
+  notifications, privacy records, access logs, retention actions, grouped
+  reports, and audit trail are modeled as bounded server-window governed list
+  surfaces.
+- The page model applies role and permission filtering, masks restricted
+  candidate data when restricted read access is absent, and gates privacy,
+  retention, access-log, approval, manager, and audit sections behind capability
+  flags.
+- Server actions validate payloads through RSS schemas, require granular
+  `hr.rss.*` capabilities, mutate the tenant-scoped RSS store, and emit audit
+  events for profile, application, document, interview, assessment, form, offer,
+  requisition, review, scorecard, approval, task, consent, retention, account,
+  and integration actions.
+- The slice is wired through the package metadata/server doors, app HR section
+  manifest and registry, HR navigation, auth capabilities, kernel execution
+  routes, and permission seed catalog.
+
+Coverage:
+
+- `HR_TALENT_RSS_REQUIREMENT_COVERAGE` marks HRM-RSS-001 through HRM-RSS-028 as
+  shipped.
+- `HR_TALENT_RSS_ACCEPTANCE_CRITERIA_COVERAGE` marks AC-01 through AC-26 as
+  shipped.
+- Package unit tests cover requirement coverage, search-parameter parsing,
+  governed list metadata, page-model gating, privacy masking, and audit
+  taxonomy.

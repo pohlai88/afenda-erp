@@ -26,6 +26,7 @@ import { hrRecordsRoutePaths } from "../../employee-management/employee-records-
 import { hrLamRoutePaths } from "../../time-attendance/leave-attendance-management/contracts/hr.time.lam-route.contract";
 import { hrFwaRoutePaths } from "../../time-attendance/flexible-work-arrangement-tracking/contracts/hr.time.fwa-route.contract";
 import { hrGeoRoutePaths } from "../../time-attendance/geolocation-remote-checkin/contracts/hr.time.geo-route.contract";
+import { hrTalentRssRoutePaths } from "../../talent-management/candidate-selfservice-portal/contracts/hr.talent.rss-route.contract";
 
 type HrNavCapability = Extract<AppCapability, `hr.${string}`>;
 
@@ -214,7 +215,12 @@ export const hrModuleNavItems = [
       "hr.compliance.read",
     ],
   },
-] as const satisfies readonly HrModuleNavItem[];
+
+  {
+    href: hrTalentRssRoutePaths.hub,
+    label: "Candidate Self-Service Portal",
+    requiredCapabilities: ["hr.rss.read", "hr.rss.write", "hr.rss.approve"],
+  },] as const satisfies readonly HrModuleNavItem[];
 
 export function resolveHrModuleNavItems(
   capabilities: readonly AppCapability[],

@@ -68,6 +68,7 @@ export const SHIPPED_CAPABILITIES = [
   "industry-specific/retail-seasonal-hourly-workforce-scheduling",
   "industry-specific/union-management",
   "payroll-compensation/benefits-administration",
+  "talent-management/candidate-selfservice-portal",
   "talent-management/performance-appraisals",
   "talent-management/recruitment-onboarding",
   "talent-management/training-development",

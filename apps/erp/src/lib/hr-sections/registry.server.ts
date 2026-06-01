@@ -25,6 +25,7 @@ import {
   hrIndustryMscRoutePaths,
   hrIndustryRwsRoutePaths,
   hrIndustryUcbRoutePaths,
+  hrTalentRssRoutePaths,
 } from "@afenda/feature-hr-suite/metadata";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
@@ -81,7 +82,8 @@ const sectionLoaders = {
   "retail-seasonal-hourly-workforce-scheduling": () =>
     import("./retail-seasonal-hourly-workforce-scheduling.server"),
   "union-management": () => import("./union-management.server"),
-} satisfies Record<HrSectionSlug, () => Promise<HrSectionModule>>;
+
+  "candidate-selfservice-portal": () => import("./candidate-selfservice-portal.server"),} satisfies Record<HrSectionSlug, () => Promise<HrSectionModule>>;
 
 const hrRoutePaths = [
   ...Object.values(hrDocumentsRoutePaths),
@@ -110,7 +112,8 @@ const hrRoutePaths = [
   ...Object.values(hrIndustryMscRoutePaths),
   ...Object.values(hrIndustryRwsRoutePaths),
   ...Object.values(hrIndustryUcbRoutePaths),
-] as const;
+
+  ...Object.values(hrTalentRssRoutePaths),] as const;
 
 const hrSectionHubPaths = new Set<string>([
   hrDocumentsRoutePaths.hub,
@@ -135,7 +138,8 @@ const hrSectionHubPaths = new Set<string>([
   hrIndustryMscRoutePaths.hub,
   hrIndustryRwsRoutePaths.hub,
   hrIndustryUcbRoutePaths.hub,
-]);
+
+  hrTalentRssRoutePaths.hub,]);
 
 export const hrSectionSlugs = hrRoutePaths
   .filter((path) => !hrSectionHubPaths.has(path))

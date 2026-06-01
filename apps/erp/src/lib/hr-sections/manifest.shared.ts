@@ -128,7 +128,11 @@ export const hrSectionManifest = {
     label: "Union Management",
     featureArea: "industry-specific/union-management",
   },
-} as const;
+
+  "candidate-selfservice-portal": {
+    label: "Candidate Self-Service Portal",
+    featureArea: "talent-management/candidate-selfservice-portal",
+  },} as const;
 
 export type HrSectionSlug = keyof typeof hrSectionManifest;
 

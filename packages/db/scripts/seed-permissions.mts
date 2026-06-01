@@ -1156,7 +1156,43 @@ const permissionCatalog = [
     description:
       "View configuration drift, coverage, reliability, and spend posture.",
   },
-] as const;
+
+  {
+    key: "hr.rss.read",
+    module: "hr",
+    label: "Read Candidate Self-Service Portal",
+    description: "Allows read access for Candidate Self-Service Portal.",
+  },
+  {
+    key: "hr.rss.write",
+    module: "hr",
+    label: "Write Candidate Self-Service Portal",
+    description: "Allows write access for Candidate Self-Service Portal.",
+  },
+  {
+    key: "hr.rss.approve",
+    module: "hr",
+    label: "Approve Candidate Self-Service Portal",
+    description: "Allows approve access for Candidate Self-Service Portal.",
+  },
+  {
+    key: "hr.rss.audit.read",
+    module: "hr",
+    label: "Audit Read Candidate Self-Service Portal",
+    description: "Allows audit read access for Candidate Self-Service Portal.",
+  },
+  {
+    key: "hr.rss.restricted.read",
+    module: "hr",
+    label: "Restricted Read Candidate Self-Service Portal",
+    description: "Allows restricted read access for Candidate Self-Service Portal.",
+  },
+  {
+    key: "hr.rss.integration.expose",
+    module: "hr",
+    label: "Integration Expose Candidate Self-Service Portal",
+    description: "Allows integration expose access for Candidate Self-Service Portal.",
+  },] as const;
 
 const roleCapabilities = {
   owner: permissionCatalog.map((permission) => permission.key),

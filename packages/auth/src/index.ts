@@ -235,7 +235,13 @@ export const appCapabilities = [
   "system-admin.billing.manage",
   "system-admin.billing.export",
   "system-admin.diagnostics.read",
-] as const;
+
+  "hr.rss.read",
+  "hr.rss.write",
+  "hr.rss.approve",
+  "hr.rss.audit.read",
+  "hr.rss.restricted.read",
+  "hr.rss.integration.expose",] as const;
 
 export const organizationRoles = [
   "owner",

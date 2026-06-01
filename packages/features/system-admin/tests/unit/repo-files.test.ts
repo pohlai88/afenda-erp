@@ -12,4 +12,10 @@ describe("resolveRepoRootFile", () => {
       "Unsafe repository relative path",
     );
   });
+
+  it("rejects safe but unapproved repository paths", async () => {
+    await expect(resolveRepoRootFile("package.json")).rejects.toThrow(
+      "Repository path is not allowlisted",
+    );
+  });
 });

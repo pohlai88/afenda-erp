@@ -183,7 +183,13 @@ const routeByCapability: Partial<Record<AppCapability, `/${string}`>> = {
   "system-admin.billing.manage": "/system-admin/billing",
   "system-admin.billing.export": "/system-admin/billing",
   "system-admin.diagnostics.read": "/system-admin/diagnostics",
-};
+
+  "hr.rss.read": "/hr/candidate-selfservice-portal",
+  "hr.rss.write": "/hr/candidate-selfservice-portal",
+  "hr.rss.approve": "/hr/candidate-selfservice-portal",
+  "hr.rss.audit.read": "/hr/candidate-selfservice-portal",
+  "hr.rss.restricted.read": "/hr/candidate-selfservice-portal",
+  "hr.rss.integration.expose": "/hr/candidate-selfservice-portal",};
 
 function titleCase(value: string) {
   return value

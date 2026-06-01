@@ -232,6 +232,7 @@ export async function buildHrOvertimePageModel(args: {
 }
 
 export { resolveOtmSurfaceAccess };
+export * from "./talent-management/candidate-selfservice-portal/server";
 export function HrDepartmentsSection(_props: any) {
   return React.createElement(EmptyState, { title: "Departments" });
 }

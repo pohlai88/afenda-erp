@@ -603,9 +603,10 @@ function namedImportInsertionEdit(input: {
     return null;
   }
 
+  const lastElement = input.namedImports.elements.at(-1);
   return {
-    index: input.namedImports.getEnd() - 1,
-    text: `,\n  ${input.name}`,
+    index: lastElement?.getEnd() ?? input.namedImports.getEnd() - 1,
+    text: lastElement ? `,\n  ${input.name}` : `\n  ${input.name}\n`,
     description: input.description,
   };
 }

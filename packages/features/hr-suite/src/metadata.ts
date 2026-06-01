@@ -1091,3 +1091,6 @@ export {
   type HrCareerReadinessLevel,
   type HrCareerReportGroupBy,
 } from "./talent-management/career-pathing-development-plans/metadata";
+
+
+export * from "./talent-management/candidate-selfservice-portal/metadata";
