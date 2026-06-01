@@ -241,7 +241,8 @@ export const appCapabilities = [
   "hr.rss.approve",
   "hr.rss.audit.read",
   "hr.rss.restricted.read",
-  "hr.rss.integration.expose",] as const;
+  "hr.rss.integration.expose",
+] as const;
 
 export const organizationRoles = [
   "owner",

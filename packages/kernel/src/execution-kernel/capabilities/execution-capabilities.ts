@@ -189,7 +189,8 @@ const routeByCapability: Partial<Record<AppCapability, `/${string}`>> = {
   "hr.rss.approve": "/hr/candidate-selfservice-portal",
   "hr.rss.audit.read": "/hr/candidate-selfservice-portal",
   "hr.rss.restricted.read": "/hr/candidate-selfservice-portal",
-  "hr.rss.integration.expose": "/hr/candidate-selfservice-portal",};
+  "hr.rss.integration.expose": "/hr/candidate-selfservice-portal",
+};
 
 function titleCase(value: string) {
   return value

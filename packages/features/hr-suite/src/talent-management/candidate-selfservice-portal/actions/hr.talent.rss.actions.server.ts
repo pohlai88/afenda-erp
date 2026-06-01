@@ -387,8 +387,7 @@ export async function respondHrTalentRssOfferAction(input: {
     }
     Object.assign(row, {
       status: parsed.response,
-      documentAcknowledged:
-        parsed.response === "viewed" ? true : row.documentAcknowledged,
+      documentAcknowledged: true,
       candidateRespondedAt: new Date().toISOString(),
     });
     emitHrTalentRssAuditEvent(store, {

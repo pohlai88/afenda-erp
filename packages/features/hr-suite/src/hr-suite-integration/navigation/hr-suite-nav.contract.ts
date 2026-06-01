@@ -220,7 +220,8 @@ export const hrModuleNavItems = [
     href: hrTalentRssRoutePaths.hub,
     label: "Candidate Self-Service Portal",
     requiredCapabilities: ["hr.rss.read", "hr.rss.write", "hr.rss.approve"],
-  },] as const satisfies readonly HrModuleNavItem[];
+  },
+] as const satisfies readonly HrModuleNavItem[];
 
 export function resolveHrModuleNavItems(
   capabilities: readonly AppCapability[],

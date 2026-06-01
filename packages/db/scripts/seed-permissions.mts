@@ -1192,7 +1192,8 @@ const permissionCatalog = [
     module: "hr",
     label: "Integration Expose Candidate Self-Service Portal",
     description: "Allows integration expose access for Candidate Self-Service Portal.",
-  },] as const;
+  },
+] as const;
 
 const roleCapabilities = {
   owner: permissionCatalog.map((permission) => permission.key),

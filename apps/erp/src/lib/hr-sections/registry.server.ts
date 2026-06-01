@@ -83,7 +83,9 @@ const sectionLoaders = {
     import("./retail-seasonal-hourly-workforce-scheduling.server"),
   "union-management": () => import("./union-management.server"),
 
-  "candidate-selfservice-portal": () => import("./candidate-selfservice-portal.server"),} satisfies Record<HrSectionSlug, () => Promise<HrSectionModule>>;
+  "candidate-selfservice-portal": () =>
+    import("./candidate-selfservice-portal.server"),
+} satisfies Record<HrSectionSlug, () => Promise<HrSectionModule>>;
 
 const hrRoutePaths = [
   ...Object.values(hrDocumentsRoutePaths),
@@ -113,7 +115,8 @@ const hrRoutePaths = [
   ...Object.values(hrIndustryRwsRoutePaths),
   ...Object.values(hrIndustryUcbRoutePaths),
 
-  ...Object.values(hrTalentRssRoutePaths),] as const;
+  ...Object.values(hrTalentRssRoutePaths),
+] as const;
 
 const hrSectionHubPaths = new Set<string>([
   hrDocumentsRoutePaths.hub,
