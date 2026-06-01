@@ -40,7 +40,10 @@ function mockContext(capabilities: string[]) {
 
 describe("HRM-CPM-021 access policy", () => {
   beforeEach(() => {
-    vi.mocked(requireExecutionPermission).mockImplementation(() => undefined);
+    vi.mocked(requireExecutionPermission).mockImplementation((_ctx, permission) => ({
+      allowed: true,
+      permission,
+    }));
     mockContext(["hr.cpm.read"]);
   });
 
@@ -68,6 +71,7 @@ describe("HRM-CPM AC-21 unauthorized access", () => {
       if (permission === HR_CPM_WRITE_CAPABILITY) {
         throw new Error(`missing capability: ${permission}`);
       }
+      return { allowed: true, permission };
     });
 
     await expect(requireHrCpmWrite()).rejects.toThrow("missing capability");
@@ -83,6 +87,7 @@ describe("HRM-CPM AC-21 unauthorized access", () => {
       if (permission === HR_CPM_APPROVE_CAPABILITY) {
         throw new Error(`missing capability: ${permission}`);
       }
+      return { allowed: true, permission };
     });
 
     await expect(requireHrCpmApprove()).rejects.toThrow("missing capability");
@@ -95,7 +100,10 @@ describe("HRM-CPM AC-21 unauthorized access", () => {
 
 describe("CPM workflow capability matrix", () => {
   beforeEach(() => {
-    vi.mocked(requireExecutionPermission).mockImplementation(() => undefined);
+    vi.mocked(requireExecutionPermission).mockImplementation((_ctx, permission) => ({
+      allowed: true,
+      permission,
+    }));
   });
 
   it("maps write and approve capabilities to workflow actions", async () => {

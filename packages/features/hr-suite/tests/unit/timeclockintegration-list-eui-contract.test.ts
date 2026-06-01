@@ -10,8 +10,7 @@ describe("hr timeclockintegration list eui contract", () => {
         rows: [],
         pageSize: 25,
         totalCount: 0,
-        offset: 0,
-        hasMore: false,
+        hasNextPage: false,
       },
       canAdmin: false,
     });

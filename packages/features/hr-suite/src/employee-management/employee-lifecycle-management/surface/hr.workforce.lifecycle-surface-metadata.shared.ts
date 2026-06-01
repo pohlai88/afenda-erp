@@ -97,3 +97,13 @@ export const HR_LIFECYCLE_WORKBENCH_READ_ONLY_SURFACE_KEYS = new Set<
   hrLifecycleOnboardingCasesSurfaceKey,
   hrLifecycleOffboardingCasesSurfaceKey,
 ]);
+
+export {
+  hrLifecycleAuditTrailSurfaceKey,
+  hrLifecycleNoticePeriodSurfaceKey,
+  hrLifecycleOffboardingCasesSurfaceKey,
+  hrLifecycleOnboardingCasesSurfaceKey,
+  hrLifecycleOverviewSurfaceKey,
+  hrLifecyclePendingTransitionsSurfaceKey,
+  hrLifecycleProbationDueSurfaceKey,
+};

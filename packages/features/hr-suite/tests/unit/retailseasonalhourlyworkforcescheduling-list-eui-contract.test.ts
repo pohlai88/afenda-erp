@@ -46,9 +46,9 @@ describe("retail seasonal hourly workforce scheduling EUI contract", () => {
 
     expect(parseListSurfaceRendererConfiguration(surface).success).toBe(true);
     expect(surface.requiresErpPermission).toEqual(hrIndustryRwsReadPermission);
-    expect(surface.presentation.toolbar?.search?.value).toBe("cashier");
+    expect(surface.presentation!.toolbar?.search?.value).toBe("cashier");
     expect(surface.surface.columnsId).toBe(hrIndustryRwsAssignmentsSurfaceKey);
-    expect(surface.pagination.totalCount).toBe(1);
+    expect(surface.pagination!.totalCount).toBe(1);
   });
 
   it("builds a page model with gated cost, integration, and audit sections", async () => {

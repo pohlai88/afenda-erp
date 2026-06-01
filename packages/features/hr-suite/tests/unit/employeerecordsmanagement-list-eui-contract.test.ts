@@ -121,7 +121,7 @@ describe("records Pattern C governed list EUI contract", () => {
       expect(surface.requiresErpPermission).toEqual(
         hrWorkforceRecordsReadPermission,
       );
-      expect(surface.presentation.toolbar?.search?.param).toBe(
+      expect(surface.presentation!.toolbar?.search?.param).toBe(
         testCase.searchParam,
       );
       expect(surface.surface.columnsId).toBe(testCase.columnsId);

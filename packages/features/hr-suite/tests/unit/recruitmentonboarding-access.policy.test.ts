@@ -44,7 +44,10 @@ function mockContext(capabilities: string[]) {
 
 describe("HRM-RON-040 recruitment onboarding access policy", () => {
   beforeEach(() => {
-    vi.mocked(requireExecutionPermission).mockImplementation(() => undefined);
+    vi.mocked(requireExecutionPermission).mockImplementation((_ctx, permission) => ({
+      allowed: true,
+      permission,
+    }));
     mockContext([HR_RON_READ_CAPABILITY]);
   });
 
@@ -64,6 +67,7 @@ describe("HRM-RON-040 recruitment onboarding access policy", () => {
       if (permission === HR_RON_WRITE_CAPABILITY) {
         throw new Error("missing write");
       }
+      return { allowed: true, permission };
     });
     await expect(requireHrRonWrite()).rejects.toThrow("missing write");
 
@@ -71,6 +75,7 @@ describe("HRM-RON-040 recruitment onboarding access policy", () => {
       if (permission === HR_RON_APPROVE_CAPABILITY) {
         throw new Error("missing requisition approve");
       }
+      return { allowed: true, permission };
     });
     await expect(requireHrRonApprove()).rejects.toThrow(
       "missing requisition approve",
@@ -80,6 +85,7 @@ describe("HRM-RON-040 recruitment onboarding access policy", () => {
       if (permission === HR_RON_OFFER_APPROVE_CAPABILITY) {
         throw new Error("missing offer approve");
       }
+      return { allowed: true, permission };
     });
     await expect(requireHrRonOfferApprove()).rejects.toThrow(
       "missing offer approve",

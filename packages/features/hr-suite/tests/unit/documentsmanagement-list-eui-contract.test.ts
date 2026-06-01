@@ -18,6 +18,6 @@ describe("documents list EUI contract", () => {
     expect(hrDocumentsRepositorySurfaceKey).toBe(
       "hr.workforce.documents.repository.list",
     );
-    expect(surface.presentation.toolbar?.search?.param).toBeTruthy();
+    expect(surface.presentation!.toolbar?.search?.param).toBeTruthy();
   });
 });

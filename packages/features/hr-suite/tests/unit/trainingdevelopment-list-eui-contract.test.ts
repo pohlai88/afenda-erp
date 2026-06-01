@@ -38,9 +38,9 @@ describe("training development list EUI contract", () => {
 
     expect(parseListSurfaceRendererConfiguration(surface).success).toBe(true);
     expect(surface.requiresErpPermission).toEqual(hrTalentTrainingReadPermission);
-    expect(surface.presentation.toolbar?.search?.value).toBe("safe");
+    expect(surface.presentation!.toolbar?.search?.value).toBe("safe");
     expect(surface.surface.columnsId).toBe(hrTrainingCoursesSurfaceKey);
-    expect(surface.pagination.totalCount).toBe(1);
+    expect(surface.pagination!.totalCount).toBe(1);
   });
 
   it("builds a page model with reporting and gated integration sections", async () => {

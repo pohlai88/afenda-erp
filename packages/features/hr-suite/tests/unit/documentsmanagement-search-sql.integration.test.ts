@@ -1,8 +1,9 @@
 import { describe, expect, it } from "vitest";
 
-import { DEMO_ORG_ID, listHrEmployeeDocumentsWindow } from "@afenda/db";
+import { listHrEmployeeDocumentsWindow } from "@afenda/db";
 
 const hasDatabase = Boolean(process.env.DATABASE_URL?.trim());
+const DEMO_ORG_ID = "org_demo";
 
 describe.skipIf(!hasDatabase)(
   "documents repository search SQL integration",

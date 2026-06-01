@@ -61,11 +61,11 @@ describe("government classification pay grades list EUI contract", () => {
 
     expect(parseListSurfaceRendererConfiguration(surface).success).toBe(true);
     expect(surface.requiresErpPermission).toEqual(hrIndustryGpgReadPermission);
-    expect(surface.presentation.toolbar?.search?.value).toBe("Ada");
+    expect(surface.presentation!.toolbar?.search?.value).toBe("Ada");
     expect(surface.surface.columnsId).toBe(
       hrIndustryGpgClassificationAssignmentsSurfaceKey,
     );
-    expect(surface.pagination.totalCount).toBe(1);
+    expect(surface.pagination!.totalCount).toBe(1);
   });
 
   it("builds a page model with gated integration and audit sections", async () => {

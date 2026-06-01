@@ -10,7 +10,7 @@ describe("HRM-GEO spec map", () => {
     expect(GEO_REQUIREMENT_CODES).toHaveLength(32);
     for (let index = 1; index <= 32; index += 1) {
       const code = `HRM-GEO-${String(index).padStart(3, "0")}` as const;
-      expect(GEO_SPEC_MAP[code]).toBeTruthy();
+      expect(GEO_SPEC_MAP[code as keyof typeof GEO_SPEC_MAP]).toBeTruthy();
     }
   });
 });

@@ -28,13 +28,13 @@ describe("offboarding Pattern C governed list EUI contract", () => {
 
     expect(cases.requiresErpPermission).toBe(hrWorkforceOffboardingReadPermission);
     expect(cases.surface.columnsId).toBe(hrOffboardingCasesColumnsId);
-    expect(cases.presentation.toolbar?.search?.param).toBe("offboardingCasesSearch");
+    expect(cases.presentation!.toolbar?.search?.param).toBe("offboardingCasesSearch");
 
     expect(clearance.requiresErpPermission).toBe(
       hrWorkforceOffboardingReadPermission,
     );
     expect(clearance.surface.columnsId).toBe(hrOffboardingClearanceColumnsId);
-    expect(clearance.presentation.toolbar?.search?.param).toBe(
+    expect(clearance.presentation!.toolbar?.search?.param).toBe(
       "offboardingClearanceSearch",
     );
 

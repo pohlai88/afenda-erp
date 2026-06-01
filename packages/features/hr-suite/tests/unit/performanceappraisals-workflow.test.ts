@@ -155,7 +155,9 @@ describe("HRM-PER workflow foundation", () => {
       cycle,
       employees,
     });
-    expect(baseReview).toBeDefined();
+    if (!baseReview) {
+      throw new Error("Expected eligible performance review fixture.");
+    }
 
     const goal = createPerformanceGoal({
       id: "goal-1",

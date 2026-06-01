@@ -28,14 +28,14 @@ describe("recruitment onboarding list EUI contract", () => {
     expect(surface.__schemaVersion).toBeTruthy();
     expect(surface.dataNature).toBe("table");
     expect(surface.requiresErpPermission).toEqual(hrTalentRonReadPermission);
-    expect(surface.presentation.toolbar?.search?.param).toBe(
+    expect(surface.presentation!.toolbar?.search?.param).toBe(
       hrRonRequisitionsSearchParam,
     );
-    expect(surface.presentation.toolbar?.search?.value).toBe("ops");
+    expect(surface.presentation!.toolbar?.search?.value).toBe("ops");
     expect(surface.surface.header.title).toBe("Job requisitions");
     expect(surface.surface.columnsId).toBe(hrRonRequisitionsSurfaceKey);
     expect(surface.surface.rowKey).toBe("id");
-    expect(surface.pagination.totalCount).toBe(1);
+    expect(surface.pagination!.totalCount).toBe(1);
   });
 
   it("builds application rows with route-safe row hrefs", () => {

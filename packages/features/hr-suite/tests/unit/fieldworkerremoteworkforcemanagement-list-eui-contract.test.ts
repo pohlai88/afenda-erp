@@ -37,9 +37,9 @@ describe("field worker remote workforce list EUI contract", () => {
 
     expect(parseListSurfaceRendererConfiguration(surface).success).toBe(true);
     expect(surface.requiresErpPermission).toEqual(hrIndustryFrmReadPermission);
-    expect(surface.presentation.toolbar?.search?.value).toBe("Maya");
+    expect(surface.presentation!.toolbar?.search?.value).toBe("Maya");
     expect(surface.surface.columnsId).toBe(hrIndustryFrmAssignmentsSurfaceKey);
-    expect(surface.pagination.totalCount).toBe(1);
+    expect(surface.pagination!.totalCount).toBe(1);
   });
 
   it("builds a page model with gated integration sections", async () => {

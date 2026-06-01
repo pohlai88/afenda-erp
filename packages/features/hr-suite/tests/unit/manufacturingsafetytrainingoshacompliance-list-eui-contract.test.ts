@@ -45,11 +45,11 @@ describe("manufacturing safety training OSHA compliance EUI contract", () => {
 
     expect(parseListSurfaceRendererConfiguration(surface).success).toBe(true);
     expect(surface.requiresErpPermission).toEqual(hrIndustryMscReadPermission);
-    expect(surface.presentation.toolbar?.search?.value).toBe("Jamal");
+    expect(surface.presentation!.toolbar?.search?.value).toBe("Jamal");
     expect(surface.surface.columnsId).toBe(
       hrIndustryMscEmployeeObligationsSurfaceKey,
     );
-    expect(surface.pagination.totalCount).toBe(1);
+    expect(surface.pagination!.totalCount).toBe(1);
   });
 
   it("builds a page model with gated integration and audit sections", async () => {

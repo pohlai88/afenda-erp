@@ -48,7 +48,10 @@ function mockContext(capabilities: string[]) {
 
 describe("HRM-PER-030 performance access policy", () => {
   beforeEach(() => {
-    vi.mocked(requireExecutionPermission).mockImplementation(() => undefined);
+    vi.mocked(requireExecutionPermission).mockImplementation((_ctx, permission) => ({
+      allowed: true,
+      permission,
+    }));
     mockContext([HR_PER_READ_CAPABILITY]);
   });
 
@@ -68,6 +71,7 @@ describe("HRM-PER-030 performance access policy", () => {
       if (permission === HR_PER_WRITE_CAPABILITY) {
         throw new Error("missing write");
       }
+      return { allowed: true, permission };
     });
     await expect(requireHrPerformanceWrite()).rejects.toThrow("missing write");
 
@@ -75,6 +79,7 @@ describe("HRM-PER-030 performance access policy", () => {
       if (permission === HR_PER_APPROVE_CAPABILITY) {
         throw new Error("missing approve");
       }
+      return { allowed: true, permission };
     });
     await expect(requireHrPerformanceApprove()).rejects.toThrow("missing approve");
   });

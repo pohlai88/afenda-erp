@@ -43,9 +43,9 @@ describe("food handler certification health compliance EUI contract", () => {
 
     expect(parseListSurfaceRendererConfiguration(surface).success).toBe(true);
     expect(surface.requiresErpPermission).toEqual(hrIndustryFhcReadPermission);
-    expect(surface.presentation.toolbar?.search?.value).toBe("Ben");
+    expect(surface.presentation!.toolbar?.search?.value).toBe("Ben");
     expect(surface.surface.columnsId).toBe(hrIndustryFhcEmployeeComplianceSurfaceKey);
-    expect(surface.pagination.totalCount).toBe(1);
+    expect(surface.pagination!.totalCount).toBe(1);
   });
 
   it("builds a page model with gated integration and audit sections", async () => {

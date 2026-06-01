@@ -115,7 +115,10 @@ describe("lifecycle Pattern C governed list EUI contract", () => {
 
   it.each(cases)(
     "$label surface satisfies governed list metadata contract",
-    ({ searchParam, columnsId, primaryColumnId = "employee", build }) => {
+    (testCase) => {
+      const { searchParam, columnsId, build } = testCase;
+      const primaryColumnId =
+        "primaryColumnId" in testCase ? testCase.primaryColumnId : "employee";
       const configuration = build();
 
       expect(configuration.dataNature).toBe("table");

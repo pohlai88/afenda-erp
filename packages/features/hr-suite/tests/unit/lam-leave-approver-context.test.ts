@@ -45,7 +45,7 @@ describe("LAM manager approver identity", () => {
   });
 
   it("grants HR approve when actor has leave write", async () => {
-    vi.mocked(getUserProfile).mockResolvedValue(null);
+    vi.mocked(getUserProfile).mockResolvedValue(undefined);
     vi.mocked(resolveHrEmployeeIdsForAuthUser).mockResolvedValue([]);
 
     const context = await resolveHrLeaveApproverContext({

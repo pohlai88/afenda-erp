@@ -29,16 +29,16 @@ describe("performance appraisals list EUI contract", () => {
     expect(surface.requiresErpPermission).toEqual(
       hrTalentPerformanceReadPermission,
     );
-    expect(surface.presentation.toolbar?.search?.param).toBe(
+    expect(surface.presentation!.toolbar?.search?.param).toBe(
       hrPerformanceAppraisalsCyclesSearchParam,
     );
-    expect(surface.presentation.toolbar?.search?.value).toBe("annual");
+    expect(surface.presentation!.toolbar?.search?.value).toBe("annual");
     expect(surface.surface.header.title).toBe("Review cycles");
     expect(surface.surface.columnsId).toBe(
       "hr.talent.performance-appraisals.cycles.columns",
     );
     expect(surface.surface.rowKey).toBe("id");
-    expect(surface.pagination.totalCount).toBe(1);
+    expect(surface.pagination!.totalCount).toBe(1);
   });
 
   it("builds review rows with route-safe row hrefs", () => {

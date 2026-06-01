@@ -174,6 +174,7 @@ describe("HRM-CPM-008..012 recommendation schemas", () => {
       increaseMode: "percent",
       increaseAmount: null,
       increasePercent: 7,
+      marketReferencePercentile: null,
       retentionRiskLevel: "critical",
     });
 
