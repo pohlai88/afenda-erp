@@ -21,9 +21,14 @@ function isTypingTarget(target: EventTarget | null) {
 export const APP_SHELL_QUICK_CREATE_EVENT = "afenda:appshell-quick-create";
 
 export function AppShellGlobalShortcuts() {
-  const runtime = useAppShellRuntime();
+  const { commandOpen, setCommandOpen } = useAppShellRuntime();
   const router = useRouter();
   const gChordDeadlineRef = useRef<number | null>(null);
+  const commandOpenRef = useRef(commandOpen);
+
+  useEffect(() => {
+    commandOpenRef.current = commandOpen;
+  }, [commandOpen]);
 
   useEffect(() => {
     function clearGChord() {
@@ -40,7 +45,7 @@ export function AppShellGlobalShortcuts() {
         return;
       }
 
-      if (runtime.commandOpen || isTypingTarget(event.target)) {
+      if (commandOpenRef.current || isTypingTarget(event.target)) {
         return;
       }
 
@@ -48,7 +53,7 @@ export function AppShellGlobalShortcuts() {
 
       if ((event.metaKey || event.ctrlKey) && key === "k") {
         event.preventDefault();
-        runtime.setCommandOpen(true);
+        setCommandOpen(true);
         return;
       }
 
@@ -77,7 +82,7 @@ export function AppShellGlobalShortcuts() {
 
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [router, runtime]);
+  }, [router, setCommandOpen]);
 
   return null;
 }

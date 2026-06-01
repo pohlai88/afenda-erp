@@ -4,6 +4,7 @@ import { ChevronsUpDown } from "lucide-react";
 import { usePathname } from "next/navigation";
 
 import {
+  Button,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -36,13 +37,15 @@ export function AppShellOrgSwitcher({
     <DropdownMenu>
       <AppShellUtilityTriggerTooltip label="Switch organization">
         <DropdownMenuTrigger asChild>
-          <button
+          <Button
             aria-label="Switch organization"
             className="af-appshell__icon-button"
+            size="icon-sm"
             type="button"
+            variant="outline"
           >
             <ChevronsUpDown aria-hidden="true" size={16} />
-          </button>
+          </Button>
         </DropdownMenuTrigger>
       </AppShellUtilityTriggerTooltip>
       <DropdownMenuContent align="start" sideOffset={8}>

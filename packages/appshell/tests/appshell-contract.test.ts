@@ -73,4 +73,52 @@ describe("AppShell contracts", () => {
       normalizeCommandRecentIds([" dashboard ", "", "finance", "dashboard"]),
     ).toEqual(["dashboard", "finance"]);
   });
+
+  it("rejects unknown utility adapter keys", () => {
+    expect(() =>
+      parseAppShellChrome({
+        rail: null,
+        utilityBar: {
+          brandHomeHref: "/dashboard",
+          commandPlaceholder: "Search commands",
+          metadata: {
+            version: 1,
+            zones: [
+              {
+                id: "right",
+                items: [
+                  {
+                    id: "workspace-invalid",
+                    zone: "right",
+                    kind: "utility-action",
+                    intent: "inspect",
+                    adapterKey: "not-real",
+                    iconKey: "search",
+                    label: "Invalid",
+                    ariaLabel: "Invalid utility",
+                    priority: 10,
+                  },
+                ],
+              },
+            ],
+          },
+          organizations: [],
+          launcherItems: [],
+          account: {
+            initials: "AF",
+            title: "Afenda",
+            email: "operator@example.com",
+          },
+        },
+        commandSections: [],
+        contextStack: null,
+        preferences: {
+          railMode: "expanded",
+          density: "comfortable",
+          utilityOrder: [],
+          commandRecents: [],
+        },
+      }),
+    ).toThrow();
+  });
 });

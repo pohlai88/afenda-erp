@@ -9,21 +9,14 @@ import type { ChartPresentationProfileId } from "../schemas/presentation-profile
 
 export type BuildGovernedChartSurfaceInput = Omit<
   GovernedChartConfigurationInput,
-  "chartKind" | "dataNature"
+  "chartKind" | "dataNature" | "__schemaVersion"
 > & {
+  __schemaVersion?: GovernedChartConfigurationInput["__schemaVersion"];
   presentationProfile: ChartPresentationProfileId;
-  /** Override the profile default chartKind. */
   chartKind?: GovernedChartKind;
-  /** Override the profile default dataNature. */
   dataNature?: ChartDataNature;
 };
 
-/**
- * Profile-first builder for governed chart surfaces.
- *
- * Feature/domain packages pass business data and intent; presentation profile
- * owns the repeated ERP chart defaults.
- */
 export function buildGovernedChartSurface(
   input: BuildGovernedChartSurfaceInput,
 ): GovernedChartConfigurationInput {

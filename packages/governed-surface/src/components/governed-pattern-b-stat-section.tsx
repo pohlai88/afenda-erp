@@ -2,6 +2,7 @@ import "server-only";
 
 import type { ReactNode } from "react";
 import { getGovernedSurfaceTranslations } from "../i18n/governed-surface-copy";
+import { governedTestId } from "../utils/governed-identity.shared";
 
 import { GovernedComponentRenderer } from "../metadata/index";
 import { logUnexpectedServerError } from "../data/governed-logging.server";
@@ -49,7 +50,7 @@ export type GovernedPatternBStatSectionProps = {
 };
 
 export function governedStatSectionTestId(surfaceKey: string): string {
-  return `governed-stat-section:${surfaceKey}`;
+  return governedTestId("stat-section", surfaceKey);
 }
 
 export async function GovernedPatternBStatSection({
@@ -76,6 +77,8 @@ export async function GovernedPatternBStatSection({
     density,
     className,
     sectionTestId,
+    surfaceKey,
+    sectionKey: surfaceKey,
     headerSlot,
     title,
     description,
@@ -135,7 +138,10 @@ export async function GovernedPatternBStatSection({
               <section
                 key={group.groupKey}
                 className="flex flex-col gap-2"
-                data-testid={`governed-stat-group:${surfaceKey}:${group.groupKey}`}
+                data-testid={governedTestId(
+                  "stat-group",
+                  `${surfaceKey}:${group.groupKey}`,
+                )}
               >
                 {group.label ? (
                   <p className="type-muted font-medium">

@@ -69,6 +69,7 @@ export {
 } from "./components/governed-list-surface";
 export {
   ActionFormErrors,
+  type ActionFormErrorKind,
   type ActionFormErrorsProps,
 } from "./components/action-form-errors";
 export {

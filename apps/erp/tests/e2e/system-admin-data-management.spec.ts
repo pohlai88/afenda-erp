@@ -28,10 +28,10 @@ async function gotoDataManagementWorkbench(
   const pageRoot = page.getByTestId("system-admin-data-management-page");
   const summary = page.getByTestId("system-admin-data-management-summary");
   const templates = page.getByTestId(
-    `governed-list-section:${systemAdminImportTemplatesSurfaceKey}`,
+    `governed:list-section:${systemAdminImportTemplatesSurfaceKey}`,
   );
   const importJobs = page.getByTestId(
-    `governed-list-section:${systemAdminImportJobsSurfaceKey}`,
+    `governed:list-section:${systemAdminImportJobsSurfaceKey}`,
   );
 
   await expect(accessDenied.or(pageRoot)).toBeVisible({ timeout: 60_000 });

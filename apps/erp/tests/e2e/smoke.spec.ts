@@ -103,13 +103,17 @@ test.describe("Afenda ERP authenticated smoke", () => {
       page.getByRole("heading", { level: 1, name: "FINANCE-001" }),
     ).toBeVisible();
 
-    const detailTabs = page.getByTestId("governed-detail-tabs");
+    const detailTabs = page.getByTestId(
+      "governed:detail-tabs:finance-milestone-1",
+    );
     await expect(detailTabs).toBeVisible();
-    await expect(detailTabs.getByTestId("tab-overview")).toBeVisible();
+    await expect(
+      detailTabs.getByTestId("governed:detail-tab:overview"),
+    ).toBeVisible();
     await expect(detailTabs.getByText("Record type")).toBeVisible();
     await expect(detailTabs.getByText("Amount")).toBeVisible();
 
-    await detailTabs.getByTestId("tab-relations").click();
+    await detailTabs.getByTestId("governed:detail-tab:relations").click();
     await expect(detailTabs.getByText("Extension metadata")).toBeVisible();
   });
 
@@ -125,9 +129,13 @@ test.describe("Afenda ERP authenticated smoke", () => {
       }),
     ).toBeVisible();
 
-    const detailTabs = page.getByTestId("governed-detail-tabs");
+    const detailTabs = page.getByTestId(
+      "governed:detail-tabs:finance-work-item-1",
+    );
     await expect(detailTabs).toBeVisible();
-    await expect(detailTabs.getByTestId("tab-overview")).toBeVisible();
+    await expect(
+      detailTabs.getByTestId("governed:detail-tab:overview"),
+    ).toBeVisible();
     await expect(detailTabs.getByText("Owner")).toBeVisible();
     await expect(detailTabs.getByText("Status")).toBeVisible();
     await expect(detailTabs.getByText("Priority")).toBeVisible();

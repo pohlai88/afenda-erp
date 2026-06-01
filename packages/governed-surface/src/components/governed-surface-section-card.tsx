@@ -11,7 +11,10 @@ import {
 import { cn } from "@afenda/ui/utils";
 
 import type { EmptyState } from "../schemas/list-surface.schema";
+import type { GovernedRenderableState } from "../schemas/governed-component-state.schema";
 import { densityGapClass } from "../schemas/surface-chrome.classes";
+import { diagnosticsDataAttributes } from "../utils/governed-diagnostics.shared";
+import { governedIdentityAttributes } from "../utils/governed-identity.shared";
 import type { GovernedPatternSectionDensity } from "./governed-pattern-section-shell.shared";
 import { GovernedEmpty } from "./governed-empty";
 
@@ -30,6 +33,10 @@ export type GovernedSurfaceSectionCardProps = {
   density?: GovernedPatternSectionDensity;
   className?: string;
   contentClassName?: string;
+  /** When set, emits identity and diagnostics attrs on the Card root. */
+  sectionKey?: string;
+  surfaceKey?: string;
+  testId?: string;
 };
 
 export function GovernedSurfaceSectionCard({
@@ -40,11 +47,31 @@ export function GovernedSurfaceSectionCard({
   density = "comfortable",
   className,
   contentClassName,
+  sectionKey,
+  surfaceKey,
+  testId,
 }: GovernedSurfaceSectionCardProps) {
+  const renderState = body.state satisfies GovernedRenderableState;
+  const contractAttrs =
+    sectionKey || surfaceKey
+      ? {
+          ...governedIdentityAttributes({
+            surfaceKey,
+            sectionKey: sectionKey ?? surfaceKey,
+            componentKey: sectionKey ?? surfaceKey,
+          }),
+          ...diagnosticsDataAttributes({
+            state: renderState,
+            testId,
+          }),
+        }
+      : {};
+
   return (
     <Card
       size={density === "compact" ? "sm" : "default"}
       className={cn("mt-surface-2xl border-solid border-border", className)}
+      {...contractAttrs}
     >
       <CardHeader>
         <CardTitle className="type-subtitle">

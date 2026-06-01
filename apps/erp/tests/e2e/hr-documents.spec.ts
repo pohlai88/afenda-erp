@@ -30,7 +30,7 @@ async function gotoDocumentsWorkbench(
     page.getByRole("alert").filter({ hasText: "Access restricted" }),
   ).not.toBeVisible();
   await expect(
-    page.locator('[data-testid^="governed-list-section:"]').first(),
+    page.locator('[data-testid^="governed:list-section:"]').first(),
   ).toBeVisible({ timeout: 240_000 });
   await dismissDevSignInPanel(page);
 }

@@ -16,12 +16,25 @@ import type {
 } from "../schemas/detail-tabs.schema";
 import { governedDetailTabsSchema } from "../schemas/detail-tabs.schema";
 
+import { governedRendererCopy } from "../i18n/governed-renderer-copy.shared";
 import { resolveGovernedDetailSectionContent } from "../metadata/detail-section.adapter";
+import { diagnosticsDataAttributes } from "../utils/governed-diagnostics.shared";
+import { GovernedHeading } from "../utils/governed-heading.shared";
+import {
+  governedDescriptionId,
+  governedHeadingId,
+  governedIdentityAttributes,
+  governedTestId,
+  toGovernedDomId,
+} from "../utils/governed-identity.shared";
 import { GovernedAuditPanel } from "./governed-audit-panel";
 import { GovernedEmpty } from "./governed-empty";
 
 export type GovernedDetailTabsProps = {
   model: GovernedDetailTabsInput;
+  surfaceKey?: string;
+  sectionKey?: string;
+  componentKey?: string;
 };
 
 function sortVisibleSections(
@@ -38,11 +51,29 @@ function renderSectionSlot(section: GovernedDetailSection) {
   return resolveGovernedDetailSectionContent(section);
 }
 
+function detailSectionHeadingId(
+  tabKind: "relations" | "referrers",
+  sectionId: string,
+): string {
+  return governedHeadingId("detail-section", `${tabKind}-${sectionId}`);
+}
+
+function detailSectionDescriptionId(
+  tabKind: "relations" | "referrers",
+  sectionId: string,
+): string {
+  return governedDescriptionId("detail-section", `${tabKind}-${sectionId}`);
+}
+
 function RevisionsTable({ rows }: { rows: GovernedRevisionEntry[] }) {
   if (rows.length === 0) {
     return (
       <GovernedEmpty
-        model={{ variant: "muted", title: "No revision history." }}
+        model={{
+          variant: "muted",
+          title: "No revision history.",
+          emptyId: "detail-revisions-empty",
+        }}
       />
     );
   }
@@ -115,19 +146,87 @@ function effectiveDefaultTab(
   return "overview";
 }
 
-export function GovernedDetailTabs({ model }: GovernedDetailTabsProps) {
+function DetailTabSection({
+  tabKind,
+  section,
+  surfaceKey,
+}: {
+  tabKind: "relations" | "referrers";
+  section: GovernedDetailSection;
+  surfaceKey?: string;
+}) {
+  const headingId = detailSectionHeadingId(tabKind, section.id);
+  const descriptionId = detailSectionDescriptionId(tabKind, section.id);
+  const sectionComponentKey = `${tabKind}-${section.id}`;
+
+  return (
+    <section
+      className="flex flex-col gap-2"
+      aria-labelledby={headingId}
+      {...(section.description ? { "aria-describedby": descriptionId } : {})}
+      {...governedIdentityAttributes({
+        surfaceKey,
+        sectionKey: sectionComponentKey,
+        componentKey: sectionComponentKey,
+      })}
+      {...diagnosticsDataAttributes({
+        state: "ready",
+        testId: governedTestId("detail-section", sectionComponentKey),
+      })}
+    >
+      <GovernedHeading level={3} variant="card" id={headingId}>
+        {section.label}
+      </GovernedHeading>
+      {section.description ? (
+        <p className="type-muted" id={descriptionId}>
+          {section.description}
+        </p>
+      ) : null}
+      {renderSectionSlot(section)}
+    </section>
+  );
+}
+
+export function GovernedDetailTabs({
+  model,
+  surfaceKey,
+  sectionKey,
+  componentKey,
+}: GovernedDetailTabsProps) {
   const parsedModel = governedDetailTabsSchema.safeParse(model);
+  const resolvedComponentKey =
+    componentKey ??
+    surfaceKey ??
+    (parsedModel.success ? parsedModel.data.entityId : "detail-tabs");
+  const panelId = toGovernedDomId("governed-detail-tabs", resolvedComponentKey);
+
   if (!parsedModel.success) {
     return (
-      <GovernedEmpty
-        model={{
-          variant: "muted",
-          title: "Detail tabs unavailable",
-          description: "The detail tab model could not be parsed.",
-        }}
-      />
+      <section
+        id={panelId}
+        {...governedIdentityAttributes({
+          surfaceKey,
+          sectionKey,
+          componentKey: resolvedComponentKey,
+        })}
+        {...diagnosticsDataAttributes({
+          state: "invalid",
+          testId: governedTestId("detail-tabs", resolvedComponentKey),
+        })}
+      >
+        <GovernedEmpty
+          model={{
+            variant: "error",
+            title: governedRendererCopy.parseError.detailTabs.userTitle,
+            description:
+              governedRendererCopy.parseError.detailTabs.userDescription,
+            emptyId: "detail-tabs-invalid",
+          }}
+        />
+      </section>
     );
   }
+
   const normalizedModel = parsedModel.data;
   const kinds = visibleTabKinds(normalizedModel);
   const defaultValue = effectiveDefaultTab(normalizedModel);
@@ -135,49 +234,80 @@ export function GovernedDetailTabs({ model }: GovernedDetailTabsProps) {
   const referrers = sortVisibleSections(normalizedModel.referrers);
   const revisions = normalizedModel.revisions ?? [];
   const auditRows = normalizedModel.audit ?? [];
+  const auditComponentKey = `${resolvedComponentKey}-audit`;
 
   return (
-    <div data-testid="governed-detail-tabs">
+    <section
+      id={panelId}
+      {...governedIdentityAttributes({
+        surfaceKey,
+        sectionKey,
+        componentKey: resolvedComponentKey,
+      })}
+      {...diagnosticsDataAttributes({
+        state: "ready",
+        testId: governedTestId("detail-tabs", resolvedComponentKey),
+      })}
+    >
       <Tabs defaultValue={defaultValue} className="gap-surface-lg">
         <TabsList
           variant="line"
           className="w-full justify-start overflow-x-auto"
         >
           {kinds.includes("overview") ? (
-            <TabsTrigger value="overview" data-testid="tab-overview">
+            <TabsTrigger
+              value="overview"
+              data-testid={governedTestId("detail-tab", "overview")}
+            >
               {normalizedModel.overview.label}
             </TabsTrigger>
           ) : null}
           {kinds.includes("relations") ? (
-            <TabsTrigger value="relations" data-testid="tab-relations">
+            <TabsTrigger
+              value="relations"
+              data-testid={governedTestId("detail-tab", "relations")}
+            >
               Relations
             </TabsTrigger>
           ) : null}
           {kinds.includes("referrers") ? (
-            <TabsTrigger value="referrers" data-testid="tab-referrers">
+            <TabsTrigger
+              value="referrers"
+              data-testid={governedTestId("detail-tab", "referrers")}
+            >
               Referrers
             </TabsTrigger>
           ) : null}
           {kinds.includes("revisions") ? (
-            <TabsTrigger value="revisions" data-testid="tab-revisions">
+            <TabsTrigger
+              value="revisions"
+              data-testid={governedTestId("detail-tab", "revisions")}
+            >
               Revisions
             </TabsTrigger>
           ) : null}
           {kinds.includes("audit") ? (
-            <TabsTrigger value="audit" data-testid="tab-audit">
+            <TabsTrigger
+              value="audit"
+              data-testid={governedTestId("detail-tab", "audit")}
+            >
               Audit
             </TabsTrigger>
           ) : null}
         </TabsList>
 
         {kinds.includes("overview") ? (
-          <TabsContent value="overview" data-testid="tab-panel-overview">
+          <TabsContent
+            value="overview"
+            data-testid={governedTestId("detail-tab-panel", "overview")}
+          >
             {normalizedModel.overview.hidden ? (
               <GovernedEmpty
                 model={{
                   variant: "muted",
                   title: "Overview hidden",
                   description: "This overview section is marked hidden.",
+                  emptyId: "detail-overview-hidden",
                 }}
               />
             ) : (
@@ -194,67 +324,55 @@ export function GovernedDetailTabs({ model }: GovernedDetailTabsProps) {
         ) : null}
 
         {kinds.includes("relations") ? (
-          <TabsContent value="relations" data-testid="tab-panel-relations">
+          <TabsContent
+            value="relations"
+            data-testid={governedTestId("detail-tab-panel", "relations")}
+          >
             <div className="flex flex-col gap-surface-2xl">
               {relations.map((section) => (
-                <section
+                <DetailTabSection
                   key={section.id}
-                  className="flex flex-col gap-2"
-                  aria-labelledby={`governed-detail-relations-${section.id}`}
-                >
-                  <h3
-                    className="type-subtitle"
-                    id={`governed-detail-relations-${section.id}`}
-                  >
-                    {section.label}
-                  </h3>
-                  {section.description ? (
-                    <p className="type-muted">
-                      {section.description}
-                    </p>
-                  ) : null}
-                  {renderSectionSlot(section)}
-                </section>
+                  tabKind="relations"
+                  section={section}
+                  surfaceKey={surfaceKey}
+                />
               ))}
             </div>
           </TabsContent>
         ) : null}
 
         {kinds.includes("referrers") ? (
-          <TabsContent value="referrers" data-testid="tab-panel-referrers">
+          <TabsContent
+            value="referrers"
+            data-testid={governedTestId("detail-tab-panel", "referrers")}
+          >
             <div className="flex flex-col gap-surface-2xl">
               {referrers.map((section) => (
-                <section
+                <DetailTabSection
                   key={section.id}
-                  className="flex flex-col gap-2"
-                  aria-labelledby={`governed-detail-referrers-${section.id}`}
-                >
-                  <h3
-                    className="type-subtitle"
-                    id={`governed-detail-referrers-${section.id}`}
-                  >
-                    {section.label}
-                  </h3>
-                  {section.description ? (
-                    <p className="type-muted">
-                      {section.description}
-                    </p>
-                  ) : null}
-                  {renderSectionSlot(section)}
-                </section>
+                  tabKind="referrers"
+                  section={section}
+                  surfaceKey={surfaceKey}
+                />
               ))}
             </div>
           </TabsContent>
         ) : null}
 
         {kinds.includes("revisions") ? (
-          <TabsContent value="revisions" data-testid="tab-panel-revisions">
+          <TabsContent
+            value="revisions"
+            data-testid={governedTestId("detail-tab-panel", "revisions")}
+          >
             <RevisionsTable rows={revisions} />
           </TabsContent>
         ) : null}
 
         {kinds.includes("audit") ? (
-          <TabsContent value="audit" data-testid="tab-panel-audit">
+          <TabsContent
+            value="audit"
+            data-testid={governedTestId("detail-tab-panel", "audit")}
+          >
             <GovernedAuditPanel
               model={{
                 dataNature: "audit-trail",
@@ -262,10 +380,13 @@ export function GovernedDetailTabs({ model }: GovernedDetailTabsProps) {
                 headerDescription: `${normalizedModel.entityKind} · ${normalizedModel.entityId}`,
                 rows: auditRows,
               }}
+              surfaceKey={surfaceKey}
+              sectionKey={sectionKey}
+              componentKey={auditComponentKey}
             />
           </TabsContent>
         ) : null}
       </Tabs>
-    </div>
+    </section>
   );
 }

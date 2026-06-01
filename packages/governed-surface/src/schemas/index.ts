@@ -273,3 +273,8 @@ export {
   parseGovernedListTrailingCellContext,
   type GovernedListTrailingCellContext,
 } from "./list-trailing-cell-context.schema";
+
+export type {
+  GovernedDataNatureTag,
+  GovernedRenderableState,
+} from "./governed-component-state.schema";

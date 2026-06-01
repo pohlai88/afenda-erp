@@ -6,6 +6,7 @@
 export {
   GovernedDataTableClient,
   type GovernedDataTableClientProps,
+  type GovernedDataTableDensity,
 } from "./components/governed-data-table.client";
 
 export {
@@ -58,6 +59,7 @@ export {
 
 export {
   ActionFormErrors,
+  type ActionFormErrorKind,
   type ActionFormErrorsProps,
 } from "./components/action-form-errors";
 
@@ -73,6 +75,32 @@ export {
   governedListRowTestId,
   governedListSurfaceTestId,
 } from "./list-surface-identity.shared";
+
+export {
+  diagnosticsDataAttributes,
+  type GovernedDiagnostics,
+  type GovernedDiagnosticsDataAttributes,
+  type GovernedRenderableState,
+} from "./utils/governed-diagnostics.shared";
+
+export {
+  governedDescriptionId,
+  governedHeadingId,
+  governedIdentityAttributes,
+  governedTestId,
+  toGovernedDomId,
+  type GovernedIdentity,
+  type GovernedIdentityAttributes,
+} from "./utils/governed-identity.shared";
+
+export {
+  GovernedHeading,
+  type GovernedHeadingLevel,
+  type GovernedHeadingProps,
+  type GovernedHeadingVariant,
+} from "./utils/governed-heading.shared";
+
+export { asGovernedRoute, isGovernedRoute } from "./utils/governed-safe-route";
 
 export {
   DEFAULT_GOVERNED_LIST_TOOLBAR_RESET_PARAMS,

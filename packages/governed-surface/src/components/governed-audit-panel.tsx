@@ -1,5 +1,3 @@
-import type { Route } from "next";
-
 import Link from "next/link";
 
 import { Badge } from "@afenda/ui/badge";
@@ -13,13 +11,38 @@ import {
 } from "@afenda/ui/table";
 import { cn } from "@afenda/ui/utils";
 
-import type { AuditPanelModel } from "../schemas/audit-panel.schema";
 import { governedRendererCopy } from "../i18n/governed-renderer-copy.shared";
+import {
+  auditPanelSchema,
+  type AuditPanelModel,
+} from "../schemas/audit-panel.schema";
+import { diagnosticsDataAttributes } from "../utils/governed-diagnostics.shared";
+import { GovernedHeading } from "../utils/governed-heading.shared";
+import {
+  governedDescriptionId,
+  governedHeadingId,
+  governedIdentityAttributes,
+  governedTestId,
+  toGovernedDomId,
+} from "../utils/governed-identity.shared";
+import { asGovernedRoute } from "../utils/governed-safe-route";
 import { GovernedEmpty } from "./governed-empty";
 
 export type GovernedAuditPanelProps = {
   model: AuditPanelModel;
+  surfaceKey?: string;
+  sectionKey?: string;
+  componentKey?: string;
+  className?: string;
 };
+
+const AUDIT_COLUMNS = {
+  when: "When",
+  action: "Action",
+  actor: "Actor",
+  resource: "Resource",
+  details: "Details",
+} as const;
 
 const AUDIT_ROW_TONE_CLASS = {
   default: "",
@@ -37,30 +60,108 @@ const AUDIT_CHIP_VARIANT = {
 /**
  * Read-only audit/evidence table — label resolution stays in the owning module.
  */
-export function GovernedAuditPanel({ model }: GovernedAuditPanelProps) {
-  if (model.rows.length === 0) {
+export function GovernedAuditPanel({
+  model,
+  surfaceKey,
+  sectionKey,
+  componentKey = surfaceKey ?? "audit-panel",
+  className,
+}: GovernedAuditPanelProps) {
+  const panelId = toGovernedDomId("governed-audit-panel", componentKey);
+  const headingId = governedHeadingId("audit-panel", componentKey);
+  const descriptionId = governedDescriptionId("audit-panel", componentKey);
+  const parsed = auditPanelSchema.safeParse(model);
+
+  if (!parsed.success) {
     return (
-      <GovernedEmpty
-        model={{
-          variant: "muted",
-          title: governedRendererCopy.empty.auditPanel.title,
-          description:
-            model.headerDescription ??
-            governedRendererCopy.empty.auditPanel.description,
-        }}
-      />
+      <section
+        id={panelId}
+        aria-labelledby={headingId}
+        className={className}
+        {...governedIdentityAttributes({
+          surfaceKey,
+          sectionKey,
+          componentKey,
+        })}
+        {...diagnosticsDataAttributes({
+          state: "invalid",
+          testId: governedTestId("audit-panel", componentKey),
+        })}
+      >
+        <GovernedHeading level={3} variant="card" id={headingId} className="sr-only">
+          {governedRendererCopy.empty.auditPanel.title}
+        </GovernedHeading>
+        <GovernedEmpty
+          model={{
+            variant: "error",
+            title: governedRendererCopy.parseError.auditPanel.userTitle,
+            description:
+              governedRendererCopy.parseError.auditPanel.userDescription,
+            emptyId: "audit-panel-invalid",
+          }}
+        />
+      </section>
     );
   }
 
-  const tableDensity = model.density === "compact" ? "compact" : "comfortable";
+  const resolved = parsed.data;
+  const isEmpty = resolved.rows.length === 0;
+  const contractAttrs = {
+    ...governedIdentityAttributes({
+      surfaceKey,
+      sectionKey,
+      componentKey,
+    }),
+    ...diagnosticsDataAttributes({
+      state: isEmpty ? "empty" : "ready",
+      testId: governedTestId("audit-panel", componentKey),
+    }),
+  };
+
+  if (isEmpty) {
+    return (
+      <section
+        id={panelId}
+        aria-labelledby={headingId}
+        className={className}
+        {...contractAttrs}
+      >
+        <GovernedHeading level={3} variant="card" id={headingId} className="sr-only">
+          {resolved.headerTitle}
+        </GovernedHeading>
+        <GovernedEmpty
+          model={{
+            variant: "muted",
+            title: governedRendererCopy.empty.auditPanel.title,
+            description:
+              resolved.headerDescription ??
+              governedRendererCopy.empty.auditPanel.description,
+            emptyId: "audit-panel-empty",
+          }}
+        />
+      </section>
+    );
+  }
+
+  const tableDensity = resolved.density === "compact" ? "compact" : "comfortable";
   const headerCellClass = "type-table-header";
 
   return (
-    <div className="flex flex-col gap-3">
+    <section
+      id={panelId}
+      aria-labelledby={headingId}
+      aria-describedby={resolved.headerDescription ? descriptionId : undefined}
+      className={cn("flex flex-col gap-3", className)}
+      {...contractAttrs}
+    >
       <div>
-        <h3 className="type-subtitle">{model.headerTitle}</h3>
-        {model.headerDescription ? (
-          <p className="type-muted">{model.headerDescription}</p>
+        <GovernedHeading level={3} variant="card" id={headingId}>
+          {resolved.headerTitle}
+        </GovernedHeading>
+        {resolved.headerDescription ? (
+          <p id={descriptionId} className="type-muted">
+            {resolved.headerDescription}
+          </p>
         ) : null}
       </div>
       {/* audit-ds: ignore no-arbitrary-value — scroll viewport height contract */}
@@ -68,24 +169,28 @@ export function GovernedAuditPanel({ model }: GovernedAuditPanelProps) {
         {/* audit-ds: ignore no-arbitrary-value — table minimum scroll width */}
         <Table
           density={tableDensity}
-          aria-label={model.headerTitle}
+          aria-labelledby={headingId}
+          aria-describedby={resolved.headerDescription ? descriptionId : undefined}
+          data-testid={governedTestId("audit-panel-table", componentKey)}
           className="min-w-[720px] text-left type-control" // audit-ds: ignore no-arbitrary-value — table minimum scroll width
         >
           <TableHeader className="sticky top-0 z-raised bg-card shadow-elevation-1">
             <TableRow>
-              <TableHead className={headerCellClass}>When</TableHead>
-              <TableHead className={headerCellClass}>Action</TableHead>
-              <TableHead className={headerCellClass}>Actor</TableHead>
-              <TableHead className={headerCellClass}>Resource</TableHead>
-              <TableHead className={headerCellClass}>Details</TableHead>
+              <TableHead className={headerCellClass}>{AUDIT_COLUMNS.when}</TableHead>
+              <TableHead className={headerCellClass}>{AUDIT_COLUMNS.action}</TableHead>
+              <TableHead className={headerCellClass}>{AUDIT_COLUMNS.actor}</TableHead>
+              <TableHead className={headerCellClass}>{AUDIT_COLUMNS.resource}</TableHead>
+              <TableHead className={headerCellClass}>{AUDIT_COLUMNS.details}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {model.rows.map((row) => {
+            {resolved.rows.map((row) => {
               const tone = row.tone ?? "default";
               return (
                 <TableRow
                   key={row.id}
+                  data-audit-row-id={row.id}
+                  data-audit-tone={tone}
                   className={cn("hover:bg-muted/30", AUDIT_ROW_TONE_CLASS[tone])}
                 >
                   <TableCell className="type-mono-muted whitespace-nowrap">
@@ -99,7 +204,7 @@ export function GovernedAuditPanel({ model }: GovernedAuditPanelProps) {
                   <TableCell className="type-mono-cell">
                     {row.href ? (
                       <Link
-                        href={row.href as Route}
+                        href={asGovernedRoute(row.href)}
                         prefetch={false}
                         className="text-primary hover:underline"
                       >
@@ -144,8 +249,9 @@ export function GovernedAuditPanel({ model }: GovernedAuditPanelProps) {
                       ) : null}
                       {row.evidenceHref ? (
                         <Link
-                          href={row.evidenceHref as Route}
+                          href={asGovernedRoute(row.evidenceHref)}
                           prefetch={false}
+                          data-testid={governedTestId("audit-evidence", row.id)}
                           className="w-fit type-caption text-primary hover:underline"
                         >
                           Evidence
@@ -159,6 +265,6 @@ export function GovernedAuditPanel({ model }: GovernedAuditPanelProps) {
           </TableBody>
         </Table>
       </div>
-    </div>
+    </section>
   );
 }

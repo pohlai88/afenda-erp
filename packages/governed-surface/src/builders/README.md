@@ -1,54 +1,66 @@
-# Governed Surface Builders Scaffold
+# Governed Surface Enterprise Builders
 
-Drop this folder into your governed surface package, usually:
+This scaffold is intentionally **builder-only**.
+
+It does not wrap React components and does not create JSX. Components such as
+`GovernedSurface`, `GovernedSection`, Pattern B/C sections, `GovernedAuditPanel`,
+and `GovernedDetailTabs` remain the rendering layer.
+
+## Intended flow
 
 ```txt
-packages/features/governed-surface/src/builders/
+Domain data
+  ↓
+Builder creates governed model/config
+  ↓
+Component renders governed model/config
 ```
 
-## What this scaffold gives you
+## Files
 
-- `buildGovernedListSurface` — list/table surface builder.
-- `buildGovernedChartSurface` — chart surface builder with schema-version defaulting.
-- `buildGovernedStatGrid` — stat card/grid builder.
-- `buildGovernedWorkbenchSurface` — page-level composition builder.
-- `buildGovernedDetailSurface` — record/detail page builder.
-- `buildGovernedFormSurface` — create/edit form builder.
-- `buildGovernedExceptionSurface` — blockers, NCRs, exceptions, approvals.
-- `buildGovernedAuditTimeline` — evidence/history timeline.
-- `buildGovernedActionBar` — primary/secondary/overflow actions.
-- `buildGovernedEmptyState` — no-data, no-results, no-access, not-configured states.
-- `governed-list-toolbar.shared` — focus search, export, toolbar merge helpers.
-- `list-surface-header.shared` — safer header helper that separates machine ID from human title.
+```txt
+builders/
+  empty-state.builders.ts
+  audit-panel.builders.ts
+  detail-tabs.builders.ts
+  build-governed-chart-surface.ts
+  build-governed-list-surface.ts
+  build-governed-stat-grid.ts
+  governed-list-toolbar.shared.ts
+  list-surface-header.shared.ts
+  index.ts
+```
 
-## Recommended enterprise pattern
+## What this solves
 
-Feature packages should expose one builder per ERP screen:
+- Standard empty states for forbidden, invalid, load error, no data, and CTA.
+- Standard audit panel model creation.
+- Standard detail tabs model creation.
+- Keeps existing chart/list/stat config builders.
+- Adds schema-version defaulting to chart builder.
+- Avoids wrapper builders around already-good components.
+
+## Integration
+
+Place the `builders/` folder under your governed-surface package, then export it
+from your package barrel if desired:
 
 ```ts
-export function buildEmployeeWorkbenchSurface(input: EmployeeWorkbenchInput) {
-  return buildGovernedWorkbenchSurface({
-    surfaceId: "hr.employee.workbench",
-    title: "Employees",
-    stats: [buildGovernedStatGrid(...)],
-    list: buildGovernedListSurface(...),
-    actions: buildGovernedActionBar(...),
-  });
-}
+export * from "./builders";
 ```
 
-## Important integration notes
+Then use it inside feature/domain modules:
 
-1. Keep builders server-safe by default. Avoid React, browser APIs, and client hooks.
-2. Builders should construct metadata/configuration only. Rendering stays inside governed-surface renderer components.
-3. Keep `surfaceId`, `columnsId`, `actionId`, and permission IDs stable.
-4. Parse/validate at renderer boundary or feature boundary using your existing Zod schemas.
-5. Add audit tests that prevent feature packages from bypassing these builders.
+```ts
+const auditModel = buildGovernedAuditPanel({ ... });
+```
 
-## Suggested next audits
+```tsx
+<GovernedAuditPanel model={auditModel} />
+```
 
-- No feature package imports renderer schema internals directly unless allowed.
-- Every governed surface has `__schemaVersion`.
-- Every action has stable `actionId`.
-- Every export/bulk action has permission coverage.
-- Every workbench has empty/no-results/access-denied state coverage.
+## Architecture rule
+
+Do not add builders named `buildGovernedSurface`, `buildGovernedSection`,
+`buildGovernedPatternBListSection`, or `buildGovernedPatternCListSection` unless
+they create serializable metadata/config rather than JSX or component props.

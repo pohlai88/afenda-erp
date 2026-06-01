@@ -1,5 +1,3 @@
-import type { Route } from "next";
-
 import Link from "next/link";
 
 import { Button } from "@afenda/ui/button";
@@ -8,10 +6,15 @@ import { ui } from "@afenda/ui/design-system";
 import { cn } from "@afenda/ui/utils";
 
 import type { EmptyState } from "../schemas/list-surface.schema";
+import { governedTestId } from "../utils/governed-identity.shared";
+import { asGovernedRoute } from "../utils/governed-safe-route";
 
 export type GovernedEmptyProps = {
-  model: EmptyState;
+  model: EmptyState & {
+    emptyId?: string;
+  };
   className?: string;
+  testId?: string;
 };
 
 const variantClassName: Record<EmptyState["variant"], string> = {
@@ -32,7 +35,7 @@ const variantClassName: Record<EmptyState["variant"], string> = {
   ),
 };
 
-export function GovernedEmpty({ model, className }: GovernedEmptyProps) {
+export function GovernedEmpty({ model, className, testId }: GovernedEmptyProps) {
   return (
     <Empty
       className={cn(
@@ -40,6 +43,13 @@ export function GovernedEmpty({ model, className }: GovernedEmptyProps) {
         variantClassName[model.variant],
         className,
       )}
+      {...(model.emptyId ? { "data-empty-id": model.emptyId } : {})}
+      data-testid={
+        testId ??
+        (model.emptyId
+          ? governedTestId("empty", model.emptyId)
+          : undefined)
+      }
     >
       <EmptyTitle>{model.title}</EmptyTitle>
       {model.description ? (
@@ -47,7 +57,7 @@ export function GovernedEmpty({ model, className }: GovernedEmptyProps) {
       ) : null}
       {model.cta ? (
         <Button variant="secondary" size="sm" asChild>
-          <Link href={model.cta.href as Route} prefetch={false}>
+          <Link href={asGovernedRoute(model.cta.href)} prefetch={false}>
             {model.cta.label}
           </Link>
         </Button>

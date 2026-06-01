@@ -5,6 +5,7 @@ import Link from "next/link";
 import {
   Avatar,
   AvatarFallback,
+  Button,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroup,
@@ -28,15 +29,17 @@ export function AppShellAccountDropdown({
     <DropdownMenu>
       <AppShellUtilityTriggerTooltip label={account.title}>
         <DropdownMenuTrigger asChild>
-          <button
+          <Button
             aria-label={account.title}
             className="af-appshell__account-button"
+            size="icon-sm"
             type="button"
+            variant="ghost"
           >
             <Avatar className="size-8">
               <AvatarFallback>{account.initials}</AvatarFallback>
             </Avatar>
-          </button>
+          </Button>
         </DropdownMenuTrigger>
       </AppShellUtilityTriggerTooltip>
       <DropdownMenuContent align="end" sideOffset={8}>

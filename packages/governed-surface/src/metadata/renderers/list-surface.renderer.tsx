@@ -1,5 +1,6 @@
 import { GovernedEmpty } from "../../client";
 import { GovernedListSurface } from "../../components/governed-list-surface";
+import { buildGovernedListSurfaceDataAttributes } from "../../list-surface-identity.shared";
 import {
   parseListSurfaceRendererConfiguration,
   type ListSurfaceRendererConfiguration,
@@ -14,12 +15,14 @@ export type ListSurfaceRendererProps = {
   configuration: unknown;
   diagnostics?: GovernedComponentRendererDiagnostics;
   variant?: "full" | "table-only";
+  surfaceKey?: string;
 };
 
 export function ListSurfaceRenderer({
   configuration,
   diagnostics = "user",
   variant,
+  surfaceKey,
 }: ListSurfaceRendererProps) {
   const parsed = parseListSurfaceRendererConfiguration(configuration);
   if (!parsed.success) {
@@ -30,6 +33,7 @@ export function ListSurfaceRenderer({
           variant: "error",
           title: copy.title,
           description: copy.description,
+          emptyId: "list-surface-parse-error",
         }}
       />
     );
@@ -39,11 +43,13 @@ export function ListSurfaceRenderer({
   const { surface, columns, rows, presentation, pagination } = config;
   const resolvedVariant = variant ?? presentation?.variant ?? "full";
   const tableDensity = presentation?.tableDensity ?? "compact";
+  const resolvedSurfaceKey = surfaceKey ?? surface.columnsId;
+  const listState = rows.length === 0 ? "empty" : "ready";
 
   const tableProps = {
     columns,
     rows,
-    surfaceKey: surface.columnsId,
+    surfaceKey: resolvedSurfaceKey,
     columnsId: surface.columnsId,
     tableLabel: surface.header.title,
     dataNature: config.dataNature,
@@ -65,11 +71,29 @@ export function ListSurfaceRenderer({
   const table = <ListSurfaceTable {...tableProps} />;
 
   if (resolvedVariant === "table-only") {
-    return <div className="@container min-w-0">{table}</div>;
+    return (
+      <div
+        className="@container min-w-0"
+        {...buildGovernedListSurfaceDataAttributes({
+          surfaceKey: resolvedSurfaceKey,
+          columnsId: surface.columnsId,
+          dataNature: config.dataNature,
+          presentationVariant: resolvedVariant,
+          density: tableDensity,
+          state: listState,
+        })}
+      >
+        {table}
+      </div>
+    );
   }
 
   return (
-    <GovernedListSurface model={surface} rowCount={rows.length}>
+    <GovernedListSurface
+      model={surface}
+      rowCount={rows.length}
+      surfaceKey={resolvedSurfaceKey}
+    >
       <div className="@container min-w-0">{table}</div>
     </GovernedListSurface>
   );

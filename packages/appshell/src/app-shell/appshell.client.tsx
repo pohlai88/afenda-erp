@@ -17,6 +17,8 @@ import { normalizeCommandRecentIds } from "./command/command-recents.shared";
 import { AppShellGlobalShortcuts } from "./appshell-global-shortcuts.client";
 import { AppShellPreferenceSync } from "./appshell-preference-sync.client";
 import { AppShellSkipToMain } from "./appshell-skip-to-main";
+import { AppShellOrgNotificationDelivery } from "./appshell-org-notification-delivery.client";
+import { AppShellQuickPushMount } from "./quick-push/appshell-quick-push-mount.client";
 import type {
   AppShellChromeProps,
   AppShellRailMode,
@@ -28,6 +30,7 @@ import {
 import { AppShellUtilityBar } from "./top-utils-bar/zones/utility-bar";
 import { CommandPalette } from "./top-utils-bar/command/command-palette.client";
 import { AppShellPrimaryLeftRail } from "./left-rail-bar/appshell-primary-left-rail.client";
+import { AppShellContextMenu } from "./left-rail-bar/appshell-context-menu.client";
 
 type AppShellRuntime = {
   railMode: AppShellRailMode;
@@ -56,20 +59,21 @@ export function useAppShellRuntime() {
 export function AppShellClient({
   chrome,
   actions,
+  overlays,
   utilityPanels,
   children,
 }: AppShellChromeProps) {
   const [railMode, setRailMode] = useState<AppShellRailMode>(
-    chrome.preferences.railMode,
+    () => chrome.preferences.railMode,
   );
-  const [density, setDensity] = useState<"comfortable" | "compact">(
+  const [density, setDensity] = useState<"comfortable" | "compact">(() =>
     chrome.preferences.density === "compact" ? "compact" : "comfortable",
   );
   const [commandOpen, setCommandOpen] = useState(false);
-  const [commandRecents, setCommandRecents] = useState<readonly string[]>(
+  const [commandRecents, setCommandRecents] = useState<readonly string[]>(() =>
     normalizeCommandRecentIds(chrome.preferences.commandRecents),
   );
-  const [utilityOrder, setUtilityOrder] = useState<readonly string[]>(
+  const [utilityOrder, setUtilityOrder] = useState<readonly string[]>(() =>
     normalizeCommandRecentIds(chrome.preferences.utilityOrder, 32),
   );
 
@@ -100,6 +104,7 @@ export function AppShellClient({
         <TooltipProvider>
           <AppShellPreferenceSync actions={actions} preferences={chrome.preferences} />
           <AppShellGlobalShortcuts />
+          <AppShellOrgNotificationDelivery />
           <AppShellChromeBody
             actions={actions}
             chrome={chrome}
@@ -109,9 +114,9 @@ export function AppShellClient({
             railMode={railMode}
             recordCommand={recordCommand}
             setCommandOpen={setCommandOpen}
-            setDensity={setDensity}
             setRailMode={setRailMode}
             utilityOrder={utilityOrder}
+            overlays={overlays}
             utilityPanels={utilityPanels}
           >
             {children}
@@ -125,12 +130,12 @@ export function AppShellClient({
 function AppShellChromeBody({
   chrome,
   actions,
+  overlays,
   utilityPanels,
   children,
   railMode,
   setRailMode,
   density,
-  setDensity,
   commandOpen,
   setCommandOpen,
   commandRecents,
@@ -140,7 +145,6 @@ function AppShellChromeBody({
   railMode: AppShellRailMode;
   setRailMode: Dispatch<SetStateAction<AppShellRailMode>>;
   density: "comfortable" | "compact";
-  setDensity: Dispatch<SetStateAction<"comfortable" | "compact">>;
   commandOpen: boolean;
   setCommandOpen: Dispatch<SetStateAction<boolean>>;
   commandRecents: readonly string[];
@@ -148,6 +152,10 @@ function AppShellChromeBody({
   utilityOrder: readonly string[];
 }) {
   const contextEntries = useAppShellOperationalContextEntries();
+  const orderedUtilityBar = useMemo(
+    () => applyUtilityOrder(chrome.utilityBar, utilityOrder),
+    [chrome.utilityBar, utilityOrder],
+  );
 
   return (
     <>
@@ -162,8 +170,6 @@ function AppShellChromeBody({
       >
         <AppShellUtilityBar
           actions={actions}
-          density={density}
-          onDensityChange={setDensity}
           onOpenCommand={() => setCommandOpen(true)}
           onToggleRail={() =>
             setRailMode((current) =>
@@ -171,7 +177,7 @@ function AppShellChromeBody({
             )
           }
           railMode={railMode}
-          utilityBar={applyUtilityOrder(chrome.utilityBar, utilityOrder)}
+          utilityBar={orderedUtilityBar}
           utilityPanels={utilityPanels}
         />
         <div className="af-appshell__body">
@@ -182,14 +188,20 @@ function AppShellChromeBody({
               data-rail-mode={railMode}
             >
               <AppShellPrimaryLeftRail
-                collapsed={railMode === "collapsed" || railMode === "hover"}
                 config={chrome.rail}
+                displayMode={
+                  railMode === "collapsed" || railMode === "hover"
+                    ? "compact"
+                    : "full"
+                }
               />
             </aside>
           ) : null}
-          <main className="af-appshell__main" id="app-shell-main" tabIndex={-1}>
-            {children}
-          </main>
+          <AppShellContextMenu>
+            <main className="af-appshell__main" id="app-shell-main" tabIndex={-1}>
+              {children}
+            </main>
+          </AppShellContextMenu>
         </div>
         <CommandPalette
           commandOpen={commandOpen}
@@ -199,6 +211,7 @@ function AppShellChromeBody({
           recentIds={commandRecents}
           setCommandOpen={setCommandOpen}
         />
+        <AppShellQuickPushMount>{overlays?.quickPush}</AppShellQuickPushMount>
       </div>
     </>
   );

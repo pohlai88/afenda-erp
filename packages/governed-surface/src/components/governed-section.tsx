@@ -2,11 +2,26 @@ import type { ReactNode } from "react";
 
 import { cn } from "@afenda/ui/utils";
 
+import type { GovernedRenderableState } from "../schemas/governed-component-state.schema";
+import { diagnosticsDataAttributes } from "../utils/governed-diagnostics.shared";
+import { GovernedHeading } from "../utils/governed-heading.shared";
+import {
+  governedDescriptionId,
+  governedHeadingId,
+  governedIdentityAttributes,
+  governedTestId,
+  toGovernedDomId,
+} from "../utils/governed-identity.shared";
+
 export type GovernedSectionProps = {
   title: string;
   description?: string;
   children: ReactNode;
   className?: string;
+  surfaceKey?: string;
+  sectionKey?: string;
+  componentKey?: string;
+  renderState?: GovernedRenderableState;
 };
 
 export function GovernedSection({
@@ -14,13 +29,39 @@ export function GovernedSection({
   description,
   children,
   className,
+  surfaceKey,
+  sectionKey,
+  componentKey = sectionKey ?? surfaceKey ?? "section",
+  renderState = "ready",
 }: GovernedSectionProps) {
+  const sectionDomId = toGovernedDomId("governed-section", componentKey);
+  const headingId = governedHeadingId("section", componentKey);
+  const descriptionId = governedDescriptionId("section", componentKey);
+
   return (
-    <section className={cn("flex flex-col gap-surface-md", className)}>
+    <section
+      id={sectionDomId}
+      className={cn("flex flex-col gap-surface-md", className)}
+      aria-labelledby={headingId}
+      {...(description ? { "aria-describedby": descriptionId } : {})}
+      {...governedIdentityAttributes({
+        surfaceKey,
+        sectionKey,
+        componentKey,
+      })}
+      {...diagnosticsDataAttributes({
+        state: renderState,
+        testId: governedTestId("section", componentKey),
+      })}
+    >
       <div className="flex flex-col gap-1">
-        <h3 className="type-subtitle">{title}</h3>
+        <GovernedHeading level={3} variant="section" id={headingId}>
+          {title}
+        </GovernedHeading>
         {description ? (
-          <p className="type-muted">{description}</p>
+          <p className="type-muted" id={descriptionId}>
+            {description}
+          </p>
         ) : null}
       </div>
       {children}

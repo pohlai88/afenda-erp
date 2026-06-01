@@ -34,6 +34,7 @@ export function GovernedKanbanReadOnlyBoard({
           description: showOperatorDiagnostics
             ? t("invalidConfigDescriptionOperator")
             : t("invalidConfigDescription"),
+          emptyId: "kanban-invalid-config",
         }}
       />
     );

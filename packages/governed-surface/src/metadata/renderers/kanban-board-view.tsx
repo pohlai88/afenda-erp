@@ -46,7 +46,10 @@ export function KanbanBoardView({
   const columns = resolveKanbanColumns(board);
   const cardsByColumn = groupCardsByColumn(board.cards);
 
-  const boardDom = resolveKanbanBoardDomProps(surfaceKey);
+  const boardDom = resolveKanbanBoardDomProps(
+    surfaceKey,
+    columns.length === 0 ? "empty" : "ready",
+  );
 
   if (columns.length === 0) {
     return (
@@ -61,6 +64,7 @@ export function KanbanBoardView({
             variant: "muted",
             title: governedRendererCopy.empty.kanbanBoard.title,
             description: governedRendererCopy.empty.kanbanBoard.description,
+            emptyId: "kanban-board-no-columns",
           }}
         />
       </section>
@@ -101,8 +105,10 @@ export function KanbanBoardView({
                       <>
                         {board.interactionMode === "read-only" &&
                         card.availableTransitions?.length ? (
-                          <KanbanTransitionHints
+          <KanbanTransitionHints
                             transitions={card.availableTransitions}
+                            surfaceKey={surfaceKey}
+                            cardId={card.id}
                           />
                         ) : null}
                         {board.interactionMode === "footer-actions" &&
@@ -126,8 +132,12 @@ export function KanbanBoardView({
 
 function KanbanTransitionHints({
   transitions,
+  surfaceKey,
+  cardId,
 }: {
   transitions: readonly KanbanCardTransitionAvailability[];
+  surfaceKey?: string;
+  cardId?: string;
 }) {
   const visible = transitions.filter(isKanbanCardTransitionRenderable);
   if (visible.length === 0) return null;
@@ -139,7 +149,11 @@ function KanbanTransitionHints({
     >
       {visible.map((transition) => (
         <li key={transition.transitionId}>
-          <GovernedKanbanTransitionHint transition={transition} />
+          <GovernedKanbanTransitionHint
+            transition={transition}
+            surfaceKey={surfaceKey}
+            cardId={cardId}
+          />
         </li>
       ))}
     </ul>

@@ -44,11 +44,11 @@ test.describe("HR geolocation remote check-in", () => {
     await gotoGeolocationWorkbench(page);
 
     await expect(
-      page.getByTestId(`governed-stat-section:${hrGeoStatsSurfaceKey}`),
+      page.getByTestId(`governed:stat-section:${hrGeoStatsSurfaceKey}`),
     ).toBeVisible({ timeout: 240_000 });
 
     await expect(
-      page.getByTestId(`governed-list-section:${hrGeoGeofencesSurfaceKey}`),
+      page.getByTestId(`governed:list-section:${hrGeoGeofencesSurfaceKey}`),
     ).toBeVisible({ timeout: 240_000 });
   });
 });

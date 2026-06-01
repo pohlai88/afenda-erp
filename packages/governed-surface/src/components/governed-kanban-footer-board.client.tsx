@@ -42,6 +42,7 @@ export function GovernedKanbanFooterBoard({
           description: showOperatorDiagnostics
             ? t("invalidConfigDescriptionOperator")
             : t("invalidConfigDescription"),
+          emptyId: "kanban-invalid-config",
         }}
       />
     );
@@ -54,6 +55,7 @@ export function GovernedKanbanFooterBoard({
           variant: "error",
           title: t("invalidConfigTitle"),
           description: t("invalidInteractionMode"),
+          emptyId: "kanban-invalid-interaction-mode-footer",
         }}
       />
     );

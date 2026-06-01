@@ -3,6 +3,7 @@ import { GovernedEmpty } from "../../client";
 import { parseAuditPanelData } from "../../schemas/audit-panel.schema";
 import { governedParseErrorCopy } from "../../i18n/governed-renderer-copy.shared";
 
+import type { RendererProps } from "../governed-renderer-dispatch";
 import type { GovernedComponentRendererDiagnostics } from "../registry";
 
 /**
@@ -11,8 +12,8 @@ import type { GovernedComponentRendererDiagnostics } from "../registry";
 export function AuditPanelRenderer({
   configuration,
   diagnostics = "user",
-}: {
-  configuration: unknown;
+  surfaceKey,
+}: RendererProps & {
   diagnostics?: GovernedComponentRendererDiagnostics;
 }) {
   const parsed = parseAuditPanelData(configuration);
@@ -25,10 +26,17 @@ export function AuditPanelRenderer({
           variant: "error",
           title: copy.title,
           description: copy.description,
+          emptyId: "audit-panel-parse-error",
         }}
       />
     );
   }
 
-  return <GovernedAuditPanel model={parsed.data} />;
+  return (
+    <GovernedAuditPanel
+      model={parsed.data}
+      surfaceKey={surfaceKey}
+      componentKey={surfaceKey ?? "audit-panel"}
+    />
+  );
 }

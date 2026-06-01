@@ -2,17 +2,21 @@
 
 import { useMemo, useState } from "react";
 
+import { Input } from "@afenda/ui";
+
 import type { AppShellPrimaryLeftRailConfig } from "./appshell-primary-left-rail.schema";
 import { filterAppShellPrimaryLeftRailNavSections } from "./appshell-primary-left-rail.shared";
 import { AppShellPrimaryLeftRailRaw } from "./appshell-primary-left-rail-raw.client";
 import { AppShellPrimaryLeftRailFooter } from "./appshell-primary-left-rail-footer.client";
 
+export type AppShellPrimaryLeftRailDisplayMode = "full" | "compact";
+
 export function AppShellPrimaryLeftRail({
   config,
-  collapsed,
+  displayMode,
 }: {
   config: AppShellPrimaryLeftRailConfig;
-  collapsed: boolean;
+  displayMode: AppShellPrimaryLeftRailDisplayMode;
 }) {
   const [query, setQuery] = useState("");
   const sections = useMemo(
@@ -34,8 +38,9 @@ export function AppShellPrimaryLeftRail({
         </div>
       </div>
       <div className="af-appshell__rail-search">
-        <input
+        <Input
           aria-label={config.labels.searchAriaLabel}
+          className="bg-surface"
           onChange={(event) => setQuery(event.target.value)}
           placeholder={config.labels.searchPlaceholder}
           type="search"
@@ -52,7 +57,7 @@ export function AppShellPrimaryLeftRail({
               <div className="af-appshell__nav-list">
                 {section.items.map((item) => (
                   <AppShellPrimaryLeftRailRaw
-                    collapsed={collapsed}
+                    displayMode={displayMode}
                     item={item}
                     key={item.id}
                   />

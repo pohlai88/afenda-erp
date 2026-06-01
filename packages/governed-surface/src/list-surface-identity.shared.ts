@@ -1,5 +1,14 @@
 import type { ListSurfaceRendererDataNature } from "./schemas/list-surface-renderer.schema";
 import type { ListSurfaceRowTrailingAction } from "./schemas/list-surface-row-trailing-action.schema";
+import {
+  diagnosticsDataAttributes,
+  type GovernedDiagnosticsDataAttributes,
+} from "./utils/governed-diagnostics.shared";
+import {
+  governedIdentityAttributes,
+  governedTestId,
+  type GovernedIdentityAttributes,
+} from "./utils/governed-identity.shared";
 
 export type GovernedListSurfaceRenderState = "empty" | "ready";
 
@@ -39,7 +48,7 @@ export function buildGovernedListSurfaceRenderFingerprint(
 }
 
 export function governedListSectionTestId(surfaceKey: string): string {
-  return `governed-list-section:${surfaceKey}`;
+  return governedTestId("list-section", surfaceKey);
 }
 
 export function governedListSectionDomId(surfaceKey: string): string {
@@ -51,14 +60,14 @@ export function governedListSectionAnchorHref(surfaceKey: string): string {
 }
 
 export function governedListSurfaceTestId(surfaceKey: string): string {
-  return `governed-list-surface:${surfaceKey}`;
+  return governedTestId("list-surface", surfaceKey);
 }
 
 export function governedListRowTestId(
   surfaceKey: string,
   rowId: string,
 ): string {
-  return `governed-list-row:${surfaceKey}:${rowId}`;
+  return governedTestId("list-row", `${surfaceKey}:${rowId}`);
 }
 
 export function summarizeListSurfaceTrailingActions(
@@ -81,7 +90,7 @@ export function summarizeListSurfaceTrailingActions(
   return summary;
 }
 
-export type GovernedListSurfaceDataAttributes = {
+export type GovernedListSurfaceLegacyDataAttributes = {
   "data-governed-surface-key"?: string;
   "data-governed-list-state"?: GovernedListSurfaceRenderState;
   "data-governed-columns-id"?: string;
@@ -90,15 +99,21 @@ export type GovernedListSurfaceDataAttributes = {
   "data-governed-presentation-variant"?: string;
 };
 
+/** Legacy `data-governed-*` attrs plus governed identity and diagnostics attrs. */
+export type GovernedListSurfaceDataAttributes = GovernedListSurfaceLegacyDataAttributes &
+  GovernedIdentityAttributes &
+  GovernedDiagnosticsDataAttributes;
+
 export function buildGovernedListSurfaceDataAttributes(input: {
   surfaceKey?: string;
+  sectionKey?: string;
   columnsId?: string;
   dataNature?: ListSurfaceRendererDataNature;
   presentationVariant?: string;
   density?: string;
   state: GovernedListSurfaceRenderState;
 }): GovernedListSurfaceDataAttributes {
-  return {
+  const legacy: GovernedListSurfaceLegacyDataAttributes = {
     ...(input.surfaceKey
       ? { "data-governed-surface-key": input.surfaceKey }
       : {}),
@@ -112,4 +127,20 @@ export function buildGovernedListSurfaceDataAttributes(input: {
       ? { "data-governed-presentation-variant": input.presentationVariant }
       : {}),
   };
+
+  const canonical = {
+    ...governedIdentityAttributes({
+      surfaceKey: input.surfaceKey,
+      sectionKey: input.sectionKey ?? input.surfaceKey,
+      componentKey: input.surfaceKey,
+    }),
+    ...diagnosticsDataAttributes({
+      state: input.state,
+      testId: input.surfaceKey
+        ? governedListSurfaceTestId(input.surfaceKey)
+        : undefined,
+    }),
+  };
+
+  return { ...legacy, ...canonical };
 }

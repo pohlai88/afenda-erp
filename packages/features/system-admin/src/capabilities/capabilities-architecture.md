@@ -89,8 +89,8 @@ system-admin-capabilities-role-matrix
 system-admin-capabilities-settings
 system-admin-capabilities-settings-form
 system-admin-capabilities-settings-submit
-governed-list-section:system-admin.capabilities.list
-governed-list-section:system-admin.capabilities.role-matrix
+governed:list-section:system-admin.capabilities.list
+governed:list-section:system-admin.capabilities.role-matrix
 ```
 
 EUI: section titles use `headingLevel={2}` under the System Admin shell; list surfaces use governed Pattern C metadata with serializable trailing cells.

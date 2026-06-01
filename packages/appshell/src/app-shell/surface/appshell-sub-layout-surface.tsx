@@ -5,6 +5,7 @@ import { PanelLeft } from "lucide-react";
 import Link from "next/link";
 
 import {
+  Button,
   Breadcrumb,
   BreadcrumbItem,
   BreadcrumbLink,
@@ -40,7 +41,7 @@ export function AppShellSurface({
           <div className="flex h-(--af-l1-height) items-center justify-between gap-3 px-4 sm:px-6">
             <div className="flex min-w-0 items-center gap-2">
               {floating ? (
-                <button
+                <Button
                   aria-controls={floating.panelId}
                   aria-expanded={floating.open}
                   aria-label={
@@ -50,11 +51,13 @@ export function AppShellSurface({
                     "af-appshell__icon-button af-appshell__icon-button--sm",
                     floating.open && "bg-accent text-accent-foreground",
                   )}
+                  size="icon-xs"
                   onClick={floating.toggle}
                   type="button"
+                  variant="ghost"
                 >
                   <PanelLeft aria-hidden="true" size={14} />
-                </button>
+                </Button>
               ) : null}
               {breadcrumbs.length > 0 ? (
                 <Breadcrumb>

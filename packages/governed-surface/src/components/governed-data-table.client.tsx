@@ -16,18 +16,38 @@ import {
   TableRow,
 } from "@afenda/ui/table";
 
+import { diagnosticsDataAttributes } from "../utils/governed-diagnostics.shared";
+import { governedIdentityAttributes } from "../utils/governed-identity.shared";
+
+export type GovernedDataTableDensity = "compact" | "comfortable";
+
 export type GovernedDataTableClientProps<TData> = {
   data: TData[];
   columns: ColumnDef<TData, unknown>[];
   getRowId: (originalRow: TData, index: number) => string;
+  tableLabel: string;
+  surfaceKey?: string;
+  sectionKey?: string;
+  componentKey?: string;
+  testId?: string;
+  density?: GovernedDataTableDensity;
+  className?: string;
+  emptyLabel?: string;
 };
 
 export function GovernedDataTableClient<TData>({
   data,
   columns,
   getRowId,
+  tableLabel,
+  surfaceKey,
+  sectionKey,
+  componentKey = sectionKey ?? surfaceKey ?? "data-table",
+  testId,
+  density = "compact",
+  className,
+  emptyLabel = "No records found.",
 }: GovernedDataTableClientProps<TData>) {
-  // TanStack Table returns unstable function identities; React Compiler skips memoization here by design.
   // eslint-disable-next-line react-hooks/incompatible-library -- upstream `useReactTable` contract
   const table = useReactTable({
     data,
@@ -36,13 +56,34 @@ export function GovernedDataTableClient<TData>({
     getRowId,
   });
 
+  const rows = table.getRowModel().rows;
+  const columnCount = table.getAllLeafColumns().length;
+  const renderState = rows.length === 0 ? "empty" : "ready";
+
   return (
-    <Table>
+    <Table
+      density={density}
+      aria-label={tableLabel}
+      className={className}
+      {...governedIdentityAttributes({
+        surfaceKey,
+        sectionKey,
+        componentKey,
+      })}
+      {...diagnosticsDataAttributes({
+        state: renderState,
+        testId,
+      })}
+    >
       <TableHeader>
         {table.getHeaderGroups().map((headerGroup) => (
-          <TableRow key={headerGroup.id}>
+          <TableRow key={headerGroup.id} data-header-group-id={headerGroup.id}>
             {headerGroup.headers.map((header) => (
-              <TableHead key={header.id}>
+              <TableHead
+                key={header.id}
+                scope="col"
+                data-column-id={header.column.id}
+              >
                 {header.isPlaceholder
                   ? null
                   : flexRender(
@@ -54,16 +95,32 @@ export function GovernedDataTableClient<TData>({
           </TableRow>
         ))}
       </TableHeader>
+
       <TableBody>
-        {table.getRowModel().rows.map((row) => (
-          <TableRow key={row.id}>
-            {row.getVisibleCells().map((cell) => (
-              <TableCell key={cell.id}>
-                {flexRender(cell.column.columnDef.cell, cell.getContext())}
-              </TableCell>
-            ))}
+        {rows.length === 0 ? (
+          <TableRow data-row-state="empty">
+            <TableCell
+              colSpan={columnCount}
+              className="py-8 text-center type-muted"
+            >
+              {emptyLabel}
+            </TableCell>
           </TableRow>
-        ))}
+        ) : (
+          rows.map((row) => (
+            <TableRow
+              key={row.id}
+              data-row-id={row.id}
+              data-row-index={row.index}
+            >
+              {row.getVisibleCells().map((cell) => (
+                <TableCell key={cell.id} data-column-id={cell.column.id}>
+                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                </TableCell>
+              ))}
+            </TableRow>
+          ))
+        )}
       </TableBody>
     </Table>
   );

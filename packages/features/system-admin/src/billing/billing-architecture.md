@@ -191,8 +191,8 @@ system-admin-billing-access-denied
 system-admin-billing-readiness
 system-admin-billing-checkout-banner
 system-admin-billing-export-button
-governed-list-section:system-admin.billing.governance
-governed-list-section:system-admin.billing.subscription
+governed:list-section:system-admin.billing.governance
+governed:list-section:system-admin.billing.subscription
 ```
 
 EUI: section titles use `headingLevel={2}` under the System Admin shell; list surfaces use governed Pattern C metadata.

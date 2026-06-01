@@ -4,6 +4,7 @@ import {
   parseGovernedKanbanBoardConfiguration,
 } from "../../schemas/kanban-board.schema";
 
+import type { RendererProps } from "../governed-renderer-dispatch";
 import type { GovernedComponentRendererDiagnostics } from "../registry";
 
 import { KanbanBoardView } from "./kanban-board-view";
@@ -11,14 +12,14 @@ import { KanbanBoardView } from "./kanban-board-view";
 /** Declares container boundary for lint coverage; geometry lives in KanbanBoardView. */
 const KANBAN_RENDERER_SHELL_CLASS = "@container min-w-0";
 
-export type KanbanBoardRendererProps = {
-  configuration: unknown;
+export type KanbanBoardRendererProps = RendererProps & {
   diagnostics?: GovernedComponentRendererDiagnostics;
 };
 
 export function KanbanBoardRenderer({
   configuration,
   diagnostics = "user",
+  surfaceKey,
 }: KanbanBoardRendererProps) {
   const parsed = parseGovernedKanbanBoardConfiguration(configuration);
 
@@ -55,6 +56,7 @@ export function KanbanBoardRenderer({
             variant: "error",
             title,
             description,
+            emptyId: "kanban-board-parse-error",
           }}
         />
       </div>
@@ -74,6 +76,7 @@ export function KanbanBoardRenderer({
             variant: "muted",
             title: parsed.data.copy.boardAriaLabel,
             description,
+            emptyId: "kanban-board-footer-actions-unavailable",
           }}
         />
       </div>
@@ -93,6 +96,7 @@ export function KanbanBoardRenderer({
             variant: "muted",
             title: parsed.data.copy.boardAriaLabel,
             description,
+            emptyId: "kanban-board-drag-unavailable",
           }}
         />
       </div>
@@ -101,7 +105,7 @@ export function KanbanBoardRenderer({
 
   return (
     <div className={KANBAN_RENDERER_SHELL_CLASS}>
-      <KanbanBoardView board={parsed.data} />
+      <KanbanBoardView board={parsed.data} surfaceKey={surfaceKey} />
     </div>
   );
 }

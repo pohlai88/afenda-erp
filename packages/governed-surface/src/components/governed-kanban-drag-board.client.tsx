@@ -45,6 +45,7 @@ export function GovernedKanbanDragBoard({
           description: showOperatorDiagnostics
             ? t("invalidConfigDescriptionOperator")
             : t("invalidConfigDescription"),
+          emptyId: "kanban-invalid-config",
         }}
       />
     );
@@ -57,6 +58,7 @@ export function GovernedKanbanDragBoard({
           variant: "error",
           title: t("invalidConfigTitle"),
           description: t("invalidInteractionModeDrag"),
+          emptyId: "kanban-invalid-interaction-mode-drag",
         }}
       />
     );

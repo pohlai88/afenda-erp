@@ -207,6 +207,32 @@ export {
 } from "./list-surface-identity.shared";
 
 export {
+  diagnosticsDataAttributes,
+  type GovernedDiagnostics,
+  type GovernedDiagnosticsDataAttributes,
+  type GovernedRenderableState,
+} from "./utils/governed-diagnostics.shared";
+
+export {
+  governedDescriptionId,
+  governedHeadingId,
+  governedIdentityAttributes,
+  governedTestId,
+  toGovernedDomId,
+  type GovernedIdentity,
+  type GovernedIdentityAttributes,
+} from "./utils/governed-identity.shared";
+
+export {
+  GovernedHeading,
+  type GovernedHeadingLevel,
+  type GovernedHeadingProps,
+  type GovernedHeadingVariant,
+} from "./utils/governed-heading.shared";
+
+export { asGovernedRoute, isGovernedRoute } from "./utils/governed-safe-route";
+
+export {
   DEFAULT_GOVERNED_LIST_TOOLBAR_RESET_PARAMS,
   buildGovernedListToolbarCanonicalHref,
   buildGovernedListToolbarClearHref,

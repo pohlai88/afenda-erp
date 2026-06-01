@@ -384,10 +384,10 @@ system-admin-data-management-import-jobs
 system-admin-data-management-create-form
 system-admin-data-management-create-submit
 system-admin-data-management-export-button
-governed-list-section:system-admin.data-management.templates.list
-governed-list-section:system-admin.data-management.import-jobs.list
-governed-list-section:system-admin.data-management.import-failures.list
-governed-list-section:system-admin.data-management.exports.list
+governed:list-section:system-admin.data-management.templates.list
+governed:list-section:system-admin.data-management.import-jobs.list
+governed:list-section:system-admin.data-management.import-failures.list
+governed:list-section:system-admin.data-management.exports.list
 ```
 
 EUI: section titles use `headingLevel={2}` under the System Admin shell; list surfaces use governed Pattern C metadata.

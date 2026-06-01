@@ -13,6 +13,7 @@ import {
   type AppShellOperationalContextStack,
 } from "./operational-context-stack.shared";
 import {
+  type AppShellUtilityAdapterKey,
   appShellUtilityBarMetadataSchema,
   type AppShellUtilityBarMetadata,
 } from "./top-utils-bar/metadata/utility-bar-metadata.shared";
@@ -185,12 +186,33 @@ export type AppShellActions = {
   signOutAction?: () => Promise<void>;
 };
 
-export type AppShellUtilityPanelSlots = Record<string, ReactNode>;
+export const appShellUtilityPanelKeys = [
+  "upload",
+  "screenshot",
+  "lynx",
+  "notifications",
+  "messenger",
+  "coordination",
+  "feedback",
+  "system-admin",
+  "quick-create",
+] as const satisfies readonly AppShellUtilityAdapterKey[];
+
+export type AppShellUtilityPanelKey =
+  (typeof appShellUtilityPanelKeys)[number];
+export type AppShellUtilityPanelSlots = Partial<
+  Record<AppShellUtilityPanelKey, ReactNode>
+>;
+
+export type AppShellOverlaySlots = {
+  quickPush?: ReactNode;
+};
 
 export type AppShellChromeProps = {
   chrome: AppShellChrome;
   actions?: AppShellActions;
   utilityPanels?: AppShellUtilityPanelSlots;
+  overlays?: AppShellOverlaySlots;
   children: ReactNode;
 };
 

@@ -22,7 +22,7 @@ async function gotoBillingWorkbench(page: import("@playwright/test").Page) {
   const pageRoot = page.getByTestId("system-admin-billing-page");
   const readiness = page.getByTestId("system-admin-billing-readiness");
   const subscription = page.getByTestId(
-    `governed-list-section:${systemAdminBillingSubscriptionSurfaceKey}`,
+    `governed:list-section:${systemAdminBillingSubscriptionSurfaceKey}`,
   );
 
   await expect(accessDenied.or(pageRoot)).toBeVisible({ timeout: 60_000 });
@@ -37,7 +37,7 @@ async function gotoBillingWorkbench(page: import("@playwright/test").Page) {
   await expect(readiness).toBeVisible();
   await expect(
     page.getByTestId(
-      `governed-list-section:${systemAdminBillingGovernanceSurfaceKey}`,
+      `governed:list-section:${systemAdminBillingGovernanceSurfaceKey}`,
     ),
   ).toBeVisible();
   await expect(subscription).toBeVisible();

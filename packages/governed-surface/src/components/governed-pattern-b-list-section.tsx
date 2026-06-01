@@ -81,6 +81,8 @@ export async function GovernedPatternBListSection({
     className,
     sectionTestId,
     sectionDomId,
+    surfaceKey,
+    sectionKey: surfaceKey,
     headerSlot,
     title,
     description,
@@ -165,5 +167,8 @@ export async function GovernedPatternBListSection({
     };
   }
 
-  return renderGovernedPatternSectionShell({ ...shellInput, body });
+  return renderGovernedPatternSectionShell({
+    ...shellInput,
+    body,
+  });
 }

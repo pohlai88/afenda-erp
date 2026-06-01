@@ -1,6 +1,8 @@
 "use client";
 
-export { AppShellClient, isAppShellPrimaryLeftRailNavItemActive, useAppShellRuntime } from "./app-shell/appshell.client";
+export { AppShellClient, useAppShellRuntime } from "./app-shell/appshell.client";
+export { AppShellQuickPushMount } from "./app-shell/quick-push/appshell-quick-push-mount.client";
+export { isAppShellPrimaryLeftRailNavItemActive } from "./app-shell/left-rail-bar/appshell-primary-left-rail-raw.shared.client";
 export { AppSubLayout, useAppShellSubLayoutFloating } from "./app-shell/surface/appshell-sub-layout.client";
 export { AppShellSurface } from "./app-shell/surface/appshell-sub-layout-surface";
 export { AppShellOrgSwitcher } from "./app-shell/top-utils-bar/identity/org-switcher.client";

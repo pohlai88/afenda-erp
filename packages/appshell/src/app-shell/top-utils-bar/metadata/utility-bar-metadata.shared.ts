@@ -4,6 +4,7 @@ import {
   appShellIconKeySchema,
   type AppShellIconKey,
 } from "../../iconography.shared";
+import { APP_SHELL_UTILITY_ADAPTER_KEYS } from "./utility-bar-items.shared";
 
 export const APP_SHELL_UTILITY_BAR_METADATA_VERSION = 1;
 
@@ -33,6 +34,9 @@ export const APP_SHELL_UTILITY_KINDS = [
 export const appShellUtilityZoneIdSchema = z.enum(APP_SHELL_UTILITY_BAR_ZONES);
 export const appShellUtilityIntentSchema = z.enum(APP_SHELL_UTILITY_INTENTS);
 export const appShellUtilityKindSchema = z.enum(APP_SHELL_UTILITY_KINDS);
+export const appShellUtilityAdapterKeySchema = z.enum(
+  APP_SHELL_UTILITY_ADAPTER_KEYS,
+);
 
 export const appShellUtilityItemMetadataSchema = z
   .object({
@@ -40,7 +44,7 @@ export const appShellUtilityItemMetadataSchema = z
     zone: appShellUtilityZoneIdSchema,
     kind: appShellUtilityKindSchema,
     intent: appShellUtilityIntentSchema,
-    adapterKey: z.string().trim().min(1),
+    adapterKey: appShellUtilityAdapterKeySchema,
     iconKey: appShellIconKeySchema.optional(),
     label: z.string().trim().min(1),
     description: z.string().trim().max(240).optional(),
@@ -72,6 +76,9 @@ export const appShellUtilityBarMetadataSchema = z
 export type AppShellUtilityZoneId = z.infer<typeof appShellUtilityZoneIdSchema>;
 export type AppShellUtilityIntent = z.infer<typeof appShellUtilityIntentSchema>;
 export type AppShellUtilityKind = z.infer<typeof appShellUtilityKindSchema>;
+export type AppShellUtilityAdapterKey = z.infer<
+  typeof appShellUtilityAdapterKeySchema
+>;
 export type AppShellUtilityItemMetadata = z.infer<
   typeof appShellUtilityItemMetadataSchema
 >;

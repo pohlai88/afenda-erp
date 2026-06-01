@@ -5,7 +5,15 @@ import type { ReactNode } from "react";
 import { cn } from "@afenda/ui/utils";
 
 import type { EmptyState } from "../schemas/list-surface.schema";
-import { governedKanbanSectionTestId } from "../kanban-surface-identity.shared";
+import {
+  buildKanbanSectionDataAttributes,
+  governedKanbanSectionTestId,
+} from "../kanban-surface-identity.shared";
+import { GovernedHeading } from "../utils/governed-heading.shared";
+import {
+  governedDescriptionId,
+  governedHeadingId,
+} from "../utils/governed-identity.shared";
 
 import { GovernedEmpty } from "./governed-empty";
 
@@ -26,8 +34,6 @@ export type GovernedKanbanFooterSectionProps = {
   contentClassName?: string;
 };
 
-const TITLED_HEADING_CLASS = "type-section-label mb-3";
-
 /**
  * RSC section shell for Pattern K kanban boards (`footer-actions` or `drag-reorder`).
  * Domain modules pass `GovernedKanbanFooterBoard`, `GovernedKanbanDragBoard`, or
@@ -46,12 +52,28 @@ export function GovernedKanbanFooterSection({
   contentClassName,
 }: GovernedKanbanFooterSectionProps) {
   const testId = sectionTestId ?? governedKanbanSectionTestId(surfaceKey);
-  const headingId = `governed-kanban-section-${surfaceKey.replace(/:/g, "-")}-title`;
-  const boardSlot = loadError ? <GovernedEmpty model={loadError} /> : children;
+  const headingId = governedHeadingId("kanban-section", surfaceKey);
+  const descriptionId = governedDescriptionId("kanban-section", surfaceKey);
+  const renderState = loadError ? "invalid" : "ready";
+  const contractAttrs = buildKanbanSectionDataAttributes({
+    surfaceKey,
+    state: renderState,
+    testId,
+  });
+  const boardSlot = loadError ? (
+    <GovernedEmpty
+      model={{
+        ...loadError,
+        emptyId: "kanban-section-load-error",
+      }}
+    />
+  ) : (
+    children
+  );
 
   if (layout === "embedded") {
     return (
-      <div className={className} data-testid={testId}>
+      <div className={className} {...contractAttrs}>
         {headerSlot}
         <div className={contentClassName}>{boardSlot}</div>
       </div>
@@ -61,17 +83,16 @@ export function GovernedKanbanFooterSection({
   return (
     <section
       className={className}
-      data-testid={testId}
       aria-labelledby={headingId}
+      {...(description ? { "aria-describedby": descriptionId } : {})}
+      {...contractAttrs}
     >
       {headerSlot}
-      <h2 id={headingId} className={TITLED_HEADING_CLASS}>
+      <GovernedHeading level={2} variant="section" id={headingId}>
         {title}
-      </h2>
+      </GovernedHeading>
       {description ? (
-        <p
-          className={cn("mb-3 type-muted", contentClassName)}
-        >
+        <p className={cn("mb-3 type-muted", contentClassName)} id={descriptionId}>
           {description}
         </p>
       ) : null}

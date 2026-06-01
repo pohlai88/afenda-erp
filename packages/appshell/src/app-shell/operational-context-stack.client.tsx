@@ -2,6 +2,7 @@
 
 import {
   createContext,
+  useCallback,
   useContext,
   useEffect,
   useMemo,
@@ -68,25 +69,31 @@ export function AppShellOperationalContextProvider({
 }) {
   const [registrations, setRegistrations] = useState<Registration[]>([]);
 
-  const runtime = useMemo<OperationalContextRuntime>(() => {
-    const mergedStack = mergeOperationalContext(baseStack, registrations);
+  const register = useCallback((registration: Registration) => {
+    setRegistrations((current) => {
+      const filtered = current.filter((item) => item.id !== registration.id);
+      return [...filtered, registration];
+    });
 
-    return {
-      entries: appShellOperationalContextStackToEntries(mergedStack),
-      register(registration) {
-        setRegistrations((current) => {
-          const filtered = current.filter((item) => item.id !== registration.id);
-          return [...filtered, registration];
-        });
-
-        return () => {
-          setRegistrations((current) =>
-            current.filter((item) => item.id !== registration.id),
-          );
-        };
-      },
+    return () => {
+      setRegistrations((current) =>
+        current.filter((item) => item.id !== registration.id),
+      );
     };
+  }, []);
+
+  const entries = useMemo(() => {
+    const mergedStack = mergeOperationalContext(baseStack, registrations);
+    return appShellOperationalContextStackToEntries(mergedStack);
   }, [baseStack, registrations]);
+
+  const runtime = useMemo<OperationalContextRuntime>(
+    () => ({
+      entries,
+      register,
+    }),
+    [entries, register],
+  );
 
   return (
     <AppShellOperationalContextRuntimeContext.Provider value={runtime}>
@@ -112,12 +119,11 @@ export function AppShellOperationalContextRegistration({
     );
   }
 
-  useEffect(() => runtime.register({ id, priority, patch }), [
-    id,
-    patch,
-    priority,
-    runtime,
-  ]);
+  const { register } = runtime;
+
+  useEffect(() => {
+    return register({ id, priority, patch });
+  }, [id, patch, priority, register]);
 
   return null;
 }

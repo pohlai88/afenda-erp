@@ -17,6 +17,7 @@ import {
   persistWorkspaceAppShellPreferencesAction,
   switchWorkspaceOrganizationAction,
 } from "@/workspace-routes/workspace-appshell.actions";
+import { LazyErpAssistantPanel } from "@/workspace-routes/erp-assistant-panel.lazy";
 import { readWorkspaceAppShellPreferences } from "@/workspace-routes/workspace-appshell-preferences.server";
 
 const moduleIconById: Record<string, AppShellIconKey> = {
@@ -41,8 +42,10 @@ export async function WorkspaceAppShell({
 }: {
   children: ReactNode;
 }) {
-  const navigation = await loadWorkspaceShellNavigation();
-  const preferences = await readWorkspaceAppShellPreferences();
+  const [navigation, preferences] = await Promise.all([
+    loadWorkspaceShellNavigation(),
+    readWorkspaceAppShellPreferences(),
+  ]);
   const chrome = buildWorkspaceAppShellChrome(navigation, preferences);
 
   return (
@@ -53,6 +56,9 @@ export async function WorkspaceAppShell({
         signOutAction,
       }}
       chrome={chrome}
+      overlays={{
+        quickPush: <LazyErpAssistantPanel />,
+      }}
       utilityPanels={buildWorkspaceUtilityPanels(navigation)}
     >
       {children}
@@ -259,6 +265,28 @@ function buildWorkspaceUtilityMetadata(): AppShellUtilityBarMetadata {
             priority: 20,
           }),
           utilityItem({
+            id: "workspace-messenger",
+            zone: "right",
+            kind: "utility-action",
+            intent: "inspect",
+            adapterKey: "messenger",
+            iconKey: "message-circle",
+            label: "Messages",
+            ariaLabel: "Open messages",
+            priority: 25,
+          }),
+          utilityItem({
+            id: "workspace-coordination",
+            zone: "right",
+            kind: "utility-action",
+            intent: "inspect",
+            adapterKey: "coordination",
+            iconKey: "briefcase",
+            label: "Coordination",
+            ariaLabel: "Open coordination",
+            priority: 27,
+          }),
+          utilityItem({
             id: "workspace-lynx",
             zone: "right",
             kind: "utility-action",
@@ -436,6 +464,30 @@ function buildWorkspaceUtilityPanels(
           detail: module.status.label,
         }))}
         title="Notifications"
+      />
+    ),
+    messenger: <LazyErpAssistantPanel />,
+    coordination: (
+      <PanelLinkList
+        description="Cross-module queue, approval, and workflow coordination routes."
+        links={[
+          {
+            href: "/dashboard#dashboard-queues",
+            label: "Dashboard queues",
+            detail: "Review active work queues across the workspace.",
+          },
+          {
+            href: "/system-admin/approvals",
+            label: "Approvals governance",
+            detail: "Inspect approval pressure, decisions, and escalations.",
+          },
+          {
+            href: "/lynx/workflows",
+            label: "Lynx workflows",
+            detail: "Resume or inspect machine-run workflow sessions.",
+          },
+        ]}
+        title="Coordination"
       />
     ),
     feedback: (

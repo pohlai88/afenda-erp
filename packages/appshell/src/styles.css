@@ -120,6 +120,10 @@
   grid-template-columns: 4rem minmax(0, 1fr);
 }
 
+.af-appshell--rail-hover .af-appshell__body {
+  grid-template-columns: 4rem minmax(0, 1fr);
+}
+
 .af-appshell__rail {
   position: sticky;
   top: 3rem;
@@ -128,6 +132,17 @@
   border-right: 1px solid var(--line);
   background: var(--surface-strong);
   padding: 0.75rem;
+}
+
+.af-appshell--rail-hover .af-appshell__rail {
+  width: 4rem;
+  overflow: visible auto;
+  transition: width 140ms ease;
+}
+
+.af-appshell--rail-hover .af-appshell__rail:hover {
+  width: 17.5rem;
+  box-shadow: 0 18px 48px color-mix(in oklab, var(--foreground) 14%, transparent);
 }
 
 .af-appshell__identity {
@@ -182,10 +197,24 @@
   padding: 0.5rem 0;
 }
 
+.af-appshell--rail-hover .af-appshell__rail:not(:hover) .af-appshell__identity {
+  justify-content: center;
+  padding: 0.5rem 0;
+}
+
 .af-appshell--rail-collapsed .af-appshell__identity-copy,
 .af-appshell--rail-collapsed .af-appshell__nav-heading,
 .af-appshell--rail-collapsed .af-appshell__nav-label,
 .af-appshell--rail-collapsed .af-appshell__nav-badge {
+  display: none;
+}
+
+.af-appshell--rail-hover .af-appshell__rail:not(:hover) .af-appshell__identity-copy,
+.af-appshell--rail-hover .af-appshell__rail:not(:hover) .af-appshell__nav-heading,
+.af-appshell--rail-hover .af-appshell__rail:not(:hover) .af-appshell__nav-label,
+.af-appshell--rail-hover .af-appshell__rail:not(:hover) .af-appshell__nav-badge,
+.af-appshell--rail-hover .af-appshell__rail:not(:hover) .af-appshell__rail-footer-button span,
+.af-appshell--rail-collapsed .af-appshell__rail-footer-button span {
   display: none;
 }
 
@@ -229,6 +258,21 @@
   gap: 0.25rem;
 }
 
+.af-appshell__nav-toggle {
+  position: absolute;
+  right: 0.5rem;
+  top: 0.5rem;
+  display: inline-flex;
+  height: 1.5rem;
+  width: 1.5rem;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted-foreground);
+}
+
 .af-appshell__nav-link {
   display: flex;
   min-height: 2.375rem;
@@ -256,6 +300,24 @@
   display: grid;
   gap: 0.125rem;
   padding-left: 2rem;
+}
+
+.af-appshell__rail-footer {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--line);
+}
+
+.af-appshell__rail-footer-button {
+  display: inline-flex;
+  width: 100%;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--foreground);
+  padding: 0.5rem 0.625rem;
 }
 
 .af-appshell__nav-child-link {
@@ -436,6 +498,45 @@
   padding: 1rem 0.5rem;
 }
 
+.af-appshell__quick-push {
+  position: fixed;
+  right: 1rem;
+  bottom: 1rem;
+  z-index: 55;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.75rem;
+}
+
+.af-appshell__quick-push-panel {
+  width: min(26rem, calc(100vw - 2rem));
+  max-height: min(42rem, calc(100vh - 6rem));
+  overflow: auto;
+  border-radius: 0.75rem;
+  border: 1px solid var(--line);
+  background: var(--surface-strong);
+  box-shadow: 0 24px 80px color-mix(in oklab, var(--foreground) 18%, transparent);
+}
+
+.af-appshell__quick-push-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--foreground);
+  color: var(--background);
+  padding: 0.625rem 0.875rem;
+  font: inherit;
+  font-weight: 600;
+  box-shadow: 0 12px 36px color-mix(in oklab, var(--foreground) 16%, transparent);
+}
+
+.af-appshell__quick-push-trigger:hover {
+  opacity: 0.96;
+}
+
 @media (max-width: 767px) {
   .af-appshell__utility {
     grid-template-columns: auto minmax(0, 1fr) auto;
@@ -452,5 +553,9 @@
 
   .af-appshell__main {
     padding: 1rem;
+  }
+
+  .af-appshell__quick-push {
+    display: none;
   }
 }

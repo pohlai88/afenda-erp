@@ -4,6 +4,7 @@ import { parseGovernedDetailTabsData } from "../../schemas/detail-tabs.schema";
 import { governedParseErrorCopy } from "../../i18n/governed-renderer-copy.shared";
 
 import type { GovernedComponentRendererDiagnostics } from "../registry";
+import type { RendererProps } from "../governed-renderer-dispatch";
 
 /**
  * governed:detail-tabs — entity detail with overview / audit / revisions.
@@ -11,8 +12,8 @@ import type { GovernedComponentRendererDiagnostics } from "../registry";
 export function DetailTabsRenderer({
   configuration,
   diagnostics = "user",
-}: {
-  configuration: unknown;
+  surfaceKey,
+}: RendererProps & {
   diagnostics?: GovernedComponentRendererDiagnostics;
 }) {
   const parsed = parseGovernedDetailTabsData(configuration);
@@ -25,10 +26,17 @@ export function DetailTabsRenderer({
           variant: "error",
           title: copy.title,
           description: copy.description,
+          emptyId: "detail-tabs-parse-error",
         }}
       />
     );
   }
 
-  return <GovernedDetailTabs model={parsed.data} />;
+  return (
+    <GovernedDetailTabs
+      model={parsed.data}
+      surfaceKey={surfaceKey}
+      componentKey={surfaceKey ?? parsed.data.entityId}
+    />
+  );
 }

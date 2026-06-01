@@ -1,5 +1,10 @@
 import type { ReactNode } from "react";
 
+import type { GovernedRenderableState } from "../schemas/governed-component-state.schema";
+import { diagnosticsDataAttributes } from "../utils/governed-diagnostics.shared";
+import {
+  governedIdentityAttributes,
+} from "../utils/governed-identity.shared";
 import { GovernedEmpty } from "./governed-empty";
 import {
   GovernedSurfaceSectionCard,
@@ -35,6 +40,10 @@ export type RenderGovernedPatternSectionShellInput = {
   className?: string;
   sectionTestId: string;
   sectionDomId?: string;
+  /** Surface identity. When set, emits canonical identity and diagnostics attrs. */
+  surfaceKey?: string;
+  /** Section identity; defaults to `surfaceKey` when omitted. */
+  sectionKey?: string;
   headerSlot?: ReactNode;
   title: string;
   description?: string;
@@ -50,6 +59,8 @@ export function renderGovernedPatternSectionShell({
   className,
   sectionTestId,
   sectionDomId,
+  surfaceKey,
+  sectionKey,
   headerSlot,
   title,
   description,
@@ -59,11 +70,26 @@ export function renderGovernedPatternSectionShell({
   contentClassName,
 }: RenderGovernedPatternSectionShellInput) {
   const sectionBody = renderGovernedSectionCardBody(body);
+  const resolvedSectionKey = sectionKey ?? surfaceKey;
+  const renderState = body.state satisfies GovernedRenderableState;
+  const contractAttrs = surfaceKey
+    ? {
+        ...governedIdentityAttributes({
+          surfaceKey,
+          sectionKey: resolvedSectionKey,
+          componentKey: resolvedSectionKey,
+        }),
+        ...diagnosticsDataAttributes({
+          state: renderState,
+          testId: sectionTestId,
+        }),
+      }
+    : diagnosticsDataAttributes({ testId: sectionTestId });
 
   const wrapperProps = {
     ...(sectionDomId ? { id: sectionDomId } : {}),
     className,
-    "data-testid": sectionTestId,
+    ...contractAttrs,
   } as const;
 
   if (layout === "embedded") {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useDeferredValue, useEffect, useMemo, useState } from "react";
 import { CommandIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 
@@ -69,6 +69,7 @@ export function CommandPalette({
 }: CommandPaletteProps) {
   const router = useRouter();
   const [query, setQuery] = useState("");
+  const deferredQuery = useDeferredValue(query);
 
   useEffect(() => {
     if (!commandOpen) {
@@ -86,7 +87,7 @@ export function CommandPalette({
   );
 
   const filteredSections = useMemo(() => {
-    const normalizedQuery = query.trim().toLowerCase();
+    const normalizedQuery = deferredQuery.trim().toLowerCase();
     if (!normalizedQuery) {
       return commands;
     }
@@ -99,7 +100,7 @@ export function CommandPalette({
         ),
       }))
       .filter((section) => section.items.length > 0);
-  }, [commands, query]);
+  }, [commands, deferredQuery]);
 
   const handleSelect = (item: AppShellCommandItem) => {
     onSelectCommand(item.id);

@@ -56,4 +56,23 @@ describe("renderGovernedPatternSectionShell", () => {
 
     expect(html).toContain('data-size="sm"');
   });
+
+  it("emits identity and diagnostics when surfaceKey is provided", () => {
+    const html = renderToStaticMarkup(
+      renderGovernedPatternSectionShell({
+        layout: "card",
+        sectionTestId: "governed:list-section:hr.records",
+        surfaceKey: "hr.records",
+        title: "Records",
+        body: readyBody,
+      }),
+    );
+
+    expect(html).toContain('data-surface-key="hr.records"');
+    expect(html).toContain('data-section-key="hr.records"');
+    expect(html).toContain('data-component-key="hr.records"');
+    expect(html).toContain('data-render-state="ready"');
+    expect(html).toContain('data-testid="governed:list-section:hr.records"');
+    expect(html.match(/data-surface-key="hr.records"/g)).toHaveLength(1);
+  });
 });

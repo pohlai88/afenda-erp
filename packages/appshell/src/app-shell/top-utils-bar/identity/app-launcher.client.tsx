@@ -4,6 +4,9 @@ import { Grid3X3 } from "lucide-react";
 import Link from "next/link";
 
 import {
+  Button,
+  Card,
+  CardContent,
   Popover,
   PopoverContent,
   PopoverTrigger,
@@ -36,13 +39,15 @@ export function AppShellLauncher({
     <Popover>
       <AppShellUtilityTriggerTooltip label="Open workspace launcher">
         <PopoverTrigger asChild>
-          <button
+          <Button
             aria-label="Open workspace launcher"
             className="af-appshell__icon-button"
+            size="icon-sm"
             type="button"
+            variant="outline"
           >
             <Grid3X3 aria-hidden="true" size={16} />
-          </button>
+          </Button>
         </PopoverTrigger>
       </AppShellUtilityTriggerTooltip>
       <PopoverContent align="start" className="w-80">
@@ -58,17 +63,20 @@ export function AppShellLauncher({
                 </div>
                 <div className="grid gap-2">
                   {groupItems.map((item) => (
-                    <Link
-                      className="rounded-card border border-border/60 px-3 py-2 transition-colors hover:border-border hover:bg-accent"
-                      href={item.href}
-                      key={item.id}
-                    >
-                      <div className="text-sm font-medium">{item.label}</div>
-                      {item.description ? (
-                        <div className="text-xs text-muted-foreground">
-                          {item.description}
-                        </div>
-                      ) : null}
+                    <Link className="block" href={item.href} key={item.id}>
+                      <Card
+                        className="gap-2 py-0 transition-colors hover:bg-accent hover:ring-border"
+                        size="sm"
+                      >
+                        <CardContent className="px-3 py-2">
+                          <div className="text-sm font-medium">{item.label}</div>
+                          {item.description ? (
+                            <div className="text-xs text-muted-foreground">
+                              {item.description}
+                            </div>
+                          ) : null}
+                        </CardContent>
+                      </Card>
                     </Link>
                   ))}
                 </div>

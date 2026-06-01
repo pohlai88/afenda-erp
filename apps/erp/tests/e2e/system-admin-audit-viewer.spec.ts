@@ -18,7 +18,7 @@ async function gotoAuditWorkbench(page: import("@playwright/test").Page) {
   const accessDenied = page.getByTestId("system-admin-audit-access-denied");
   const pageRoot = page.getByTestId("system-admin-audit-page");
   const catalog = page.getByTestId(
-    `governed-list-section:${systemAdminAuditViewerSurfaceKey}`,
+    `governed:list-section:${systemAdminAuditViewerSurfaceKey}`,
   );
 
   await expect(accessDenied.or(pageRoot)).toBeVisible({ timeout: 60_000 });

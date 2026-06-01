@@ -7,10 +7,9 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import Link from "next/link";
 import { PanelLeft } from "lucide-react";
-import { usePathname } from "next/navigation";
 
+import { Button } from "@afenda/ui";
 import { cn } from "@afenda/ui/utils";
 
 import {
@@ -18,11 +17,10 @@ import {
   type AppShellOperationalContextStackPatch,
 } from "../operational-context-stack.shared";
 import { AppShellOperationalContextRegistration } from "../operational-context-stack.client";
-import {
-  isAppShellPrimaryLeftRailNavItemActive,
-  useAppShellRuntime,
-} from "../appshell.client";
+import { useAppShellRuntime } from "../appshell.client";
 import type { AppShellPrimaryLeftRailConfig } from "../left-rail-bar/appshell-primary-left-rail.schema";
+import { appShellSubLayoutFloatingPanelId } from "./appshell-sub-layout-floating-panel-id.shared";
+import { AppShellSubLayoutLeftRail } from "./appshell-sub-layout-left-rail.client";
 
 type AppSubLayoutFloatingContextValue = {
   open: boolean;
@@ -61,7 +59,7 @@ export function AppSubLayout({
       open: floatingOpen,
       toggle: () => setFloatingOpen((current) => !current),
       close: () => setFloatingOpen(false),
-      panelId: rail ? `af-appshell-sub-layout-${rail.storageKey}` : "af-appshell-sub-layout",
+      panelId: appShellSubLayoutFloatingPanelId(rail?.storageKey),
     }),
     [floatingOpen, rail],
   );
@@ -117,14 +115,16 @@ function FloatingSubLayoutRail({ rail }: { rail: AppShellPrimaryLeftRailConfig }
     >
       <div className="flex items-center justify-between border-b border-border/60 px-3 py-2">
         <div className="text-sm font-medium">{rail.identity.primary}</div>
-        <button
+        <Button
           aria-label="Close section navigation"
           className="af-appshell__icon-button af-appshell__icon-button--sm"
+          size="icon-xs"
           onClick={floating.close}
           type="button"
+          variant="ghost"
         >
           <PanelLeft aria-hidden="true" size={14} />
-        </button>
+        </Button>
       </div>
       <SubLayoutRail rail={rail} />
     </div>
@@ -132,36 +132,5 @@ function FloatingSubLayoutRail({ rail }: { rail: AppShellPrimaryLeftRailConfig }
 }
 
 function SubLayoutRail({ rail }: { rail: AppShellPrimaryLeftRailConfig }) {
-  const pathname = usePathname();
-
-  return (
-    <nav className="grid gap-4 p-3" aria-label={rail.labels.ariaLabel}>
-      {rail.sections.map((section) => (
-        <section className="grid gap-1" key={section.id}>
-          {section.label ? (
-            <div className="text-[11px] font-medium uppercase text-muted-foreground">
-              {section.label}
-            </div>
-          ) : null}
-          {section.items.map((item) => {
-            const active = isAppShellPrimaryLeftRailNavItemActive(item, pathname);
-            return (
-              <Link
-                className={cn(
-                  "rounded-card px-2 py-1.5 text-sm transition-colors",
-                  active
-                    ? "bg-accent font-medium text-accent-foreground"
-                    : "text-muted-foreground hover:bg-accent/60 hover:text-foreground",
-                )}
-                href={item.href}
-                key={item.id}
-              >
-                {item.label}
-              </Link>
-            );
-          })}
-        </section>
-      ))}
-    </nav>
-  );
+  return <AppShellSubLayoutLeftRail rail={rail} />;
 }

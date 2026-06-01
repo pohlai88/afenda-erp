@@ -79,7 +79,7 @@ Optional review pass (attach manually): **frontend-design-review**, **wcag-acces
 
 **Builder recipe:** `packages/kernel/src/modules/list-surfaces.ts` exports builders that return `ListSurfaceRendererConfigurationInput`. Pattern C sections pass the builder output to `GovernedPatternCListSection` — do not re-parse in the route.
 
-**Pattern C polish:** `surfaceKey`, `requiresErpPermission`, row `trailingAction` + `disabledReason`, `data-trailing-action-state` on trailing cells, `data-testid="governed-list-section:{surfaceKey}"`.
+**Pattern C polish:** `surfaceKey`, `requiresErpPermission`, row `trailingAction` + `disabledReason`, `data-trailing-action-state` on trailing cells. Governed identity contract: `data-surface-key`, `data-section-key`, `data-component-key` via `governedIdentityAttributes()`; render state via `diagnosticsDataAttributes()`. Section Playwright id: `data-testid="governed:list-section:{surfaceKey}"` (from `governedListSectionTestId` / `governedTestId("list-section", surfaceKey)`).
 
 ## Next.js runtime contract (Afenda)
 

@@ -33,7 +33,7 @@ test.describe("HR employee records", () => {
     test.setTimeout(360_000);
     await gotoEmployeesWorkbench(page);
     await expect(
-      page.locator('[data-testid^="governed-list-section:"]').first(),
+      page.locator('[data-testid^="governed:list-section:"]').first(),
     ).toBeVisible({ timeout: 240_000 });
   });
 
@@ -44,12 +44,12 @@ test.describe("HR employee records", () => {
     await gotoEmployeesWorkbench(page);
 
     const directory = page.getByTestId(
-      `governed-list-section:${hrRecordsDirectorySurfaceKey}`,
+      `governed:list-section:${hrRecordsDirectorySurfaceKey}`,
     );
     await expect(directory).toBeVisible({ timeout: 240_000 });
 
     const firstRow = directory
-      .locator(`[data-testid^="governed-list-row:${hrRecordsDirectorySurfaceKey}:"]`)
+      .locator(`[data-testid^="governed:list-row:${hrRecordsDirectorySurfaceKey}:"]`)
       .first();
     const hasRow = await firstRow.isVisible({ timeout: 120_000 }).catch(() => false);
 

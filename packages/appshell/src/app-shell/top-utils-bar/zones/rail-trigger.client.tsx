@@ -2,6 +2,8 @@
 
 import { PanelLeft } from "lucide-react";
 
+import { Button } from "@afenda/ui";
+
 import { AppShellUtilityTriggerTooltip } from "../template/utility-trigger-tooltip.client";
 
 export function AppShellRailTrigger({
@@ -13,14 +15,16 @@ export function AppShellRailTrigger({
 }) {
   return (
     <AppShellUtilityTriggerTooltip label={label}>
-      <button
+      <Button
         aria-label={label}
         className="af-appshell__icon-button"
         onClick={onToggle}
+        size="icon-sm"
         type="button"
+        variant="outline"
       >
         <PanelLeft aria-hidden="true" size={16} />
-      </button>
+      </Button>
     </AppShellUtilityTriggerTooltip>
   );
 }

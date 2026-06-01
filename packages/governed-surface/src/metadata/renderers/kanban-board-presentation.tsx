@@ -1,5 +1,4 @@
 import type { DragEvent, ReactNode } from "react";
-import type { Route } from "next";
 
 import Link from "next/link";
 
@@ -15,6 +14,7 @@ import type {
 import type { KanbanCardDropState } from "../../index";
 import { GovernedEmpty } from "../../client";
 import { cn } from "@afenda/ui/utils";
+import { asGovernedRoute } from "../../utils/governed-safe-route";
 
 export const KANBAN_DATA_NATURE_CLASS: Record<KanbanBoardDataNature, string> = {
   kanban: "@container flex flex-col gap-3",
@@ -156,7 +156,11 @@ export function KanbanColumnPanel({
 export function KanbanEmptyColumn({ label }: { label: string }) {
   return (
     <GovernedEmpty
-      model={{ variant: "muted", title: label }}
+      model={{
+        variant: "muted",
+        title: label,
+        emptyId: "kanban-empty-column",
+      }}
       className={cn("border-0 bg-transparent p-4 @sm:p-4")}
     />
   );
@@ -188,7 +192,7 @@ export function KanbanCardTile({
             {card.href ? (
               <Link
                 id={titleId}
-                href={card.href as Route}
+                href={asGovernedRoute(card.href)}
                 prefetch={false}
                 className="type-control font-medium leading-snug text-primary hover:underline"
               >

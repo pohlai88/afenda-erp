@@ -123,7 +123,7 @@ export function KanbanBoardDragView({
     endDrag();
   }
 
-  const boardDom = resolveKanbanBoardDomProps(surfaceKey);
+  const boardDom = resolveKanbanBoardDomProps(surfaceKey, "ready");
 
   return (
     <section

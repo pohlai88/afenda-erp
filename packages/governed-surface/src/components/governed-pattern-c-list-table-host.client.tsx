@@ -27,6 +27,7 @@ export type GovernedPatternCListTableHostProps = {
 
 function toTableTrailingColumn(
   spec: GovernedPatternCTrailingColumnSpec | undefined,
+  surfaceKey: string,
 ): ListSurfaceTableTrailingColumn | undefined {
   if (!spec) {
     return undefined;
@@ -35,7 +36,10 @@ function toTableTrailingColumn(
   return {
     header: resolved.header,
     Cell: resolved.Cell,
-    context: resolved.context,
+    context: {
+      ...resolved.context,
+      surfaceKey: resolved.context?.surfaceKey ?? surfaceKey,
+    },
   };
 }
 
@@ -48,7 +52,7 @@ export function GovernedPatternCListTableHost({
 }: GovernedPatternCListTableHostProps) {
   const tableDensity = config.presentation?.tableDensity ?? "compact";
   const presentationVariant = config.presentation?.variant ?? "table-only";
-  const tableTrailing = toTableTrailingColumn(trailingColumn);
+  const tableTrailing = toTableTrailingColumn(trailingColumn, surfaceKey);
 
   return (
     <>

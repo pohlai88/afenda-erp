@@ -14,6 +14,7 @@ import type { GovernedComponentRendererDiagnostics } from "../registry";
 export type SectionRendererProps = {
   configuration: unknown;
   diagnostics?: GovernedComponentRendererDiagnostics;
+  surfaceKey?: string;
 };
 
 /**
@@ -22,6 +23,7 @@ export type SectionRendererProps = {
 export function SectionRenderer({
   configuration,
   diagnostics = "user",
+  surfaceKey,
 }: SectionRendererProps) {
   const parsed = parseGovernedSectionConfiguration(configuration);
 
@@ -62,6 +64,8 @@ export function SectionRenderer({
     <GovernedSection
       title={header.title}
       description={header.description}
+      surfaceKey={surfaceKey}
+      sectionKey={surfaceKey}
       className={cn(
         "flex flex-col",
         gapClass,

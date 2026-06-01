@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import { GovernedComponentRenderer } from "../metadata/index";
 import { logUnexpectedServerError } from "../data/governed-logging.server";
 import { getGovernedSurfaceTranslations } from "../i18n/governed-surface-copy";
+import { governedTestId } from "../utils/governed-identity.shared";
 
 import type { EmptyState } from "../schemas/list-surface.schema";
 import {
@@ -37,7 +38,7 @@ export type GovernedPatternBChartSectionProps = {
 };
 
 export function governedChartSectionTestId(surfaceKey: string): string {
-  return `governed-chart-section:${surfaceKey}`;
+  return governedTestId("chart-section", surfaceKey);
 }
 
 export async function GovernedPatternBChartSection({
@@ -64,6 +65,8 @@ export async function GovernedPatternBChartSection({
     density,
     className,
     sectionTestId,
+    surfaceKey,
+    sectionKey: surfaceKey,
     headerSlot,
     title,
     description,

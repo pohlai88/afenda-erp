@@ -3,6 +3,7 @@ import { z } from "zod";
 import type { SchemaStability } from "./_stability.shared";
 
 import { emptyStateSchema } from "./list-surface.schema";
+import { governedMetadataSchemaVersionSchema } from "./schema-version.shared";
 import { governedSurfaceChromeSchema } from "./surface-chrome.schema";
 
 export const GOVERNED_CHART_CONFIGURATION_SCHEMA_ID =
@@ -82,8 +83,8 @@ export const chartAnnotationSchema = z
   })
   .strict();
 
-const governedChartConfigurationCoreSchema = z
-  .object({
+const governedChartConfigurationCoreSchema =
+  governedMetadataSchemaVersionSchema.extend({
     dataNature: chartDataNatureSchema,
     chartKind: governedChartKindSchema,
     title: z.string().trim().min(1).optional(),
@@ -98,9 +99,7 @@ const governedChartConfigurationCoreSchema = z
     annotations: z.array(chartAnnotationSchema).optional(),
     interaction: z.enum(["none", "brush"]).default("none"),
     chrome: governedSurfaceChromeSchema.optional(),
-  })
-  .strict()
-  .superRefine((config, ctx) => {
+  }).superRefine((config, ctx) => {
     if (config.chartKind === "heatmap") {
       if (!config.heatmap?.cells.length) {
         ctx.addIssue({

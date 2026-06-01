@@ -92,6 +92,8 @@ export async function GovernedPatternCListSection({
     className,
     sectionTestId,
     sectionDomId,
+    surfaceKey,
+    sectionKey: surfaceKey,
     headerSlot,
     headerAction: cardHeaderAction,
     title,
@@ -173,5 +175,8 @@ export async function GovernedPatternCListSection({
     };
   }
 
-  return renderGovernedPatternSectionShell({ ...shellInput, body });
+  return renderGovernedPatternSectionShell({
+    ...shellInput,
+    body,
+  });
 }

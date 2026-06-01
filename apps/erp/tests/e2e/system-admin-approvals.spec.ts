@@ -17,7 +17,7 @@ async function gotoApprovalsWorkbench(page: import("@playwright/test").Page) {
 
   const accessDenied = page.getByTestId("system-admin-approvals-access-denied");
   const catalog = page.getByTestId(
-    `governed-list-section:${systemAdminApprovalsSurfaceKey}`,
+    `governed:list-section:${systemAdminApprovalsSurfaceKey}`,
   );
   const pageRoot = page.getByTestId("system-admin-approvals-page");
 

@@ -23,10 +23,10 @@ async function gotoCapabilitiesWorkbench(page: import("@playwright/test").Page) 
   const accessDenied = page.getByTestId("system-admin-capabilities-access-denied");
   const pageRoot = page.getByTestId("system-admin-capabilities-page");
   const catalog = page.getByTestId(
-    `governed-list-section:${systemAdminCapabilitiesSurfaceKey}`,
+    `governed:list-section:${systemAdminCapabilitiesSurfaceKey}`,
   );
   const roleMatrix = page.getByTestId(
-    `governed-list-section:${systemAdminCapabilityRoleMatrixSurfaceKey}`,
+    `governed:list-section:${systemAdminCapabilityRoleMatrixSurfaceKey}`,
   );
 
   await expect(accessDenied.or(pageRoot)).toBeVisible({ timeout: 60_000 });

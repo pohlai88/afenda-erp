@@ -1,10 +1,23 @@
 import { Alert, AlertDescription, AlertTitle } from "@afenda/ui/alert";
 
 import type { ActionResult } from "../schemas/action-result.shared";
+import { governedTestId } from "../utils/governed-identity.shared";
+
+export type ActionFormErrorKind =
+  | "validation"
+  | "business-rule"
+  | "permission"
+  | "system";
 
 export type ActionFormErrorsProps<T = void> = {
-  result: ActionResult<T> | null | undefined;
+  result:
+    | (ActionResult<T> & {
+        errorKind?: ActionFormErrorKind;
+      })
+    | null
+    | undefined;
   title?: string;
+  testId?: string;
 };
 
 /**
@@ -13,10 +26,11 @@ export type ActionFormErrorsProps<T = void> = {
 export function ActionFormErrors<T>({
   result,
   title,
+  testId,
 }: ActionFormErrorsProps<T>) {
-  if (!result || result.ok) {
-    return null;
-  }
+  if (!result || result.ok) return null;
+
+  const errorKind = result.errorKind ?? "system";
 
   const entries = result.fieldErrors
     ? Object.entries(result.fieldErrors).filter(
@@ -26,17 +40,29 @@ export function ActionFormErrors<T>({
     : [];
 
   return (
-    <Alert variant="destructive" className="w-full max-w-xl">
+    <Alert
+      variant="destructive"
+      className="w-full max-w-xl"
+      role="alert"
+      data-action-error-kind={errorKind}
+      {...(result.code ? { "data-action-error-code": result.code } : {})}
+      data-testid={testId ?? governedTestId("action-form-errors", errorKind)}
+    >
       <AlertTitle>{title ?? result.error}</AlertTitle>
       <AlertDescription className="flex flex-col gap-2">
         {title ? <p>{result.error}</p> : null}
+
         {result.code ? (
           <p className="type-mono-cell text-critical/90">{result.code}</p>
         ) : null}
+
         {entries.length > 0 ? (
-          <ul className="flex list-inside list-disc flex-col gap-1 type-body">
+          <ul
+            className="flex list-inside list-disc flex-col gap-1 type-body"
+            aria-label="Field errors"
+          >
             {entries.map(([field, message]) => (
-              <li key={field}>
+              <li key={field} data-field-error={field}>
                 <span className="font-medium">{field}</span>
                 {": "}
                 {message}
