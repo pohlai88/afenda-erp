@@ -75,7 +75,7 @@ export function SystemAdminBillingSection({
   return (
     <div className="@container flex flex-col gap-surface-2xl">
       <SectionPanel
-        headingLevel={1}
+        headingLevel={2}
         title={copy.page.title}
         description={copy.page.description}
         aside={
@@ -121,18 +121,20 @@ export function SystemAdminBillingSection({
         />
       ) : null}
 
-      <GovernedPatternCListSection
-        title={copy.governance.title}
-        surfaceKey={systemAdminBillingGovernanceSurfaceKey}
-        listConfiguration={buildBillingGovernanceListSurface({
-          readiness,
-          subscription,
-          seatCount: subscription.seatsUsed,
-          gatewaySpendAvailable: posture.gatewaySpendAvailable,
-        })}
-        parentAccessAllowed
-        layout="embedded"
-      />
+      <div data-testid="system-admin-billing-readiness" className="contents">
+        <GovernedPatternCListSection
+          title={copy.governance.title}
+          surfaceKey={systemAdminBillingGovernanceSurfaceKey}
+          listConfiguration={buildBillingGovernanceListSurface({
+            readiness,
+            subscription,
+            seatCount: subscription.seatsUsed,
+            gatewaySpendAvailable: posture.gatewaySpendAvailable,
+          })}
+          parentAccessAllowed
+          layout="embedded"
+        />
+      </div>
 
       <GovernedPatternCListSection
         title={copy.subscription.title}
@@ -213,7 +215,7 @@ export function SystemAdminBillingAccessDenied() {
   return (
     <div className="@container flex flex-col gap-surface-lg">
       <SectionPanel
-        headingLevel={1}
+        headingLevel={2}
         title={copy.page.title}
         description={copy.page.description}
       />

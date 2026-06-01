@@ -90,7 +90,7 @@ export function buildHrWorkforceEssWorkbenchListSurface(input: {
   readonly rows: readonly HrWorkforceEssListRow[];
   readonly search?: string | null;
 }) {
-    return buildHrWorkforceEssListSurface({
+  return buildHrWorkforceEssListSurface({
     surfaceKey: hrWorkforceEssProfileSummarySurfaceKey,
     rows: input.rows,
     searchValue: input.search,

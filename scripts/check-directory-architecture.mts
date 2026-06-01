@@ -56,6 +56,13 @@ const packageArchitectureRules: Record<string, PackageArchitectureRule> = {
     requiresPackageBuild: true,
     turboBuildOutputs: ["dist/**"],
   },
+  "@afenda/appshell": {
+    category: "runtime-library",
+    workspaceRoot: "packages",
+    requiresCompiledDistExports: true,
+    requiresPackageBuild: true,
+    turboBuildOutputs: ["dist/**"],
+  },
   "@afenda/auth": {
     category: "runtime-library",
     workspaceRoot: "packages",

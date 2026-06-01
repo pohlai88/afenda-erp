@@ -10,7 +10,7 @@ export function SystemAdminBillingCheckoutBanner({
 }) {
   if (checkoutStatus === "success") {
     return (
-      <Alert>
+      <Alert data-testid="system-admin-billing-checkout-banner">
         <AlertTitle>{systemAdminBillingUiCopy.checkout.successTitle}</AlertTitle>
         <AlertDescription>
           {systemAdminBillingUiCopy.checkout.successDescription}
@@ -21,7 +21,7 @@ export function SystemAdminBillingCheckoutBanner({
 
   if (checkoutStatus === "cancelled") {
     return (
-      <Alert>
+      <Alert data-testid="system-admin-billing-checkout-banner">
         <AlertTitle>{systemAdminBillingUiCopy.checkout.cancelledTitle}</AlertTitle>
         <AlertDescription>
           {systemAdminBillingUiCopy.checkout.cancelledDescription}

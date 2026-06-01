@@ -93,4 +93,5 @@ export type ExportSystemAdminDataManagementActionData = {
   csv: string;
   rowCount: number;
   exportId: string;
+  truncated: boolean;
 };

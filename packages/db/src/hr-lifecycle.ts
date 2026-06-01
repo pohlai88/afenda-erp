@@ -8,6 +8,7 @@ import {
   isNotNull,
   isNull,
   lte,
+  notInArray,
   or,
   sql,
 } from "drizzle-orm";
@@ -37,8 +38,11 @@ export type HrMovementKind =
   | "promotion"
   | "transfer"
   | "demotion"
+  | "job_change"
   | "department_change"
-  | "manager_change";
+  | "manager_change"
+  | "grade_change"
+  | "location_change";
 
 const TERMINAL_STATUSES = new Set<HrEmploymentStatus>([
   "separated",
@@ -50,29 +54,55 @@ const ALLOWED_EMPLOYMENT_TRANSITIONS: Record<
   HrEmploymentStatus,
   readonly HrEmploymentStatus[]
 > = {
-  onboarding: ["probation", "confirmed", "active", "suspended", "separated"],
+  onboarding: [
+    "probation",
+    "confirmed",
+    "active",
+    "suspended",
+    "terminated",
+    "separated",
+  ],
   active: [
     "probation",
     "confirmed",
     "suspended",
     "notice_period",
     "offboarding",
+    "terminated",
     "separated",
     "retired",
   ],
-  probation: ["active", "confirmed", "suspended", "separated"],
+  probation: ["active", "confirmed", "suspended", "terminated", "separated"],
   confirmed: [
     "active",
     "probation",
     "suspended",
     "notice_period",
     "offboarding",
+    "terminated",
     "separated",
     "retired",
   ],
-  suspended: ["active", "confirmed", "probation", "onboarding"],
-  notice_period: ["offboarding", "separated", "active", "confirmed"],
-  offboarding: ["separated", "retired"],
+  suspended: [
+    "active",
+    "confirmed",
+    "probation",
+    "onboarding",
+    "notice_period",
+    "offboarding",
+    "terminated",
+    "separated",
+    "retired",
+  ],
+  notice_period: [
+    "offboarding",
+    "terminated",
+    "separated",
+    "retired",
+    "active",
+    "confirmed",
+  ],
+  offboarding: ["terminated", "separated", "retired"],
   terminated: ["archived", "separated"],
   separated: [],
   retired: [],
@@ -409,6 +439,7 @@ export type HrLifecycleProbationDueWindow = {
 };
 
 const PROBATION_REVIEW_HORIZON_DAYS = 30;
+const CONTRACT_REVIEW_HORIZON_DAYS = 60;
 
 export async function listHrLifecycleProbationDueWindow(input: {
   organizationId: string;
@@ -476,6 +507,120 @@ export async function listHrLifecycleProbationDueWindow(input: {
         displayName: row.preferredName?.trim() || row.legalName,
         employmentStatus: row.employmentStatus,
         probationEndDate: row.probationEndDate!,
+      }));
+
+    return {
+      rows: mapped,
+      pageSize,
+      totalCount: actualTotal,
+      hasNextPage: offset + mapped.length < actualTotal,
+    };
+  });
+}
+
+export type HrLifecycleContractReviewRow = {
+  id: string;
+  employeeNumber: string;
+  displayName: string;
+  employmentStatus: HrEmploymentStatus;
+  employmentType: string | null;
+  legalEntityCode: string | null;
+  workLocationCode: string | null;
+  contractEndDate: Date;
+  hrOwnerEmployeeId: string | null;
+  managerEmployeeId: string | null;
+};
+
+export type HrLifecycleContractReviewWindow = {
+  rows: readonly HrLifecycleContractReviewRow[];
+  pageSize: number;
+  totalCount: number;
+  hasNextPage: boolean;
+};
+
+export async function listHrLifecycleContractReviewWindow(input: {
+  organizationId: string;
+  limit?: number;
+  offset?: number;
+  search?: string;
+  asOf?: Date;
+}): Promise<HrLifecycleContractReviewWindow> {
+  const pageSize = clampPageSize(input.limit);
+  const offset = Math.max(0, input.offset ?? 0);
+  const asOf = input.asOf ?? new Date();
+  const horizon = new Date(asOf);
+  horizon.setDate(horizon.getDate() + CONTRACT_REVIEW_HORIZON_DAYS);
+
+  return runWithOrganizationContext(input.organizationId, async (db) => {
+    const conditions = [
+      eq(hrEmployees.organizationId, input.organizationId),
+      isNull(hrEmployees.archivedAt),
+      isNotNull(hrEmployees.contractEndDate),
+      lte(hrEmployees.contractEndDate, horizon),
+      notInArray(hrEmployees.employmentStatus, [
+        "separated",
+        "retired",
+        "archived",
+      ]),
+    ];
+
+    const trimmedSearch = input.search?.trim();
+    if (trimmedSearch) {
+      const pattern = `%${trimmedSearch}%`;
+      conditions.push(
+        or(
+          ilike(hrEmployees.employeeNumber, pattern),
+          ilike(hrEmployees.legalName, pattern),
+          ilike(hrEmployees.preferredName, pattern),
+          ilike(hrEmployees.employmentType, pattern),
+          ilike(hrEmployees.legalEntityCode, pattern),
+          ilike(hrEmployees.workLocationCode, pattern),
+        )!,
+      );
+    }
+
+    const whereClause = and(...conditions);
+
+    const [totalRow] = await db
+      .select({ total: count() })
+      .from(hrEmployees)
+      .where(whereClause);
+
+    const actualTotal = Number(totalRow?.total ?? 0);
+
+    const rows = await db
+      .select({
+        id: hrEmployees.id,
+        employeeNumber: hrEmployees.employeeNumber,
+        legalName: hrEmployees.legalName,
+        preferredName: hrEmployees.preferredName,
+        employmentStatus: hrEmployees.employmentStatus,
+        employmentType: hrEmployees.employmentType,
+        legalEntityCode: hrEmployees.legalEntityCode,
+        workLocationCode: hrEmployees.workLocationCode,
+        contractEndDate: hrEmployees.contractEndDate,
+        hrOwnerEmployeeId: hrEmployees.hrOwnerEmployeeId,
+        managerEmployeeId: hrEmployees.managerEmployeeId,
+      })
+      .from(hrEmployees)
+      .where(whereClause)
+      .orderBy(hrEmployees.contractEndDate)
+      .limit(pageSize)
+      .offset(offset);
+
+    const mapped: HrLifecycleContractReviewRow[] = rows
+      .filter((row) => row.contractEndDate)
+      .map((row) => ({
+        id: row.id,
+        employeeNumber: row.employeeNumber,
+        displayName: row.preferredName?.trim() || row.legalName,
+        employmentStatus: row.employmentStatus,
+        employmentType: row.employmentType,
+        legalEntityCode: row.legalEntityCode,
+        workLocationCode: row.workLocationCode,
+        contractEndDate: row.contractEndDate!,
+        hrOwnerEmployeeId: row.hrOwnerEmployeeId,
+        managerEmployeeId: row.managerEmployeeId,
       }));
 
     return {
@@ -930,9 +1075,15 @@ export async function recordHrEmployeeMovement(input: {
   movementKind: HrMovementKind;
   effectiveDate?: Date;
   placement: HrEmployeePlacementInput;
+  grade?: string | null;
+  workLocationCode?: string | null;
   reason?: string | null;
   approvalReference?: string | null;
-}): Promise<{ eventId: string; assignmentId: string | null }> {
+}): Promise<{
+  eventId: string;
+  assignmentId: string | null;
+  changedFields: readonly string[];
+}> {
   return runWithOrganizationContext(input.organizationId, async (db) => {
     const employee = await assertLifecycleEmployeeWritable(
       db,
@@ -949,6 +1100,26 @@ export async function recordHrEmployeeMovement(input: {
       reason: input.reason ?? input.movementKind,
     });
 
+    const employmentPatch: Partial<typeof hrEmployees.$inferInsert> = {};
+    const changedFields = [...assignment.changedFields];
+
+    if (input.grade !== undefined) {
+      employmentPatch.grade = input.grade?.trim() || null;
+      changedFields.push("grade");
+    }
+
+    if (input.workLocationCode !== undefined) {
+      employmentPatch.workLocationCode = input.workLocationCode?.trim() || null;
+      changedFields.push("workLocationCode");
+    }
+
+    if (Object.keys(employmentPatch).length > 0) {
+      await db
+        .update(hrEmployees)
+        .set(employmentPatch)
+        .where(eq(hrEmployees.id, input.employeeId));
+    }
+
     const eventId = await insertLifecycleEvent(db, {
       organizationId: input.organizationId,
       employeeId: input.employeeId,
@@ -960,7 +1131,43 @@ export async function recordHrEmployeeMovement(input: {
       approvalReference: input.approvalReference,
     });
 
-    return { eventId, assignmentId: assignment.assignmentId };
+    return { eventId, assignmentId: assignment.assignmentId, changedFields };
+  });
+}
+
+export async function renewHrEmployeeContract(input: {
+  organizationId: string;
+  employeeId: string;
+  contractEndDate: Date;
+  effectiveDate?: Date;
+  reason?: string | null;
+  approvalReference?: string | null;
+}): Promise<{ eventId: string }> {
+  return runWithOrganizationContext(input.organizationId, async (db) => {
+    const employee = await assertLifecycleEmployeeWritable(
+      db,
+      input.organizationId,
+      input.employeeId,
+    );
+    const effectiveDate = input.effectiveDate ?? new Date();
+
+    await db
+      .update(hrEmployees)
+      .set({ contractEndDate: input.contractEndDate })
+      .where(eq(hrEmployees.id, input.employeeId));
+
+    const eventId = await insertLifecycleEvent(db, {
+      organizationId: input.organizationId,
+      employeeId: input.employeeId,
+      kind: "contract_renewal",
+      previousStatus: employee.employmentStatus,
+      newStatus: employee.employmentStatus,
+      effectiveDate,
+      reason: input.reason,
+      approvalReference: input.approvalReference,
+    });
+
+    return { eventId };
   });
 }
 

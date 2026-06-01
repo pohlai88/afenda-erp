@@ -4,6 +4,11 @@ import {
   parseHrWorkforceEssSearchParams,
   toHrWorkforceEssPageModelInput,
 } from "../../src/employee-management/employee-selfservice-portal/data/hr.workforce.ess-search-params.parse.shared";
+import {
+  HR_WORKFORCE_ESS_LIST_SEARCH_PARAM_MODEL_FIELDS,
+  HR_WORKFORCE_ESS_LIST_SEARCH_PARAMS_BY_KEY,
+  HR_WORKFORCE_ESS_LIST_SURFACE_KEYS,
+} from "../../src/employee-management/employee-selfservice-portal/surface/hr.workforce.ess-surface-metadata.shared";
 
 describe("Employee Self-Service Portal search params", () => {
   it("parses and trims ESS list, grouping, and status params", () => {
@@ -25,6 +30,31 @@ describe("Employee Self-Service Portal search params", () => {
       auditTrailSearch: "access",
       reportGroupBy: "department",
       status: "pending_approval",
+    });
+  });
+
+  it("parses every registered ESS list search param into its page model field", () => {
+    const searchParams = new URLSearchParams();
+
+    HR_WORKFORCE_ESS_LIST_SURFACE_KEYS.forEach((surfaceKey, index) => {
+      const param = HR_WORKFORCE_ESS_LIST_SEARCH_PARAMS_BY_KEY[surfaceKey];
+      searchParams.set(param, ` value-${index} `);
+    });
+
+    const parsed = parseHrWorkforceEssSearchParams(searchParams);
+
+    expect(
+      new Set(Object.values(HR_WORKFORCE_ESS_LIST_SEARCH_PARAMS_BY_KEY)).size,
+    ).toBe(HR_WORKFORCE_ESS_LIST_SURFACE_KEYS.length);
+    expect(new Set(HR_WORKFORCE_ESS_LIST_SEARCH_PARAM_MODEL_FIELDS).size).toBe(
+      HR_WORKFORCE_ESS_LIST_SURFACE_KEYS.length,
+    );
+
+    HR_WORKFORCE_ESS_LIST_SURFACE_KEYS.forEach((_, index) => {
+      const modelField = HR_WORKFORCE_ESS_LIST_SEARCH_PARAM_MODEL_FIELDS[
+        index
+      ] as keyof typeof parsed;
+      expect(parsed[modelField]).toBe(`value-${index}`);
     });
   });
 

@@ -4,10 +4,12 @@ import { assertCiBuildEnv } from "./env.build.js";
 
 /**
  * Workspace packages compiled by Next during `apps/erp` build.
- * When adding `@afenda/feature-<moduleId>`, append it here (ARCH-002).
+ * When adding `@afenda/feature-<moduleId>` or a first-class runtime package,
+ * append it here (ARCH-002 / ARCH-013).
  */
 export const afendaTranspilePackages = [
   "@afenda/ai",
+  "@afenda/appshell",
   "@afenda/auth",
   "@afenda/billing",
   "@afenda/config",

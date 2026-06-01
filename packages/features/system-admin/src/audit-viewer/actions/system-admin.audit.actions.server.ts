@@ -15,17 +15,16 @@ import {
   requireSystemAdminAuditReview,
 } from "../policies/system-admin.audit-viewer.policy.server";
 import { systemAdminRetentionPolicyActionSchema } from "../schemas/system-admin.retention-action.schema";
-import { systemAdminAuditExportFormatSchema } from "../schemas/system-admin.audit-export.schema";
 import {
   systemAdminAuditViewerAuditActions,
-  systemAdminAuditViewerWebhookEvents,
+  systemAdminAuditViewerRetentionUpdatedWebhookEvent,
 } from "../events/system-admin.audit-viewer.event";
-import { parseAuditFilterDate } from "../data/system-admin.audit.query.server";
-import { parseSystemAdminAuditSearchParams } from "../data/system-admin.audit-search-params.parse.shared";
+import { buildSystemAdminAuditSearchFilters } from "../data/system-admin.audit-search-filters.shared";
+import { parseSystemAdminAuditExportFormData } from "../data/system-admin.audit-export-form.shared";
 import { buildAuditExportBody } from "../data/system-admin.audit-export.build.server";
 import type { SystemAdminAuditExportPayload } from "../contracts/system-admin.audit-export.contract";
-
-const EXPORT_ROW_LIMIT = 5_000;
+import { SYSTEM_ADMIN_AUDIT_EXPORT_ROW_LIMIT } from "../contracts/system-admin.audit-viewer.limits.shared";
+import { SYSTEM_ADMIN_AUDIT_PATH } from "../surface/system-admin.audit-pagination.shared";
 
 export async function exportSystemAdminAuditLogsAction(
   formData: FormData,
@@ -33,53 +32,32 @@ export async function exportSystemAdminAuditLogsAction(
   const { context, organization, session } =
     await requireSystemAdminAuditExport();
 
-  const readOptional = (key: string) => {
-    const value = formData.get(key);
-    return typeof value === "string" && value.length > 0 ? value : undefined;
-  };
-
-  const formatParsed = systemAdminAuditExportFormatSchema.safeParse(
-    readOptional("format") ?? "csv",
-  );
+  const { formatParsed, paramsParsed } = parseSystemAdminAuditExportFormData(formData);
   if (!formatParsed.success) {
     return zodActionFailure(formatParsed.error);
   }
+  if (!paramsParsed.success) {
+    return zodActionFailure(paramsParsed.error);
+  }
 
-  const params = parseSystemAdminAuditSearchParams({
-    auditQ: readOptional("auditQ"),
-    auditActor: readOptional("auditActor"),
-    auditAction: readOptional("auditAction"),
-    auditTargetType: readOptional("auditTargetType"),
-    auditTargetId: readOptional("auditTargetId"),
-    auditModule: readOptional("auditModule"),
-    auditFrom: readOptional("auditFrom"),
-    auditTo: readOptional("auditTo"),
-    auditSort: readOptional("auditSort"),
-  });
+  const params = paramsParsed.data;
 
-  const { rows } = await searchTenantAuditLogs({
+  const { rows, totalCount } = await searchTenantAuditLogs({
     organizationId: organization.id,
-    limit: EXPORT_ROW_LIMIT,
+    limit: SYSTEM_ADMIN_AUDIT_EXPORT_ROW_LIMIT,
     offset: 0,
-    filters: {
-      actorAuthUserId: params.auditActor,
-      action: params.auditAction,
-      entityType: params.auditTargetType,
-      entityId: params.auditTargetId,
-      moduleKey: params.auditModule,
-      query: params.auditQ,
-      createdAfter: parseAuditFilterDate(params.auditFrom),
-      createdBefore: parseAuditFilterDate(params.auditTo),
-      sortDirection: params.auditSort ?? "desc",
-    },
+    filters: buildSystemAdminAuditSearchFilters(params),
   });
 
-  const exportBody = await Promise.resolve(
-    buildAuditExportBody({
-      format: formatParsed.data,
-      rows,
-    }),
-  );
+  const truncated = totalCount > rows.length;
+
+  const exportBody = await buildAuditExportBody({
+    format: formatParsed.data,
+    rows,
+    truncated,
+    totalCount,
+    rowLimit: SYSTEM_ADMIN_AUDIT_EXPORT_ROW_LIMIT,
+  });
 
   await writeExecutionAuditEvent({
     organizationId: organization.id,
@@ -90,6 +68,9 @@ export async function exportSystemAdminAuditLogsAction(
     targetId: organization.id,
     metadata: {
       rowCount: rows.length,
+      totalCount,
+      truncated,
+      rowLimit: SYSTEM_ADMIN_AUDIT_EXPORT_ROW_LIMIT,
       format: formatParsed.data,
       filters: params,
     },
@@ -104,14 +85,16 @@ export async function exportSystemAdminAuditLogsAction(
       module: "system-admin",
       operation: "audit.export",
     },
-    { rowCount: rows.length, format: formatParsed.data },
+    { rowCount: rows.length, totalCount, truncated, format: formatParsed.data },
   );
 
-  revalidatePath("/system-admin/audit");
+  revalidatePath(SYSTEM_ADMIN_AUDIT_PATH);
   return systemAdminActionSuccess({
     format: formatParsed.data,
     content: exportBody.content,
     rowCount: rows.length,
+    totalCount,
+    truncated,
     mimeType: exportBody.mimeType,
     fileExtension: exportBody.fileExtension,
     encoding: exportBody.encoding,
@@ -173,7 +156,7 @@ export async function upsertSystemAdminRetentionPolicyAction(
   await dispatchSystemAdminWebhook({
     organizationId: organization.id,
     userId: session.id,
-    eventType: systemAdminAuditViewerWebhookEvents[0],
+    eventType: systemAdminAuditViewerRetentionUpdatedWebhookEvent,
     payload: {
       entityType: parsed.data.entityType,
       retentionDays: parsed.data.retentionDays,
@@ -181,6 +164,6 @@ export async function upsertSystemAdminRetentionPolicyAction(
     },
   });
 
-  revalidatePath("/system-admin/audit");
+  revalidatePath(SYSTEM_ADMIN_AUDIT_PATH);
   return systemAdminActionSuccess(undefined);
 }

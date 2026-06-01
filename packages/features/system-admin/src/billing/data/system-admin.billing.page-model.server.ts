@@ -17,6 +17,7 @@ import type {
 } from "../contracts/system-admin.billing-list.contract";
 import type { SystemAdminBillingPlanRow } from "../contracts/system-admin.billing-plans.contract";
 import { mapStripeBillingPlansToRows } from "./system-admin.billing-plans.mapper.server";
+import { resolveSystemAdminBillingDefaultPlanKey } from "./system-admin.billing-default-plan.shared";
 import { systemAdminBillingAuditActions } from "../events/system-admin.billing.event";
 
 export type SystemAdminBillingPageModel = {
@@ -80,11 +81,10 @@ export async function buildSystemAdminBillingPageModel(input: {
   });
 
   const plans = mapStripeBillingPlansToRows();
-  const defaultPlanKey =
-    process.env.STRIPE_DEFAULT_PLAN_KEY?.trim() ||
-    plans.find((plan) => plan.key === posture.subscription.planKey)?.key ||
-    plans[0]?.key ||
-    "pro";
+  const defaultPlanKey = resolveSystemAdminBillingDefaultPlanKey({
+    plans,
+    currentPlanKey: posture.subscription.planKey,
+  });
 
   return {
     posture,

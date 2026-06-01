@@ -10,13 +10,16 @@ import {
   cancelHrLifecycleTransitionAction,
   changeHrEmploymentStatusAction,
   recordHrProbationOutcomeAction,
+  renewHrEmployeeContractAction,
   startHrOffboardingCaseAction,
 } from "../actions/hr.workforce.lifecycle.actions.server";
 import { hrLifecycleOverviewSurfaceKey } from "../surface/hr.workforce.lifecycle-overview-list.surface";
 import { hrLifecyclePendingTransitionsSurfaceKey } from "../surface/hr.workforce.lifecycle-pending-transitions-list.surface";
 import { hrLifecycleProbationDueSurfaceKey } from "../surface/hr.workforce.lifecycle-probation-due-list.surface";
+import { hrLifecycleContractReviewsSurfaceKey } from "../surface/hr.workforce.lifecycle-contract-reviews-list.surface";
 import { hrLifecycleNoticePeriodSurfaceKey } from "../surface/hr.workforce.lifecycle-notice-period-list.surface";
 import {
+  HrLifecycleContractRenewalTrailingForm,
   HrLifecycleNoticePeriodOffboardingTrailingForm,
   HrLifecycleOverviewScheduleTrailingForm,
   HrLifecyclePendingTransitionCancelTrailingForm,
@@ -78,6 +81,26 @@ export function HrLifecycleProbationDueTrailingCell(
       <HrLifecycleProbationOutcomeTrailingForm
         row={props.row}
         action={recordHrProbationOutcomeAction}
+      />
+    </GovernedTrailingActionSlot>
+  );
+}
+
+export function HrLifecycleContractReviewsTrailingCell(
+  props: GovernedListTrailingCellProps,
+) {
+  if (
+    !isListSurfaceTrailingActionRenderable(props.row.trailingAction) ||
+    props.context?.surfaceKey !== hrLifecycleContractReviewsSurfaceKey
+  ) {
+    return null;
+  }
+
+  return (
+    <GovernedTrailingActionSlot>
+      <HrLifecycleContractRenewalTrailingForm
+        row={props.row}
+        action={renewHrEmployeeContractAction}
       />
     </GovernedTrailingActionSlot>
   );

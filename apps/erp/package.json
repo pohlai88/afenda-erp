@@ -17,6 +17,7 @@
     "test:e2e:public": "playwright test --config=playwright.config.cjs --project=chromium-public-smoke",
     "test:e2e:auth": "playwright test --config=playwright.config.cjs --project=chromium-authenticated-smoke",
     "test:e2e:hr": "playwright test --config=playwright.config.cjs --project=chromium-hr-critical",
+    "test:e2e:system-admin": "playwright test --config=playwright.config.cjs --project=chromium-system-admin-approvals --project=chromium-system-admin-audit-viewer --project=chromium-system-admin-billing --project=chromium-system-admin-capabilities --project=chromium-system-admin-data-management",
     "test:e2e:neon": "playwright test --config=playwright.config.cjs --project=chromium-neon-smoke",
     "test:e2e:shard": "playwright test --config=playwright.config.cjs --grep-invert \"@visual\"",
     "test:visual": "playwright test --config=playwright.config.cjs --grep \"@visual\"",
@@ -24,6 +25,7 @@
   },
   "dependencies": {
     "@afenda/ai": "workspace:*",
+    "@afenda/appshell": "workspace:*",
     "@afenda/auth": "workspace:*",
     "@afenda/billing": "workspace:*",
     "@afenda/db": "workspace:*",

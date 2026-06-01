@@ -1,4 +1,4 @@
-import { and, eq, isNull, ne } from "drizzle-orm";
+import { and, eq, ne, sql } from "drizzle-orm";
 import { runWithOrganizationContext, type AfendaTransaction } from "./client";
 import { createEntityId } from "./ids";
 import {
@@ -104,17 +104,29 @@ export type RehireHrEmployeeInput = {
   reason?: string | null;
 };
 
+function normalizeHrEmployeeRecordEmail(email: string | null | undefined) {
+  return email?.trim().toLowerCase() || null;
+}
+
+function normalizeHrEmployeeRecordPhone(phoneNumber: string | null | undefined) {
+  return phoneNumber?.replace(/\D/g, "") || null;
+}
+
 async function assertNoDuplicateProfileIdentity(
   db: AfendaTransaction,
   input: {
     organizationId: string;
     identityNumber?: string | null;
+    personalEmail?: string | null;
     phoneNumber?: string | null;
     excludeEmployeeId?: string;
   },
 ) {
   const trimmedIdentity = input.identityNumber?.trim();
-  const trimmedPhone = input.phoneNumber?.trim();
+  const normalizedPersonalEmail = normalizeHrEmployeeRecordEmail(
+    input.personalEmail,
+  );
+  const normalizedPhone = normalizeHrEmployeeRecordPhone(input.phoneNumber);
 
   if (trimmedIdentity) {
     const conditions = [
@@ -128,9 +140,7 @@ async function assertNoDuplicateProfileIdentity(
       .select({ employeeId: hrEmployeeProfiles.employeeId })
       .from(hrEmployeeProfiles)
       .innerJoin(hrEmployees, eq(hrEmployeeProfiles.employeeId, hrEmployees.id))
-      .where(
-        and(...conditions, isNull(hrEmployees.archivedAt)),
-      )
+      .where(and(...conditions))
       .limit(1);
     if (duplicate) {
       throw new HrEmployeeCommandError(
@@ -140,10 +150,34 @@ async function assertNoDuplicateProfileIdentity(
     }
   }
 
-  if (trimmedPhone) {
+  if (normalizedPersonalEmail) {
+    const emailConditions = [
+      eq(hrEmployeeProfiles.organizationId, input.organizationId),
+      sql`lower(${hrEmployeeProfiles.personalEmail}) = ${normalizedPersonalEmail}`,
+    ];
+    if (input.excludeEmployeeId) {
+      emailConditions.push(
+        ne(hrEmployeeProfiles.employeeId, input.excludeEmployeeId),
+      );
+    }
+    const [duplicatePersonalEmail] = await db
+      .select({ employeeId: hrEmployeeProfiles.employeeId })
+      .from(hrEmployeeProfiles)
+      .innerJoin(hrEmployees, eq(hrEmployeeProfiles.employeeId, hrEmployees.id))
+      .where(and(...emailConditions))
+      .limit(1);
+    if (duplicatePersonalEmail) {
+      throw new HrEmployeeCommandError(
+        "duplicate_email",
+        "Personal email already in use.",
+      );
+    }
+  }
+
+  if (normalizedPhone) {
     const phoneConditions = [
       eq(hrEmployeeProfiles.organizationId, input.organizationId),
-      eq(hrEmployeeProfiles.phoneNumber, trimmedPhone),
+      sql`regexp_replace(coalesce(${hrEmployeeProfiles.phoneNumber}, ''), '[^0-9]', '', 'g') = ${normalizedPhone}`,
     ];
     if (input.excludeEmployeeId) {
       phoneConditions.push(ne(hrEmployeeProfiles.employeeId, input.excludeEmployeeId));
@@ -152,7 +186,7 @@ async function assertNoDuplicateProfileIdentity(
       .select({ employeeId: hrEmployeeProfiles.employeeId })
       .from(hrEmployeeProfiles)
       .innerJoin(hrEmployees, eq(hrEmployeeProfiles.employeeId, hrEmployees.id))
-      .where(and(...phoneConditions, isNull(hrEmployees.archivedAt)))
+      .where(and(...phoneConditions))
       .limit(1);
     if (duplicatePhone) {
       throw new HrEmployeeCommandError(
@@ -198,6 +232,204 @@ export async function insertHrEmployeeRecordEventInTx(
   return { eventId };
 }
 
+function hasOwnRecordField(
+  input: object,
+  key: PropertyKey,
+): boolean {
+  return Object.prototype.hasOwnProperty.call(input, key);
+}
+
+function toHrEmployeeRecordAuditValue(value: unknown): unknown {
+  if (value === undefined) return null;
+  if (value === null) return null;
+  if (value instanceof Date) return value.toISOString();
+  if (Array.isArray(value)) {
+    return value.map((entry) => toHrEmployeeRecordAuditValue(entry));
+  }
+  if (typeof value === "object") {
+    return Object.fromEntries(
+      Object.entries(value as Record<string, unknown>).map(([key, entry]) => [
+        key,
+        toHrEmployeeRecordAuditValue(entry),
+      ]),
+    );
+  }
+  return value;
+}
+
+function serializeHrEmployeeRecordAuditValue(value: unknown): string | null {
+  const prepared = toHrEmployeeRecordAuditValue(value);
+  if (prepared === null || prepared === undefined) return null;
+  if (typeof prepared === "string") return prepared;
+  return JSON.stringify(prepared);
+}
+
+function hrEmployeeRecordAuditValuesEqual(
+  previousValue: unknown,
+  newValue: unknown,
+): boolean {
+  return (
+    serializeHrEmployeeRecordAuditValue(previousValue) ===
+    serializeHrEmployeeRecordAuditValue(newValue)
+  );
+}
+
+async function loadHrEmployeeRecordAuditBaselineInTx(
+  db: AfendaTransaction,
+  input: {
+    organizationId: string;
+    employeeId: string;
+  },
+) {
+  const [employee] = await db
+    .select({
+      employeeNumber: hrEmployees.employeeNumber,
+      legalName: hrEmployees.legalName,
+      preferredName: hrEmployees.preferredName,
+      email: hrEmployees.email,
+      employmentStatus: hrEmployees.employmentStatus,
+      currentDepartmentId: hrEmployees.currentDepartmentId,
+      currentPositionId: hrEmployees.currentPositionId,
+      managerEmployeeId: hrEmployees.managerEmployeeId,
+      employmentStartDate: hrEmployees.employmentStartDate,
+      employmentType: hrEmployees.employmentType,
+      workerCategory: hrEmployees.workerCategory,
+      grade: hrEmployees.grade,
+      level: hrEmployees.level,
+      legalEntityCode: hrEmployees.legalEntityCode,
+      workLocationCode: hrEmployees.workLocationCode,
+      countryCode: hrEmployees.countryCode,
+      contractStartDate: hrEmployees.contractStartDate,
+      contractEndDate: hrEmployees.contractEndDate,
+      matrixManagerEmployeeId: hrEmployees.matrixManagerEmployeeId,
+      hrOwnerEmployeeId: hrEmployees.hrOwnerEmployeeId,
+    })
+    .from(hrEmployees)
+    .where(
+      and(
+        eq(hrEmployees.organizationId, input.organizationId),
+        eq(hrEmployees.id, input.employeeId),
+      ),
+    )
+    .limit(1);
+
+  if (!employee) {
+    throw new HrEmployeeCommandError("employee_not_found");
+  }
+
+  return employee;
+}
+
+async function loadHrEmployeeProfileAuditBaselineInTx(
+  db: AfendaTransaction,
+  input: {
+    organizationId: string;
+    employeeId: string;
+  },
+) {
+  const [profile] = await db
+    .select({
+      identityDocumentType: hrEmployeeProfiles.identityDocumentType,
+      identityNumber: hrEmployeeProfiles.identityNumber,
+      nationality: hrEmployeeProfiles.nationality,
+      dateOfBirth: hrEmployeeProfiles.dateOfBirth,
+      gender: hrEmployeeProfiles.gender,
+      maritalStatus: hrEmployeeProfiles.maritalStatus,
+      languagePreference: hrEmployeeProfiles.languagePreference,
+      personalEmail: hrEmployeeProfiles.personalEmail,
+      phoneNumber: hrEmployeeProfiles.phoneNumber,
+      residentialAddress: hrEmployeeProfiles.residentialAddress,
+      mailingAddress: hrEmployeeProfiles.mailingAddress,
+    })
+    .from(hrEmployeeProfiles)
+    .where(
+      and(
+        eq(hrEmployeeProfiles.organizationId, input.organizationId),
+        eq(hrEmployeeProfiles.employeeId, input.employeeId),
+      ),
+    )
+    .limit(1);
+
+  return profile ?? null;
+}
+
+async function loadHrEmployeeEmergencyContactsAuditBaselineInTx(
+  db: AfendaTransaction,
+  input: {
+    organizationId: string;
+    employeeId: string;
+  },
+) {
+  return db
+    .select({
+      contactName: hrEmployeeEmergencyContacts.contactName,
+      relationship: hrEmployeeEmergencyContacts.relationship,
+      phoneNumber: hrEmployeeEmergencyContacts.phoneNumber,
+      isPriority: hrEmployeeEmergencyContacts.isPriority,
+      sortOrder: hrEmployeeEmergencyContacts.sortOrder,
+    })
+    .from(hrEmployeeEmergencyContacts)
+    .where(
+      and(
+        eq(hrEmployeeEmergencyContacts.organizationId, input.organizationId),
+        eq(hrEmployeeEmergencyContacts.employeeId, input.employeeId),
+      ),
+    )
+    .orderBy(hrEmployeeEmergencyContacts.sortOrder);
+}
+
+function normalizeHrEmployeeProfileAuditValue(
+  profile: HrEmployeeProfileInput | null | undefined,
+) {
+  if (!profile) return null;
+
+  return {
+    identityDocumentType: profile.identityDocumentType ?? null,
+    identityNumber: profile.identityNumber?.trim() || null,
+    nationality: profile.nationality?.trim() || null,
+    dateOfBirth: profile.dateOfBirth ?? null,
+    gender: profile.gender?.trim() || null,
+    maritalStatus: profile.maritalStatus?.trim() || null,
+    languagePreference: profile.languagePreference?.trim() || null,
+    personalEmail: profile.personalEmail?.trim() || null,
+    phoneNumber: profile.phoneNumber?.trim() || null,
+    residentialAddress: profile.residentialAddress?.trim() || null,
+    mailingAddress: profile.mailingAddress?.trim() || null,
+  };
+}
+
+function normalizeHrEmployeeEmergencyContactsAuditValue(
+  contacts:
+    | readonly HrEmployeeEmergencyContactInput[]
+    | readonly {
+        contactName: string;
+        relationship: string;
+        phoneNumber: string;
+        isPriority: boolean;
+        sortOrder: number;
+      }[],
+) {
+  return contacts.map((contact, index) => ({
+    contactName: contact.contactName.trim(),
+    relationship: contact.relationship.trim(),
+    phoneNumber: contact.phoneNumber.trim(),
+    isPriority: contact.isPriority ?? index === 0,
+    sortOrder: "sortOrder" in contact ? contact.sortOrder : index,
+  }));
+}
+
+function normalizeHrEmployeePlacementAuditValue(input: {
+  currentDepartmentId: string | null;
+  currentPositionId: string | null;
+  managerEmployeeId: string | null;
+}) {
+  return {
+    currentDepartmentId: input.currentDepartmentId,
+    currentPositionId: input.currentPositionId,
+    managerEmployeeId: input.managerEmployeeId,
+  };
+}
+
 async function upsertEmployeeProfileInTx(
   db: AfendaTransaction,
   input: {
@@ -212,6 +444,7 @@ async function upsertEmployeeProfileInTx(
   await assertNoDuplicateProfileIdentity(db, {
     organizationId: input.organizationId,
     identityNumber: input.profile.identityNumber,
+    personalEmail: input.profile.personalEmail,
     phoneNumber: input.profile.phoneNumber,
     excludeEmployeeId: input.excludeEmployeeId ?? input.employeeId,
   });
@@ -292,6 +525,7 @@ export async function createHrEmployeeRecordInTx(
   await assertNoDuplicateProfileIdentity(db, {
     organizationId: input.organizationId,
     identityNumber: input.profile?.identityNumber,
+    personalEmail: input.profile?.personalEmail,
     phoneNumber: input.profile?.phoneNumber,
   });
 
@@ -302,7 +536,6 @@ export async function createHrEmployeeRecordInTx(
   const numberConditions = [
     eq(hrEmployees.organizationId, input.organizationId),
     eq(hrEmployees.employeeNumber, employeeNumber),
-    isNull(hrEmployees.archivedAt),
   ];
   const [duplicateNumber] = await db
     .select({ id: hrEmployees.id })
@@ -314,15 +547,15 @@ export async function createHrEmployeeRecordInTx(
   }
 
   const trimmedEmail = input.email?.trim();
-  if (trimmedEmail) {
+  const normalizedEmail = normalizeHrEmployeeRecordEmail(input.email);
+  if (normalizedEmail) {
     const [duplicateEmail] = await db
       .select({ id: hrEmployees.id })
       .from(hrEmployees)
       .where(
         and(
           eq(hrEmployees.organizationId, input.organizationId),
-          eq(hrEmployees.email, trimmedEmail),
-          isNull(hrEmployees.archivedAt),
+          sql`lower(${hrEmployees.email}) = ${normalizedEmail}`,
         ),
       )
       .limit(1);
@@ -402,6 +635,57 @@ export async function updateHrEmployeeRecord(
   input: UpdateHrEmployeeRecordInput,
 ): Promise<{ employeeId: string; changedFields: string[]; assignmentId: string | null }> {
   return runWithOrganizationContext(input.organizationId, async (db) => {
+    const baseline = await loadHrEmployeeRecordAuditBaselineInTx(db, {
+      organizationId: input.organizationId,
+      employeeId: input.employeeId,
+    });
+    const profileBaseline = input.profile
+      ? await loadHrEmployeeProfileAuditBaselineInTx(db, {
+          organizationId: input.organizationId,
+          employeeId: input.employeeId,
+        })
+      : null;
+    const emergencyContactsBaseline = input.emergencyContacts
+      ? await loadHrEmployeeEmergencyContactsAuditBaselineInTx(db, {
+          organizationId: input.organizationId,
+          employeeId: input.employeeId,
+        })
+      : [];
+    const previousRecordValues: Record<string, unknown> = {};
+    const newRecordValues: Record<string, unknown> = {};
+    const trackRecordChange = (
+      fieldName: string,
+      previousValue: unknown,
+      newValue: unknown,
+    ) => {
+      if (hrEmployeeRecordAuditValuesEqual(previousValue, newValue)) {
+        return false;
+      }
+      previousRecordValues[fieldName] =
+        toHrEmployeeRecordAuditValue(previousValue);
+      newRecordValues[fieldName] = toHrEmployeeRecordAuditValue(newValue);
+      return true;
+    };
+    const nextPlacement = normalizeHrEmployeePlacementAuditValue({
+      currentDepartmentId:
+        input.placement && hasOwnRecordField(input.placement, "currentDepartmentId")
+          ? input.placement.currentDepartmentId ?? null
+          : baseline.currentDepartmentId,
+      currentPositionId:
+        input.placement && hasOwnRecordField(input.placement, "currentPositionId")
+          ? input.placement.currentPositionId ?? null
+          : baseline.currentPositionId,
+      managerEmployeeId:
+        input.placement && hasOwnRecordField(input.placement, "managerEmployeeId")
+          ? input.placement.managerEmployeeId ?? null
+          : baseline.managerEmployeeId,
+    });
+    const previousPlacement = normalizeHrEmployeePlacementAuditValue({
+      currentDepartmentId: baseline.currentDepartmentId,
+      currentPositionId: baseline.currentPositionId,
+      managerEmployeeId: baseline.managerEmployeeId,
+    });
+
     const core = await updateHrEmployeeCoreInTx(db, {
       organizationId: input.organizationId,
       employeeId: input.employeeId,
@@ -419,54 +703,180 @@ export async function updateHrEmployeeRecord(
 
     const employmentPatch: Partial<(typeof hrEmployees.$inferInsert)> = {};
     const changedFields = [...core.changedFields];
+    const nextCoreValues = {
+      employeeNumber: input.employeeNumber?.trim() ?? baseline.employeeNumber,
+      legalName: input.legalName?.trim() ?? baseline.legalName,
+      preferredName:
+        input.preferredName !== undefined
+          ? input.preferredName?.trim() || null
+          : baseline.preferredName,
+      email:
+        input.email !== undefined ? input.email?.trim() || null : baseline.email,
+      employmentStatus: input.employmentStatus ?? baseline.employmentStatus,
+    };
+
+    for (const fieldName of core.changedFields) {
+      if (fieldName === "employeeNumber") {
+        trackRecordChange(
+          fieldName,
+          baseline.employeeNumber,
+          nextCoreValues.employeeNumber,
+        );
+      } else if (fieldName === "legalName") {
+        trackRecordChange(fieldName, baseline.legalName, nextCoreValues.legalName);
+      } else if (fieldName === "preferredName") {
+        trackRecordChange(
+          fieldName,
+          baseline.preferredName,
+          nextCoreValues.preferredName,
+        );
+      } else if (fieldName === "email") {
+        trackRecordChange(fieldName, baseline.email, nextCoreValues.email);
+      } else if (fieldName === "employmentStatus") {
+        trackRecordChange(
+          fieldName,
+          baseline.employmentStatus,
+          nextCoreValues.employmentStatus,
+        );
+      } else if (fieldName === "currentDepartmentId") {
+        trackRecordChange(
+          fieldName,
+          baseline.currentDepartmentId,
+          nextPlacement.currentDepartmentId,
+        );
+      } else if (fieldName === "currentPositionId") {
+        trackRecordChange(
+          fieldName,
+          baseline.currentPositionId,
+          nextPlacement.currentPositionId,
+        );
+      } else if (fieldName === "managerEmployeeId") {
+        trackRecordChange(
+          fieldName,
+          baseline.managerEmployeeId,
+          nextPlacement.managerEmployeeId,
+        );
+      }
+    }
 
     if (input.employmentStartDate !== undefined) {
       employmentPatch.employmentStartDate = input.employmentStartDate;
-      changedFields.push("employmentStartDate");
+      if (
+        trackRecordChange(
+          "employmentStartDate",
+          baseline.employmentStartDate,
+          input.employmentStartDate,
+        )
+      ) {
+        changedFields.push("employmentStartDate");
+      }
     }
     if (input.employmentType !== undefined) {
-      employmentPatch.employmentType = input.employmentType?.trim() || null;
-      changedFields.push("employmentType");
+      const nextValue = input.employmentType?.trim() || null;
+      employmentPatch.employmentType = nextValue;
+      if (trackRecordChange("employmentType", baseline.employmentType, nextValue)) {
+        changedFields.push("employmentType");
+      }
     }
     if (input.workerCategory !== undefined) {
-      employmentPatch.workerCategory = input.workerCategory?.trim() || null;
-      changedFields.push("workerCategory");
+      const nextValue = input.workerCategory?.trim() || null;
+      employmentPatch.workerCategory = nextValue;
+      if (
+        trackRecordChange("workerCategory", baseline.workerCategory, nextValue)
+      ) {
+        changedFields.push("workerCategory");
+      }
     }
     if (input.grade !== undefined) {
-      employmentPatch.grade = input.grade?.trim() || null;
-      changedFields.push("grade");
+      const nextValue = input.grade?.trim() || null;
+      employmentPatch.grade = nextValue;
+      if (trackRecordChange("grade", baseline.grade, nextValue)) {
+        changedFields.push("grade");
+      }
     }
     if (input.level !== undefined) {
-      employmentPatch.level = input.level?.trim() || null;
-      changedFields.push("level");
+      const nextValue = input.level?.trim() || null;
+      employmentPatch.level = nextValue;
+      if (trackRecordChange("level", baseline.level, nextValue)) {
+        changedFields.push("level");
+      }
     }
     if (input.legalEntityCode !== undefined) {
-      employmentPatch.legalEntityCode = input.legalEntityCode?.trim() || null;
-      changedFields.push("legalEntityCode");
+      const nextValue = input.legalEntityCode?.trim() || null;
+      employmentPatch.legalEntityCode = nextValue;
+      if (
+        trackRecordChange("legalEntityCode", baseline.legalEntityCode, nextValue)
+      ) {
+        changedFields.push("legalEntityCode");
+      }
     }
     if (input.workLocationCode !== undefined) {
-      employmentPatch.workLocationCode = input.workLocationCode?.trim() || null;
-      changedFields.push("workLocationCode");
+      const nextValue = input.workLocationCode?.trim() || null;
+      employmentPatch.workLocationCode = nextValue;
+      if (
+        trackRecordChange(
+          "workLocationCode",
+          baseline.workLocationCode,
+          nextValue,
+        )
+      ) {
+        changedFields.push("workLocationCode");
+      }
     }
     if (input.countryCode !== undefined) {
-      employmentPatch.countryCode = input.countryCode?.trim() || null;
-      changedFields.push("countryCode");
+      const nextValue = input.countryCode?.trim() || null;
+      employmentPatch.countryCode = nextValue;
+      if (trackRecordChange("countryCode", baseline.countryCode, nextValue)) {
+        changedFields.push("countryCode");
+      }
     }
     if (input.contractStartDate !== undefined) {
       employmentPatch.contractStartDate = input.contractStartDate;
-      changedFields.push("contractStartDate");
+      if (
+        trackRecordChange(
+          "contractStartDate",
+          baseline.contractStartDate,
+          input.contractStartDate,
+        )
+      ) {
+        changedFields.push("contractStartDate");
+      }
     }
     if (input.contractEndDate !== undefined) {
       employmentPatch.contractEndDate = input.contractEndDate;
-      changedFields.push("contractEndDate");
+      if (
+        trackRecordChange(
+          "contractEndDate",
+          baseline.contractEndDate,
+          input.contractEndDate,
+        )
+      ) {
+        changedFields.push("contractEndDate");
+      }
     }
     if (input.matrixManagerEmployeeId !== undefined) {
       employmentPatch.matrixManagerEmployeeId = input.matrixManagerEmployeeId;
-      changedFields.push("matrixManagerEmployeeId");
+      if (
+        trackRecordChange(
+          "matrixManagerEmployeeId",
+          baseline.matrixManagerEmployeeId,
+          input.matrixManagerEmployeeId,
+        )
+      ) {
+        changedFields.push("matrixManagerEmployeeId");
+      }
     }
     if (input.hrOwnerEmployeeId !== undefined) {
       employmentPatch.hrOwnerEmployeeId = input.hrOwnerEmployeeId;
-      changedFields.push("hrOwnerEmployeeId");
+      if (
+        trackRecordChange(
+          "hrOwnerEmployeeId",
+          baseline.hrOwnerEmployeeId,
+          input.hrOwnerEmployeeId,
+        )
+      ) {
+        changedFields.push("hrOwnerEmployeeId");
+      }
     }
 
     if (Object.keys(employmentPatch).length > 0) {
@@ -477,6 +887,19 @@ export async function updateHrEmployeeRecord(
     }
 
     let assignmentId = core.assignmentId;
+    if (input.placement && !input.assignmentEffectiveFrom && core.assignmentId) {
+      await insertHrEmployeeRecordEventInTx(db, {
+        organizationId: input.organizationId,
+        employeeId: input.employeeId,
+        kind: "assignment_changed",
+        previousValue: serializeHrEmployeeRecordAuditValue(previousPlacement),
+        newValue: serializeHrEmployeeRecordAuditValue(nextPlacement),
+        reason: input.reason ?? input.assignmentReason ?? null,
+        approvalReference: input.approvalReference ?? null,
+        actorUserId: input.actorUserId ?? null,
+      });
+    }
+
     if (input.placement && input.assignmentEffectiveFrom) {
       const assignment = await upsertHrEmployeeEffectiveAssignmentInTx(db, {
         organizationId: input.organizationId,
@@ -491,7 +914,8 @@ export async function updateHrEmployeeRecord(
           organizationId: input.organizationId,
           employeeId: input.employeeId,
           kind: "assignment_changed",
-          newValue: JSON.stringify(input.placement),
+          previousValue: serializeHrEmployeeRecordAuditValue(previousPlacement),
+          newValue: serializeHrEmployeeRecordAuditValue(nextPlacement),
           effectiveDate: input.assignmentEffectiveFrom,
           reason: input.reason ?? null,
           approvalReference: input.approvalReference ?? null,
@@ -501,37 +925,112 @@ export async function updateHrEmployeeRecord(
     }
 
     if (input.profile) {
+      const previousProfile =
+        normalizeHrEmployeeProfileAuditValue(profileBaseline);
+      const newProfile = normalizeHrEmployeeProfileAuditValue(input.profile);
       await upsertEmployeeProfileInTx(db, {
         organizationId: input.organizationId,
         employeeId: input.employeeId,
         profile: input.profile,
         excludeEmployeeId: input.employeeId,
       });
-      changedFields.push("profile");
+      if (!hrEmployeeRecordAuditValuesEqual(previousProfile, newProfile)) {
+        changedFields.push("profile");
+        await insertHrEmployeeRecordEventInTx(db, {
+          organizationId: input.organizationId,
+          employeeId: input.employeeId,
+          kind: "profile_updated",
+          fieldName: "profile",
+          previousValue: serializeHrEmployeeRecordAuditValue(previousProfile),
+          newValue: serializeHrEmployeeRecordAuditValue(newProfile),
+          reason: input.reason ?? null,
+          approvalReference: input.approvalReference ?? null,
+          actorUserId: input.actorUserId ?? null,
+        });
+      }
     }
 
     if (input.emergencyContacts) {
+      const previousContacts =
+        normalizeHrEmployeeEmergencyContactsAuditValue(emergencyContactsBaseline);
+      const newContacts = normalizeHrEmployeeEmergencyContactsAuditValue(
+        input.emergencyContacts,
+      );
       await replaceEmergencyContactsInTx(db, {
         organizationId: input.organizationId,
         employeeId: input.employeeId,
         contacts: input.emergencyContacts,
       });
-      changedFields.push("emergencyContacts");
+      if (!hrEmployeeRecordAuditValuesEqual(previousContacts, newContacts)) {
+        changedFields.push("emergencyContacts");
+        await insertHrEmployeeRecordEventInTx(db, {
+          organizationId: input.organizationId,
+          employeeId: input.employeeId,
+          kind: "emergency_contact_updated",
+          fieldName: "emergencyContacts",
+          previousValue: serializeHrEmployeeRecordAuditValue(previousContacts),
+          newValue: serializeHrEmployeeRecordAuditValue(newContacts),
+          reason: input.reason ?? null,
+          approvalReference: input.approvalReference ?? null,
+          actorUserId: input.actorUserId ?? null,
+        });
+      }
+    }
+
+    if (changedFields.includes("employmentStatus")) {
       await insertHrEmployeeRecordEventInTx(db, {
         organizationId: input.organizationId,
         employeeId: input.employeeId,
-        kind: "emergency_contact_updated",
+        kind: "status_changed",
+        fieldName: "employmentStatus",
+        previousValue: serializeHrEmployeeRecordAuditValue(
+          baseline.employmentStatus,
+        ),
+        newValue: serializeHrEmployeeRecordAuditValue(
+          nextCoreValues.employmentStatus,
+        ),
         reason: input.reason ?? null,
+        approvalReference: input.approvalReference ?? null,
         actorUserId: input.actorUserId ?? null,
       });
     }
 
-    if (changedFields.length > 0) {
+    const dedicatedAuditFields = new Set([
+      "employmentStatus",
+      "currentDepartmentId",
+      "currentPositionId",
+      "managerEmployeeId",
+      "profile",
+      "emergencyContacts",
+    ]);
+    const recordChangedFields = changedFields.filter(
+      (fieldName) => !dedicatedAuditFields.has(fieldName),
+    );
+
+    if (recordChangedFields.length > 0) {
+      const previousValue = Object.fromEntries(
+        recordChangedFields.map((fieldName) => [
+          fieldName,
+          previousRecordValues[fieldName] ?? null,
+        ]),
+      );
+      const newValue = Object.fromEntries(
+        recordChangedFields.map((fieldName) => [
+          fieldName,
+          newRecordValues[fieldName] ?? null,
+        ]),
+      );
+
       await insertHrEmployeeRecordEventInTx(db, {
         organizationId: input.organizationId,
         employeeId: input.employeeId,
-        kind: input.employmentStatus ? "status_changed" : "updated",
-        newValue: JSON.stringify(changedFields),
+        kind: "updated",
+        fieldName:
+          recordChangedFields.length === 1
+            ? recordChangedFields[0]
+            : "employeeRecord",
+        previousValue: serializeHrEmployeeRecordAuditValue(previousValue),
+        newValue: serializeHrEmployeeRecordAuditValue(newValue),
         reason: input.reason ?? null,
         approvalReference: input.approvalReference ?? null,
         actorUserId: input.actorUserId ?? null,

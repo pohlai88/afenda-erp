@@ -39,6 +39,12 @@ function toHrWorkforceEssExecutionGuard(
     HR_WORKFORCE_ESS_APPROVE_CAPABILITY,
   );
   const isLeadership = context.role === "owner" || context.role === "admin";
+  const canReadRestricted =
+    canRead &&
+    (isLeadership ||
+      moduleGuard.hasCapability(HR_WORKFORCE_ESS_RESTRICTED_READ_CAPABILITY));
+  const canReadOrganizationScope = isLeadership || canReadRestricted;
+  const hasPortalAccess = canRead || canWrite || canApprove;
 
   return {
     context,
@@ -51,9 +57,7 @@ function toHrWorkforceEssExecutionGuard(
       (isLeadership ||
         moduleGuard.hasCapability(HR_WORKFORCE_ESS_AUDIT_READ_CAPABILITY)),
     canReadRestricted:
-      canRead &&
-      (isLeadership ||
-        moduleGuard.hasCapability(HR_WORKFORCE_ESS_RESTRICTED_READ_CAPABILITY)),
+      canReadRestricted,
     canExposeIntegrations:
       canRead &&
       (isLeadership ||
@@ -64,13 +68,16 @@ function toHrWorkforceEssExecutionGuard(
       return moduleGuard.hasCapability(capability);
     },
     async resolveVisibleEmployeeIds(input) {
-      if (!canRead) {
+      if (!hasPortalAccess) {
         return [];
       }
-      if (isLeadership || canWrite || canApprove) {
+      if (canReadOrganizationScope) {
         return input?.managedEmployeeIds?.length
           ? input.managedEmployeeIds
           : null;
+      }
+      if (canApprove && input?.managedEmployeeIds?.length) {
+        return input.managedEmployeeIds;
       }
       if (input?.selfEmployeeId) {
         return [input.selfEmployeeId];

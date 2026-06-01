@@ -179,6 +179,34 @@ describe("system admin audit viewer", () => {
       expect.objectContaining({
         action: "system-admin.audit.export",
         targetType: "organization",
+        metadata: expect.objectContaining({
+          truncated: false,
+          totalCount: 1,
+        }),
+      }),
+    );
+  });
+
+  it("records export truncation in audit metadata", async () => {
+    mockSearchAudit.mockResolvedValue({
+      rows: [sampleAuditRow],
+      totalCount: 10_000,
+    });
+
+    const formData = new FormData();
+    const result = await exportSystemAdminAuditLogsAction(formData);
+
+    expect(result.ok).toBe(true);
+    if (result.ok && result.data) {
+      expect(result.data.truncated).toBe(true);
+      expect(result.data.totalCount).toBe(10_000);
+    }
+    expect(mockWriteAudit).toHaveBeenCalledWith(
+      expect.objectContaining({
+        metadata: expect.objectContaining({
+          truncated: true,
+          totalCount: 10_000,
+        }),
       }),
     );
   });
@@ -295,7 +323,7 @@ describe("system admin audit viewer", () => {
       expect(result.data.format).toBe("json");
       expect(result.data.fileExtension).toBe("json");
       expect(result.data.encoding).toBe("utf8");
-      expect(JSON.parse(result.data.content)).toHaveLength(1);
+      expect(JSON.parse(result.data.content).rows).toHaveLength(1);
     }
   });
 

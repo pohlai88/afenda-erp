@@ -57,6 +57,7 @@ Lynx is the ERP machine layer — every machine-assisted modality routes through
    - Feature scaffold follows `packages/_template-definition`. Run `pnpm scaffold:feature <moduleId>`. Avoid catch-all folders (`_shared`, `common`, `lib`, `utils`, `helpers`, `misc`).
    - Feature server-only markers live at `src/server.ts` via `import "@afenda/kernel/server";`. Do not import `server-only` or `@afenda/kernel/server` from deep feature implementation files; local Vitest package tests import deep files without needing server-only stubs.
 6. **Governed UI** — Metadata declares intent; runtime owns authority. Lists use server windows and `GovernedPatternCListSection`; never ship full datasets to the client for pagination.
+   - **Shell viewport separation** — Treat desktop/tablet and mobile AppShell as separate views. Default shell previews and reviews to desktop/tablet only; do not care about, check, or optimize mobile in the same pass unless the user explicitly asks for a separate mobile AppShell view. Do not mix mobile-only controls into the desktop shell, or desktop-only chrome into the mobile shell.
 7. **Lazy clients** — Use `getDb()` and package auth doors; do not create Neon pools or SDK clients at module scope in new app code.
 8. **Caching** — `cacheComponents: true` via `@afenda/config`. Cache only shared/non-tenant data. Tenant dashboards and org-scoped lists stay dynamic.
 9. **Cron** — `/api/cron/*` must validate `Authorization: Bearer ${CRON_SECRET}` (`src/lib/cron.ts`).

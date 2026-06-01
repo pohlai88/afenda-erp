@@ -6,6 +6,7 @@ import {
   confirmHrEmployment,
   recordHrEmployeeMovement,
   recordHrProbationOutcome,
+  renewHrEmployeeContract,
   startHrOffboarding,
   startHrOnboarding,
   type HrProbationOutcome,
@@ -21,6 +22,7 @@ import {
   parseHrLifecycleProbationOutcomeForm,
 } from "../schemas/hr.workforce.lifecycle-probation.schema";
 import { parseHrLifecycleMovementForm } from "../schemas/hr.workforce.lifecycle-movement.schema";
+import { parseHrLifecycleContractRenewalForm } from "../schemas/hr.workforce.lifecycle-contract.schema";
 import {
   parseHrLifecycleNoticePeriodForm,
   parseHrLifecycleStartOffboardingForm,
@@ -199,9 +201,15 @@ export async function recordHrEmployeeMovementAction(
 
   const effectiveDate = parsed.data.effectiveDate ?? new Date();
   const placement = {
-    currentDepartmentId: parsed.data.currentDepartmentId ?? null,
-    currentPositionId: parsed.data.currentPositionId ?? null,
-    managerEmployeeId: parsed.data.managerEmployeeId ?? null,
+    ...(parsed.data.currentDepartmentId !== undefined
+      ? { currentDepartmentId: parsed.data.currentDepartmentId }
+      : {}),
+    ...(parsed.data.currentPositionId !== undefined
+      ? { currentPositionId: parsed.data.currentPositionId }
+      : {}),
+    ...(parsed.data.managerEmployeeId !== undefined
+      ? { managerEmployeeId: parsed.data.managerEmployeeId }
+      : {}),
   };
 
   return finalizeLifecycleMutation(organization.id, async () => {
@@ -211,6 +219,8 @@ export async function recordHrEmployeeMovementAction(
       movementKind: parsed.data.movementKind,
       effectiveDate,
       placement,
+      grade: parsed.data.grade,
+      workLocationCode: parsed.data.workLocationCode,
       reason: parsed.data.reason ?? null,
       approvalReference: parsed.data.approvalReference ?? null,
     });
@@ -227,6 +237,46 @@ export async function recordHrEmployeeMovementAction(
         effectiveDate: effectiveDate.toISOString(),
         lifecycleEventId: result.eventId,
         assignmentId: result.assignmentId,
+        changedFields: result.changedFields,
+      },
+    };
+  });
+}
+
+export async function renewHrEmployeeContractAction(
+  _previous: ActionResult | undefined,
+  formData: FormData,
+): Promise<ActionResult> {
+  const { session, organization } = await requireHrLifecycleWrite();
+  const parsed = parseHrLifecycleContractRenewalForm(formData);
+
+  if (!parsed.success) {
+    return zodActionFailure(parsed.error);
+  }
+
+  const effectiveDate = parsed.data.effectiveDate ?? new Date();
+
+  return finalizeLifecycleMutation(organization.id, async () => {
+    const result = await renewHrEmployeeContract({
+      organizationId: organization.id,
+      employeeId: parsed.data.employeeId,
+      contractEndDate: parsed.data.contractEndDate,
+      effectiveDate,
+      reason: parsed.data.reason,
+      approvalReference: parsed.data.approvalReference ?? null,
+    });
+
+    return {
+      organizationId: organization.id,
+      actorId: session.id,
+      action: hrWorkforceLifecycleAuditActions.contract.renewed,
+      targetId: parsed.data.employeeId,
+      summary: "Renewed fixed-term contract",
+      reason: parsed.data.reason,
+      metadata: {
+        effectiveDate: effectiveDate.toISOString(),
+        contractEndDate: parsed.data.contractEndDate.toISOString(),
+        lifecycleEventId: result.eventId,
       },
     };
   });

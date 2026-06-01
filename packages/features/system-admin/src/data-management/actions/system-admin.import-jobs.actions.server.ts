@@ -1,10 +1,6 @@
 "use server";
 
 import { createHash } from "node:crypto";
-import {
-  writeExecutionAuditEvent,
-  type ExecutionActorType,
-} from "@afenda/kernel/execution";
 import { revalidatePath } from "next/cache";
 import { systemAdminRoutePaths } from "../../overview/contracts/system-admin.route-paths.contract";
 import {
@@ -17,6 +13,7 @@ import type {
   CreateSystemAdminImportJobActionData,
   ExportSystemAdminDataManagementActionData,
 } from "../contracts";
+import { SYSTEM_ADMIN_DATA_MANAGEMENT_QUERY_LIMIT } from "../contracts/system-admin.data-management.limits.shared";
 import { systemAdminDataManagementAuditActions } from "../events";
 import {
   requireSystemAdminDataManagementCancel,
@@ -25,15 +22,18 @@ import {
   requireSystemAdminDataManagementRun,
 } from "../policies/system-admin.data-management.policy.server";
 import {
-  createSystemAdminImportJobSchema,
   exportSystemAdminDataManagementSchema,
   systemAdminImportJobCommandSchema,
 } from "../schemas";
 import { parseSystemAdminCsv } from "../data/system-admin.data-management-csv.parse.shared";
+import { writeSystemAdminDataManagementAudit } from "../data/system-admin.data-management-audit.shared";
+import { buildSystemAdminDataManagementExportCsv } from "../data/system-admin.data-management-export.build.server";
+import { findMissingCsvHeaders } from "../data/system-admin.data-management-headers.shared";
 import {
   getSystemAdminImportAdapter,
   getSystemAdminImportTemplate,
 } from "../data/system-admin.import-adapter.registry.server";
+import { parseSystemAdminImportJobFormData } from "../data/system-admin.import-job-form.shared";
 import {
   cancelSystemAdminDataImportJob,
   createSystemAdminDataImportJob,
@@ -48,63 +48,13 @@ function digest(value: string) {
   return createHash("sha256").update(value).digest("hex");
 }
 
-function escapeCsvCell(value: string | number | null | undefined) {
-  const normalized = String(value ?? "");
-  if (/[",\n]/.test(normalized)) {
-    return `"${normalized.replace(/"/g, '""')}"`;
-  }
-
-  return normalized;
-}
-
-function buildCsv(rows: readonly (readonly (string | number | null | undefined)[])[]) {
-  return rows.map((row) => row.map(escapeCsvCell).join(",")).join("\n");
-}
-
-function normalizeFormString(formData: FormData, key: string) {
-  const value = formData.get(key);
-  return typeof value === "string" ? value : "";
-}
-
-function findMissingHeaders(
-  actualHeaders: readonly string[],
-  requiredHeaders: readonly string[],
-) {
-  const actual = new Set(actualHeaders.map((header) => header.toLowerCase()));
-  return requiredHeaders.filter((header) => !actual.has(header.toLowerCase()));
-}
-
-async function writeDataManagementAudit(input: {
-  organizationId: string;
-  actorId: string;
-  actorType: ExecutionActorType;
-  action: string;
-  targetId: string;
-  metadata?: Record<string, unknown>;
-}) {
-  await writeExecutionAuditEvent({
-    organizationId: input.organizationId,
-    actorId: input.actorId,
-    actorType: input.actorType,
-    action: input.action,
-    targetType: "system_admin_data_management",
-    targetId: input.targetId,
-    metadata: input.metadata,
-  });
-}
-
 export async function createSystemAdminImportJobAction(
   formData: FormData,
 ): Promise<SystemAdminActionResult<CreateSystemAdminImportJobActionData>> {
   const { context, organization } =
     await requireSystemAdminDataManagementManage();
 
-  const parsed = createSystemAdminImportJobSchema.safeParse({
-    templateId: normalizeFormString(formData, "templateId"),
-    sourceLabel: normalizeFormString(formData, "sourceLabel"),
-    filename: normalizeFormString(formData, "filename") || undefined,
-    sourceData: normalizeFormString(formData, "sourceData"),
-  });
+  const parsed = parseSystemAdminImportJobFormData(formData);
 
   if (!parsed.success) {
     return zodActionFailure(parsed.error);
@@ -131,7 +81,10 @@ export async function createSystemAdminImportJobAction(
     });
   }
 
-  const missingHeaders = findMissingHeaders(csv.headers, template.requiredHeaders);
+  const missingHeaders = findMissingCsvHeaders(
+    csv.headers,
+    template.requiredHeaders,
+  );
   if (missingHeaders.length > 0) {
     return systemAdminActionFailure("CSV source is missing required headers.", {
       sourceData: `Missing headers: ${missingHeaders.join(", ")}`,
@@ -180,7 +133,7 @@ export async function createSystemAdminImportJobAction(
     rows,
   });
 
-  await writeDataManagementAudit({
+  await writeSystemAdminDataManagementAudit({
     organizationId: organization.id,
     actorId: context.userId,
     actorType: context.actorType,
@@ -197,7 +150,7 @@ export async function createSystemAdminImportJobAction(
     },
   });
 
-  await writeDataManagementAudit({
+  await writeSystemAdminDataManagementAudit({
     organizationId: organization.id,
     actorId: context.userId,
     actorType: context.actorType,
@@ -219,7 +172,7 @@ export async function createSystemAdminImportJobAction(
   });
 
   if (job.failedRows > 0) {
-    await writeDataManagementAudit({
+    await writeSystemAdminDataManagementAudit({
       organizationId: organization.id,
       actorId: context.userId,
       actorType: context.actorType,
@@ -277,6 +230,15 @@ export async function runSystemAdminImportJobAction(
       return systemAdminActionFailure("Data import job was not found.");
     }
 
+    if (jobBeforeRun.status === "completed") {
+      return systemAdminActionSuccess({
+        jobId: jobBeforeRun.id,
+        status: jobBeforeRun.status,
+        totalRows: jobBeforeRun.totalRows,
+        failedRows: jobBeforeRun.failedRows,
+      });
+    }
+
     const adapter = getSystemAdminImportAdapter(jobBeforeRun.adapterId);
     if (!adapter) {
       return systemAdminActionFailure("Data import adapter is no longer available.");
@@ -287,7 +249,7 @@ export async function runSystemAdminImportJobAction(
       jobId: parsed.data.jobId,
     });
 
-    await writeDataManagementAudit({
+    await writeSystemAdminDataManagementAudit({
       organizationId: organization.id,
       actorId: context.userId,
       actorType: context.actorType,
@@ -301,7 +263,7 @@ export async function runSystemAdminImportJobAction(
       },
     });
 
-    await writeDataManagementAudit({
+    await writeSystemAdminDataManagementAudit({
       organizationId: organization.id,
       actorId: context.userId,
       actorType: context.actorType,
@@ -350,7 +312,7 @@ export async function cancelSystemAdminImportJobAction(
       jobId: parsed.data.jobId,
     });
 
-    await writeDataManagementAudit({
+    await writeSystemAdminDataManagementAudit({
       organizationId: organization.id,
       actorId: context.userId,
       actorType: context.actorType,
@@ -411,7 +373,7 @@ export async function retrySystemAdminImportJobAction(
       jobId: parsed.data.jobId,
     });
 
-    await writeDataManagementAudit({
+    await writeSystemAdminDataManagementAudit({
       organizationId: organization.id,
       actorId: context.userId,
       actorType: context.actorType,
@@ -458,105 +420,29 @@ export async function exportSystemAdminDataManagementAction(input?: {
     organizationId: organization.id,
   });
 
-  const csv =
-    parsed.data.scope === "failures"
-      ? buildCsv([
-          [
-            "id",
-            "jobId",
-            "rowNumber",
-            "status",
-            "code",
-            "message",
-            "rowDigest",
-          ],
-          ...model.rowFailures.map((row) => [
-            row.id,
-            row.jobId,
-            row.rowNumber,
-            row.status,
-            row.validationCode,
-            row.validationMessage,
-            row.rowDigest,
-          ]),
-        ])
-      : parsed.data.scope === "exports"
-        ? buildCsv([
-            [
-              "id",
-              "exportType",
-              "sourceLabel",
-              "status",
-              "rowCount",
-              "packageDigest",
-              "createdBy",
-              "createdAt",
-            ],
-            ...model.exportJobs.map((row) => [
-              row.id,
-              row.exportType,
-              row.sourceLabel,
-              row.status,
-              row.rowCount,
-              row.packageDigest,
-              row.createdByAuthUserId,
-              row.createdAt.toISOString(),
-            ]),
-          ])
-        : buildCsv([
-            [
-              "id",
-              "adapterId",
-              "templateId",
-              "sourceLabel",
-              "status",
-              "totalRows",
-              "validatedRows",
-              "appliedRows",
-              "failedRows",
-              "skippedRows",
-              "inputDigest",
-              "createdBy",
-              "createdAt",
-              "completedAt",
-            ],
-            ...model.importJobs.map((row) => [
-              row.id,
-              row.adapterId,
-              row.templateId,
-              row.sourceLabel,
-              row.status,
-              row.totalRows,
-              row.validatedRows,
-              row.appliedRows,
-              row.failedRows,
-              row.skippedRows,
-              row.inputDigest,
-              row.createdByAuthUserId,
-              row.createdAt.toISOString(),
-              row.completedAt?.toISOString() ?? "",
-            ]),
-          ]);
+  const { csv, rowCount, truncated } = buildSystemAdminDataManagementExportCsv({
+    scope: parsed.data.scope,
+    jobs: model.importJobs,
+    failures: model.rowFailures,
+    exports: model.exportJobs,
+    queryLimit: SYSTEM_ADMIN_DATA_MANAGEMENT_QUERY_LIMIT,
+  });
 
   const exportJob = await recordSystemAdminDataExportJob({
     organizationId: organization.id,
     exportType: parsed.data.scope,
     sourceLabel: `system-admin.data-management.${parsed.data.scope}`,
-    rowCount:
-      parsed.data.scope === "failures"
-        ? model.rowFailures.length
-        : parsed.data.scope === "exports"
-          ? model.exportJobs.length
-          : model.importJobs.length,
+    rowCount,
     packageDigest: digest(csv),
     createdByAuthUserId: context.userId,
     metadata: {
       redacted: true,
       scope: parsed.data.scope,
+      truncated,
     },
   });
 
-  await writeDataManagementAudit({
+  await writeSystemAdminDataManagementAudit({
     organizationId: organization.id,
     actorId: context.userId,
     actorType: context.actorType,
@@ -566,6 +452,7 @@ export async function exportSystemAdminDataManagementAction(input?: {
       exportType: parsed.data.scope,
       rowCount: exportJob.rowCount,
       packageDigest: exportJob.packageDigest,
+      truncated,
     },
   });
 
@@ -575,5 +462,6 @@ export async function exportSystemAdminDataManagementAction(input?: {
     csv,
     rowCount: exportJob.rowCount,
     exportId: exportJob.id,
+    truncated,
   });
 }

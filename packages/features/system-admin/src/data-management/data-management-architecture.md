@@ -344,3 +344,68 @@ pnpm security:review
 
 Run `pnpm test:e2e` when route flows, file upload/paste flows, export flows, or
 cancellation behavior are wired into the app.
+
+---
+
+## Package Layout (as-built)
+
+```txt
+packages/features/system-admin/src/data-management/
+  actions/          # Import job create/run/cancel/retry and CSV export
+  components/       # Section, summary, create form, export button, trailing cells
+  contracts/        # Job DTOs, adapter contract, limits constants
+  data/             # Page model, CSV parser, export builder, form parser, audit helper
+  events/           # Audit action key registry
+  policies/         # requireSystemAdminDataManagementRead | Manage | Run | Cancel | Export
+  schemas/          # Zod job creation, command, and export validation
+  surface/          # Pattern C list metadata + UI copy
+```
+
+Shared helpers (DRY, testable without server context):
+
+```txt
+contracts/system-admin.data-management.limits.shared.ts   — query limit, field max sizes, audit target type
+data/system-admin.import-job-form.shared.ts               — trimmed FormData + Zod safeParse
+data/system-admin.data-management-headers.shared.ts       — required header diff
+data/system-admin.data-management-export.build.server.ts  — CSV builder with truncated flag
+data/system-admin.data-management-audit.shared.ts          — writeExecutionAuditEvent wrapper
+```
+
+Route adapter: `apps/erp/src/lib/system-admin-sections/data-management.server.tsx`
+
+Test IDs:
+
+```txt
+system-admin-data-management-page
+system-admin-data-management-access-denied
+system-admin-data-management-summary
+system-admin-data-management-templates
+system-admin-data-management-import-jobs
+system-admin-data-management-create-form
+system-admin-data-management-create-submit
+system-admin-data-management-export-button
+governed-list-section:system-admin.data-management.templates.list
+governed-list-section:system-admin.data-management.import-jobs.list
+governed-list-section:system-admin.data-management.import-failures.list
+governed-list-section:system-admin.data-management.exports.list
+```
+
+EUI: section titles use `headingLevel={2}` under the System Admin shell; list surfaces use governed Pattern C metadata.
+
+Mutation correctness:
+
+```txt
+Import create — rejects unknown adapter, missing headers, and invalid CSV before staging
+Import run    — no-op success when job is already completed (avoids duplicate audit noise)
+Export        — records truncated in export job metadata and audit when query limit is reached
+Audit         — targetType uses SYSTEM_ADMIN_DATA_MANAGEMENT_AUDIT_TARGET_TYPE constant
+```
+
+E2E: `apps/erp/tests/e2e/system-admin-data-management.spec.ts` (project `chromium-system-admin-data-management`).
+
+Unit coverage:
+
+```txt
+tests/unit/system-admin.data-management.shared.test.ts — form parser, headers, export truncation, audit keys
+tests/unit/system-admin.data-management.test.ts      — CSV parse, adapter redaction, governed surfaces
+```

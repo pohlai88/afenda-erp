@@ -28,6 +28,11 @@ export {
 } from "./surface/hr.workforce.lifecycle-probation-due-list.surface";
 
 export {
+  hrLifecycleContractReviewsSurfaceKey,
+  hrLifecycleContractReviewsSearchParam,
+} from "./surface/hr.workforce.lifecycle-contract-reviews-list.surface";
+
+export {
   hrLifecycleAuditTrailSurfaceKey,
   hrLifecycleAuditTrailSearchParam,
 } from "./surface/hr.workforce.lifecycle-audit-trail-list.surface";
@@ -59,3 +64,9 @@ export {
   toHrLifecyclePageModelInput,
   type HrLifecycleSearchParams,
 } from "./data/hr.workforce.lifecycle-search-params.parse.shared";
+
+export {
+  HR_WORKFORCE_LIFECYCLE_ACCEPTANCE_CRITERIA_COVERAGE,
+  HR_WORKFORCE_LIFECYCLE_REQUIREMENT_COVERAGE,
+  assertHrWorkforceLifecycleEnterpriseCoverage,
+} from "./data/hr.workforce.lifecycle-coverage.shared";

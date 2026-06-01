@@ -10,8 +10,10 @@ import {
   hrWorkforceEssAccessLogSurfaceKey,
   hrWorkforceEssApprovalInboxSurfaceKey,
   hrWorkforceEssAuditTrailSurfaceKey,
+  hrWorkforceEssExpenseClaimsSurfaceKey,
   hrWorkforceEssPayDocumentsSurfaceKey,
   hrWorkforceEssProfileSummarySurfaceKey,
+  hrWorkforceEssRequestTrackerSurfaceKey,
 } from "../../src/employee-management/employee-selfservice-portal/surface/hr.workforce.ess-surface-metadata.shared";
 
 describe("Employee Self-Service Portal list EUI contract", () => {
@@ -101,11 +103,88 @@ describe("Employee Self-Service Portal list EUI contract", () => {
     expect(sectionKeys).not.toContain(hrWorkforceEssAccessLogSurfaceKey);
     expect(sectionKeys).not.toContain(hrWorkforceEssAuditTrailSurfaceKey);
 
+    const profileSection = pageModel.sections.find(
+      (section) =>
+        section.surfaceKey === hrWorkforceEssProfileSummarySurfaceKey,
+    );
+    expect(JSON.stringify(profileSection?.listConfiguration.rows)).toContain(
+      "Nadia Ismail",
+    );
+    expect(JSON.stringify(profileSection?.listConfiguration.rows)).not.toContain(
+      "Victor Tan",
+    );
+
     const paySection = pageModel.sections.find(
       (section) => section.surfaceKey === hrWorkforceEssPayDocumentsSurfaceKey,
     );
     expect(JSON.stringify(paySection?.listConfiguration.rows)).toContain(
       "Restricted",
     );
+  });
+
+  it("keeps rejection reason and correction guidance visible in ESS tracking surfaces", async () => {
+    resetHrWorkforceEssStore("org-ess-guidance");
+
+    const pageModel = await buildHrWorkforceEssPageModel({
+      organizationId: "org-ess-guidance",
+      actorUserId: "user_ess_peer",
+      visibleEmployeeIds: ["ess-employee-2"],
+      canWrite: false,
+      canApprove: false,
+      canReadAudit: false,
+      canReadRestricted: false,
+      canExposeIntegrations: false,
+      reportGroupBy: "status",
+      status: "rejected",
+    });
+
+    const requestTrackerSection = pageModel.sections.find(
+      (section) => section.surfaceKey === hrWorkforceEssRequestTrackerSurfaceKey,
+    );
+    const claimsSection = pageModel.sections.find(
+      (section) => section.surfaceKey === hrWorkforceEssExpenseClaimsSurfaceKey,
+    );
+    const trackingRows = JSON.stringify(
+      requestTrackerSection?.listConfiguration.rows,
+    );
+    const claimRows = JSON.stringify(claimsSection?.listConfiguration.rows);
+
+    expect(trackingRows).toContain(
+      "Attach manager exception approval before resubmitting.",
+    );
+    expect(claimRows).toContain(
+      "Attach manager exception approval before resubmitting.",
+    );
+  });
+
+  it("does not expand write-only employee scope to other employees or approval inbox", async () => {
+    resetHrWorkforceEssStore("org-ess-write-self");
+
+    const pageModel = await buildHrWorkforceEssPageModel({
+      organizationId: "org-ess-write-self",
+      actorUserId: "user_ess_employee",
+      visibleEmployeeIds: null,
+      canWrite: true,
+      canApprove: false,
+      canReadAudit: false,
+      canReadRestricted: false,
+      canExposeIntegrations: false,
+      reportGroupBy: "employee",
+      status: "all",
+    });
+    const sectionKeys = pageModel.sections.map((section) => section.surfaceKey);
+    const profileSection = pageModel.sections.find(
+      (section) =>
+        section.surfaceKey === hrWorkforceEssProfileSummarySurfaceKey,
+    );
+    const serializedRows = JSON.stringify(
+      pageModel.sections.flatMap((section) => section.listConfiguration.rows),
+    );
+
+    expect(sectionKeys).not.toContain(hrWorkforceEssApprovalInboxSurfaceKey);
+    expect(profileSection?.listConfiguration.rows).toHaveLength(1);
+    expect(serializedRows).toContain("Nadia Ismail");
+    expect(serializedRows).not.toContain("Victor Tan");
+    expect(serializedRows).not.toContain("EMP-1002");
   });
 });

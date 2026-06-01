@@ -20,6 +20,11 @@ const LIFECYCLE_STATUSES_REQUIRING_REASON = new Set([
   "terminated",
 ]);
 
+const LIFECYCLE_STATUSES_REQUIRING_AUTHORIZATION = new Set([
+  "suspended",
+  "terminated",
+]);
+
 export const hrLifecycleScheduleStatusChangeSchema = z
   .object({
     employeeId: z.string().min(1),
@@ -38,6 +43,22 @@ export const hrLifecycleScheduleStatusChangeSchema = z
         message: "Reason is required for this lifecycle transition.",
         path: ["reason"],
       });
+    }
+    if (LIFECYCLE_STATUSES_REQUIRING_AUTHORIZATION.has(value.toStatus)) {
+      if (!value.effectiveDate) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Effective date is required for this lifecycle transition.",
+          path: ["effectiveDate"],
+        });
+      }
+      if (!value.approvalReference?.trim()) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Approval reference is required for this lifecycle transition.",
+          path: ["approvalReference"],
+        });
+      }
     }
   });
 

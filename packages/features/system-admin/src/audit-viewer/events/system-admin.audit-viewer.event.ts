@@ -2,6 +2,9 @@ export const systemAdminAuditViewerWebhookEvents = [
   "tenant.retention.updated",
 ] as const;
 
+export const systemAdminAuditViewerRetentionUpdatedWebhookEvent =
+  systemAdminAuditViewerWebhookEvents[0];
+
 export const systemAdminAuditViewerAuditActions = {
   view: "system-admin.audit.view",
   review: "system-admin.audit.review",

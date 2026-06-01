@@ -562,7 +562,7 @@ export async function buildHrWorkforceEssPageModel(
     }),
   ];
 
-  if (input.canWrite || input.canApprove) {
+  if (input.canApprove) {
     sections.push(
       section({
         surfaceKey: hrWorkforceEssApprovalInboxSurfaceKey,

@@ -19,6 +19,10 @@ export type SystemAdminAuditEventDetail = {
   moduleKey: string;
   summary: string;
   metadata: Record<string, unknown>;
+  /** Policy keys referenced in event metadata when present. */
+  policyKeys: readonly string[];
+  /** Approval keys referenced in event metadata when present. */
+  approvalKeys: readonly string[];
   /** Chronological evidence for the same target (oldest first). */
   timeline: readonly SystemAdminAuditEventRow[];
 };

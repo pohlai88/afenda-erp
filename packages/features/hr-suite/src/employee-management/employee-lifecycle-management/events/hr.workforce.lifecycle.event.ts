@@ -14,6 +14,9 @@ export const hrWorkforceLifecycleAuditActions = {
   movement: {
     recorded: "hr.lifecycle.movement.record",
   },
+  contract: {
+    renewed: "hr.lifecycle.contract.renew",
+  },
   transition: {
     cancelled: "hr.lifecycle.transition.cancel",
     applied: "hr.lifecycle.transition.apply",
@@ -34,6 +37,7 @@ export type HrWorkforceLifecycleAuditAction =
   | (typeof hrWorkforceLifecycleAuditActions)["probation"][keyof (typeof hrWorkforceLifecycleAuditActions)["probation"]]
   | (typeof hrWorkforceLifecycleAuditActions)["confirmation"][keyof (typeof hrWorkforceLifecycleAuditActions)["confirmation"]]
   | (typeof hrWorkforceLifecycleAuditActions)["movement"][keyof (typeof hrWorkforceLifecycleAuditActions)["movement"]]
+  | (typeof hrWorkforceLifecycleAuditActions)["contract"][keyof (typeof hrWorkforceLifecycleAuditActions)["contract"]]
   | (typeof hrWorkforceLifecycleAuditActions)["transition"][keyof (typeof hrWorkforceLifecycleAuditActions)["transition"]]
   | (typeof hrWorkforceLifecycleAuditActions)["onboarding"][keyof (typeof hrWorkforceLifecycleAuditActions)["onboarding"]]
   | (typeof hrWorkforceLifecycleAuditActions)["offboarding"][keyof (typeof hrWorkforceLifecycleAuditActions)["offboarding"]]

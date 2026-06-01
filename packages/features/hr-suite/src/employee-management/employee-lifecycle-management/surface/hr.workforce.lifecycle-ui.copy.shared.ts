@@ -68,6 +68,28 @@ export const hrLifecycleUiCopy = {
     trailingReason: "Reason",
     trailingApprovalRef: "Approval reference",
   },
+  contractReviews: {
+    sectionTitle: "Contract renewal review",
+    sectionDescription:
+      "Fixed-term employees with contract expiry inside the review window or already overdue.",
+    searchLabel: "Search contract reviews",
+    searchPlaceholder: "Employee, employment type, entity, or location",
+    colEmployee: "Employee",
+    colContractEnd: "Contract end",
+    colReviewPosture: "Review posture",
+    colEmploymentType: "Employment type",
+    colScope: "Entity / location",
+    colStage: "Stage",
+    emptyTitle: "No contract reviews due",
+    emptyDescription:
+      "Upcoming contract expiry reminders appear here before end date.",
+    surfaceHeaderTitle: "Contract reviews",
+    trailingRenewLabel: "Renew contract",
+    trailingNewEndDate: "New end date",
+    trailingEffectiveDate: "Effective date",
+    trailingReason: "Reason",
+    trailingApprovalRef: "Approval reference",
+  },
   onboardingCases: {
     sectionTitle: "Onboarding checklists",
     sectionDescription:
@@ -128,12 +150,14 @@ export const hrLifecycleUiCopy = {
   movement: {
     panelTitle: "Record movement",
     panelDescription:
-      "Promotion, transfer, demotion, or placement change without changing employment stage.",
+      "Promotion, transfer, demotion, job, grade, manager, department, or location change without changing employment stage.",
     employeeLabel: "Employee",
     movementKindLabel: "Movement type",
     departmentLabel: "Department ID",
     positionLabel: "Position ID",
     managerLabel: "Manager employee ID",
+    gradeLabel: "Grade",
+    workLocationLabel: "Work location code",
     effectiveDateLabel: "Effective date",
     reasonLabel: "Reason",
     approvalRefLabel: "Approval reference",

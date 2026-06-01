@@ -3,6 +3,10 @@ import {
   hrLifecycleAuditTrailSurfaceKey,
 } from "./hr.workforce.lifecycle-audit-trail-list.surface";
 import {
+  hrLifecycleContractReviewsSearchParam,
+  hrLifecycleContractReviewsSurfaceKey,
+} from "./hr.workforce.lifecycle-contract-reviews-list.surface";
+import {
   hrLifecycleEmploymentStatusFilterParam,
   hrLifecycleOverviewSearchParam,
   hrLifecycleOverviewSurfaceKey,
@@ -29,6 +33,7 @@ import {
 } from "./hr.workforce.lifecycle-probation-due-list.surface";
 import {
   hrLifecycleAuditTrailColumnsId,
+  hrLifecycleContractReviewsColumnsId,
   hrLifecycleNoticePeriodColumnsId,
   hrLifecycleOffboardingCasesColumnsId,
   hrLifecycleOnboardingCasesColumnsId,
@@ -41,6 +46,7 @@ import {
 export const HR_LIFECYCLE_LIST_SURFACE_KEYS = [
   hrLifecyclePendingTransitionsSurfaceKey,
   hrLifecycleProbationDueSurfaceKey,
+  hrLifecycleContractReviewsSurfaceKey,
   hrLifecycleOnboardingCasesSurfaceKey,
   hrLifecycleNoticePeriodSurfaceKey,
   hrLifecycleOffboardingCasesSurfaceKey,
@@ -59,6 +65,7 @@ export const HR_LIFECYCLE_LIST_SURFACE_COLUMNS_BY_KEY = {
   [hrLifecyclePendingTransitionsSurfaceKey]:
     hrLifecyclePendingTransitionsColumnsId,
   [hrLifecycleProbationDueSurfaceKey]: hrLifecycleProbationDueColumnsId,
+  [hrLifecycleContractReviewsSurfaceKey]: hrLifecycleContractReviewsColumnsId,
   [hrLifecycleOnboardingCasesSurfaceKey]: hrLifecycleOnboardingCasesColumnsId,
   [hrLifecycleNoticePeriodSurfaceKey]: hrLifecycleNoticePeriodColumnsId,
   [hrLifecycleOffboardingCasesSurfaceKey]:
@@ -71,6 +78,8 @@ export const HR_LIFECYCLE_LIST_SEARCH_PARAMS_BY_KEY = {
   [hrLifecyclePendingTransitionsSurfaceKey]:
     hrLifecyclePendingTransitionsSearchParam,
   [hrLifecycleProbationDueSurfaceKey]: hrLifecycleProbationDueSearchParam,
+  [hrLifecycleContractReviewsSurfaceKey]:
+    hrLifecycleContractReviewsSearchParam,
   [hrLifecycleOnboardingCasesSurfaceKey]: hrLifecycleOnboardingCasesSearchParam,
   [hrLifecycleNoticePeriodSurfaceKey]: hrLifecycleNoticePeriodSearchParam,
   [hrLifecycleOffboardingCasesSurfaceKey]:
@@ -82,6 +91,7 @@ export const HR_LIFECYCLE_LIST_SEARCH_PARAMS_BY_KEY = {
 export const HR_LIFECYCLE_LIST_SEARCH_PARAM_MODEL_FIELDS = {
   [hrLifecyclePendingTransitionsSearchParam]: "pendingTransitionsSearch",
   [hrLifecycleProbationDueSearchParam]: "probationDueSearch",
+  [hrLifecycleContractReviewsSearchParam]: "contractReviewsSearch",
   [hrLifecycleOnboardingCasesSearchParam]: "onboardingCasesSearch",
   [hrLifecycleNoticePeriodSearchParam]: "noticePeriodSearch",
   [hrLifecycleOffboardingCasesSearchParam]: "offboardingCasesSearch",
@@ -100,6 +110,7 @@ export const HR_LIFECYCLE_WORKBENCH_READ_ONLY_SURFACE_KEYS = new Set<
 
 export {
   hrLifecycleAuditTrailSurfaceKey,
+  hrLifecycleContractReviewsSurfaceKey,
   hrLifecycleNoticePeriodSurfaceKey,
   hrLifecycleOffboardingCasesSurfaceKey,
   hrLifecycleOnboardingCasesSurfaceKey,

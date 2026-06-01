@@ -4,7 +4,7 @@ import type {
   TenantModuleSettingRow,
 } from "@afenda/db";
 import type { ExecutionCapability } from "@afenda/kernel/execution-capabilities";
-import { listExecutionCapabilities } from "@afenda/kernel/execution-capabilities";
+import { listUniqueExecutionCapabilities } from "./system-admin.capabilities-catalog.shared";
 import type {
   CapabilityCoverageVerdict,
   SystemAdminCapabilityAvailability,
@@ -12,16 +12,15 @@ import type {
   SystemAdminCapabilityReadinessVerdict,
 } from "../contracts";
 import { isCriticalExecutionCapability } from "../contracts/system-admin.capability-safety.contract";
+import {
+  buildSystemAdminCapabilitySettingsMap,
+  buildSystemAdminModuleSettingsMap,
+  isSystemAdminModuleDisabledForOrg,
+  resolveSystemAdminCapabilityOrgAvailability,
+} from "./system-admin.capabilities-org-settings.shared";
 
 function isSensitiveCapability(capability: ExecutionCapability) {
   return isCriticalExecutionCapability(capability);
-}
-
-function resolveOrgAvailability(
-  capabilityKey: string,
-  settingsByCapability: Map<string, TenantCapabilitySettingRow>,
-): SystemAdminCapabilityAvailability {
-  return settingsByCapability.get(capabilityKey)?.availability ?? "enabled";
 }
 
 export function resolveSystemAdminCapabilityReadinessVerdict(input: {
@@ -53,24 +52,6 @@ export function resolveSystemAdminCapabilityReadinessVerdict(input: {
   return "ready";
 }
 
-function moduleIsDisabled(
-  moduleKey: string,
-  settingsByModule: Map<string, TenantModuleSettingRow>,
-) {
-  const setting = settingsByModule.get(moduleKey);
-
-  if (!setting) {
-    return false;
-  }
-
-  return (
-    setting.enabled === false ||
-    setting.visible === false ||
-    setting.readiness === "blocked" ||
-    setting.readiness === "deprecated"
-  );
-}
-
 function capabilityOrgAvailability(
   capabilityKey: string,
   settingsByCapability: Map<string, TenantCapabilitySettingRow>,
@@ -87,14 +68,11 @@ export function evaluateCapabilityCoverage(input: {
   issues: string[];
 } {
   const issues: string[] = [];
-  const settingsByModule = new Map(
-    (input.moduleSettings ?? []).map((setting) => [setting.moduleKey, setting]),
+  const settingsByModule = buildSystemAdminModuleSettingsMap(
+    input.moduleSettings ?? [],
   );
-  const settingsByCapability = new Map(
-    (input.capabilitySettings ?? []).map((setting) => [
-      setting.capabilityKey,
-      setting,
-    ]),
+  const settingsByCapability = buildSystemAdminCapabilitySettingsMap(
+    input.capabilitySettings ?? [],
   );
   const orgAvailability = capabilityOrgAvailability(
     input.capability.key,
@@ -125,7 +103,7 @@ export function evaluateCapabilityCoverage(input: {
     );
   }
 
-  if (moduleIsDisabled(input.capability.moduleKey, settingsByModule)) {
+  if (isSystemAdminModuleDisabledForOrg(input.capability.moduleKey, settingsByModule)) {
     issues.push("Parent module is disabled or hidden for this organization.");
   }
 
@@ -164,19 +142,17 @@ export function buildSystemAdminCapabilityCoverageRows(input?: {
   moduleSettings?: readonly TenantModuleSettingRow[];
   capabilitySettings?: readonly TenantCapabilitySettingRow[];
 }): SystemAdminCapabilityCoverageRow[] {
-  return listExecutionCapabilities().map((capability) => {
+  const settingsByCapability = buildSystemAdminCapabilitySettingsMap(
+    input?.capabilitySettings ?? [],
+  );
+
+  return listUniqueExecutionCapabilities().map((capability) => {
     const { verdict, issues } = evaluateCapabilityCoverage({
       capability,
       moduleSettings: input?.moduleSettings,
       capabilitySettings: input?.capabilitySettings,
     });
-    const settingsByCapability = new Map(
-      (input?.capabilitySettings ?? []).map((setting) => [
-        setting.capabilityKey,
-        setting,
-      ]),
-    );
-    const availability = resolveOrgAvailability(
+    const availability = resolveSystemAdminCapabilityOrgAvailability(
       capability.key,
       settingsByCapability,
     );

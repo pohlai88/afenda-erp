@@ -1,4 +1,5 @@
 import type { SystemAdminAuditSearchParams } from "../schemas/system-admin.audit-filter.schema";
+import { SYSTEM_ADMIN_AUDIT_DEFAULT_PAGE_SIZE } from "../contracts/system-admin.audit-viewer.limits.shared";
 
 export const SYSTEM_ADMIN_AUDIT_PATH = "/system-admin/audit";
 
@@ -58,7 +59,7 @@ export function buildSystemAdminAuditPageHref(
     search.set("auditPage", String(page));
   }
 
-  if (params.auditPageSize && params.auditPageSize !== 25) {
+  if (params.auditPageSize && params.auditPageSize !== SYSTEM_ADMIN_AUDIT_DEFAULT_PAGE_SIZE) {
     search.set("auditPageSize", String(params.auditPageSize));
   }
 

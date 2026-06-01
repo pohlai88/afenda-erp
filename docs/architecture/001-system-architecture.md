@@ -7,7 +7,7 @@
 | Status     | Active — aligned with `afenda-erp` repo as-built (May 2026)                                                        |
 | Authority  | Product-wide runtime, deployment, data, auth, AI, observability                                                    |
 | Supersedes | Informal root architecture draft (removed; do not add new copies)                                                  |
-| Related    | **ARCH-002** (platform, packages, execution §4) · **ARCH-005** (database) · **ARCH-006** (metadata UI) · **ARCH-008** (package discipline) |
+| Related    | **ARCH-002** (platform, packages, execution §4) · **ARCH-005** (database) · **ARCH-006** (metadata UI) · **ARCH-008** (package discipline) · **ARCH-013** (AppShell) |
 
 ## Executive Summary
 
@@ -76,6 +76,7 @@ extracted. Feature-package authority:
 apps/
   erp/                  # Next.js App Router ERP application
 packages/
+  appshell/             # Authenticated ERP AppShell chrome and contracts
   features/             # Target: ERP module packages when domains mature
     finance/
     sales/
@@ -86,7 +87,7 @@ packages/
     approvals/
     reports/
     admin/
-  ui/                   # Shared UI primitives and ERP layout components
+  ui/                   # Shared UI primitives only
   governed-surface/     # Metadata-driven ERP UI contracts and renderers
   db/                   # Drizzle schema, migrations, Neon connection helpers
   auth/                 # Neon Auth integration, roles, permission helpers
@@ -107,8 +108,12 @@ and `dev`. The `@afenda/erp#build` task must cache `.next/**` and **exclude**
 
 Package ownership rules:
 
-- `apps/erp` owns routing, route handlers, page composition, layouts, and
-  application shell behavior.
+- `apps/erp` owns routing, route handlers, page composition, layouts, session
+  and organization resolution, and AppShell mounting.
+- `packages/appshell` owns authenticated ERP AppShell chrome: L1 utility bar,
+  primary rail, command center, overlays, DTO schemas, geometry, and client
+  interaction state. See
+  [AppShell Package Architecture](013-appshell-package-architecture.md).
 - `packages/features/*` owns mature ERP module implementation: module-specific
   metadata, business commands, query services, page sections, schemas,
   workflow adapters, and tests. Feature packages cannot import from `apps/erp`.

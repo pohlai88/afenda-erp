@@ -19,16 +19,43 @@ import {
 import { systemAdminRoutePaths } from "../../overview/contracts/system-admin.route-paths.contract";
 import { dispatchSystemAdminWebhook } from "../../integrations/events/system-admin.webhook-dispatch.event";
 import type { SystemAdminCapabilityAvailability } from "../contracts";
+import {
+  SYSTEM_ADMIN_CAPABILITY_KEY_MAX_LENGTH,
+  SYSTEM_ADMIN_CAPABILITY_SETTINGS_QUERY_LIMIT,
+  SYSTEM_ADMIN_PROTECTED_CAPABILITY_PERMISSION,
+} from "../contracts";
 import { isCriticalExecutionCapability } from "../contracts/system-admin.capability-safety.contract";
 import { requireSystemAdminCapabilitiesManage } from "../policies/system-admin.capabilities.policy.server";
+import { parseSystemAdminCapabilitySettingsFormData } from "../data/system-admin.capability-settings-form.shared";
 import {
   resolveSystemAdminCapabilityAuditAction,
-  systemAdminCapabilityWebhookEvents,
+  SYSTEM_ADMIN_CAPABILITY_SETTINGS_WEBHOOK_EVENT,
 } from "../events/system-admin.capabilities.event";
 import { systemAdminCapabilitySettingsActionSchema } from "../schemas/system-admin.capability-settings.schema";
 
+function resolvePreviousCapabilityAvailability(input: {
+  capabilityKey: string;
+  existingSettings: Awaited<ReturnType<typeof listTenantCapabilitySettings>>;
+}): SystemAdminCapabilityAvailability | null | "truncated" {
+  const previousSetting = input.existingSettings.find(
+    (setting) => setting.capabilityKey === input.capabilityKey,
+  );
+
+  if (previousSetting) {
+    return previousSetting.availability;
+  }
+
+  if (
+    input.existingSettings.length >= SYSTEM_ADMIN_CAPABILITY_SETTINGS_QUERY_LIMIT
+  ) {
+    return "truncated";
+  }
+
+  return null;
+}
+
 const setCapabilityAvailabilityInputSchema = z.object({
-  capabilityKey: z.string().trim().min(1).max(160),
+  capabilityKey: z.string().trim().min(1).max(SYSTEM_ADMIN_CAPABILITY_KEY_MAX_LENGTH),
   availability: systemAdminCapabilitySettingsActionSchema.shape.availability,
 });
 
@@ -58,7 +85,7 @@ async function persistSystemAdminCapabilitySetting(input: {
 
   if (
     input.availability === "disabled" &&
-    capability.requiredPermission === "system-admin.settings.read"
+    capability.requiredPermission === SYSTEM_ADMIN_PROTECTED_CAPABILITY_PERMISSION
   ) {
     return systemAdminActionFailure(
       "System Admin settings read cannot be disabled for this organization.",
@@ -74,10 +101,20 @@ async function persistSystemAdminCapabilitySetting(input: {
     );
   }
 
-  const previous = input.existingSettings.find(
-    (setting) => setting.capabilityKey === input.capabilityKey,
-  );
-  const previousAvailability = previous?.availability ?? null;
+  const previousAvailability = resolvePreviousCapabilityAvailability({
+    capabilityKey: input.capabilityKey,
+    existingSettings: input.existingSettings,
+  });
+
+  if (previousAvailability === "truncated") {
+    return systemAdminActionFailure(
+      "Cannot verify the current capability setting because the organization settings list was truncated. Retry or contact an operator.",
+    );
+  }
+
+  if (previousAvailability === input.availability) {
+    return systemAdminActionSuccess(undefined);
+  }
 
   await upsertTenantCapabilitySettings({
     organizationId: input.organizationId,
@@ -105,7 +142,7 @@ async function persistSystemAdminCapabilitySetting(input: {
   await dispatchSystemAdminWebhook({
     organizationId: input.organizationId,
     userId: input.actorAuthUserId,
-    eventType: systemAdminCapabilityWebhookEvents[0],
+    eventType: SYSTEM_ADMIN_CAPABILITY_SETTINGS_WEBHOOK_EVENT,
     payload: {
       capabilityKey: input.capabilityKey,
       availability: input.availability,
@@ -130,7 +167,7 @@ export async function setSystemAdminCapabilityAvailabilityAction(input: {
     await requireSystemAdminCapabilitiesManage();
   const existingSettings = await listTenantCapabilitySettings({
     organizationId: organization.id,
-    limit: 500,
+    limit: SYSTEM_ADMIN_CAPABILITY_SETTINGS_QUERY_LIMIT,
   });
 
   return persistSystemAdminCapabilitySetting({
@@ -150,10 +187,7 @@ export async function updateSystemAdminCapabilitySettingsAction(
 ): Promise<SystemAdminActionResult> {
   const { context, organization, session } =
     await requireSystemAdminCapabilitiesManage();
-  const parsed = systemAdminCapabilitySettingsActionSchema.safeParse({
-    capabilityKey: formData.get("capabilityKey"),
-    availability: formData.get("availability"),
-  });
+  const parsed = parseSystemAdminCapabilitySettingsFormData(formData);
 
   if (!parsed.success) {
     return zodActionFailure(parsed.error);
@@ -161,7 +195,7 @@ export async function updateSystemAdminCapabilitySettingsAction(
 
   const existingSettings = await listTenantCapabilitySettings({
     organizationId: organization.id,
-    limit: 500,
+    limit: SYSTEM_ADMIN_CAPABILITY_SETTINGS_QUERY_LIMIT,
   });
 
   return persistSystemAdminCapabilitySetting({

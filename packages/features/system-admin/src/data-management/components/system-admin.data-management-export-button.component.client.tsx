@@ -24,6 +24,7 @@ export function SystemAdminDataManagementExportButton({
       type="button"
       variant="outline"
       disabled={pending}
+      data-testid="system-admin-data-management-export-button"
       onClick={() => {
         startTransition(async () => {
           const result = await exportDataManagementAction({ scope: "jobs" });

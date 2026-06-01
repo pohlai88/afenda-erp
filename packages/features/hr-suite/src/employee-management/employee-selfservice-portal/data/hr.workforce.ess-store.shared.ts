@@ -739,17 +739,31 @@ export function emitHrWorkforceEssAuditEvent(
 
 function visibleEmployeeProfileIds(input: {
   readonly profiles: readonly HrWorkforceEssEmployeeProfileInput[];
+  readonly actorUserId?: string;
+  readonly canApprove: boolean;
+  readonly canReadRestricted: boolean;
   readonly visibleEmployeeIds?: readonly string[] | null;
 }) {
-  if (!input.visibleEmployeeIds) {
+  if (input.visibleEmployeeIds === null && input.canReadRestricted) {
     return null;
   }
-  const visible = new Set(input.visibleEmployeeIds);
-  return new Set(
-    input.profiles
-      .filter((row) => visible.has(row.id) || visible.has(row.userId))
-      .map((row) => row.id),
-  );
+
+  const explicitVisible = new Set(input.visibleEmployeeIds ?? []);
+  const visibleProfileIds = new Set<string>();
+
+  for (const row of input.profiles) {
+    if (explicitVisible.has(row.id) || explicitVisible.has(row.userId)) {
+      visibleProfileIds.add(row.id);
+    }
+    if (input.actorUserId && row.userId === input.actorUserId) {
+      visibleProfileIds.add(row.id);
+    }
+    if (input.canApprove && input.actorUserId === row.managerUserId) {
+      visibleProfileIds.add(row.id);
+    }
+  }
+
+  return visibleProfileIds;
 }
 
 function employeeVisible(employeeId: string, visibleIds: ReadonlySet<string> | null) {
@@ -801,13 +815,12 @@ export function filterHrWorkforceEssRecordsForAccess(input: {
   readonly access: HrWorkforceEssAccessFilter;
 }): HrWorkforceEssStore {
   const { store, access } = input;
-  const managerOrHrScope =
-    access.canWrite || access.canApprove || access.canReadRestricted;
   const visibleIds = visibleEmployeeProfileIds({
     profiles: store.employeeProfiles,
-    visibleEmployeeIds: managerOrHrScope
-      ? access.visibleEmployeeIds ?? null
-      : access.visibleEmployeeIds ?? (access.actorUserId ? [access.actorUserId] : []),
+    actorUserId: access.actorUserId,
+    canApprove: access.canApprove,
+    canReadRestricted: access.canReadRestricted,
+    visibleEmployeeIds: access.visibleEmployeeIds,
   });
 
   const employeeProfiles = store.employeeProfiles
@@ -834,11 +847,11 @@ export function filterHrWorkforceEssRecordsForAccess(input: {
     requestTracker: employeeRows(store.requestTracker, visibleIds),
     notifications: employeeRows(store.notifications, visibleIds),
     approvalInbox:
-      access.canApprove || access.canWrite
+      access.canApprove
         ? store.approvalInbox.filter(
             (row) =>
-              employeeVisible(row.employeeId, visibleIds) ||
-              row.approverUserId === access.actorUserId,
+              row.approverUserId === access.actorUserId ||
+              (visibleIds === null && employeeVisible(row.employeeId, visibleIds)),
           )
         : [],
     benefits: employeeRows(store.benefits, visibleIds),

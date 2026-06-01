@@ -1,4 +1,9 @@
 import { z } from "zod";
+import {
+  SYSTEM_ADMIN_IMPORT_FILENAME_MAX_LENGTH,
+  SYSTEM_ADMIN_IMPORT_SOURCE_DATA_MAX_BYTES,
+  SYSTEM_ADMIN_IMPORT_SOURCE_LABEL_MAX_LENGTH,
+} from "../contracts/system-admin.data-management.limits.shared";
 
 export const systemAdminDataManagementImportJobStatuses = [
   "uploaded",
@@ -37,13 +42,24 @@ export const systemAdminExportJobStatusSchema = z.enum(
 );
 
 export const createSystemAdminImportJobSchema = z.object({
-  templateId: z.string().min(1),
-  sourceLabel: z.string().trim().min(1).max(120),
-  filename: z.string().trim().max(180).optional(),
+  templateId: z.string().trim().min(1),
+  sourceLabel: z
+    .string()
+    .trim()
+    .min(1)
+    .max(SYSTEM_ADMIN_IMPORT_SOURCE_LABEL_MAX_LENGTH),
+  filename: z
+    .string()
+    .trim()
+    .max(SYSTEM_ADMIN_IMPORT_FILENAME_MAX_LENGTH)
+    .optional(),
   sourceData: z
     .string()
     .min(1, "Import source data is required.")
-    .max(256_000, "Import source data may not exceed 256 KB."),
+    .max(
+      SYSTEM_ADMIN_IMPORT_SOURCE_DATA_MAX_BYTES,
+      "Import source data may not exceed 256 KB.",
+    ),
 });
 
 export const systemAdminImportJobCommandSchema = z.object({

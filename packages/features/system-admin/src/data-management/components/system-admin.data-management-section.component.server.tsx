@@ -38,9 +38,9 @@ export function SystemAdminDataManagementSection({
   const copy = systemAdminDataManagementUiCopy;
 
   return (
-    <div className="flex flex-col gap-surface-2xl">
+    <div className="@container flex flex-col gap-surface-2xl">
       <SectionPanel
-        headingLevel={1}
+        headingLevel={2}
         title={copy.page.title}
         description={copy.page.description}
         aside={
@@ -52,7 +52,9 @@ export function SystemAdminDataManagementSection({
         }
       />
 
-      <SystemAdminDataManagementSummaryPanel summary={model.summary} />
+      <div data-testid="system-admin-data-management-summary" className="contents">
+        <SystemAdminDataManagementSummaryPanel summary={model.summary} />
+      </div>
 
       <SectionPanel title={copy.create.title} description={copy.create.description}>
         {canManage ? (
@@ -71,35 +73,39 @@ export function SystemAdminDataManagementSection({
         )}
       </SectionPanel>
 
-      <GovernedPatternCListSection
-        title={copy.templates.title}
-        description={copy.templates.description}
-        surfaceKey={systemAdminImportTemplatesSurfaceKey}
-        listConfiguration={buildSystemAdminImportTemplatesListSurface({
-          templates: model.templates,
-        })}
-        parentAccessAllowed
-        layout="embedded"
-      />
+      <div data-testid="system-admin-data-management-templates" className="contents">
+        <GovernedPatternCListSection
+          title={copy.templates.title}
+          description={copy.templates.description}
+          surfaceKey={systemAdminImportTemplatesSurfaceKey}
+          listConfiguration={buildSystemAdminImportTemplatesListSurface({
+            templates: model.templates,
+          })}
+          parentAccessAllowed
+          layout="embedded"
+        />
+      </div>
 
-      <GovernedPatternCListSection
-        title={copy.importJobs.title}
-        description={copy.importJobs.description}
-        surfaceKey={systemAdminImportJobsSurfaceKey}
-        listConfiguration={buildSystemAdminImportJobsListSurface({
-          jobs: model.importJobs,
-          canRun,
-          canCancel,
-          searchValue: model.importJobsSearch,
-          totalCount: model.importJobs.length,
-        })}
-        parentAccessAllowed
-        layout="embedded"
-        trailingColumn={{
-          header: copy.importJobs.trailingHeader,
-          Cell: SystemAdminImportJobsTrailingCell,
-        }}
-      />
+      <div data-testid="system-admin-data-management-import-jobs" className="contents">
+        <GovernedPatternCListSection
+          title={copy.importJobs.title}
+          description={copy.importJobs.description}
+          surfaceKey={systemAdminImportJobsSurfaceKey}
+          listConfiguration={buildSystemAdminImportJobsListSurface({
+            jobs: model.importJobs,
+            canRun,
+            canCancel,
+            searchValue: model.importJobsSearch,
+            totalCount: model.importJobs.length,
+          })}
+          parentAccessAllowed
+          layout="embedded"
+          trailingColumn={{
+            header: copy.importJobs.trailingHeader,
+            Cell: SystemAdminImportJobsTrailingCell,
+          }}
+        />
+      </div>
 
       <GovernedPatternCListSection
         title={copy.failures.title}
@@ -135,7 +141,7 @@ export function SystemAdminDataManagementAccessDenied() {
   return (
     <div className="@container flex flex-col gap-surface-lg">
       <SectionPanel
-        headingLevel={1}
+        headingLevel={2}
         title={pageCopy.title}
         description={pageCopy.description}
       />

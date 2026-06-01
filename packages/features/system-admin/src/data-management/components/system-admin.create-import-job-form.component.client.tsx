@@ -18,6 +18,10 @@ import type {
   CreateSystemAdminImportJobActionData,
   SystemAdminImportTemplate,
 } from "../contracts";
+import {
+  SYSTEM_ADMIN_IMPORT_FILENAME_MAX_LENGTH,
+  SYSTEM_ADMIN_IMPORT_SOURCE_LABEL_MAX_LENGTH,
+} from "../contracts/system-admin.data-management.limits.shared";
 import type { SystemAdminActionResult } from "../../tenant-execution/contracts/system-admin.action-result.contract";
 import { systemAdminDataManagementUiCopy } from "../surface/system-admin.data-management-ui.copy.shared";
 
@@ -43,7 +47,11 @@ export function SystemAdminCreateImportJobForm({
   const disabled = pending || templates.length === 0;
 
   return (
-    <form action={formAction} className="@container">
+    <form
+      action={formAction}
+      className="@container"
+      data-testid="system-admin-data-management-create-form"
+    >
       <FieldGroup className="grid gap-surface-md @lg:grid-cols-[1fr_1fr_auto]">
         <Field>
           <FieldLabel>{copy.templateLabel}</FieldLabel>
@@ -63,7 +71,7 @@ export function SystemAdminCreateImportJobForm({
           <FieldLabel>{copy.sourceLabel}</FieldLabel>
           <Input
             name="sourceLabel"
-            maxLength={120}
+            maxLength={SYSTEM_ADMIN_IMPORT_SOURCE_LABEL_MAX_LENGTH}
             placeholder="Quarterly access review"
             required
             disabled={disabled}
@@ -74,7 +82,7 @@ export function SystemAdminCreateImportJobForm({
           <FieldLabel>{copy.filenameLabel}</FieldLabel>
           <Input
             name="filename"
-            maxLength={180}
+            maxLength={SYSTEM_ADMIN_IMPORT_FILENAME_MAX_LENGTH}
             placeholder="access-review.csv"
             disabled={disabled}
           />
@@ -95,7 +103,11 @@ export function SystemAdminCreateImportJobForm({
         </Field>
 
         <div className="@lg:col-span-3 flex flex-wrap items-center gap-surface-sm">
-          <Button type="submit" disabled={disabled}>
+          <Button
+            type="submit"
+            disabled={disabled}
+            data-testid="system-admin-data-management-create-submit"
+          >
             <UploadIcon data-icon="inline-start" />
             {pending ? "Staging..." : copy.submitLabel}
           </Button>

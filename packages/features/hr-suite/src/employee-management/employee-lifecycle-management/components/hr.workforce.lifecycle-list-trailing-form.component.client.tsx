@@ -205,6 +205,73 @@ export function HrLifecycleProbationOutcomeTrailingForm({
   );
 }
 
+export function HrLifecycleContractRenewalTrailingForm({
+  row,
+  action,
+}: {
+  row: GovernedListTrailingCellProps["row"];
+  action: (
+    previous: ActionResult | undefined,
+    formData: FormData,
+  ) => Promise<ActionResult>;
+}) {
+  const copy = hrLifecycleUiCopy.contractReviews;
+  const employeeId = String(row.cells.employeeIdValue ?? row.id);
+  const defaultContractEnd = String(row.cells.contractEndDateInput ?? "");
+
+  return (
+    <LifecycleTrailingActionForm
+      action={action}
+      submitLabel={copy.trailingRenewLabel}
+      hiddenFields={
+        <input type="hidden" name="employeeId" value={employeeId} />
+      }
+    >
+      <Field>
+        <FieldLabel htmlFor={`contract-renew-end-${row.id}`}>
+          {copy.trailingNewEndDate}
+        </FieldLabel>
+        <Input
+          id={`contract-renew-end-${row.id}`}
+          name="contractEndDate"
+          type="date"
+          defaultValue={defaultContractEnd}
+          required
+        />
+      </Field>
+      <Field>
+        <FieldLabel htmlFor={`contract-renew-effective-${row.id}`}>
+          {copy.trailingEffectiveDate}
+        </FieldLabel>
+        <Input
+          id={`contract-renew-effective-${row.id}`}
+          name="effectiveDate"
+          type="datetime-local"
+        />
+      </Field>
+      <Field>
+        <FieldLabel htmlFor={`contract-renew-reason-${row.id}`}>
+          {copy.trailingReason}
+        </FieldLabel>
+        <Input
+          id={`contract-renew-reason-${row.id}`}
+          name="reason"
+          required
+        />
+      </Field>
+      <Field>
+        <FieldLabel htmlFor={`contract-renew-approval-${row.id}`}>
+          {copy.trailingApprovalRef}
+        </FieldLabel>
+        <Input
+          id={`contract-renew-approval-${row.id}`}
+          name="approvalReference"
+        />
+      </Field>
+    </LifecycleTrailingActionForm>
+  );
+}
+
 export function HrLifecycleNoticePeriodOffboardingTrailingForm({
   row,
   action,

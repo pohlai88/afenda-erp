@@ -8,19 +8,16 @@ import type {
   SystemAdminAuditEventDetail,
   SystemAdminAuditEventRow,
 } from "../contracts/system-admin.audit-event.contract";
+import {
+  SYSTEM_ADMIN_AUDIT_DEFAULT_PAGE_SIZE,
+  SYSTEM_ADMIN_AUDIT_TARGET_TIMELINE_DEFAULT_LIMIT,
+} from "../contracts/system-admin.audit-viewer.limits.shared";
 import { redactAuditMetadata } from "./system-admin.audit-metadata.redact.shared";
+import { extractAuditCorrelationRefs } from "./system-admin.audit-correlation.shared";
+import { buildSystemAdminAuditSearchFilters } from "./system-admin.audit-search-filters.shared";
 import type { SystemAdminAuditSearchParams } from "../schemas/system-admin.audit-filter.schema";
 
-const DEFAULT_PAGE_SIZE = 25;
-
-export function parseAuditFilterDate(value: string | undefined) {
-  if (!value) {
-    return undefined;
-  }
-
-  const parsed = new Date(value);
-  return Number.isNaN(parsed.getTime()) ? undefined : parsed;
-}
+export { parseAuditFilterDate, buildSystemAdminAuditSearchFilters } from "./system-admin.audit-search-filters.shared";
 
 export function resolveAuditModuleKey(action: string) {
   const [moduleKey] = action.split(".");
@@ -44,6 +41,9 @@ export function mapTenantAuditLogToDetail(
   log: TenantAuditLog,
   timeline: readonly SystemAdminAuditEventRow[] = [],
 ): SystemAdminAuditEventDetail {
+  const metadata = redactAuditMetadata(log.metadata) as Record<string, unknown>;
+  const { policyKeys, approvalKeys } = extractAuditCorrelationRefs(metadata);
+
   return {
     id: log.id,
     occurredAt: formatErpDateTime(log.createdAt),
@@ -53,7 +53,9 @@ export function mapTenantAuditLogToDetail(
     entityId: log.entityId,
     moduleKey: resolveAuditModuleKey(log.action),
     summary: log.summary,
-    metadata: redactAuditMetadata(log.metadata) as Record<string, unknown>,
+    metadata,
+    policyKeys,
+    approvalKeys,
     timeline,
   };
 }
@@ -62,7 +64,7 @@ export async function searchSystemAdminAuditEvents(input: {
   organizationId: string;
   params: SystemAdminAuditSearchParams;
 }) {
-  const pageSize = input.params.auditPageSize ?? DEFAULT_PAGE_SIZE;
+  const pageSize = input.params.auditPageSize ?? SYSTEM_ADMIN_AUDIT_DEFAULT_PAGE_SIZE;
   const page = input.params.auditPage ?? 1;
   const offset = (page - 1) * pageSize;
 
@@ -70,17 +72,7 @@ export async function searchSystemAdminAuditEvents(input: {
     organizationId: input.organizationId,
     limit: pageSize,
     offset,
-    filters: {
-      actorAuthUserId: input.params.auditActor,
-      action: input.params.auditAction,
-      entityType: input.params.auditTargetType,
-      entityId: input.params.auditTargetId,
-      moduleKey: input.params.auditModule,
-      query: input.params.auditQ,
-      createdAfter: parseAuditFilterDate(input.params.auditFrom),
-      createdBefore: parseAuditFilterDate(input.params.auditTo),
-      sortDirection: input.params.auditSort ?? "desc",
-    },
+    filters: buildSystemAdminAuditSearchFilters(input.params),
   });
 
   return {
@@ -100,7 +92,7 @@ export async function listSystemAdminAuditTargetTimeline(input: {
 }) {
   const { rows } = await searchTenantAuditLogs({
     organizationId: input.organizationId,
-    limit: input.limit ?? 50,
+    limit: input.limit ?? SYSTEM_ADMIN_AUDIT_TARGET_TIMELINE_DEFAULT_LIMIT,
     offset: 0,
     filters: {
       entityType: input.entityType as TenantAuditLog["entityType"],

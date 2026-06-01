@@ -9,6 +9,8 @@ import {
 } from "../../tenant-execution/contracts/system-admin.action-result.contract";
 import { systemAdminRoutePaths } from "../../overview/contracts/system-admin.route-paths.contract";
 import { upsertSystemAdminBillingContacts } from "../data/system-admin.billing-contacts.repository.server";
+import { parseSystemAdminBillingContactsFormData } from "../data/system-admin.billing-contacts-form.shared";
+import { buildSystemAdminBillingSummaryCsv } from "../data/system-admin.billing-export.build.server";
 import {
   createStripeBillingPortalSession,
   createStripeCheckoutSession,
@@ -19,15 +21,6 @@ import {
   requireSystemAdminBillingExport,
   requireSystemAdminBillingManage,
 } from "../policies/system-admin.billing.policy.server";
-import { systemAdminBillingContactsSchema } from "../schemas/system-admin.billing-contact.schema";
-
-function escapeCsvCell(value: string) {
-  if (/[",\n]/.test(value)) {
-    return `"${value.replace(/"/g, '""')}"`;
-  }
-
-  return value;
-}
 
 export async function updateSystemAdminBillingContactsAction(
   _state: SystemAdminActionResult | undefined,
@@ -35,27 +28,7 @@ export async function updateSystemAdminBillingContactsAction(
 ): Promise<SystemAdminActionResult> {
   const { context, organization } = await requireSystemAdminBillingManage();
 
-  const parsed = systemAdminBillingContactsSchema.safeParse({
-    primary: {
-      name: formData.get("primaryName"),
-      email: formData.get("primaryEmail"),
-    },
-    invoice:
-      formData.get("invoiceName") && formData.get("invoiceEmail")
-        ? {
-            name: formData.get("invoiceName"),
-            email: formData.get("invoiceEmail"),
-          }
-        : undefined,
-    procurement:
-      formData.get("procurementName") && formData.get("procurementEmail")
-        ? {
-            name: formData.get("procurementName"),
-            email: formData.get("procurementEmail"),
-          }
-        : undefined,
-  });
-
+  const parsed = parseSystemAdminBillingContactsFormData(formData);
   if (!parsed.success) {
     return zodActionFailure(parsed.error);
   }
@@ -95,31 +68,7 @@ export async function exportSystemAdminBillingSummaryAction(): Promise<
     organizationSlug: organization.slug,
   });
 
-  const rows = [
-    ["area", "signal", "value"],
-    ["subscription", "plan", snapshot.subscription.planKey],
-    ["subscription", "status", snapshot.subscription.status],
-    [
-      "subscription",
-      "seats",
-      `${snapshot.subscription.seatsUsed}/${snapshot.subscription.seatsPurchased}`,
-    ],
-    ["usage", "machine_events", String(snapshot.aiUsageEventCount)],
-    ["usage", "lynx_runs", String(snapshot.lynxRunCount)],
-    [
-      "usage",
-      "gateway_spend_usd",
-      snapshot.gatewaySpendAvailable
-        ? snapshot.gatewayCostUsd.toFixed(4)
-        : "unavailable",
-    ],
-    ["entitlements", "count", String(snapshot.entitlements.length)],
-    ["marketplace", "linkage", snapshot.marketplaceLinkage],
-  ];
-
-  const csv = rows
-    .map((row) => row.map((cell) => escapeCsvCell(cell)).join(","))
-    .join("\n");
+  const { csv, rowCount } = buildSystemAdminBillingSummaryCsv(snapshot);
 
   await writeExecutionAuditEvent({
     organizationId: organization.id,
@@ -128,10 +77,10 @@ export async function exportSystemAdminBillingSummaryAction(): Promise<
     action: systemAdminBillingAuditActions.export,
     targetType: "organization_billing",
     targetId: organization.id,
-    metadata: { rowCount: rows.length - 1 },
+    metadata: { rowCount },
   });
 
-  return systemAdminActionSuccess({ csv, rowCount: rows.length - 1 });
+  return systemAdminActionSuccess({ csv, rowCount });
 }
 
 export async function startStripeCheckoutAction(input?: {

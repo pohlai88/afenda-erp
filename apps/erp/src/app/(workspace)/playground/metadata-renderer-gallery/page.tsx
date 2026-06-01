@@ -32,11 +32,17 @@ import {
 import {
   buildApprovalsListSurface,
   buildMembersListSurface,
+  buildSystemAdminAuditViewerListSurface,
   buildUsersListSurface,
   systemAdminApprovalDetailGalleryFixture,
   systemAdminApprovalsGalleryRows,
   systemAdminApprovalsSurfaceKey,
   systemAdminApprovalsUiCopy,
+  systemAdminAuditCoverageGalleryGaps,
+  systemAdminAuditDetailGalleryFixture,
+  systemAdminAuditViewerGalleryRows,
+  systemAdminAuditViewerSurfaceKey,
+  systemAdminAuditUiCopy,
   systemAdminMembersSurfaceKey,
   systemAdminMembershipsGalleryRows,
   systemAdminUsersGalleryRows,
@@ -46,7 +52,11 @@ import {
   SystemAdminApprovalTrailingCell,
   SystemAdminMembershipTrailingCell,
 } from "@afenda/feature-system-admin/client";
-import { SystemAdminApprovalDetailPanel } from "@afenda/feature-system-admin/server";
+import {
+  SystemAdminApprovalDetailPanel,
+  SystemAdminAuditCoveragePanel,
+  SystemAdminAuditDetailPanel,
+} from "@afenda/feature-system-admin/server";
 import {
   GovernedKanbanFooterSection,
   GovernedKanbanReadOnlyBoard,
@@ -430,6 +440,52 @@ export default function MetadataRendererGalleryPage() {
         <SystemAdminApprovalDetailPanel
           detail={systemAdminApprovalDetailGalleryFixture}
           backHref="/system-admin/approvals"
+        />
+      </GallerySection>
+
+      <GallerySection label="Pattern C — System admin audit viewer (ready)">
+        <GovernedPatternCListSection
+          title={systemAdminAuditUiCopy.auditList.title}
+          description={systemAdminAuditUiCopy.auditList.description}
+          surfaceKey={systemAdminAuditViewerSurfaceKey}
+          listConfiguration={buildSystemAdminAuditViewerListSurface({
+            rows: systemAdminAuditViewerGalleryRows,
+            params: { auditPage: 1, auditPageSize: 25 },
+            totalCount: systemAdminAuditViewerGalleryRows.length,
+            pageSize: 25,
+            page: 1,
+            hasNextPage: false,
+          })}
+          parentAccessAllowed
+          {...galleryPatternSection}
+        />
+      </GallerySection>
+
+      <GallerySection label="Pattern C — System admin audit viewer (empty)">
+        <GovernedPatternCListSection
+          title={systemAdminAuditUiCopy.auditList.title}
+          surfaceKey={`${systemAdminAuditViewerSurfaceKey}.empty`}
+          listConfiguration={buildSystemAdminAuditViewerListSurface({
+            rows: [],
+            params: { auditPage: 1, auditPageSize: 25 },
+            totalCount: 0,
+            pageSize: 25,
+            page: 1,
+            hasNextPage: false,
+          })}
+          parentAccessAllowed
+          {...galleryPatternSection}
+        />
+      </GallerySection>
+
+      <GallerySection label="System admin audit coverage (fixture)">
+        <SystemAdminAuditCoveragePanel gaps={systemAdminAuditCoverageGalleryGaps} />
+      </GallerySection>
+
+      <GallerySection label="System admin audit detail (fixture)">
+        <SystemAdminAuditDetailPanel
+          detail={systemAdminAuditDetailGalleryFixture}
+          backHref="/system-admin/audit"
         />
       </GallerySection>
 

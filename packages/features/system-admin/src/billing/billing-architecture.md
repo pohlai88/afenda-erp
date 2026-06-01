@@ -64,15 +64,15 @@ Modules
 ## Example Permission
 
 ```txt
-system_admin.billing.manage
+system-admin.billing.manage
 ```
 
 Recommended split:
 
 ```txt
-system_admin.billing.read
-system_admin.billing.manage
-system_admin.billing.export
+system-admin.billing.read
+system-admin.billing.manage
+system-admin.billing.export
 ```
 
 ## Core Principle
@@ -181,6 +181,32 @@ Purpose:
 Review subscription, entitlements, invoices, and usage.
 ```
 
+Route adapter: `apps/erp/src/lib/system-admin-sections/billing.server.tsx`
+
+Test IDs:
+
+```txt
+system-admin-billing-page
+system-admin-billing-access-denied
+system-admin-billing-readiness
+system-admin-billing-checkout-banner
+system-admin-billing-export-button
+governed-list-section:system-admin.billing.governance
+governed-list-section:system-admin.billing.subscription
+```
+
+EUI: section titles use `headingLevel={2}` under the System Admin shell; list surfaces use governed Pattern C metadata.
+
+Next.js MCP verification (dev server `:3000`):
+
+```txt
+get_errors → 0 config/session errors after browser session connected
+/system-admin/billing → pageRoot visible, 8 governed billing list sections
+?checkout=success → checkout banner test id visible
+```
+
+E2E: `apps/erp/tests/e2e/system-admin-billing.spec.ts` (project `chromium-system-admin-billing`).
+
 Recommended sections:
 
 ```txt
@@ -255,12 +281,67 @@ No entitlement conflicts
 ## Audit Actions
 
 ```txt
-system_admin.billing.contact.update
-system_admin.billing.export
-system_admin.billing.subscription.review
+system-admin.billing.contact.update
+system-admin.billing.export
+system-admin.billing.subscription.review
 ```
 
 Commercial events from payment providers should also be auditable.
+
+Audit action keys use hyphenated `system-admin.*` convention (not underscore).
+
+## Package Layout (as-built)
+
+```txt
+packages/features/system-admin/src/billing/
+  actions/          # Server actions (contacts, export, Stripe checkout/portal)
+  components/       # Section, forms, checkout banner, export button
+  contracts/        # Posture, subscription, readiness, limits constants
+  data/             # Page model, posture query, repositories, shared parsers/builders
+  events/           # Audit action key registry
+  policies/         # requireSystemAdminBillingRead | Manage | Export
+  schemas/          # Zod contact validation
+  surface/          # Pattern C list metadata + UI copy
+```
+
+Shared helpers (DRY, testable without server context):
+
+```txt
+data/system-admin.billing-export.build.server.ts     → buildSystemAdminBillingSummaryCsv
+data/system-admin.billing-contacts-form.shared.ts    → parseSystemAdminBillingContactsFormData
+data/system-admin.billing-default-plan.shared.ts     → resolveSystemAdminBillingDefaultPlanKey
+data/system-admin.billing-checkout-status.shared.ts  → parseSystemAdminBillingCheckoutStatus
+contracts/system-admin.billing.limits.shared.ts      → export row limits, default plan key
+```
+
+## Export Action Pattern
+
+```ts
+export async function exportSystemAdminBillingSummaryAction() {
+  const { context, organization } = await requireSystemAdminBillingExport()
+
+  const snapshot = await getBillingPostureSnapshot({
+    organizationId: organization.id,
+    organizationSlug: organization.slug,
+  })
+
+  const { csv, rowCount } = buildSystemAdminBillingSummaryCsv(snapshot)
+
+  await writeExecutionAuditEvent({
+    organizationId: organization.id,
+    actorId: context.userId,
+    actorType: context.actorType,
+    action: systemAdminBillingAuditActions.export,
+    targetType: "organization_billing",
+    targetId: organization.id,
+    metadata: { rowCount },
+  })
+
+  return systemAdminActionSuccess({ csv, rowCount })
+}
+```
+
+Contact updates parse `FormData` through `parseSystemAdminBillingContactsFormData` (trimmed optional pairs, Zod-backed) before repository upsert and audit write.
 
 ## Safety Rules
 
@@ -301,6 +382,14 @@ usage visible
 entitlements visible
 billing readiness generated
 organization scope enforced
+```
+
+Unit coverage:
+
+```txt
+tests/unit/system-admin.billing.shared.test.ts   — CSV builder, form parser, plan resolver, checkout status, audit keys
+tests/unit/system-admin.billing.test.ts          — readiness posture
+tests/unit/billing-stripe-plans.test.ts          — Stripe plan mapping
 ```
 
 ## Final Architecture Statement

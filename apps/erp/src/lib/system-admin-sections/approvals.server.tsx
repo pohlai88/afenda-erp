@@ -31,7 +31,11 @@ export default async function SystemAdminApprovalsPage({
   try {
     ({ organization, context } = await requireSystemAdminApprovalsRead());
   } catch {
-    return <SystemAdminApprovalsAccessDenied />;
+    return (
+      <div data-testid="system-admin-approvals-access-denied" className="contents">
+        <SystemAdminApprovalsAccessDenied />
+      </div>
+    );
   }
 
   const canMutate =
@@ -53,15 +57,17 @@ export default async function SystemAdminApprovalsPage({
   });
 
   return (
-    <SystemAdminApprovalsSection
-      approvals={approvals}
-      searchValue={searchValue}
-      canMutate={canMutate}
-      approverRoleOptions={approverRoleOptions}
-      updateApprovalRuleAction={updateSystemAdminApprovalRuleAction}
-      selectedApprovalKey={selectedApprovalKey}
-      approvalDetail={approvalDetail}
-      editorDefaults={editorDefaults}
-    />
+    <div data-testid="system-admin-approvals-page" className="contents">
+      <SystemAdminApprovalsSection
+        approvals={approvals}
+        searchValue={searchValue}
+        canMutate={canMutate}
+        approverRoleOptions={approverRoleOptions}
+        updateApprovalRuleAction={updateSystemAdminApprovalRuleAction}
+        selectedApprovalKey={selectedApprovalKey}
+        approvalDetail={approvalDetail}
+        editorDefaults={editorDefaults}
+      />
+    </div>
   );
 }

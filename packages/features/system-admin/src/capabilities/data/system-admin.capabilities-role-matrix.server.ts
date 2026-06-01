@@ -8,10 +8,17 @@ import type {
   TenantCapabilitySettingRow,
   TenantModuleSettingRow,
 } from "@afenda/db";
-import { listExecutionCapabilities } from "@afenda/kernel/execution-capabilities";
+import { listUniqueExecutionCapabilities } from "./system-admin.capabilities-catalog.shared";
 import { listRoleOverridesForOrganization } from "../../users/data/system-admin.identity.repository.server";
 import { resolveEffectivePermissionsForRole } from "../../permissions/data/system-admin.permissions.query.server";
 import { systemAdminSeedRoles } from "../../roles/contracts";
+import { SYSTEM_ADMIN_CAPABILITY_SETTINGS_QUERY_LIMIT } from "../contracts/system-admin.capabilities.limits.shared";
+import {
+  buildSystemAdminCapabilitySettingsMap,
+  buildSystemAdminModuleSettingsMap,
+  isSystemAdminModuleDisabledForOrg,
+  resolveSystemAdminCapabilityOrgAvailability,
+} from "./system-admin.capabilities-org-settings.shared";
 
 export type SystemAdminCapabilityRoleAccess = "granted" | "denied" | "blocked";
 
@@ -27,31 +34,6 @@ export type SystemAdminCapabilityRoleMatrixRow = {
   orgAvailability: string;
 };
 
-function moduleIsDisabled(
-  moduleKey: string,
-  settingsByModule: Map<string, TenantModuleSettingRow>,
-) {
-  const setting = settingsByModule.get(moduleKey);
-
-  if (!setting) {
-    return false;
-  }
-
-  return (
-    setting.enabled === false ||
-    setting.visible === false ||
-    setting.readiness === "blocked" ||
-    setting.readiness === "deprecated"
-  );
-}
-
-function resolveOrgAvailability(
-  capabilityKey: string,
-  settingsByCapability: Map<string, TenantCapabilitySettingRow>,
-) {
-  return settingsByCapability.get(capabilityKey)?.availability ?? "enabled";
-}
-
 export async function buildSystemAdminCapabilityRoleMatrix(input: {
   organizationId: string;
   moduleSettings: readonly TenantModuleSettingRow[];
@@ -60,17 +42,12 @@ export async function buildSystemAdminCapabilityRoleMatrix(input: {
 }): Promise<SystemAdminCapabilityRoleMatrixRow[]> {
   const roleOverrides = await listRoleOverridesForOrganization({
     organizationId: input.organizationId,
-    limit: 500,
+    limit: SYSTEM_ADMIN_CAPABILITY_SETTINGS_QUERY_LIMIT,
   });
 
-  const settingsByModule = new Map(
-    input.moduleSettings.map((setting) => [setting.moduleKey, setting]),
-  );
-  const settingsByCapability = new Map(
-    input.capabilitySettings.map((setting) => [
-      setting.capabilityKey,
-      setting,
-    ]),
+  const settingsByModule = buildSystemAdminModuleSettingsMap(input.moduleSettings);
+  const settingsByCapability = buildSystemAdminCapabilitySettingsMap(
+    input.capabilitySettings,
   );
 
   const roles = input.roleFilter
@@ -86,12 +63,12 @@ export async function buildSystemAdminCapabilityRoleMatrix(input: {
     const roleLabel =
       systemAdminSeedRoles.find((entry) => entry.key === role)?.name ?? role;
 
-    for (const capability of listExecutionCapabilities()) {
-      const orgAvailability = resolveOrgAvailability(
+    for (const capability of listUniqueExecutionCapabilities()) {
+      const orgAvailability = resolveSystemAdminCapabilityOrgAvailability(
         capability.key,
         settingsByCapability,
       );
-      const moduleBlocked = moduleIsDisabled(
+      const moduleBlocked = isSystemAdminModuleDisabledForOrg(
         capability.moduleKey,
         settingsByModule,
       );

@@ -20,6 +20,16 @@ function escapeCsvCell(value: string) {
   return value;
 }
 
+function serializeRedactedMetadata(value: unknown) {
+  try {
+    return JSON.stringify(value ?? {});
+  } catch (error) {
+    throw new Error("Audit export metadata is not JSON-serializable.", {
+      cause: error,
+    });
+  }
+}
+
 function mapExportRows(rows: readonly TenantAuditLog[]) {
   const metadataById = new Map(
     rows.map((row) => [row.id, redactAuditMetadata(row.metadata)]),
@@ -34,11 +44,27 @@ function mapExportRows(rows: readonly TenantAuditLog[]) {
     module: row.moduleKey,
     result: row.result,
     summary: row.summary,
-    metadata: JSON.stringify(metadataById.get(row.id) ?? {}),
+    metadata: serializeRedactedMetadata(metadataById.get(row.id) ?? {}),
   }));
 }
 
-async function buildPdfExport(rows: ReturnType<typeof mapExportRows>) {
+function buildTruncationNotice(input: {
+  truncated: boolean;
+  rowCount: number;
+  totalCount: number;
+  rowLimit: number;
+}) {
+  if (!input.truncated) {
+    return null;
+  }
+
+  return `Export truncated: ${input.rowCount} of ${input.totalCount} matching events (limit ${input.rowLimit}).`;
+}
+
+async function buildPdfExport(
+  rows: ReturnType<typeof mapExportRows>,
+  truncationNotice: string | null,
+) {
   const pdf = await PDFDocument.create();
   const font = await pdf.embedFont(StandardFonts.Helvetica);
   const fontSize = 9;
@@ -70,6 +96,9 @@ async function buildPdfExport(rows: ReturnType<typeof mapExportRows>) {
 
   drawLine("Afenda administrative audit evidence export");
   drawLine(`Generated: ${new Date().toISOString()}`);
+  if (truncationNotice) {
+    drawLine(truncationNotice);
+  }
   drawLine("---");
 
   for (const row of rows) {
@@ -91,8 +120,17 @@ async function buildPdfExport(rows: ReturnType<typeof mapExportRows>) {
 export function buildAuditExportBody(input: {
   format: SystemAdminAuditExportFormat;
   rows: readonly TenantAuditLog[];
+  truncated?: boolean;
+  totalCount?: number;
+  rowLimit?: number;
 }): AuditExportBody | Promise<AuditExportBody> {
   const exportRows = mapExportRows(input.rows);
+  const truncationNotice = buildTruncationNotice({
+    truncated: input.truncated ?? false,
+    rowCount: exportRows.length,
+    totalCount: input.totalCount ?? exportRows.length,
+    rowLimit: input.rowLimit ?? exportRows.length,
+  });
 
   if (input.format === "json") {
     const payload = exportRows.map((row) => ({
@@ -101,7 +139,14 @@ export function buildAuditExportBody(input: {
     }));
 
     return {
-      content: JSON.stringify(payload, null, 2),
+      content: JSON.stringify(
+        {
+          ...(truncationNotice ? { exportNotice: truncationNotice } : {}),
+          rows: payload,
+        },
+        null,
+        2,
+      ),
       mimeType: "application/json;charset=utf-8",
       fileExtension: "json",
       encoding: "utf8",
@@ -127,7 +172,7 @@ export function buildAuditExportBody(input: {
   }
 
   if (input.format === "pdf") {
-    return buildPdfExport(exportRows);
+    return buildPdfExport(exportRows, truncationNotice);
   }
 
   const header = [
@@ -156,7 +201,11 @@ export function buildAuditExportBody(input: {
   );
 
   return {
-    content: [header.join(","), ...lines].join("\n"),
+    content: [
+      ...(truncationNotice ? [`# ${truncationNotice}`] : []),
+      header.join(","),
+      ...lines,
+    ].join("\n"),
     mimeType: "text/csv;charset=utf-8",
     fileExtension: "csv",
     encoding: "utf8",

@@ -19,7 +19,7 @@ export const systemAdminAuditUiCopy = {
     description: "Retention posture for purge and legal hold.",
     emptyTitle: "No retention policies configured.",
     emptyDescription:
-      "Define retention below when you have system-admin.audit.manage.",
+      "Define retention below when you have system-admin.audit.review.",
   },
   retentionForm: {
     title: "Update retention policy",
@@ -30,6 +30,20 @@ export const systemAdminAuditUiCopy = {
     title: "Audit event detail",
     backLabel: "Back to results",
     metadataLabel: "Metadata (redacted)",
+    correlationTitle: "Evidence correlation",
+    policyLabel: "Policy references",
+    approvalLabel: "Approval references",
+    emptyCorrelation: "No policy or approval references in this event metadata.",
+    timelineTitle: "Evidence timeline",
+    selectedEventSuffix: " (selected)",
+    fields: {
+      time: "Time",
+      actor: "Actor",
+      action: "Action",
+      module: "Module",
+      target: "Target",
+      summary: "Summary",
+    },
   },
   export: {
     csvLabel: "Export CSV",

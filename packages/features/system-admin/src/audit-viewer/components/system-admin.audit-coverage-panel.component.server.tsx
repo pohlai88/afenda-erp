@@ -3,6 +3,7 @@ import Link from "next/link";
 import type { SystemAdminAuditCoverageGapRow } from "../contracts/system-admin.audit-coverage.contract";
 import { systemAdminAuditCoverageDiagnosticsHref } from "../../diagnostics/contracts/system-admin.diagnostics-links.shared";
 import { systemAdminControlLinks } from "../../overview/contracts/system-admin.control-links.contract";
+import { SYSTEM_ADMIN_AUDIT_COVERAGE_GAPS_PREVIEW_LIMIT } from "../contracts/system-admin.audit-viewer.limits.shared";
 import { systemAdminAuditUiCopy } from "../surface/system-admin.audit-ui.copy.shared";
 
 export function SystemAdminAuditCoveragePanel({
@@ -33,7 +34,7 @@ export function SystemAdminAuditCoveragePanel({
         <p className="type-muted">{copy.empty}</p>
       ) : (
         <ul className="flex flex-col gap-surface-sm">
-          {gaps.slice(0, 8).map((gap) => (
+          {gaps.slice(0, SYSTEM_ADMIN_AUDIT_COVERAGE_GAPS_PREVIEW_LIMIT).map((gap) => (
             <li
               key={gap.capabilityKey}
               className="flex flex-col gap-1 rounded-control border border-border p-surface-md @sm:flex-row @sm:items-center @sm:justify-between"
@@ -52,9 +53,10 @@ export function SystemAdminAuditCoveragePanel({
         </ul>
       )}
 
-      {gaps.length > 8 ? (
+      {gaps.length > SYSTEM_ADMIN_AUDIT_COVERAGE_GAPS_PREVIEW_LIMIT ? (
         <p className="type-caption">
-          {gaps.length - 8} {copy.truncatedSuffix}
+          {gaps.length - SYSTEM_ADMIN_AUDIT_COVERAGE_GAPS_PREVIEW_LIMIT}{" "}
+          {copy.truncatedSuffix}
         </p>
       ) : null}
     </section>

@@ -7,7 +7,7 @@ export function SystemAdminCapabilitiesAccessDenied() {
   return (
     <div className="@container flex flex-col gap-surface-lg">
       <SectionPanel
-        headingLevel={1}
+        headingLevel={2}
         title={copy.page.title}
         description={copy.page.description}
       />

@@ -42,8 +42,16 @@ export default async function SystemAdminCapabilitiesPage({
   try {
     ({ organization, context } = await requireSystemAdminCapabilitiesRead());
   } catch {
-    return <SystemAdminCapabilitiesAccessDenied />;
+    return (
+      <div
+        data-testid="system-admin-capabilities-access-denied"
+        className="contents"
+      >
+        <SystemAdminCapabilitiesAccessDenied />
+      </div>
+    );
   }
+
   const canMutate = hasExecutionPermission(
     context,
     "system-admin.capabilities.manage",
@@ -55,53 +63,64 @@ export default async function SystemAdminCapabilitiesPage({
     });
 
   return (
-    <div className="flex flex-col gap-surface-2xl">
-      <SectionPanel
-        headingLevel={1}
-        title={systemAdminCapabilitiesUiCopy.page.title}
-        description={systemAdminCapabilitiesUiCopy.page.description}
-      />
-
-      <GovernedPatternCListSection
-        title={systemAdminCapabilitiesUiCopy.list.title}
-        surfaceKey={systemAdminCapabilitiesSurfaceKey}
-        listConfiguration={buildCapabilitiesListSurface({
-          searchValue,
-          capabilities,
-          canMutate,
-        })}
-        parentAccessAllowed
-        layout="embedded"
-        trailingColumn={{
-          header: "Actions",
-          Cell: SystemAdminCapabilityTrailingCell,
-        }}
-      />
-
-      <GovernedPatternCListSection
-        title={systemAdminCapabilitiesUiCopy.roleMatrix.title}
-        surfaceKey={systemAdminCapabilityRoleMatrixSurfaceKey}
-        listConfiguration={buildCapabilityRoleMatrixListSurface({
-          rows: roleMatrix,
-          roleFilter: matrixRole,
-        })}
-        parentAccessAllowed
-        layout="embedded"
-      />
-
-      {canMutate ? (
+    <div data-testid="system-admin-capabilities-page" className="contents">
+      <div className="@container flex flex-col gap-surface-2xl">
         <SectionPanel
-          title={systemAdminCapabilitiesUiCopy.settings.title}
-          description={systemAdminCapabilitiesUiCopy.settings.description}
-        >
-          <SystemAdminCapabilitySettingsDialog
-            updateCapabilitySettingsAction={
-              updateSystemAdminCapabilitySettingsAction
-            }
-            capabilityOptions={capabilityOptions}
+          headingLevel={2}
+          title={systemAdminCapabilitiesUiCopy.page.title}
+          description={systemAdminCapabilitiesUiCopy.page.description}
+        />
+
+        <div data-testid="system-admin-capabilities-catalog" className="contents">
+          <GovernedPatternCListSection
+            title={systemAdminCapabilitiesUiCopy.list.title}
+            surfaceKey={systemAdminCapabilitiesSurfaceKey}
+            listConfiguration={buildCapabilitiesListSurface({
+              searchValue,
+              capabilities,
+              canMutate,
+            })}
+            parentAccessAllowed
+            layout="embedded"
+            trailingColumn={{
+              header: "Actions",
+              Cell: SystemAdminCapabilityTrailingCell,
+            }}
           />
-        </SectionPanel>
-      ) : null}
+        </div>
+
+        <div
+          data-testid="system-admin-capabilities-role-matrix"
+          className="contents"
+        >
+          <GovernedPatternCListSection
+            title={systemAdminCapabilitiesUiCopy.roleMatrix.title}
+            surfaceKey={systemAdminCapabilityRoleMatrixSurfaceKey}
+            listConfiguration={buildCapabilityRoleMatrixListSurface({
+              rows: roleMatrix,
+              roleFilter: matrixRole,
+            })}
+            parentAccessAllowed
+            layout="embedded"
+          />
+        </div>
+
+        {canMutate ? (
+          <div data-testid="system-admin-capabilities-settings" className="contents">
+            <SectionPanel
+              title={systemAdminCapabilitiesUiCopy.settings.title}
+              description={systemAdminCapabilitiesUiCopy.settings.description}
+            >
+              <SystemAdminCapabilitySettingsDialog
+                updateCapabilitySettingsAction={
+                  updateSystemAdminCapabilitySettingsAction
+                }
+                capabilityOptions={capabilityOptions}
+              />
+            </SectionPanel>
+          </div>
+        ) : null}
+      </div>
     </div>
   );
 }

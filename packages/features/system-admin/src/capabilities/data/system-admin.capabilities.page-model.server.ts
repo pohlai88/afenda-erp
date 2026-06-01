@@ -1,13 +1,16 @@
-import { listExecutionCapabilities } from "@afenda/kernel/execution-capabilities";
+import { listUniqueExecutionCapabilities } from "./system-admin.capabilities-catalog.shared";
 import {
   listTenantCapabilitySettings,
   listTenantModuleSettings,
 } from "../../tenant-execution/data/system-admin.execution-settings.repository.server";
 import { resolveSystemAdminListSearch } from "../../overview/contracts/system-admin.list-search.shared";
+import {
+  SYSTEM_ADMIN_CAPABILITY_SETTINGS_QUERY_LIMIT,
+  SYSTEM_ADMIN_MODULE_SETTINGS_QUERY_LIMIT,
+} from "../contracts/system-admin.capabilities.limits.shared";
 import { buildSystemAdminCapabilityCoverageRows } from "./system-admin.capabilities.coverage.server";
 import { buildSystemAdminCapabilityRoleMatrix } from "./system-admin.capabilities-role-matrix.server";
-import type { OrganizationRole } from "@afenda/auth";
-import { organizationRoles } from "@afenda/auth";
+import { parseSystemAdminCapabilityMatrixRole } from "./system-admin.capabilities-matrix-role.shared";
 
 export async function buildSystemAdminCapabilitiesPageModel(input: {
   organizationId: string;
@@ -17,28 +20,25 @@ export async function buildSystemAdminCapabilitiesPageModel(input: {
     input.searchParams,
     "capabilities",
   );
-  const matrixRoleRaw = input.searchParams?.matrixRole;
-  const matrixRole =
-    typeof matrixRoleRaw === "string" &&
-    (organizationRoles as readonly string[]).includes(matrixRoleRaw)
-      ? (matrixRoleRaw as OrganizationRole)
-      : undefined;
+  const matrixRole = parseSystemAdminCapabilityMatrixRole(
+    input.searchParams?.matrixRole,
+  );
 
   const [moduleSettings, capabilitySettings] = await Promise.all([
     listTenantModuleSettings({
       organizationId: input.organizationId,
-      limit: 100,
+      limit: SYSTEM_ADMIN_MODULE_SETTINGS_QUERY_LIMIT,
     }),
     listTenantCapabilitySettings({
       organizationId: input.organizationId,
-      limit: 500,
+      limit: SYSTEM_ADMIN_CAPABILITY_SETTINGS_QUERY_LIMIT,
     }),
   ]);
   const capabilities = buildSystemAdminCapabilityCoverageRows({
     moduleSettings,
     capabilitySettings,
   });
-  const capabilityOptions = listExecutionCapabilities().map((capability) => ({
+  const capabilityOptions = listUniqueExecutionCapabilities().map((capability) => ({
     value: capability.key,
     label: capability.label,
   }));

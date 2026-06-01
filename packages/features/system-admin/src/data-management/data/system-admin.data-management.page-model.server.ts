@@ -5,6 +5,7 @@ import type {
 } from "@afenda/db";
 import { filterSystemAdminListRows } from "../../overview/contracts/system-admin.list-filter.shared";
 import { resolveSystemAdminListSearch } from "../../overview/contracts/system-admin.list-search.shared";
+import { SYSTEM_ADMIN_DATA_MANAGEMENT_QUERY_LIMIT } from "../contracts/system-admin.data-management.limits.shared";
 import type {
   SystemAdminDataManagementSummary,
   SystemAdminExportJobListRow,
@@ -125,16 +126,16 @@ export async function buildSystemAdminDataManagementPageModel(input: {
   const [jobRows, failureRows, exportRows] = await Promise.all([
     listSystemAdminDataImportJobs({
       organizationId: input.organizationId,
-      limit: 100,
+      limit: SYSTEM_ADMIN_DATA_MANAGEMENT_QUERY_LIMIT,
     }),
     listSystemAdminDataImportRows({
       organizationId: input.organizationId,
       status: "failed",
-      limit: 100,
+      limit: SYSTEM_ADMIN_DATA_MANAGEMENT_QUERY_LIMIT,
     }),
     listSystemAdminDataExportJobs({
       organizationId: input.organizationId,
-      limit: 100,
+      limit: SYSTEM_ADMIN_DATA_MANAGEMENT_QUERY_LIMIT,
     }),
   ]);
 

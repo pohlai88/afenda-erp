@@ -16,6 +16,7 @@ import { hrLifecycleAuditTrailSurfaceKey } from "../surface/hr.workforce.lifecyc
 import { hrLifecycleOverviewSurfaceKey } from "../surface/hr.workforce.lifecycle-overview-list.surface";
 import { hrLifecyclePendingTransitionsSurfaceKey } from "../surface/hr.workforce.lifecycle-pending-transitions-list.surface";
 import { hrLifecycleProbationDueSurfaceKey } from "../surface/hr.workforce.lifecycle-probation-due-list.surface";
+import { hrLifecycleContractReviewsSurfaceKey } from "../surface/hr.workforce.lifecycle-contract-reviews-list.surface";
 import { hrLifecycleOnboardingCasesSurfaceKey } from "../surface/hr.workforce.lifecycle-onboarding-cases-list.surface";
 import { hrLifecycleNoticePeriodSurfaceKey } from "../surface/hr.workforce.lifecycle-notice-period-list.surface";
 import { hrLifecycleOffboardingCasesSurfaceKey } from "../surface/hr.workforce.lifecycle-offboarding-cases-list.surface";
@@ -28,6 +29,7 @@ import {
   HrLifecycleOverviewTrailingCell,
   HrLifecyclePendingTransitionsTrailingCell,
   HrLifecycleProbationDueTrailingCell,
+  HrLifecycleContractReviewsTrailingCell,
 } from "./hr.workforce.lifecycle-list-trailing.component.client";
 
 const lifecycleForbiddenState = {
@@ -156,6 +158,19 @@ export function HrLifecycleWorkbenchSection({
         loadError={model.probationDueLoadError}
         actionsHeader={copy.probationDue.trailingOutcomeLabel}
         TrailingCell={HrLifecycleProbationDueTrailingCell}
+      />
+
+      <HrLifecycleGovernedListSection
+        canWrite={model.canWrite}
+        title={copy.contractReviews.sectionTitle}
+        description={copy.contractReviews.sectionDescription}
+        surfaceKey={hrLifecycleContractReviewsSurfaceKey}
+        listConfiguration={
+          model.contractReviewsList as ListSurfaceRendererConfigurationInput
+        }
+        loadError={model.contractReviewsLoadError}
+        actionsHeader={copy.contractReviews.trailingRenewLabel}
+        TrailingCell={HrLifecycleContractReviewsTrailingCell}
       />
 
       <HrLifecycleReadOnlyListSection

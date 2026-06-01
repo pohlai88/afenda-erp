@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { hrWorkforceLifecycleReadPermission } from "../../src/employee-management/employee-lifecycle-management/contracts/hr.workforce.lifecycle.contract";
 import { buildHrLifecycleAuditTrailListSurface } from "../../src/employee-management/employee-lifecycle-management/surface/hr.workforce.lifecycle-audit-trail-list.surface";
+import { buildHrLifecycleContractReviewsListSurface } from "../../src/employee-management/employee-lifecycle-management/surface/hr.workforce.lifecycle-contract-reviews-list.surface";
 import { buildHrLifecycleNoticePeriodListSurface } from "../../src/employee-management/employee-lifecycle-management/surface/hr.workforce.lifecycle-notice-period-list.surface";
 import { buildHrLifecycleOffboardingCasesListSurface } from "../../src/employee-management/employee-lifecycle-management/surface/hr.workforce.lifecycle-offboarding-cases-list.surface";
 import { buildHrLifecycleOnboardingCasesListSurface } from "../../src/employee-management/employee-lifecycle-management/surface/hr.workforce.lifecycle-onboarding-cases-list.surface";
@@ -10,6 +11,7 @@ import { buildHrLifecyclePendingTransitionsListSurface } from "../../src/employe
 import { buildHrLifecycleProbationDueListSurface } from "../../src/employee-management/employee-lifecycle-management/surface/hr.workforce.lifecycle-probation-due-list.surface";
 import {
   hrLifecycleAuditTrailColumnsId,
+  hrLifecycleContractReviewsColumnsId,
   hrLifecycleNoticePeriodColumnsId,
   hrLifecycleOffboardingCasesColumnsId,
   hrLifecycleOnboardingCasesColumnsId,
@@ -19,6 +21,7 @@ import {
 } from "../../src/employee-management/employee-lifecycle-management/surface/hr.workforce.lifecycle-surface-columns.shared";
 import {
   hrLifecycleAuditTrailSurfaceKey,
+  hrLifecycleContractReviewsSurfaceKey,
   hrLifecycleNoticePeriodSurfaceKey,
   hrLifecycleOffboardingCasesSurfaceKey,
   hrLifecycleOnboardingCasesSurfaceKey,
@@ -54,6 +57,17 @@ describe("lifecycle Pattern C governed list EUI contract", () => {
       columnsId: hrLifecycleProbationDueColumnsId,
       build: () =>
         buildHrLifecycleProbationDueListSurface({
+          window: emptyWindow,
+          canWrite: true,
+        }),
+    },
+    {
+      label: "contract reviews",
+      surfaceKey: hrLifecycleContractReviewsSurfaceKey,
+      searchParam: "lifecycleContractReviewsSearch",
+      columnsId: hrLifecycleContractReviewsColumnsId,
+      build: () =>
+        buildHrLifecycleContractReviewsListSurface({
           window: emptyWindow,
           canWrite: true,
         }),

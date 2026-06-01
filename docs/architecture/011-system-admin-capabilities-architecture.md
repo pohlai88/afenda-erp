@@ -57,7 +57,7 @@ Policies
 ## Example Permission
 
 ```txt
-system_admin.capabilities.manage
+system-admin.capabilities.manage
 ```
 
 Phase 2 minimum:

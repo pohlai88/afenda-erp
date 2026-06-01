@@ -32,7 +32,11 @@ export default async function SystemAdminAuditPage({
   try {
     ({ organization, context } = await requireSystemAdminAuditRead());
   } catch {
-    return <SystemAdminAuditAccessDenied />;
+    return (
+      <div data-testid="system-admin-audit-access-denied" className="contents">
+        <SystemAdminAuditAccessDenied />
+      </div>
+    );
   }
   const canExport = hasExecutionPermission(
     context,
@@ -51,21 +55,23 @@ export default async function SystemAdminAuditPage({
   });
 
   return (
-    <SystemAdminAuditSection
-      rows={pageModel.rows}
-      params={pageModel.params}
-      searchValue={pageModel.searchValue}
-      totalCount={pageModel.totalCount}
-      pageSize={pageModel.pageSize}
-      page={pageModel.page}
-      hasNextPage={pageModel.hasNextPage}
-      selected={pageModel.selected}
-      retentionPolicies={pageModel.retentionPolicies}
-      coverageGaps={pageModel.coverageGaps}
-      canExport={canExport}
-      canReview={canReview}
-      exportAuditLogsAction={exportSystemAdminAuditLogsAction}
-      upsertRetentionPolicyAction={upsertSystemAdminRetentionPolicyAction}
-    />
+    <div data-testid="system-admin-audit-page" className="contents">
+      <SystemAdminAuditSection
+        rows={pageModel.rows}
+        params={pageModel.params}
+        searchValue={pageModel.searchValue}
+        totalCount={pageModel.totalCount}
+        pageSize={pageModel.pageSize}
+        page={pageModel.page}
+        hasNextPage={pageModel.hasNextPage}
+        selected={pageModel.selected}
+        retentionPolicies={pageModel.retentionPolicies}
+        coverageGaps={pageModel.coverageGaps}
+        canExport={canExport}
+        canReview={canReview}
+        exportAuditLogsAction={exportSystemAdminAuditLogsAction}
+        upsertRetentionPolicyAction={upsertSystemAdminRetentionPolicyAction}
+      />
+    </div>
   );
 }

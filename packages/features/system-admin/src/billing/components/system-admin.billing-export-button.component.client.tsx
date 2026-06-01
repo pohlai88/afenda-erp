@@ -21,6 +21,7 @@ export function SystemAdminBillingExportButton({
       type="button"
       variant="outline"
       disabled={pending}
+      data-testid="system-admin-billing-export-button"
       onClick={() => {
         startTransition(async () => {
           const result = await exportBillingSummaryAction();

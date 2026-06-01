@@ -47,7 +47,7 @@ export function SystemAdminApprovalsSection({
   return (
     <div className="@container flex flex-col gap-surface-2xl">
       <SectionPanel
-        headingLevel={1}
+        headingLevel={2}
         title={copy.page.title}
         description={copy.page.description}
       />
@@ -102,7 +102,7 @@ export function SystemAdminApprovalsAccessDenied() {
   return (
     <div className="@container flex flex-col gap-surface-lg">
       <SectionPanel
-        headingLevel={1}
+        headingLevel={2}
         title={copy.page.title}
         description={copy.page.description}
       />

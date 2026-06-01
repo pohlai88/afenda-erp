@@ -19,7 +19,7 @@ describe("hr lifecycle workbench metadata", () => {
         hrLifecycleOffboardingCasesSurfaceKey,
       ]),
     );
-    expect(HR_LIFECYCLE_LIST_SURFACE_KEYS).toHaveLength(7);
+    expect(HR_LIFECYCLE_LIST_SURFACE_KEYS).toHaveLength(8);
   });
 
   it("maps every registry search param to a page-model field", () => {

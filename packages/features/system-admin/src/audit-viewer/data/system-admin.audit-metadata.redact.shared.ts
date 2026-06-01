@@ -1,3 +1,8 @@
+import {
+  SYSTEM_ADMIN_AUDIT_METADATA_REDACT_MAX_DEPTH,
+  SYSTEM_ADMIN_AUDIT_METADATA_REDACT_MAX_STRING_LENGTH,
+} from "../contracts/system-admin.audit-viewer.limits.shared";
+
 const SECRET_KEY_PATTERN =
   /(password|secret|token|hash|ciphertext|signing|api[_-]?key|private|credential)/i;
 
@@ -5,7 +10,7 @@ export function redactAuditMetadata(
   value: unknown,
   depth = 0,
 ): unknown {
-  if (depth > 6) {
+  if (depth > SYSTEM_ADMIN_AUDIT_METADATA_REDACT_MAX_DEPTH) {
     return "[truncated]";
   }
 
@@ -25,8 +30,8 @@ export function redactAuditMetadata(
     );
   }
 
-  if (typeof value === "string" && value.length > 500) {
-    return `${value.slice(0, 500)}…`;
+  if (typeof value === "string" && value.length > SYSTEM_ADMIN_AUDIT_METADATA_REDACT_MAX_STRING_LENGTH) {
+    return `${value.slice(0, SYSTEM_ADMIN_AUDIT_METADATA_REDACT_MAX_STRING_LENGTH)}…`;
   }
 
   return value;

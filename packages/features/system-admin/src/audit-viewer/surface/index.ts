@@ -14,6 +14,11 @@ export {
 } from "./system-admin.audit-pagination.shared";
 export { systemAdminAuditUiCopy } from "./system-admin.audit-ui.copy.shared";
 export {
+  systemAdminAuditCoverageGalleryGaps,
+  systemAdminAuditDetailGalleryFixture,
+  systemAdminAuditViewerGalleryRows,
+} from "./system-admin.audit-viewer-gallery.fixtures.shared";
+export {
   buildSystemAdminActionInvestigationHref,
   buildSystemAdminActorInvestigationHref,
   buildSystemAdminAuditInvestigationLinks,

@@ -35,6 +35,7 @@ function readSearchParam(
 export type HrLifecycleSearchParams = {
   pendingTransitionsSearch?: string;
   probationDueSearch?: string;
+  contractReviewsSearch?: string;
   onboardingCasesSearch?: string;
   noticePeriodSearch?: string;
   offboardingCasesSearch?: string;
@@ -90,6 +91,7 @@ export function toHrLifecyclePageModelInput(input: {
     canWrite: input.canWrite,
     pendingTransitionsSearch: parsed.pendingTransitionsSearch,
     probationDueSearch: parsed.probationDueSearch,
+    contractReviewsSearch: parsed.contractReviewsSearch,
     onboardingCasesSearch: parsed.onboardingCasesSearch,
     noticePeriodSearch: parsed.noticePeriodSearch,
     offboardingCasesSearch: parsed.offboardingCasesSearch,

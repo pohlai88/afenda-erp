@@ -7,7 +7,7 @@
 | Status     | Active — platform map, package boundaries, and execution-kernel doctrine (May 2026)                                                   |
 | Authority  | Feature-package extraction, `@afenda/kernel` scope, import rules, execution enforcement, Vercel single-app build model                |
 | Supersedes | Per-module route folders, microfrontend deployment assumptions, and split “kernel map” vs “execution kernel” reading paths            |
-| Related    | **ARCH-001** (runtime/deploy) · **ARCH-003** (package categories) · **ARCH-005** (schema) · **ARCH-006**/**ARCH-007** (governed UI) · **ARCH-008** (workspace discipline) · **ARCH-011** (System Admin control plane) |
+| Related    | **ARCH-001** (runtime/deploy) · **ARCH-003** (package categories) · **ARCH-005** (schema) · **ARCH-006**/**ARCH-007** (governed UI) · **ARCH-008** (workspace discipline) · **ARCH-011** (System Admin control plane) · **ARCH-013** (AppShell) |
 
 Afenda ERP is **features-first**: finance stays in `@afenda/feature-finance`, and so on. The deployable app composes routes; platform packages (`auth`, `db`, `workflows`, …) provide pipes. HR product code is not in-repo until TRACK-004 rescaffolds `@afenda/feature-hr` (see **ARCH-010**).
 
@@ -22,6 +22,7 @@ Use this table before placing code. “Kernel” answers **may this actor run th
 | Package | Role | Typical examples |
 | ------- | ---- | ---------------- |
 | `apps/erp` | Deployable Next.js app — routes, layouts, thin adapters | `page.tsx`, `workspace-routes/`, API route handlers |
+| `@afenda/appshell` | Authenticated ERP AppShell chrome and serialized chrome contracts | L1 utility bar, primary rail, command center |
 | `@afenda/feature-*` | Module business behavior | HR employee commands, finance posting rules |
 | `@afenda/db` | Physical schema, migrations, tenancy helpers, command primitives | `schema/hr.ts`, RLS, `getDb()` |
 | `@afenda/auth` | Session, organization resolution, capability **source** | Neon Auth, `requireCapability` inputs |
@@ -36,13 +37,17 @@ Use this table before placing code. “Kernel” answers **may this actor run th
 ```mermaid
 flowchart LR
   App["apps/erp"]
+  AppShell["@afenda/appshell"]
   Feat["@afenda/feature-*"]
   Kern["@afenda/kernel"]
+  UI["@afenda/ui"]
   Auth["@afenda/auth"]
   DB["@afenda/db"]
   WF["@afenda/workflows"]
 
+  App --> AppShell
   App --> Feat
+  AppShell --> UI
   Feat --> Kern
   Feat --> DB
   Feat --> Auth
@@ -384,6 +389,7 @@ Runtime and module map: [ARCH-001](001-system-architecture.md).
 | Concern                     | Current owner                                                                 |
 | --------------------------- | ----------------------------------------------------------------------------- |
 | Module workspace routes     | `apps/erp` `(workspace)/[moduleId]/…` + `workspace-routes/`                   |
+| AppShell chrome             | Target `@afenda/appshell`; current runtime adoption remains a later change    |
 | Governed list configuration | `kernel/.../list-surfaces.ts`, `@afenda/feature-lynx/metadata`                |
 | Governed rendering          | `@afenda/governed-surface/server`                                             |
 | Shared ERP records          | `@afenda/db` via kernel contracts                                             |
@@ -395,9 +401,13 @@ Do not treat the compatibility layer as the final home for posting-grade or stat
 
 ## 11. App boundary
 
-`apps/erp` owns route files, layout composition, session/org resolution at page entry, and thin adapters to feature packages.
+`apps/erp` owns route files, layout composition, session/org resolution at page entry, AppShell mounting, and thin adapters to feature packages.
 
-`apps/erp` must **not** own durable ERP business rules, primitive UI, table schema, cross-module workflow state, or module-specific query logic.
+`apps/erp` must **not** own durable ERP business rules, primitive UI, table schema, cross-module workflow state, module-specific query logic, or reusable AppShell chrome.
+
+`@afenda/appshell` owns the authenticated ERP AppShell chrome package. `apps/erp`
+passes serialized chrome DTOs after resolving tenant/session/capabilities on the
+server. See [ARCH-013](013-appshell-package-architecture.md).
 
 ---
 
@@ -464,7 +474,8 @@ Do not extend generic `erp_module_records` for posting-grade data ([ARCH-005](00
 
 | From                     | May import                                                                                                                             |
 | ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------- |
-| `apps/erp`               | `@afenda/feature-*`, `@afenda/kernel`, platform packages                                                                               |
+| `apps/erp`               | `@afenda/appshell`, `@afenda/feature-*`, `@afenda/kernel`, platform packages                                                           |
+| `@afenda/appshell`       | `@afenda/ui`; serialized metadata from app/feature public doors only                                                                   |
 | `@afenda/feature-*`      | `@afenda/kernel`, `@afenda/db`, `@afenda/auth`, `@afenda/governed-surface`, `@afenda/ui`, `@afenda/workflows`, `@afenda/observability` |
 | Shared platform packages | Each other per **ARCH-003**; **not** `apps/erp` or `@afenda/feature-*`                                                                 |
 | `@afenda/ui`             | Primitives only                                                                                                                        |
@@ -501,6 +512,7 @@ Checklist for new feature packages: workspace folder, `build` → `dist`, `archi
 - **ARCH-006** [Metadata-Driven UI](006-metadata-driven-ui-architecture.md)
 - **ARCH-008** [Workspace Package Discipline](008-workspace-package-discipline.md)
 - **ARCH-011** [System Admin](011-system-admin-enterprise-architecture.md)
+- **ARCH-013** [AppShell Package Architecture](013-appshell-package-architecture.md)
 
 ### External (Vercel monorepo)
 

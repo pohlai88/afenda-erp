@@ -70,6 +70,18 @@ export function HrLifecycleMovementPanel() {
         <Input id="lifecycle-movement-manager" name="managerEmployeeId" />
       </Field>
       <Field>
+        <FieldLabel htmlFor="lifecycle-movement-grade">
+          {copy.gradeLabel}
+        </FieldLabel>
+        <Input id="lifecycle-movement-grade" name="grade" />
+      </Field>
+      <Field>
+        <FieldLabel htmlFor="lifecycle-movement-location">
+          {copy.workLocationLabel}
+        </FieldLabel>
+        <Input id="lifecycle-movement-location" name="workLocationCode" />
+      </Field>
+      <Field>
         <FieldLabel htmlFor="lifecycle-movement-effective">
           {copy.effectiveDateLabel}
         </FieldLabel>

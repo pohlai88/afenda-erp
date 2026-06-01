@@ -23,4 +23,10 @@ describe("assertHrEmploymentStatusTransition", () => {
       assertHrEmploymentStatusTransition("active", "archived"),
     ).toThrow(HrLifecycleCommandError);
   });
+
+  it("allows authorized termination initiation from active employment", () => {
+    expect(() =>
+      assertHrEmploymentStatusTransition("active", "terminated"),
+    ).not.toThrow();
+  });
 });

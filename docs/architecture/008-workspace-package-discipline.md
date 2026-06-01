@@ -7,7 +7,7 @@
 | Status    | Active — implementation discipline for large-module development (May 2026)                  |
 | Authority | Workspace package classes, export doors, dependency direction, split criteria, guard policy |
 | Defers to | **ARCH-002** for feature ownership · **ARCH-001** for Vercel deployment topology            |
-| Related   | **ARCH-003** (guards) · **ARCH-004** (naming) · **ARCH-005** (schema ownership)             |
+| Related   | **ARCH-003** (guards) · **ARCH-004** (naming) · **ARCH-005** (schema ownership) · **ARCH-013** (AppShell) |
 
 Afenda ERP uses one deployable Next.js application and many disciplined
 workspace packages. Package boundaries are the maintainability unit; Vercel
@@ -24,6 +24,8 @@ Afenda stays a **single-app Vercel/Turborepo monorepo**:
 - one Vercel project from the repository root;
 - one deployable app, `@afenda/erp`;
 - internal packages built by Turborepo and consumed by the app;
+- one first-class AppShell package, `@afenda/appshell`, for authenticated ERP
+  chrome;
 - feature packages under `packages/features/<moduleId>`;
 - no per-module Vercel projects, app folders, or microfrontends for core ERP
   modules.
@@ -35,7 +37,8 @@ edges. Do not use packages to create deployment fragmentation.
 
 | Class              | Location                          | Responsibility                                                                  |
 | ------------------ | --------------------------------- | ------------------------------------------------------------------------------- |
-| Deployable app     | `apps/erp`                        | App Router routes, layouts, handlers, shell composition                         |
+| Deployable app     | `apps/erp`                        | App Router routes, layouts, handlers, AppShell mounting                         |
+| AppShell package   | `packages/appshell`               | Authenticated ERP chrome, command center, DTOs, geometry, interaction state     |
 | Feature package    | `packages/features/<moduleId>`    | Module-specific commands, queries, metadata, components, schemas, tests         |
 | Domain contracts   | `packages/kernel`                 | Module IDs, shared contracts, registry contracts, compatibility adapters        |
 | Platform packages  | `packages/db`, `auth`, `ai`, ...  | Database, auth, AI, workflows, observability, config                            |
@@ -88,6 +91,21 @@ Feature packages compile to `dist/**` with
 point at compiled `./dist/*.js`; `types` and `development` may point at `./src`
 for local development.
 
+## AppShell Package Shape
+
+`@afenda/appshell` follows [ARCH-013](013-appshell-package-architecture.md) and
+uses three public doors:
+
+| Export                    | Use                                                                 |
+| ------------------------- | ------------------------------------------------------------------- |
+| `@afenda/appshell`        | Server-safe contracts and RSC bridge components                     |
+| `@afenda/appshell/client` | Client AppShell components and browser-only interaction state       |
+| `@afenda/appshell/server` | Server validation and composition helpers for serialized chrome DTOs |
+
+AppShell DTOs are serializable presentation contracts. They must not carry
+callbacks, database rows, raw org authority, raw permission authority, or command
+labels/hrefs that bypass server recomposition.
+
 Internal folder grammar comes from
 [`packages/_template-definition/src`](../../packages/_template-definition/src).
 Scaffold with `pnpm scaffold:feature <moduleId>`, then remove starter buckets
@@ -122,7 +140,8 @@ a proven dependency-cycle problem that cannot be solved by internal folders.
 
 | From              | Allowed direction                                                                  |
 | ----------------- | ---------------------------------------------------------------------------------- |
-| `apps/erp`        | Imports public doors from feature/kernel/platform/UI packages                      |
+| `apps/erp`        | Imports public doors from AppShell, feature, kernel, platform, and UI packages     |
+| `@afenda/appshell` | Imports UI primitives and serialized metadata from public doors only              |
 | Feature packages  | Import kernel, db, auth, governed-surface, UI, workflows, observability as needed  |
 | Platform packages | Do not import from `apps/erp` or feature implementations unless explicitly allowed |
 | `@afenda/ui`      | Primitive UI only; no DB, auth server, AI, governed metadata registry, or routes   |
@@ -133,7 +152,8 @@ feature dependency becomes necessary, expose it through `.` / `./server` /
 `./metadata`; never import `src`, `dist`, or `internal` paths.
 
 Client export paths must not import `@afenda/db`, `@afenda/ai`,
-`@afenda/workflows`, `@afenda/auth/server`, or Node built-ins.
+`@afenda/workflows`, `@afenda/auth/server`, Node built-ins, or AppShell server
+helpers.
 
 ## Vercel and Turborepo Contract
 
@@ -198,3 +218,4 @@ server-owned, and governed lists use bounded server windows.
 - **ARCH-003** [Directory Architecture Audit](003-directory-architecture-audit.md)
 - **ARCH-004** [Naming Conventions](004-naming-conventions.md)
 - **ARCH-005** [Database Scale Architecture](005-database-scale-architecture.md)
+- **ARCH-013** [AppShell Package Architecture](013-appshell-package-architecture.md)

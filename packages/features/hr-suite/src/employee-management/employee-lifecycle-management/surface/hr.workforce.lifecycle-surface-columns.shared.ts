@@ -7,6 +7,9 @@ export const hrLifecyclePendingTransitionsColumnsId =
 export const hrLifecycleProbationDueColumnsId =
   "hr.workforce.lifecycle.probation-due" as const;
 
+export const hrLifecycleContractReviewsColumnsId =
+  "hr.workforce.lifecycle.contract-reviews" as const;
+
 export const hrLifecycleAuditTrailColumnsId =
   "hr.workforce.lifecycle.audit-trail" as const;
 

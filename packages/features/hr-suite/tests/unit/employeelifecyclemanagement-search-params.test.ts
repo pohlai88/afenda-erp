@@ -12,6 +12,7 @@ describe("hr lifecycle search params", () => {
       parseHrLifecycleSearchParams({
         lifecyclePendingTransitionsSearch: "pending-query",
         lifecycleProbationDueSearch: "probation-query",
+        lifecycleContractReviewsSearch: "contract-query",
         lifecycleOnboardingCasesSearch: "onboarding-query",
         lifecycleNoticePeriodSearch: "notice-query",
         lifecycleOffboardingCasesSearch: "offboarding-query",
@@ -22,6 +23,7 @@ describe("hr lifecycle search params", () => {
     ).toEqual({
       pendingTransitionsSearch: "pending-query",
       probationDueSearch: "probation-query",
+      contractReviewsSearch: "contract-query",
       onboardingCasesSearch: "onboarding-query",
       noticePeriodSearch: "notice-query",
       offboardingCasesSearch: "offboarding-query",

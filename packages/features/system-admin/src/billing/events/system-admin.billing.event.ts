@@ -1,5 +1,5 @@
 export const systemAdminBillingAuditActions = {
-  view: "system_admin.billing.subscription.review",
-  contactUpdate: "system_admin.billing.contact.update",
-  export: "system_admin.billing.export",
+  view: "system-admin.billing.subscription.review",
+  contactUpdate: "system-admin.billing.contact.update",
+  export: "system-admin.billing.export",
 } as const;

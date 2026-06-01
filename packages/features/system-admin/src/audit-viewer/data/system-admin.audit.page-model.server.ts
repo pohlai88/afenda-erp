@@ -1,6 +1,7 @@
 import type { SystemAdminRetentionPolicyListRow } from "../contracts";
 import { parseSystemAdminAuditSearchParams } from "./system-admin.audit-search-params.parse.shared";
 import { listRetentionPolicies } from "./system-admin.audit.repository.server";
+import { SYSTEM_ADMIN_AUDIT_RETENTION_LIST_LIMIT } from "../contracts/system-admin.audit-viewer.limits.shared";
 import { listSystemAdminAuditCoverageGaps } from "./system-admin.audit-coverage.query.server";
 import { recordSystemAdminAuditViewerViewEvent } from "./system-admin.audit-view-event.server";
 import {
@@ -34,7 +35,7 @@ export async function buildSystemAdminAuditPageModel(input: {
     }),
     listRetentionPolicies({
       organizationId: input.organizationId,
-      limit: 50,
+      limit: SYSTEM_ADMIN_AUDIT_RETENTION_LIST_LIMIT,
     }),
     listSystemAdminAuditCoverageGaps({
       organizationId: input.organizationId,

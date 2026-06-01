@@ -27,6 +27,19 @@ import {
 
 const HR_RECORDS_DEFAULT_PAGE_SIZE = 25;
 const HR_RECORDS_MAX_PAGE_SIZE = 100;
+const HR_EMPLOYMENT_STATUS_VALUES = new Set<string>([
+  "onboarding",
+  "active",
+  "probation",
+  "confirmed",
+  "suspended",
+  "notice_period",
+  "offboarding",
+  "terminated",
+  "separated",
+  "retired",
+  "archived",
+]);
 
 function clampPageSize(limit: number | undefined): number {
   if (limit === undefined || !Number.isFinite(limit)) {
@@ -42,6 +55,21 @@ function displayName(input: {
   preferredName: string | null;
 }): string {
   return input.preferredName?.trim() || input.legalName;
+}
+
+function normalizeHrRecordEmail(email: string | null | undefined) {
+  return email?.trim().toLowerCase() || null;
+}
+
+function normalizeHrRecordPhone(phoneNumber: string | null | undefined) {
+  return phoneNumber?.replace(/\D/g, "") || null;
+}
+
+function toHrEmploymentStatus(value: string | null): HrEmploymentStatus | null {
+  if (!value || !HR_EMPLOYMENT_STATUS_VALUES.has(value)) {
+    return null;
+  }
+  return value as HrEmploymentStatus;
 }
 
 const managerEmployee = alias(hrEmployees, "manager_employee");
@@ -888,8 +916,12 @@ export async function listHrEmployeeStatusHistoryWindow(input: {
         preferredName: hrEmployees.preferredName,
         source: sql<"lifecycle" | "record">`'lifecycle'`.as("source"),
         kind: hrLifecycleEvents.kind,
-        previousStatus: hrLifecycleEvents.previousStatus,
-        newStatus: hrLifecycleEvents.newStatus,
+        previousStatus: sql<string | null>`${hrLifecycleEvents.previousStatus}::text`.as(
+          "previous_status",
+        ),
+        newStatus: sql<string | null>`${hrLifecycleEvents.newStatus}::text`.as(
+          "new_status",
+        ),
         effectiveDate: hrLifecycleEvents.effectiveDate,
         reason: hrLifecycleEvents.reason,
         approvalReference: hrLifecycleEvents.approvalReference,
@@ -911,10 +943,12 @@ export async function listHrEmployeeStatusHistoryWindow(input: {
         preferredName: hrEmployees.preferredName,
         source: sql<"lifecycle" | "record">`'record'`.as("source"),
         kind: sql<string>`${hrEmployeeRecordEvents.kind}::text`.as("kind"),
-        previousStatus: sql<HrEmploymentStatus | null>`null`.as(
+        previousStatus: sql<string | null>`${hrEmployeeRecordEvents.previousValue}`.as(
           "previous_status",
         ),
-        newStatus: sql<HrEmploymentStatus | null>`null`.as("new_status"),
+        newStatus: sql<string | null>`${hrEmployeeRecordEvents.newValue}`.as(
+          "new_status",
+        ),
         effectiveDate: hrEmployeeRecordEvents.effectiveDate,
         reason: hrEmployeeRecordEvents.reason,
         approvalReference: hrEmployeeRecordEvents.approvalReference,
@@ -945,8 +979,8 @@ export async function listHrEmployeeStatusHistoryWindow(input: {
       displayName: displayName(row),
       source: row.source,
       kind: row.kind,
-      previousStatus: row.previousStatus,
-      newStatus: row.newStatus,
+      previousStatus: toHrEmploymentStatus(row.previousStatus),
+      newStatus: toHrEmploymentStatus(row.newStatus),
       effectiveDate: row.effectiveDate,
       reason: row.reason,
       approvalReference: row.approvalReference,
@@ -1200,6 +1234,7 @@ export async function findHrEmployeeDuplicateCandidates(input: {
   organizationId: string;
   identityNumber?: string;
   email?: string;
+  personalEmail?: string;
   phoneNumber?: string;
   excludeEmployeeId?: string;
 }): Promise<string[]> {
@@ -1221,18 +1256,17 @@ export async function findHrEmployeeDuplicateCandidates(input: {
         .select({ employeeId: hrEmployeeProfiles.employeeId })
         .from(hrEmployeeProfiles)
         .innerJoin(hrEmployees, eq(hrEmployeeProfiles.employeeId, hrEmployees.id))
-        .where(and(...identityConditions, isNull(hrEmployees.archivedAt)));
+        .where(and(...identityConditions));
       for (const match of identityMatches) {
         candidateIds.add(match.employeeId);
       }
     }
 
-    const trimmedEmail = input.email?.trim();
-    if (trimmedEmail) {
+    const normalizedEmail = normalizeHrRecordEmail(input.email);
+    if (normalizedEmail) {
       const emailConditions = [
         eq(hrEmployees.organizationId, input.organizationId),
-        eq(hrEmployees.email, trimmedEmail),
-        isNull(hrEmployees.archivedAt),
+        sql`lower(${hrEmployees.email}) = ${normalizedEmail}`,
       ];
       if (input.excludeEmployeeId) {
         emailConditions.push(ne(hrEmployees.id, input.excludeEmployeeId));
@@ -1246,11 +1280,32 @@ export async function findHrEmployeeDuplicateCandidates(input: {
       }
     }
 
-    const trimmedPhone = input.phoneNumber?.trim();
-    if (trimmedPhone) {
+    const normalizedPersonalEmail = normalizeHrRecordEmail(input.personalEmail);
+    if (normalizedPersonalEmail) {
+      const personalEmailConditions = [
+        eq(hrEmployeeProfiles.organizationId, input.organizationId),
+        sql`lower(${hrEmployeeProfiles.personalEmail}) = ${normalizedPersonalEmail}`,
+      ];
+      if (input.excludeEmployeeId) {
+        personalEmailConditions.push(
+          ne(hrEmployeeProfiles.employeeId, input.excludeEmployeeId),
+        );
+      }
+      const personalEmailMatches = await db
+        .select({ employeeId: hrEmployeeProfiles.employeeId })
+        .from(hrEmployeeProfiles)
+        .innerJoin(hrEmployees, eq(hrEmployeeProfiles.employeeId, hrEmployees.id))
+        .where(and(...personalEmailConditions));
+      for (const match of personalEmailMatches) {
+        candidateIds.add(match.employeeId);
+      }
+    }
+
+    const normalizedPhone = normalizeHrRecordPhone(input.phoneNumber);
+    if (normalizedPhone) {
       const phoneConditions = [
         eq(hrEmployeeProfiles.organizationId, input.organizationId),
-        eq(hrEmployeeProfiles.phoneNumber, trimmedPhone),
+        sql`regexp_replace(coalesce(${hrEmployeeProfiles.phoneNumber}, ''), '[^0-9]', '', 'g') = ${normalizedPhone}`,
       ];
       if (input.excludeEmployeeId) {
         phoneConditions.push(
@@ -1261,7 +1316,7 @@ export async function findHrEmployeeDuplicateCandidates(input: {
         .select({ employeeId: hrEmployeeProfiles.employeeId })
         .from(hrEmployeeProfiles)
         .innerJoin(hrEmployees, eq(hrEmployeeProfiles.employeeId, hrEmployees.id))
-        .where(and(...phoneConditions, isNull(hrEmployees.archivedAt)));
+        .where(and(...phoneConditions));
       for (const match of phoneMatches) {
         candidateIds.add(match.employeeId);
       }

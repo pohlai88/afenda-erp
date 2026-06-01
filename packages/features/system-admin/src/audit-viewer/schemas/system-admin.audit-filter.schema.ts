@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { SYSTEM_ADMIN_AUDIT_DEFAULT_PAGE_SIZE } from "../contracts/system-admin.audit-viewer.limits.shared";
+
 const auditEntityTypeSchema = z.enum([
   "organization",
   "membership",
@@ -22,7 +24,7 @@ export const systemAdminAuditSearchParamsSchema = z.object({
   auditTo: z.string().trim().max(40).optional(),
   auditSort: z.enum(["asc", "desc"]).optional(),
   auditPage: z.coerce.number().int().min(1).default(1),
-  auditPageSize: z.coerce.number().int().min(10).max(100).default(25),
+  auditPageSize: z.coerce.number().int().min(10).max(100).default(SYSTEM_ADMIN_AUDIT_DEFAULT_PAGE_SIZE),
   auditId: z.string().trim().min(1).optional(),
 });
 

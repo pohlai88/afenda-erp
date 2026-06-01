@@ -233,6 +233,11 @@ function createAuthenticatedProject({ name, testMatch, grep, extra = {} }) {
 const SMOKE_SPEC = /smoke\.spec\.ts/;
 const HR_CRITICAL_SPECS =
   /hr-(records|org|lifecycle|geolocation|documents)\.spec\.ts/;
+const SYSTEM_ADMIN_APPROVALS_SPEC = /system-admin-approvals\.spec\.ts/;
+const SYSTEM_ADMIN_AUDIT_VIEWER_SPEC = /system-admin-audit-viewer\.spec\.ts/;
+const SYSTEM_ADMIN_BILLING_SPEC = /system-admin-billing\.spec\.ts/;
+const SYSTEM_ADMIN_CAPABILITIES_SPEC = /system-admin-capabilities\.spec\.ts/;
+const SYSTEM_ADMIN_DATA_MANAGEMENT_SPEC = /system-admin-data-management\.spec\.ts/;
 
 function createProductionProjects() {
   return [
@@ -274,6 +279,26 @@ function createProductionProjects() {
     createAuthenticatedProject({
       name: "chromium-hr-critical",
       testMatch: HR_CRITICAL_SPECS,
+    }),
+    createAuthenticatedProject({
+      name: "chromium-system-admin-approvals",
+      testMatch: SYSTEM_ADMIN_APPROVALS_SPEC,
+    }),
+    createAuthenticatedProject({
+      name: "chromium-system-admin-audit-viewer",
+      testMatch: SYSTEM_ADMIN_AUDIT_VIEWER_SPEC,
+    }),
+    createAuthenticatedProject({
+      name: "chromium-system-admin-billing",
+      testMatch: SYSTEM_ADMIN_BILLING_SPEC,
+    }),
+    createAuthenticatedProject({
+      name: "chromium-system-admin-capabilities",
+      testMatch: SYSTEM_ADMIN_CAPABILITIES_SPEC,
+    }),
+    createAuthenticatedProject({
+      name: "chromium-system-admin-data-management",
+      testMatch: SYSTEM_ADMIN_DATA_MANAGEMENT_SPEC,
     }),
     createAuthenticatedProject({
       name: "chromium-metadata-gallery",

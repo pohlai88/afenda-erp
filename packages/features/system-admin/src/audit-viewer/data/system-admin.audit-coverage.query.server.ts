@@ -4,15 +4,19 @@ import {
 } from "../../tenant-execution/data/system-admin.execution-settings.repository.server";
 import { buildSystemAdminCapabilityCoverageRows } from "../../capabilities/data/system-admin.capabilities.coverage.server";
 import type { SystemAdminAuditCoverageGapRow } from "../contracts/system-admin.audit-coverage.contract";
+import {
+  SYSTEM_ADMIN_AUDIT_COVERAGE_CAPABILITY_LIMIT,
+  SYSTEM_ADMIN_AUDIT_COVERAGE_MODULE_LIMIT,
+} from "../contracts/system-admin.audit-viewer.limits.shared";
 
 export async function listSystemAdminAuditCoverageGaps(input: {
   organizationId: string;
 }): Promise<readonly SystemAdminAuditCoverageGapRow[]> {
   const [moduleSettings, capabilitySettings] = await Promise.all([
-    listTenantModuleSettings({ organizationId: input.organizationId, limit: 200 }),
+    listTenantModuleSettings({ organizationId: input.organizationId, limit: SYSTEM_ADMIN_AUDIT_COVERAGE_MODULE_LIMIT }),
     listTenantCapabilitySettings({
       organizationId: input.organizationId,
-      limit: 500,
+      limit: SYSTEM_ADMIN_AUDIT_COVERAGE_CAPABILITY_LIMIT,
     }),
   ]);
 

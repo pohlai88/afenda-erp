@@ -139,6 +139,54 @@ describe("system admin capabilities actions", () => {
     );
   });
 
+  it("skips writes and audit when availability is unchanged", async () => {
+    mockListCapabilitySettings.mockResolvedValue([
+      {
+        organizationId: "org_1",
+        capabilityKey: "finance.view",
+        availability: "enabled",
+      },
+    ]);
+
+    const { setSystemAdminCapabilityAvailabilityAction } = await import(
+      "../../src/capabilities/actions/system-admin.capability-settings.actions.server"
+    );
+
+    const result = await setSystemAdminCapabilityAvailabilityAction({
+      capabilityKey: "finance.view",
+      availability: "enabled",
+    });
+
+    expect(result.ok).toBe(true);
+    expect(mockUpsertCapabilitySettings).not.toHaveBeenCalled();
+    expect(mockWriteAudit).not.toHaveBeenCalled();
+  });
+
+  it("rejects mutations when capability settings query is truncated", async () => {
+    mockListCapabilitySettings.mockResolvedValue(
+      Array.from({ length: 500 }, (_, index) => ({
+        organizationId: "org_1",
+        capabilityKey: `capability.${index}`,
+        availability: "enabled" as const,
+      })),
+    );
+
+    const { setSystemAdminCapabilityAvailabilityAction } = await import(
+      "../../src/capabilities/actions/system-admin.capability-settings.actions.server"
+    );
+
+    const result = await setSystemAdminCapabilityAvailabilityAction({
+      capabilityKey: "finance.view",
+      availability: "disabled",
+    });
+
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.error).toContain("truncated");
+    }
+    expect(mockUpsertCapabilitySettings).not.toHaveBeenCalled();
+  });
+
   it("selects granular audit actions from availability transitions", () => {
     expect(
       resolveSystemAdminCapabilityAuditAction({

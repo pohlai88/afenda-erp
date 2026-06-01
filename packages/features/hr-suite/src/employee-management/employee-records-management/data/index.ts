@@ -1,4 +1,5 @@
 export * from "./hr.workforce.records-action-result.shared";
+export * from "./hr.workforce.records-coverage.shared";
 export * from "./hr.workforce.records-list-load.shared";
 export * from "./hr.workforce.records-overview.shared";
 export * from "./hr.workforce.records-search-params.parse.shared";

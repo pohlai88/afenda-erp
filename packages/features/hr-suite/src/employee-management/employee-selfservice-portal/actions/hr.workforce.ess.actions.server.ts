@@ -8,6 +8,7 @@ import {
   getHrWorkforceEssStore,
   listHrWorkforceEssIntegrationExposures,
   nextHrWorkforceEssId,
+  type HrWorkforceEssStore,
 } from "../data/hr.workforce.ess-store.shared";
 import { hrWorkforceEssAuditActions } from "../events/hr.workforce.ess.event";
 import {
@@ -18,14 +19,16 @@ import {
 } from "../policies/hr.workforce.ess-access.policy.server";
 import {
   HR_WORKFORCE_ESS_CLAIM_TYPES,
-  HR_WORKFORCE_ESS_CONSENT_STATUSES,
   HR_WORKFORCE_ESS_DOCUMENT_TYPES,
   HR_WORKFORCE_ESS_LEAVE_TYPES,
+  HR_WORKFORCE_ESS_PAY_DOCUMENT_TYPES,
   HR_WORKFORCE_ESS_PROFILE_UPDATE_FIELDS,
 } from "../schemas/hr.workforce.ess-constants.shared";
 import {
+  hrWorkforceEssApprovalInboxItemSchema,
   hrWorkforceEssExpenseClaimSchema,
   hrWorkforceEssLeaveRequestSchema,
+  hrWorkforceEssNotificationSchema,
   hrWorkforceEssProfileUpdateRequestSchema,
   hrWorkforceEssRequestTrackerSchema,
 } from "../schemas/hr.workforce.ess.schema";
@@ -39,37 +42,70 @@ const profileUpdateSchema = z.object({
   sensitive: z.boolean().default(false),
 });
 
-const leaveRequestSchema = z.object({
-  employeeId: z.string().min(1).optional(),
-  requestRef: z.string().min(1),
-  leaveType: z.enum(HR_WORKFORCE_ESS_LEAVE_TYPES),
-  startDate: z.string().min(10),
-  endDate: z.string().min(10),
-  days: z.number().positive(),
-});
+const isoDateOnlySchema = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);
+
+function dateValue(value: string) {
+  return Date.parse(`${value}T00:00:00.000Z`);
+}
+
+const leaveRequestSchema = z
+  .object({
+    employeeId: z.string().min(1).optional(),
+    requestRef: z.string().min(1),
+    leaveType: z.enum(HR_WORKFORCE_ESS_LEAVE_TYPES),
+    startDate: isoDateOnlySchema,
+    endDate: isoDateOnlySchema,
+    days: z.number().positive(),
+  })
+  .refine((value) => dateValue(value.endDate) >= dateValue(value.startDate), {
+    message: "Leave end date must be on or after the start date.",
+    path: ["endDate"],
+  });
 
 const claimRequestSchema = z.object({
   employeeId: z.string().min(1).optional(),
   claimRef: z.string().min(1),
   claimType: z.enum(HR_WORKFORCE_ESS_CLAIM_TYPES),
   amount: z.number().nonnegative(),
-  currency: z.string().min(3),
+  currency: z.string().regex(/^[A-Z]{3}$/),
   receiptCount: z.number().int().nonnegative().default(0),
 });
 
+const documentDownloadTypeSchema = z.enum([
+  ...HR_WORKFORCE_ESS_DOCUMENT_TYPES,
+  ...HR_WORKFORCE_ESS_PAY_DOCUMENT_TYPES,
+]);
+
 const documentAccessSchema = z.object({
   documentId: z.string().min(1),
-  documentType: z.enum(HR_WORKFORCE_ESS_DOCUMENT_TYPES).optional(),
+  documentType: documentDownloadTypeSchema.optional(),
 });
 
-const decisionSchema = z.object({
-  approvalId: z.string().min(1),
-  decision: z.enum(["approved", "rejected", "returned"]),
-  reason: z.string().min(1).optional(),
-});
+const decisionSchema = z
+  .object({
+    approvalId: z.string().min(1),
+    decision: z.enum(["approved", "rejected", "returned"]),
+    reason: z.string().min(1).optional(),
+  })
+  .refine(
+    (value) =>
+      value.decision === "approved" ||
+      Boolean(value.reason?.trim().length),
+    {
+      message: "Rejected or returned approvals require a reason.",
+      path: ["reason"],
+    },
+  );
 
 function actionFailure<T = void>(message: string, code: string) {
   return hrSuiteActionFailure<T>(message, { code });
+}
+
+function employeeAccessFailure<T = void>() {
+  return actionFailure<T>(
+    "Employee record is outside the self-service access scope.",
+    "hr.ess.employee_forbidden",
+  );
 }
 
 function findSelfEmployeeId(guard: ActionGuard, store: {
@@ -91,10 +127,224 @@ async function resolveWritableEmployeeId(input: {
     selfEmployeeId: input.selfEmployeeId,
   });
   const candidate = input.requestedEmployeeId ?? input.selfEmployeeId;
-  if (visibleEmployeeIds === null || visibleEmployeeIds.includes(candidate)) {
+  if (
+    input.employeeIds.includes(candidate) &&
+    (visibleEmployeeIds === null || visibleEmployeeIds.includes(candidate))
+  ) {
     return candidate;
   }
-  throw new Error("Employee is outside the self-service access scope.");
+  return null;
+}
+
+async function canAccessEmployeeRecord(input: {
+  readonly guard: ActionGuard;
+  readonly store: HrWorkforceEssStore;
+  readonly employeeId: string;
+}) {
+  const visibleEmployeeIds = await input.guard.resolveVisibleEmployeeIds({
+    selfEmployeeId: findSelfEmployeeId(input.guard, input.store),
+  });
+  return (
+    visibleEmployeeIds === null ||
+    visibleEmployeeIds.includes(input.employeeId)
+  );
+}
+
+async function canDecideApproval(input: {
+  readonly guard: ActionGuard;
+  readonly store: HrWorkforceEssStore;
+  readonly approval: { readonly approverUserId: string; readonly employeeId: string };
+}) {
+  if (input.approval.approverUserId === input.guard.session.id) {
+    return true;
+  }
+
+  const visibleEmployeeIds = await input.guard.resolveVisibleEmployeeIds({
+    selfEmployeeId: findSelfEmployeeId(input.guard, input.store),
+  });
+  return visibleEmployeeIds === null;
+}
+
+function employeeDisplayName(input: {
+  readonly store: HrWorkforceEssStore;
+  readonly employeeId: string;
+}) {
+  return (
+    input.store.employeeProfiles.find((row) => row.id === input.employeeId)
+      ?.displayName ?? input.employeeId
+  );
+}
+
+function employeeManagerUserId(input: {
+  readonly store: HrWorkforceEssStore;
+  readonly employeeId: string;
+}) {
+  return (
+    input.store.employeeProfiles.find((row) => row.id === input.employeeId)
+      ?.managerUserId ?? "manager_unassigned"
+  );
+}
+
+function enqueueNotification(input: {
+  readonly store: HrWorkforceEssStore;
+  readonly organizationId: string;
+  readonly employeeId: string;
+  readonly event:
+    | "request_submitted"
+    | "request_approved"
+    | "request_rejected"
+    | "request_returned"
+    | "task_required";
+  readonly message: string;
+}) {
+  const row = hrWorkforceEssNotificationSchema.parse({
+    id: nextHrWorkforceEssId("ess-notification", input.store.notifications),
+    organizationId: input.organizationId,
+    employeeId: input.employeeId,
+    event: input.event,
+    status: "delivered",
+    channel: "portal",
+    message: input.message,
+    sentAt: new Date().toISOString(),
+  });
+  input.store.notifications.unshift(row);
+  return row;
+}
+
+function enqueueApproval(input: {
+  readonly store: HrWorkforceEssStore;
+  readonly organizationId: string;
+  readonly approvalType: "profile_update" | "leave" | "claim" | "task_completion";
+  readonly targetId: string;
+  readonly employeeId: string;
+  readonly approverUserId: string;
+  readonly submittedAt: string;
+}) {
+  const row = hrWorkforceEssApprovalInboxItemSchema.parse({
+    id: nextHrWorkforceEssId("ess-approval", input.store.approvalInbox),
+    organizationId: input.organizationId,
+    approvalType: input.approvalType,
+    targetId: input.targetId,
+    employeeId: input.employeeId,
+    employeeName: employeeDisplayName(input),
+    approverUserId: input.approverUserId,
+    status: "pending_approval",
+    submittedAt: input.submittedAt,
+  });
+  input.store.approvalInbox.unshift(row);
+  return row;
+}
+
+function updateRequestTracker(input: {
+  readonly store: HrWorkforceEssStore;
+  readonly employeeId: string;
+  readonly requestRef: string;
+  readonly requestType: "profile_update" | "leave" | "claim";
+  readonly status: "submitted" | "pending_approval" | "approved" | "rejected" | "returned" | "cancelled" | "amended";
+  readonly updatedAt: string;
+  readonly reason?: string;
+}) {
+  for (const row of input.store.requestTracker) {
+    if (
+      row.employeeId === input.employeeId &&
+      row.requestRef === input.requestRef &&
+      row.requestType === input.requestType
+    ) {
+      Object.assign(row, {
+        status: input.status,
+        updatedAt: input.updatedAt,
+        rejectionReason: input.status === "rejected" ? input.reason : undefined,
+        correctionGuidance:
+          input.status === "returned" ? input.reason : undefined,
+      });
+    }
+  }
+}
+
+function targetDecisionFields(input: {
+  readonly decision: "approved" | "rejected" | "returned";
+  readonly reason?: string;
+  readonly decidedAt: string;
+}) {
+  return {
+    status: input.decision,
+    decidedAt: input.decidedAt,
+    rejectionReason: input.decision === "rejected" ? input.reason : undefined,
+    correctionGuidance: input.decision === "returned" ? input.reason : undefined,
+  };
+}
+
+function syncApprovalDecisionTarget(input: {
+  readonly store: HrWorkforceEssStore;
+  readonly approval: {
+    readonly approvalType: string;
+    readonly targetId: string;
+    readonly employeeId: string;
+  };
+  readonly decision: "approved" | "rejected" | "returned";
+  readonly reason?: string;
+  readonly decidedAt: string;
+}) {
+  const decisionFields = targetDecisionFields(input);
+
+  if (input.approval.approvalType === "profile_update") {
+    const target = input.store.profileUpdates.find(
+      (row) => row.id === input.approval.targetId,
+    );
+    if (!target) return;
+    Object.assign(target, decisionFields);
+    updateRequestTracker({
+      store: input.store,
+      employeeId: target.employeeId,
+      requestRef: target.requestRef,
+      requestType: "profile_update",
+      status: input.decision,
+      updatedAt: input.decidedAt,
+      reason: input.reason,
+    });
+    return;
+  }
+
+  if (input.approval.approvalType === "leave") {
+    const target = input.store.leaveRequests.find(
+      (row) => row.id === input.approval.targetId,
+    );
+    if (!target) return;
+    Object.assign(target, decisionFields);
+    updateRequestTracker({
+      store: input.store,
+      employeeId: target.employeeId,
+      requestRef: target.requestRef,
+      requestType: "leave",
+      status: input.decision,
+      updatedAt: input.decidedAt,
+      reason: input.reason,
+    });
+    return;
+  }
+
+  if (input.approval.approvalType === "claim") {
+    const target = input.store.expenseClaims.find(
+      (row) => row.id === input.approval.targetId,
+    );
+    if (!target) return;
+    Object.assign(target, {
+      status: input.decision,
+      rejectionReason:
+        input.decision === "rejected" ? input.reason : undefined,
+      correctionGuidance:
+        input.decision === "returned" ? input.reason : undefined,
+    });
+    updateRequestTracker({
+      store: input.store,
+      employeeId: target.employeeId,
+      requestRef: target.claimRef,
+      requestType: "claim",
+      status: input.decision,
+      updatedAt: input.decidedAt,
+      reason: input.reason,
+    });
+  }
 }
 
 export async function refreshHrWorkforceEssWorkbenchAction() {
@@ -128,6 +378,11 @@ export async function requestHrWorkforceEssProfileUpdateAction(
       selfEmployeeId: findSelfEmployeeId(guard, store),
       employeeIds: store.employeeProfiles.map((row) => row.id),
     });
+    if (!employeeId) {
+      return employeeAccessFailure();
+    }
+    const submittedAt = new Date().toISOString();
+    const approverUserId = parsed.sensitive ? "user_hr_partner" : undefined;
     const row = hrWorkforceEssProfileUpdateRequestSchema.parse({
       id: nextHrWorkforceEssId("ess-profile-update", store.profileUpdates),
       organizationId: guard.organization.id,
@@ -136,10 +391,40 @@ export async function requestHrWorkforceEssProfileUpdateAction(
       fieldGroup: parsed.fieldGroup,
       sensitive: parsed.sensitive,
       status: parsed.sensitive ? "pending_approval" : "submitted",
-      submittedAt: new Date().toISOString(),
-      approverUserId: parsed.sensitive ? "user_hr_partner" : undefined,
+      submittedAt,
+      approverUserId,
     });
     store.profileUpdates.unshift(row);
+    store.requestTracker.unshift(
+      hrWorkforceEssRequestTrackerSchema.parse({
+        id: nextHrWorkforceEssId("ess-tracker", store.requestTracker),
+        organizationId: guard.organization.id,
+        employeeId,
+        requestType: "profile_update",
+        requestRef: row.requestRef,
+        status: row.status,
+        submittedAt,
+        updatedAt: submittedAt,
+      }),
+    );
+    if (approverUserId) {
+      enqueueApproval({
+        store,
+        organizationId: guard.organization.id,
+        approvalType: "profile_update",
+        targetId: row.id,
+        employeeId,
+        approverUserId,
+        submittedAt,
+      });
+    }
+    enqueueNotification({
+      store,
+      organizationId: guard.organization.id,
+      employeeId,
+      event: "request_submitted",
+      message: `Profile update ${row.requestRef} was submitted.`,
+    });
     emitHrWorkforceEssAuditEvent(store, {
       organizationId: guard.organization.id,
       action: hrWorkforceEssAuditActions.profileUpdateRequested,
@@ -171,7 +456,11 @@ export async function submitHrWorkforceEssLeaveRequestAction(
       selfEmployeeId: findSelfEmployeeId(guard, store),
       employeeIds: store.employeeProfiles.map((row) => row.id),
     });
-    const employee = store.employeeProfiles.find((row) => row.id === employeeId);
+    if (!employeeId) {
+      return employeeAccessFailure();
+    }
+    const submittedAt = new Date().toISOString();
+    const approverUserId = employeeManagerUserId({ store, employeeId });
     const row = hrWorkforceEssLeaveRequestSchema.parse({
       id: nextHrWorkforceEssId("ess-leave", store.leaveRequests),
       organizationId: guard.organization.id,
@@ -182,8 +471,8 @@ export async function submitHrWorkforceEssLeaveRequestAction(
       endDate: parsed.endDate,
       days: parsed.days,
       status: "pending_approval",
-      submittedAt: new Date().toISOString(),
-      approverUserId: employee?.managerUserId ?? "manager_unassigned",
+      submittedAt,
+      approverUserId,
     });
     store.leaveRequests.unshift(row);
     store.requestTracker.unshift(
@@ -194,10 +483,26 @@ export async function submitHrWorkforceEssLeaveRequestAction(
         requestType: "leave",
         requestRef: row.requestRef,
         status: row.status,
-        submittedAt: row.submittedAt,
-        updatedAt: row.submittedAt,
+        submittedAt,
+        updatedAt: submittedAt,
       }),
     );
+    enqueueApproval({
+      store,
+      organizationId: guard.organization.id,
+      approvalType: "leave",
+      targetId: row.id,
+      employeeId,
+      approverUserId,
+      submittedAt,
+    });
+    enqueueNotification({
+      store,
+      organizationId: guard.organization.id,
+      employeeId,
+      event: "request_submitted",
+      message: `Leave request ${row.requestRef} was submitted.`,
+    });
     emitHrWorkforceEssAuditEvent(store, {
       organizationId: guard.organization.id,
       action: hrWorkforceEssAuditActions.leaveRequested,
@@ -231,11 +536,22 @@ export async function amendHrWorkforceEssLeaveRequestAction(input: {
     if (!row || !["submitted", "pending_approval", "returned"].includes(row.status)) {
       return actionFailure("Leave request cannot be amended.", "hr.ess.leave_amend_forbidden");
     }
+    if (!(await canAccessEmployeeRecord({ guard, store, employeeId: row.employeeId }))) {
+      return employeeAccessFailure();
+    }
     Object.assign(row, {
       startDate: input.startDate,
       endDate: input.endDate,
       days: input.days,
       status: "amended",
+    });
+    updateRequestTracker({
+      store,
+      employeeId: row.employeeId,
+      requestRef: row.requestRef,
+      requestType: "leave",
+      status: "amended",
+      updatedAt: new Date().toISOString(),
     });
     emitHrWorkforceEssAuditEvent(store, {
       organizationId: guard.organization.id,
@@ -264,7 +580,18 @@ export async function cancelHrWorkforceEssLeaveRequestAction(input: {
     if (!row || ["approved", "rejected", "cancelled"].includes(row.status)) {
       return actionFailure("Leave request cannot be cancelled.", "hr.ess.leave_cancel_forbidden");
     }
+    if (!(await canAccessEmployeeRecord({ guard, store, employeeId: row.employeeId }))) {
+      return employeeAccessFailure();
+    }
     Object.assign(row, { status: "cancelled" });
+    updateRequestTracker({
+      store,
+      employeeId: row.employeeId,
+      requestRef: row.requestRef,
+      requestType: "leave",
+      status: "cancelled",
+      updatedAt: new Date().toISOString(),
+    });
     emitHrWorkforceEssAuditEvent(store, {
       organizationId: guard.organization.id,
       action: hrWorkforceEssAuditActions.leaveCancelled,
@@ -293,6 +620,10 @@ export async function submitHrWorkforceEssClaimAction(
       selfEmployeeId: findSelfEmployeeId(guard, store),
       employeeIds: store.employeeProfiles.map((row) => row.id),
     });
+    if (!employeeId) {
+      return employeeAccessFailure();
+    }
+    const submittedAt = new Date().toISOString();
     const row = hrWorkforceEssExpenseClaimSchema.parse({
       id: nextHrWorkforceEssId("ess-claim", store.expenseClaims),
       organizationId: guard.organization.id,
@@ -303,7 +634,7 @@ export async function submitHrWorkforceEssClaimAction(
       currency: parsed.currency,
       status: "submitted",
       receiptCount: parsed.receiptCount,
-      submittedAt: new Date().toISOString(),
+      submittedAt,
     });
     store.expenseClaims.unshift(row);
     store.requestTracker.unshift(
@@ -314,10 +645,26 @@ export async function submitHrWorkforceEssClaimAction(
         requestType: "claim",
         requestRef: row.claimRef,
         status: row.status,
-        submittedAt: row.submittedAt,
-        updatedAt: row.submittedAt,
+        submittedAt,
+        updatedAt: submittedAt,
       }),
     );
+    enqueueApproval({
+      store,
+      organizationId: guard.organization.id,
+      approvalType: "claim",
+      targetId: row.id,
+      employeeId,
+      approverUserId: employeeManagerUserId({ store, employeeId }),
+      submittedAt,
+    });
+    enqueueNotification({
+      store,
+      organizationId: guard.organization.id,
+      employeeId,
+      event: "request_submitted",
+      message: `Claim ${row.claimRef} was submitted.`,
+    });
     emitHrWorkforceEssAuditEvent(store, {
       organizationId: guard.organization.id,
       action: hrWorkforceEssAuditActions.claimSubmitted,
@@ -343,6 +690,15 @@ export async function uploadHrWorkforceEssSupportingDocumentAction(input: {
     const claim = store.expenseClaims.find((row) => row.id === input.targetId);
     if (!claim) {
       return actionFailure("Target request was not found.", "hr.ess.upload_target_missing");
+    }
+    if (
+      !(await canAccessEmployeeRecord({
+        guard,
+        store,
+        employeeId: claim.employeeId,
+      }))
+    ) {
+      return employeeAccessFailure();
     }
     claim.receiptCount += 1;
     emitHrWorkforceEssAuditEvent(store, {
@@ -375,6 +731,24 @@ export async function downloadHrWorkforceEssDocumentAction(
     if (!document || !document.authorized) {
       return actionFailure("Document is not authorized for download.", "hr.ess.document_forbidden");
     }
+    if (
+      parsed.documentType &&
+      document.documentType !== parsed.documentType
+    ) {
+      return actionFailure(
+        "Document type is not authorized for this download.",
+        "hr.ess.document_type_forbidden",
+      );
+    }
+    if (
+      !(await canAccessEmployeeRecord({
+        guard,
+        store,
+        employeeId: document.employeeId,
+      }))
+    ) {
+      return employeeAccessFailure();
+    }
     Object.assign(document, { downloadedAt: new Date().toISOString() });
     emitHrWorkforceEssAuditEvent(store, {
       organizationId: guard.organization.id,
@@ -406,10 +780,11 @@ export async function acknowledgeHrWorkforceEssPolicyAction(input: {
     if (!row) {
       return actionFailure("Acknowledgement was not found.", "hr.ess.ack_missing");
     }
+    if (!(await canAccessEmployeeRecord({ guard, store, employeeId: row.employeeId }))) {
+      return employeeAccessFailure();
+    }
     Object.assign(row, {
-      status: HR_WORKFORCE_ESS_CONSENT_STATUSES.includes("acknowledged")
-        ? "acknowledged"
-        : row.status,
+      status: "acknowledged",
       acknowledgedAt: new Date().toISOString(),
     });
     emitHrWorkforceEssAuditEvent(store, {
@@ -436,6 +811,9 @@ export async function completeHrWorkforceEssTaskAction(input: {
     const row = store.assignedTasks.find((candidate) => candidate.id === input.taskId);
     if (!row) {
       return actionFailure("Task was not found.", "hr.ess.task_missing");
+    }
+    if (!(await canAccessEmployeeRecord({ guard, store, employeeId: row.employeeId }))) {
+      return employeeAccessFailure();
     }
     Object.assign(row, {
       status: "completed",
@@ -467,6 +845,9 @@ export async function markHrWorkforceEssNotificationReadAction(input: {
     );
     if (!row) {
       return actionFailure("Notification was not found.", "hr.ess.notification_missing");
+    }
+    if (!(await canAccessEmployeeRecord({ guard, store, employeeId: row.employeeId }))) {
+      return employeeAccessFailure();
     }
     Object.assign(row, {
       status: "read",
@@ -500,10 +881,40 @@ export async function decideHrWorkforceEssApprovalAction(
     if (!row) {
       return actionFailure("Approval was not found.", "hr.ess.approval_missing");
     }
+    if (row.status !== "pending_approval") {
+      return actionFailure(
+        "Approval has already been decided.",
+        "hr.ess.approval_not_pending",
+      );
+    }
+    if (!(await canDecideApproval({ guard, store, approval: row }))) {
+      return employeeAccessFailure();
+    }
+    const decidedAt = new Date().toISOString();
+    const reason = parsed.reason?.trim();
     Object.assign(row, {
       status: parsed.decision,
-      decisionReason: parsed.reason,
-      decidedAt: new Date().toISOString(),
+      decisionReason: reason,
+      decidedAt,
+    });
+    syncApprovalDecisionTarget({
+      store,
+      approval: row,
+      decision: parsed.decision,
+      reason,
+      decidedAt,
+    });
+    enqueueNotification({
+      store,
+      organizationId: guard.organization.id,
+      employeeId: row.employeeId,
+      event:
+        parsed.decision === "approved"
+          ? "request_approved"
+          : parsed.decision === "rejected"
+            ? "request_rejected"
+            : "request_returned",
+      message: `Request approval ${row.id} was ${parsed.decision}.`,
     });
     emitHrWorkforceEssAuditEvent(store, {
       organizationId: guard.organization.id,
@@ -532,6 +943,9 @@ export async function captureHrWorkforceEssConsentAction(input: {
     );
     if (!row) {
       return actionFailure("Consent record was not found.", "hr.ess.consent_missing");
+    }
+    if (!(await canAccessEmployeeRecord({ guard, store, employeeId: row.employeeId }))) {
+      return employeeAccessFailure();
     }
     Object.assign(row, {
       status: input.status,

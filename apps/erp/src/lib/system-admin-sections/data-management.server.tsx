@@ -25,7 +25,14 @@ export default async function SystemAdminDataManagementPage({
   try {
     guard = await requireSystemAdminDataManagementRead();
   } catch {
-    return <SystemAdminDataManagementAccessDenied />;
+    return (
+      <div
+        data-testid="system-admin-data-management-access-denied"
+        className="contents"
+      >
+        <SystemAdminDataManagementAccessDenied />
+      </div>
+    );
   }
 
   const model = await buildSystemAdminDataManagementPageModel({
@@ -34,27 +41,30 @@ export default async function SystemAdminDataManagementPage({
   });
 
   return (
-    <SystemAdminDataManagementSection
-      model={model}
-      canManage={
-        hasExecutionPermission(
+    <div data-testid="system-admin-data-management-page" className="contents">
+      <SystemAdminDataManagementSection
+        model={model}
+        canManage={
+          hasExecutionPermission(
+            guard.context,
+            "system-admin.data-management.manage",
+          ) ||
+          hasExecutionPermission(guard.context, "system-admin.settings.write")
+        }
+        canRun={hasExecutionPermission(
           guard.context,
-          "system-admin.data-management.manage",
-        ) || hasExecutionPermission(guard.context, "system-admin.settings.write")
-      }
-      canRun={hasExecutionPermission(
-        guard.context,
-        "system-admin.data-management.run",
-      )}
-      canCancel={hasExecutionPermission(
-        guard.context,
-        "system-admin.data-management.cancel",
-      )}
-      canExport={hasExecutionPermission(
-        guard.context,
-        "system-admin.data-management.export",
-      )}
-      exportDataManagementAction={exportSystemAdminDataManagementAction}
-    />
+          "system-admin.data-management.run",
+        )}
+        canCancel={hasExecutionPermission(
+          guard.context,
+          "system-admin.data-management.cancel",
+        )}
+        canExport={hasExecutionPermission(
+          guard.context,
+          "system-admin.data-management.export",
+        )}
+        exportDataManagementAction={exportSystemAdminDataManagementAction}
+      />
+    </div>
   );
 }

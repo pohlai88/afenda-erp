@@ -1,7 +1,10 @@
 import { resolveListSurfaceRowTrailingAction } from "@afenda/governed-surface";
 import { getExecutionCapability } from "@afenda/kernel/execution-capabilities";
 import type { SystemAdminCapabilityAvailability } from "../contracts";
-import { isCriticalExecutionCapability } from "../contracts/system-admin.capability-safety.contract";
+import {
+  isCriticalExecutionCapability,
+  SYSTEM_ADMIN_PROTECTED_CAPABILITY_PERMISSION,
+} from "../contracts/system-admin.capability-safety.contract";
 
 export const SYSTEM_ADMIN_CAPABILITIES_MANAGE_DENIED =
   "Requires system-admin.capabilities.manage.";
@@ -15,7 +18,7 @@ export function resolveSystemAdminCapabilityRowTrailingAction(input: {
   const nextAvailability: SystemAdminCapabilityAvailability =
     input.availability === "disabled" ? "enabled" : "disabled";
   const isProtected =
-    capability?.requiredPermission === "system-admin.settings.read";
+    capability?.requiredPermission === SYSTEM_ADMIN_PROTECTED_CAPABILITY_PERMISSION;
   const isCritical = capability
     ? isCriticalExecutionCapability(capability)
     : false;

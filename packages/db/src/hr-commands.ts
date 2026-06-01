@@ -1,9 +1,11 @@
-import { and, eq, isNull, ne } from "drizzle-orm";
+import { and, eq, isNull, ne, sql } from "drizzle-orm";
 import { runWithOrganizationContext, type AfendaTransaction } from "./client";
 import { createEntityId } from "./ids";
 import {
+  hrDepartments,
   hrEmployeeAssignments,
   hrEmployees,
+  hrPositions,
 } from "./schema/hr";
 
 export type HrEmployeeCommandErrorCode =
@@ -66,6 +68,10 @@ export type HrEmployeeAssignmentRow = {
   reason: string | null;
 };
 
+function normalizeEmployeeEmail(email: string | null | undefined) {
+  return email?.trim().toLowerCase() || null;
+}
+
 async function assertEmployeeWritable(
   db: AfendaTransaction,
   organizationId: string,
@@ -74,6 +80,7 @@ async function assertEmployeeWritable(
   const [employee] = await db
     .select({
       id: hrEmployees.id,
+      employmentStatus: hrEmployees.employmentStatus,
       archivedAt: hrEmployees.archivedAt,
     })
     .from(hrEmployees)
@@ -88,7 +95,12 @@ async function assertEmployeeWritable(
   if (!employee) {
     throw new HrEmployeeCommandError("employee_not_found");
   }
-  if (employee.archivedAt) {
+  if (
+    employee.archivedAt ||
+    employee.employmentStatus === "separated" ||
+    employee.employmentStatus === "terminated" ||
+    employee.employmentStatus === "retired"
+  ) {
     throw new HrEmployeeCommandError("employee_archived");
   }
 
@@ -105,13 +117,12 @@ async function assertNoDuplicateEmployeeIdentity(
   },
 ) {
   const trimmedNumber = input.employeeNumber?.trim();
-  const trimmedEmail = input.email?.trim();
+  const normalizedEmail = normalizeEmployeeEmail(input.email);
 
   if (trimmedNumber) {
     const numberConditions = [
       eq(hrEmployees.organizationId, input.organizationId),
       eq(hrEmployees.employeeNumber, trimmedNumber),
-      isNull(hrEmployees.archivedAt),
     ];
     if (input.excludeEmployeeId) {
       numberConditions.push(ne(hrEmployees.id, input.excludeEmployeeId));
@@ -126,11 +137,10 @@ async function assertNoDuplicateEmployeeIdentity(
     }
   }
 
-  if (trimmedEmail) {
+  if (normalizedEmail) {
     const emailConditions = [
       eq(hrEmployees.organizationId, input.organizationId),
-      eq(hrEmployees.email, trimmedEmail),
-      isNull(hrEmployees.archivedAt),
+      sql`lower(${hrEmployees.email}) = ${normalizedEmail}`,
     ];
     if (input.excludeEmployeeId) {
       emailConditions.push(ne(hrEmployees.id, input.excludeEmployeeId));
@@ -171,6 +181,54 @@ async function assertManagerInOrganization(
 
   if (!manager) {
     throw new HrEmployeeCommandError("invalid_manager");
+  }
+}
+
+async function assertDepartmentInOrganization(
+  db: AfendaTransaction,
+  organizationId: string,
+  departmentId: string | null | undefined,
+) {
+  if (!departmentId) return;
+
+  const [department] = await db
+    .select({ id: hrDepartments.id })
+    .from(hrDepartments)
+    .where(
+      and(
+        eq(hrDepartments.organizationId, organizationId),
+        eq(hrDepartments.id, departmentId),
+        isNull(hrDepartments.archivedAt),
+      ),
+    )
+    .limit(1);
+
+  if (!department) {
+    throw new HrEmployeeCommandError("invalid_department");
+  }
+}
+
+async function assertPositionInOrganization(
+  db: AfendaTransaction,
+  organizationId: string,
+  positionId: string | null | undefined,
+) {
+  if (!positionId) return;
+
+  const [position] = await db
+    .select({ id: hrPositions.id })
+    .from(hrPositions)
+    .where(
+      and(
+        eq(hrPositions.organizationId, organizationId),
+        eq(hrPositions.id, positionId),
+        isNull(hrPositions.archivedAt),
+      ),
+    )
+    .limit(1);
+
+  if (!position) {
+    throw new HrEmployeeCommandError("invalid_position");
   }
 }
 
@@ -232,6 +290,16 @@ export async function upsertHrEmployeeEffectiveAssignmentInTx(
       input.organizationId,
       nextManagerId,
       input.employeeId,
+    );
+    await assertDepartmentInOrganization(
+      db,
+      input.organizationId,
+      nextDepartmentId,
+    );
+    await assertPositionInOrganization(
+      db,
+      input.organizationId,
+      nextPositionId,
     );
 
     if (employee?.currentDepartmentId !== nextDepartmentId) {

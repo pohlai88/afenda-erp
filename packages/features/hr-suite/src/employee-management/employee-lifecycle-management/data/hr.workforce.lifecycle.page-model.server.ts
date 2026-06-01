@@ -1,5 +1,6 @@
 import {
   listHrLifecycleAuditEventsWindow,
+  listHrLifecycleContractReviewWindow,
   listHrLifecycleNoticePeriodWindow,
   listHrLifecycleOverviewWindow,
   listHrLifecyclePendingTransitionsWindow,
@@ -23,6 +24,11 @@ import {
   hrLifecycleAuditTrailSearchParam,
 } from "../surface/hr.workforce.lifecycle-audit-trail-list.surface";
 import { hrLifecycleAuditTrailSurfaceKey } from "../surface/hr.workforce.lifecycle-audit-trail-list.surface";
+import {
+  buildHrLifecycleContractReviewsListSurface,
+  hrLifecycleContractReviewsSearchParam,
+  hrLifecycleContractReviewsSurfaceKey,
+} from "../surface/hr.workforce.lifecycle-contract-reviews-list.surface";
 import {
   buildHrLifecycleProbationDueListSurface,
   hrLifecycleProbationDueSearchParam,
@@ -59,6 +65,7 @@ export type HrLifecyclePageModelInput = {
   canWrite: boolean;
   pendingTransitionsSearch?: string;
   probationDueSearch?: string;
+  contractReviewsSearch?: string;
   onboardingCasesSearch?: string;
   noticePeriodSearch?: string;
   offboardingCasesSearch?: string;
@@ -86,6 +93,7 @@ export async function buildHrLifecyclePageModel(
   const overviewCopy = hrLifecycleUiCopy.overview;
   const pendingCopy = hrLifecycleUiCopy.pendingTransitions;
   const probationCopy = hrLifecycleUiCopy.probationDue;
+  const contractCopy = hrLifecycleUiCopy.contractReviews;
   const onboardingCopy = hrLifecycleUiCopy.onboardingCases;
   const noticeCopy = hrLifecycleUiCopy.noticePeriod;
   const offboardingCopy = hrLifecycleUiCopy.offboardingCases;
@@ -95,6 +103,7 @@ export async function buildHrLifecyclePageModel(
     snapshot,
     pendingLoad,
     probationLoad,
+    contractLoad,
     onboardingLoad,
     noticeLoad,
     offboardingLoad,
@@ -120,6 +129,16 @@ export async function buildHrLifecyclePageModel(
         listHrLifecycleProbationDueWindow({
           organizationId: input.organizationId,
           search: input.probationDueSearch,
+          limit: 25,
+          offset: 0,
+        }),
+    }),
+    settleLifecycleListLoad({
+      sectionTitle: contractCopy.sectionTitle,
+      load: () =>
+        listHrLifecycleContractReviewWindow({
+          organizationId: input.organizationId,
+          search: input.contractReviewsSearch,
           limit: 25,
           offset: 0,
         }),
@@ -235,6 +254,25 @@ export async function buildHrLifecyclePageModel(
         emptyDescription: onboardingCopy.emptyDescription,
       });
 
+  const contractReviewsList = contractLoad.value
+    ? buildHrLifecycleContractReviewsListSurface({
+        window: contractLoad.value,
+        searchValue: input.contractReviewsSearch,
+        canWrite: input.canWrite,
+      })
+    : buildLifecycleListLoadErrorPlaceholder({
+        columnsId:
+          HR_LIFECYCLE_LIST_SURFACE_COLUMNS_BY_KEY[
+            hrLifecycleContractReviewsSurfaceKey
+          ],
+        searchParam: hrLifecycleContractReviewsSearchParam,
+        searchLabel: contractCopy.searchLabel,
+        searchPlaceholder: contractCopy.searchPlaceholder,
+        surfaceHeaderTitle: contractCopy.surfaceHeaderTitle,
+        emptyTitle: contractCopy.emptyTitle,
+        emptyDescription: contractCopy.emptyDescription,
+      });
+
   const noticePeriodList = noticeLoad.value
     ? buildHrLifecycleNoticePeriodListSurface({
         window: noticeLoad.value,
@@ -312,6 +350,8 @@ export async function buildHrLifecyclePageModel(
     pendingTransitionsLoadError: pendingLoad.loadError,
     probationDueList,
     probationDueLoadError: probationLoad.loadError,
+    contractReviewsList,
+    contractReviewsLoadError: contractLoad.loadError,
     onboardingCasesList,
     onboardingCasesLoadError: onboardingLoad.loadError,
     noticePeriodList,

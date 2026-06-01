@@ -182,7 +182,7 @@ export function HrRecordsSeparatedTrailingCell(
           <Input
             id={`records-rehire-number-${props.row.id}`}
             name="employeeNumber"
-            defaultValue={String(props.row.cells.employeeNumberValue ?? "")}
+            placeholder={String(props.row.cells.employeeNumberValue ?? "")}
             required
           />
         </Field>

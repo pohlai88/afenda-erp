@@ -24,7 +24,7 @@ export function SystemAdminCapabilitySettingsDialog({
   >(updateCapabilitySettingsAction, undefined);
 
   return (
-    <form action={formAction} className="@container">
+    <form action={formAction} className="@container" data-testid="system-admin-capabilities-settings-form">
       <FieldGroup className="grid gap-surface-md @md:grid-cols-2">
         <Field>
           <FieldLabel>Capability</FieldLabel>
@@ -54,7 +54,7 @@ export function SystemAdminCapabilitySettingsDialog({
           </p>
         </div>
         <div className="flex items-end @md:col-span-2">
-          <Button type="submit" disabled={pending}>
+          <Button type="submit" disabled={pending} data-testid="system-admin-capabilities-settings-submit">
             <ShieldIcon data-icon="inline-start" />
             Save capability setting
           </Button>

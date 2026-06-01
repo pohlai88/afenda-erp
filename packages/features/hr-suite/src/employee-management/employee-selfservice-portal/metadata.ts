@@ -52,4 +52,7 @@ export {
   HR_WORKFORCE_ESS_ACCEPTANCE_CRITERIA_COVERAGE,
   HR_WORKFORCE_ESS_REQUIREMENT_COVERAGE,
   assertHrWorkforceEssEnterpriseCoverage,
+  type HrWorkforceEssCoverageEntry,
+  type HrWorkforceEssCoverageStatus,
+  type HrWorkforceEssRequirementCode,
 } from "./data/hr.workforce.ess-coverage.shared";

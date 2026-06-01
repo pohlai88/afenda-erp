@@ -4,8 +4,11 @@ export const HR_LIFECYCLE_MOVEMENT_KINDS = [
   "promotion",
   "transfer",
   "demotion",
+  "job_change",
   "department_change",
   "manager_change",
+  "grade_change",
+  "location_change",
 ] as const;
 
 export const hrLifecycleMovementKindSchema = z.enum(HR_LIFECYCLE_MOVEMENT_KINDS);
@@ -17,6 +20,8 @@ export const hrLifecycleMovementFormSchema = z.object({
   currentDepartmentId: z.string().trim().optional(),
   currentPositionId: z.string().trim().optional(),
   managerEmployeeId: z.string().trim().optional(),
+  grade: z.string().trim().optional(),
+  workLocationCode: z.string().trim().optional(),
   reason: z.string().trim().max(2000).optional(),
   approvalReference: z.string().trim().max(500).optional(),
 });
@@ -39,6 +44,8 @@ export function parseHrLifecycleMovementForm(formData: FormData) {
     currentDepartmentId: readLifecycleFormField(formData, "currentDepartmentId"),
     currentPositionId: readLifecycleFormField(formData, "currentPositionId"),
     managerEmployeeId: readLifecycleFormField(formData, "managerEmployeeId"),
+    grade: readLifecycleFormField(formData, "grade"),
+    workLocationCode: readLifecycleFormField(formData, "workLocationCode"),
     reason: readLifecycleFormField(formData, "reason"),
     approvalReference: readLifecycleFormField(formData, "approvalReference"),
   });

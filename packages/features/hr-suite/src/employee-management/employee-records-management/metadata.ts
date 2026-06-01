@@ -56,6 +56,15 @@ export {
 export { hrRecordsUiCopy } from "./surface/hr.workforce.records-ui.copy.shared";
 
 export {
+  HR_WORKFORCE_RECORDS_ACCEPTANCE_CRITERIA_COVERAGE,
+  HR_WORKFORCE_RECORDS_REQUIREMENT_COVERAGE,
+  assertHrWorkforceRecordsEnterpriseCoverage,
+  type HrRecordsCoverageEntry,
+  type HrRecordsCoverageStatus,
+  type HrRecordsRequirementCode,
+} from "./data/hr.workforce.records-coverage.shared";
+
+export {
   hrRecordsOverviewStatSurfaceKey,
   buildHrRecordsOverviewStatGroups,
 } from "./surface/hr.workforce.records-overview-stat.surface";
