@@ -2,6 +2,7 @@
  * Fail-closed layout guard for @afenda/object-storage.
  * ARCH-1002 §8: three top-level slices + full template bucket set per slice.
  */
+import { spawnSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -12,6 +13,7 @@ import {
 } from "../../_scaffold/scripts/lib/scaffold-grammar.mts";
 
 const packageRoot = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
+const repoRoot = path.join(packageRoot, "../..");
 const srcDir = path.join(packageRoot, "src");
 
 const allowedTopDirs = new Set(["blob", "r2", "_object-storage-integration"]);
@@ -137,6 +139,23 @@ function checkNoDbInApiHandlers() {
 checkLayout();
 checkNoLegacyPackageRootR2();
 checkNoDbInApiHandlers();
+
+const ingressScript = path.join(
+  packageRoot,
+  "scripts/check-object-storage-ingress-governance.mts",
+);
+if (fs.existsSync(ingressScript)) {
+  const result = spawnSync("pnpm", ["exec", "tsx", ingressScript], {
+    cwd: repoRoot,
+    encoding: "utf8",
+    shell: process.platform === "win32",
+  });
+
+  if (result.status !== 0) {
+    const output = [result.stdout, result.stderr].filter(Boolean).join("\n").trim();
+    problems.push(output || "[object-storage:ingress-governance] check failed");
+  }
+}
 
 if (problems.length > 0) {
   console.error("[object-storage:layout] Violations:");

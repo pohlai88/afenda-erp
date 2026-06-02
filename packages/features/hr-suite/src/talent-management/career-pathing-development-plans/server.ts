@@ -1,3 +1,15 @@
+import React from "react";
+
+import {
+  buildHrCareerPathPageModel,
+} from "./data/hr.talent.career-pathing-foundation.page-model.server";
+import { toHrCareerPathingPageModelInput } from "./data/hr.talent.career-pathing-search-params.parse.shared";
+import {
+  HrCareerPathingAccessDeniedPanel,
+  HrCareerPathingSection,
+} from "./components";
+import { requireHrCareerPathingRead } from "./policies/hr.talent.career-pathing-access.policy.server";
+
 export * from "./actions/hr.talent.career-pathing.actions.server";
 export * from "./contracts/hr.talent.career-pathing.contract";
 export * from "./contracts/hr.talent.career-pathing-integration.contract";
@@ -88,3 +100,28 @@ export {
   computeEmployeeReadinessAction,
   syncCareerPathingDueNotificationsAction,
 } from "./actions/hr.talent.career-pathing.actions.server";
+
+type HrRawSearchParams = Record<string, string | string[] | undefined> | undefined;
+type HrSearchParamsInput = HrRawSearchParams | Promise<HrRawSearchParams>;
+
+export async function renderHrCareerPathingPage(
+  searchParams?: HrSearchParamsInput,
+) {
+  const resolvedSearchParams = searchParams ? await searchParams : undefined;
+
+  try {
+    const guard = await requireHrCareerPathingRead();
+    const pageModel = await buildHrCareerPathPageModel(
+      toHrCareerPathingPageModelInput({
+        organizationId: guard.organization.id,
+        actorAuthUserId: guard.session.id,
+        canWrite: guard.canWrite,
+        searchParams: resolvedSearchParams,
+      }),
+    );
+
+    return React.createElement(HrCareerPathingSection, { pageModel });
+  } catch {
+    return React.createElement(HrCareerPathingAccessDeniedPanel);
+  }
+}

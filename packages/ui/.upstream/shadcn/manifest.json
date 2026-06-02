@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedAt": "2026-05-31T08:46:19.259Z",
+  "generatedAt": "2026-06-02T13:09:59.163Z",
   "note": "Approved shadcn structure snapshot for @afenda/ui. Regenerate only after intentional primitive changes.",
   "files": {
     "accordion.tsx": {
@@ -1459,7 +1459,8 @@
     },
     "sonner.tsx": {
       "exports": [
-        "Toaster"
+        "Toaster",
+        "toast"
       ],
       "rootFunctions": [],
       "dataSlots": [],

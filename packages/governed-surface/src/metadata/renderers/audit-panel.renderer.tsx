@@ -13,6 +13,8 @@ export function AuditPanelRenderer({
   configuration,
   diagnostics = "user",
   surfaceKey,
+  sectionKey,
+  componentKey,
 }: RendererProps & {
   diagnostics?: GovernedComponentRendererDiagnostics;
 }) {
@@ -36,7 +38,8 @@ export function AuditPanelRenderer({
     <GovernedAuditPanel
       model={parsed.data}
       surfaceKey={surfaceKey}
-      componentKey={surfaceKey ?? "audit-panel"}
+      sectionKey={sectionKey}
+      componentKey={componentKey ?? sectionKey ?? surfaceKey ?? "audit-panel"}
     />
   );
 }

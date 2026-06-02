@@ -6,3 +6,4 @@ export {
   SystemAdminBillingAccessDenied,
   SystemAdminBillingSection,
 } from "./system-admin.billing-section.component.server";
+export { SystemAdminBillingPage } from "./system-admin.billing-page.component.server";

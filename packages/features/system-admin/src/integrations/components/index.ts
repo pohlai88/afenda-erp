@@ -9,3 +9,4 @@ export {
   SystemAdminIntegrationsAccessDenied,
   SystemAdminIntegrationsSection,
 } from "./system-admin.integrations-section.component.server";
+export { SystemAdminIntegrationsPage } from "./system-admin.integrations-page.component.server";

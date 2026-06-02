@@ -1,5 +1,5 @@
 import { getCachedNavigationExtensionMetadata } from "@/lib/cached-module-metadata";
-import { LynxConsoleRoutePage } from "@/workspace-routes/lynx-console-route";
+import { LynxConsoleRoutePage } from "@/routes/workspace/lynx/lynx-console-route";
 import { lynxConsolePageMetadata } from "@afenda/feature-lynx/client";
 import type { Metadata } from "next";
 

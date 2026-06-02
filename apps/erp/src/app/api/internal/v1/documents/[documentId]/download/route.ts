@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getTenantDocument } from "@afenda/db";
+import { createTenantObjectStorageDownloadDeps } from "@afenda/feature-system-admin/server";
 import { handleObjectStorageDocumentDownloadGet } from "@afenda/object-storage/server";
 
 type RouteContext = {
@@ -13,7 +13,7 @@ export async function GET(
   const { documentId } = await context.params;
   const result = await handleObjectStorageDocumentDownloadGet(
     { request, documentId },
-    { getTenantDocument },
+    createTenantObjectStorageDownloadDeps(),
   );
   return result.redirect
     ? NextResponse.redirect(result.redirect, 302)

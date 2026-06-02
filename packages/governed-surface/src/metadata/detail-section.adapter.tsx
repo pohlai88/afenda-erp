@@ -20,10 +20,22 @@ import { GovernedComponentRenderer } from "./render-governed-component";
  */
 export function resolveGovernedDetailSectionContent(
   section: GovernedDetailSection,
+  identity?: {
+    surfaceKey?: string;
+    sectionKey?: string;
+    componentKey?: string;
+  },
 ): ReactNode {
   try {
     const envelope = toGovernedComponentEnvelopeFromDetailSection(section);
-    return <GovernedComponentRenderer component={envelope} />;
+    return (
+      <GovernedComponentRenderer
+        component={envelope}
+        surfaceKey={identity?.surfaceKey}
+        sectionKey={identity?.sectionKey}
+        componentKey={identity?.componentKey}
+      />
+    );
   } catch {
     const copy = governedSurfaceParseErrorCopy("user");
     return (

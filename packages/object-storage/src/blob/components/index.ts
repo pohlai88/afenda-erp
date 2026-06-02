@@ -1,5 +1,5 @@
-/**
- * @afenda-bucket components
- * Scaffold components from packages/_scaffold.
- */
-export {};
+export {
+  uploadVercelBlobClient,
+  type VercelBlobClientUploadInput,
+  type VercelBlobClientUploadResult,
+} from "./upload-client.client";

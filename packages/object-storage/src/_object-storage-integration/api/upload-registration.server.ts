@@ -3,12 +3,23 @@ import "server-only";
 import { uploadRouteCopy } from "@afenda/kernel";
 import { logServerEvent } from "@afenda/observability";
 import { z } from "zod";
-import type { UploadRegistrationInput } from "../contracts/index";
+import type {
+  ObjectStorageEvidenceAuditSink,
+  ObjectStorageGateDecision,
+  ObjectStorageUploadQuotaInput,
+  UploadRegistrationInput,
+} from "../contracts/index";
 import { UploadRouteError } from "../domain/upload-route.error.shared";
 import {
   uploadPayloadSchema,
   type UploadTokenPayload,
 } from "../schemas/upload-payload.shared";
+import {
+  documentMagicBytePrefixBytes,
+  magicBytesMatchDeclaredContentType,
+} from "../policies/document-content-verification.shared";
+import { recordEvidenceEvent } from "./evidence-governance.server";
+import { incrementObjectStorageMetric } from "./object-storage-metrics.server";
 
 export type ObjectStorageHandlerResult = {
   status: number;
@@ -19,7 +30,11 @@ export type ObjectStorageHandlerResult = {
 export type ObjectStorageUploadHandlerDeps = {
   registerUploadedDocument?: (
     input: UploadRegistrationInput,
-  ) => Promise<void>;
+  ) => Promise<string | void>;
+  assertUploadQuota?: (
+    input: ObjectStorageUploadQuotaInput,
+  ) => Promise<ObjectStorageGateDecision | void>;
+  recordEvidenceEvent?: ObjectStorageEvidenceAuditSink;
 };
 
 export function parseUploadTokenPayload(tokenPayload: string | null | undefined) {
@@ -45,6 +60,32 @@ export function storedContentTypeMatchesDeclared(
   }
 
   return storedContentType === declaredContentType;
+}
+
+export function assertStoredContentMatchesDeclared(input: {
+  storedContentType?: string;
+  declaredContentType: string;
+  prefixBytes?: Uint8Array;
+}) {
+  if (
+    !storedContentTypeMatchesDeclared(
+      input.storedContentType,
+      input.declaredContentType,
+    )
+  ) {
+    throw new UploadRouteError(400, uploadRouteCopy.invalidRequest);
+  }
+
+  if (
+    input.prefixBytes &&
+    input.prefixBytes.length >= documentMagicBytePrefixBytes &&
+    !magicBytesMatchDeclaredContentType(
+      input.declaredContentType,
+      input.prefixBytes,
+    )
+  ) {
+    throw new UploadRouteError(400, uploadRouteCopy.invalidRequest);
+  }
 }
 
 export function buildStoredObjectResult(input: {
@@ -77,12 +118,13 @@ export async function registerUploadedDocument(input: {
   sizeBytes: number;
   etag?: string;
   source: string;
+  sourceIp?: string;
 }) {
   if (!input.deps.registerUploadedDocument) {
     throw new UploadRouteError(503, uploadRouteCopy.uploadFailed);
   }
 
-  await input.deps.registerUploadedDocument({
+  const documentId = await input.deps.registerUploadedDocument({
     organizationId: input.organization.id,
     moduleId: input.parsedPayload.moduleId,
     ownerEntityId: input.parsedPayload.ownerEntityId,
@@ -93,11 +135,35 @@ export async function registerUploadedDocument(input: {
     sizeBytes: input.sizeBytes,
     access: input.parsedPayload.access,
     blobEtag: input.etag,
+    classification: input.parsedPayload.classification,
+    retentionClass: input.parsedPayload.retentionClass,
     uploadedByAuthUserId: input.session.id,
     metadata: {
       source: input.source,
       declaredContentType: input.parsedPayload.contentType,
       declaredSizeBytes: input.parsedPayload.sizeBytes,
+    },
+  });
+
+  await recordEvidenceEvent({
+    sink: input.deps.recordEvidenceEvent,
+    event: {
+      action: "DOCUMENT_UPLOADED",
+      organizationId: input.organization.id,
+      moduleId: input.parsedPayload.moduleId,
+      userId: input.session.id,
+      sessionId: input.session.id,
+      documentId: typeof documentId === "string" ? documentId : undefined,
+      pathname: input.pathname,
+      classification: input.parsedPayload.classification,
+      retentionClass: input.parsedPayload.retentionClass,
+      sourceIp: input.sourceIp,
+      metadata: {
+        source: input.source,
+        contentType: input.contentType,
+        sizeBytes: input.sizeBytes,
+        access: input.parsedPayload.access,
+      },
     },
   });
 
@@ -118,4 +184,10 @@ export async function registerUploadedDocument(input: {
       sizeBytes: input.sizeBytes,
     },
   );
+
+  incrementObjectStorageMetric("uploads_total", {
+    requestId: input.requestId,
+    organizationId: input.organization.id,
+    moduleId: input.parsedPayload.moduleId,
+  });
 }

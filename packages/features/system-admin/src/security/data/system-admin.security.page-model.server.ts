@@ -1,4 +1,6 @@
 import { writeExecutionAuditEvent } from "@afenda/kernel/execution";
+import { loadSystemAdminDocumentQuarantineInboxWindow } from "../../tenant-execution/data/system-admin.document-quarantine-inbox.read-model.server";
+import { loadOrganizationStorageQuotaSnapshot } from "../../tenant-execution/data/system-admin.organization-storage-quota.read-model.server";
 import { getSystemAdminOrganizationSecuritySettings } from "./system-admin.security.query.server";
 import { evaluateSecurityReadiness } from "./system-admin.security.readiness.server";
 import { listSystemAdminSecurityRecentChanges } from "./system-admin.security.recent-changes.server";
@@ -9,11 +11,18 @@ export async function buildSystemAdminSecurityPageModel(input: {
   actorId: string;
   actorType: "user" | "system" | "agent";
 }) {
-  const [security, recentChanges] = await Promise.all([
+  const [security, recentChanges, quarantineWindow, storageQuota] =
+    await Promise.all([
     getSystemAdminOrganizationSecuritySettings({
       organizationId: input.organizationId,
     }),
     listSystemAdminSecurityRecentChanges({
+      organizationId: input.organizationId,
+    }),
+    loadSystemAdminDocumentQuarantineInboxWindow({
+      organizationId: input.organizationId,
+    }),
+    loadOrganizationStorageQuotaSnapshot({
       organizationId: input.organizationId,
     }),
   ]);
@@ -38,5 +47,7 @@ export async function buildSystemAdminSecurityPageModel(input: {
     security,
     readiness,
     recentChanges,
+    quarantineWindow,
+    storageQuota,
   };
 }

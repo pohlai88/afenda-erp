@@ -4,8 +4,13 @@ import type { ReactNode } from "react";
 
 import { GovernedComponentRenderer } from "../metadata/index";
 import { logUnexpectedServerError } from "../data/governed-logging.server";
+import { governedRendererCopy } from "../i18n/governed-renderer-copy.shared";
 import { getGovernedSurfaceTranslations } from "../i18n/governed-surface-copy";
-import { governedTestId } from "../utils/governed-identity.shared";
+import { diagnosticsDataAttributes } from "../utils/governed-diagnostics.shared";
+import {
+  governedIdentityAttributes,
+  governedTestId,
+} from "../utils/governed-identity.shared";
 
 import type { EmptyState } from "../schemas/list-surface.schema";
 import {
@@ -36,6 +41,8 @@ export type GovernedPatternBStatSectionProps = {
   title: string;
   description?: string;
   surfaceKey: string;
+  sectionKey?: string;
+  componentKey?: string;
   statGroups: ReadonlyArray<GovernedPatternBStatGroup>;
   layout?: GovernedPatternBStatSectionLayout;
   density?: GovernedPatternSectionDensity;
@@ -57,6 +64,8 @@ export async function GovernedPatternBStatSection({
   title,
   description,
   surfaceKey,
+  sectionKey,
+  componentKey,
   statGroups,
   layout = "card",
   density = "comfortable",
@@ -70,15 +79,16 @@ export async function GovernedPatternBStatSection({
   contentClassName,
 }: GovernedPatternBStatSectionProps) {
   const t = await getGovernedSurfaceTranslations("Erp");
-  const sectionTestId = governedStatSectionTestId(surfaceKey);
+  const resolvedSectionKey = sectionKey ?? `${surfaceKey}-stats`;
+  const resolvedComponentKey = componentKey ?? resolvedSectionKey;
 
   const shellInput = {
     layout,
     density,
     className,
-    sectionTestId,
     surfaceKey,
-    sectionKey: surfaceKey,
+    sectionKey: resolvedSectionKey,
+    componentKey: resolvedComponentKey,
     headerSlot,
     title,
     description,
@@ -115,10 +125,12 @@ export async function GovernedPatternBStatSection({
     };
   } else if (statGroups.length === 0) {
     body = {
-      state: "invalid",
+      state: "empty",
       model: {
-        ...fallbackInvalidModel,
-        emptyId: invalid?.emptyId ?? "stat-section-empty-groups",
+        variant: "muted",
+        title: governedRendererCopy.empty.statCard.title,
+        description: governedRendererCopy.empty.statCard.description,
+        emptyId: `${resolvedComponentKey}-empty-groups`,
       },
     };
   } else {
@@ -133,7 +145,12 @@ export async function GovernedPatternBStatSection({
       logUnexpectedServerError(
         "GovernedPatternBStatSection invalid stat configuration",
         firstInvalid.parsed.error,
-        { surfaceKey, groupKey: firstInvalid.group.groupKey },
+        {
+          surfaceKey,
+          sectionKey: resolvedSectionKey,
+          componentKey: resolvedComponentKey,
+          groupKey: firstInvalid.group.groupKey,
+        },
       );
 
       body = {
@@ -150,30 +167,41 @@ export async function GovernedPatternBStatSection({
         state: "ready",
         children: (
           <div className="flex flex-col gap-surface-lg">
-            {validGroups.map(({ group, configuration }) => (
-              <section
-                key={group.groupKey}
-                className="flex flex-col gap-2"
-                data-stat-group-key={group.groupKey}
-                data-testid={governedTestId(
-                  "stat-group",
-                  `${surfaceKey}:${group.groupKey}`,
-                )}
-              >
-                {group.label ? (
-                  <p className="type-muted font-medium">{group.label}</p>
-                ) : null}
+            {validGroups.map(({ group, configuration }) => {
+              const groupComponentKey = `${resolvedComponentKey}-${group.groupKey}`;
 
-                <GovernedComponentRenderer
-                  component={{
-                    type: "governed:stat-card",
-                    serverType: "governed:stat-card",
-                    configuration,
-                  }}
-                  surfaceKey={surfaceKey}
-                />
-              </section>
-            ))}
+              return (
+                <section
+                  key={group.groupKey}
+                  className="flex flex-col gap-2"
+                  data-stat-group-key={group.groupKey}
+                  {...governedIdentityAttributes({
+                    surfaceKey,
+                    sectionKey: resolvedSectionKey,
+                    componentKey: groupComponentKey,
+                  })}
+                  {...diagnosticsDataAttributes({
+                    state: "ready",
+                    testId: governedTestId("stat-group", groupComponentKey),
+                  })}
+                >
+                  {group.label ? (
+                    <p className="type-muted font-medium">{group.label}</p>
+                  ) : null}
+
+                  <GovernedComponentRenderer
+                    component={{
+                      type: "governed:stat-card",
+                      serverType: "governed:stat-card",
+                      configuration,
+                    }}
+                    surfaceKey={surfaceKey}
+                    sectionKey={resolvedSectionKey}
+                    componentKey={groupComponentKey}
+                  />
+                </section>
+              );
+            })}
           </div>
         ),
       };

@@ -1,0 +1,1 @@
+ALTER TABLE "hr_employee_documents" ADD COLUMN "pathname" text;

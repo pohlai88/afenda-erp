@@ -3,7 +3,7 @@ import type { DragEvent, ReactNode } from "react";
 import Link from "next/link";
 
 import { Badge } from "@afenda/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@afenda/ui/card";
+import { Card, CardContent } from "@afenda/ui/card";
 import type {
   GovernedKanbanBoardConfiguration,
   KanbanBadgeTone,
@@ -107,9 +107,9 @@ export function KanbanColumnPanel({
   const dropState = columnDropSurface?.dropState ?? "none";
 
   return (
-    <Card
+    <section
       className={cn(
-        "flex min-h-40 flex-col transition-colors",
+        "flex min-h-40 flex-col rounded-section border border-border bg-card/50 transition-colors",
         dropState === "allowed" && "ring-2 ring-primary/40",
         dropState === "disabled" && "ring-2 ring-muted-foreground/25",
       )}
@@ -120,10 +120,10 @@ export function KanbanColumnPanel({
       onDrop={columnDropSurface?.onDrop}
       onDragLeave={columnDropSurface?.onDragLeave}
     >
-      <CardHeader className="flex flex-row items-center justify-between gap-2 pb-2">
-        <CardTitle id={headingId} className="type-control font-medium">
+      <div className="flex flex-row items-center justify-between gap-2 p-3 pb-2">
+        <h3 id={headingId} className="type-control font-medium">
           {column.label}
-        </CardTitle>
+        </h3>
         {column.badgeTone ? (
           <Badge
             variant={COLUMN_BADGE_VARIANT[column.badgeTone]}
@@ -136,8 +136,8 @@ export function KanbanColumnPanel({
             {cards.length}
           </span>
         )}
-      </CardHeader>
-      <CardContent className="flex min-h-0 flex-1 flex-col gap-2 pt-0">
+      </div>
+      <div className="flex min-h-0 flex-1 flex-col gap-2 p-3 pt-0">
         {cards.length === 0 ? (
           <KanbanEmptyColumn label={emptyColumnLabel} />
         ) : (
@@ -148,8 +148,8 @@ export function KanbanColumnPanel({
             {cards.map((card) => renderCard(card))}
           </ul>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </section>
   );
 }
 

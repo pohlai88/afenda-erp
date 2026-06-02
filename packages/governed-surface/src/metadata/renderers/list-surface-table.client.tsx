@@ -49,6 +49,7 @@ import type {
   ListSurfaceRowTone,
 } from "../../schemas/list-surface-renderer.schema";
 import type { ListSurfaceToolbar } from "../../schemas/list-surface-toolbar.schema";
+import type { GovernedServerActionHandler } from "../../schemas/server-actions.shared";
 import type { GovernedListTrailingCellContext } from "../../schemas/list-trailing-cell-context.schema";
 import type { uiDensity } from "@afenda/ui/design-system";
 import { cn } from "@afenda/ui/utils";
@@ -197,6 +198,8 @@ export type ListSurfaceTableClientProps = {
   columns: readonly ListColumn[];
   rows: readonly ListSurfaceRow[];
   surfaceKey?: string;
+  sectionKey?: string;
+  componentKey?: string;
   columnsId?: string;
   /** Accessible name for the data table (typically the list surface title). */
   tableLabel?: string;
@@ -216,6 +219,7 @@ export type ListSurfaceTableClientProps = {
   decisionLedger?: ListSurfacePresentation["decisionLedger"];
   exportFormId?: string;
   exportTriggerElementId?: string;
+  bulkActionHandlers?: Record<string, GovernedServerActionHandler<FormData, void>>;
   pagination?: {
     pageSize: number;
     hasNextPage?: boolean;
@@ -231,6 +235,8 @@ export function ListSurfaceTableClient({
   columns,
   rows,
   surfaceKey,
+  sectionKey,
+  componentKey,
   columnsId,
   tableLabel,
   dataNature,
@@ -249,6 +255,7 @@ export function ListSurfaceTableClient({
   decisionLedger,
   exportFormId,
   exportTriggerElementId,
+  bulkActionHandlers,
   pagination,
 }: ListSurfaceTableClientProps) {
   const router = useRouter();
@@ -291,6 +298,8 @@ export function ListSurfaceTableClient({
     : undefined;
   const governedDataAttrs = buildGovernedListSurfaceDataAttributes({
     surfaceKey,
+    sectionKey,
+    componentKey,
     columnsId,
     dataNature,
     presentationVariant,
@@ -391,6 +400,24 @@ export function ListSurfaceTableClient({
   const TrailingCell = trailingColumn?.Cell;
   const selectionMode = selection?.mode ?? "none";
   const showSelection = selectionMode !== "none";
+  const selectableRowIds = useMemo(
+    () =>
+      rows
+        .filter((row) => !row.selectionDisabledReason)
+        .map((row) => row.id),
+    [rows],
+  );
+  const selectableRowIdSet = useMemo(
+    () => new Set(selectableRowIds),
+    [selectableRowIds],
+  );
+  const selectedEligibleRowIds = useMemo(
+    () =>
+      Array.from(selectedRowIds).filter((rowId) =>
+        selectableRowIdSet.has(rowId),
+      ),
+    [selectableRowIdSet, selectedRowIds],
+  );
   const showDecisionLedger =
     decisionLedger?.enabled !== false &&
     rows.some((row) => row.decisionLedger !== undefined);
@@ -413,6 +440,10 @@ export function ListSurfaceTableClient({
   };
 
   const toggleRowSelection = (rowId: string) => {
+    if (!selectableRowIdSet.has(rowId)) {
+      return;
+    }
+
     setSelectedRowIds((prev) => {
       if (selectionMode === "single") {
         return prev.has(rowId) ? new Set() : new Set([rowId]);
@@ -429,10 +460,13 @@ export function ListSurfaceTableClient({
 
   const toggleAllRows = () => {
     setSelectedRowIds((prev) => {
-      if (prev.size === rows.length) {
+      if (
+        selectableRowIds.length > 0 &&
+        selectableRowIds.every((rowId) => prev.has(rowId))
+      ) {
         return new Set();
       }
-      return new Set(rows.map((row) => row.id));
+      return new Set(selectableRowIds);
     });
   };
 
@@ -481,8 +515,10 @@ export function ListSurfaceTableClient({
             exportTriggerElementId={
               exportTriggerElementId ?? toolbar?.export?.triggerElementId
             }
-            selectedCount={selectedRowIds.size}
+            selectedCount={selectedEligibleRowIds.length}
+            selectedRowIds={selectedEligibleRowIds}
             selectionLabel={selection?.bulkScopeLabel ?? selection?.label}
+            bulkActionHandlers={bulkActionHandlers}
           />
         </div>
       ) : null}
@@ -593,9 +629,12 @@ export function ListSurfaceTableClient({
                             <Checkbox
                               aria-label={selection?.label ?? "Select all rows"}
                               checked={
-                                selectedRowIds.size > 0 &&
-                                selectedRowIds.size === rows.length
+                                selectableRowIds.length > 0 &&
+                                selectableRowIds.every((rowId) =>
+                                  selectedRowIds.has(rowId),
+                                )
                               }
+                              disabled={selectableRowIds.length === 0}
                               onCheckedChange={toggleAllRows}
                             />
                           ) : null}
@@ -785,6 +824,10 @@ export function ListSurfaceTableClient({
                               <Checkbox
                                 aria-label={`Select row ${source.id}`}
                                 checked={selectedRowIds.has(source.id)}
+                                disabled={Boolean(
+                                  source.selectionDisabledReason,
+                                )}
+                                title={source.selectionDisabledReason}
                                 onClick={(event) => event.stopPropagation()}
                                 onCheckedChange={() =>
                                   toggleRowSelection(source.id)

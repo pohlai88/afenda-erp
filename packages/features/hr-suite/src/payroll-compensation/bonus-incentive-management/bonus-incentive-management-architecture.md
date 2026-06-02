@@ -193,7 +193,7 @@ Bonus & Incentive Management **does not** calculate net pay, apply statutory rul
 | HRM-BON-020 | **Shipped** | `collectHrBonusPayoutValidationFlagsInTx`; `hr_bonus_payouts.validation_flags` |
 | HRM-BON-021 | **Shipped** | `submitHrBonusPayoutForApprovalInTx`; `submitBonusPayoutForApprovalAction` |
 | HRM-BON-022 | **Shipped** | `resolveHrBonusApprovalSteps`; `hr_bonus_payout_approval_steps`; plan `approval_routing_config` |
-| HRM-BON-023 | **Shipped** | `reviewHrBonusPayoutInTx`; `requireHrBonusApprove` (`hr.bonus.approve`); `POST /api/hr/bonus/payouts/review` |
+| HRM-BON-023 | **Shipped** | `reviewHrBonusPayoutInTx`; `requireHrBonusApprove` (`hr.bonus.approve`); `POST /api/internal/v1/hr/bonus/payouts/review` |
 | HRM-BON-024 | **Shipped** | Zod + DB reason gates for reject, return, and adjust |
 
 | AC | Covered by |

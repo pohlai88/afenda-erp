@@ -56,6 +56,7 @@ export const listSurfaceRowSchema = z
     rowHref: z.string().min(1).optional(),
     linkColumnId: z.string().min(1).optional(),
     rowTone: listSurfaceRowToneSchema.optional(),
+    selectionDisabledReason: z.string().trim().min(1).optional(),
     /** Per-row cell renderer overrides (row wins over column `cellKind`). */
     cellKinds: z.record(z.string(), listCellKindSchema).optional(),
     trailingAction: listSurfaceRowTrailingActionSchema.optional(),
@@ -210,6 +211,36 @@ const listSurfaceRendererConfigurationValidatedSchema =
               path: ["presentation", "summary", "rows", summaryRow.id, "cells"],
             });
           }
+        }
+      }
+
+      for (const [rowIndex, row] of config.rows.entries()) {
+        const trailingId = row.trailingAction?.descriptor?.id;
+        const trailingState = row.trailingAction?.state;
+        if (
+          trailingId !== "document-lifecycle" ||
+          trailingState === "hidden" ||
+          trailingState === undefined
+        ) {
+          continue;
+        }
+
+        if (row.cells.scanStatusValue === undefined) {
+          context.addIssue({
+            code: z.ZodIssueCode.custom,
+            message:
+              "scanStatusValue is required in cells when trailing action id is document-lifecycle",
+            path: ["rows", rowIndex, "cells", "scanStatusValue"],
+          });
+        }
+
+        if (row.cells.retentionClassValue === undefined) {
+          context.addIssue({
+            code: z.ZodIssueCode.custom,
+            message:
+              "retentionClassValue is required in cells when trailing action id is document-lifecycle",
+            path: ["rows", rowIndex, "cells", "retentionClassValue"],
+          });
         }
       }
     },

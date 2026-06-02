@@ -1,10 +1,19 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import {
+  GOVERNED_ACTION_ID_FIELD,
+  GOVERNED_CONFIRM_FIELD,
+  GOVERNED_SELECTED_ROW_ID_FIELD,
+  clearGovernedServerActionRegistryForTest,
+  resolveGovernedBulkServerAction,
+  type ActionResult,
+} from "@afenda/governed-surface/schemas";
 import {
   systemAdminInspectUserAccessInputSchema,
   systemAdminInviteUserInputSchema,
   systemAdminResendInvitationInputSchema,
   systemAdminUserStatusInputSchema,
 } from "../../src/users/schemas";
+import { SYSTEM_ADMIN_USERS_BULK_SUSPEND_ACTION_ID } from "../../src/users/contracts/system-admin.users-actions.contract";
 
 const mockRequireUsersManage = vi.fn();
 const mockRequireUsersRead = vi.fn();
@@ -165,6 +174,10 @@ describe("system admin users actions", () => {
     });
   });
 
+  afterEach(() => {
+    clearGovernedServerActionRegistryForTest();
+  });
+
   it("denies non-admin from reading users via policy guard", async () => {
     mockRequireUsersRead.mockRejectedValue(new Error("Forbidden"));
 
@@ -257,6 +270,122 @@ describe("system admin users actions", () => {
     );
     expect(mockWriteAudit).toHaveBeenCalledWith(
       expect.objectContaining({ action: "system-admin.user.remove" }),
+    );
+  });
+
+  it("registered bulk suspend rejects no selected rows before auth", async () => {
+    const { registerSystemAdminUsersGovernedActions } = await import(
+      "../../src/users/actions/system-admin.users-governed-actions.server"
+    );
+    registerSystemAdminUsersGovernedActions();
+    const action = resolveGovernedBulkServerAction(
+      SYSTEM_ADMIN_USERS_BULK_SUSPEND_ACTION_ID,
+    );
+    const formData = new FormData();
+    formData.set(
+      GOVERNED_ACTION_ID_FIELD,
+      SYSTEM_ADMIN_USERS_BULK_SUSPEND_ACTION_ID,
+    );
+    formData.set(GOVERNED_CONFIRM_FIELD, "confirmed");
+
+    const result = (await action?.(
+      undefined,
+      formData,
+    )) as ActionResult | undefined;
+
+    expect(result?.ok).toBe(false);
+    expect(result).toMatchObject({ code: "governed.selection.too_few" });
+    expect(mockRequireUsersManage).not.toHaveBeenCalled();
+  });
+
+  it("bulk suspend rejects tampered selected membership ids", async () => {
+    mockGetMembership.mockResolvedValueOnce(null);
+    const { bulkSuspendSystemAdminUsers } = await import(
+      "../../src/users/actions/system-admin.users.actions.server"
+    );
+    const formData = new FormData();
+    formData.append(GOVERNED_SELECTED_ROW_ID_FIELD, "member_missing");
+
+    const result = await bulkSuspendSystemAdminUsers(undefined, formData);
+
+    expect(result.ok).toBe(false);
+    expect(result).toMatchObject({
+      code: "system-admin.users.bulk.selection_mismatch",
+    });
+    expect(mockUpdateMembershipStatus).not.toHaveBeenCalled();
+  });
+
+  it("bulk suspend rejects self-suspension", async () => {
+    mockGetMembership.mockResolvedValueOnce({
+      membershipId: "member_1",
+      authUserId: "actor_1",
+      role: "admin",
+      status: "active",
+    });
+    const { bulkSuspendSystemAdminUsers } = await import(
+      "../../src/users/actions/system-admin.users.actions.server"
+    );
+    const formData = new FormData();
+    formData.append(GOVERNED_SELECTED_ROW_ID_FIELD, "member_1");
+
+    const result = await bulkSuspendSystemAdminUsers(undefined, formData);
+
+    expect(result.ok).toBe(false);
+    expect(result).toMatchObject({
+      code: "system-admin.users.bulk.self_suspension",
+    });
+    expect(mockUpdateMembershipStatus).not.toHaveBeenCalled();
+  });
+
+  it("bulk suspend suspends valid active memberships and revalidates users", async () => {
+    const memberOne = {
+      membershipId: "member_1",
+      authUserId: "user_1",
+      role: "admin",
+      status: "active",
+    };
+    const memberTwo = {
+      membershipId: "member_2",
+      authUserId: "user_2",
+      role: "staff",
+      status: "active",
+    };
+    mockGetMembership
+      .mockResolvedValueOnce(memberOne)
+      .mockResolvedValueOnce(memberTwo)
+      .mockResolvedValueOnce(memberOne)
+      .mockResolvedValueOnce(memberTwo);
+    const { bulkSuspendSystemAdminUsers } = await import(
+      "../../src/users/actions/system-admin.users.actions.server"
+    );
+    const { revalidatePath } = await import("next/cache");
+    const formData = new FormData();
+    formData.append(GOVERNED_SELECTED_ROW_ID_FIELD, "member_1");
+    formData.append(GOVERNED_SELECTED_ROW_ID_FIELD, "member_2");
+
+    const result = await bulkSuspendSystemAdminUsers(undefined, formData);
+
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.data?.updatedCount).toBe(2);
+    }
+    expect(mockUpdateMembershipStatus).toHaveBeenCalledWith(
+      expect.objectContaining({
+        membershipId: "member_1",
+        status: "suspended",
+      }),
+    );
+    expect(mockUpdateMembershipStatus).toHaveBeenCalledWith(
+      expect.objectContaining({
+        membershipId: "member_2",
+        status: "suspended",
+      }),
+    );
+    expect(mockWriteAudit).toHaveBeenCalledWith(
+      expect.objectContaining({ action: "system-admin.user.suspend" }),
+    );
+    expect(vi.mocked(revalidatePath)).toHaveBeenCalledWith(
+      "/system-admin/users",
     );
   });
 

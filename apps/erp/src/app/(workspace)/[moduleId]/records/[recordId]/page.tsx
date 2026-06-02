@@ -1,5 +1,5 @@
-import { loadModuleRecordDetailContext } from "@/workspace-routes/workspace-route-cache";
-import { RecordDetailRoutePage } from "@/workspace-routes/record-detail-route";
+import { loadModuleRecordDetailContext } from "@/routes/workspace/shared/workspace-route-cache";
+import { RecordDetailRoutePage } from "@/routes/workspace/modules/record-detail-route";
 import type { Metadata } from "next";
 
 export const unstable_instant = {

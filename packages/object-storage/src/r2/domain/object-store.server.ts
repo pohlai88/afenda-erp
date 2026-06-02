@@ -3,6 +3,7 @@ import "server-only";
 import type { ObjectStorageR2Env } from "@afenda/config/env";
 import { uploadRouteCopy } from "@afenda/kernel";
 import {
+  DeleteObjectCommand,
   GetObjectCommand,
   HeadObjectCommand,
   PutObjectCommand,
@@ -94,6 +95,16 @@ export function createR2ObjectStore(r2: ObjectStorageR2Env): ObjectStorePort {
         Bucket: r2.bucket,
         Key: input.pathname,
         ContentType: input.contentType,
+        ...(input.governance
+          ? {
+              Metadata: {
+                organizationId: input.governance.organizationId,
+                moduleId: input.governance.moduleId,
+                classification: input.governance.classification,
+                uploadedBy: input.governance.uploadedByAuthUserId,
+              },
+            }
+          : {}),
       });
 
       const uploadUrl = await getSignedUrl(client, command, {
@@ -131,6 +142,23 @@ export function createR2ObjectStore(r2: ObjectStorageR2Env): ObjectStorePort {
       }
     },
 
+    async readObjectPrefix(pathname: string, maxBytes: number) {
+      const response = await client.send(
+        new GetObjectCommand({
+          Bucket: r2.bucket,
+          Key: pathname,
+          Range: `bytes=0-${Math.max(0, maxBytes - 1)}`,
+        }),
+      );
+
+      const body = response.Body;
+      if (!body) {
+        throw new UploadRouteError(400, uploadRouteCopy.invalidRequest);
+      }
+
+      return new Uint8Array(await body.transformToByteArray());
+    },
+
     async getSignedDownloadUrl(
       input: SignedDownloadInput,
     ): Promise<SignedDownloadResult> {
@@ -157,6 +185,19 @@ export function createR2ObjectStore(r2: ObjectStorageR2Env): ObjectStorePort {
         url,
         validUntilMs: input.validUntilMs,
       };
+    },
+
+    async deleteObject(input: { pathname: string }) {
+      try {
+        await client.send(
+          new DeleteObjectCommand({
+            Bucket: r2.bucket,
+            Key: input.pathname,
+          }),
+        );
+      } catch (error) {
+        throw mapR2HeadObjectError(error);
+      }
     },
   };
 }

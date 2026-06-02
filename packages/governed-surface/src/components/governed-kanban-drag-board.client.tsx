@@ -16,6 +16,8 @@ import { GovernedEmpty } from "./governed-empty";
 export type GovernedKanbanDragBoardProps = {
   configuration: GovernedKanbanBoardConfigurationInput;
   surfaceKey?: string;
+  sectionKey?: string;
+  componentKey?: string;
   onCardMove: (payload: KanbanCardMovePayload) => void | Promise<void>;
   isMovePending?: boolean;
   pendingCardId?: string | null;
@@ -29,6 +31,8 @@ export type GovernedKanbanDragBoardProps = {
 export function GovernedKanbanDragBoard({
   configuration,
   surfaceKey,
+  sectionKey,
+  componentKey,
   onCardMove,
   isMovePending = false,
   pendingCardId = null,
@@ -75,6 +79,8 @@ export function GovernedKanbanDragBoard({
     <KanbanBoardDragView
       board={parsed.data}
       surfaceKey={surfaceKey}
+      sectionKey={sectionKey}
+      componentKey={componentKey}
       onCardMove={onCardMove}
       isMovePending={isMovePending}
       pendingCardId={pendingCardId}

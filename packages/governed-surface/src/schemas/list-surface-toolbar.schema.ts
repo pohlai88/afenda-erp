@@ -5,6 +5,7 @@ export const listSurfaceToolbarParamSchema = z.string().trim().min(1);
 export const listSurfaceToolbarExportSchema = z
   .object({
     actionId: z.string().trim().min(1),
+    kind: z.literal("download").default("download"),
     label: z.string().trim().min(1),
     formats: z.array(z.literal("csv")).min(1),
     /** Clicks this element id when export is a client-triggered download. */
@@ -78,11 +79,21 @@ export const listSurfaceToolbarSavedViewSchema = z
   })
   .strict();
 
+export const listSurfaceToolbarActionConfirmSchema = z
+  .object({
+    title: z.string().trim().min(1),
+    description: z.string().trim().min(1).optional(),
+    confirmLabel: z.string().trim().min(1),
+  })
+  .strict();
+
 export const listSurfaceToolbarBulkActionSchema = z
   .object({
     actionId: z.string().trim().min(1),
+    kind: z.literal("server-action").default("server-action"),
     label: z.string().trim().min(1),
     disabledReason: z.string().trim().min(1).optional(),
+    confirm: listSurfaceToolbarActionConfirmSchema.optional(),
   })
   .strict();
 
@@ -124,6 +135,9 @@ export type ListSurfaceToolbarSavedView = z.infer<
 export type ListSurfaceToolbarSavedViewItem = NonNullable<
   ListSurfaceToolbarSavedView["items"]
 >[number];
+export type ListSurfaceToolbarActionConfirm = z.infer<
+  typeof listSurfaceToolbarActionConfirmSchema
+>;
 export type ListSurfaceToolbarBulkAction = z.infer<
   typeof listSurfaceToolbarBulkActionSchema
 >;

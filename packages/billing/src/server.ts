@@ -8,6 +8,7 @@ export {
   processStripeWebhookEvent,
   type StripeConfigurationStatus,
 } from "./stripe-billing.server";
+export { handleStripeWebhookPost } from "./stripe-webhook.handler.server";
 export {
   formatStripePlanPrice,
   listStripeBillingPlans,

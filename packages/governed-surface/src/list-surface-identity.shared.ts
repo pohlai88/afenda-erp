@@ -21,6 +21,8 @@ export type GovernedListSurfaceTrailingSummary = {
 
 export type GovernedListSurfaceRenderLogFields = {
   surfaceKey: string;
+  sectionKey?: string;
+  componentKey?: string;
   columnsId: string;
   dataNature: ListSurfaceRendererDataNature;
   presentationVariant: string;
@@ -36,6 +38,8 @@ export function buildGovernedListSurfaceRenderFingerprint(
 ): string {
   return [
     input.surfaceKey,
+    input.sectionKey ?? "",
+    input.componentKey ?? "",
     input.state,
     input.rowCount,
     input.columnsId,
@@ -107,6 +111,7 @@ export type GovernedListSurfaceDataAttributes = GovernedListSurfaceLegacyDataAtt
 export function buildGovernedListSurfaceDataAttributes(input: {
   surfaceKey?: string;
   sectionKey?: string;
+  componentKey?: string;
   columnsId?: string;
   dataNature?: ListSurfaceRendererDataNature;
   presentationVariant?: string;
@@ -132,7 +137,7 @@ export function buildGovernedListSurfaceDataAttributes(input: {
     ...governedIdentityAttributes({
       surfaceKey: input.surfaceKey,
       sectionKey: input.sectionKey ?? input.surfaceKey,
-      componentKey: input.surfaceKey,
+      componentKey: input.componentKey ?? input.sectionKey ?? input.surfaceKey,
     }),
     ...diagnosticsDataAttributes({
       state: input.state,

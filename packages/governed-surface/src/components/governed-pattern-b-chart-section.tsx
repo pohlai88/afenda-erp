@@ -28,6 +28,8 @@ export type GovernedPatternBChartSectionProps = {
   title: string;
   description?: string;
   surfaceKey: string;
+  sectionKey?: string;
+  componentKey?: string;
   chartConfiguration: GovernedChartConfigurationInput;
   layout?: GovernedPatternBChartSectionLayout;
   density?: GovernedPatternSectionDensity;
@@ -49,6 +51,8 @@ export async function GovernedPatternBChartSection({
   title,
   description,
   surfaceKey,
+  sectionKey,
+  componentKey,
   chartConfiguration,
   layout = "card",
   density = "comfortable",
@@ -62,15 +66,17 @@ export async function GovernedPatternBChartSection({
   contentClassName,
 }: GovernedPatternBChartSectionProps) {
   const t = await getGovernedSurfaceTranslations("Erp");
-  const sectionTestId = governedChartSectionTestId(surfaceKey);
+  const defaultSectionKey = `${surfaceKey}-chart`;
+  const resolvedSectionKey = sectionKey ?? defaultSectionKey;
+  const resolvedComponentKey = componentKey ?? resolvedSectionKey;
 
   const shellInput = {
     layout,
     density,
     className,
-    sectionTestId,
     surfaceKey,
-    sectionKey: surfaceKey,
+    sectionKey: resolvedSectionKey,
+    componentKey: resolvedComponentKey,
     headerSlot,
     title,
     description,
@@ -101,7 +107,11 @@ export async function GovernedPatternBChartSection({
       logUnexpectedServerError(
         "GovernedPatternBChartSection invalid chart configuration",
         parsed.error,
-        { surfaceKey },
+        {
+          surfaceKey,
+          sectionKey: resolvedSectionKey,
+          componentKey: resolvedComponentKey,
+        },
       );
 
       body = {
@@ -120,6 +130,8 @@ export async function GovernedPatternBChartSection({
         children: (
           <GovernedComponentRenderer
             surfaceKey={surfaceKey}
+            sectionKey={resolvedSectionKey}
+            componentKey={resolvedComponentKey}
             component={{
               type: "governed:chart",
               serverType: "governed:chart",

@@ -18,13 +18,17 @@ import {
 
 export type GovernedPatternCListTableHostProps = {
   surfaceKey: string;
+  sectionKey: string;
+  componentKey: string;
   config: ListSurfaceRendererConfiguration;
   trailingColumn?: GovernedPatternCTrailingColumnSpec;
 };
 
-function toTableTrailingColumn(
+export function resolvePatternCTableTrailingColumn(
   spec: GovernedPatternCTrailingColumnSpec | undefined,
   surfaceKey: string,
+  sectionKey: string,
+  componentKey: string,
 ): ListSurfaceTableTrailingColumn | undefined {
   if (!spec) {
     return undefined;
@@ -38,22 +42,33 @@ function toTableTrailingColumn(
     context: {
       ...resolved.context,
       surfaceKey: resolved.context?.surfaceKey ?? surfaceKey,
+      sectionKey: resolved.context?.sectionKey ?? sectionKey,
+      componentKey: resolved.context?.componentKey ?? componentKey,
     },
   };
 }
 
 export function GovernedPatternCListTableHost({
   surfaceKey,
+  sectionKey,
+  componentKey,
   config,
   trailingColumn,
 }: GovernedPatternCListTableHostProps) {
   const tableDensity = config.presentation?.tableDensity ?? "compact";
   const presentationVariant = config.presentation?.variant ?? "table-only";
-  const tableTrailing = toTableTrailingColumn(trailingColumn, surfaceKey);
+  const tableTrailing = resolvePatternCTableTrailingColumn(
+    trailingColumn,
+    surfaceKey,
+    sectionKey,
+    componentKey,
+  );
 
   return (
     <GovernedListSurfaceWithTrailingColumn
       surfaceKey={surfaceKey}
+      sectionKey={sectionKey}
+      componentKey={componentKey}
       columnsId={config.surface.columnsId}
       dataNature={config.dataNature}
       presentationVariant={presentationVariant}

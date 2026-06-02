@@ -7,6 +7,8 @@ describe("buildGovernedListSurfaceDataAttributes", () => {
     expect(
       buildGovernedListSurfaceDataAttributes({
         surfaceKey: "hr.records",
+        sectionKey: "active-records",
+        componentKey: "records-list",
         columnsId: "hr-records-v1",
         dataNature: "table",
         presentationVariant: "table-only",
@@ -21,8 +23,8 @@ describe("buildGovernedListSurfaceDataAttributes", () => {
       "data-governed-data-nature": "table",
       "data-governed-presentation-variant": "table-only",
       "data-surface-key": "hr.records",
-      "data-section-key": "hr.records",
-      "data-component-key": "hr.records",
+      "data-section-key": "active-records",
+      "data-component-key": "records-list",
       "data-render-state": "ready",
       "data-testid": "governed:list-surface:hr.records",
     });

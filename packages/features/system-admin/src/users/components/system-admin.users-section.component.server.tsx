@@ -1,6 +1,7 @@
 import { GovernedPatternCListSection } from "@afenda/governed-surface/server";
 import { SectionPanel } from "@afenda/ui";
 import type { SystemAdminUserRow } from "../contracts";
+import { registerSystemAdminUsersGovernedActions } from "../actions/system-admin.users-governed-actions.server";
 import {
   buildUsersListSurface,
   systemAdminUsersSurfaceKey,
@@ -20,6 +21,7 @@ export function SystemAdminUsersSection({
   totalCount?: number;
 }) {
   const copy = systemAdminUsersUiCopy.section;
+  registerSystemAdminUsersGovernedActions();
   const listConfiguration = buildUsersListSurface({
     users,
     canMutate,

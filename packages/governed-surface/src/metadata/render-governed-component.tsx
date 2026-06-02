@@ -12,6 +12,8 @@ export type GovernedComponentRendererProps = {
   registry?: AfendaGovernedComponentRegistry;
   diagnostics?: GovernedComponentRendererDiagnostics;
   surfaceKey?: string;
+  sectionKey?: string;
+  componentKey?: string;
 };
 
 /**
@@ -26,6 +28,8 @@ export function GovernedComponentRenderer({
   registry,
   diagnostics = "user",
   surfaceKey,
+  sectionKey,
+  componentKey,
 }: GovernedComponentRendererProps): ReactNode {
   return (
     <GovernedComponentTree
@@ -33,6 +37,8 @@ export function GovernedComponentRenderer({
       registry={registry}
       diagnostics={diagnostics}
       surfaceKey={surfaceKey}
+      sectionKey={sectionKey}
+      componentKey={componentKey}
     />
   );
 }

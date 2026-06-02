@@ -30,15 +30,19 @@ export const appCapabilities = [
   "finance.view",
   "finance.documents.read",
   "finance.documents.write",
+  "finance.documents.sensitive.read",
   "sales.view",
   "sales.documents.read",
   "sales.documents.write",
+  "sales.documents.sensitive.read",
   "purchasing.view",
   "purchasing.documents.read",
   "purchasing.documents.write",
+  "purchasing.documents.sensitive.read",
   "inventory.view",
   "inventory.documents.read",
   "inventory.documents.write",
+  "inventory.documents.sensitive.read",
   "hr.view",
   "hr.employees.read",
   "hr.employees.write",
@@ -204,13 +208,16 @@ export const appCapabilities = [
   "crm.view",
   "crm.documents.read",
   "crm.documents.write",
+  "crm.documents.sensitive.read",
   "approvals.view",
   "approvals.decide",
   "approvals.documents.read",
   "approvals.documents.write",
+  "approvals.documents.sensitive.read",
   "reports.view",
   "reports.documents.read",
   "reports.documents.write",
+  "reports.documents.sensitive.read",
   "system-admin.view",
   "system-admin.documents.read",
   "system-admin.documents.write",
@@ -475,6 +482,34 @@ export function hasDocumentWriteAccess(
 
   const writeCap = documentWriteCapability(moduleId);
   return writeCap !== null && capabilities.includes(writeCap);
+}
+
+export function documentSensitiveReadCapability(
+  moduleId: string,
+): AppCapability | null {
+  const hrSensitive = "hr.documents.sensitive.read";
+  if (moduleId === "hr" && isAppCapability(hrSensitive)) {
+    return hrSensitive;
+  }
+
+  const moduleSensitive = `${moduleId}.documents.sensitive.read`;
+  if (isAppCapability(moduleSensitive)) {
+    return moduleSensitive;
+  }
+
+  return null;
+}
+
+export function hasDocumentSensitiveReadAccess(
+  capabilities: readonly AppCapability[],
+  moduleId: string,
+): boolean {
+  if (capabilities.includes("system-admin.security.read")) {
+    return true;
+  }
+
+  const sensitiveCap = documentSensitiveReadCapability(moduleId);
+  return sensitiveCap !== null && capabilities.includes(sensitiveCap);
 }
 
 const appCapabilitySet = new Set<string>(appCapabilities);

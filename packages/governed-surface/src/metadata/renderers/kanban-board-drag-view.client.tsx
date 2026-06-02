@@ -10,10 +10,10 @@ import {
   buildKanbanCardMovePayload,
   governedKanbanCardTestId,
   isKanbanCardDraggable,
-  resolveKanbanBoardDomProps,
   resolveKanbanCardDropState,
   type KanbanCardMovePayload,
 } from "../../client";
+import { buildKanbanBoardDataAttributes } from "../../kanban-surface-identity.shared";
 
 import {
   groupCardsByColumn,
@@ -27,6 +27,8 @@ import {
 export type KanbanBoardDragViewProps = {
   board: GovernedKanbanBoardConfiguration;
   surfaceKey?: string;
+  sectionKey?: string;
+  componentKey?: string;
   onCardMove: (payload: KanbanCardMovePayload) => void;
   /** When true, suppresses new drags while a move is in flight. */
   isMovePending?: boolean;
@@ -40,6 +42,8 @@ type DragSession = {
 export function KanbanBoardDragView({
   board,
   surfaceKey,
+  sectionKey,
+  componentKey,
   onCardMove,
   isMovePending = false,
   pendingCardId = null,
@@ -123,7 +127,12 @@ export function KanbanBoardDragView({
     endDrag();
   }
 
-  const boardDom = resolveKanbanBoardDomProps(surfaceKey, "ready");
+  const boardDom = buildKanbanBoardDataAttributes({
+    surfaceKey,
+    sectionKey,
+    componentKey,
+    state: "ready",
+  });
 
   return (
     <section

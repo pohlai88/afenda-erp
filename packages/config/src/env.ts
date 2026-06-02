@@ -90,6 +90,17 @@ const aiEnvSchema = z.object({
   VERCEL_ENV: optionalNonEmptyEnvString,
 });
 
+const documentAvEnvSchema = z.object({
+  DOCUMENT_AV_API_URL: optionalNonEmptyEnvString,
+  DOCUMENT_AV_API_KEY: optionalNonEmptyEnvString,
+  DOCUMENT_AV_WEBHOOK_SECRET: optionalNonEmptyEnvString,
+  DOCUMENT_AV_STALE_SCANNING_MINUTES: z.coerce
+    .number()
+    .int()
+    .positive()
+    .default(30),
+});
+
 export type BaseEnv = z.infer<typeof baseEnvSchema>;
 export type DatabaseEnv = z.infer<typeof databaseEnvSchema>;
 export type AiEnv = z.infer<typeof aiEnvSchema>;
@@ -122,6 +133,13 @@ export type ObjectStorageEnv = {
   configured: boolean;
   vercelBlob?: BlobEnv & { BLOB_READ_WRITE_TOKEN: string };
   r2?: ObjectStorageR2Env;
+};
+
+export type DocumentAvEnv = {
+  apiUrl?: string;
+  apiKey?: string;
+  webhookSecret?: string;
+  staleScanningMinutes: number;
 };
 
 export function getBaseEnv(input: NodeJS.ProcessEnv = process.env): BaseEnv {
@@ -189,6 +207,29 @@ export function getVercelDrainSecret(
 ): string | undefined {
   const parsed = observabilityEnvSchema.safeParse(input);
   return parsed.success ? parsed.data.VERCEL_DRAIN_SECRET : undefined;
+}
+
+export function getDocumentAvEnv(
+  input: NodeJS.ProcessEnv = process.env,
+): DocumentAvEnv {
+  const parsed = documentAvEnvSchema.safeParse(input);
+
+  if (!parsed.success) {
+    return { staleScanningMinutes: 30 };
+  }
+
+  return {
+    apiUrl: parsed.data.DOCUMENT_AV_API_URL,
+    apiKey: parsed.data.DOCUMENT_AV_API_KEY,
+    webhookSecret: parsed.data.DOCUMENT_AV_WEBHOOK_SECRET,
+    staleScanningMinutes: parsed.data.DOCUMENT_AV_STALE_SCANNING_MINUTES,
+  };
+}
+
+export function getDocumentAvWebhookSecret(
+  input: NodeJS.ProcessEnv = process.env,
+): string | undefined {
+  return getDocumentAvEnv(input).webhookSecret;
 }
 
 export function getBlobEnv(input: NodeJS.ProcessEnv = process.env): BlobEnv {

@@ -3,6 +3,11 @@ import {
   GOVERNED_KANBAN_BOARD_SCHEMA_ID,
   parseGovernedKanbanBoardConfiguration,
 } from "../../schemas/kanban-board.schema";
+import { diagnosticsDataAttributes } from "../../utils/governed-diagnostics.shared";
+import {
+  governedIdentityAttributes,
+  governedTestId,
+} from "../../utils/governed-identity.shared";
 
 import type { RendererProps } from "../governed-renderer-dispatch";
 import type { GovernedComponentRendererDiagnostics } from "../registry";
@@ -20,7 +25,10 @@ export function KanbanBoardRenderer({
   configuration,
   diagnostics = "user",
   surfaceKey,
+  sectionKey,
+  componentKey,
 }: KanbanBoardRendererProps) {
+  const resolvedComponentKey = componentKey ?? sectionKey ?? surfaceKey ?? "kanban-board";
   const parsed = parseGovernedKanbanBoardConfiguration(configuration);
 
   if (!parsed.success) {
@@ -58,6 +66,10 @@ export function KanbanBoardRenderer({
             description,
             emptyId: "kanban-board-parse-error",
           }}
+          surfaceKey={surfaceKey}
+          sectionKey={sectionKey}
+          componentKey={resolvedComponentKey}
+          renderState="invalid"
         />
       </div>
     );
@@ -78,6 +90,9 @@ export function KanbanBoardRenderer({
             description,
             emptyId: "kanban-board-footer-actions-unavailable",
           }}
+          surfaceKey={surfaceKey}
+          sectionKey={sectionKey}
+          componentKey={resolvedComponentKey}
         />
       </div>
     );
@@ -98,14 +113,34 @@ export function KanbanBoardRenderer({
             description,
             emptyId: "kanban-board-drag-unavailable",
           }}
+          surfaceKey={surfaceKey}
+          sectionKey={sectionKey}
+          componentKey={resolvedComponentKey}
         />
       </div>
     );
   }
 
   return (
-    <div className={KANBAN_RENDERER_SHELL_CLASS}>
-      <KanbanBoardView board={parsed.data} surfaceKey={surfaceKey} />
+    <div
+      className={KANBAN_RENDERER_SHELL_CLASS}
+      {...governedIdentityAttributes({
+        surfaceKey,
+        sectionKey,
+        componentKey: resolvedComponentKey,
+      })}
+      {...diagnosticsDataAttributes({
+        state: "ready",
+        testId: governedTestId("kanban-board-renderer", resolvedComponentKey),
+        componentType: "governed:kanban-board",
+      })}
+    >
+      <KanbanBoardView
+        board={parsed.data}
+        surfaceKey={surfaceKey}
+        sectionKey={sectionKey}
+        componentKey={resolvedComponentKey}
+      />
     </div>
   );
 }

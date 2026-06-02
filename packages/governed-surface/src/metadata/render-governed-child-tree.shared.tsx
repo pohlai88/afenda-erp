@@ -14,6 +14,11 @@ import type { GovernedComponentRendererDiagnostics } from "./registry";
 export function renderGovernedChildTree(
   children: unknown[],
   diagnostics: GovernedComponentRendererDiagnostics,
+  identity?: {
+    surfaceKey?: string;
+    sectionKey?: string;
+    componentKey?: string;
+  },
 ): ReactNode {
   return children.map((child, index) => {
     const parsed = parseGovernedComponentData(child);
@@ -39,6 +44,13 @@ export function renderGovernedChildTree(
         key={`${parsed.data.type}-${index}`}
         component={parsed.data as GovernedComponent}
         diagnostics={diagnostics}
+        surfaceKey={identity?.surfaceKey}
+        sectionKey={identity?.sectionKey}
+        componentKey={
+          identity?.componentKey
+            ? `${identity.componentKey}-${parsed.data.type}-${index}`
+            : undefined
+        }
       />
     );
   });

@@ -1,11 +1,20 @@
 import React from "react";
 
+import {
+  ExecutionAccessDeniedError,
+  ExecutionContextRequiredError,
+} from "@afenda/kernel/execution";
 import { SectionPanel } from "@afenda/ui";
 
 import {
   HrLifecycleAccessDeniedPanel,
   HrLifecycleWorkbenchSection,
 } from "./components/hr.workforce.lifecycle-section.component.server";
+import {
+  buildHrLifecyclePageModel,
+  toHrLifecyclePageModelInput,
+} from "./data";
+import { requireHrLifecycleRead } from "./policies/hr.workforce.lifecycle-access.policy.server";
 
 /**
  * Server door — employee-management/employee-lifecycle-management
@@ -44,4 +53,40 @@ export function HrLifecycleSection({
     { headingLevel: 2, title, description },
     children,
   );
+}
+
+function isLifecycleAccessFailure(error: unknown) {
+  return (
+    error instanceof ExecutionAccessDeniedError ||
+    error instanceof ExecutionContextRequiredError
+  );
+}
+
+export async function renderHrLifecyclePage(
+  searchParams?: Promise<Record<string, string | string[] | undefined>>,
+) {
+  let guard: Awaited<ReturnType<typeof requireHrLifecycleRead>>;
+  let resolvedSearchParams: Record<string, string | string[] | undefined> | undefined;
+
+  try {
+    [guard, resolvedSearchParams] = await Promise.all([
+      requireHrLifecycleRead(),
+      searchParams ?? Promise.resolve(undefined),
+    ]);
+  } catch (error) {
+    if (isLifecycleAccessFailure(error)) {
+      return React.createElement(HrLifecycleAccessDeniedPanel);
+    }
+    throw error;
+  }
+
+  const model = await buildHrLifecyclePageModel(
+    toHrLifecyclePageModelInput({
+      organizationId: guard.organization.id,
+      canWrite: guard.hasCapability("hr.lifecycle.write"),
+      searchParams: resolvedSearchParams,
+    }),
+  );
+
+  return React.createElement(HrLifecycleWorkbenchSection, { model });
 }

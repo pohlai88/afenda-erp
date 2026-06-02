@@ -2226,6 +2226,20 @@ export async function listRetentionPolicies(input: {
   );
 }
 
+export async function getRetentionPolicy(input: {
+  organizationId: string;
+  entityType: (typeof retentionPolicies.$inferInsert)["entityType"];
+}) {
+  return runWithOrganizationContext(input.organizationId, async (db) =>
+    db.query.retentionPolicies.findFirst({
+      where: and(
+        eq(retentionPolicies.organizationId, input.organizationId),
+        eq(retentionPolicies.entityType, input.entityType),
+      ),
+    }),
+  );
+}
+
 export async function upsertRetentionPolicy(input: {
   organizationId: string;
   entityType: (typeof retentionPolicies.$inferInsert)["entityType"];
@@ -2278,6 +2292,13 @@ export async function getOrganizationProfile(input: {
       where: eq(organizations.id, input.organizationId),
     }),
   );
+}
+
+export async function getOrganizationObjectStorageProvider(input: {
+  organizationId: string;
+}): Promise<"vercel-blob" | "r2" | null> {
+  const profile = await getOrganizationProfile(input);
+  return profile?.objectStorageProvider ?? null;
 }
 
 export async function createCronRunHistory(input: {

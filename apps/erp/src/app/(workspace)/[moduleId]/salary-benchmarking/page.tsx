@@ -1,3 +1,3 @@
-import HrSalaryBenchmarkingHubPage from "@/workspace-routes/hr-salary-benchmarking-hub.server";
-export { metadata } from "@/workspace-routes/hr-salary-benchmarking-hub.server";
+import HrSalaryBenchmarkingHubPage from "@/routes/workspace/modules/hr-salary-benchmarking-hub.server";
+export { metadata } from "@/routes/workspace/modules/hr-salary-benchmarking-hub.server";
 export default HrSalaryBenchmarkingHubPage;

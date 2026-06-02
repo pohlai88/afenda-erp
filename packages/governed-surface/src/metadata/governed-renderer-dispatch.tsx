@@ -27,6 +27,8 @@ export type RendererProps = {
   /** Governed component type literal — forwarded for telemetry and error context. */
   componentType: string;
   surfaceKey?: string;
+  sectionKey?: string;
+  componentKey?: string;
 };
 
 export type RenderGovernedRendererArgs = {
@@ -35,6 +37,8 @@ export type RenderGovernedRendererArgs = {
   configuration: unknown;
   diagnostics: GovernedComponentRendererDiagnostics;
   surfaceKey?: string;
+  sectionKey?: string;
+  componentKey?: string;
 };
 
 /**
@@ -69,6 +73,8 @@ export function renderGovernedRendererById({
   configuration,
   diagnostics,
   surfaceKey,
+  sectionKey,
+  componentKey,
 }: RenderGovernedRendererArgs): ReactNode {
   // `satisfies` preserves the narrow concrete renderer types, so the lookup
   // returns a union of specific function signatures. Cast to the shared
@@ -100,6 +106,8 @@ export function renderGovernedRendererById({
       diagnostics={diagnostics}
       componentType={componentType}
       surfaceKey={surfaceKey}
+      sectionKey={sectionKey}
+      componentKey={componentKey}
     />
   );
 }

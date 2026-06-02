@@ -4,5 +4,6 @@ export {
   SystemAdminDataManagementAccessDenied,
   SystemAdminDataManagementSection,
 } from "./system-admin.data-management-section.component.server";
+export { SystemAdminDataManagementPage } from "./system-admin.data-management-page.component.server";
 export * from "./system-admin.data-management-summary.component.server";
 export * from "./system-admin.import-jobs-trailing-cells.component.client";

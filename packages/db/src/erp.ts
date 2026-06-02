@@ -7,22 +7,32 @@ import {
   gte,
   inArray,
   lte,
+  or,
   sql,
   sum,
   type SQL,
 } from "drizzle-orm";
 import { createAuditLog } from "./audit";
+import {
+  isErpDocumentRowOnLegalHold,
+  isOrganizationDocumentLegalHoldActive,
+} from "./document-legal-hold.server";
 import { getDb, runWithOrganizationContext } from "./client";
 import type { AfendaTransaction } from "./tenant-context";
 import { createEntityId } from "./ids";
 import {
+  auditLogs,
   erpDocuments,
   erpModuleRecords,
   erpSavedViews,
   erpWorkItems,
   organizations,
 } from "./schema";
+import { hrEmployeeDocuments } from "./schema/hr";
 
+import {
+  clampPageSize,
+} from "./list-window.shared";
 import {
   coreModuleIds,
   moduleIds,
@@ -92,6 +102,21 @@ export type TenantErpWorkItemWindowQuery = {
 
 export type ErpDocumentRetentionClass = "standard" | "short-term" | "legal-hold";
 
+export type ErpDocumentClassification =
+  | "public"
+  | "internal"
+  | "confidential"
+  | "restricted"
+  | "highly-restricted"
+  | "regulated";
+
+export type ErpDocumentScanStatus =
+  | "pending"
+  | "scanning"
+  | "passed"
+  | "failed"
+  | "quarantined";
+
 export type TenantErpDocument = {
   id: string;
   title: string;
@@ -100,7 +125,9 @@ export type TenantErpDocument = {
   access: ErpDocumentAccess;
   /** ETag returned by Vercel Blob — the store's content integrity identifier. */
   blobEtag: string | null;
+  classification: ErpDocumentClassification;
   retentionClass: ErpDocumentRetentionClass;
+  scanStatus: ErpDocumentScanStatus;
   createdAt: Date;
 };
 
@@ -110,6 +137,22 @@ export type TenantErpDocumentWindowQuery = {
 
 export type TenantErpDocumentWindow = {
   rows: readonly TenantErpDocument[];
+  pageSize: number;
+  totalCount: number;
+  hasNextPage: boolean;
+  nextCursor?: string;
+};
+
+export type TenantErpDocumentQuarantineRow = TenantErpDocument & {
+  moduleId: ErpModuleId;
+};
+
+export type TenantErpDocumentQuarantineWindowQuery = {
+  cursor?: string;
+};
+
+export type TenantErpDocumentQuarantineWindow = {
+  rows: readonly TenantErpDocumentQuarantineRow[];
   pageSize: number;
   totalCount: number;
   hasNextPage: boolean;
@@ -193,22 +236,10 @@ export type TenantErpWorkItemWindow = {
   nextCursor?: string;
 };
 
-function decodeWindowOffset(cursor: string | undefined) {
-  if (!cursor) {
-    return 0;
-  }
-
-  const match = /^offset:(\d+)$/.exec(cursor);
-  if (!match) {
-    return 0;
-  }
-
-  return Number(match[1]);
-}
-
-function encodeWindowOffset(offset: number) {
-  return `offset:${offset}`;
-}
+import {
+  decodeWindowOffset,
+  encodeWindowOffset,
+} from "./window-pagination.shared";
 
 function recordOrderBy(sort: TenantErpRecordSort | undefined): SQL[] {
   switch (sort) {
@@ -854,14 +885,16 @@ export async function listTenantDocumentWindow(input: {
     const [rows, totalRows] = await Promise.all([
       db
         .select({
-          id: erpDocuments.id,
-          title: erpDocuments.title,
-          contentType: erpDocuments.contentType,
-          sizeBytes: erpDocuments.sizeBytes,
-          access: erpDocuments.access,
-          blobEtag: erpDocuments.blobEtag,
-          retentionClass: erpDocuments.retentionClass,
-          createdAt: erpDocuments.createdAt,
+        id: erpDocuments.id,
+        title: erpDocuments.title,
+        contentType: erpDocuments.contentType,
+        sizeBytes: erpDocuments.sizeBytes,
+        access: erpDocuments.access,
+        blobEtag: erpDocuments.blobEtag,
+        classification: erpDocuments.classification,
+        retentionClass: erpDocuments.retentionClass,
+        scanStatus: erpDocuments.scanStatus,
+        createdAt: erpDocuments.createdAt,
         })
         .from(erpDocuments)
         .where(whereClause)
@@ -907,9 +940,14 @@ export async function getTenantDocument(input: {
         id: erpDocuments.id,
         title: erpDocuments.title,
         pathname: erpDocuments.pathname,
+        blobUrl: erpDocuments.blobUrl,
         contentType: erpDocuments.contentType,
+        sizeBytes: erpDocuments.sizeBytes,
         access: erpDocuments.access,
         moduleId: erpDocuments.moduleId,
+        classification: erpDocuments.classification,
+        retentionClass: erpDocuments.retentionClass,
+        scanStatus: erpDocuments.scanStatus,
       })
       .from(erpDocuments)
       .where(
@@ -925,6 +963,37 @@ export async function getTenantDocument(input: {
   });
 }
 
+export async function getOrganizationDocumentStorageBytes(input: {
+  organizationId: string;
+}): Promise<number> {
+  return runWithOrganizationContext(input.organizationId, async (db) => {
+    const [erpRows, hrRows] = await Promise.all([
+      db
+        .select({
+          totalBytes: sum(erpDocuments.sizeBytes),
+        })
+        .from(erpDocuments)
+        .where(eq(erpDocuments.organizationId, input.organizationId)),
+      db
+        .select({
+          totalBytes: sum(hrEmployeeDocuments.sizeBytes),
+        })
+        .from(hrEmployeeDocuments)
+        .where(
+          and(
+            eq(hrEmployeeDocuments.organizationId, input.organizationId),
+            eq(hrEmployeeDocuments.isLatestActive, true),
+            eq(hrEmployeeDocuments.lifecycleStatus, "active"),
+          ),
+        ),
+    ]);
+
+    return (
+      Number(erpRows[0]?.totalBytes ?? 0) + Number(hrRows[0]?.totalBytes ?? 0)
+    );
+  });
+}
+
 export async function registerTenantDocument(input: {
   organizationId: string;
   moduleId: ErpModuleId;
@@ -937,8 +1006,11 @@ export async function registerTenantDocument(input: {
   access: ErpDocumentAccess;
   /** ETag returned by Vercel Blob on upload. */
   blobEtag?: string | null;
+  classification?: ErpDocumentClassification;
   /** Retention class per org data-handling policy (ARCH-1001). Defaults to 'standard'. */
   retentionClass?: ErpDocumentRetentionClass;
+  /** Malware scan status — defaults to passed until AV pipeline ships. */
+  scanStatus?: ErpDocumentScanStatus;
   uploadedByAuthUserId: string;
   metadata: Record<string, unknown>;
 }) {
@@ -971,7 +1043,9 @@ export async function registerTenantDocument(input: {
       sizeBytes: input.sizeBytes,
       access: input.access,
       blobEtag: input.blobEtag ?? null,
+      classification: input.classification ?? "internal",
       retentionClass: input.retentionClass ?? "standard",
+      scanStatus: input.scanStatus ?? "pending",
       uploadedByAuthUserId: input.uploadedByAuthUserId,
       metadata: input.metadata,
     });
@@ -990,11 +1064,553 @@ export async function registerTenantDocument(input: {
         sizeBytes: input.sizeBytes,
         access: input.access,
         blobEtag: input.blobEtag ?? null,
+        classification: input.classification ?? "internal",
         retentionClass: input.retentionClass ?? "standard",
+        scanStatus: input.scanStatus ?? "pending",
       },
     });
 
     return documentId;
+  });
+}
+
+export async function updateTenantDocumentScanStatus(input: {
+  organizationId: string;
+  documentId: string;
+  scanStatus: ErpDocumentScanStatus;
+}) {
+  return runWithOrganizationContext(input.organizationId, async (db) => {
+    await db
+      .update(erpDocuments)
+      .set({
+        scanStatus: input.scanStatus,
+        updatedAt: new Date(),
+      })
+      .where(
+        and(
+          eq(erpDocuments.organizationId, input.organizationId),
+          eq(erpDocuments.id, input.documentId),
+        ),
+      );
+  });
+}
+
+export async function listTenantDocumentsByScanStatus(input: {
+  organizationId: string;
+  scanStatuses: readonly ErpDocumentScanStatus[];
+  limit?: number;
+  query?: TenantErpDocumentQuarantineWindowQuery;
+}): Promise<TenantErpDocumentQuarantineWindow> {
+  const pageSize = clampPageSize(input.limit);
+  const offset = decodeWindowOffset(input.query?.cursor);
+  const scanStatuses =
+    input.scanStatuses.length > 0
+      ? input.scanStatuses
+      : (["failed", "quarantined"] as const);
+
+  return runWithOrganizationContext(input.organizationId, async (db) => {
+    const whereClause = and(
+      eq(erpDocuments.organizationId, input.organizationId),
+      inArray(erpDocuments.scanStatus, [...scanStatuses]),
+    );
+    const [rows, totalRows] = await Promise.all([
+      db
+        .select({
+          id: erpDocuments.id,
+          moduleId: erpDocuments.moduleId,
+          title: erpDocuments.title,
+          contentType: erpDocuments.contentType,
+          sizeBytes: erpDocuments.sizeBytes,
+          access: erpDocuments.access,
+          blobEtag: erpDocuments.blobEtag,
+          classification: erpDocuments.classification,
+          retentionClass: erpDocuments.retentionClass,
+          scanStatus: erpDocuments.scanStatus,
+          createdAt: erpDocuments.createdAt,
+        })
+        .from(erpDocuments)
+        .where(whereClause)
+        .orderBy(desc(erpDocuments.updatedAt), desc(erpDocuments.createdAt))
+        .limit(pageSize + 1)
+        .offset(offset),
+      db.select({ value: count() }).from(erpDocuments).where(whereClause),
+    ]);
+    const visibleRows = rows.slice(0, pageSize);
+    const hasNextPage = rows.length > pageSize;
+    const nextCursor = hasNextPage
+      ? encodeWindowOffset(offset + pageSize)
+      : undefined;
+
+    return {
+      rows: visibleRows,
+      pageSize,
+      totalCount: Number(totalRows[0]?.value ?? 0),
+      hasNextPage,
+      ...(nextCursor ? { nextCursor } : {}),
+    };
+  });
+}
+
+export async function listTenantDocumentsPendingScan(input: {
+  organizationId: string;
+  limit?: number;
+  staleScanningBefore?: Date;
+}) {
+  const limit = Math.min(Math.max(input.limit ?? 100, 1), 500);
+  const staleScanningBefore = input.staleScanningBefore ?? new Date();
+
+  return runWithOrganizationContext(input.organizationId, async (db) => {
+    return db
+      .select({
+        id: erpDocuments.id,
+        moduleId: erpDocuments.moduleId,
+        title: erpDocuments.title,
+        pathname: erpDocuments.pathname,
+        blobUrl: erpDocuments.blobUrl,
+        contentType: erpDocuments.contentType,
+        sizeBytes: erpDocuments.sizeBytes,
+        scanStatus: erpDocuments.scanStatus,
+        updatedAt: erpDocuments.updatedAt,
+      })
+      .from(erpDocuments)
+      .where(
+        and(
+          eq(erpDocuments.organizationId, input.organizationId),
+          or(
+            eq(erpDocuments.scanStatus, "pending"),
+            and(
+              eq(erpDocuments.scanStatus, "scanning"),
+              lte(erpDocuments.updatedAt, staleScanningBefore),
+            ),
+          ),
+        ),
+      )
+      .orderBy(asc(erpDocuments.updatedAt))
+      .limit(limit);
+  });
+}
+
+/** Atomically marks a document as scanning — skips if another worker claimed it. */
+export async function claimTenantDocumentForScan(input: {
+  organizationId: string;
+  documentId: string;
+  staleScanningBefore?: Date;
+}): Promise<boolean> {
+  const staleScanningBefore = input.staleScanningBefore ?? new Date();
+
+  return runWithOrganizationContext(input.organizationId, async (db) => {
+    const rows = await db
+      .update(erpDocuments)
+      .set({
+        scanStatus: "scanning",
+        updatedAt: new Date(),
+      })
+      .where(
+        and(
+          eq(erpDocuments.organizationId, input.organizationId),
+          eq(erpDocuments.id, input.documentId),
+          or(
+            eq(erpDocuments.scanStatus, "pending"),
+            and(
+              eq(erpDocuments.scanStatus, "scanning"),
+              lte(erpDocuments.updatedAt, staleScanningBefore),
+            ),
+          ),
+        ),
+      )
+      .returning({ id: erpDocuments.id });
+
+    return rows.length > 0;
+  });
+}
+
+export class TenantDocumentMutationError extends Error {
+  readonly code:
+    | "not_found"
+    | "legal_hold"
+    | "not_on_legal_hold"
+    | "scan_not_releasable";
+
+  constructor(
+    code:
+      | "not_found"
+      | "legal_hold"
+      | "not_on_legal_hold"
+      | "scan_not_releasable",
+  ) {
+    super(code);
+    this.code = code;
+  }
+}
+
+const SHORT_TERM_RETENTION_DAYS = 30;
+
+export async function listTenantDocumentsPastRetentionExpiry(input: {
+  organizationId: string;
+  limit?: number;
+  before?: Date;
+}) {
+  const limit = Math.min(Math.max(input.limit ?? 100, 1), 500);
+  const before = input.before ?? new Date();
+  const createdBefore = new Date(before);
+  createdBefore.setUTCDate(
+    createdBefore.getUTCDate() - SHORT_TERM_RETENTION_DAYS,
+  );
+
+  return runWithOrganizationContext(input.organizationId, async (db) => {
+    return db
+      .select({
+        id: erpDocuments.id,
+        moduleId: erpDocuments.moduleId,
+        title: erpDocuments.title,
+        retentionClass: erpDocuments.retentionClass,
+        createdAt: erpDocuments.createdAt,
+      })
+      .from(erpDocuments)
+      .where(
+        and(
+          eq(erpDocuments.organizationId, input.organizationId),
+          eq(erpDocuments.retentionClass, "short-term"),
+          lte(erpDocuments.createdAt, createdBefore),
+        ),
+      )
+      .orderBy(asc(erpDocuments.createdAt))
+      .limit(limit);
+  });
+}
+
+export async function getTenantDocumentStorageRef(input: {
+  organizationId: string;
+  documentId: string;
+}) {
+  return runWithOrganizationContext(input.organizationId, async (db) => {
+    const rows = await db
+      .select({
+        id: erpDocuments.id,
+        title: erpDocuments.title,
+        moduleId: erpDocuments.moduleId,
+        pathname: erpDocuments.pathname,
+        blobUrl: erpDocuments.blobUrl,
+        classification: erpDocuments.classification,
+        retentionClass: erpDocuments.retentionClass,
+        scanStatus: erpDocuments.scanStatus,
+      })
+      .from(erpDocuments)
+      .where(
+        and(
+          eq(erpDocuments.organizationId, input.organizationId),
+          eq(erpDocuments.id, input.documentId),
+        ),
+      )
+      .limit(1);
+
+    return rows[0] ?? null;
+  });
+}
+
+export async function applyTenantDocumentLegalHold(input: {
+  organizationId: string;
+  documentId: string;
+  actorAuthUserId: string;
+}) {
+  return runWithOrganizationContext(input.organizationId, async (db) => {
+    const rows = await db
+      .select({
+        id: erpDocuments.id,
+        title: erpDocuments.title,
+        retentionClass: erpDocuments.retentionClass,
+      })
+      .from(erpDocuments)
+      .where(
+        and(
+          eq(erpDocuments.organizationId, input.organizationId),
+          eq(erpDocuments.id, input.documentId),
+        ),
+      )
+      .limit(1);
+
+    const document = rows[0];
+    if (!document) {
+      throw new TenantDocumentMutationError("not_found");
+    }
+
+    if (document.retentionClass === "legal-hold") {
+      return document;
+    }
+
+    await db
+      .update(erpDocuments)
+      .set({ retentionClass: "legal-hold" })
+      .where(
+        and(
+          eq(erpDocuments.organizationId, input.organizationId),
+          eq(erpDocuments.id, input.documentId),
+        ),
+      );
+
+    await createAuditLog({
+      organizationId: input.organizationId,
+      actorAuthUserId: input.actorAuthUserId,
+      entityType: "document",
+      entityId: document.id,
+      action: "document.legal-hold",
+      summary: `Applied legal hold to document ${document.title}.`,
+      metadata: {
+        previousRetentionClass: document.retentionClass,
+        retentionClass: "legal-hold",
+      },
+    });
+
+    return document;
+  });
+}
+
+function parseAuditMetadataPreviousRetentionClass(
+  metadata: Record<string, unknown> | string | null | undefined,
+): string | undefined {
+  if (!metadata) {
+    return undefined;
+  }
+
+  if (typeof metadata === "object") {
+    const previousRetentionClass = metadata.previousRetentionClass;
+    return typeof previousRetentionClass === "string"
+      ? previousRetentionClass
+      : undefined;
+  }
+
+  try {
+    const parsed = JSON.parse(metadata) as { previousRetentionClass?: string };
+    return typeof parsed.previousRetentionClass === "string"
+      ? parsed.previousRetentionClass
+      : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+export async function releaseTenantDocumentLegalHold(input: {
+  organizationId: string;
+  documentId: string;
+  actorAuthUserId: string;
+}) {
+  return runWithOrganizationContext(input.organizationId, async (db) => {
+    const rows = await db
+      .select({
+        id: erpDocuments.id,
+        title: erpDocuments.title,
+        retentionClass: erpDocuments.retentionClass,
+      })
+      .from(erpDocuments)
+      .where(
+        and(
+          eq(erpDocuments.organizationId, input.organizationId),
+          eq(erpDocuments.id, input.documentId),
+        ),
+      )
+      .limit(1);
+
+    const document = rows[0];
+    if (!document) {
+      throw new TenantDocumentMutationError("not_found");
+    }
+
+    if (!isErpDocumentRowOnLegalHold(document.retentionClass)) {
+      throw new TenantDocumentMutationError("not_on_legal_hold");
+    }
+
+    const holdAuditRows = await db
+      .select({ metadata: auditLogs.metadata })
+      .from(auditLogs)
+      .where(
+        and(
+          eq(auditLogs.organizationId, input.organizationId),
+          eq(auditLogs.entityId, input.documentId),
+          eq(auditLogs.action, "document.legal-hold"),
+        ),
+      )
+      .orderBy(desc(auditLogs.createdAt))
+      .limit(1);
+
+    const restoredRetentionClass: ErpDocumentRetentionClass =
+      (parseAuditMetadataPreviousRetentionClass(holdAuditRows[0]?.metadata) ??
+        "standard") as ErpDocumentRetentionClass;
+
+    await db
+      .update(erpDocuments)
+      .set({
+        retentionClass: restoredRetentionClass,
+        updatedAt: new Date(),
+      })
+      .where(
+        and(
+          eq(erpDocuments.organizationId, input.organizationId),
+          eq(erpDocuments.id, input.documentId),
+        ),
+      );
+
+    await createAuditLog({
+      organizationId: input.organizationId,
+      actorAuthUserId: input.actorAuthUserId,
+      entityType: "document",
+      entityId: document.id,
+      action: "document.legal-hold-released",
+      summary: `Released legal hold on document ${document.title}.`,
+      metadata: {
+        previousRetentionClass: "legal-hold",
+        retentionClass: restoredRetentionClass,
+      },
+    });
+
+    return {
+      id: document.id,
+      title: document.title,
+      retentionClass: restoredRetentionClass,
+    };
+  });
+}
+
+const SCAN_QUARANTINE_STATUSES = new Set<ErpDocumentScanStatus>([
+  "failed",
+  "quarantined",
+]);
+
+export async function releaseTenantDocumentFromScanQuarantine(input: {
+  organizationId: string;
+  documentId: string;
+  actorAuthUserId: string;
+}) {
+  return runWithOrganizationContext(input.organizationId, async (db) => {
+    const rows = await db
+      .select({
+        id: erpDocuments.id,
+        title: erpDocuments.title,
+        moduleId: erpDocuments.moduleId,
+        pathname: erpDocuments.pathname,
+        classification: erpDocuments.classification,
+        retentionClass: erpDocuments.retentionClass,
+        scanStatus: erpDocuments.scanStatus,
+      })
+      .from(erpDocuments)
+      .where(
+        and(
+          eq(erpDocuments.organizationId, input.organizationId),
+          eq(erpDocuments.id, input.documentId),
+        ),
+      )
+      .limit(1);
+
+    const document = rows[0];
+    if (!document) {
+      throw new TenantDocumentMutationError("not_found");
+    }
+
+    if (!SCAN_QUARANTINE_STATUSES.has(document.scanStatus)) {
+      throw new TenantDocumentMutationError("scan_not_releasable");
+    }
+
+    await db
+      .update(erpDocuments)
+      .set({
+        scanStatus: "passed",
+        updatedAt: new Date(),
+      })
+      .where(
+        and(
+          eq(erpDocuments.organizationId, input.organizationId),
+          eq(erpDocuments.id, input.documentId),
+        ),
+      );
+
+    await createAuditLog({
+      organizationId: input.organizationId,
+      actorAuthUserId: input.actorAuthUserId,
+      entityType: "document",
+      entityId: document.id,
+      action: "document.scan-released",
+      summary: `Operator released document ${document.title} from scan quarantine.`,
+      metadata: {
+        previousScanStatus: document.scanStatus,
+        scanStatus: "passed",
+      },
+    });
+
+    return {
+      id: document.id,
+      title: document.title,
+      moduleId: document.moduleId,
+      pathname: document.pathname,
+      classification: document.classification,
+      retentionClass: document.retentionClass,
+      previousScanStatus: document.scanStatus,
+    };
+  });
+}
+
+export async function deleteTenantDocument(input: {
+  organizationId: string;
+  documentId: string;
+  actorAuthUserId: string;
+}) {
+  return runWithOrganizationContext(input.organizationId, async (db) => {
+    const rows = await db
+      .select({
+        id: erpDocuments.id,
+        title: erpDocuments.title,
+        moduleId: erpDocuments.moduleId,
+        pathname: erpDocuments.pathname,
+        classification: erpDocuments.classification,
+        retentionClass: erpDocuments.retentionClass,
+        scanStatus: erpDocuments.scanStatus,
+      })
+      .from(erpDocuments)
+      .where(
+        and(
+          eq(erpDocuments.organizationId, input.organizationId),
+          eq(erpDocuments.id, input.documentId),
+        ),
+      )
+      .limit(1);
+
+    const document = rows[0];
+    if (!document) {
+      throw new TenantDocumentMutationError("not_found");
+    }
+
+    if (isErpDocumentRowOnLegalHold(document.retentionClass)) {
+      throw new TenantDocumentMutationError("legal_hold");
+    }
+
+    if (await isOrganizationDocumentLegalHoldActive(input.organizationId)) {
+      throw new TenantDocumentMutationError("legal_hold");
+    }
+
+    await db
+      .delete(erpDocuments)
+      .where(
+        and(
+          eq(erpDocuments.organizationId, input.organizationId),
+          eq(erpDocuments.id, input.documentId),
+        ),
+      );
+
+    await createAuditLog({
+      organizationId: input.organizationId,
+      actorAuthUserId: input.actorAuthUserId,
+      entityType: "document",
+      entityId: document.id,
+      action: "document.delete",
+      summary: `Deleted document ${document.title}.`,
+      metadata: {
+        moduleId: document.moduleId,
+        pathname: document.pathname,
+        classification: document.classification,
+        retentionClass: document.retentionClass,
+        scanStatus: document.scanStatus,
+      },
+    });
+
+    return document;
   });
 }
 

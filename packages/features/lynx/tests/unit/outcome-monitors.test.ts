@@ -81,12 +81,19 @@ function workspace(input: {
     documents: (input.documents ?? []).map((document) => ({
       ...document,
       contentType: "application/pdf",
+      createdAt: new Date().toISOString(),
       size: "1 KB",
       access: "private",
     })),
     documentWindow: {
       pageSize: 10,
       totalCount: input.documents?.length ?? 0,
+      hasNextPage: false,
+    },
+    documentActivityEvents: [],
+    documentActivityWindow: {
+      pageSize: 10,
+      totalCount: 0,
       hasNextPage: false,
     },
   } satisfies ModuleWorkspace;

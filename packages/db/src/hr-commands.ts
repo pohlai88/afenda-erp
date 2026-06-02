@@ -1,5 +1,6 @@
 import { and, eq, isNull, ne, sql } from "drizzle-orm";
 import { runWithOrganizationContext, type AfendaTransaction } from "./client";
+import { archiveHrEmployeeDocumentsOnSeparationInTx } from "./hr-documents";
 import { createEntityId } from "./ids";
 import {
   hrDepartments,
@@ -560,6 +561,11 @@ export async function archiveHrEmployeeInTx(
         isNull(hrEmployeeAssignments.effectiveTo),
       ),
     );
+
+  await archiveHrEmployeeDocumentsOnSeparationInTx(db, {
+    organizationId: input.organizationId,
+    employeeId: input.employeeId,
+  });
 
   return { employeeId: input.employeeId };
 }

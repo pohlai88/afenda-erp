@@ -24,6 +24,11 @@ export const systemAdminSecurityUiCopy = {
     sensitive: "Sensitive action protection",
     metadata: "Configuration metadata",
   },
+  storage: {
+    title: "Document storage quota",
+    description:
+      "ERP and HR registry bytes counted toward the organization upload quota gate.",
+  },
   recentChanges: {
     title: "Recent security changes",
     description: `Latest audited security configuration events. Open the audit viewer (${systemAdminRoutePaths.audit}) for full search and export.`,

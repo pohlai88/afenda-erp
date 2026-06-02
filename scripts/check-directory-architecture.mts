@@ -299,12 +299,17 @@ function checkDocumentationNaming(filePath: string) {
     );
   const isKernelLegacyArchitectureRedirect =
     normalizedRel === "packages/kernel/kernel-architecture.md";
+  const isObjectStorageArchitectureDoc =
+    /^packages\/object-storage\/docs\/[^/]*architecture[^/]*\.md$/.test(
+      normalizedRel,
+    );
   if (
     isArchitectureDoc &&
     !rel.startsWith("docs/architecture/") &&
     !isFeatureVerticalArchitectureDoc &&
     !isKernelVerticalArchitectureDoc &&
-    !isKernelLegacyArchitectureRedirect
+    !isKernelLegacyArchitectureRedirect &&
+    !isObjectStorageArchitectureDoc
   ) {
     problems.push(
       `Architecture docs must live under docs/architecture/, an allowed package architecture supplement, or a feature vertical bucket: ${rel}`,

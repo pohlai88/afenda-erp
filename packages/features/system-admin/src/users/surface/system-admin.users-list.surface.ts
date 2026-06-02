@@ -13,6 +13,10 @@ import {
 } from "../../overview/surfaces/system-admin.list-surface.shared";
 import type { ListSurfaceRow } from "@afenda/governed-surface";
 import type { SystemAdminUserRow, SystemAdminUserStatus } from "../contracts";
+import {
+  SYSTEM_ADMIN_USERS_BULK_SUSPEND_ACTION_ID,
+  systemAdminUsersBulkSuspendConfirm,
+} from "../contracts/system-admin.users-actions.contract";
 import { systemAdminUsersUiCopy } from "./system-admin.users-ui.copy.shared";
 import { resolveSystemAdminUserRowTrailingAction } from "./system-admin.users-list-trailing.shared";
 
@@ -80,25 +84,44 @@ export function buildUsersListSurface(input: {
     dataNature: "table",
     presentationProfile: "erp-operational-table",
     presentation: {
-      toolbar: buildSystemAdminListToolbar({
-        scope: "users",
-        searchPlaceholder: listCopy.searchPlaceholder,
-        sortColumn: "user",
-        searchValue: input.searchValue,
-        filters: [
-          {
-            id: "status",
-            label: "Status",
-            param: "usersStatus",
-            options: [
-              { label: "Invited", value: "invited" },
-              { label: "Active", value: "active" },
-              { label: "Suspended", value: "suspended" },
-              { label: "Removed", value: "removed" },
-            ],
-          },
-        ],
-      }),
+      toolbar: {
+        ...buildSystemAdminListToolbar({
+          scope: "users",
+          searchPlaceholder: listCopy.searchPlaceholder,
+          sortColumn: "user",
+          searchValue: input.searchValue,
+          filters: [
+            {
+              id: "status",
+              label: "Status",
+              param: "usersStatus",
+              options: [
+                { label: "Invited", value: "invited" },
+                { label: "Active", value: "active" },
+                { label: "Suspended", value: "suspended" },
+                { label: "Removed", value: "removed" },
+              ],
+            },
+          ],
+        }),
+        bulkActions: canMutate
+          ? [
+              {
+                actionId: SYSTEM_ADMIN_USERS_BULK_SUSPEND_ACTION_ID,
+                kind: "server-action",
+                label: "Suspend selected",
+                confirm: systemAdminUsersBulkSuspendConfirm,
+              },
+            ]
+          : undefined,
+      },
+      selection: canMutate
+        ? {
+            mode: "multiple",
+            label: "Select users",
+            bulkScopeLabel: "users selected",
+          }
+        : undefined,
     },
     requiresErpPermission: {
       module: "system-admin",
@@ -152,6 +175,10 @@ export function buildUsersListSurface(input: {
         canMutate,
         hasMembership: Boolean(user.membershipId),
       }),
+      selectionDisabledReason:
+        user.status === "active" && user.membershipId
+          ? undefined
+          : "Only active organization memberships can be bulk suspended.",
     })),
   });
 }

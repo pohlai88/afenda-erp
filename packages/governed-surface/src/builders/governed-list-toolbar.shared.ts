@@ -75,6 +75,7 @@ export function buildGovernedListExportToolbarPresentation(
     toolbar: {
       export: {
         actionId: input.actionId,
+        kind: "download",
         label: input.label,
         formats: ["csv"],
       },

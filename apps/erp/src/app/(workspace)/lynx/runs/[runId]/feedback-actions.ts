@@ -2,14 +2,16 @@
 
 import { requireCapability } from "@afenda/auth/server";
 import {
-  recordLynxRunFeedback,
+  executeLynxRecordRunFeedbackCommand,
+  lynxLiveRunFeedbackRequestSchema,
   type LynxRunFeedbackCategory,
   type LynxRunFeedbackRating,
-} from "@afenda/db";
+} from "@afenda/feature-lynx/server";
 import {
   actionFailure,
   actionSuccess,
   type ActionResult,
+  zodActionFailure,
 } from "@afenda/governed-surface/schemas";
 import { revalidatePath } from "next/cache";
 
@@ -73,17 +75,28 @@ export async function recordLynxRunFeedbackAction(
       });
     }
 
-    await recordLynxRunFeedback({
-      organizationId: organization.id,
+    const parsed = lynxLiveRunFeedbackRequestSchema.safeParse({
       runId: runIdValue,
-      userAuthId: session.id,
-      rating: ratingValue as LynxRunFeedbackRating,
-      category: categoryValue as LynxRunFeedbackCategory,
+      rating: ratingValue,
+      category: categoryValue,
       note: typeof note === "string" ? note.trim().slice(0, 1000) : "",
-      metadata: {
-        route: "lynx.run-detail",
-      },
     });
+
+    if (!parsed.success) {
+      return zodActionFailure(parsed.error);
+    }
+
+    const result = await executeLynxRecordRunFeedbackCommand({
+      organizationId: organization.id,
+      userAuthId: session.id,
+      capabilities: organization.capabilities,
+      request: parsed.data,
+      requestId: "",
+    });
+
+    if (!result) {
+      return actionFailure("Lynx run was not found.");
+    }
 
     revalidatePath(`/lynx/runs/${runIdValue}`);
     return actionSuccess();

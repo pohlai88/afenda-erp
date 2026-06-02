@@ -1,4 +1,4 @@
-import { LynxRunDetailRoutePage } from "@/workspace-routes/lynx-run-detail-route";
+import { LynxRunDetailRoutePage } from "@/routes/workspace/lynx/lynx-run-detail-route";
 
 export const unstable_instant = {
   prefetch: "static",

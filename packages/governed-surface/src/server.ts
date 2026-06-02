@@ -45,6 +45,26 @@ export {
   type GovernedPatternBChartSectionProps,
 } from "./components/governed-pattern-b-chart-section";
 export {
+  GovernedPatternBApprovalTimelineSection,
+  type GovernedPatternBApprovalTimelineSectionLayout,
+  type GovernedPatternBApprovalTimelineSectionProps,
+} from "./components/governed-pattern-b-approval-timeline-section";
+export {
+  GovernedPatternBActionBarSection,
+  type GovernedPatternBActionBarSectionLayout,
+  type GovernedPatternBActionBarSectionProps,
+} from "./components/governed-pattern-b-action-bar-section";
+export {
+  GovernedPatternBMultiStepFormSection,
+  type GovernedPatternBMultiStepFormSectionLayout,
+  type GovernedPatternBMultiStepFormSectionProps,
+} from "./components/governed-pattern-b-multi-step-form-section";
+export {
+  GovernedPatternBScorecardFormSection,
+  type GovernedPatternBScorecardFormSectionLayout,
+  type GovernedPatternBScorecardFormSectionProps,
+} from "./components/governed-pattern-b-scorecard-form-section";
+export {
   GovernedKanbanFooterSection,
   type GovernedKanbanFooterSectionLayout,
   type GovernedKanbanFooterSectionProps,
@@ -59,6 +79,14 @@ export {
   GovernedKanbanReadOnlyBoard,
   type GovernedKanbanReadOnlyBoardProps,
 } from "./components/governed-kanban-read-only-board.client";
+export {
+  GovernedKanbanFooterBoard,
+  type GovernedKanbanFooterBoardProps,
+} from "./components/governed-kanban-footer-board.client";
+export {
+  GovernedKanbanDragBoard,
+  type GovernedKanbanDragBoardProps,
+} from "./components/governed-kanban-drag-board.client";
 export {
   GovernedEmpty,
   type GovernedEmptyProps,

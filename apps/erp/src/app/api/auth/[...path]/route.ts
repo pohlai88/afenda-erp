@@ -2,18 +2,15 @@ import {
   getNeonAuthServer,
   isNeonAuthReady,
 } from "@afenda/auth/neon-auth-server";
+import { authApiRouteCopy } from "@afenda/kernel";
 import { getRequestId, logServerEvent } from "@afenda/observability";
-import {
-  getAuthRouteFailedResponse,
-  getNeonAuthNotConfiguredResponse,
-} from "@/lib/api/auth-route";
 
 type AuthMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 type AuthRouteContext = { params: Promise<{ path: string[] }> };
 
 async function resolveHandler(method: AuthMethod) {
   if (!isNeonAuthReady()) {
-    return getNeonAuthNotConfiguredResponse();
+    return new Response(authApiRouteCopy.neonNotConfigured, { status: 503 });
   }
 
   const handlers = getNeonAuthServer().handler();
@@ -55,7 +52,7 @@ async function handleAuthRequest(
       error: error instanceof Error ? error.message : String(error),
     });
 
-    return getAuthRouteFailedResponse();
+    return new Response(authApiRouteCopy.routeFailed, { status: 500 });
   }
 }
 

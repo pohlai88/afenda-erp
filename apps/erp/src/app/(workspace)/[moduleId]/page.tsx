@@ -4,8 +4,8 @@ import { SYSTEM_ADMIN_MODULE_ID } from "@/lib/system-admin-route.shared";
 import {
   createModuleMetadata,
   ModuleRoutePage,
-} from "@/workspace-routes/module-screen";
-import { SystemAdminModuleHubSection } from "@/workspace-routes/module-hub-section.server";
+} from "@/routes/workspace/modules/module-screen";
+import { SystemAdminModuleHubSection } from "@/routes/workspace/modules/module-hub-section.server";
 import {
   isCoreModuleId,
   isModuleId,
@@ -70,7 +70,9 @@ export default function DynamicModulePage({
     <Suspense fallback={<SystemAdminSectionSkeleton />}>
       {params.then(async ({ moduleId }) => {
         if (moduleId === SYSTEM_ADMIN_MODULE_ID) {
-          return <SystemAdminModuleHubSection />;
+          return (
+            <SystemAdminModuleHubSection searchParams={await searchParams} />
+          );
         }
 
         if (moduleId === "approvals") {

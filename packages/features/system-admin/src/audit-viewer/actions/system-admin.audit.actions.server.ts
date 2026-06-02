@@ -1,6 +1,6 @@
 "use server";
 
-import { searchTenantAuditLogs, upsertRetentionPolicy } from "@afenda/db";
+import { searchTenantAuditLogs, getRetentionPolicy, upsertRetentionPolicy } from "@afenda/db";
 import { writeExecutionAuditEvent } from "@afenda/kernel/execution";
 import { logServerEvent } from "@afenda/observability";
 import { revalidatePath } from "next/cache";
@@ -116,6 +116,17 @@ export async function upsertSystemAdminRetentionPolicyAction(
     return zodActionFailure(parsed.error);
   }
 
+  const existingPolicy = await getRetentionPolicy({
+    organizationId: organization.id,
+    entityType: parsed.data.entityType,
+  });
+
+  const orgHoldActivated =
+    parsed.data.legalHold &&
+    !existingPolicy?.legalHold &&
+    (parsed.data.entityType === "document" ||
+      parsed.data.entityType === "organization");
+
   await upsertRetentionPolicy({
     organizationId: organization.id,
     entityType: parsed.data.entityType,
@@ -123,6 +134,17 @@ export async function upsertSystemAdminRetentionPolicyAction(
     legalHold: parsed.data.legalHold,
     actorAuthUserId: session.id,
   });
+
+  if (orgHoldActivated) {
+    const { cascadeOrganizationLegalHoldCommand } = await import(
+      "../../tenant-execution/commands/cascade-organization-legal-hold.command.server"
+    );
+
+    await cascadeOrganizationLegalHoldCommand({
+      organizationId: organization.id,
+      actorAuthUserId: session.id,
+    });
+  }
 
   await writeExecutionAuditEvent({
     organizationId: organization.id,

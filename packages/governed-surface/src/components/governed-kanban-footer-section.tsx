@@ -21,6 +21,8 @@ export type GovernedKanbanFooterSectionLayout = "embedded" | "titled";
 
 export type GovernedKanbanFooterSectionProps = {
   surfaceKey: string;
+  sectionKey?: string;
+  componentKey?: string;
   title: string;
   description?: string;
   sectionTestId?: string;
@@ -39,6 +41,8 @@ export type GovernedKanbanFooterSectionProps = {
  */
 export function GovernedKanbanFooterSection({
   surfaceKey,
+  sectionKey,
+  componentKey,
   title,
   description,
   sectionTestId,
@@ -49,12 +53,19 @@ export function GovernedKanbanFooterSection({
   className,
   contentClassName,
 }: GovernedKanbanFooterSectionProps) {
-  const testId = sectionTestId ?? governedKanbanSectionTestId(surfaceKey);
-  const headingId = governedHeadingId("kanban-section", surfaceKey);
-  const descriptionId = governedDescriptionId("kanban-section", surfaceKey);
+  const resolvedSectionKey = sectionKey ?? `${surfaceKey}-kanban`;
+  const resolvedComponentKey = componentKey ?? resolvedSectionKey;
+  const testId = sectionTestId ?? governedKanbanSectionTestId(resolvedComponentKey);
+  const headingId = governedHeadingId("kanban-section", resolvedComponentKey);
+  const descriptionId = governedDescriptionId(
+    "kanban-section",
+    resolvedComponentKey,
+  );
 
   const contractAttrs = buildKanbanSectionDataAttributes({
     surfaceKey,
+    sectionKey: resolvedSectionKey,
+    componentKey: resolvedComponentKey,
     state: loadError ? "invalid" : "ready",
     testId,
   });

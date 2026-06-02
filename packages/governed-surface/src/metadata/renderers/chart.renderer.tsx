@@ -12,14 +12,21 @@ import {
   CardTitle,
 } from "@afenda/ui/card";
 import { GovernedEmpty } from "../../client";
+import { resolveGovernedServerAction } from "../../schemas/server-actions.shared";
 import {
   parseGovernedChartConfiguration,
   type ChartAction,
   type ChartDataNature,
 } from "../../schemas/chart.schema";
 import { governedParseErrorCopy } from "../../i18n/governed-renderer-copy.shared";
+import { diagnosticsDataAttributes } from "../../utils/governed-diagnostics.shared";
+import {
+  governedIdentityAttributes,
+  governedTestId,
+} from "../../utils/governed-identity.shared";
 
 import type { GovernedComponentRendererDiagnostics } from "../registry";
+import { ActionBarActionForm } from "./action-bar-action.client";
 import { ChartRendererBody } from "./chart-renderer-body.client";
 
 const DATA_NATURE_CLASS: Record<ChartDataNature, string> = {
@@ -30,12 +37,15 @@ const DATA_NATURE_CLASS: Record<ChartDataNature, string> = {
 export type ChartRendererProps = {
   configuration: unknown;
   diagnostics?: GovernedComponentRendererDiagnostics;
+  surfaceKey?: string;
+  sectionKey?: string;
+  componentKey?: string;
 };
 
 function ChartHeaderAction({
   action,
 }: {
-  action: Pick<ChartAction, "label" | "href" | "actionId">;
+  action: Pick<ChartAction, "id" | "label" | "href" | "actionId">;
 }) {
   if (action.href) {
     return (
@@ -44,6 +54,19 @@ function ChartHeaderAction({
           {action.label}
         </Link>
       </Button>
+    );
+  }
+
+  if (action.actionId) {
+    return (
+      <ActionBarActionForm
+        action={{
+          id: action.actionId,
+          label: action.label,
+          intent: "default",
+        }}
+        serverAction={resolveGovernedServerAction(action.actionId)}
+      />
     );
   }
 
@@ -63,6 +86,9 @@ function ChartHeaderAction({
 export function ChartRenderer({
   configuration,
   diagnostics = "user",
+  surfaceKey,
+  sectionKey,
+  componentKey,
 }: ChartRendererProps) {
   const parsed = parseGovernedChartConfiguration(configuration);
 
@@ -81,10 +107,15 @@ export function ChartRenderer({
 
   const { actions, dataNature, description, drilldownHref, title } =
     parsed.data;
-  const headerActions: Array<Pick<ChartAction, "label" | "href" | "actionId">> =
+  const resolvedComponentKey = componentKey ?? sectionKey ?? surfaceKey ?? "chart";
+  const headerActions: Array<
+    Pick<ChartAction, "id" | "label" | "href" | "actionId">
+  > =
     [
       ...(actions ?? []),
-      ...(drilldownHref ? [{ href: drilldownHref, label: "View detail" }] : []),
+      ...(drilldownHref
+        ? [{ id: "chart-drilldown", href: drilldownHref, label: "View detail" }]
+        : []),
     ];
   const hasHeader = Boolean(title || description || headerActions.length);
 
@@ -92,6 +123,15 @@ export function ChartRenderer({
     <section
       aria-label={title ?? "Chart"}
       className={DATA_NATURE_CLASS[dataNature]}
+      {...governedIdentityAttributes({
+        surfaceKey,
+        sectionKey,
+        componentKey: resolvedComponentKey,
+      })}
+      {...diagnosticsDataAttributes({
+        state: "ready",
+        testId: governedTestId("chart", resolvedComponentKey),
+      })}
     >
       <Card>
         {hasHeader ? (

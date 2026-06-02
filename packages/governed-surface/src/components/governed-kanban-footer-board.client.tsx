@@ -16,6 +16,8 @@ import { GovernedEmpty } from "./governed-empty";
 export type GovernedKanbanFooterBoardProps = {
   configuration: GovernedKanbanBoardConfigurationInput;
   surfaceKey?: string;
+  sectionKey?: string;
+  componentKey?: string;
   renderCardFooter?: (card: KanbanCard) => ReactNode;
   showOperatorDiagnostics?: boolean;
 };
@@ -27,6 +29,8 @@ export type GovernedKanbanFooterBoardProps = {
 export function GovernedKanbanFooterBoard({
   configuration,
   surfaceKey,
+  sectionKey,
+  componentKey,
   renderCardFooter,
   showOperatorDiagnostics = false,
 }: GovernedKanbanFooterBoardProps) {
@@ -71,6 +75,8 @@ export function GovernedKanbanFooterBoard({
     <KanbanBoardView
       board={parsed.data}
       surfaceKey={surfaceKey}
+      sectionKey={sectionKey}
+      componentKey={componentKey}
       renderCardFooter={renderCardFooter}
     />
   );

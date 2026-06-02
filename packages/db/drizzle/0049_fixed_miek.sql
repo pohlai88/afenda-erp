@@ -1,0 +1,1 @@
+ALTER TABLE "erp_documents" ALTER COLUMN "scan_status" SET DEFAULT 'pending';

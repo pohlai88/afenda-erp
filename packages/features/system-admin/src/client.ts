@@ -21,6 +21,8 @@ export * from "./roles/client";
 export * from "./security/client";
 export * from "./users/client";
 
+export * from "./tenant-execution/client";
+
 export { systemAdminRoutePaths } from "./overview/contracts/system-admin.route-paths.contract";
 export {
   isSystemAdminApiScope,

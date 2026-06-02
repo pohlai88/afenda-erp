@@ -330,6 +330,41 @@
       "when": 1780286853935,
       "tag": "0046_warm_iron_patriot",
       "breakpoints": true
+    },
+    {
+      "idx": 47,
+      "version": "7",
+      "when": 1780402565343,
+      "tag": "0047_bent_shadow_king",
+      "breakpoints": true
+    },
+    {
+      "idx": 48,
+      "version": "7",
+      "when": 1780403820324,
+      "tag": "0048_large_ravenous",
+      "breakpoints": true
+    },
+    {
+      "idx": 49,
+      "version": "7",
+      "when": 1780409233186,
+      "tag": "0049_fixed_miek",
+      "breakpoints": true
+    },
+    {
+      "idx": 50,
+      "version": "7",
+      "when": 1780412647603,
+      "tag": "0050_stale_chameleon",
+      "breakpoints": true
+    },
+    {
+      "idx": 51,
+      "version": "7",
+      "when": 1780417162742,
+      "tag": "0051_silly_vin_gonzales",
+      "breakpoints": true
     }
   ]
 }

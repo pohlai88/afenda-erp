@@ -13,6 +13,8 @@ export function DetailTabsRenderer({
   configuration,
   diagnostics = "user",
   surfaceKey,
+  sectionKey,
+  componentKey,
 }: RendererProps & {
   diagnostics?: GovernedComponentRendererDiagnostics;
 }) {
@@ -36,7 +38,8 @@ export function DetailTabsRenderer({
     <GovernedDetailTabs
       model={parsed.data}
       surfaceKey={surfaceKey}
-      componentKey={surfaceKey ?? parsed.data.entityId}
+      sectionKey={sectionKey}
+      componentKey={componentKey ?? sectionKey ?? surfaceKey ?? parsed.data.entityId}
     />
   );
 }

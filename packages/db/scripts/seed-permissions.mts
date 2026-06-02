@@ -894,11 +894,25 @@ const permissionCatalog = [
     description: "Approve or reject items in the operator approval queue.",
   },
   {
+    key: "approvals.documents.sensitive.read",
+    module: "approvals",
+    label: "View sensitive approval documents",
+    description:
+      "Read confidential or restricted document titles and download protected approval artifacts.",
+  },
+  {
     key: "reports.view",
     module: "reports",
     label: "View reports",
     description:
       "Read saved views, exports, snapshots, and report freshness state.",
+  },
+  {
+    key: "reports.documents.sensitive.read",
+    module: "reports",
+    label: "View sensitive report documents",
+    description:
+      "Read confidential or restricted document titles and download protected report artifacts.",
   },
   {
     key: "system-admin.view",

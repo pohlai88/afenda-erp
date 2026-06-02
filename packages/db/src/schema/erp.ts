@@ -9,7 +9,9 @@ import {
 } from "drizzle-orm/pg-core";
 import {
   erpDocumentAccessEnum,
+  erpDocumentClassificationEnum,
   erpDocumentRetentionEnum,
+  erpDocumentScanStatusEnum,
   erpModuleIdEnum,
   erpPriorityEnum,
   erpRecordStatusEnum,
@@ -139,6 +141,14 @@ export const erpDocuments = pgTable(
     retentionClass: erpDocumentRetentionEnum("retention_class")
       .notNull()
       .default("standard"),
+    /** Platform classification for download governance (ARCH-OS-1001 §5). */
+    classification: erpDocumentClassificationEnum("classification")
+      .notNull()
+      .default("internal"),
+    /** Malware scan gate — pending until scan pipeline marks passed (ARCH-OS-001). */
+    scanStatus: erpDocumentScanStatusEnum("scan_status")
+      .notNull()
+      .default("pending"),
     uploadedByAuthUserId: text("uploaded_by_auth_user_id").notNull(),
     metadata: jsonb("metadata").$type<Record<string, unknown>>().notNull(),
     ...timestampColumns,
@@ -153,5 +163,9 @@ export const erpDocuments = pgTable(
       table.moduleId,
     ),
     index("erp_documents_owner_entity_idx").on(table.ownerEntityId),
+    index("erp_documents_org_scan_status_idx").on(
+      table.organizationId,
+      table.scanStatus,
+    ),
   ],
 );

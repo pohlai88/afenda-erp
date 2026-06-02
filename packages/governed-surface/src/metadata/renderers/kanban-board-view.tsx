@@ -9,8 +9,8 @@ import {
   GovernedKanbanTransitionHint,
   governedKanbanCardTestId,
   isKanbanCardTransitionRenderable,
-  resolveKanbanBoardDomProps,
 } from "../../client";
+import { buildKanbanBoardDataAttributes } from "../../kanban-surface-identity.shared";
 
 import {
   groupCardsByColumn,
@@ -34,6 +34,8 @@ export type KanbanBoardViewProps = {
   board: GovernedKanbanBoardConfiguration;
   /** When set, board and cards use stable Playwright ids (`governed-kanban-board:{key}`). */
   surfaceKey?: string;
+  sectionKey?: string;
+  componentKey?: string;
   /** Server Actions / forms — required for `footer-actions` interaction mode. */
   renderCardFooter?: (card: KanbanCard) => ReactNode;
 };
@@ -41,15 +43,19 @@ export type KanbanBoardViewProps = {
 export function KanbanBoardView({
   board,
   surfaceKey,
+  sectionKey,
+  componentKey,
   renderCardFooter,
 }: KanbanBoardViewProps) {
   const columns = resolveKanbanColumns(board);
   const cardsByColumn = groupCardsByColumn(board.cards);
 
-  const boardDom = resolveKanbanBoardDomProps(
+  const boardDom = buildKanbanBoardDataAttributes({
     surfaceKey,
-    columns.length === 0 ? "empty" : "ready",
-  );
+    sectionKey,
+    componentKey,
+    state: columns.length === 0 ? "empty" : "ready",
+  });
 
   if (columns.length === 0) {
     return (
@@ -108,6 +114,8 @@ export function KanbanBoardView({
           <KanbanTransitionHints
                             transitions={card.availableTransitions}
                             surfaceKey={surfaceKey}
+                            sectionKey={sectionKey}
+                            componentKey={componentKey}
                             cardId={card.id}
                           />
                         ) : null}
@@ -133,10 +141,14 @@ export function KanbanBoardView({
 function KanbanTransitionHints({
   transitions,
   surfaceKey,
+  sectionKey,
+  componentKey,
   cardId,
 }: {
   transitions: readonly KanbanCardTransitionAvailability[];
   surfaceKey?: string;
+  sectionKey?: string;
+  componentKey?: string;
   cardId?: string;
 }) {
   const visible = transitions.filter(isKanbanCardTransitionRenderable);
@@ -152,6 +164,8 @@ function KanbanTransitionHints({
           <GovernedKanbanTransitionHint
             transition={transition}
             surfaceKey={surfaceKey}
+            sectionKey={sectionKey}
+            componentKey={componentKey}
             cardId={cardId}
           />
         </li>

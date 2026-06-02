@@ -73,7 +73,7 @@ Project: `afenda-erp` on team `jacks-projects-7b3cfe94`. As of setup, **no Strip
 
 **Production webhook** (Stripe Dashboard → Developers → Webhooks → Add endpoint):
 
-- URL: `https://<production-host>/api/webhooks/stripe`
+- URL: `https://<production-host>/api/internal/v1/webhooks/stripe`
 - Events (minimum): `checkout.session.completed`, `customer.subscription.created`, `customer.subscription.updated`, `customer.subscription.deleted`, `invoice.paid`, `invoice.payment_failed`, `invoice.finalized`
 - Copy the signing secret into Vercel as `STRIPE_WEBHOOK_SECRET`.
 

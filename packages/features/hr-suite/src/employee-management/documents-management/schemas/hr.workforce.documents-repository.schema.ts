@@ -5,6 +5,7 @@ export const registerHrEmployeeDocumentFormSchema = z.object({
   documentType: z.string().trim().min(1),
   title: z.string().trim().min(1),
   blobUrl: z.string().trim().min(1),
+  pathname: z.string().trim().min(1),
   mimeType: z.string().trim().min(1),
   sizeBytes: z.coerce.number().int().positive(),
   classification: z
@@ -45,6 +46,7 @@ export const replaceHrEmployeeDocumentFormSchema = z.object({
   documentId: z.string().trim().min(1),
   title: z.string().trim().min(1),
   blobUrl: z.string().trim().min(1),
+  pathname: z.string().trim().min(1),
   mimeType: z.string().trim().min(1),
   sizeBytes: z.coerce.number().int().positive(),
   effectiveTo: z.coerce.date().nullable().optional(),

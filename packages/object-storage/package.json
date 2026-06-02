@@ -41,6 +41,14 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "lint": "tsc -p tsconfig.json --noEmit",
     "layout:check": "tsx scripts/check-object-storage-layout.mts",
+    "verify:env": "tsx scripts/verify-object-storage-env.mts",
+    "r2:verify:s3-api": "tsx scripts/verify-r2-s3-api.mts",
+    "r2:verify:presign": "tsx scripts/verify-r2-presign.mts",
+    "r2:verify": "pnpm verify:env && pnpm r2:verify:presign",
+    "r2:provision": "tsx scripts/r2-provision.mts",
+    "r2:domain:provision": "tsx scripts/r2-domain-provision.mts",
+    "r2:cloudflare:verify": "tsx scripts/verify-cloudflare-sdk.mts",
+    "r2:status": "tsx scripts/r2-cloudflare-status.mts",
     "test": "vitest run --config vitest.config.ts"
   },
   "devDependencies": {

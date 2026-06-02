@@ -2,6 +2,8 @@
 
 Platform package — **ARCH-1002** §6 allowlist. **No ERP module business rules.**
 
+**Local architecture (ARCH-OS-1001):** [`docs/arch-os-1001-object-storage-evidence-architecture.md`](docs/arch-os-1001-object-storage-evidence-architecture.md) — Object Storage & Document Evidence (9.5 target): ECOs, lifecycle, classification, audit ledger split, dual provider (Blob vs R2), maturity ladder.
+
 Category: `runtime-library` · Multi-provider tenant object storage (Vercel Blob, Cloudflare R2).
 
 ## Source layout (hard law)
@@ -120,6 +122,15 @@ pnpm r2:verify:presign
 
 Cloudflare MCP checks: `execute` → `GET .../buckets/{bucket}/cors` (must allow PUT + Content-Type + expose ETag).
 
+## Phase 5 governance (shipped)
+
+| Surface | Location |
+| ------- | -------- |
+| Quarantine inbox | System Admin → Security — `loadSystemAdminDocumentQuarantineInboxWindow` (`scanStatuses: failed`, `quarantined`); trailing **Review scan** / **Approve release** |
+| Structured metrics | `incrementObjectStorageMetric` in `_object-storage-integration/api/object-storage-metrics.server.ts` — logs `metric`, `metricValue: 1`, `metricType: "counter"`, `operation: metric.{name}`, optional `moduleId` / `provider` |
+| DR runbook | [`docs/object-storage-dr-runbook.md`](docs/object-storage-dr-runbook.md) — quarterly drills; linked from System Admin Reliability |
+| Per-org provider | Migration **0051** — `object_storage_provider` enum on `organizations`; download via `getOrganizationObjectStorageProvider` |
+
 ## Data migration (Vercel Blob → R2)
 
 Cloudflare [data migration](https://developers.cloudflare.com/r2/data-migration/) tools:
@@ -129,7 +140,7 @@ Cloudflare [data migration](https://developers.cloudflare.com/r2/data-migration/
 | [Super Slurper](https://developers.cloudflare.com/r2/data-migration/super-slurper/) | One-time bulk copy from S3, GCS, or S3-compatible sources | **Not for Vercel Blob** — dashboard: [R2 data migration](https://dash.cloudflare.com/?to=/:account/r2/slurper) |
 | [Sippy](https://developers.cloudflare.com/r2/data-migration/sippy/) | Lazy copy on read from an S3-compatible source | **Not for Vercel Blob** — requires S3 source bucket behind R2 |
 
-**Vercel Blob → R2** needs a custom copy (Vercel Blob is not S3-compatible):
+**Vercel Blob → R2** needs a custom copy (Vercel Blob is not S3-compatible). No in-repo migration script yet — operator-run copy:
 
 1. **Preserve pathnames** — downloads resolve via `erp_documents.pathname` (signed GET from R2), not legacy `blob_url` hostnames.
 2. **Copy objects** — list from Vercel Blob (`@vercel/blob` + `BLOB_READ_WRITE_TOKEN`), `PUT` to R2 at the same key (`tenants/{orgId}/{moduleId}/…`).
@@ -183,8 +194,11 @@ Pathnames are built from server-resolved `pathnamePrefix` (config route) — nev
 | ----- | ------- |
 | `POST /api/internal/v1/uploads` | Upload (Vercel body or R2 presign/complete) |
 | `GET /api/internal/v1/uploads/config` | Provider + tenant prefix + policy |
-| `GET /api/internal/v1/documents/[documentId]/download` | Signed download redirect |
-| `GET /api/documents/[documentId]/download` | **308 redirect** to internal route (legacy) |
+| `GET /api/internal/v1/documents/[documentId]/download` | Signed tenant document download (`createTenantObjectStorageDownloadDeps`) |
+| `GET /api/documents/[documentId]/download` | Legacy **308** redirect to internal v1 download |
+| `POST /api/internal/v1/cron/document-scan-sweep` | Scan queue sweep |
+| `POST /api/internal/v1/cron/document-retention-sweep` | Retention / destruction sweep |
+| `POST /api/internal/v1/webhooks/document-scan-result` | AV scan result webhook |
 
 ## Forbidden
 

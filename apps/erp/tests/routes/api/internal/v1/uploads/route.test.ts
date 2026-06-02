@@ -16,12 +16,19 @@ const uploadHandler = vi.hoisted(() => ({
   })),
 }));
 
-const registerCommand = vi.hoisted(() => ({
-  registerUploadedTenantDocumentCommand: vi.fn(async () => undefined),
+const governanceDeps = vi.hoisted(() => ({
+  createTenantObjectStorageUploadDeps: vi.fn(
+    (input: { registerUploadedDocument: unknown }) => ({
+      registerUploadedDocument: input.registerUploadedDocument,
+      recordEvidenceEvent: vi.fn(async () => undefined),
+      assertUploadQuota: vi.fn(async () => undefined),
+    }),
+  ),
+  registerUploadedTenantDocumentCommand: vi.fn(async () => "doc_test"),
 }));
 
 vi.mock("@afenda/object-storage/server", () => uploadHandler);
-vi.mock("@afenda/feature-system-admin/server", () => registerCommand);
+vi.mock("@afenda/feature-system-admin/server", () => governanceDeps);
 
 import { OBJECT_STORAGE_HTTP_ROUTES } from "@afenda/object-storage/client";
 import { POST as postUpload } from "@/app/api/internal/v1/uploads/route";
@@ -31,10 +38,11 @@ describe("internal upload routes", () => {
   beforeEach(() => {
     uploadHandler.handleObjectStorageUploadPost.mockClear();
     uploadHandler.handleObjectStorageUploadConfigGet.mockClear();
-    registerCommand.registerUploadedTenantDocumentCommand.mockClear();
+    governanceDeps.createTenantObjectStorageUploadDeps.mockClear();
+    governanceDeps.registerUploadedTenantDocumentCommand.mockClear();
   });
 
-  it("wires ERP document registration into upload POST", async () => {
+  it("wires governance upload deps into upload POST", async () => {
     const response = await postUpload(
       new Request(`http://localhost${OBJECT_STORAGE_HTTP_ROUTES.upload}`, {
         method: "POST",
@@ -44,12 +52,16 @@ describe("internal upload routes", () => {
     );
 
     expect(response.status).toBe(200);
+    expect(governanceDeps.createTenantObjectStorageUploadDeps).toHaveBeenCalledWith({
+      registerUploadedDocument:
+        governanceDeps.registerUploadedTenantDocumentCommand,
+    });
     expect(uploadHandler.handleObjectStorageUploadPost).toHaveBeenCalledWith(
       expect.any(Request),
-      {
+      expect.objectContaining({
         registerUploadedDocument:
-          registerCommand.registerUploadedTenantDocumentCommand,
-      },
+          governanceDeps.registerUploadedTenantDocumentCommand,
+      }),
     );
   });
 

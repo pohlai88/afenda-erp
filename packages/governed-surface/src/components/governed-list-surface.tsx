@@ -40,6 +40,7 @@ export function GovernedListSurface({
   const contractAttrs = buildGovernedListSurfaceDataAttributes({
     surfaceKey,
     sectionKey,
+    componentKey,
     columnsId: model.columnsId,
     state: listState,
   });

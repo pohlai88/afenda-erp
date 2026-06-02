@@ -1,6 +1,6 @@
-import { DevSignInFloatingPanel } from "@/app/(auth)/_components/dev-sign-in-floating-panel";
+import { DevSignInFloatingPanel } from "@/routes/auth/_components/dev-sign-in-floating-panel";
 import { WorkspaceSkeleton } from "@/app-route-state/route-states";
-import { WorkspaceAppShell } from "@/workspace-routes/workspace-appshell.server";
+import { WorkspaceAppShell } from "@/routes/workspace/shell/workspace-appshell.server";
 import { Toaster } from "@afenda/ui/sonner";
 import { Suspense } from "react";
 

@@ -3,6 +3,11 @@ import { index, pgEnum, pgTable, text, uniqueIndex } from "drizzle-orm/pg-core";
 import { organizationRoleEnum, timestampColumns } from "./common";
 import { userProfiles } from "./identity";
 
+export const objectStorageProviderEnum = pgEnum("object_storage_provider", [
+  "vercel-blob",
+  "r2",
+]);
+
 export const organizations = pgTable(
   "organizations",
   {
@@ -10,6 +15,8 @@ export const organizations = pgTable(
     slug: text("slug").notNull(),
     name: text("name").notNull(),
     ownerAuthUserId: text("owner_auth_user_id").notNull(),
+    /** Per-org object storage provider override; null uses deployment default. */
+    objectStorageProvider: objectStorageProviderEnum("object_storage_provider"),
     ...timestampColumns,
   },
   (table) => [uniqueIndex("organizations_slug_idx").on(table.slug)],

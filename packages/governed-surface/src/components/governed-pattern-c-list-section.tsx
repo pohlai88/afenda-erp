@@ -10,7 +10,6 @@ import { getGovernedSurfaceTranslations } from "../i18n/governed-surface-copy";
 import { logGovernedListSurfaceRender } from "../log-governed-list-surface-render.server";
 import {
   governedListSectionDomId,
-  governedListSectionTestId as buildGovernedListSectionTestId,
   summarizeListSurfaceTrailingActions,
 } from "../list-surface-identity.shared";
 
@@ -20,6 +19,7 @@ import {
   type ListSurfaceRendererConfiguration,
   type ListSurfaceRendererConfigurationInput,
 } from "../schemas/list-surface-renderer.schema";
+import { GovernedComponentSkeleton } from "../metadata/governed-component-skeleton";
 import { GovernedPatternCListTableHost } from "./governed-pattern-c-list-table-host.client";
 import {
   renderGovernedPatternSectionShell,
@@ -38,6 +38,8 @@ export type GovernedPatternCListSectionProps = {
   description?: string;
   listConfiguration: ListSurfaceRendererConfigurationInput;
   surfaceKey: string;
+  sectionKey?: string;
+  componentKey?: string;
   layout?: GovernedPatternCListSectionLayout;
   density?: GovernedPatternSectionDensity;
   /** Query/load failure before permission or parse — uses same card/embedded shell as other states. */
@@ -71,6 +73,8 @@ export async function GovernedPatternCListSection({
   description,
   listConfiguration,
   surfaceKey,
+  sectionKey,
+  componentKey,
   layout = "card",
   density = "comfortable",
   loadError,
@@ -88,17 +92,19 @@ export async function GovernedPatternCListSection({
   contentClassName,
 }: GovernedPatternCListSectionProps) {
   const t = await getGovernedSurfaceTranslations("Erp");
-  const sectionTestId = buildGovernedListSectionTestId(surfaceKey);
-  const sectionDomId = governedListSectionDomId(surfaceKey);
+  const defaultSectionKey = listConfiguration.surface?.columnsId ?? surfaceKey;
+  const resolvedSectionKey = sectionKey ?? defaultSectionKey;
+  const resolvedComponentKey = componentKey ?? resolvedSectionKey;
+  const sectionDomId = governedListSectionDomId(resolvedComponentKey);
 
   const shellInput = {
     layout,
     density,
     className,
-    sectionTestId,
     sectionDomId,
     surfaceKey,
-    sectionKey: surfaceKey,
+    sectionKey: resolvedSectionKey,
+    componentKey: resolvedComponentKey,
     headerSlot,
     headerAction: cardHeaderAction,
     title,
@@ -124,7 +130,11 @@ export async function GovernedPatternCListSection({
       logUnexpectedServerError(
         "GovernedPatternCListSection invalid list configuration",
         parsed.error,
-        { surfaceKey },
+        {
+          surfaceKey,
+          sectionKey: resolvedSectionKey,
+          componentKey: resolvedComponentKey,
+        },
       );
 
       body = {
@@ -167,6 +177,8 @@ export async function GovernedPatternCListSection({
 
         logGovernedListSurfaceRender({
           surfaceKey,
+          sectionKey: resolvedSectionKey,
+          componentKey: resolvedComponentKey,
           columnsId: config.surface.columnsId,
           dataNature: config.dataNature,
           presentationVariant,
@@ -176,22 +188,31 @@ export async function GovernedPatternCListSection({
           trailing: summarizeListSurfaceTrailingActions(config.rows),
         });
 
-        body = {
-          state: listState,
-          children: (
-            <>
-              {contentBeforeList}
-              <Suspense fallback={null}>
-                <GovernedPatternCListTableHost
-                  surfaceKey={surfaceKey}
-                  config={config}
-                  trailingColumn={trailingColumn}
-                />
-              </Suspense>
-              {contentAfterList}
-            </>
-          ),
-        };
+        const children = (
+          <>
+            {contentBeforeList}
+            <Suspense fallback={<GovernedComponentSkeleton rendererId="list-surface" />}>
+              <GovernedPatternCListTableHost
+                surfaceKey={surfaceKey}
+                sectionKey={resolvedSectionKey}
+                componentKey={resolvedComponentKey}
+                config={config}
+                trailingColumn={trailingColumn}
+              />
+            </Suspense>
+            {contentAfterList}
+          </>
+        );
+
+        body = isEmpty
+          ? {
+              state: "empty",
+              model: {
+                ...config.surface.empty,
+                emptyId: `${resolvedComponentKey}-empty`,
+              },
+            }
+          : { state: "ready", children };
       }
     }
   }

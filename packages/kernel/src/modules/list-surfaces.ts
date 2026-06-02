@@ -2,6 +2,7 @@ import type { ModuleId } from "@afenda/config/module-ids";
 import {
   buildGovernedListSurface,
   GOVERNED_METADATA_SCHEMA_VERSION,
+  resolveListSurfaceRowTrailingAction,
   type ListSurfaceToolbar,
   type ListSurfaceRendererConfigurationResolvedInput,
 } from "@afenda/governed-surface";
@@ -63,7 +64,11 @@ type ModuleListWindow = {
   nextCursor?: string;
 };
 
-type ModulePaginationKind = "records" | "work-items" | "documents";
+type ModulePaginationKind =
+  | "records"
+  | "work-items"
+  | "documents"
+  | "document-activity";
 
 const MODULE_WORK_ITEM_COLUMNS = [
   {
@@ -223,7 +228,9 @@ function buildModuleListHref(input: {
       ? "recordsCursor"
       : input.kind === "documents"
         ? "documentsCursor"
-        : "workItemsCursor";
+        : input.kind === "document-activity"
+          ? "documentActivityCursor"
+          : "workItemsCursor";
   if (input.cursor) {
     params.set(cursorParam, input.cursor);
   }
@@ -259,7 +266,9 @@ function buildPaginationWithHref(input: {
       ? input.query?.recordsCursor
       : input.kind === "documents"
         ? input.query?.documentsCursor
-        : input.query?.workItemsCursor;
+        : input.kind === "document-activity"
+          ? input.query?.documentActivityCursor
+          : input.query?.workItemsCursor;
   const currentOffset = decodeWindowOffset(cursor);
   const pageSize = input.window?.pageSize ?? input.rowCount;
   const previousOffset = Math.max(0, currentOffset - Math.max(1, pageSize));
@@ -851,13 +860,185 @@ export function buildDashboardAutomationListSurface(input: {
 
 // ─── Document-registry list ───────────────────────────────────────────────────
 
+const sensitiveDocumentClassifications = new Set([
+  "confidential",
+  "restricted",
+  "highly-restricted",
+  "regulated",
+]);
+
+function isSensitiveDocumentClassification(classification: string) {
+  return sensitiveDocumentClassifications.has(classification);
+}
+
+function maskSensitiveDocumentLabel(
+  value: string,
+  canViewSensitive: boolean,
+): string {
+  if (canViewSensitive || !value.trim()) {
+    return value;
+  }
+
+  return "Restricted document";
+}
+
+function formatDocumentGovernanceLabel(value: string): string {
+  if (!value.trim()) {
+    return value;
+  }
+
+  return value
+    .split("-")
+    .map((segment) => segment.charAt(0).toUpperCase() + segment.slice(1))
+    .join(" ");
+}
+
+function documentScanAllowsDownload(scanStatus: string): boolean {
+  return scanStatus === "passed";
+}
+
 type DocumentRegistryRow = {
   id: string;
   title: string;
   contentType: string;
   size: string;
   access: string;
+  classification: string;
+  retentionClass: string;
+  scanStatus: string;
+  createdAt: string;
 };
+
+type DocumentQuarantineInboxRow = DocumentRegistryRow & {
+  moduleId: ModuleId;
+};
+
+function mapDocumentRegistryRowCells(input: {
+  doc: DocumentRegistryRow;
+  moduleId: ModuleId;
+  canViewSensitive: boolean;
+  canWrite: boolean;
+}) {
+  const { doc, moduleId, canViewSensitive, canWrite } = input;
+  const canExpose =
+    canViewSensitive || !isSensitiveDocumentClassification(doc.classification);
+  const title = maskSensitiveDocumentLabel(doc.title, canViewSensitive);
+  const classification = canExpose
+    ? formatDocumentGovernanceLabel(doc.classification)
+    : maskSensitiveDocumentLabel(doc.classification, canViewSensitive);
+  const scanStatus = canExpose
+    ? formatDocumentGovernanceLabel(doc.scanStatus)
+    : maskSensitiveDocumentLabel(doc.scanStatus, canViewSensitive);
+  const retentionClass = canExpose
+    ? formatDocumentGovernanceLabel(doc.retentionClass)
+    : maskSensitiveDocumentLabel(doc.retentionClass, canViewSensitive);
+  const access = canExpose
+    ? formatDocumentGovernanceLabel(doc.access)
+    : maskSensitiveDocumentLabel(doc.access, canViewSensitive);
+  const canDownload = canExpose && documentScanAllowsDownload(doc.scanStatus);
+  const onLegalHold = doc.retentionClass === "legal-hold";
+  const scanQuarantined =
+    doc.scanStatus === "failed" || doc.scanStatus === "quarantined";
+
+  return {
+    id: doc.id,
+    cells: {
+      title,
+      contentType: doc.contentType,
+      size: doc.size,
+      classification,
+      scanStatus,
+      retentionClass,
+      access,
+      createdAt: doc.createdAt,
+      download: canDownload ? "Download" : "—",
+      retentionClassValue: doc.retentionClass,
+      scanStatusValue: doc.scanStatus,
+      moduleIdValue: moduleId,
+    },
+    trailingAction: canWrite
+      ? resolveListSurfaceRowTrailingAction({
+          visible: canExpose,
+          allowed: true,
+          descriptor: {
+            id: "document-lifecycle",
+            label: onLegalHold
+              ? "Release hold"
+              : scanQuarantined
+                ? "Review scan"
+                : "Manage",
+            intent: "default",
+          },
+        })
+      : resolveListSurfaceRowTrailingAction({
+          visible: false,
+          allowed: false,
+        }),
+    cellKinds: {
+      classification: {
+        kind: "badge" as const,
+        tone: resolveDocumentClassificationTone(doc.classification),
+      },
+      scanStatus: {
+        kind: "badge" as const,
+        tone: resolveDocumentScanTone(doc.scanStatus),
+      },
+      retentionClass: {
+        kind: "badge" as const,
+        tone: resolveDocumentRetentionTone(doc.retentionClass),
+      },
+      access: {
+        kind: "badge" as const,
+        tone: doc.access === "public" ? ("positive" as const) : ("default" as const),
+      },
+      download: canDownload
+        ? {
+            kind: "link" as const,
+            href: `/api/internal/v1/documents/${doc.id}/download?moduleId=${moduleId}`,
+          }
+        : { kind: "text" as const },
+    },
+  };
+}
+
+function resolveDocumentClassificationTone(classification: string) {
+  if (
+    classification === "highly-restricted" ||
+    classification === "regulated"
+  ) {
+    return "critical" as const;
+  }
+
+  if (classification === "confidential" || classification === "restricted") {
+    return "attention" as const;
+  }
+
+  return "default" as const;
+}
+
+function resolveDocumentScanTone(scanStatus: string) {
+  if (scanStatus === "failed" || scanStatus === "quarantined") {
+    return "critical" as const;
+  }
+
+  if (scanStatus === "pending" || scanStatus === "scanning") {
+    return "attention" as const;
+  }
+
+  return "positive" as const;
+}
+
+function resolveDocumentRetentionTone(retentionClass: string) {
+  if (retentionClass === "legal-hold") {
+    return "critical" as const;
+  }
+
+  if (retentionClass === "short-term") {
+    return "attention" as const;
+  }
+
+  return "default" as const;
+}
 
 const DOCUMENT_REGISTRY_COLUMNS = [
   {
@@ -871,9 +1052,29 @@ const DOCUMENT_REGISTRY_COLUMNS = [
   { id: "contentType", header: "Type" },
   { id: "size", header: "Size" },
   {
+    id: "classification",
+    header: "Classification",
+    cellKind: { kind: "badge" as const },
+  },
+  {
+    id: "scanStatus",
+    header: "Scan",
+    cellKind: { kind: "badge" as const, tone: "attention" as const },
+  },
+  {
+    id: "retentionClass",
+    header: "Retention",
+    cellKind: { kind: "badge" as const },
+  },
+  {
     id: "access",
     header: "Access",
     cellKind: { kind: "badge" as const },
+  },
+  {
+    id: "createdAt",
+    header: "Uploaded",
+    cellKind: { kind: "date" as const },
   },
   {
     id: "download",
@@ -887,8 +1088,12 @@ export function buildDocumentRegistryListSurface(input: {
   moduleId: ModuleId;
   window?: ModuleListWindow;
   query?: ModuleWorkspaceListQuery;
+  canViewSensitive?: boolean;
+  canWrite?: boolean;
 }): ListSurfaceRendererConfigurationResolvedInput {
   const rows = input.documents;
+  const canViewSensitive = input.canViewSensitive ?? false;
+  const canWrite = input.canWrite ?? false;
 
   return buildGovernedListSurface({
     __schemaVersion: GOVERNED_METADATA_SCHEMA_VERSION,
@@ -916,22 +1121,56 @@ export function buildDocumentRegistryListSurface(input: {
       },
     },
     columns: DOCUMENT_REGISTRY_COLUMNS,
-    rows: rows.map((doc) => ({
-      id: doc.id,
-      cells: {
-        title: doc.title,
-        contentType: doc.contentType,
-        size: doc.size,
-        access: doc.access,
-        download: "Download",
+    rows: rows.map((doc) =>
+      mapDocumentRegistryRowCells({
+        doc,
+        moduleId: input.moduleId,
+        canViewSensitive,
+        canWrite,
+      }),
+    ),
+  });
+}
+
+export function buildDocumentQuarantineInboxListSurface(input: {
+  documents: readonly DocumentQuarantineInboxRow[];
+  window?: ModuleListWindow;
+  query?: ModuleWorkspaceListQuery;
+  canViewSensitive?: boolean;
+  canWrite?: boolean;
+}): ListSurfaceRendererConfigurationResolvedInput {
+  const rows = input.documents;
+  const canViewSensitive = input.canViewSensitive ?? false;
+  const canWrite = input.canWrite ?? false;
+
+  return buildGovernedListSurface({
+    __schemaVersion: GOVERNED_METADATA_SCHEMA_VERSION,
+    dataNature: "table",
+    presentationProfile: "erp-audit-ledger",
+    requiresErpPermission: {
+      module: "system-admin",
+      object: "documents",
+      function: "read",
+    },
+    pagination: buildPagination(input.window, rows.length),
+    surface: {
+      header: { title: "Quarantine inbox" },
+      columnsId: "system-admin-documents-quarantine",
+      rowKey: "id",
+      empty: {
+        variant: "muted",
+        title: "No quarantined documents.",
       },
-      cellKinds: {
-        download: {
-          kind: "link" as const,
-          href: `/api/internal/v1/documents/${doc.id}/download?moduleId=${input.moduleId}`,
-        },
-      },
-    })),
+    },
+    columns: DOCUMENT_REGISTRY_COLUMNS,
+    rows: rows.map((doc) =>
+      mapDocumentRegistryRowCells({
+        doc,
+        moduleId: doc.moduleId,
+        canViewSensitive,
+        canWrite,
+      }),
+    ),
   });
 }
 
@@ -978,7 +1217,7 @@ export function buildDocumentActivityLinesListSurface(input: {
     },
     pagination: buildPaginationWithHref({
       moduleId: input.moduleId,
-      kind: "documents",
+      kind: "document-activity",
       window: input.window,
       rowCount: rows.length,
       query: input.query,
@@ -989,7 +1228,7 @@ export function buildDocumentActivityLinesListSurface(input: {
       rowKey: "id",
       empty: {
         variant: "muted",
-        title: moduleScreenSections.documents.emptyState,
+        title: "No document activity recorded yet.",
       },
     },
     columns: DOCUMENT_ACTIVITY_COLUMNS,

@@ -1,5 +1,6 @@
 /**
  * Client door — system-admin/tenant-execution
- * Infrastructure slice; no browser UI.
+ * Document lifecycle trailing cells and browser-safe helpers.
  */
-export {};
+export { SystemAdminDocumentRegistryTrailingCell } from "./components/system-admin.document-registry-trailing.component.client";
+export { SystemAdminDocumentQuarantineTrailingCell } from "./components/system-admin.document-quarantine-trailing-cell.component.client";

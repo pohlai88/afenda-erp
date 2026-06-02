@@ -19,6 +19,7 @@ import {
   buildDashboardHardeningChecklistSurface,
   buildDashboardWorkflowListSurface,
   buildDocumentRegistryListSurface,
+  buildDocumentQuarantineInboxListSurface,
   buildDocumentActivityLinesListSurface,
   buildModuleRecordListSurface,
   buildModuleWorkItemListSurface,
@@ -271,10 +272,118 @@ describe("auxiliary list surface gallery fixtures", () => {
             title: "Invoice Q1",
             contentType: "PDF",
             size: "120 KB",
-            access: "internal",
+            access: "private",
+            classification: "internal",
+            retentionClass: "standard",
+            scanStatus: "passed",
+            createdAt: "2026-06-02T10:00:00.000Z",
           },
         ],
         moduleId: "finance",
+      }),
+    ],
+    [
+      "document registry — pending scan",
+      buildDocumentRegistryListSurface({
+        documents: [
+          {
+            id: "d2",
+            title: "Draft contract",
+            contentType: "PDF",
+            size: "88 KB",
+            access: "private",
+            classification: "internal",
+            retentionClass: "standard",
+            scanStatus: "pending",
+            createdAt: "2026-06-02T11:00:00.000Z",
+          },
+        ],
+        moduleId: "finance",
+      }),
+    ],
+    [
+      "document registry — quarantined scan",
+      buildDocumentRegistryListSurface({
+        documents: [
+          {
+            id: "d4",
+            title: "Suspicious attachment",
+            contentType: "PDF",
+            size: "64 KB",
+            access: "private",
+            classification: "internal",
+            retentionClass: "standard",
+            scanStatus: "quarantined",
+            createdAt: "2026-06-02T13:00:00.000Z",
+          },
+        ],
+        moduleId: "finance",
+        canWrite: true,
+      }),
+    ],
+    [
+      "document quarantine inbox",
+      buildDocumentQuarantineInboxListSurface({
+        documents: [
+          {
+            id: "d4",
+            moduleId: "finance",
+            title: "Suspicious attachment",
+            contentType: "PDF",
+            size: "64 KB",
+            access: "private",
+            classification: "internal",
+            retentionClass: "standard",
+            scanStatus: "quarantined",
+            createdAt: "2026-06-02T13:00:00.000Z",
+          },
+        ],
+        window: {
+          pageSize: 25,
+          totalCount: 1,
+          hasNextPage: false,
+        },
+        canWrite: true,
+      }),
+    ],
+    [
+      "document registry — legal hold",
+      buildDocumentRegistryListSurface({
+        documents: [
+          {
+            id: "d5",
+            title: "Litigation bundle",
+            contentType: "PDF",
+            size: "2.1 MB",
+            access: "private",
+            classification: "confidential",
+            retentionClass: "legal-hold",
+            scanStatus: "passed",
+            createdAt: "2026-06-02T14:00:00.000Z",
+          },
+        ],
+        moduleId: "finance",
+        canWrite: true,
+      }),
+    ],
+    [
+      "document registry — sensitive masked",
+      buildDocumentRegistryListSurface({
+        documents: [
+          {
+            id: "d3",
+            title: "Payroll packet",
+            contentType: "PDF",
+            size: "512 KB",
+            access: "private",
+            classification: "restricted",
+            retentionClass: "standard",
+            scanStatus: "passed",
+            createdAt: "2026-06-02T12:00:00.000Z",
+          },
+        ],
+        moduleId: "hr",
+        canViewSensitive: false,
       }),
     ],
     [
@@ -291,8 +400,83 @@ describe("auxiliary list surface gallery fixtures", () => {
         moduleId: "finance",
       }),
     ],
+    [
+      "document activity — hr vault union",
+      buildDocumentActivityLinesListSurface({
+        events: [
+          {
+            id: "evt-hr-1",
+            summary: "Contract verified",
+            actorLabel: "HR Admin",
+            occurredAt: "2026-06-02T11:00:00.000Z",
+            evidenceHref:
+              "/api/internal/v1/documents/hr_doc_a/download?moduleId=hr",
+            policyLabel: "Verify",
+            riskTone: "positive",
+          },
+          {
+            id: "evt-hr-2",
+            summary: "Legal hold applied",
+            actorLabel: "System",
+            occurredAt: "2026-06-02T09:00:00.000Z",
+            policyLabel: "Legal Hold",
+            riskTone: "attention",
+          },
+        ],
+        moduleId: "hr",
+      }),
+    ],
   ])("parses %s", (_name, surface) => {
     expect(parseListSurfaceRendererConfiguration(surface).success).toBe(true);
+  });
+
+  it("serializes document registry shadow cells and trailing actions", () => {
+    const quarantined = buildDocumentRegistryListSurface({
+      documents: [
+        {
+          id: "d4",
+          title: "Suspicious attachment",
+          contentType: "PDF",
+          size: "64 KB",
+          access: "private",
+          classification: "internal",
+          retentionClass: "standard",
+          scanStatus: "quarantined",
+          createdAt: "2026-06-02T13:00:00.000Z",
+        },
+      ],
+      moduleId: "finance",
+      canWrite: true,
+    });
+
+    const row = quarantined.rows[0];
+    expect(row?.cells.scanStatusValue).toBe("quarantined");
+    expect(row?.cells.retentionClassValue).toBe("standard");
+    expect(row?.trailingAction?.state).toBe("ready");
+    expect(row?.trailingAction?.descriptor?.label).toBe("Review scan");
+
+    const onHold = buildDocumentRegistryListSurface({
+      documents: [
+        {
+          id: "d5",
+          title: "Litigation bundle",
+          contentType: "PDF",
+          size: "2.1 MB",
+          access: "private",
+          classification: "confidential",
+          retentionClass: "legal-hold",
+          scanStatus: "passed",
+          createdAt: "2026-06-02T14:00:00.000Z",
+        },
+      ],
+      moduleId: "finance",
+      canWrite: true,
+      canViewSensitive: true,
+    });
+
+    const holdRow = onHold.rows[0];
+    expect(holdRow?.cells.retentionClassValue).toBe("legal-hold");
+    expect(holdRow?.trailingAction?.descriptor?.label).toBe("Release hold");
   });
 });
 

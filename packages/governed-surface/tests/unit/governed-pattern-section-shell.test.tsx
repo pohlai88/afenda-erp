@@ -16,7 +16,8 @@ describe("renderGovernedPatternSectionShell", () => {
     const html = renderToStaticMarkup(
       renderGovernedPatternSectionShell({
         layout: "embedded",
-        sectionTestId: "test-section",
+        surfaceKey: "finance",
+        sectionKey: "records",
         title: "Hidden title",
         description: "Hidden description",
         body: readyBody,
@@ -33,7 +34,8 @@ describe("renderGovernedPatternSectionShell", () => {
     const html = renderToStaticMarkup(
       renderGovernedPatternSectionShell({
         layout: "card",
-        sectionTestId: "test-section",
+        surfaceKey: "finance",
+        sectionKey: "records",
         title: "Visible title",
         body: readyBody,
       }),
@@ -48,7 +50,8 @@ describe("renderGovernedPatternSectionShell", () => {
       renderGovernedPatternSectionShell({
         layout: "card",
         density: "compact",
-        sectionTestId: "test-section",
+        surfaceKey: "finance",
+        sectionKey: "records",
         title: "Compact section",
         body: readyBody,
       }),
@@ -61,8 +64,8 @@ describe("renderGovernedPatternSectionShell", () => {
     const html = renderToStaticMarkup(
       renderGovernedPatternSectionShell({
         layout: "card",
-        sectionTestId: "governed:list-section:hr.records",
         surfaceKey: "hr.records",
+        sectionKey: "hr.records",
         title: "Records",
         body: readyBody,
       }),
@@ -72,7 +75,26 @@ describe("renderGovernedPatternSectionShell", () => {
     expect(html).toContain('data-section-key="hr.records"');
     expect(html).toContain('data-component-key="hr.records"');
     expect(html).toContain('data-render-state="ready"');
-    expect(html).toContain('data-testid="governed:list-section:hr.records"');
-    expect(html.match(/data-surface-key="hr.records"/g)).toHaveLength(1);
+    expect(html).toContain('data-testid="governed:pattern-section:hr.records"');
+    expect(html).toContain('data-testid="governed:section-card:hr.records-card"');
+  });
+
+  it("emits governed identity and diagnostics for embedded body content", () => {
+    const html = renderToStaticMarkup(
+      renderGovernedPatternSectionShell({
+        layout: "embedded",
+        surfaceKey: "hr.records",
+        sectionKey: "hr.records",
+        componentKey: "records-list",
+        title: "Records",
+        body: readyBody,
+      }),
+    );
+
+    expect(html).toContain('id="pattern-section-records-list"');
+    expect(html).toContain('data-component-key="records-list"');
+    expect(html).toContain('data-component-key="records-list-body"');
+    expect(html).toContain('data-testid="governed:pattern-section:records-list"');
+    expect(html).toContain('data-testid="governed:pattern-section-body:records-list"');
   });
 });

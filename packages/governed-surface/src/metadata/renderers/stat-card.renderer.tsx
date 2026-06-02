@@ -10,6 +10,11 @@ import {
   governedRendererCopy,
 } from "../../i18n/governed-renderer-copy.shared";
 import { GOVERNED_STAT_GRID_CLASS } from "../../stat-card-layout.shared";
+import { diagnosticsDataAttributes } from "../../utils/governed-diagnostics.shared";
+import {
+  governedIdentityAttributes,
+  governedTestId,
+} from "../../utils/governed-identity.shared";
 
 import type { GovernedComponentRendererDiagnostics } from "../registry";
 import { StatCardBody } from "./stat-card-body.client";
@@ -17,11 +22,17 @@ import { StatCardBody } from "./stat-card-body.client";
 export type StatCardRendererProps = {
   configuration: unknown;
   diagnostics?: GovernedComponentRendererDiagnostics;
+  surfaceKey?: string;
+  sectionKey?: string;
+  componentKey?: string;
 };
 
 export function StatCardRenderer({
   configuration,
   diagnostics = "user",
+  surfaceKey,
+  sectionKey,
+  componentKey,
 }: StatCardRendererProps) {
   const parsed = parseStatCardConfiguration(configuration);
 
@@ -39,6 +50,8 @@ export function StatCardRenderer({
   }
 
   const { stats, density } = parsed.data;
+  const resolvedComponentKey =
+    componentKey ?? sectionKey ?? surfaceKey ?? "stat-card";
 
   if (stats.length === 0) {
     return (
@@ -53,7 +66,19 @@ export function StatCardRenderer({
   }
 
   return (
-    <section aria-label="Statistics" className="@container">
+    <section
+      aria-label="Statistics"
+      className="@container"
+      {...governedIdentityAttributes({
+        surfaceKey,
+        sectionKey,
+        componentKey: resolvedComponentKey,
+      })}
+      {...diagnosticsDataAttributes({
+        state: "ready",
+        testId: governedTestId("stat-card", resolvedComponentKey),
+      })}
+    >
       <div className={GOVERNED_STAT_GRID_CLASS[density]}>
         {stats.map((stat) => (
           <StatTile

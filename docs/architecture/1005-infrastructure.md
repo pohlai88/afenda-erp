@@ -421,6 +421,8 @@ Mutating AI tools: `needsApproval: true` + domain services — never direct tabl
 
 ### 10.2 Object storage (`@afenda/object-storage`)
 
+**Vertical supplement:** [ARCH-OS-1001](../../packages/object-storage/docs/arch-os-1001-object-storage-evidence-architecture.md) — document evidence platform (movement vs meaning vs audit ledger; 9.5 maturity target).
+
 Tenant attachments and exports route through **`@afenda/object-storage`** — not direct `@vercel/blob` or AWS SDK imports in `apps/erp` or feature packages.
 
 | Provider | Env | Upload flow |
@@ -431,23 +433,35 @@ Tenant attachments and exports route through **`@afenda/object-storage`** — no
 **Authenticate before issuing upload tokens** — without server-side pathname and capability checks, anyone can upload to the store.
 
 ```ts
+import {
+  createTenantObjectStorageUploadDeps,
+  registerUploadedTenantDocumentCommand,
+} from "@afenda/feature-system-admin/server";
 import { handleObjectStorageUploadPost } from "@afenda/object-storage/server";
 
 export async function POST(request: Request) {
-  const result = await handleObjectStorageUploadPost(request);
+  const result = await handleObjectStorageUploadPost(
+    request,
+    createTenantObjectStorageUploadDeps({
+      registerUploadedDocument: registerUploadedTenantDocumentCommand,
+    }),
+  );
   return NextResponse.json(result.body, { status: result.status });
 }
 ```
 
 | Rule | Detail |
 | ---- | ------ |
-| Compliant upload ingress | `app/api/internal/v1/uploads/` (**ARCH-1004** §5) |
+| Compliant upload ingress | `app/api/internal/v1/uploads/` + `…/uploads/config` (**ARCH-1004** §5) |
+| Thin routes | ≤15 lines — dispatch only; governance in `@afenda/feature-system-admin` via `createTenantObjectStorageUploadDeps` / `createTenantObjectStorageDownloadDeps` (`system-admin.object-storage-governance.server.ts`) |
 | Auth | Same tenancy as Server Actions — **ARCH-1003** §4 |
 | Vercel `onUploadCompleted` | **Does not fire on localhost** — use ngrok or similar to test the full webhook path |
 | R2 registration | `intent: "complete"` heads object, verifies size, then `registerUploadedTenantDocumentCommand` (wired from ERP upload route) |
-| Persistence | `@afenda/feature-system-admin` command wraps `registerTenantDocument`; download reads via injected `getTenantDocument` from apps/erp route (`ObjectStorageDownloadHandlerDeps`) — **no `@afenda/db` in object-storage `api/`** |
+| Persistence | `@afenda/feature-system-admin` commands + injected ports — **no `@afenda/db` in object-storage `api/`** |
+| Per-org provider | `organizations.object_storage_provider` (migration 0051); download resolver honors org column; upload uses env default when unset |
 | Access | Prefer `access: 'private'` for tenant attachments; signed download routes for reads |
 | Import law | Features use `@afenda/object-storage/client` or `/server` — never provider SDKs |
+| Ingress CI | `packages/object-storage/scripts/check-object-storage-ingress-governance.mts` (via `layout:check`) — fail-closed wiring for deps, cron, webhook, legacy redirect |
 
 **Source layout (`packages/object-storage/src/`)** — enforced by `layout:check` and `guard-architecture-compliance.mjs`:
 
@@ -472,18 +486,30 @@ Each slice contains **only** ARCH-1002 §8 template buckets (`actions`, `command
 Download route wiring (required):
 
 ```ts
-import { getTenantDocument } from "@afenda/db";
+import { createTenantObjectStorageDownloadDeps } from "@afenda/feature-system-admin/server";
 import { handleObjectStorageDocumentDownloadGet } from "@afenda/object-storage/server";
 
 export async function GET(request: Request, context: RouteContext) {
   const { documentId } = await context.params;
   const result = await handleObjectStorageDocumentDownloadGet(
     { request, documentId },
-    { getTenantDocument },
+    createTenantObjectStorageDownloadDeps(),
   );
-  // ...
+  return result.redirect
+    ? NextResponse.redirect(result.redirect, 302)
+    : NextResponse.json(result.body, { status: result.status });
 }
 ```
+
+**Related internal v1 routes** (document evidence lifecycle — handlers in `@afenda/feature-system-admin/server`):
+
+| Route | Role |
+| ----- | ---- |
+| `POST /api/internal/v1/cron/document-scan-sweep` | Async AV / scan queue sweep (`CRON_SECRET`) |
+| `POST /api/internal/v1/cron/document-retention-sweep` | ERP `short-term` + HR archive/destruction expiry |
+| `POST /api/internal/v1/webhooks/document-scan-result` | External AV worker callback (`ERP_WEBHOOK_HTTP_ROUTES.documentScanResult`) |
+
+**Legacy redirect** (permanent): `GET /api/documents/[documentId]/download` → `308` to `/api/internal/v1/documents/[documentId]/download` (preserves query string).
 
 ### 10.3 Edge Config (optional)
 

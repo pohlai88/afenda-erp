@@ -32,6 +32,7 @@ vi.mock("@afenda/kernel/execution", () => ({
 
 vi.mock("next/cache", () => ({
   revalidatePath: vi.fn(),
+  revalidateTag: vi.fn(),
 }));
 
 vi.mock("../../src/integrations/events/system-admin.webhook-dispatch.event", () => ({

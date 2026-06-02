@@ -1,5 +1,8 @@
 /**
  * @afenda-bucket data
- * Scaffold data from packages/_scaffold.
+ * Data ports are implemented by app/feature adapters and injected into handlers.
  */
-export {};
+export type {
+  GetTenantDocumentForDownload,
+  TenantDocumentDownloadRecord,
+} from "./tenant-document.read-port.shared";

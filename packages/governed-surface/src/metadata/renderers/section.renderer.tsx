@@ -10,11 +10,18 @@ import { cn } from "@afenda/ui/utils";
 
 import { renderGovernedChildTree } from "../render-governed-child-tree.shared";
 import type { GovernedComponentRendererDiagnostics } from "../registry";
+import { diagnosticsDataAttributes } from "../../utils/governed-diagnostics.shared";
+import {
+  governedIdentityAttributes,
+  governedTestId,
+} from "../../utils/governed-identity.shared";
 
 export type SectionRendererProps = {
   configuration: unknown;
   diagnostics?: GovernedComponentRendererDiagnostics;
   surfaceKey?: string;
+  sectionKey?: string;
+  componentKey?: string;
 };
 
 /**
@@ -24,6 +31,8 @@ export function SectionRenderer({
   configuration,
   diagnostics = "user",
   surfaceKey,
+  sectionKey,
+  componentKey,
 }: SectionRendererProps) {
   const parsed = parseGovernedSectionConfiguration(configuration);
 
@@ -39,11 +48,18 @@ export function SectionRenderer({
           title: copy.title,
           description: copy.description,
         }}
+        surfaceKey={surfaceKey}
+        sectionKey={sectionKey}
+        componentKey={componentKey ?? sectionKey ?? surfaceKey}
+        renderState="invalid"
       />
     );
   }
 
   const { header, children, chrome } = parsed.data;
+  const resolvedSurfaceKey = surfaceKey ?? header?.title;
+  const resolvedSectionKey = sectionKey ?? resolvedSurfaceKey ?? header?.title;
+  const resolvedComponentKey = componentKey ?? resolvedSectionKey;
   const gapClass = densityGapClass(chrome?.density);
 
   if (!header?.title) {
@@ -54,8 +70,22 @@ export function SectionRenderer({
           gapClass,
           elevatedChromeFrameClass(chrome?.elevation, chrome?.surface),
         )}
+        {...governedIdentityAttributes({
+          surfaceKey: resolvedSurfaceKey,
+          sectionKey: resolvedSectionKey,
+          componentKey: resolvedComponentKey,
+        })}
+        {...diagnosticsDataAttributes({
+          state: "ready",
+          testId: governedTestId("section", resolvedComponentKey ?? "section"),
+          componentType: "governed:section",
+        })}
       >
-        {renderGovernedChildTree(children, diagnostics)}
+        {renderGovernedChildTree(children, diagnostics, {
+          surfaceKey: resolvedSurfaceKey,
+          sectionKey: resolvedSectionKey,
+          componentKey: resolvedComponentKey,
+        })}
       </div>
     );
   }
@@ -64,15 +94,20 @@ export function SectionRenderer({
     <GovernedSection
       title={header.title}
       description={header.description}
-      surfaceKey={surfaceKey}
-      sectionKey={surfaceKey ?? header.title}
+      surfaceKey={resolvedSurfaceKey ?? header.title}
+      sectionKey={resolvedSectionKey ?? header.title}
+      componentKey={resolvedComponentKey ?? header.title}
       className={cn(
         "flex flex-col",
         gapClass,
         elevatedChromeFrameClass(chrome?.elevation, chrome?.surface),
       )}
     >
-      {renderGovernedChildTree(children, diagnostics)}
+      {renderGovernedChildTree(children, diagnostics, {
+        surfaceKey: resolvedSurfaceKey,
+        sectionKey: resolvedSectionKey,
+        componentKey: resolvedComponentKey,
+      })}
     </GovernedSection>
   );
 }

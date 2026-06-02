@@ -14,6 +14,8 @@
 export type GovernedTelemetryBase = {
   type: string;
   surfaceKey?: string;
+  sectionKey?: string;
+  componentKey?: string;
 };
 
 export type GovernedTelemetryEvent =

@@ -14,6 +14,8 @@ export type GovernedKanbanTransitionHintProps = {
     state: "ready" | "disabled";
   };
   surfaceKey?: string;
+  sectionKey?: string;
+  componentKey?: string;
   cardId?: string;
 };
 
@@ -23,10 +25,17 @@ export type GovernedKanbanTransitionHintProps = {
 export function GovernedKanbanTransitionHint({
   transition,
   surfaceKey,
+  sectionKey,
+  componentKey,
   cardId,
 }: GovernedKanbanTransitionHintProps) {
   const disabled = transition.state === "disabled";
   const hasDisabledReason = disabled && Boolean(transition.disabledReason);
+
+  const resolvedComponentKey =
+    componentKey ??
+    ([cardId, transition.transitionId].filter(Boolean).join("-") ||
+      transition.transitionId);
 
   const shell = (
     <span
@@ -42,8 +51,8 @@ export function GovernedKanbanTransitionHint({
       data-transition-id={transition.transitionId}
       {...governedIdentityAttributes({
         surfaceKey,
-        sectionKey: surfaceKey,
-        componentKey: cardId,
+        sectionKey: sectionKey ?? surfaceKey,
+        componentKey: resolvedComponentKey,
       })}
       {...diagnosticsDataAttributes({
         state: transition.state,

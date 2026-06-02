@@ -10,8 +10,18 @@ import {
   buildStoredObjectResult,
   parseUploadTokenPayload,
   registerUploadedDocument,
-  storedContentTypeMatchesDeclared,
+  assertStoredContentMatchesDeclared,
 } from "../../_object-storage-integration/api/upload-registration.server";
+import {
+  documentMagicBytePrefixBytes,
+} from "../../_object-storage-integration/policies/document-content-verification.shared";
+import {
+  assertUploadQuotaAllowed,
+  getRequestSourceIp,
+  recordEvidenceEvent,
+  runUploadWithDeniedAudit,
+  type UploadDeniedAuditContext,
+} from "../../_object-storage-integration/api/evidence-governance.server";
 import { requireUploadModuleAccess } from "../../_object-storage-integration/domain/upload-route-auth.server";
 import { createObjectStore } from "../../_object-storage-integration/domain/create-object-store.server";
 import { assertObjectStorageConfigured } from "../../_object-storage-integration/domain/object-storage-config.server";
@@ -44,6 +54,8 @@ export async function handleR2UploadPost(
     throw new UploadRouteError(503, uploadRouteCopy.blobNotConfigured);
   }
 
+  const createPresignedUpload = store.createPresignedUpload;
+
   const body = (await request.json()) as Record<string, unknown>;
 
   if (body.intent === "presign") {
@@ -51,10 +63,25 @@ export async function handleR2UploadPost(
     const parsedPayload = uploadPayloadSchema.parse(
       JSON.parse(parsed.clientPayload),
     );
+    const sourceIp = getRequestSourceIp(request);
+    const deniedContext: UploadDeniedAuditContext = {
+      sourceIp,
+      moduleId: parsedPayload.moduleId,
+      pathname: parsed.pathname,
+      classification: parsedPayload.classification,
+      retentionClass: parsedPayload.retentionClass,
+    };
+
+    return runUploadWithDeniedAudit({
+      sink: deps.recordEvidenceEvent,
+      context: deniedContext,
+      action: async () => {
     const { session, organization } = await requireUploadModuleAccess(
       parsedPayload.moduleId,
       "upload",
     );
+    deniedContext.organizationId = organization.id;
+    deniedContext.userId = session.id;
 
     assertUploadPathnameMatchesTenant({
       pathname: parsed.pathname,
@@ -70,12 +97,36 @@ export async function handleR2UploadPost(
     }
 
     const storagePathname = addRandomPathSuffix(parsed.pathname);
+    deniedContext.pathname = storagePathname;
 
-    const presigned = await store.createPresignedUpload({
+    await assertUploadQuotaAllowed({
+      quotaGate: deps.assertUploadQuota,
+      recordDenied: deps.recordEvidenceEvent,
+      sourceIp,
+      quotaInput: {
+        organizationId: organization.id,
+        moduleId: parsedPayload.moduleId,
+        pathname: storagePathname,
+        sizeBytes: parsedPayload.sizeBytes,
+        contentType: parsedPayload.contentType,
+        access: parsedPayload.access,
+        classification: parsedPayload.classification,
+        retentionClass: parsedPayload.retentionClass,
+        uploadedByAuthUserId: session.id,
+      },
+    });
+
+    const presigned = await createPresignedUpload({
       pathname: storagePathname,
       contentType: parsedPayload.contentType,
       sizeBytes: parsedPayload.sizeBytes,
       access: parsedPayload.access,
+      governance: {
+        organizationId: organization.id,
+        moduleId: parsedPayload.moduleId,
+        classification: parsedPayload.classification,
+        uploadedByAuthUserId: session.id,
+      },
     });
 
     const tokenPayload = JSON.stringify({
@@ -110,15 +161,32 @@ export async function handleR2UploadPost(
         tokenPayload,
       },
     };
+      },
+    });
   }
 
   if (body.intent === "complete") {
     const parsed = r2CompleteBodySchema.parse(body);
     const parsedPayload = parseUploadTokenPayload(parsed.tokenPayload);
+    const deniedContext: UploadDeniedAuditContext = {
+      sourceIp: getRequestSourceIp(request),
+      organizationId: parsedPayload.organizationId,
+      moduleId: parsedPayload.moduleId,
+      userId: parsedPayload.uploadedByAuthUserId,
+      pathname: parsed.pathname,
+      classification: parsedPayload.classification,
+      retentionClass: parsedPayload.retentionClass,
+    };
+
+    return runUploadWithDeniedAudit({
+      sink: deps.recordEvidenceEvent,
+      context: deniedContext,
+      action: async () => {
     const { organization, session } = await requireUploadModuleAccess(
       parsedPayload.moduleId,
       "upload",
     );
+    deniedContext.userId = session.id;
 
     assertUploadTokenMatchesSession(parsedPayload, organization, session);
 
@@ -142,14 +210,18 @@ export async function handleR2UploadPost(
       throw new UploadRouteError(400, uploadRouteCopy.invalidRequest);
     }
 
-    if (
-      !storedContentTypeMatchesDeclared(
-        stored.contentType,
-        parsedPayload.contentType,
-      )
-    ) {
-      throw new UploadRouteError(400, uploadRouteCopy.invalidRequest);
-    }
+    const prefixBytes = store.readObjectPrefix
+      ? await store.readObjectPrefix(
+          parsed.pathname,
+          documentMagicBytePrefixBytes,
+        )
+      : undefined;
+
+    assertStoredContentMatchesDeclared({
+      storedContentType: stored.contentType,
+      declaredContentType: parsedPayload.contentType,
+      prefixBytes,
+    });
 
     if (parsed.etag && stored.etag && parsed.etag !== stored.etag) {
       throw new UploadRouteError(400, uploadRouteCopy.invalidRequest);
@@ -164,6 +236,27 @@ export async function handleR2UploadPost(
     });
 
     if (parsedPayload.registerTenantDocument === false) {
+      await recordEvidenceEvent({
+        sink: deps.recordEvidenceEvent,
+        event: {
+          action: "DOCUMENT_UPLOADED",
+          organizationId: organization.id,
+          moduleId: parsedPayload.moduleId,
+          userId: session.id,
+          sessionId: session.id,
+          pathname: stored.pathname,
+          classification: parsedPayload.classification,
+          retentionClass: parsedPayload.retentionClass,
+          sourceIp: getRequestSourceIp(request),
+          metadata: {
+            source: "r2-presigned-upload-only",
+            contentType: storedResult.contentType,
+            sizeBytes: stored.sizeBytes,
+            access: parsedPayload.access,
+          },
+        },
+      });
+
       return {
         status: 200,
         body: {
@@ -188,6 +281,7 @@ export async function handleR2UploadPost(
       sizeBytes: stored.sizeBytes,
       etag: stored.etag,
       source: "r2-presigned-upload",
+      sourceIp: getRequestSourceIp(request),
     });
 
     return {
@@ -198,6 +292,8 @@ export async function handleR2UploadPost(
         ...storedResult,
       },
     };
+      },
+    });
   }
 
   throw new UploadRouteError(400, uploadRouteCopy.invalidRequest);

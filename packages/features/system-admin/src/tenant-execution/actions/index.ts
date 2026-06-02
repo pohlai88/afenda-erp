@@ -1,2 +1,2 @@
-/** Infrastructure slice — mutations live in domain vertical actions. */
-export {};
+/** Infrastructure slice — platform document lifecycle actions. */
+export * from "./tenant-document-lifecycle.actions.server";

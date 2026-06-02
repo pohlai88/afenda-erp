@@ -1,6 +1,10 @@
 "use server";
 
 import {
+  getGovernedSelectedRowIds,
+  type ActionResult,
+} from "@afenda/governed-surface/schemas";
+import {
   getTenantMembershipById,
   resendOrganizationInvitation,
   revokeOrganizationInvitation,
@@ -162,6 +166,84 @@ async function updateSystemAdminUserStatus(input: {
 
 export async function suspendSystemAdminUser(membershipId: string) {
   return updateSystemAdminUserStatus({ membershipId, status: "suspended" });
+}
+
+export async function bulkSuspendSystemAdminUsers(
+  _previous:
+    | ActionResult<{
+        updatedCount: number;
+      }>
+    | undefined,
+  formData: FormData,
+): Promise<
+  SystemAdminActionResult<{
+    updatedCount: number;
+  }>
+> {
+  const selectedMembershipIds = [
+    ...new Set(getGovernedSelectedRowIds(formData)),
+  ];
+
+  if (selectedMembershipIds.length === 0) {
+    return systemAdminActionFailure(
+      "Select at least one active membership to suspend.",
+      undefined,
+      "system-admin.users.bulk.no_selection",
+    );
+  }
+
+  const { organization, session } = await requireSystemAdminUsersManage();
+  const memberships = await Promise.all(
+    selectedMembershipIds.map((membershipId) =>
+      getTenantMembershipById({
+        organizationId: organization.id,
+        membershipId,
+      }),
+    ),
+  );
+
+  for (let index = 0; index < selectedMembershipIds.length; index += 1) {
+    const membership = memberships[index];
+
+    if (!membership) {
+      return systemAdminActionFailure(
+        "Bulk suspend included a membership outside the allowed organization row set.",
+        undefined,
+        "system-admin.users.bulk.selection_mismatch",
+      );
+    }
+
+    if (membership.authUserId === session.id) {
+      return systemAdminActionFailure(
+        "You cannot suspend your own membership from the Users surface.",
+        undefined,
+        "system-admin.users.bulk.self_suspension",
+      );
+    }
+
+    if (membership.status !== "active") {
+      return systemAdminActionFailure(
+        "Bulk suspend only accepts active organization memberships.",
+        undefined,
+        "system-admin.users.bulk.ineligible_status",
+      );
+    }
+  }
+
+  for (const membershipId of selectedMembershipIds) {
+    const result = await updateSystemAdminUserStatus({
+      membershipId,
+      status: "suspended",
+    });
+
+    if (!result.ok) {
+      return result;
+    }
+  }
+
+  return systemAdminActionSuccess({
+    updatedCount: selectedMembershipIds.length,
+  });
 }
 
 export async function reactivateSystemAdminUser(membershipId: string) {

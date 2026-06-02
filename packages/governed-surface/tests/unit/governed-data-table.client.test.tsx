@@ -50,7 +50,7 @@ describe("GovernedDataTableClient", () => {
   it("uses colSpan 1 when columns are empty", () => {
     const html = renderToStaticMarkup(
       <GovernedDataTableClient
-        data={[]}
+        data={[] as Row[]}
         columns={[]}
         getRowId={(row) => row.id}
         tableLabel="Employees"

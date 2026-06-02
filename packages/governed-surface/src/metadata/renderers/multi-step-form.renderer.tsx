@@ -3,19 +3,28 @@ import {
   GOVERNED_MULTI_STEP_FORM_SCHEMA_ID,
   parseGovernedMultiStepFormConfiguration,
 } from "../../schemas/multi-step-form.schema";
+import { resolveGovernedServerAction } from "../../schemas/server-actions.shared";
 import { governedParseErrorCopy } from "../../i18n/governed-renderer-copy.shared";
+import { diagnosticsDataAttributes } from "../../utils/governed-diagnostics.shared";
+import {
+  governedIdentityAttributes,
+  governedTestId,
+} from "../../utils/governed-identity.shared";
 
-import type { GovernedComponentRendererDiagnostics } from "../registry";
+import type { RendererProps } from "../governed-renderer-dispatch";
 
 import { MultiStepFormSurface } from "./multi-step-form.client";
 
 export function MultiStepFormRenderer({
   configuration,
   diagnostics = "user",
-}: {
-  configuration: unknown;
-  diagnostics?: GovernedComponentRendererDiagnostics;
-}) {
+  surfaceKey,
+  sectionKey,
+  componentKey,
+  componentType = "governed:multi-step-form",
+}: RendererProps) {
+  const resolvedComponentKey =
+    componentKey ?? sectionKey ?? surfaceKey ?? "multi-step-form";
   const parsed = parseGovernedMultiStepFormConfiguration(configuration);
 
   if (!parsed.success) {
@@ -31,9 +40,31 @@ export function MultiStepFormRenderer({
           title: copy.title,
           description: copy.description,
         }}
+        surfaceKey={surfaceKey}
+        sectionKey={sectionKey}
+        componentKey={resolvedComponentKey}
+        renderState="invalid"
       />
     );
   }
 
-  return <MultiStepFormSurface form={parsed.data} />;
+  const action = resolveGovernedServerAction(parsed.data.actionId);
+
+  return (
+    <div
+      className="@container min-w-0"
+      {...governedIdentityAttributes({
+        surfaceKey,
+        sectionKey,
+        componentKey: resolvedComponentKey,
+      })}
+      {...diagnosticsDataAttributes({
+        state: "ready",
+        testId: governedTestId("multi-step-form", resolvedComponentKey),
+        componentType,
+      })}
+    >
+      <MultiStepFormSurface form={parsed.data} action={action} />
+    </div>
+  );
 }

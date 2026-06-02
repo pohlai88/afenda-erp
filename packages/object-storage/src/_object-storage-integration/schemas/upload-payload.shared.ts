@@ -6,8 +6,18 @@ import {
   documentUploadContentTypes,
   documentUploadMaxSizeBytes,
 } from "../policies/document-upload-policy.shared";
+import {
+  defaultObjectStorageDocumentClassification,
+  defaultObjectStorageRetentionClass,
+  objectStorageDocumentClassifications,
+  objectStorageRetentionClasses,
+} from "../policies/document-governance-policy.shared";
 
 export const uploadAccessSchema = z.enum(["private", "public"]);
+export const uploadClassificationSchema = z.enum(
+  objectStorageDocumentClassifications,
+);
+export const uploadRetentionClassSchema = z.enum(objectStorageRetentionClasses);
 
 export const uploadPayloadSchema = z.object({
   moduleId: z.enum(moduleIds),
@@ -16,6 +26,12 @@ export const uploadPayloadSchema = z.object({
   contentType: z.enum(documentUploadContentTypes),
   sizeBytes: z.number().int().positive().max(documentUploadMaxSizeBytes),
   access: uploadAccessSchema.default("private"),
+  classification: uploadClassificationSchema.default(
+    defaultObjectStorageDocumentClassification,
+  ),
+  retentionClass: uploadRetentionClassSchema.default(
+    defaultObjectStorageRetentionClass,
+  ),
   /** When false, upload completes without ERP document registry write (HR attachments, etc.). */
   registerTenantDocument: z.boolean().default(true),
 });

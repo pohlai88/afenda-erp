@@ -11,7 +11,10 @@ export const SCHEMA_STABILITY: SchemaStability = "beta";
 export const governedListTrailingCellContextSchema = z
   .object({
     surfaceKey: z.string().min(1).optional(),
+    sectionKey: z.string().min(1).optional(),
+    componentKey: z.string().min(1).optional(),
     moduleId: z.string().min(1).optional(),
+    organizationLegalHoldActive: z.boolean().optional(),
   })
   .strict();
 

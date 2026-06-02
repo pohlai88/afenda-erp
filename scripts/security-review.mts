@@ -41,14 +41,17 @@ const checks: readonly Check[] = [
     file: "apps/erp/src/app/api/internal/v1/uploads/route.ts",
     patterns: [
       "handleObjectStorageUploadPost",
+      "createTenantObjectStorageUploadDeps",
       "registerUploadedTenantDocumentCommand",
-      "registerUploadedDocument",
     ],
   },
   {
-    name: "ERP document download wires db read port",
+    name: "ERP document download wires governance deps",
     file: "apps/erp/src/app/api/internal/v1/documents/[documentId]/download/route.ts",
-    patterns: ["handleObjectStorageDocumentDownloadGet", "getTenantDocument"],
+    patterns: [
+      "handleObjectStorageDocumentDownloadGet",
+      "createTenantObjectStorageDownloadDeps",
+    ],
   },
   {
     name: "Legacy document download redirects to internal route",

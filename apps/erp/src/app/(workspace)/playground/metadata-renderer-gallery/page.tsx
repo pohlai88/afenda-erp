@@ -11,6 +11,7 @@ import {
   buildAuditPanelModel,
   buildDashboardHardeningChart,
   buildDashboardKpiStatGrid,
+  buildDocumentActivityLinesListSurface,
   buildDocumentRegistryListSurface,
   buildModuleRecordListSurface,
   buildModuleWorkItemKanbanSurface,
@@ -47,6 +48,14 @@ import {
   systemAdminAuditViewerGalleryRows,
   systemAdminAuditViewerSurfaceKey,
   systemAdminAuditUiCopy,
+  systemAdminDocumentActivityGalleryEvents,
+  systemAdminDocumentActivityGallerySurfaceKey,
+  systemAdminDocumentQuarantineInboxGalleryRows,
+  systemAdminDocumentQuarantineInboxSurfaceKey,
+  systemAdminDocumentRegistryGalleryModuleId,
+  systemAdminDocumentRegistryGalleryRows,
+  systemAdminDocumentRegistryGallerySurfaceKey,
+  buildSystemAdminDocumentQuarantineInboxListSurface,
   systemAdminMembersSurfaceKey,
   systemAdminMembershipsGalleryRows,
   systemAdminUsersGalleryRows,
@@ -55,6 +64,8 @@ import {
 import {
   SystemAdminApprovalQueueTrailingCell,
   SystemAdminApprovalTrailingCell,
+  SystemAdminDocumentQuarantineTrailingCell,
+  SystemAdminDocumentRegistryTrailingCell,
   SystemAdminMembershipTrailingCell,
 } from "@afenda/feature-system-admin/client";
 import {
@@ -125,13 +136,11 @@ const GALLERY_WORK_ITEM_ESCALATED = {
   dueAt: "2026-06-15T00:00:00.000Z",
 };
 
-const GALLERY_DOCUMENT = {
-  id: "gallery-doc-001",
-  title: "Supplier invoice Q2",
-  contentType: "PDF",
-  size: "121 KB",
-  access: "internal",
-};
+const GALLERY_DOCUMENT = systemAdminDocumentRegistryGalleryRows[0]!;
+
+const GALLERY_DOCUMENT_QUARANTINED = systemAdminDocumentRegistryGalleryRows[1]!;
+
+const GALLERY_DOCUMENT_LEGAL_HOLD = systemAdminDocumentRegistryGalleryRows[2]!;
 
 const GALLERY_VIEW = {
   id: "gallery-view-001",
@@ -187,9 +196,42 @@ export default function MetadataRendererGalleryPage() {
     workItems: [GALLERY_WORK_ITEM, GALLERY_WORK_ITEM_ESCALATED],
   });
   const documentListSurface = buildDocumentRegistryListSurface({
-    moduleId: "finance",
+    moduleId: systemAdminDocumentRegistryGalleryModuleId,
     documents: [GALLERY_DOCUMENT],
   });
+  const documentListQuarantinedSurface = buildDocumentRegistryListSurface({
+    moduleId: systemAdminDocumentRegistryGalleryModuleId,
+    documents: [GALLERY_DOCUMENT_QUARANTINED],
+    canWrite: true,
+  });
+  const documentListLegalHoldSurface = buildDocumentRegistryListSurface({
+    moduleId: systemAdminDocumentRegistryGalleryModuleId,
+    documents: [GALLERY_DOCUMENT_LEGAL_HOLD],
+    canWrite: true,
+    canViewSensitive: true,
+  });
+  const emptyDocumentListSurface = buildDocumentRegistryListSurface({
+    moduleId: systemAdminDocumentRegistryGalleryModuleId,
+    documents: [],
+  });
+  const documentActivitySurface = buildDocumentActivityLinesListSurface({
+    moduleId: systemAdminDocumentRegistryGalleryModuleId,
+    events: systemAdminDocumentActivityGalleryEvents,
+  });
+  const emptyDocumentActivitySurface = buildDocumentActivityLinesListSurface({
+    moduleId: systemAdminDocumentRegistryGalleryModuleId,
+    events: [],
+  });
+  const documentQuarantineInboxSurface =
+    buildSystemAdminDocumentQuarantineInboxListSurface({
+      documents: systemAdminDocumentQuarantineInboxGalleryRows,
+      window: {
+        pageSize: 25,
+        totalCount: systemAdminDocumentQuarantineInboxGalleryRows.length,
+        hasNextPage: false,
+      },
+      canWrite: true,
+    });
   const savedViewsListSurface = buildSavedViewsListSurface({
     views: [GALLERY_VIEW],
     moduleId: "finance",
@@ -319,10 +361,161 @@ export default function MetadataRendererGalleryPage() {
       <GallerySection label="Pattern C — Document registry">
         <GovernedPatternCListSection
           title="Documents"
-          surfaceKey="gallery.finance.documents"
+          surfaceKey={systemAdminDocumentRegistryGallerySurfaceKey}
           listConfiguration={documentListSurface}
           parentAccessAllowed
           {...galleryPatternSection}
+        />
+      </GallerySection>
+
+      <GallerySection label="Pattern C — Document registry (empty)">
+        <GovernedPatternCListSection
+          title="Documents"
+          surfaceKey={`${systemAdminDocumentRegistryGallerySurfaceKey}.empty`}
+          listConfiguration={emptyDocumentListSurface}
+          parentAccessAllowed
+          {...galleryPatternSection}
+        />
+      </GallerySection>
+
+      <GallerySection label="Pattern C — Document registry (trailing — ready)">
+        <GovernedPatternCListSection
+          title="Documents"
+          surfaceKey={`${systemAdminDocumentRegistryGallerySurfaceKey}.trailing`}
+          listConfiguration={buildDocumentRegistryListSurface({
+            moduleId: systemAdminDocumentRegistryGalleryModuleId,
+            documents: [GALLERY_DOCUMENT],
+            canWrite: true,
+          })}
+          parentAccessAllowed
+          {...galleryPatternSection}
+          trailingColumn={{
+            header: "Actions",
+            Cell: SystemAdminDocumentRegistryTrailingCell,
+            context: {
+              surfaceKey: systemAdminDocumentRegistryGallerySurfaceKey,
+              moduleId: systemAdminDocumentRegistryGalleryModuleId,
+              organizationLegalHoldActive: false,
+            },
+          }}
+        />
+      </GallerySection>
+
+      <GallerySection label="Pattern C — Document registry (trailing — org legal hold)">
+        <GovernedPatternCListSection
+          title="Documents"
+          surfaceKey={`${systemAdminDocumentRegistryGallerySurfaceKey}.trailing.org-hold`}
+          listConfiguration={buildDocumentRegistryListSurface({
+            moduleId: systemAdminDocumentRegistryGalleryModuleId,
+            documents: [GALLERY_DOCUMENT],
+            canWrite: true,
+          })}
+          parentAccessAllowed
+          {...galleryPatternSection}
+          trailingColumn={{
+            header: "Actions",
+            Cell: SystemAdminDocumentRegistryTrailingCell,
+            context: {
+              surfaceKey: systemAdminDocumentRegistryGallerySurfaceKey,
+              moduleId: systemAdminDocumentRegistryGalleryModuleId,
+              organizationLegalHoldActive: true,
+            },
+          }}
+        />
+      </GallerySection>
+
+      <GallerySection label="Pattern C — Document registry (trailing — quarantined scan)">
+        <GovernedPatternCListSection
+          title="Documents"
+          surfaceKey={`${systemAdminDocumentRegistryGallerySurfaceKey}.trailing.quarantine`}
+          listConfiguration={documentListQuarantinedSurface}
+          parentAccessAllowed
+          {...galleryPatternSection}
+          trailingColumn={{
+            header: "Actions",
+            Cell: SystemAdminDocumentRegistryTrailingCell,
+            context: {
+              surfaceKey: systemAdminDocumentRegistryGallerySurfaceKey,
+              moduleId: systemAdminDocumentRegistryGalleryModuleId,
+              organizationLegalHoldActive: false,
+            },
+          }}
+        />
+      </GallerySection>
+
+      <GallerySection label="Pattern C — Document registry (trailing — legal hold)">
+        <GovernedPatternCListSection
+          title="Documents"
+          surfaceKey={`${systemAdminDocumentRegistryGallerySurfaceKey}.trailing.legal-hold`}
+          listConfiguration={documentListLegalHoldSurface}
+          parentAccessAllowed
+          {...galleryPatternSection}
+          trailingColumn={{
+            header: "Actions",
+            Cell: SystemAdminDocumentRegistryTrailingCell,
+            context: {
+              surfaceKey: systemAdminDocumentRegistryGallerySurfaceKey,
+              moduleId: systemAdminDocumentRegistryGalleryModuleId,
+              organizationLegalHoldActive: false,
+            },
+          }}
+        />
+      </GallerySection>
+
+      <GallerySection label="Pattern C — Document activity (document-lines)">
+        <GovernedPatternCListSection
+          title="Document activity"
+          description="Upload, download, retention, and governance events."
+          surfaceKey={systemAdminDocumentActivityGallerySurfaceKey}
+          listConfiguration={documentActivitySurface}
+          parentAccessAllowed
+          {...galleryPatternSection}
+        />
+      </GallerySection>
+
+      <GallerySection label="Pattern C — Document activity (empty)">
+        <GovernedPatternCListSection
+          title="Document activity"
+          surfaceKey={`${systemAdminDocumentActivityGallerySurfaceKey}.empty`}
+          listConfiguration={emptyDocumentActivitySurface}
+          parentAccessAllowed
+          {...galleryPatternSection}
+        />
+      </GallerySection>
+
+      <GallerySection label="Pattern C — System admin quarantine inbox (ready)">
+        <GovernedPatternCListSection
+          title="Quarantine inbox"
+          surfaceKey={systemAdminDocumentQuarantineInboxSurfaceKey}
+          listConfiguration={documentQuarantineInboxSurface}
+          parentAccessAllowed
+          {...galleryPatternSection}
+          trailingColumn={{
+            header: "Actions",
+            Cell: SystemAdminDocumentQuarantineTrailingCell,
+            context: {
+              surfaceKey: systemAdminDocumentQuarantineInboxSurfaceKey,
+              organizationLegalHoldActive: false,
+            },
+          }}
+        />
+      </GallerySection>
+
+      <GallerySection label="Pattern C — System admin quarantine inbox (org legal hold)">
+        <GovernedPatternCListSection
+          title="Quarantine inbox"
+          surfaceKey={`${systemAdminDocumentQuarantineInboxSurfaceKey}.org-hold`}
+          listConfiguration={documentQuarantineInboxSurface}
+          parentAccessAllowed
+          {...galleryPatternSection}
+          trailingColumn={{
+            header: "Actions",
+            Cell: SystemAdminDocumentQuarantineTrailingCell,
+            context: {
+              surfaceKey: systemAdminDocumentQuarantineInboxSurfaceKey,
+              organizationLegalHoldActive: true,
+            },
+          }}
         />
       </GallerySection>
 

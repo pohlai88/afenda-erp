@@ -8,6 +8,7 @@ import type { GovernedRenderableState } from "../schemas/governed-component-stat
 import type { PageHeader } from "../schemas/page-header.schema";
 import { diagnosticsDataAttributes } from "../utils/governed-diagnostics.shared";
 import {
+  governedHeadingId,
   governedIdentityAttributes,
   governedTestId,
   toGovernedDomId,
@@ -21,15 +22,33 @@ export type GovernedSurfaceProps = {
   children: ReactNode;
   actions?: ReactNode;
   className?: string;
+
+  /**
+   * Required governed ERP surface identity.
+   */
   surfaceKey: string;
+
+  /**
+   * Optional section identity within the surface.
+   */
   sectionKey?: string;
+
+  /**
+   * Stable component identity for diagnostics, DOM id, and test hooks.
+   */
   componentKey?: string;
+
   renderState?: GovernedRenderableState;
 };
 
 /**
- * Thin RSC shell — composes approved primitives only (renderer capability ceiling).
- * Callers resolve all copy and locale-internal paths before passing metadata in.
+ * Governed RSC surface shell.
+ *
+ * Responsibilities:
+ * - owns page-level governed identity
+ * - composes approved header/action/content regions
+ * - exposes stable diagnostics and test hooks
+ * - keeps route safety at the shell boundary
  */
 export function GovernedSurface({
   header,
@@ -42,11 +61,19 @@ export function GovernedSurface({
   renderState = "ready",
 }: GovernedSurfaceProps) {
   const surfaceDomId = toGovernedDomId("governed-surface", componentKey);
+  const headerComponentKey = `${componentKey}-header`;
+  const actionsComponentKey = `${componentKey}-actions`;
+  const contentComponentKey = `${componentKey}-content`;
+
+  const backHref = header.backHref;
+  const backLabel = header.backLabel;
+  const hasActions = Boolean(actions);
 
   return (
     <section
       id={surfaceDomId}
       className={cn("flex flex-col gap-surface-lg", className)}
+      aria-labelledby={governedHeadingId("page-header", headerComponentKey)}
       {...governedIdentityAttributes({
         surfaceKey,
         sectionKey,
@@ -65,22 +92,59 @@ export function GovernedSurface({
             description={header.description}
             surfaceKey={surfaceKey}
             sectionKey={sectionKey}
-            componentKey={`${componentKey}-header`}
+            componentKey={headerComponentKey}
           />
 
-          {header.backHref && header.backLabel ? (
-            <Button variant="link" className="h-auto p-0 type-control" asChild>
-              <Link href={asGovernedRoute(header.backHref)} prefetch={false}>
-                {header.backLabel}
+          {backHref && backLabel ? (
+            <Button
+              variant="link"
+              className="h-auto w-fit p-0 type-control"
+              asChild
+              {...diagnosticsDataAttributes({
+                state: renderState,
+                testId: governedTestId("surface-back-link", componentKey),
+              })}
+            >
+              <Link href={asGovernedRoute(backHref)} prefetch={false}>
+                {backLabel}
               </Link>
             </Button>
           ) : null}
         </div>
 
-        {actions ? <div className="shrink-0">{actions}</div> : null}
+        {hasActions ? (
+          <div
+            className="flex shrink-0 items-center gap-2"
+            aria-label="Page actions"
+            {...governedIdentityAttributes({
+              surfaceKey,
+              sectionKey,
+              componentKey: actionsComponentKey,
+            })}
+            {...diagnosticsDataAttributes({
+              state: renderState,
+              testId: governedTestId("surface-actions", componentKey),
+            })}
+          >
+            {actions}
+          </div>
+        ) : null}
       </div>
 
-      {children}
+      <div
+        className="min-w-0"
+        {...governedIdentityAttributes({
+          surfaceKey,
+          sectionKey,
+          componentKey: contentComponentKey,
+        })}
+        {...diagnosticsDataAttributes({
+          state: renderState,
+          testId: governedTestId("surface-content", componentKey),
+        })}
+      >
+        {children}
+      </div>
     </section>
   );
 }

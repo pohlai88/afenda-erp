@@ -1,13 +1,19 @@
 import "server-only";
 
 import { moduleIds } from "@afenda/config/module-ids";
-import { uploadRouteCopy } from "@afenda/kernel";
+import { uploadRouteCopy, type ModuleId } from "@afenda/kernel";
 import { getRequestId, logServerEvent } from "@afenda/observability";
 import { z } from "zod";
 import { handleVercelBlobUploadPost } from "../../blob/api/upload-handler.server";
 import { requireUploadModuleAccess } from "../domain/upload-route-auth.server";
 import { OBJECT_STORAGE_HTTP_ROUTES } from "../contracts/index";
 import type { GetTenantDocumentForDownload } from "../contracts/index";
+import type {
+  ObjectStorageDocumentScanStatus,
+  ObjectStorageEvidenceAuditSink,
+  ObjectStorageGateDecision,
+  ObjectStorageDownloadGovernanceInput,
+} from "../contracts/index";
 import { createObjectStore } from "../domain/create-object-store.server";
 import { assertObjectStorageConfigured } from "../domain/object-storage-config.server";
 import {
@@ -19,6 +25,7 @@ import {
   documentUploadContentTypes,
   documentUploadMaxSizeBytes,
 } from "../policies/document-upload-policy.shared";
+import { objectStorageGovernancePolicy } from "../policies/document-governance-policy.shared";
 import {
   assertUploadPathnameMatchesTenant,
   buildTenantObjectPathPrefix,
@@ -30,9 +37,29 @@ import type {
   ObjectStorageHandlerResult,
   ObjectStorageUploadHandlerDeps,
 } from "./upload-registration.server";
+import {
+  assertDocumentScanPassed,
+  assertGateDecisionAllowed,
+  getRequestSourceIp,
+  recordEvidenceEvent,
+  recordGovernanceDeniedEvidenceEvent,
+  recordUploadRouteDeniedEvidence,
+} from "./evidence-governance.server";
+import { incrementObjectStorageMetric } from "./object-storage-metrics.server";
+import type { ObjectStorageProviderId } from "../domain/create-object-store.server";
 
 export type ObjectStorageDownloadHandlerDeps = {
   getTenantDocument: GetTenantDocumentForDownload;
+  authorizeDocumentDownload?: (
+    input: ObjectStorageDownloadGovernanceInput,
+  ) => Promise<ObjectStorageGateDecision | void>;
+  getDocumentScanStatus?: (
+    input: ObjectStorageDownloadGovernanceInput,
+  ) => Promise<ObjectStorageDocumentScanStatus | null>;
+  recordEvidenceEvent?: ObjectStorageEvidenceAuditSink;
+  resolveOrganizationObjectStorageProvider?: (
+    organizationId: string,
+  ) => Promise<ObjectStorageProviderId | null | undefined>;
 };
 
 export type ObjectStorageHandlerDeps = ObjectStorageUploadHandlerDeps &
@@ -105,6 +132,57 @@ export async function handleObjectStorageUploadPost(
   } catch (error) {
     const response = getUploadRouteErrorResponse(error);
 
+    if (
+      error instanceof UploadRouteError &&
+      (error.status === 403 || error.status === 429)
+    ) {
+      if (deps.recordEvidenceEvent) {
+      const requestBody = (await request.clone().json().catch(() => null)) as
+        | Record<string, unknown>
+        | null;
+      const clientPayload =
+        requestBody?.payload && typeof requestBody.payload === "object"
+          ? (requestBody.payload as Record<string, unknown>)
+          : null;
+      const moduleIdRaw =
+        (typeof clientPayload?.moduleId === "string"
+          ? clientPayload.moduleId
+          : null) ??
+        (typeof requestBody?.moduleId === "string" ? requestBody.moduleId : null);
+
+      if (moduleIdRaw) {
+        try {
+          const moduleId = moduleIdSchema.parse(moduleIdRaw);
+          const { organization, session } = await requireUploadModuleAccess(
+            moduleId,
+            "upload",
+          );
+
+          await recordUploadRouteDeniedEvidence({
+            sink: deps.recordEvidenceEvent,
+            error,
+            context: {
+              organizationId: organization.id,
+              moduleId,
+              userId: session.id,
+              sourceIp: getRequestSourceIp(request),
+            },
+          });
+        } catch {
+          // Auth context unavailable — skip denied audit rather than fail the response.
+        }
+      }
+      }
+
+      incrementObjectStorageMetric("permission_denied", {
+        requestId,
+      });
+    }
+
+    incrementObjectStorageMetric("upload_failures", {
+      requestId,
+    });
+
     logServerEvent("error", "Upload route failed.", context, {
       route,
       durationMs: Date.now() - startedAt,
@@ -143,6 +221,7 @@ export async function handleObjectStorageUploadConfigGet(
         maxSizeBytes: documentUploadMaxSizeBytes,
         contentTypes: [...documentUploadContentTypes],
         accept: documentUploadAccept,
+        governance: objectStorageGovernancePolicy,
         ...(objectStorageEnv.provider === "vercel-blob"
           ? { multipartThresholdBytes: MULTIPART_UPLOAD_THRESHOLD_BYTES }
           : {}),
@@ -184,18 +263,36 @@ export async function handleObjectStorageDocumentDownloadGet(
   const startedAt = Date.now();
   const requestId = getRequestId(input.request) ?? "unknown";
   const route = OBJECT_STORAGE_HTTP_ROUTES.documentDownload;
+  let deniedAuditContext:
+    | {
+        organizationId: string;
+        moduleId: ModuleId;
+        documentId: string;
+        pathname: string;
+        classification?: ObjectStorageDownloadGovernanceInput["classification"];
+        retentionClass?: ObjectStorageDownloadGovernanceInput["retentionClass"];
+        userId: string;
+        sessionId?: string;
+        sourceIp?: string;
+      }
+    | undefined;
 
   try {
     const objectStorageEnv = assertObjectStorageConfigured();
-    const store = createObjectStore(objectStorageEnv);
-
     const moduleId = moduleIdSchema.parse(
       new URL(input.request.url).searchParams.get("moduleId"),
     );
-    const { organization } = await requireUploadModuleAccess(
+    const { organization, session } = await requireUploadModuleAccess(
       moduleId,
       "download",
     );
+    const organizationProviderId =
+      await deps.resolveOrganizationObjectStorageProvider?.(organization.id);
+    const store = createObjectStore(objectStorageEnv, {
+      organizationId: organization.id,
+      organizationProviderId,
+    });
+    const sourceIp = getRequestSourceIp(input.request);
     const document = await deps.getTenantDocument({
       organizationId: organization.id,
       documentId: input.documentId,
@@ -215,6 +312,37 @@ export async function handleObjectStorageDocumentDownloadGet(
       moduleId: document.moduleId,
     });
 
+    const governanceInput: ObjectStorageDownloadGovernanceInput = {
+      organizationId: organization.id,
+      moduleId: document.moduleId,
+      documentId: document.id,
+      pathname: document.pathname,
+      access: document.access,
+      classification: document.classification,
+      retentionClass: document.retentionClass,
+      requestedByAuthUserId: session.id,
+    };
+
+    deniedAuditContext = {
+      organizationId: organization.id,
+      moduleId: document.moduleId,
+      documentId: document.id,
+      pathname: document.pathname,
+      classification: document.classification,
+      retentionClass: document.retentionClass,
+      userId: session.id,
+      sessionId: session.id,
+      sourceIp,
+    };
+
+    assertDocumentScanPassed({ scanStatus: document.scanStatus });
+    assertDocumentScanPassed({
+      scanStatus: await deps.getDocumentScanStatus?.(governanceInput),
+    });
+    assertGateDecisionAllowed(
+      await deps.authorizeDocumentDownload?.(governanceInput),
+    );
+
     const validUntil = Date.now() + SIGNED_URL_TTL_MS;
     const contentDisposition = formatDownloadContentDisposition(document.title);
     const signed = await store.getSignedDownloadUrl({
@@ -222,6 +350,27 @@ export async function handleObjectStorageDocumentDownloadGet(
       access: document.access,
       contentDisposition,
       validUntilMs: validUntil,
+    });
+
+    await recordEvidenceEvent({
+      sink: deps.recordEvidenceEvent,
+      event: {
+        action: "DOCUMENT_DOWNLOADED",
+        organizationId: organization.id,
+        moduleId: document.moduleId,
+        documentId: document.id,
+        pathname: document.pathname,
+        classification: document.classification,
+        retentionClass: document.retentionClass,
+        userId: governanceInput.requestedByAuthUserId,
+        sessionId: session.id,
+        sourceIp,
+        metadata: {
+          access: document.access,
+          provider: objectStorageEnv.provider,
+          validUntilMs: validUntil,
+        },
+      },
     });
 
     logServerEvent(
@@ -243,12 +392,52 @@ export async function handleObjectStorageDocumentDownloadGet(
       },
     );
 
+    incrementObjectStorageMetric("downloads_total", {
+      requestId,
+      organizationId: organization.id,
+      moduleId: document.moduleId,
+      provider: objectStorageEnv.provider,
+    });
+
     return {
       status: 302,
       redirect: signed.url,
     };
   } catch (error) {
     if (error instanceof UploadRouteError) {
+      if (deniedAuditContext) {
+        await recordGovernanceDeniedEvidenceEvent({
+          sink: deps.recordEvidenceEvent,
+          action: "DOCUMENT_DOWNLOAD_DENIED",
+          status: error.status,
+          reason: error.message,
+          event: {
+            organizationId: deniedAuditContext.organizationId,
+            moduleId: deniedAuditContext.moduleId,
+            documentId: deniedAuditContext.documentId,
+            pathname: deniedAuditContext.pathname,
+            classification: deniedAuditContext.classification,
+            retentionClass: deniedAuditContext.retentionClass,
+            userId: deniedAuditContext.userId,
+            sourceIp: deniedAuditContext.sourceIp,
+          },
+        });
+      }
+
+      if (error.status === 403 || error.status === 429) {
+        incrementObjectStorageMetric("permission_denied", {
+          requestId,
+          organizationId: deniedAuditContext?.organizationId,
+          moduleId: deniedAuditContext?.moduleId,
+        });
+      }
+
+      incrementObjectStorageMetric("download_failures", {
+        requestId,
+        organizationId: deniedAuditContext?.organizationId,
+        moduleId: deniedAuditContext?.moduleId,
+      });
+
       return {
         status: error.status,
         body: { error: error.message },
@@ -256,6 +445,10 @@ export async function handleObjectStorageDocumentDownloadGet(
     }
 
     const response = getUploadRouteErrorResponse(error);
+
+    incrementObjectStorageMetric("download_failures", {
+      requestId,
+    });
 
     logServerEvent(
       "error",

@@ -60,6 +60,15 @@ const AUDIT_CHIP_VARIANT = {
   critical: "critical",
 } as const;
 
+function summarizeAuditRows(rows: AuditPanelModel["rows"]) {
+  return {
+    attention: rows.filter((row) => row.tone === "attention").length,
+    critical: rows.filter((row) => row.tone === "critical").length,
+    evidence: rows.filter((row) => Boolean(row.evidenceHref)).length,
+    actors: new Set(rows.map((row) => row.actorLabel)).size,
+  };
+}
+
 /**
  * Read-only audit/evidence table — label resolution stays in the owning module.
  */
@@ -154,6 +163,7 @@ export function GovernedAuditPanel({
 
   const tableDensity = resolved.density === "compact" ? "compact" : "comfortable";
   const headerCellClass = "type-table-header";
+  const summary = summarizeAuditRows(resolved.rows);
 
   return (
     <section
@@ -173,6 +183,21 @@ export function GovernedAuditPanel({
           </p>
         ) : null}
       </div>
+
+      <div className="flex flex-wrap items-center gap-1.5">
+        <Badge variant="outline">{resolved.rows.length} events</Badge>
+        <Badge variant="secondary">{summary.actors} actors</Badge>
+        {summary.evidence > 0 ? (
+          <Badge variant="info">{summary.evidence} evidence links</Badge>
+        ) : null}
+        {summary.attention > 0 ? (
+          <Badge variant="warning">{summary.attention} attention</Badge>
+        ) : null}
+        {summary.critical > 0 ? (
+          <Badge variant="critical">{summary.critical} critical</Badge>
+        ) : null}
+      </div>
+
       {/* audit-ds: ignore no-arbitrary-value — scroll viewport height contract */}
       <div className="max-h-[28rem] overflow-auto rounded-section border">
         {/* audit-ds: ignore no-arbitrary-value — table minimum scroll width */}

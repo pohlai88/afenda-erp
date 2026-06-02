@@ -1,8 +1,14 @@
 import type { ReactNode } from "react";
 
+import { cn } from "@afenda/ui/utils";
+
 import type { GovernedRenderableState } from "../schemas/governed-component-state.schema";
 import { diagnosticsDataAttributes } from "../utils/governed-diagnostics.shared";
-import { governedIdentityAttributes } from "../utils/governed-identity.shared";
+import {
+  governedIdentityAttributes,
+  governedTestId,
+  toGovernedDomId,
+} from "../utils/governed-identity.shared";
 import { GovernedEmpty } from "./governed-empty";
 import {
   GovernedSurfaceSectionCard,
@@ -11,33 +17,36 @@ import {
 
 export type GovernedPatternSectionLayout = "card" | "embedded";
 
-/** Section spacing — maps to Card size and content gap tokens. */
 export type GovernedPatternSectionDensity = "comfortable" | "compact";
 
-/** Renders embedded-layout section content (forbidden/invalid → GovernedEmpty). */
 export function renderGovernedSectionCardBody(
   body: GovernedSurfaceSectionCardBody,
 ) {
-  if (body.state === "forbidden" || body.state === "invalid") {
-    return <GovernedEmpty model={body.model} />;
+  if (body.state === "ready") {
+    return body.children;
   }
 
-  return body.children;
+  return <GovernedEmpty model={body.model} />;
 }
 
 export type RenderGovernedPatternSectionShellInput = {
   layout: GovernedPatternSectionLayout;
   density?: GovernedPatternSectionDensity;
+
+  surfaceKey: string;
+  sectionKey: string;
+  componentKey?: string;
+
   className?: string;
-  sectionTestId: string;
   sectionDomId?: string;
-  surfaceKey?: string;
-  sectionKey?: string;
+
   headerSlot?: ReactNode;
   title: string;
   description?: string;
   headerAction?: ReactNode;
+
   body: GovernedSurfaceSectionCardBody;
+
   cardClassName?: string;
   contentClassName?: string;
 };
@@ -45,11 +54,11 @@ export type RenderGovernedPatternSectionShellInput = {
 export function renderGovernedPatternSectionShell({
   layout,
   density = "comfortable",
-  className,
-  sectionTestId,
-  sectionDomId,
   surfaceKey,
   sectionKey,
+  componentKey = sectionKey,
+  className,
+  sectionDomId,
   headerSlot,
   title,
   description,
@@ -58,45 +67,56 @@ export function renderGovernedPatternSectionShell({
   cardClassName,
   contentClassName,
 }: RenderGovernedPatternSectionShellInput) {
-  const sectionBody = renderGovernedSectionCardBody(body);
-  const resolvedSectionKey = sectionKey ?? surfaceKey;
   const renderState: GovernedRenderableState = body.state;
+  const resolvedSectionDomId =
+    sectionDomId ?? toGovernedDomId("pattern-section", componentKey);
 
-  const contractAttrs = surfaceKey
-    ? {
-        ...governedIdentityAttributes({
-          surfaceKey,
-          sectionKey: resolvedSectionKey,
-          componentKey: resolvedSectionKey,
-        }),
-        ...diagnosticsDataAttributes({
-          state: renderState,
-          testId: sectionTestId,
-        }),
-      }
-    : diagnosticsDataAttributes({
-        state: renderState,
-        testId: sectionTestId,
-      });
+  const bodyComponentKey = `${componentKey}-body`;
+  const cardComponentKey = `${componentKey}-card`;
 
-  const wrapperProps = {
-    ...(sectionDomId ? { id: sectionDomId } : {}),
-    className,
-    ...contractAttrs,
+  const sectionBody = renderGovernedSectionCardBody(body);
+
+  const wrapperAttrs = {
+    id: resolvedSectionDomId,
+    className: cn("min-w-0", className),
+    ...governedIdentityAttributes({
+      surfaceKey,
+      sectionKey,
+      componentKey,
+    }),
+    ...diagnosticsDataAttributes({
+      state: renderState,
+      testId: governedTestId("pattern-section", componentKey),
+    }),
   };
 
   if (layout === "embedded") {
     return (
-      <div {...wrapperProps}>
+      <section {...wrapperAttrs}>
         {headerSlot}
-        <div className={contentClassName}>{sectionBody}</div>
-      </div>
+
+        <div
+          className={cn("min-w-0", contentClassName)}
+          {...governedIdentityAttributes({
+            surfaceKey,
+            sectionKey,
+            componentKey: bodyComponentKey,
+          })}
+          {...diagnosticsDataAttributes({
+            state: renderState,
+            testId: governedTestId("pattern-section-body", componentKey),
+          })}
+        >
+          {sectionBody}
+        </div>
+      </section>
     );
   }
 
   return (
-    <div {...wrapperProps}>
+    <section {...wrapperAttrs}>
       {headerSlot}
+
       <GovernedSurfaceSectionCard
         title={title}
         description={description}
@@ -105,7 +125,10 @@ export function renderGovernedPatternSectionShell({
         density={density}
         className={cardClassName}
         contentClassName={contentClassName}
+        surfaceKey={surfaceKey}
+        sectionKey={sectionKey}
+        componentKey={cardComponentKey}
       />
-    </div>
+    </section>
   );
 }

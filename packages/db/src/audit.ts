@@ -10,7 +10,12 @@ import {
   lte,
   max,
   or,
+  sql,
 } from "drizzle-orm";
+import {
+  decodeWindowOffset,
+  encodeWindowOffset,
+} from "./window-pagination.shared";
 import {
   getDb,
   runWithOrganizationContext,
@@ -18,6 +23,7 @@ import {
 } from "./client";
 import { createEntityId } from "./ids";
 import { auditLogs } from "./schema";
+import { hrDocumentAuditEvents } from "./schema/hr";
 
 export type AuditEntityType =
   | "organization"
@@ -306,4 +312,213 @@ export async function listAuditLogsForEntity(input: {
       .orderBy(desc(auditLogs.createdAt))
       .limit(input.limit ?? 20),
   );
+}
+
+export type TenantDocumentEvidenceWindowQuery = {
+  cursor?: string;
+};
+
+export type TenantDocumentEvidenceWindowRow = {
+  id: string;
+  action: string;
+  summary: string;
+  actorAuthUserId: string;
+  entityId: string;
+  metadata: Record<string, unknown>;
+  createdAt: Date;
+};
+
+export type TenantDocumentEvidenceWindow = {
+  rows: readonly TenantDocumentEvidenceWindowRow[];
+  pageSize: number;
+  totalCount: number;
+  hasNextPage: boolean;
+  nextCursor?: string;
+};
+
+function buildDocumentEvidenceWhere(
+  organizationId: string,
+  moduleId: string,
+) {
+  return and(
+    eq(auditLogs.organizationId, organizationId),
+    eq(auditLogs.entityType, "document"),
+    ilike(auditLogs.action, "DOCUMENT_%"),
+    sql`${auditLogs.metadata}->>'moduleId' = ${moduleId}`,
+  );
+}
+
+/** Governed document activity ledger — DOCUMENT_* audit rows scoped by module. */
+export async function listTenantDocumentEvidenceWindow(input: {
+  organizationId: string;
+  moduleId: string;
+  limit?: number;
+  query?: TenantDocumentEvidenceWindowQuery;
+}): Promise<TenantDocumentEvidenceWindow> {
+  const pageSize = input.limit ?? 8;
+  const offset = decodeWindowOffset(input.query?.cursor);
+  const where = buildDocumentEvidenceWhere(
+    input.organizationId,
+    input.moduleId,
+  );
+
+  return runWithOrganizationContext(input.organizationId, async (db) => {
+    const [rows, totalRows] = await Promise.all([
+      db
+        .select({
+          id: auditLogs.id,
+          action: auditLogs.action,
+          summary: auditLogs.summary,
+          actorAuthUserId: auditLogs.actorAuthUserId,
+          entityId: auditLogs.entityId,
+          metadata: auditLogs.metadata,
+          createdAt: auditLogs.createdAt,
+        })
+        .from(auditLogs)
+        .where(where)
+        .orderBy(desc(auditLogs.createdAt))
+        .limit(pageSize + 1)
+        .offset(offset),
+      db.select({ value: count() }).from(auditLogs).where(where),
+    ]);
+
+    const visibleRows = rows.slice(0, pageSize);
+    const hasNextPage = rows.length > pageSize;
+    const nextCursor = hasNextPage
+      ? encodeWindowOffset(offset + pageSize)
+      : undefined;
+
+    return {
+      rows: visibleRows.map((row) => ({
+        ...row,
+        metadata: row.metadata ?? {},
+      })),
+      pageSize,
+      totalCount: Number(totalRows[0]?.value ?? 0),
+      hasNextPage,
+      ...(nextCursor ? { nextCursor } : {}),
+    };
+  });
+}
+
+function mapHrDocumentAuditEventToEvidenceRow(row: {
+  id: string;
+  action: string;
+  summary: string;
+  actorUserId: string | null;
+  documentId: string | null;
+  metadata: string | null;
+  occurredAt: Date;
+}): TenantDocumentEvidenceWindowRow {
+  let metadata: Record<string, unknown> = { moduleId: "hr", source: "hr-vault" };
+
+  if (row.metadata) {
+    try {
+      metadata = {
+        ...metadata,
+        ...(JSON.parse(row.metadata) as Record<string, unknown>),
+      };
+    } catch {
+      metadata = { ...metadata, rawMetadata: row.metadata };
+    }
+  }
+
+  return {
+    id: row.id,
+    action: row.action,
+    summary: row.summary,
+    actorAuthUserId: row.actorUserId ?? "system",
+    entityId: row.documentId ?? row.id,
+    metadata,
+    createdAt: row.occurredAt,
+  };
+}
+
+/** Module document activity — unions platform DOCUMENT_* with HR vault audit for hr module. */
+export async function listTenantModuleDocumentActivityWindow(input: {
+  organizationId: string;
+  moduleId: string;
+  limit?: number;
+  query?: TenantDocumentEvidenceWindowQuery;
+}): Promise<TenantDocumentEvidenceWindow> {
+  if (input.moduleId !== "hr") {
+    return listTenantDocumentEvidenceWindow(input);
+  }
+
+  const pageSize = input.limit ?? 8;
+  const offset = decodeWindowOffset(input.query?.cursor);
+  const fetchLimit = offset + pageSize + 1;
+
+  return runWithOrganizationContext(input.organizationId, async (db) => {
+    const platformWhere = buildDocumentEvidenceWhere(
+      input.organizationId,
+      input.moduleId,
+    );
+
+    const [platformRows, hrRows, platformCountRow, hrCountRow] =
+      await Promise.all([
+        db
+          .select({
+            id: auditLogs.id,
+            action: auditLogs.action,
+            summary: auditLogs.summary,
+            actorAuthUserId: auditLogs.actorAuthUserId,
+            entityId: auditLogs.entityId,
+            metadata: auditLogs.metadata,
+            createdAt: auditLogs.createdAt,
+          })
+          .from(auditLogs)
+          .where(platformWhere)
+          .orderBy(desc(auditLogs.createdAt))
+          .limit(fetchLimit),
+        db
+          .select({
+            id: hrDocumentAuditEvents.id,
+            action: hrDocumentAuditEvents.action,
+            summary: hrDocumentAuditEvents.summary,
+            actorUserId: hrDocumentAuditEvents.actorUserId,
+            documentId: hrDocumentAuditEvents.documentId,
+            metadata: hrDocumentAuditEvents.metadata,
+            occurredAt: hrDocumentAuditEvents.occurredAt,
+          })
+          .from(hrDocumentAuditEvents)
+          .where(eq(hrDocumentAuditEvents.organizationId, input.organizationId))
+          .orderBy(desc(hrDocumentAuditEvents.occurredAt))
+          .limit(fetchLimit),
+        db.select({ value: count() }).from(auditLogs).where(platformWhere),
+        db
+          .select({ value: count() })
+          .from(hrDocumentAuditEvents)
+          .where(eq(hrDocumentAuditEvents.organizationId, input.organizationId)),
+      ]);
+
+    const merged = [
+      ...platformRows.map((row) => ({
+        id: row.id,
+        action: row.action,
+        summary: row.summary,
+        actorAuthUserId: row.actorAuthUserId,
+        entityId: row.entityId,
+        metadata: row.metadata ?? {},
+        createdAt: row.createdAt,
+      })),
+      ...hrRows.map(mapHrDocumentAuditEventToEvidenceRow),
+    ].sort((left, right) => right.createdAt.getTime() - left.createdAt.getTime());
+
+    const page = merged.slice(offset, offset + pageSize);
+    const hasNextPage = merged.length > offset + pageSize;
+    const nextCursor = hasNextPage
+      ? encodeWindowOffset(offset + pageSize)
+      : undefined;
+
+    return {
+      rows: page,
+      pageSize,
+      totalCount:
+        Number(platformCountRow[0]?.value ?? 0) +
+        Number(hrCountRow[0]?.value ?? 0),
+      hasNextPage,
+      ...(nextCursor ? { nextCursor } : {}),
+    };
+  });
 }

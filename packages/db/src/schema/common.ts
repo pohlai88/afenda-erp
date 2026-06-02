@@ -78,6 +78,25 @@ export const erpDocumentRetentionEnum = pgEnum("erp_document_retention", [
   "legal-hold",
 ]);
 
+/** Platform-wide document classification (ARCH-OS-1001 §5). */
+export const erpDocumentClassificationEnum = pgEnum("erp_document_classification", [
+  "public",
+  "internal",
+  "confidential",
+  "restricted",
+  "highly-restricted",
+  "regulated",
+]);
+
+/** Malware scan lifecycle for ERP document registry (ARCH-OS-001). */
+export const erpDocumentScanStatusEnum = pgEnum("erp_document_scan_status", [
+  "pending",
+  "scanning",
+  "passed",
+  "failed",
+  "quarantined",
+]);
+
 export const aiFeatureEnum = pgEnum("ai_feature", [
   "assistant",
   "document-extraction",

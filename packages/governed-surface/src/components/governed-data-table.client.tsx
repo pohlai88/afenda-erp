@@ -103,7 +103,7 @@ export function GovernedDataTableClient<TData>({
           <TableRow data-row-state="empty">
             <TableCell
               colSpan={columnCount}
-              className="py-8 text-center type-muted"
+              className="py-density-relaxed text-center type-muted"
             >
               {emptyLabel}
             </TableCell>

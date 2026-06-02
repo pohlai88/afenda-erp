@@ -1,5 +1,5 @@
-import { loadModuleWorkItemDetailContext } from "@/workspace-routes/workspace-route-cache";
-import { WorkItemDetailRoutePage } from "@/workspace-routes/work-item-detail-route";
+import { loadModuleWorkItemDetailContext } from "@/routes/workspace/shared/workspace-route-cache";
+import { WorkItemDetailRoutePage } from "@/routes/workspace/modules/work-item-detail-route";
 import type { Metadata } from "next";
 
 export const unstable_instant = {

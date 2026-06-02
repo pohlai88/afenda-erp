@@ -1,11 +1,13 @@
 "use client";
 
 import type { ModuleId } from "@afenda/kernel";
+import { uploadVercelBlobClient } from "../../blob/components/index";
 import { OBJECT_STORAGE_HTTP_ROUTES } from "../contracts/index";
 import {
   documentUploadContentTypes,
   documentUploadMaxSizeBytes,
 } from "../policies/document-upload-policy.shared";
+import { objectStorageGovernancePolicy } from "../policies/document-governance-policy.shared";
 import {
   sanitizeUploadFilename,
   shouldUseMultipartUpload,
@@ -22,6 +24,7 @@ export type ObjectStorageUploadConfig = {
   contentTypes?: string[];
   accept?: string;
   multipartThresholdBytes?: number;
+  governance?: typeof objectStorageGovernancePolicy;
   error?: string;
 };
 
@@ -31,6 +34,8 @@ export type TenantDocumentUploadInput = {
   title: string;
   ownerEntityId?: string;
   access?: UploadTokenPayload["access"];
+  classification?: UploadTokenPayload["classification"];
+  retentionClass?: UploadTokenPayload["retentionClass"];
   /** When false, skips ERP document registry (HR attachments, receipts). Default true. */
   registerTenantDocument?: boolean;
 };
@@ -93,6 +98,10 @@ function buildClientPayload(
     contentType: input.file.type as UploadTokenPayload["contentType"],
     sizeBytes: input.file.size,
     access: input.access ?? "private",
+    classification:
+      input.classification ?? objectStorageGovernancePolicy.defaultClassification,
+    retentionClass:
+      input.retentionClass ?? objectStorageGovernancePolicy.defaultRetentionClass,
     registerTenantDocument: input.registerTenantDocument ?? true,
   };
 }
@@ -188,21 +197,14 @@ async function uploadViaVercelBlob(
     "organizationId" | "uploadedByAuthUserId" | "pathname"
   >,
 ): Promise<TenantObjectUploadResult> {
-  const { upload } = await import("@vercel/blob/client");
-  const result = await upload(pathname, input.file, {
+  return uploadVercelBlobClient({
+    pathname,
+    file: input.file,
     access: input.access ?? "private",
     handleUploadUrl: OBJECT_STORAGE_HTTP_ROUTES.upload,
     multipart: shouldUseMultipartUpload(input.file.size),
     clientPayload: JSON.stringify(clientPayload),
   });
-
-  return {
-    pathname: result.pathname,
-    blobUrl: result.url,
-    contentType: result.contentType ?? input.file.type,
-    sizeBytes: input.file.size,
-    etag: result.etag,
-  };
 }
 
 export async function uploadTenantObject(

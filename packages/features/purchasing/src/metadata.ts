@@ -9,6 +9,7 @@ export const {
   buildOverviewStatGrid,
   buildSavedViewsListSurface,
   buildDocumentRegistryListSurface,
+  buildDocumentActivityLinesListSurface,
   buildRecordDetailTabs,
   buildWorkItemDetailTabs,
   buildWorkItemKanbanSurface,

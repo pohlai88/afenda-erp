@@ -8,7 +8,12 @@ import { governedSurfaceParseErrorCopy } from "../../i18n/governed-renderer-copy
 import { cn } from "@afenda/ui/utils";
 
 import { renderGovernedChildTree } from "../render-governed-child-tree.shared";
-import type { GovernedComponentRendererDiagnostics } from "../registry";
+import type { RendererProps } from "../governed-renderer-dispatch";
+import { diagnosticsDataAttributes } from "../../utils/governed-diagnostics.shared";
+import {
+  governedIdentityAttributes,
+  governedTestId,
+} from "../../utils/governed-identity.shared";
 
 /**
  * governed:stack — flex layout for nested governed children.
@@ -16,10 +21,11 @@ import type { GovernedComponentRendererDiagnostics } from "../registry";
 export function StackRenderer({
   configuration,
   diagnostics = "user",
-}: {
-  configuration: unknown;
-  diagnostics?: GovernedComponentRendererDiagnostics;
-}) {
+  surfaceKey,
+  sectionKey,
+  componentKey,
+}: RendererProps) {
+  const resolvedComponentKey = componentKey ?? sectionKey ?? surfaceKey ?? "stack";
   const parsed = parseGovernedStackConfiguration(configuration);
 
   if (!parsed.success) {
@@ -34,6 +40,10 @@ export function StackRenderer({
           title: copy.title,
           description: copy.description,
         }}
+        surfaceKey={surfaceKey}
+        sectionKey={sectionKey}
+        componentKey={resolvedComponentKey}
+        renderState="invalid"
       />
     );
   }
@@ -62,8 +72,22 @@ export function StackRenderer({
         direction === "bento" && "gap-surface-lg",
         elevatedChromeFrameClass(chrome?.elevation, chrome?.surface),
       )}
+      {...governedIdentityAttributes({
+        surfaceKey,
+        sectionKey,
+        componentKey: resolvedComponentKey,
+      })}
+      {...diagnosticsDataAttributes({
+        state: "ready",
+        testId: governedTestId("stack", resolvedComponentKey),
+        componentType: "governed:stack",
+      })}
     >
-      {renderGovernedChildTree(children, diagnostics)}
+      {renderGovernedChildTree(children, diagnostics, {
+        surfaceKey,
+        sectionKey,
+        componentKey: resolvedComponentKey,
+      })}
     </div>
   );
 }

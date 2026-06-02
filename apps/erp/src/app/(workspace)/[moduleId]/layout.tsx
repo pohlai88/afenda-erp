@@ -1,6 +1,6 @@
 import { SystemAdminSectionSkeleton } from "@/app-route-state/route-states";
-import { HrSectionNav } from "@/workspace-routes/hr-section-nav.server";
-import { SystemAdminSectionNav } from "@/workspace-routes/system-admin-section-nav.server";
+import { HrSectionNav } from "@/routes/workspace/modules/hr-section-nav.server";
+import { SystemAdminSectionNav } from "@/routes/workspace/modules/system-admin-section-nav.server";
 import { HR_MODULE_ID } from "@/lib/hr-route.shared";
 import { SYSTEM_ADMIN_MODULE_ID } from "@/lib/system-admin-route.shared";
 import type { ReactNode } from "react";

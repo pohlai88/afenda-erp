@@ -1,6 +1,6 @@
 import { assertHrModuleId } from "@/lib/hr-route.shared";
-import HrCompetencySkillsHubPage from "@/lib/hr-sections/competency-skills.server";
-export { metadata } from "@/lib/hr-sections/competency-skills.server";
+import HrCompetencySkillsHubPage from "@/section-adapters/hr/competency-skills.server";
+export { metadata } from "@/section-adapters/hr/competency-skills.server";
 
 export const unstable_instant = {
   prefetch: "static",

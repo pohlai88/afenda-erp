@@ -145,16 +145,16 @@ export function collectPlatformInstrumentationIssues(): SystemAdminReliabilityIs
         "Track queue instrumentation in platform infrastructure before enabling operational alerts here.",
     }),
     withHref({
-      id: issueId(["storage_health", "not-instrumented"]),
+      id: issueId(["storage_health", "metrics-shipped"]),
       category: "storage_health",
       severity: "info",
-      title: "Object storage health is not instrumented",
+      title: "Object storage metrics emit via structured logs",
       description:
-        "Blob utilization and failure rates are managed by the hosting provider until storage probes ship.",
+        "Upload/download counters and malware_detected events log to the observability drain. Run pnpm r2:verify quarterly for DR evidence.",
       targetType: "platform",
       targetId: "storage",
       recommendedAction:
-        "Monitor Vercel Blob or R2 dashboards until storage probes are wired into reliability.",
+        "Run pnpm r2:verify and pnpm r2:verify:presign from repo root after env:sync:all. See packages/object-storage/docs/object-storage-dr-runbook.md.",
     }),
     withHref({
       id: issueId(["cache_health", "not-instrumented"]),
@@ -239,7 +239,13 @@ export function buildReliabilityOperationalLinkRows(): SystemAdminReliabilityOpe
       id: "observability-drain",
       area: "Observability drain",
       status: "Configured",
-      detail: "Route /api/observability/drain",
+      detail: "Route /api/internal/v1/observability/drain",
+    },
+    {
+      id: "object-storage-verify",
+      area: "Object storage DR drill",
+      status: "Operator",
+      detail: "pnpm r2:verify + pnpm r2:verify:presign (see object-storage-dr-runbook.md)",
     },
     {
       id: "governance-diagnostics",

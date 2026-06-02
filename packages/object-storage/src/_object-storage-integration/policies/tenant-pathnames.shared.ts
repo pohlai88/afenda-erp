@@ -15,6 +15,19 @@ export const BLOB_MULTIPART_THRESHOLD_BYTES = MULTIPART_UPLOAD_THRESHOLD_BYTES;
 
 export const DEFAULT_DOCUMENT_LIST_PAGE_SIZE = 6;
 
+export function extractTenantPathnameFromObjectUrl(url: string): string | null {
+  try {
+    const objectPath = new URL(url).pathname.replace(/^\/+/, "");
+    if (objectPath.startsWith(`${TENANT_OBJECT_ROOT}/`)) {
+      return objectPath;
+    }
+  } catch {
+    return null;
+  }
+
+  return null;
+}
+
 export function sanitizeUploadFilename(filename: string) {
   const trimmed = filename.trim();
 

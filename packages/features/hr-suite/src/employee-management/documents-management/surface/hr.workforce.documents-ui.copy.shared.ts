@@ -37,6 +37,7 @@ export const hrDocumentsUiCopy = {
     colLifecycle: "Lifecycle",
     colExpiry: "Expiry",
     colUploaded: "Uploaded",
+    colDownload: "Download",
     colActions: "Actions",
     formSubmitLabel: "Register document",
     formFieldEmployee: "Employee",

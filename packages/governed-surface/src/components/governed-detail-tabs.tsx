@@ -1,3 +1,4 @@
+import { Badge } from "@afenda/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@afenda/ui/tabs";
 import {
   Table,
@@ -47,8 +48,15 @@ function sortVisibleSections(
     .sort((a, b) => a.orderIndex - b.orderIndex);
 }
 
-function renderSectionSlot(section: GovernedDetailSection) {
-  return resolveGovernedDetailSectionContent(section);
+function renderSectionSlot(
+  section: GovernedDetailSection,
+  identity?: {
+    surfaceKey?: string;
+    sectionKey?: string;
+    componentKey?: string;
+  },
+) {
+  return resolveGovernedDetailSectionContent(section, identity);
 }
 
 function detailSectionHeadingId(
@@ -200,6 +208,15 @@ function effectiveDefaultTab(
   return "overview";
 }
 
+function summarizeDetailTabs(model: GovernedDetailTabsModel) {
+  return {
+    relations: sortVisibleSections(model.relations).length,
+    referrers: sortVisibleSections(model.referrers).length,
+    revisions: model.revisions?.length ?? 0,
+    audit: model.audit?.length ?? 0,
+  };
+}
+
 function DetailTabSection({
   tabKind,
   section,
@@ -242,7 +259,11 @@ function DetailTabSection({
           {section.description}
         </p>
       ) : null}
-      {renderSectionSlot(section)}
+      {renderSectionSlot(section, {
+        surfaceKey,
+        sectionKey: sectionKey ?? scopedSectionKey,
+        componentKey: scopedSectionKey,
+      })}
     </section>
   );
 }
@@ -299,6 +320,7 @@ export function GovernedDetailTabs({
   const revisions = normalizedModel.revisions ?? [];
   const auditRows = normalizedModel.audit ?? [];
   const auditComponentKey = `${resolvedComponentKey}-audit`;
+  const summary = summarizeDetailTabs(normalizedModel);
 
   return (
     <section
@@ -315,6 +337,34 @@ export function GovernedDetailTabs({
       })}
     >
       <Tabs defaultValue={defaultValue} className="gap-surface-lg">
+        <div className="flex flex-col gap-2">
+          <div className="flex flex-wrap items-start justify-between gap-2">
+            <div className="min-w-0">
+              <GovernedHeading level={3} variant="card">
+                {normalizedModel.entityLabel}
+              </GovernedHeading>
+              <p className="type-muted">
+                {normalizedModel.entityKind} · {normalizedModel.entityId}
+              </p>
+            </div>
+            <div className="flex flex-wrap items-center gap-1.5">
+              <Badge variant="outline">{kinds.length} tabs</Badge>
+              {summary.relations > 0 ? (
+                <Badge variant="secondary">{summary.relations} relations</Badge>
+              ) : null}
+              {summary.referrers > 0 ? (
+                <Badge variant="secondary">{summary.referrers} referrers</Badge>
+              ) : null}
+              {summary.revisions > 0 ? (
+                <Badge variant="info">{summary.revisions} revisions</Badge>
+              ) : null}
+              {summary.audit > 0 ? (
+                <Badge variant="warning">{summary.audit} audit events</Badge>
+              ) : null}
+            </div>
+          </div>
+        </div>
+
         <TabsList
           variant="line"
           className="w-full justify-start overflow-x-auto"
@@ -396,7 +446,11 @@ export function GovernedDetailTabs({
                       {normalizedModel.overview.description}
                     </p>
                   ) : null}
-                  {renderSectionSlot(normalizedModel.overview)}
+                  {renderSectionSlot(normalizedModel.overview, {
+                    surfaceKey,
+                    sectionKey,
+                    componentKey: `${resolvedComponentKey}-overview`,
+                  })}
                 </>
               )}
             </section>

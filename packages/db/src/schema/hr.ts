@@ -875,6 +875,7 @@ export const hrEmployeeDocuments = pgTable(
     documentType: text("document_type").notNull(),
     title: text("title").notNull(),
     blobUrl: text("blob_url").notNull(),
+    pathname: text("pathname"),
     payloadHash: text("payload_hash").notNull(),
     mimeType: text("mime_type").notNull(),
     sizeBytes: integer("size_bytes").notNull(),
@@ -897,6 +898,7 @@ export const hrEmployeeDocuments = pgTable(
     versionNumber: integer("version_number").notNull().default(1),
     isLatestActive: boolean("is_latest_active").notNull().default(true),
     archivedAt: timestamp("archived_at", { withTimezone: true }),
+    legalHold: boolean("legal_hold").notNull().default(false),
     ...timestampColumns,
   },
   (table) => [

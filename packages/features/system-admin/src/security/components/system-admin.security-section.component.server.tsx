@@ -1,6 +1,14 @@
-import { GovernedPatternCListSection } from "@afenda/governed-surface/server";
+import { GovernedPatternBStatSection, GovernedPatternCListSection } from "@afenda/governed-surface/server";
+import { isAppCapability } from "@afenda/auth";
 import { SectionPanel } from "@afenda/ui";
 import type { SystemAdminActionResult } from "../../tenant-execution/contracts/system-admin.action-result.contract";
+import { SystemAdminDocumentQuarantineInboxSection } from "../../tenant-execution/components/system-admin.document-quarantine-inbox-section.component.server";
+import type { SystemAdminDocumentQuarantineInboxWindow } from "../../tenant-execution/data/system-admin.document-quarantine-inbox.read-model.server";
+import type { OrganizationStorageQuotaSnapshot } from "../../tenant-execution/data/system-admin.organization-storage-quota.read-model.server";
+import {
+  buildSystemAdminOrganizationStorageQuotaStatGroups,
+  systemAdminOrganizationStorageQuotaSurfaceKey,
+} from "../../tenant-execution/surface/system-admin.organization-storage-quota-stat.surface";
 import type { OrganizationSecuritySettings } from "../contracts/system-admin.security-settings.contract";
 import type { SecurityReadinessReport } from "../contracts/system-admin.security-readiness.contract";
 import type { SystemAdminDiagnosticsRecentChangeRow } from "../../diagnostics/contracts/system-admin.diagnostics-coverage.contract";
@@ -22,16 +30,25 @@ export function SystemAdminSecuritySection({
   security,
   readiness,
   recentChanges,
+  quarantineWindow,
+  storageQuota,
+  capabilities,
+  organizationLegalHoldActive,
   canMutate,
   updateSecuritySettingsAction,
 }: {
   security: OrganizationSecuritySettings | null;
   readiness: SecurityReadinessReport;
   recentChanges: readonly SystemAdminDiagnosticsRecentChangeRow[];
+  quarantineWindow: SystemAdminDocumentQuarantineInboxWindow;
+  storageQuota: OrganizationStorageQuotaSnapshot;
+  capabilities: readonly string[];
+  organizationLegalHoldActive: boolean;
   canMutate: boolean;
   updateSecuritySettingsAction: UpdateSecuritySettingsAction;
 }) {
   const copy = systemAdminSecurityUiCopy;
+  const appCapabilities = capabilities.filter(isAppCapability);
 
   return (
     <div className="@container flex flex-col gap-surface-2xl">
@@ -52,6 +69,16 @@ export function SystemAdminSecuritySection({
         layout="embedded"
       />
 
+      <GovernedPatternBStatSection
+        title={copy.storage.title}
+        description={copy.storage.description}
+        surfaceKey={systemAdminOrganizationStorageQuotaSurfaceKey}
+        layout="embedded"
+        statGroups={buildSystemAdminOrganizationStorageQuotaStatGroups({
+          snapshot: storageQuota,
+        })}
+      />
+
       <GovernedPatternCListSection
         title={copy.recentChanges.title}
         description={copy.recentChanges.description}
@@ -61,6 +88,12 @@ export function SystemAdminSecuritySection({
         })}
         parentAccessAllowed
         layout="embedded"
+      />
+
+      <SystemAdminDocumentQuarantineInboxSection
+        quarantineWindow={quarantineWindow}
+        capabilities={appCapabilities}
+        organizationLegalHoldActive={organizationLegalHoldActive}
       />
 
       {canMutate && security ? (

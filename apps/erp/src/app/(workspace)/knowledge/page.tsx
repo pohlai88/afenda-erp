@@ -1,4 +1,4 @@
-import { KnowledgeAdminRoutePage } from "@/workspace-routes/knowledge-route";
+import { KnowledgeAdminRoutePage } from "@/routes/workspace/knowledge/knowledge-route";
 import type { Metadata } from "next";
 
 export const unstable_instant = {

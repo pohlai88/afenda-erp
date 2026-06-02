@@ -28,6 +28,7 @@ vi.mock("@afenda/db", async (importOriginal) => {
   return {
     ...actual,
     searchTenantAuditLogs: (...args: unknown[]) => mockSearchAudit(...args),
+    getRetentionPolicy: vi.fn(async () => null),
     listRetentionPolicies: vi.fn(async () => []),
     upsertRetentionPolicy: (...args: unknown[]) => mockUpsertRetention(...args),
   };

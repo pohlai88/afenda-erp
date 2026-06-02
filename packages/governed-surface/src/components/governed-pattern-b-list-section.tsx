@@ -9,7 +9,6 @@ import { getGovernedSurfaceTranslations } from "../i18n/governed-surface-copy";
 import { logGovernedListSurfaceRender } from "../log-governed-list-surface-render.server";
 import {
   governedListSectionDomId,
-  governedListSectionTestId as buildGovernedListSectionTestId,
   summarizeListSurfaceTrailingActions,
 } from "../list-surface-identity.shared";
 
@@ -36,6 +35,8 @@ export type GovernedPatternBListSectionProps = {
   description?: string;
   listConfiguration: ListSurfaceRendererConfigurationInput;
   surfaceKey: string;
+  sectionKey?: string;
+  componentKey?: string;
   layout?: GovernedPatternBListSectionLayout;
   density?: GovernedPatternSectionDensity;
   loadError?: GovernedPatternEmptyState;
@@ -58,6 +59,8 @@ export async function GovernedPatternBListSection({
   description,
   listConfiguration,
   surfaceKey,
+  sectionKey,
+  componentKey,
   layout = "card",
   density = "comfortable",
   loadError,
@@ -74,17 +77,19 @@ export async function GovernedPatternBListSection({
   contentClassName,
 }: GovernedPatternBListSectionProps) {
   const t = await getGovernedSurfaceTranslations("Erp");
-  const sectionTestId = buildGovernedListSectionTestId(surfaceKey);
-  const sectionDomId = governedListSectionDomId(surfaceKey);
+  const defaultSectionKey = listConfiguration.surface?.columnsId ?? surfaceKey;
+  const resolvedSectionKey = sectionKey ?? defaultSectionKey;
+  const resolvedComponentKey = componentKey ?? resolvedSectionKey;
+  const sectionDomId = governedListSectionDomId(resolvedComponentKey);
 
   const shellInput = {
     layout,
     density,
     className,
-    sectionTestId,
     sectionDomId,
     surfaceKey,
-    sectionKey: surfaceKey,
+    sectionKey: resolvedSectionKey,
+    componentKey: resolvedComponentKey,
     headerSlot,
     title,
     description,
@@ -110,7 +115,11 @@ export async function GovernedPatternBListSection({
       logUnexpectedServerError(
         "GovernedPatternBListSection invalid list configuration",
         parsed.error,
-        { surfaceKey },
+        {
+          surfaceKey,
+          sectionKey: resolvedSectionKey,
+          componentKey: resolvedComponentKey,
+        },
       );
 
       body = {
@@ -153,6 +162,8 @@ export async function GovernedPatternBListSection({
 
         logGovernedListSurfaceRender({
           surfaceKey,
+          sectionKey: resolvedSectionKey,
+          componentKey: resolvedComponentKey,
           columnsId: config.surface.columnsId,
           dataNature: config.dataNature,
           presentationVariant,
@@ -162,23 +173,32 @@ export async function GovernedPatternBListSection({
           trailing: summarizeListSurfaceTrailingActions(config.rows),
         });
 
-        body = {
-          state: listState,
-          children: (
-            <>
-              {contentBeforeList}
-              <GovernedComponentRenderer
-                component={{
-                  type: "governed:list-surface",
-                  serverType: "governed:list-surface",
-                  configuration: config,
-                }}
-                surfaceKey={surfaceKey}
-              />
-              {contentAfterList}
-            </>
-          ),
-        };
+        const children = (
+          <>
+            {contentBeforeList}
+            <GovernedComponentRenderer
+              component={{
+                type: "governed:list-surface",
+                serverType: "governed:list-surface",
+                configuration: config,
+              }}
+              surfaceKey={surfaceKey}
+              sectionKey={resolvedSectionKey}
+              componentKey={resolvedComponentKey}
+            />
+            {contentAfterList}
+          </>
+        );
+
+        body = isEmpty
+          ? {
+              state: "empty",
+              model: {
+                ...config.surface.empty,
+                emptyId: `${resolvedComponentKey}-empty`,
+              },
+            }
+          : { state: "ready", children };
       }
     }
   }

@@ -6,7 +6,10 @@ import {
   formatUploadLimit,
   uploadTenantObject,
 } from "@afenda/object-storage/client";
+import { Alert, AlertDescription } from "@afenda/ui/alert";
+import { Badge } from "@afenda/ui/badge";
 import { Button } from "@afenda/ui/button";
+import { Input } from "@afenda/ui/input";
 import { Label } from "@afenda/ui/label";
 import { useRef, useState } from "react";
 
@@ -44,18 +47,21 @@ export function GovernedFileUploadField({
 }) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
-  const [message, setMessage] = useState<string | null>(null);
+  const [statusMessage, setStatusMessage] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const uploaded = isFileUploadValue(value) ? value : null;
 
   async function handleUpload() {
     const file = fileInputRef.current?.files?.[0];
     if (!file) {
-      setMessage("Select a file first.");
+      setErrorMessage("Select a file first.");
+      setStatusMessage(null);
       return;
     }
 
     setUploading(true);
-    setMessage("Uploading…");
+    setErrorMessage(null);
+    setStatusMessage("Uploading...");
 
     try {
       const result = await uploadTenantObject({
@@ -73,9 +79,10 @@ export function GovernedFileUploadField({
         sizeBytes: result.sizeBytes,
         etag: result.etag,
       });
-      setMessage("Upload complete.");
+      setStatusMessage("Upload complete.");
     } catch (error) {
-      setMessage(
+      setStatusMessage(null);
+      setErrorMessage(
         error instanceof Error ? error.message : "Upload failed. Try again.",
       );
     } finally {
@@ -85,15 +92,14 @@ export function GovernedFileUploadField({
 
   return (
     <div className="flex flex-col gap-2">
-      <input
+      <Input
         ref={fileInputRef}
         id={`wizard-field-${field.id}`}
         type="file"
         accept={field.accept ?? documentUploadAccept}
         disabled={!enabled || uploading}
-        className="w-full rounded-control border border-input bg-background px-3 py-2 type-control file:mr-3 file:rounded-control file:border-0 file:bg-primary file:px-3 file:py-1.5 file:type-control file:font-medium file:text-primary-foreground"
       />
-      <p className="type-caption text-muted-foreground">
+      <p className="type-caption">
         Max size {formatUploadLimit()}.
       </p>
       <div className="flex flex-wrap items-center gap-2">
@@ -107,13 +113,19 @@ export function GovernedFileUploadField({
           {uploading ? "Uploading…" : "Upload file"}
         </Button>
         {uploaded ? (
-          <span className="type-caption text-emerald-700">
+          <Badge variant="secondary">
             {uploaded.pathname.split("/").pop()}
-          </span>
+          </Badge>
         ) : null}
       </div>
-      {message ? (
-        <output className="type-caption text-muted-foreground">{message}</output>
+      {errorMessage ? (
+        <Alert variant="destructive">
+          <AlertDescription>{errorMessage}</AlertDescription>
+        </Alert>
+      ) : statusMessage ? (
+        <output className="type-muted">
+          {statusMessage}
+        </output>
       ) : null}
       {field.required && !uploaded ? (
         <span className="sr-only">

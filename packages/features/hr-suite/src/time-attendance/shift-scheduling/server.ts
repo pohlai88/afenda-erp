@@ -1,4 +1,18 @@
 import React from "react";
+import {
+  ExecutionAccessDeniedError,
+  ExecutionContextRequiredError,
+} from "@afenda/kernel/execution";
+
+import {
+  buildHrSftPageModel,
+  buildHrSftSelfServicePageModel,
+} from "./data/hr.time.sft.page-model.server";
+import {
+  toHrSftPageModelInput,
+  toHrSftSelfServicePageModelInput,
+} from "./data/hr.time.sft-search-params.parse.shared";
+import { requireHrSftRead } from "./policies/hr.time.sft-access.policy.server";
 
 export * from "./actions";
 export * from "./events";
@@ -109,7 +123,67 @@ export {
 } from "./surface/hr.time.sft-audit-trail-list.surface";
 
 import { HrSftAccessDeniedPanel } from "./components/hr.time.sft-section.component.server";
+import {
+  HrSftMySwapsSection,
+  HrSftWorkbenchSection,
+} from "./components/hr.time.sft-section.component.server";
 
 export function HrSftAccessDenied() {
   return React.createElement(HrSftAccessDeniedPanel);
+}
+
+type HrRawSearchParams = Record<string, string | string[] | undefined> | undefined;
+type HrSearchParamsInput = HrRawSearchParams | Promise<HrRawSearchParams>;
+
+function isHrSftAccessFailure(error: unknown) {
+  return (
+    error instanceof ExecutionContextRequiredError ||
+    error instanceof ExecutionAccessDeniedError
+  );
+}
+
+export async function renderHrSftPage(searchParams?: HrSearchParamsInput) {
+  const resolvedSearchParams = searchParams ? await searchParams : undefined;
+
+  try {
+    const guard = await requireHrSftRead();
+    const actorEmployeeId = guard.actorEmployeeIds[0];
+
+    if (guard.accessScope === "self" && actorEmployeeId) {
+      const selfServiceModel = await buildHrSftSelfServicePageModel(
+        toHrSftSelfServicePageModelInput({
+          organizationId: guard.organization.id,
+          actorEmployeeId,
+          searchParams: resolvedSearchParams,
+        }),
+      );
+
+      return React.createElement(HrSftMySwapsSection, {
+        model: selfServiceModel,
+      });
+    }
+
+    const visibleEmployeeIds = await guard.resolveVisibleEmployeeIds();
+    const pageModel = await buildHrSftPageModel(
+      toHrSftPageModelInput({
+        organizationId: guard.organization.id,
+        actorAuthUserId: guard.session.id,
+        accessScope: guard.accessScope,
+        canManage: guard.canManageShifts,
+        canApprove: guard.canApprove,
+        actorEmployeeId,
+        canViewPayrollRefs: guard.canViewPayrollRefs,
+        canViewAudit: guard.canViewAudit,
+        visibleEmployeeIds,
+        searchParams: resolvedSearchParams,
+      }),
+    );
+
+    return React.createElement(HrSftWorkbenchSection, { model: pageModel });
+  } catch (error) {
+    if (isHrSftAccessFailure(error)) {
+      return React.createElement(HrSftAccessDeniedPanel);
+    }
+    throw error;
+  }
 }

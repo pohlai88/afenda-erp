@@ -1,4 +1,5 @@
 export { SystemAdminLynxAccessDenied } from "./system-admin.lynx-access.component.server";
+export { SystemAdminLynxPage } from "./system-admin.lynx-page.component.server";
 export { AiFeatureEntitlementTrailingCell } from "./system-admin.ai-feature-entitlement-trailing-cell.component.client";
 export { SandboxTrailingCell } from "./system-admin.sandbox-trailing-cell.component.client";
 export { LynxOutcomeMonitorSection } from "./system-admin.lynx-outcome-monitor-section.component.server";

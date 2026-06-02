@@ -1,6 +1,6 @@
 import { assertHrModuleId } from "@/lib/hr-route.shared";
-import HrCompensationPlanningAuditPage from "@/workspace-routes/hr-compensation-planning-audit.server";
-export { metadata } from "@/workspace-routes/hr-compensation-planning-audit.server";
+import HrCompensationPlanningAuditPage from "@/routes/workspace/modules/hr-compensation-planning-audit.server";
+export { metadata } from "@/routes/workspace/modules/hr-compensation-planning-audit.server";
 
 export const unstable_instant = {
   prefetch: "static",

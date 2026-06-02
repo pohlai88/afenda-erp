@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
 import type { Route } from "next";
+import { useActionState, useState } from "react";
 import {
   Check,
   ChevronDown,
@@ -17,9 +17,12 @@ import { Button } from "@afenda/ui/button";
 import { Checkbox } from "@afenda/ui/checkbox";
 import {
   DropdownMenu,
+  DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@afenda/ui/dropdown-menu";
 import { Input } from "@afenda/ui/input";
@@ -30,9 +33,19 @@ import {
   governedListToolbarOwnedParams,
   governedListToolbarResetParams,
 } from "../../client";
+import { ActionFormErrors } from "../../components/action-form-errors";
+import {
+  actionFailure,
+  type ActionResult,
+} from "../../schemas/action-result.shared";
 import type { ListSurfaceToolbar } from "../../schemas/list-surface-toolbar.schema";
+import {
+  GOVERNED_ACTION_ID_FIELD,
+  GOVERNED_CONFIRM_FIELD,
+  GOVERNED_SELECTED_ROW_ID_FIELD,
+  type GovernedServerActionHandler,
+} from "../../schemas/server-actions.shared";
 import type { uiDensity } from "@afenda/ui/design-system";
-import { cn } from "@afenda/ui/utils";
 
 export type ListSurfaceToolbarClientProps = {
   toolbar?: ListSurfaceToolbar;
@@ -44,8 +57,17 @@ export type ListSurfaceToolbarClientProps = {
   exportFormId?: string;
   exportTriggerElementId?: string;
   selectedCount?: number;
+  selectedRowIds?: readonly string[];
   selectionLabel?: string;
+  bulkActionHandlers?: Record<string, GovernedServerActionHandler<FormData, void>>;
 };
+
+const missingBulkAction: GovernedServerActionHandler = async () =>
+  actionFailure(
+    "This list bulk action is not connected to a registered server action.",
+    undefined,
+    "governed.action.unregistered",
+  );
 
 function currentToolbarHref(): string {
   if (typeof window === "undefined") {
@@ -88,11 +110,11 @@ export function ListSurfaceToolbarClient({
   exportFormId,
   exportTriggerElementId,
   selectedCount = 0,
+  selectedRowIds = [],
   selectionLabel,
+  bulkActionHandlers,
 }: ListSurfaceToolbarClientProps) {
   const router = useRouter();
-  const [showColumns, setShowColumns] = useState(false);
-
   if (!toolbar) {
     return null;
   }
@@ -306,46 +328,42 @@ export function ListSurfaceToolbarClient({
         </Button>
       ) : null}
       {toolbar.columnPicker && columnIds.length > 0 ? (
-        <div className="relative">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
           <Button
             type="button"
             variant="outline"
             size="sm"
-            onClick={() => setShowColumns((open) => !open)}
-            aria-expanded={showColumns}
           >
             <SlidersHorizontal data-icon="inline-start" aria-hidden />
             Columns
           </Button>
-          {showColumns ? (
-            <div
-              className={cn(
-                "absolute end-0 top-full z-raised mt-1 min-w-[10rem] rounded-popover border border-border bg-popover p-2 shadow-elevation-2", // audit-ds: ignore no-arbitrary-value — column picker dropdown minimum width
-              )}
-              role="menu"
-            >
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuLabel>Columns</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuGroup>
               {columnIds.map((columnId) => (
-                <label
+                <DropdownMenuCheckboxItem
                   key={columnId}
-                  className="flex cursor-pointer items-center gap-2 rounded px-2 py-1 type-body hover:bg-muted"
+                  checked={!hiddenColumnIds?.has(columnId)}
+                  onCheckedChange={() => onToggleColumn?.(columnId)}
                 >
-                  <Checkbox
-                    checked={!hiddenColumnIds?.has(columnId)}
-                    onCheckedChange={() => onToggleColumn?.(columnId)}
-                    aria-label={`Toggle column ${columnId}`}
-                  />
                   {columnId}
-                </label>
+                </DropdownMenuCheckboxItem>
               ))}
-            </div>
-          ) : null}
-        </div>
+            </DropdownMenuGroup>
+          </DropdownMenuContent>
+        </DropdownMenu>
       ) : null}
       {toolbar.export && exportTriggerElementId ? (
         <Button
           type="button"
           variant="outline"
           size="sm"
+          data-action-id={toolbar.export.actionId}
+          data-action-kind={toolbar.export.kind}
+          data-action-resolution="client-download-trigger"
           onClick={() =>
             document.getElementById(exportTriggerElementId)?.click()
           }
@@ -355,23 +373,118 @@ export function ListSurfaceToolbarClient({
         </Button>
       ) : null}
       {toolbar.export && exportFormId && !exportTriggerElementId ? (
-        <Button type="submit" form={exportFormId} variant="outline" size="sm">
+        <Button
+          type="submit"
+          form={exportFormId}
+          variant="outline"
+          size="sm"
+          data-action-id={toolbar.export.actionId}
+          data-action-kind={toolbar.export.kind}
+          data-action-resolution="server-export-form"
+        >
           <Download data-icon="inline-start" aria-hidden />
           {toolbar.export.label}
         </Button>
       ) : null}
       {toolbar.bulkActions?.map((action) => (
-        <Button
+        <ListSurfaceBulkActionForm
           key={action.actionId}
-          type="button"
-          variant="outline"
-          size="sm"
-          disabled={Boolean(action.disabledReason)}
-          title={action.disabledReason}
-        >
-          {action.label}
-        </Button>
+          action={action}
+          selectedRowIds={selectedRowIds}
+          selectedCount={selectedCount}
+          handler={bulkActionHandlers?.[action.actionId]}
+        />
       ))}
     </div>
+  );
+}
+
+function ListSurfaceBulkActionForm({
+  action,
+  selectedRowIds,
+  selectedCount,
+  handler,
+}: {
+  action: NonNullable<ListSurfaceToolbar["bulkActions"]>[number];
+  selectedRowIds: readonly string[];
+  selectedCount: number;
+  handler?: GovernedServerActionHandler<FormData, void>;
+}) {
+  const [confirmed, setConfirmed] = useState(false);
+  const [result, formAction, pending] = useActionState<
+    ActionResult<void> | undefined,
+    FormData
+  >(handler ?? missingBulkAction, undefined);
+  const actionRegistered = Boolean(handler);
+  const missingConfirmation = Boolean(action.confirm) && !confirmed;
+  const disabled =
+    pending ||
+    selectedCount === 0 ||
+    Boolean(action.disabledReason) ||
+    !actionRegistered ||
+    missingConfirmation;
+
+  return (
+    <form
+      action={formAction}
+      className="inline-flex items-center gap-1.5"
+      data-action-id={action.actionId}
+      data-action-kind={action.kind}
+      data-action-resolution={actionRegistered ? "registered" : "missing"}
+      data-action-has-confirm={action.confirm ? "true" : undefined}
+      data-selection-count={selectedCount}
+    >
+      <input
+        type="hidden"
+        name={GOVERNED_ACTION_ID_FIELD}
+        value={action.actionId}
+      />
+      {selectedRowIds.map((rowId) => (
+        <input
+          key={rowId}
+          type="hidden"
+          name={GOVERNED_SELECTED_ROW_ID_FIELD}
+          value={rowId}
+        />
+      ))}
+      {action.confirm && confirmed ? (
+        <input
+          type="hidden"
+          name={GOVERNED_CONFIRM_FIELD}
+          value="confirmed"
+        />
+      ) : null}
+      {action.confirm ? (
+        <label className="type-caption inline-flex items-center gap-1">
+          <Checkbox
+            aria-label={action.confirm.title}
+            checked={confirmed}
+            onCheckedChange={(checked) => setConfirmed(checked === true)}
+          />
+          <span>{action.confirm.confirmLabel}</span>
+        </label>
+      ) : null}
+      <Button
+        type="submit"
+        variant="outline"
+        size="sm"
+        disabled={disabled}
+        title={
+          action.disabledReason ??
+          (selectedCount === 0
+            ? "Select at least one row."
+            : !actionRegistered
+              ? "Bulk server action is not registered."
+              : missingConfirmation
+                ? action.confirm?.title
+              : undefined)
+        }
+        data-action-id={action.actionId}
+        data-action-kind={action.kind}
+      >
+        {pending ? "Working..." : action.label}
+      </Button>
+      <ActionFormErrors result={result} />
+    </form>
   );
 }

@@ -9,5 +9,6 @@ export {
   SystemAdminAuditAccessDenied,
   SystemAdminAuditSection,
 } from "./system-admin.audit-section.component.server";
+export { SystemAdminAuditPage } from "./system-admin.audit-page.component.server";
 export { SystemAdminAuditCoveragePanel } from "./system-admin.audit-coverage-panel.component.server";
 export { SystemAdminAuditInvestigationPanel } from "./system-admin.audit-investigation-panel.component.server";

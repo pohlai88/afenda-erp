@@ -14,17 +14,22 @@ import type { GovernedRenderableState } from "../schemas/governed-component-stat
 import type { EmptyState } from "../schemas/list-surface.schema";
 import { densityGapClass } from "../schemas/surface-chrome.classes";
 import { diagnosticsDataAttributes } from "../utils/governed-diagnostics.shared";
-import { governedIdentityAttributes } from "../utils/governed-identity.shared";
+import {
+  governedIdentityAttributes,
+  governedTestId,
+  toGovernedDomId,
+} from "../utils/governed-identity.shared";
 import { GovernedEmpty } from "./governed-empty";
 import type { GovernedPatternSectionDensity } from "./governed-pattern-section-shell.shared";
 
-export type GovernedSectionEmptyModel = EmptyState & { emptyId?: string };
+export type GovernedSectionEmptyModel = EmptyState & {
+  emptyId?: string;
+};
 
-/** Section body contract — one Card shell, one state path (ADR-0026 Pattern C recipe). */
 export type GovernedSurfaceSectionCardBody =
   | { state: "forbidden"; model: GovernedSectionEmptyModel }
   | { state: "invalid"; model: GovernedSectionEmptyModel }
-  | { state: "empty"; children: ReactNode }
+  | { state: "empty"; model: GovernedSectionEmptyModel }
   | { state: "ready"; children: ReactNode };
 
 export type GovernedSurfaceSectionCardProps = {
@@ -35,9 +40,10 @@ export type GovernedSurfaceSectionCardProps = {
   density?: GovernedPatternSectionDensity;
   className?: string;
   contentClassName?: string;
-  sectionKey?: string;
-  surfaceKey?: string;
-  testId?: string;
+
+  surfaceKey: string;
+  sectionKey: string;
+  componentKey?: string;
 };
 
 export function GovernedSurfaceSectionCard({
@@ -48,46 +54,89 @@ export function GovernedSurfaceSectionCard({
   density = "comfortable",
   className,
   contentClassName,
-  sectionKey,
   surfaceKey,
-  testId,
+  sectionKey,
+  componentKey = sectionKey,
 }: GovernedSurfaceSectionCardProps) {
   const renderState: GovernedRenderableState = body.state;
-  const resolvedSectionKey = sectionKey ?? surfaceKey;
+  const titleId = toGovernedDomId("section-card-title", componentKey);
+  const descriptionId = description
+    ? toGovernedDomId("section-card-description", componentKey)
+    : undefined;
 
-  const contractAttrs = resolvedSectionKey
-    ? {
-        ...governedIdentityAttributes({
-          surfaceKey,
-          sectionKey: resolvedSectionKey,
-          componentKey: resolvedSectionKey,
-        }),
-        ...diagnosticsDataAttributes({
-          state: renderState,
-          testId,
-        }),
-      }
-    : {};
+  const bodyComponentKey = `${componentKey}-body`;
+  const actionComponentKey = `${componentKey}-header-action`;
 
   return (
     <Card
       size={density === "compact" ? "sm" : "default"}
       className={cn("mt-surface-2xl border-solid border-border", className)}
-      {...contractAttrs}
+      aria-labelledby={titleId}
+      aria-describedby={descriptionId}
+      {...governedIdentityAttributes({
+        surfaceKey,
+        sectionKey,
+        componentKey,
+      })}
+      {...diagnosticsDataAttributes({
+        state: renderState,
+        testId: governedTestId("section-card", componentKey),
+      })}
     >
       <CardHeader>
-        <CardTitle className="type-subtitle">{title}</CardTitle>
+        <CardTitle id={titleId} className="type-subtitle">
+          {title}
+        </CardTitle>
 
-        {description ? <CardDescription>{description}</CardDescription> : null}
+        {description ? (
+          <CardDescription id={descriptionId}>{description}</CardDescription>
+        ) : null}
 
-        {headerAction ? <CardAction>{headerAction}</CardAction> : null}
+        {headerAction ? (
+          <CardAction
+            {...governedIdentityAttributes({
+              surfaceKey,
+              sectionKey,
+              componentKey: actionComponentKey,
+            })}
+            {...diagnosticsDataAttributes({
+              state: renderState,
+              testId: governedTestId("section-card-action", componentKey),
+            })}
+          >
+            {headerAction}
+          </CardAction>
+        ) : null}
       </CardHeader>
 
-      <CardContent className={cn(densityGapClass(density), contentClassName)}>
-        {body.state === "forbidden" || body.state === "invalid" ? (
-          <GovernedEmpty model={body.model} />
-        ) : (
+      <CardContent
+        className={cn(densityGapClass(density), contentClassName)}
+        {...governedIdentityAttributes({
+          surfaceKey,
+          sectionKey,
+          componentKey: bodyComponentKey,
+        })}
+        {...diagnosticsDataAttributes({
+          state: renderState,
+          testId: governedTestId("section-card-body", componentKey),
+        })}
+      >
+        {body.state === "ready" ? (
           body.children
+        ) : (
+          <GovernedEmpty
+            model={
+              body.state === "empty"
+                ? body.model
+                : {
+                    ...body.model,
+                    variant:
+                      body.state === "forbidden"
+                        ? "forbidden"
+                        : body.model.variant,
+                  }
+            }
+          />
         )}
       </CardContent>
     </Card>

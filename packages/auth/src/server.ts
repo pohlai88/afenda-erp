@@ -326,6 +326,10 @@ async function ensureDevSessionTenant(session: UserSession) {
   });
 }
 
+export async function bootstrapDevSessionTenant(session: UserSession) {
+  await ensureDevSessionTenant(session);
+}
+
 async function loadSession(): Promise<UserSession | null> {
   if (isDevAuthBypassEnabled()) {
     // UI/dev loop: in-memory demo session only (no Neon, no tenant bootstrap queries).

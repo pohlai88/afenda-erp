@@ -9,3 +9,7 @@ export type HrDocumentsRoutePath =
 export function hrEmployeeDetailRoutePath(employeeId: string): `/hr/records/${string}` {
   return `/hr/records/${employeeId}`;
 }
+
+export function hrTenantDocumentDownloadPath(documentId: string): string {
+  return `/api/internal/v1/documents/${documentId}/download?moduleId=hr`;
+}

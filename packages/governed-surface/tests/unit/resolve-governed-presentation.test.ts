@@ -29,6 +29,7 @@ describe("resolveGovernedListPresentation", () => {
         toolbar: {
           export: {
             actionId: "hrm.frm.exceptions.export",
+            kind: "download",
             label: "Export",
             formats: ["csv"],
           },
@@ -99,6 +100,7 @@ describe("buildGovernedListSurface", () => {
         toolbar: {
           export: {
             actionId: "erp.hrm.leave.export.requests",
+            kind: "download",
             label: "Export CSV",
             formats: ["csv"],
           },
@@ -222,6 +224,9 @@ describe("enterprise visualization metadata v2 schemas", () => {
     expect(parsed.success).toBe(true);
     if (!parsed.success) return;
     expect(parsed.data.presentation?.toolbar?.search?.param).toBe("q");
+    expect(parsed.data.presentation?.toolbar?.bulkActions?.[0]?.kind).toBe(
+      "server-action",
+    );
     expect(parsed.data.presentation?.narrowMode).toBe("cards");
     expect(parsed.data.columns[0]?.priority).toBe("primary");
     expect(parsed.data.columns[0]?.headerAction?.label).toBe("Configure name");
@@ -344,6 +349,33 @@ describe("enterprise visualization metadata v2 schemas", () => {
     expect(parsed.data.referenceBands?.[0]?.label).toBe("Legacy band");
     expect(parsed.data.actions?.[0]?.label).toBe("Open table");
     expect(parsed.data.annotations?.[0]?.tone).toBe("attention");
+  });
+
+  it("classifies toolbar export actions as downloads", () => {
+    const parsed = parseListSurfaceRendererConfiguration({
+      dataNature: "table",
+      presentation: {
+        toolbar: {
+          export: {
+            actionId: "export-list",
+            label: "Export",
+            formats: ["csv"],
+          },
+        },
+      },
+      surface: {
+        header: { title: "Exportable list" },
+        columnsId: "export-list",
+        rowKey: "id",
+        empty: { variant: "muted", title: "Empty" },
+      },
+      columns: [{ id: "name", header: "Name" }],
+      rows: [{ id: "1", cells: { name: "Ada" } }],
+    });
+
+    expect(parsed.success).toBe(true);
+    if (!parsed.success) return;
+    expect(parsed.data.presentation?.toolbar?.export?.kind).toBe("download");
   });
 
   it("accepts compact audit and timeline hierarchy metadata", () => {

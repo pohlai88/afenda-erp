@@ -43,6 +43,7 @@ export type GovernedKanbanBoardDataAttributes = GovernedKanbanBoardLegacyDataAtt
 export function buildKanbanBoardDataAttributes(input: {
   surfaceKey?: string;
   sectionKey?: string;
+  componentKey?: string;
   state: GovernedKanbanBoardRenderState;
 }): GovernedKanbanBoardDataAttributes {
   const legacy: GovernedKanbanBoardLegacyDataAttributes = input.surfaceKey
@@ -53,7 +54,7 @@ export function buildKanbanBoardDataAttributes(input: {
     ...governedIdentityAttributes({
       surfaceKey: input.surfaceKey,
       sectionKey: input.sectionKey ?? input.surfaceKey,
-      componentKey: input.surfaceKey,
+      componentKey: input.componentKey ?? input.sectionKey ?? input.surfaceKey,
     }),
     ...diagnosticsDataAttributes({
       state: input.state,
@@ -72,6 +73,8 @@ export type GovernedKanbanSectionDataAttributes = GovernedKanbanBoardLegacyDataA
 
 export function buildKanbanSectionDataAttributes(input: {
   surfaceKey: string;
+  sectionKey?: string;
+  componentKey?: string;
   state: GovernedKanbanBoardRenderState;
   testId?: string;
 }): GovernedKanbanSectionDataAttributes {
@@ -81,8 +84,8 @@ export function buildKanbanSectionDataAttributes(input: {
       : {}),
     ...governedIdentityAttributes({
       surfaceKey: input.surfaceKey,
-      sectionKey: input.surfaceKey,
-      componentKey: input.surfaceKey,
+      sectionKey: input.sectionKey ?? input.surfaceKey,
+      componentKey: input.componentKey ?? input.sectionKey ?? input.surfaceKey,
     }),
     ...diagnosticsDataAttributes({
       state: input.state,

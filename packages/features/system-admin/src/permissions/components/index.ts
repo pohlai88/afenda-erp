@@ -3,3 +3,4 @@ export {
   SystemAdminPermissionsAccessDenied,
   SystemAdminPermissionsSection,
 } from "./system-admin.permissions-section.component.server";
+export { SystemAdminPermissionsPage } from "./system-admin.permissions-page.component.server";

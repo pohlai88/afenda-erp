@@ -1,3 +1,3 @@
-import HrLmsPage from "@/lib/hr-sections/lms.server";
-export { metadata } from "@/lib/hr-sections/lms.server";
+import HrLmsPage from "@/section-adapters/hr/lms.server";
+export { metadata } from "@/section-adapters/hr/lms.server";
 export default HrLmsPage;

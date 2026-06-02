@@ -111,8 +111,8 @@ export function HrObjectStorageFileField({
         disabled={uploading}
         className="w-full rounded-control border border-input bg-background px-3 py-2 type-control file:mr-3 file:rounded-control file:border-0 file:bg-primary file:px-3 file:py-1.5 file:type-control file:font-medium file:text-primary-foreground"
       />
-      {hint ? <p className="type-caption text-muted-foreground">{hint}</p> : null}
-      <p className="type-caption text-muted-foreground">
+      {hint ? <p className="type-caption">{hint}</p> : null}
+      <p className="type-caption">
         Max size {formatUploadLimit()}.
       </p>
       <div className="flex flex-wrap items-center gap-2">

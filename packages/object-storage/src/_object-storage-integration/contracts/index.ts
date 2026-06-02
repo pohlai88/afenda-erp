@@ -1,14 +1,87 @@
 import type { ModuleId } from "@afenda/kernel";
+import type {
+  ObjectStorageDocumentClassification,
+  ObjectStorageRetentionClass,
+} from "../policies/document-governance-policy.shared";
 
 export const OBJECT_STORAGE_HTTP_ROUTES = {
   upload: "/api/internal/v1/uploads",
   uploadConfig: "/api/internal/v1/uploads/config",
   documentDownload: "/api/internal/v1/documents/[documentId]/download",
-  /** @deprecated Use documentDownload — kept for redirect compatibility */
-  legacyDocumentDownload: "/api/documents/[documentId]/download",
 } as const;
 
 export type ObjectStorageAccess = "private" | "public";
+
+export type ObjectStorageDocumentScanStatus =
+  | "pending"
+  | "scanning"
+  | "passed"
+  | "failed"
+  | "quarantined";
+
+export type ObjectStorageGateDecision =
+  | { allowed: true; metadata?: Record<string, unknown> }
+  | {
+    allowed: false;
+    status?: 400 | 403 | 409 | 423 | 429;
+    reason: string;
+    metadata?: Record<string, unknown>;
+  };
+
+export type ObjectStorageEvidenceAction =
+  | "DOCUMENT_UPLOADED"
+  | "DOCUMENT_DOWNLOADED"
+  | "DOCUMENT_UPLOAD_DENIED"
+  | "DOCUMENT_DOWNLOAD_DENIED"
+  | "DOCUMENT_DELETED"
+  | "DOCUMENT_LEGAL_HOLD_APPLIED"
+  | "DOCUMENT_LEGAL_HOLD_RELEASED"
+  | "DOCUMENT_ORG_LEGAL_HOLD_CASCADED"
+  | "DOCUMENT_SCAN_QUARANTINE_RELEASED"
+  | "DOCUMENT_RETENTION_EXPIRED"
+  | "DOCUMENT_MALWARE_DETECTED";
+
+export type ObjectStorageEvidenceAuditEvent = {
+  action: ObjectStorageEvidenceAction;
+  organizationId: string;
+  moduleId: ModuleId;
+  userId: string;
+  timestamp: string;
+  documentId?: string;
+  pathname?: string;
+  classification?: ObjectStorageDocumentClassification;
+  retentionClass?: ObjectStorageRetentionClass;
+  sourceIp?: string;
+  sessionId?: string;
+  metadata?: Record<string, unknown>;
+};
+
+export type ObjectStorageEvidenceAuditSink = (
+  event: ObjectStorageEvidenceAuditEvent,
+) => Promise<void>;
+
+export type ObjectStorageUploadQuotaInput = {
+  organizationId: string;
+  moduleId: ModuleId;
+  pathname: string;
+  sizeBytes: number;
+  contentType: string;
+  access: ObjectStorageAccess;
+  classification: ObjectStorageDocumentClassification;
+  retentionClass: ObjectStorageRetentionClass;
+  uploadedByAuthUserId: string;
+};
+
+export type ObjectStorageDownloadGovernanceInput = {
+  organizationId: string;
+  moduleId: ModuleId;
+  documentId: string;
+  pathname: string;
+  access: ObjectStorageAccess;
+  classification?: ObjectStorageDocumentClassification;
+  retentionClass?: ObjectStorageRetentionClass;
+  requestedByAuthUserId: string;
+};
 
 export type StoredObjectMetadata = {
   pathname: string;
@@ -18,11 +91,19 @@ export type StoredObjectMetadata = {
   etag?: string;
 };
 
+export type ObjectStorageGovernanceMetadata = {
+  organizationId: string;
+  moduleId: string;
+  classification: string;
+  uploadedByAuthUserId: string;
+};
+
 export type PresignedUploadInput = {
   pathname: string;
   contentType: string;
   sizeBytes: number;
   access: ObjectStorageAccess;
+  governance?: ObjectStorageGovernanceMetadata;
 };
 
 export type PresignedUploadResult = {
@@ -53,9 +134,19 @@ export type ObjectStorePort = {
 
   headObject(pathname: string): Promise<StoredObjectMetadata>;
 
+  readObjectPrefix?(
+    pathname: string,
+    maxBytes: number,
+  ): Promise<Uint8Array>;
+
   getSignedDownloadUrl(
     input: SignedDownloadInput,
   ): Promise<SignedDownloadResult>;
+
+  deleteObject(input: {
+    pathname: string;
+    blobUrl?: string;
+  }): Promise<void>;
 };
 
 export type UploadRegistrationInput = {
@@ -69,6 +160,8 @@ export type UploadRegistrationInput = {
   sizeBytes: number;
   access: ObjectStorageAccess;
   blobEtag?: string;
+  classification: ObjectStorageDocumentClassification;
+  retentionClass: ObjectStorageRetentionClass;
   uploadedByAuthUserId: string;
   metadata: Record<string, unknown>;
 };
@@ -80,6 +173,9 @@ export type TenantDocumentDownloadRecord = {
   pathname: string;
   access: ObjectStorageAccess;
   moduleId: ModuleId;
+  classification?: ObjectStorageDocumentClassification;
+  retentionClass?: ObjectStorageRetentionClass;
+  scanStatus?: ObjectStorageDocumentScanStatus;
 };
 
 export type GetTenantDocumentForDownload = (input: {

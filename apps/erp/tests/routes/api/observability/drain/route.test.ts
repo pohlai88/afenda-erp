@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { createHmac } from "node:crypto";
 
 vi.mock("@afenda/observability", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@afenda/observability")>();
@@ -16,7 +17,7 @@ vi.mock("@afenda/observability", async (importOriginal) => {
 });
 
 import { verifyVercelSignature } from "@afenda/observability";
-import { POST } from "@/app/api/observability/drain/route";
+import { POST } from "@/app/api/internal/v1/observability/drain/route";
 
 describe("observability drain route", () => {
   beforeEach(() => {
@@ -26,7 +27,7 @@ describe("observability drain route", () => {
 
   it("returns 503 when drain secret is missing", async () => {
     const response = await POST(
-      new Request("http://localhost/api/observability/drain", {
+      new Request("http://localhost/api/internal/v1/observability/drain", {
         method: "POST",
         body: "[]",
       }),
@@ -40,7 +41,7 @@ describe("observability drain route", () => {
     vi.mocked(verifyVercelSignature).mockResolvedValue(false);
 
     const response = await POST(
-      new Request("http://localhost/api/observability/drain", {
+      new Request("http://localhost/api/internal/v1/observability/drain", {
         method: "POST",
         headers: {
           "x-vercel-signature": "invalid",
@@ -54,15 +55,18 @@ describe("observability drain route", () => {
 
   it("accepts signed drain payloads", async () => {
     process.env.VERCEL_DRAIN_SECRET = "drain-secret";
-    vi.mocked(verifyVercelSignature).mockResolvedValue(true);
+    const body = '[{"type":"log"}]';
+    const signature = createHmac("sha1", "drain-secret")
+      .update(body)
+      .digest("hex");
 
     const response = await POST(
-      new Request("http://localhost/api/observability/drain", {
+      new Request("http://localhost/api/internal/v1/observability/drain", {
         method: "POST",
         headers: {
-          "x-vercel-signature": "valid",
+          "x-vercel-signature": signature,
         },
-        body: "[]",
+        body,
       }),
     );
 

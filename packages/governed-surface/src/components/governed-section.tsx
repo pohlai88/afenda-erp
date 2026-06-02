@@ -14,13 +14,20 @@ import {
 } from "../utils/governed-identity.shared";
 
 export type GovernedSectionProps = {
-  title: string;
-  description?: string;
+  title: ReactNode;
+  description?: ReactNode;
   children: ReactNode;
+
   className?: string;
-  surfaceKey?: string;
+  headerClassName?: string;
+  bodyClassName?: string;
+  descriptionClassName?: string;
+
+  surfaceKey: string;
   sectionKey: string;
   componentKey?: string;
+
+  headingLevel?: 2 | 3 | 4;
   renderState?: GovernedRenderableState;
 };
 
@@ -29,21 +36,29 @@ export function GovernedSection({
   description,
   children,
   className,
+  headerClassName,
+  bodyClassName,
+  descriptionClassName,
   surfaceKey,
   sectionKey,
   componentKey = sectionKey,
+  headingLevel = 3,
   renderState = "ready",
 }: GovernedSectionProps) {
   const sectionDomId = toGovernedDomId("governed-section", componentKey);
   const headingId = governedHeadingId("section", componentKey);
-  const descriptionId = governedDescriptionId("section", componentKey);
+  const descriptionId = description
+    ? governedDescriptionId("section", componentKey)
+    : undefined;
+
+  const bodyComponentKey = `${componentKey}-body`;
 
   return (
     <section
       id={sectionDomId}
       className={cn("flex flex-col gap-surface-md", className)}
       aria-labelledby={headingId}
-      aria-describedby={description ? descriptionId : undefined}
+      aria-describedby={descriptionId}
       {...governedIdentityAttributes({
         surfaceKey,
         sectionKey,
@@ -54,19 +69,32 @@ export function GovernedSection({
         testId: governedTestId("section", componentKey),
       })}
     >
-      <div className="flex flex-col gap-1">
-        <GovernedHeading level={3} variant="section" id={headingId}>
+      <div className={cn("flex flex-col gap-1", headerClassName)}>
+        <GovernedHeading level={headingLevel} variant="section" id={headingId}>
           {title}
         </GovernedHeading>
 
         {description ? (
-          <p className="type-muted" id={descriptionId}>
+          <p id={descriptionId} className={cn("type-muted max-w-prose", descriptionClassName)}>
             {description}
           </p>
         ) : null}
       </div>
 
-      {children}
+      <div
+        className={cn("min-w-0", bodyClassName)}
+        {...governedIdentityAttributes({
+          surfaceKey,
+          sectionKey,
+          componentKey: bodyComponentKey,
+        })}
+        {...diagnosticsDataAttributes({
+          state: renderState,
+          testId: governedTestId("section-body", componentKey),
+        })}
+      >
+        {children}
+      </div>
     </section>
   );
 }

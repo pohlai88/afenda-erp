@@ -1,6 +1,6 @@
 import type { HrEmployeeDocumentWindow } from "@afenda/db";
 
-import { hrEmployeeDetailRoutePath } from "../contracts/hr.workforce.documents-route.contract";
+import { hrEmployeeDetailRoutePath, hrTenantDocumentDownloadPath } from "../contracts/hr.workforce.documents-route.contract";
 import { deriveHrDocumentEffectiveVerificationStatus } from "../data/hr.workforce.documents-status.shared";
 import {
   isHrDocumentClassificationSensitive,
@@ -94,6 +94,11 @@ export function buildHrDocumentsRepositoryListSurface(input: {
         header: copy.colUploaded,
         cellKind: { kind: "date" },
       },
+      {
+        id: "download",
+        header: copy.colDownload,
+        cellKind: { kind: "link" },
+      },
     ],
     rows: window.rows.map((row) => {
       const effectiveVerification = deriveHrDocumentEffectiveVerificationStatus({
@@ -126,6 +131,7 @@ export function buildHrDocumentsRepositoryListSurface(input: {
           effectiveTo: row.effectiveTo?.toISOString() ?? "",
           effectiveToInput: formatDocumentsDateTimeLocalInput(row.effectiveTo),
           uploadedAt: row.uploadedAt.toISOString(),
+          download: canExposeDocumentPayload ? "Download" : "—",
           versionNumberValue: String(row.versionNumber),
           isLatestActiveValue: row.isLatestActive ? "true" : "false",
           rejectionReasonValue: row.rejectionReason ?? "",
@@ -138,6 +144,12 @@ export function buildHrDocumentsRepositoryListSurface(input: {
             kind: "badge",
             tone: resolveDocumentsVerificationBadgeTone(effectiveVerification),
           },
+          download: canExposeDocumentPayload
+            ? {
+                kind: "link",
+                href: hrTenantDocumentDownloadPath(row.id),
+              }
+            : { kind: "text" },
         },
         trailingAction: resolveDocumentsRepositoryTrailingAction(
           canWrite && canExposeDocumentPayload,

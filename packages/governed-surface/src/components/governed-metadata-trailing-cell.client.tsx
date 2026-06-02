@@ -23,14 +23,18 @@ export function GovernedMetadataTrailingCell({
 
   const disabled = trailingAction.state === "disabled";
   const label = trailingAction.descriptor?.label ?? "Action";
-  const surfaceKey = context?.surfaceKey;
+  const surfaceKey = context?.surfaceKey ?? "governed-metadata";
+  const sectionKey = context?.sectionKey ?? surfaceKey;
+  const componentKey = context?.componentKey
+    ? `${context.componentKey}-${row.id}-trailing-action`
+    : row.id;
 
   return (
     <GovernedTrailingActionSlot
       trailingAction={trailingAction}
       surfaceKey={surfaceKey}
-      sectionKey={surfaceKey}
-      componentKey={row.id}
+      sectionKey={sectionKey}
+      componentKey={componentKey}
       rowId={row.id}
     >
       {!disabled && row.rowHref ? (

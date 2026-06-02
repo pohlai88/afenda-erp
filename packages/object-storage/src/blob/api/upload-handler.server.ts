@@ -8,9 +8,21 @@ import type {
   ObjectStorageUploadHandlerDeps,
 } from "../../_object-storage-integration/api/upload-registration.server";
 import {
+  assertStoredContentMatchesDeclared,
   parseUploadTokenPayload,
   registerUploadedDocument,
 } from "../../_object-storage-integration/api/upload-registration.server";
+import {
+  documentMagicBytePrefixBytes,
+} from "../../_object-storage-integration/policies/document-content-verification.shared";
+import {
+  assertUploadQuotaAllowed,
+  getRequestSourceIp,
+  recordEvidenceEvent,
+  runUploadWithDeniedAudit,
+  type UploadDeniedAuditContext,
+} from "../../_object-storage-integration/api/evidence-governance.server";
+import { incrementObjectStorageMetric } from "../../_object-storage-integration/api/object-storage-metrics.server";
 import { requireUploadModuleAccess } from "../../_object-storage-integration/domain/upload-route-auth.server";
 import {
   assertObjectStorageConfigured,
@@ -70,17 +82,49 @@ export async function handleVercelBlobUploadPost(
     request,
     token: blobEnv.BLOB_READ_WRITE_TOKEN,
     onBeforeGenerateToken: async (pathname, clientPayload) => {
+      const sourceIp = getRequestSourceIp(request);
       const parsedPayload = uploadPayloadSchema.parse(
         JSON.parse(clientPayload ?? "{}"),
       );
+      const deniedContext: UploadDeniedAuditContext = {
+        sourceIp,
+        moduleId: parsedPayload.moduleId,
+        pathname,
+        classification: parsedPayload.classification,
+        retentionClass: parsedPayload.retentionClass,
+      };
+
+      return runUploadWithDeniedAudit({
+        sink: deps.recordEvidenceEvent,
+        context: deniedContext,
+        action: async () => {
       const { session, organization } = await getUploadAccess(
         parsedPayload.moduleId,
       );
+      deniedContext.organizationId = organization.id;
+      deniedContext.userId = session.id;
 
       assertUploadPathnameMatchesTenant({
         pathname,
         organizationId: organization.id,
         moduleId: parsedPayload.moduleId,
+      });
+
+      await assertUploadQuotaAllowed({
+        quotaGate: deps.assertUploadQuota,
+        recordDenied: deps.recordEvidenceEvent,
+        sourceIp,
+        quotaInput: {
+          organizationId: organization.id,
+          moduleId: parsedPayload.moduleId,
+          pathname,
+          sizeBytes: parsedPayload.sizeBytes,
+          contentType: parsedPayload.contentType,
+          access: parsedPayload.access,
+          classification: parsedPayload.classification,
+          retentionClass: parsedPayload.retentionClass,
+          uploadedByAuthUserId: session.id,
+        },
       });
 
       logServerEvent(
@@ -113,12 +157,29 @@ export async function handleVercelBlobUploadPost(
           pathname,
         } satisfies UploadTokenPayload),
       };
+        },
+      });
     },
     onUploadCompleted: async ({ blob, tokenPayload }) => {
       const parsedPayload = parseUploadTokenPayload(tokenPayload);
+      const deniedContext: UploadDeniedAuditContext = {
+        sourceIp: getRequestSourceIp(request),
+        organizationId: parsedPayload.organizationId,
+        moduleId: parsedPayload.moduleId,
+        userId: parsedPayload.uploadedByAuthUserId,
+        pathname: blob.pathname,
+        classification: parsedPayload.classification,
+        retentionClass: parsedPayload.retentionClass,
+      };
+
+      await runUploadWithDeniedAudit({
+        sink: deps.recordEvidenceEvent,
+        context: deniedContext,
+        action: async () => {
       const { organization, session } = await getUploadAccess(
         parsedPayload.moduleId,
       );
+      deniedContext.userId = session.id;
 
       assertUploadTokenMatchesSession(parsedPayload, organization, session);
       assertUploadPathnameMatchesTenant({
@@ -132,7 +193,44 @@ export async function handleVercelBlobUploadPost(
         blob,
       });
 
+      const prefixResponse = await fetch(blob.url, {
+        headers: {
+          Range: `bytes=0-${documentMagicBytePrefixBytes - 1}`,
+        },
+      });
+
+      if (!prefixResponse.ok) {
+        throw new UploadRouteError(400, uploadRouteCopy.invalidRequest);
+      }
+
+      assertStoredContentMatchesDeclared({
+        storedContentType: blob.contentType ?? parsedPayload.contentType,
+        declaredContentType: parsedPayload.contentType,
+        prefixBytes: new Uint8Array(await prefixResponse.arrayBuffer()),
+      });
+
       if (parsedPayload.registerTenantDocument === false) {
+        await recordEvidenceEvent({
+          sink: deps.recordEvidenceEvent,
+          event: {
+            action: "DOCUMENT_UPLOADED",
+            organizationId: organization.id,
+            moduleId: parsedPayload.moduleId,
+            userId: session.id,
+            sessionId: session.id,
+            pathname: blob.pathname,
+            classification: parsedPayload.classification,
+            retentionClass: parsedPayload.retentionClass,
+            sourceIp: getRequestSourceIp(request),
+            metadata: {
+              source: "vercel-blob-client-upload-only",
+              contentType: blob.contentType ?? parsedPayload.contentType,
+              sizeBytes,
+              access: parsedPayload.access,
+            },
+          },
+        });
+
         logServerEvent(
           "info",
           "Upload completed without ERP registry write.",
@@ -149,6 +247,13 @@ export async function handleVercelBlobUploadPost(
             sizeBytes,
           },
         );
+
+        incrementObjectStorageMetric("uploads_total", {
+          requestId: context.requestId,
+          organizationId: organization.id,
+          moduleId: parsedPayload.moduleId,
+          provider: "vercel-blob",
+        });
         return;
       }
 
@@ -166,6 +271,9 @@ export async function handleVercelBlobUploadPost(
         sizeBytes,
         etag: blob.etag,
         source: "vercel-blob-client-upload",
+        sourceIp: getRequestSourceIp(request),
+      });
+        },
       });
     },
   });

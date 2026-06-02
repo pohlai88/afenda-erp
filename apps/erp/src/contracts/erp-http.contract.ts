@@ -10,4 +10,10 @@ export const ERP_CRON_HTTP_ROUTES = {
   lynxOutcomes: "/api/internal/v1/cron/lynx-outcomes",
   knowledgeSync: "/api/internal/v1/cron/knowledge-sync",
   hrTimeClockSync: "/api/internal/v1/cron/hr-time-clock-sync",
+  documentRetentionSweep: "/api/internal/v1/cron/document-retention-sweep",
+  documentScanSweep: "/api/internal/v1/cron/document-scan-sweep",
+} as const;
+
+export const ERP_WEBHOOK_HTTP_ROUTES = {
+  documentScanResult: "/api/internal/v1/webhooks/document-scan-result",
 } as const;

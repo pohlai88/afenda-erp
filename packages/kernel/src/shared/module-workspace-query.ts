@@ -39,6 +39,7 @@ export type ModuleWorkspaceListQuery = {
   workItemsStatus?: ErpWorkItemStatus;
   workItemsPriority?: ErpPriority;
   documentsCursor?: string;
+  documentActivityCursor?: string;
 };
 
 function firstParam(value: string | string[] | undefined) {
@@ -85,6 +86,7 @@ export function resolveModuleWorkspaceListQuery(
       erpPriorities,
     ),
     documentsCursor: firstParam(searchParams.documentsCursor),
+    documentActivityCursor: firstParam(searchParams.documentActivityCursor),
   };
 }
 
@@ -112,6 +114,18 @@ export function toDocumentWindowQuery(
 
   return {
     cursor: query.documentsCursor,
+  };
+}
+
+export function toDocumentActivityWindowQuery(
+  query: ModuleWorkspaceListQuery | undefined,
+): import("@afenda/db").TenantDocumentEvidenceWindowQuery | undefined {
+  if (!query) {
+    return undefined;
+  }
+
+  return {
+    cursor: query.documentActivityCursor,
   };
 }
 

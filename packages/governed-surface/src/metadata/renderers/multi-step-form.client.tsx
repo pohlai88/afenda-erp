@@ -1,13 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useActionState, useState } from "react";
 
+import { Alert, AlertDescription, AlertTitle } from "@afenda/ui/alert";
+import { Badge } from "@afenda/ui/badge";
 import { Button } from "@afenda/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@afenda/ui/card";
 import { Checkbox } from "@afenda/ui/checkbox";
 import { FieldGroup } from "@afenda/ui/field";
 import { Input } from "@afenda/ui/input";
 import { Label } from "@afenda/ui/label";
+import { Progress } from "@afenda/ui/progress";
 import {
   Select,
   SelectContent,
@@ -16,7 +18,12 @@ import {
   SelectValue,
 } from "@afenda/ui/select";
 import { Textarea } from "@afenda/ui/textarea";
-import { resolveFormFieldRuleState, type FormRuleValues, GovernedEmpty } from "../../client";
+import {
+  GovernedEmpty,
+  resolveFormFieldRuleState,
+  type FormRuleValues,
+} from "../../client";
+import { ActionFormErrors } from "../../components/action-form-errors";
 import { governedRendererCopy } from "../../i18n/governed-renderer-copy.shared";
 import {
   GovernedFileUploadField,
@@ -27,6 +34,11 @@ import type {
   GovernedMultiStepFormConfiguration,
   MultiStepFormDataNature,
 } from "../../schemas/multi-step-form.schema";
+import {
+  actionFailure,
+  type ActionResult,
+} from "../../schemas/action-result.shared";
+import type { GovernedServerActionHandler } from "../../schemas/server-actions.shared";
 import { densityGapClass } from "../../schemas/surface-chrome.classes";
 import { cn } from "@afenda/ui/utils";
 
@@ -34,23 +46,51 @@ const DATA_NATURE_CLASS: Record<MultiStepFormDataNature, string> = {
   wizard: "@container flex flex-col gap-surface-lg",
 };
 
+const missingGovernedFormAction: GovernedServerActionHandler = async () =>
+  actionFailure(
+    "This governed form is not connected to a registered server action.",
+    undefined,
+    "governed.action.unregistered",
+  );
+
 function buildInitialWizardValues(
   form: GovernedMultiStepFormConfiguration,
 ): FormRuleValues {
   const initial: FormRuleValues = {};
   for (const step of form.steps) {
     for (const field of step.fields) {
-      initial[field.id] = field.kind === "checkbox" ? false : field.kind === "file-upload" ? "" : "";
+      initial[field.id] =
+        field.kind === "checkbox"
+          ? false
+          : field.kind === "file-upload"
+            ? ""
+            : "";
     }
   }
   return initial;
 }
 
+function countRequiredFields(
+  fields: readonly GovernedFormField[],
+  values: FormRuleValues,
+): number {
+  return fields.filter((field) => {
+    const { visible } = resolveFormFieldRuleState(field.rules, values);
+    return visible && field.required;
+  }).length;
+}
+
 export function MultiStepFormSurface({
   form,
+  action,
 }: {
   form: GovernedMultiStepFormConfiguration;
+  action?: GovernedServerActionHandler<FormData, void>;
 }) {
+  const [result, formAction, pending] = useActionState<
+    ActionResult<void> | undefined,
+    FormData
+  >(action ?? missingGovernedFormAction, undefined);
   const [stepIndex, setStepIndex] = useState(0);
   const [values, setValues] = useState<FormRuleValues>(() =>
     buildInitialWizardValues(form),
@@ -58,6 +98,9 @@ export function MultiStepFormSurface({
   const step = form.steps[stepIndex];
   const isFirst = stepIndex === 0;
   const isLast = stepIndex === form.steps.length - 1;
+  const progress = Math.round(
+    ((stepIndex + 1) / Math.max(form.steps.length, 1)) * 100,
+  );
 
   if (form.steps.length === 0) {
     return (
@@ -77,90 +120,132 @@ export function MultiStepFormSurface({
   }
 
   if (!step) {
-    return null;
+    return (
+      <section
+        aria-label="Multi-step form"
+        className={DATA_NATURE_CLASS[form.dataNature]}
+      >
+        <GovernedEmpty
+          model={{
+            variant: "error",
+            title: governedRendererCopy.parseError.multiStepForm.userTitle,
+            description:
+              governedRendererCopy.parseError.multiStepForm.userDescription,
+            emptyId: "multi-step-form-invalid-step",
+          }}
+        />
+      </section>
+    );
   }
 
   function setFieldValue(fieldId: string, next: unknown) {
     setValues((prev) => ({ ...prev, [fieldId]: next }));
   }
 
+  const requiredFieldCount = countRequiredFields(step.fields, values);
+  const actionRegistered = Boolean(action);
+
   return (
     <section
       aria-label="Multi-step form"
       className={DATA_NATURE_CLASS[form.dataNature]}
     >
-      <Card>
-        <CardHeader className="pb-2">
-          <p className="type-caption">
-            Step {stepIndex + 1} of {form.steps.length}
-          </p>
-          <CardTitle>{step.title}</CardTitle>
+      <form
+        action={formAction}
+        className={cn("flex flex-col", densityGapClass(form.chrome?.density))}
+        data-form-id={form.formId}
+        data-action-id={form.actionId}
+        data-action-resolution={actionRegistered ? "registered" : "missing"}
+      >
+        <input type="hidden" name="__governedFormId" value={form.formId} />
+        <input type="hidden" name="__governedActionId" value={form.actionId} />
+        <div className="flex flex-col gap-2">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div className="min-w-0">
+              <p className="type-caption">
+                Step {stepIndex + 1} of {form.steps.length}
+              </p>
+              <h3 className="type-card-title">{step.title}</h3>
+            </div>
+            <div className="flex flex-wrap items-center gap-1.5">
+              <Badge variant="outline">{step.fields.length} fields</Badge>
+              {requiredFieldCount > 0 ? (
+                <Badge variant="warning">{requiredFieldCount} required</Badge>
+              ) : null}
+            </div>
+          </div>
           {step.description ? (
             <p className="type-muted">{step.description}</p>
           ) : null}
-        </CardHeader>
-        <CardContent
-          className={cn("flex flex-col", densityGapClass(form.chrome?.density))}
-        >
-          <ol className="flex flex-wrap gap-2" aria-label="Form steps">
-            {form.steps.map((s, index) => (
-              <li key={s.id}>
-                <Button
-                  type="button"
-                  size="sm"
-                  variant={index === stepIndex ? "default" : "outline"}
-                  className="type-caption h-7"
-                  onClick={() => setStepIndex(index)}
-                  aria-current={index === stepIndex ? "step" : undefined}
-                >
-                  {s.title}
-                </Button>
-              </li>
-            ))}
-          </ol>
-          <FieldGroup
-            className={cn(
-              densityGapClass(form.chrome?.density),
-            )}
-          >
-            {step.fields.map((field) => (
-              <WizardField
-                key={field.id}
-                field={field}
-                formModuleId={form.moduleId}
-                values={values}
-                onValueChange={setFieldValue}
-              />
-            ))}
-          </FieldGroup>
-          <div className="flex flex-wrap gap-2 border-t border-border/60 pt-3">
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              disabled={isFirst}
-              onClick={() => setStepIndex((i) => Math.max(0, i - 1))}
-            >
-              Back
-            </Button>
-            {isLast ? (
-              <Button type="button" size="sm" data-form-id={form.formId}>
-                {form.submitLabel}
-              </Button>
-            ) : (
+          <Progress value={progress} aria-label="Form progress" />
+        </div>
+
+        <ol className="flex flex-wrap gap-2" aria-label="Form steps">
+          {form.steps.map((s, index) => (
+            <li key={s.id}>
               <Button
                 type="button"
                 size="sm"
-                onClick={() =>
-                  setStepIndex((i) => Math.min(form.steps.length - 1, i + 1))
-                }
+                variant={index === stepIndex ? "default" : "outline"}
+                className="type-caption h-7"
+                onClick={() => setStepIndex(index)}
+                aria-current={index === stepIndex ? "step" : undefined}
               >
-                Next
+                {s.title}
               </Button>
-            )}
-          </div>
-        </CardContent>
-      </Card>
+            </li>
+          ))}
+        </ol>
+        <FieldGroup className={cn(densityGapClass(form.chrome?.density))}>
+          {step.fields.map((field) => (
+            <WizardField
+              key={field.id}
+              field={field}
+              formModuleId={form.moduleId}
+              values={values}
+              onValueChange={setFieldValue}
+            />
+          ))}
+        </FieldGroup>
+        <div className="flex flex-wrap gap-2 border-t border-border/60 pt-3">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            disabled={isFirst}
+            onClick={() => setStepIndex((i) => Math.max(0, i - 1))}
+          >
+            Back
+          </Button>
+          {isLast ? (
+            <Button
+              type="submit"
+              size="sm"
+              data-form-id={form.formId}
+              data-action-id={form.actionId}
+              disabled={!actionRegistered || pending}
+            >
+              {pending ? "Submitting..." : form.submitLabel}
+            </Button>
+          ) : (
+            <Button
+              type="button"
+              size="sm"
+              onClick={() =>
+                setStepIndex((i) => Math.min(form.steps.length - 1, i + 1))
+              }
+            >
+              Next
+            </Button>
+          )}
+        </div>
+        {!actionRegistered ? (
+          <p className="type-caption text-critical" role="status">
+            Server action is not registered for this governed form.
+          </p>
+        ) : null}
+        <ActionFormErrors result={result} />
+      </form>
     </section>
   );
 }
@@ -187,9 +272,12 @@ function WizardField({
   if (field.kind === "file-upload") {
     if (!uploadModuleId) {
       return (
-        <p className="type-caption text-critical">
-          File upload requires a valid form moduleId.
-        </p>
+        <Alert variant="destructive">
+          <AlertTitle>Upload unavailable</AlertTitle>
+          <AlertDescription>
+            File upload requires a valid form moduleId.
+          </AlertDescription>
+        </Alert>
       );
     }
 

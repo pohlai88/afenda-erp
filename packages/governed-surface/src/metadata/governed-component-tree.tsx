@@ -24,6 +24,8 @@ export type GovernedComponentTreeProps = {
   registry?: AfendaGovernedComponentRegistry;
   diagnostics?: GovernedComponentRendererDiagnostics;
   surfaceKey?: string;
+  sectionKey?: string;
+  componentKey?: string;
 };
 
 /**
@@ -42,6 +44,8 @@ export function GovernedComponentTree({
   registry = AFENDA_GOVERNED_COMPONENT_REGISTRY,
   diagnostics = "user",
   surfaceKey,
+  sectionKey,
+  componentKey,
 }: GovernedComponentTreeProps): ReactNode {
   const parsed = parseGovernedComponentData(component);
 
@@ -52,6 +56,8 @@ export function GovernedComponentTree({
       serverType: "(unknown)",
       dataNature: undefined,
       surfaceKey,
+      sectionKey,
+      componentKey,
       validation: "parse_failed",
     });
     const copy = governedDispatchErrorCopy(
@@ -83,6 +89,8 @@ export function GovernedComponentTree({
       serverType: data.serverType,
       dataNature: extractGovernedConfigurationDataNature(data.configuration),
       surfaceKey,
+      sectionKey,
+      componentKey,
       validation: "unregistered",
     });
     const copy = governedDispatchErrorCopy(
@@ -117,6 +125,8 @@ export function GovernedComponentTree({
         observed: "(missing)",
         accepted: contract.acceptedNatures,
         surfaceKey,
+        sectionKey,
+        componentKey,
       });
       recordGovernedDispatchSpan({
         rendererId,
@@ -124,6 +134,8 @@ export function GovernedComponentTree({
         serverType: data.serverType,
         dataNature: undefined,
         surfaceKey,
+        sectionKey,
+        componentKey,
         validation: "nature_mismatch",
       });
       const copy = governedDispatchErrorCopy(
@@ -150,6 +162,8 @@ export function GovernedComponentTree({
         observed: dataNature,
         accepted: contract.acceptedNatures,
         surfaceKey,
+        sectionKey,
+        componentKey,
       });
       recordGovernedDispatchSpan({
         rendererId,
@@ -157,6 +171,8 @@ export function GovernedComponentTree({
         serverType: data.serverType,
         dataNature,
         surfaceKey,
+        sectionKey,
+        componentKey,
         validation: "nature_mismatch",
       });
       const copy = governedDispatchErrorCopy(
@@ -182,6 +198,8 @@ export function GovernedComponentTree({
     serverType: data.serverType,
     dataNature: extractGovernedConfigurationDataNature(data.configuration),
     surfaceKey,
+    sectionKey,
+    componentKey,
     validation: "ok",
   });
 
@@ -191,6 +209,8 @@ export function GovernedComponentTree({
     configuration: data.configuration,
     diagnostics,
     surfaceKey,
+    sectionKey,
+    componentKey,
   });
 }
 
@@ -200,6 +220,8 @@ function recordGovernedDispatchSpan(input: {
   serverType: string;
   dataNature: string | undefined;
   surfaceKey: string | undefined;
+  sectionKey: string | undefined;
+  componentKey: string | undefined;
   validation: "ok" | "parse_failed" | "nature_mismatch" | "unregistered";
 }) {
   if (typeof window !== "undefined") return;
@@ -216,6 +238,12 @@ function recordGovernedDispatchSpan(input: {
   }
   if (input.surfaceKey) {
     span.setAttribute("governed.surface_key", input.surfaceKey);
+  }
+  if (input.sectionKey) {
+    span.setAttribute("governed.section_key", input.sectionKey);
+  }
+  if (input.componentKey) {
+    span.setAttribute("governed.component_key", input.componentKey);
   }
   span.end();
 }

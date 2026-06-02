@@ -14,6 +14,8 @@ import { GovernedEmpty } from "./governed-empty";
 export type GovernedKanbanReadOnlyBoardProps = {
   configuration: GovernedKanbanBoardConfigurationInput;
   surfaceKey?: string;
+  sectionKey?: string;
+  componentKey?: string;
   showOperatorDiagnostics?: boolean;
 };
 
@@ -24,6 +26,8 @@ export type GovernedKanbanReadOnlyBoardProps = {
 export function GovernedKanbanReadOnlyBoard({
   configuration,
   surfaceKey,
+  sectionKey,
+  componentKey,
   showOperatorDiagnostics = false,
 }: GovernedKanbanReadOnlyBoardProps) {
   const t = useTranslations("Erp.GovernedSurface.kanban");
@@ -63,5 +67,12 @@ export function GovernedKanbanReadOnlyBoard({
     );
   }
 
-  return <KanbanBoardView board={parsed.data} surfaceKey={surfaceKey} />;
+  return (
+    <KanbanBoardView
+      board={parsed.data}
+      surfaceKey={surfaceKey}
+      sectionKey={sectionKey}
+      componentKey={componentKey}
+    />
+  );
 }

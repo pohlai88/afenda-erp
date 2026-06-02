@@ -42,6 +42,17 @@ export {
 } from "./action.schema";
 
 export {
+  GOVERNED_ACTION_BAR_CONFIGURATION_SCHEMA_ID,
+  GOVERNED_ACTION_BAR_CONFIGURATION_SCHEMA_STABILITY,
+  actionBarDataNatureSchema,
+  governedActionBarConfigurationSchema,
+  parseGovernedActionBarConfiguration,
+  type ActionBarDataNature,
+  type GovernedActionBarConfiguration,
+  type GovernedActionBarConfigurationInput,
+} from "./action-bar.schema";
+
+export {
   SCHEMA_STABILITY as AUDIT_PANEL_SCHEMA_STABILITY,
   auditPanelRowSchema,
   auditPanelSchema,
@@ -107,6 +118,7 @@ export {
 
 export {
   listSurfaceToolbarSchema,
+  type ListSurfaceToolbarActionConfirm,
   type ListSurfaceToolbarBulkAction,
   type ListSurfaceToolbarExport,
   type ListSurfaceToolbarFilter,
@@ -227,6 +239,40 @@ export {
 } from "./action-result.shared";
 
 export {
+  GOVERNED_ACTION_ID_FIELD,
+  GOVERNED_CONFIRM_FIELD,
+  GOVERNED_FORM_ID_FIELD,
+  GOVERNED_SELECTED_ROW_ID_FIELD,
+  GOVERNED_STEP_UP_TOKEN_FIELD,
+  clearGovernedServerActionRegistryForTest,
+  getGovernedSelectedRowIds,
+  getGovernedServerActionRegistration,
+  getGovernedServerActionRegistry,
+  registerGovernedBulkServerAction,
+  registerGovernedGuardedServerAction,
+  registerGovernedPolicyBulkServerAction,
+  registerGovernedPolicyServerAction,
+  registerGovernedServerAction,
+  resolveGovernedBulkServerAction,
+  resolveGovernedServerAction,
+  setGovernedServerActionAuditSinkForTest,
+  validateGovernedServerActionPolicySubmission,
+  validateGovernedServerActionSubmission,
+  withGovernedServerActionPolicyGuard,
+  withGovernedServerActionSubmissionGuard,
+  type GovernedServerActionAuditEvent,
+  type GovernedServerActionAuditMetadata,
+  type GovernedServerActionAuditSink,
+  type GovernedServerActionAuditStage,
+  type GovernedServerActionHandler,
+  type GovernedServerActionPolicyExpectation,
+  type GovernedServerActionRegistration,
+  type GovernedServerActionRegistry,
+  type GovernedServerActionStepUpVerifier,
+  type GovernedServerActionSubmissionExpectation,
+} from "./server-actions.shared";
+
+export {
   assertGovernedSurfaceInput,
   tryGovernedSurfaceInput,
   type GovernedSurfaceInputAssertion,
@@ -266,6 +312,55 @@ export {
   type GovernedMultiStepFormConfigurationInput,
   type MultiStepFormDataNature,
 } from "./multi-step-form.schema";
+
+export {
+  GOVERNED_SCORECARD_FORM_SCHEMA_ID,
+  GOVERNED_SCORECARD_FORM_SCHEMA_STABILITY,
+  governedScorecardFormConfigurationSchema,
+  parseGovernedScorecardFormConfiguration,
+  scorecardCriterionSchema,
+  scorecardFormDataNatureSchema,
+  type GovernedScorecardFormConfiguration,
+  type GovernedScorecardFormConfigurationInput,
+  type ScorecardCriterion,
+  type ScorecardFormDataNature,
+} from "./scorecard-form.schema";
+
+export {
+  GOVERNED_SECTION_CONFIGURATION_SCHEMA_ID,
+  GOVERNED_SECTION_CONFIGURATION_SCHEMA_STABILITY,
+  governedSectionConfigurationSchema,
+  parseGovernedSectionConfiguration,
+  type GovernedSectionConfiguration,
+  type GovernedSectionConfigurationInput,
+} from "./section.schema";
+
+export {
+  GOVERNED_STACK_CONFIGURATION_SCHEMA_ID,
+  GOVERNED_STACK_CONFIGURATION_SCHEMA_STABILITY,
+  governedStackBentoTemplateSchema,
+  governedStackConfigurationSchema,
+  governedStackDirectionSchema,
+  parseGovernedStackConfiguration,
+  type GovernedStackConfiguration,
+  type GovernedStackConfigurationInput,
+  type GovernedStackDirection,
+} from "./stack.schema";
+
+export {
+  GOVERNED_SURFACE_CHROME_SCHEMA_ID,
+  GOVERNED_SURFACE_CHROME_SCHEMA_STABILITY,
+  governedSurfaceChromeSchema,
+  governedSurfaceDensitySchema,
+  governedSurfaceElevationSchema,
+  governedSurfaceMaterialSchema,
+  parseGovernedSurfaceChromeData,
+  type GovernedSurfaceChrome,
+  type GovernedSurfaceChromeInput,
+  type GovernedSurfaceDensity,
+  type GovernedSurfaceElevation,
+  type GovernedSurfaceMaterial,
+} from "./surface-chrome.schema";
 
 export {
   SCHEMA_STABILITY as LIST_TRAILING_CELL_CONTEXT_SCHEMA_STABILITY,

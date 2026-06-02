@@ -9,6 +9,7 @@ export * from "./billing";
 export * from "./ai";
 export * from "./client";
 export * from "./tenant-context";
+export * from "./document-legal-hold.server";
 export * from "./erp";
 export * from "./hr";
 export * from "./hr-commands";

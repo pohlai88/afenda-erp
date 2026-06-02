@@ -6,7 +6,12 @@ import { ui } from "@afenda/ui/design-system";
 import { cn } from "@afenda/ui/utils";
 
 import type { EmptyState } from "../schemas/list-surface.schema";
-import { governedTestId } from "../utils/governed-identity.shared";
+import type { GovernedRenderableState } from "../schemas/governed-component-state.schema";
+import { diagnosticsDataAttributes } from "../utils/governed-diagnostics.shared";
+import {
+  governedIdentityAttributes,
+  governedTestId,
+} from "../utils/governed-identity.shared";
 import { asGovernedRoute } from "../utils/governed-safe-route";
 
 export type GovernedEmptyProps = {
@@ -15,6 +20,10 @@ export type GovernedEmptyProps = {
   };
   className?: string;
   testId?: string;
+  surfaceKey?: string;
+  sectionKey?: string;
+  componentKey?: string;
+  renderState?: GovernedRenderableState;
 };
 
 const variantClassName = {
@@ -38,7 +47,19 @@ const variantRole = {
   error: "alert",
 } satisfies Record<EmptyState["variant"], "status" | "alert" | undefined>;
 
-export function GovernedEmpty({ model, className, testId }: GovernedEmptyProps) {
+export function GovernedEmpty({
+  model,
+  className,
+  testId,
+  surfaceKey,
+  sectionKey,
+  componentKey = model.emptyId,
+  renderState = model.variant === "error"
+    ? "invalid"
+    : model.variant === "forbidden"
+      ? "forbidden"
+      : "empty",
+}: GovernedEmptyProps) {
   const resolvedTestId =
     testId ??
     (model.emptyId ? governedTestId("empty", model.emptyId) : undefined);
@@ -57,7 +78,15 @@ export function GovernedEmpty({ model, className, testId }: GovernedEmptyProps) 
       )}
       data-empty-id={model.emptyId}
       data-empty-variant={model.variant}
-      data-testid={resolvedTestId}
+      {...governedIdentityAttributes({
+        surfaceKey,
+        sectionKey,
+        componentKey,
+      })}
+      {...diagnosticsDataAttributes({
+        state: renderState,
+        testId: resolvedTestId,
+      })}
     >
       <EmptyTitle>{model.title}</EmptyTitle>
 

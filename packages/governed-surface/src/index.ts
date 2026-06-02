@@ -24,6 +24,51 @@ export {
 } from "./schemas/action.schema";
 
 export {
+  GOVERNED_ACTION_ID_FIELD,
+  GOVERNED_CONFIRM_FIELD,
+  GOVERNED_FORM_ID_FIELD,
+  GOVERNED_SELECTED_ROW_ID_FIELD,
+  GOVERNED_STEP_UP_TOKEN_FIELD,
+  clearGovernedServerActionRegistryForTest,
+  getGovernedSelectedRowIds,
+  getGovernedServerActionRegistration,
+  getGovernedServerActionRegistry,
+  registerGovernedBulkServerAction,
+  registerGovernedGuardedServerAction,
+  registerGovernedPolicyBulkServerAction,
+  registerGovernedPolicyServerAction,
+  registerGovernedServerAction,
+  resolveGovernedBulkServerAction,
+  resolveGovernedServerAction,
+  setGovernedServerActionAuditSinkForTest,
+  validateGovernedServerActionPolicySubmission,
+  validateGovernedServerActionSubmission,
+  withGovernedServerActionPolicyGuard,
+  withGovernedServerActionSubmissionGuard,
+  type GovernedServerActionAuditEvent,
+  type GovernedServerActionAuditMetadata,
+  type GovernedServerActionAuditSink,
+  type GovernedServerActionAuditStage,
+  type GovernedServerActionHandler,
+  type GovernedServerActionPolicyExpectation,
+  type GovernedServerActionRegistration,
+  type GovernedServerActionRegistry,
+  type GovernedServerActionStepUpVerifier,
+  type GovernedServerActionSubmissionExpectation,
+} from "./schemas/server-actions.shared";
+
+export {
+  GOVERNED_ACTION_BAR_CONFIGURATION_SCHEMA_ID,
+  GOVERNED_ACTION_BAR_CONFIGURATION_SCHEMA_STABILITY,
+  actionBarDataNatureSchema,
+  governedActionBarConfigurationSchema,
+  parseGovernedActionBarConfiguration,
+  type ActionBarDataNature,
+  type GovernedActionBarConfiguration,
+  type GovernedActionBarConfigurationInput,
+} from "./schemas/action-bar.schema";
+
+export {
   emptyStateSchema,
   listCellKindSchema,
   listColumnSchema,
@@ -51,6 +96,7 @@ export {
 export {
   listSurfaceToolbarSchema,
   type ListSurfaceToolbar,
+  type ListSurfaceToolbarActionConfirm,
   type ListSurfaceToolbarBulkAction,
   type ListSurfaceToolbarExport,
   type ListSurfaceToolbarFilter,
@@ -158,6 +204,89 @@ export {
   type GovernedChartConfigurationInput,
   type GovernedChartKind,
 } from "./schemas/chart.schema";
+
+export {
+  GOVERNED_APPROVAL_TIMELINE_SCHEMA_ID,
+  GOVERNED_APPROVAL_TIMELINE_SCHEMA_STABILITY,
+  approvalTimelineDataNatureSchema,
+  approvalTimelineStepSchema,
+  approvalTimelineStepStatusSchema,
+  governedApprovalTimelineConfigurationSchema,
+  parseGovernedApprovalTimelineConfiguration,
+  type ApprovalTimelineDataNature,
+  type ApprovalTimelineStep,
+  type ApprovalTimelineStepStatus,
+  type GovernedApprovalTimelineConfiguration,
+  type GovernedApprovalTimelineConfigurationInput,
+} from "./schemas/approval-timeline.schema";
+
+export {
+  GOVERNED_MULTI_STEP_FORM_SCHEMA_ID,
+  GOVERNED_MULTI_STEP_FORM_SCHEMA_STABILITY,
+  governedFormFieldKindSchema,
+  governedFormFieldOptionSchema,
+  governedFormFieldSchema,
+  governedFormStepSchema,
+  governedMultiStepFormConfigurationSchema,
+  multiStepFormDataNatureSchema,
+  parseGovernedMultiStepFormConfiguration,
+  type GovernedFormField,
+  type GovernedFormFieldKind,
+  type GovernedFormFieldOption,
+  type GovernedFormStep,
+  type GovernedMultiStepFormConfiguration,
+  type GovernedMultiStepFormConfigurationInput,
+  type MultiStepFormDataNature,
+} from "./schemas/multi-step-form.schema";
+
+export {
+  GOVERNED_SCORECARD_FORM_SCHEMA_ID,
+  GOVERNED_SCORECARD_FORM_SCHEMA_STABILITY,
+  governedScorecardFormConfigurationSchema,
+  parseGovernedScorecardFormConfiguration,
+  scorecardCriterionSchema,
+  scorecardFormDataNatureSchema,
+  type GovernedScorecardFormConfiguration,
+  type GovernedScorecardFormConfigurationInput,
+  type ScorecardCriterion,
+  type ScorecardFormDataNature,
+} from "./schemas/scorecard-form.schema";
+
+export {
+  GOVERNED_SECTION_CONFIGURATION_SCHEMA_ID,
+  GOVERNED_SECTION_CONFIGURATION_SCHEMA_STABILITY,
+  governedSectionConfigurationSchema,
+  parseGovernedSectionConfiguration,
+  type GovernedSectionConfiguration,
+  type GovernedSectionConfigurationInput,
+} from "./schemas/section.schema";
+
+export {
+  GOVERNED_STACK_CONFIGURATION_SCHEMA_ID,
+  GOVERNED_STACK_CONFIGURATION_SCHEMA_STABILITY,
+  governedStackBentoTemplateSchema,
+  governedStackConfigurationSchema,
+  governedStackDirectionSchema,
+  parseGovernedStackConfiguration,
+  type GovernedStackConfiguration,
+  type GovernedStackConfigurationInput,
+  type GovernedStackDirection,
+} from "./schemas/stack.schema";
+
+export {
+  GOVERNED_SURFACE_CHROME_SCHEMA_ID,
+  GOVERNED_SURFACE_CHROME_SCHEMA_STABILITY,
+  governedSurfaceChromeSchema,
+  governedSurfaceDensitySchema,
+  governedSurfaceElevationSchema,
+  governedSurfaceMaterialSchema,
+  parseGovernedSurfaceChromeData,
+  type GovernedSurfaceChrome,
+  type GovernedSurfaceChromeInput,
+  type GovernedSurfaceDensity,
+  type GovernedSurfaceElevation,
+  type GovernedSurfaceMaterial,
+} from "./schemas/surface-chrome.schema";
 
 export {
   buildKanbanWorkflowFromColumnTransitions,

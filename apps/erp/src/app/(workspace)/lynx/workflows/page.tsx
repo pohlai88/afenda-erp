@@ -1,4 +1,4 @@
-import { LynxWorkflowsRoutePage } from "@/workspace-routes/lynx-workflows-route";
+import { LynxWorkflowsRoutePage } from "@/routes/workspace/lynx/lynx-workflows-route";
 
 export const unstable_instant = {
   prefetch: "static",

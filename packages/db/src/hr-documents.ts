@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 import {
   and,
+  asc,
   count,
   desc,
   eq,
@@ -13,6 +14,10 @@ import {
   sql,
 } from "drizzle-orm";
 import { runWithOrganizationContext, type AfendaTransaction } from "./client";
+import {
+  isHrEmployeeDocumentOnLegalHold,
+  isOrganizationDocumentLegalHoldActive,
+} from "./document-legal-hold.server";
 import { createEntityId } from "./ids";
 import {
   hrDocumentAcknowledgments,
@@ -238,6 +243,8 @@ export class HrDocumentCommandError extends Error {
     | "employee_not_found"
     | "document_not_found"
     | "document_archived"
+    | "document_not_archived"
+    | "document_legal_hold"
     | "invalid_replacement"
     | "sensitive_access_denied";
 
@@ -278,6 +285,7 @@ export async function registerHrEmployeeDocument(input: {
   documentType: string;
   title: string;
   blobUrl: string;
+  pathname: string;
   mimeType: string;
   sizeBytes: number;
   classification?: (typeof hrEmployeeDocuments.$inferInsert)["classification"];
@@ -304,6 +312,21 @@ export async function registerHrEmployeeDocument(input: {
 
     const documentId = createEntityId("hr_doc");
     const effectiveFrom = input.effectiveFrom ?? new Date();
+    let effectiveTo = input.effectiveTo ?? null;
+
+    if (input.effectiveTo === undefined) {
+      const policy = await resolveHrDocumentRetentionPolicyInTx(db, {
+        organizationId: input.organizationId,
+        documentType: input.documentType.trim(),
+      });
+
+      const retentionDays = policy?.retentionDays ?? 2555;
+      effectiveTo = resolveEffectiveToFromRetentionDays(
+        effectiveFrom,
+        retentionDays,
+      );
+    }
+
     const payloadHash = hashHrDocumentPayload({
       blobUrl: input.blobUrl,
       title: input.title.trim(),
@@ -317,12 +340,13 @@ export async function registerHrEmployeeDocument(input: {
       documentType: input.documentType.trim(),
       title: input.title.trim(),
       blobUrl: input.blobUrl.trim(),
+      pathname: input.pathname.trim(),
       payloadHash,
       mimeType: input.mimeType.trim(),
       sizeBytes: input.sizeBytes,
       classification: input.classification ?? "internal",
       effectiveFrom,
-      effectiveTo: input.effectiveTo ?? null,
+      effectiveTo,
       versionNumber: 1,
       isLatestActive: true,
     });
@@ -346,48 +370,28 @@ export async function archiveHrEmployeeDocument(input: {
   actorUserId?: string | null;
 }): Promise<{ documentId: string }> {
   return runWithOrganizationContext(input.organizationId, async (db) => {
-    const [document] = await db
-      .select({
-        id: hrEmployeeDocuments.id,
-        employeeId: hrEmployeeDocuments.employeeId,
-        title: hrEmployeeDocuments.title,
-        lifecycleStatus: hrEmployeeDocuments.lifecycleStatus,
-      })
-      .from(hrEmployeeDocuments)
-      .where(
-        and(
-          eq(hrEmployeeDocuments.organizationId, input.organizationId),
-          eq(hrEmployeeDocuments.id, input.documentId),
-        ),
-      )
-      .limit(1);
+    const archived = await archiveHrEmployeeDocumentInTx(db, input);
 
-    if (!document) {
-      throw new HrDocumentCommandError("document_not_found");
-    }
-    if (document.lifecycleStatus === "archived") {
+    if (!archived) {
+      const [document] = await db
+        .select({ lifecycleStatus: hrEmployeeDocuments.lifecycleStatus })
+        .from(hrEmployeeDocuments)
+        .where(
+          and(
+            eq(hrEmployeeDocuments.organizationId, input.organizationId),
+            eq(hrEmployeeDocuments.id, input.documentId),
+          ),
+        )
+        .limit(1);
+
+      if (!document) {
+        throw new HrDocumentCommandError("document_not_found");
+      }
+
       throw new HrDocumentCommandError("document_archived");
     }
 
-    const archivedAt = new Date();
-    await db
-      .update(hrEmployeeDocuments)
-      .set({
-        lifecycleStatus: "archived",
-        archivedAt,
-      })
-      .where(eq(hrEmployeeDocuments.id, input.documentId));
-
-    await insertHrDocumentAuditEventInTx(db, {
-      organizationId: input.organizationId,
-      documentId: input.documentId,
-      employeeId: document.employeeId,
-      action: "hr.document.archive",
-      actorUserId: input.actorUserId ?? null,
-      summary: `Archived document ${document.title}`,
-    });
-
-    return { documentId: input.documentId };
+    return archived;
   });
 }
 
@@ -542,6 +546,254 @@ export async function authorizeHrEmployeeDocumentDownload(input: {
   });
 }
 
+export type HrEmployeeDocumentDownloadRecord = {
+  id: string;
+  title: string;
+  pathname: string;
+  classification: (typeof hrEmployeeDocuments.$inferSelect)["classification"];
+  verificationStatus: (typeof hrEmployeeDocuments.$inferSelect)["verificationStatus"];
+};
+
+export async function getHrEmployeeDocumentForDownload(input: {
+  organizationId: string;
+  documentId: string;
+}): Promise<HrEmployeeDocumentDownloadRecord | null> {
+  return runWithOrganizationContext(input.organizationId, async (db) => {
+    const [document] = await db
+      .select({
+        id: hrEmployeeDocuments.id,
+        title: hrEmployeeDocuments.title,
+        pathname: hrEmployeeDocuments.pathname,
+        blobUrl: hrEmployeeDocuments.blobUrl,
+        classification: hrEmployeeDocuments.classification,
+        verificationStatus: hrEmployeeDocuments.verificationStatus,
+        lifecycleStatus: hrEmployeeDocuments.lifecycleStatus,
+      })
+      .from(hrEmployeeDocuments)
+      .where(
+        and(
+          eq(hrEmployeeDocuments.organizationId, input.organizationId),
+          eq(hrEmployeeDocuments.id, input.documentId),
+          eq(hrEmployeeDocuments.lifecycleStatus, "active"),
+        ),
+      )
+      .limit(1);
+
+    if (!document) {
+      return null;
+    }
+
+    const pathname =
+      document.pathname?.trim() ||
+      extractPathnameFromBlobUrl(document.blobUrl);
+
+    if (!pathname) {
+      return null;
+    }
+
+    return {
+      id: document.id,
+      title: document.title,
+      pathname,
+      classification: document.classification,
+      verificationStatus: document.verificationStatus,
+    };
+  });
+}
+
+type HrDocumentRetentionPolicyRow =
+  typeof hrDocumentRetentionPolicies.$inferSelect;
+
+async function resolveHrDocumentRetentionPolicyInTx(
+  db: AfendaTransaction,
+  input: {
+    organizationId: string;
+    documentType: string;
+    documentGroup?: string | null;
+  },
+): Promise<HrDocumentRetentionPolicyRow | null> {
+  const documentType = input.documentType.trim();
+  const documentGroup = input.documentGroup?.trim() || null;
+
+  if (documentGroup) {
+    const [typeAndGroup] = await db
+      .select()
+      .from(hrDocumentRetentionPolicies)
+      .where(
+        and(
+          eq(hrDocumentRetentionPolicies.organizationId, input.organizationId),
+          eq(hrDocumentRetentionPolicies.active, true),
+          eq(hrDocumentRetentionPolicies.documentType, documentType),
+          eq(hrDocumentRetentionPolicies.documentGroup, documentGroup),
+        ),
+      )
+      .limit(1);
+
+    if (typeAndGroup) {
+      return typeAndGroup;
+    }
+  }
+
+  const [typeOnly] = await db
+    .select()
+    .from(hrDocumentRetentionPolicies)
+    .where(
+      and(
+        eq(hrDocumentRetentionPolicies.organizationId, input.organizationId),
+        eq(hrDocumentRetentionPolicies.active, true),
+        eq(hrDocumentRetentionPolicies.documentType, documentType),
+        isNull(hrDocumentRetentionPolicies.documentGroup),
+      ),
+    )
+    .limit(1);
+
+  if (typeOnly) {
+    return typeOnly;
+  }
+
+  const [orgDefault] = await db
+    .select()
+    .from(hrDocumentRetentionPolicies)
+    .where(
+      and(
+        eq(hrDocumentRetentionPolicies.organizationId, input.organizationId),
+        eq(hrDocumentRetentionPolicies.active, true),
+        isNull(hrDocumentRetentionPolicies.documentType),
+        isNull(hrDocumentRetentionPolicies.documentGroup),
+      ),
+    )
+    .limit(1);
+
+  return orgDefault ?? null;
+}
+
+function resolveEffectiveToFromRetentionDays(
+  effectiveFrom: Date,
+  retentionDays: number,
+): Date {
+  const effectiveTo = new Date(effectiveFrom);
+  effectiveTo.setUTCDate(effectiveTo.getUTCDate() + Math.max(0, retentionDays));
+  return effectiveTo;
+}
+
+async function archiveHrEmployeeDocumentInTx(
+  db: AfendaTransaction,
+  input: {
+    organizationId: string;
+    documentId: string;
+    actorUserId?: string | null;
+    summarySuffix?: string;
+  },
+): Promise<{ documentId: string } | null> {
+  const [document] = await db
+    .select({
+      id: hrEmployeeDocuments.id,
+      employeeId: hrEmployeeDocuments.employeeId,
+      title: hrEmployeeDocuments.title,
+      lifecycleStatus: hrEmployeeDocuments.lifecycleStatus,
+    })
+    .from(hrEmployeeDocuments)
+    .where(
+      and(
+        eq(hrEmployeeDocuments.organizationId, input.organizationId),
+        eq(hrEmployeeDocuments.id, input.documentId),
+      ),
+    )
+    .limit(1);
+
+  if (!document || document.lifecycleStatus === "archived") {
+    return null;
+  }
+
+  const archivedAt = new Date();
+  await db
+    .update(hrEmployeeDocuments)
+    .set({
+      lifecycleStatus: "archived",
+      archivedAt,
+    })
+    .where(eq(hrEmployeeDocuments.id, input.documentId));
+
+  await insertHrDocumentAuditEventInTx(db, {
+    organizationId: input.organizationId,
+    documentId: input.documentId,
+    employeeId: document.employeeId,
+    action: "hr.document.archive",
+    actorUserId: input.actorUserId ?? null,
+    summary: `Archived document ${document.title}${input.summarySuffix ?? ""}`,
+  });
+
+  return { documentId: input.documentId };
+}
+
+/** Archives active employee documents when retention policy requires separation archive. */
+export async function archiveHrEmployeeDocumentsOnSeparationInTx(
+  db: AfendaTransaction,
+  input: {
+    organizationId: string;
+    employeeId: string;
+    actorUserId?: string | null;
+  },
+): Promise<{ archivedCount: number }> {
+  const activeDocuments = await db
+    .select({
+      id: hrEmployeeDocuments.id,
+      documentType: hrEmployeeDocuments.documentType,
+      documentGroup: hrEmployeeDocuments.documentGroup,
+      legalHold: hrEmployeeDocuments.legalHold,
+    })
+    .from(hrEmployeeDocuments)
+    .where(
+      and(
+        eq(hrEmployeeDocuments.organizationId, input.organizationId),
+        eq(hrEmployeeDocuments.employeeId, input.employeeId),
+        eq(hrEmployeeDocuments.lifecycleStatus, "active"),
+        eq(hrEmployeeDocuments.isLatestActive, true),
+        eq(hrEmployeeDocuments.legalHold, false),
+      ),
+    );
+
+  let archivedCount = 0;
+
+  for (const document of activeDocuments) {
+    const policy = await resolveHrDocumentRetentionPolicyInTx(db, {
+      organizationId: input.organizationId,
+      documentType: document.documentType,
+      documentGroup: document.documentGroup,
+    });
+
+    if (policy && !policy.archiveOnSeparation) {
+      continue;
+    }
+
+    const archived = await archiveHrEmployeeDocumentInTx(db, {
+      organizationId: input.organizationId,
+      documentId: document.id,
+      actorUserId: input.actorUserId ?? null,
+      summarySuffix: " (employee separation)",
+    });
+
+    if (archived) {
+      archivedCount += 1;
+    }
+  }
+
+  return { archivedCount };
+}
+
+function extractPathnameFromBlobUrl(blobUrl: string): string | null {
+  try {
+    const objectPath = new URL(blobUrl).pathname.replace(/^\/+/, "");
+    if (objectPath.startsWith("tenants/")) {
+      return objectPath;
+    }
+  } catch {
+    return null;
+  }
+
+  return null;
+}
+
 export async function upsertHrDocumentRequirement(input: {
   organizationId: string;
   documentType: string;
@@ -642,18 +894,24 @@ export async function runHrDocumentExpirySweep(input?: { withinDays?: number }) 
   horizon.setUTCDate(horizon.getUTCDate() + withinDays);
 
   for (const organization of organizations) {
+    if (await isOrganizationDocumentLegalHoldActive(organization.id)) {
+      continue;
+    }
+
     await runWithOrganizationContext(organization.id, async (db) => {
       const expired = await db
         .select({
           id: hrEmployeeDocuments.id,
           employeeId: hrEmployeeDocuments.employeeId,
           title: hrEmployeeDocuments.title,
+          legalHold: hrEmployeeDocuments.legalHold,
         })
         .from(hrEmployeeDocuments)
         .where(
           and(
             eq(hrEmployeeDocuments.organizationId, organization.id),
             eq(hrEmployeeDocuments.lifecycleStatus, "active"),
+            eq(hrEmployeeDocuments.legalHold, false),
             isNotNull(hrEmployeeDocuments.effectiveTo),
             lte(hrEmployeeDocuments.effectiveTo, now),
           ),
@@ -701,11 +959,219 @@ export async function runHrDocumentExpirySweep(input?: { withinDays?: number }) 
   };
 }
 
+const HR_ARCHIVED_DESTRUCTION_GRACE_DAYS = 30;
+
+export async function listHrEmployeeDocumentsEligibleForDestruction(input: {
+  organizationId: string;
+  limit?: number;
+  before?: Date;
+}) {
+  const limit = Math.min(Math.max(input.limit ?? 100, 1), 500);
+  const before = input.before ?? new Date();
+  const archivedBefore = new Date(before);
+  archivedBefore.setUTCDate(
+    archivedBefore.getUTCDate() - HR_ARCHIVED_DESTRUCTION_GRACE_DAYS,
+  );
+
+  return runWithOrganizationContext(input.organizationId, async (db) =>
+    db
+      .select({
+        id: hrEmployeeDocuments.id,
+        title: hrEmployeeDocuments.title,
+        employeeId: hrEmployeeDocuments.employeeId,
+        documentType: hrEmployeeDocuments.documentType,
+        archivedAt: hrEmployeeDocuments.archivedAt,
+      })
+      .from(hrEmployeeDocuments)
+      .where(
+        and(
+          eq(hrEmployeeDocuments.organizationId, input.organizationId),
+          eq(hrEmployeeDocuments.lifecycleStatus, "archived"),
+          eq(hrEmployeeDocuments.legalHold, false),
+          isNotNull(hrEmployeeDocuments.archivedAt),
+          lte(hrEmployeeDocuments.archivedAt, archivedBefore),
+        ),
+      )
+      .orderBy(asc(hrEmployeeDocuments.archivedAt))
+      .limit(limit),
+  );
+}
+
+export async function getHrEmployeeDocumentStorageRef(input: {
+  organizationId: string;
+  documentId: string;
+}) {
+  return runWithOrganizationContext(input.organizationId, async (db) => {
+    const [document] = await db
+      .select({
+        id: hrEmployeeDocuments.id,
+        title: hrEmployeeDocuments.title,
+        pathname: hrEmployeeDocuments.pathname,
+        blobUrl: hrEmployeeDocuments.blobUrl,
+        classification: hrEmployeeDocuments.classification,
+        lifecycleStatus: hrEmployeeDocuments.lifecycleStatus,
+        legalHold: hrEmployeeDocuments.legalHold,
+        employeeId: hrEmployeeDocuments.employeeId,
+      })
+      .from(hrEmployeeDocuments)
+      .where(
+        and(
+          eq(hrEmployeeDocuments.organizationId, input.organizationId),
+          eq(hrEmployeeDocuments.id, input.documentId),
+        ),
+      )
+      .limit(1);
+
+    if (!document) {
+      return null;
+    }
+
+    const pathname =
+      document.pathname?.trim() ||
+      extractPathnameFromBlobUrl(document.blobUrl);
+
+    if (!pathname) {
+      return null;
+    }
+
+    return {
+      ...document,
+      pathname,
+    };
+  });
+}
+
+export async function deleteHrEmployeeDocument(input: {
+  organizationId: string;
+  documentId: string;
+  actorAuthUserId: string;
+}) {
+  return runWithOrganizationContext(input.organizationId, async (db) => {
+    const [document] = await db
+      .select({
+        id: hrEmployeeDocuments.id,
+        title: hrEmployeeDocuments.title,
+        pathname: hrEmployeeDocuments.pathname,
+        blobUrl: hrEmployeeDocuments.blobUrl,
+        classification: hrEmployeeDocuments.classification,
+        lifecycleStatus: hrEmployeeDocuments.lifecycleStatus,
+        legalHold: hrEmployeeDocuments.legalHold,
+        employeeId: hrEmployeeDocuments.employeeId,
+      })
+      .from(hrEmployeeDocuments)
+      .where(
+        and(
+          eq(hrEmployeeDocuments.organizationId, input.organizationId),
+          eq(hrEmployeeDocuments.id, input.documentId),
+        ),
+      )
+      .limit(1);
+
+    if (!document) {
+      throw new HrDocumentCommandError("document_not_found");
+    }
+
+    if (document.lifecycleStatus !== "archived") {
+      throw new HrDocumentCommandError("document_not_archived");
+    }
+
+    if (
+      isHrEmployeeDocumentOnLegalHold(document.legalHold) ||
+      (await isOrganizationDocumentLegalHoldActive(input.organizationId))
+    ) {
+      throw new HrDocumentCommandError("document_legal_hold");
+    }
+
+    const pathname =
+      document.pathname?.trim() ||
+      extractPathnameFromBlobUrl(document.blobUrl);
+
+    if (!pathname) {
+      throw new HrDocumentCommandError("document_not_found");
+    }
+
+    await db
+      .delete(hrEmployeeDocuments)
+      .where(
+        and(
+          eq(hrEmployeeDocuments.organizationId, input.organizationId),
+          eq(hrEmployeeDocuments.id, input.documentId),
+        ),
+      );
+
+    await insertHrDocumentAuditEventInTx(db, {
+      organizationId: input.organizationId,
+      documentId: document.id,
+      employeeId: document.employeeId,
+      action: "hr.document.delete",
+      actorUserId: input.actorAuthUserId,
+      summary: `Destroyed archived document ${document.title}`,
+    });
+
+    return {
+      id: document.id,
+      title: document.title,
+      pathname,
+      blobUrl: document.blobUrl,
+      classification: document.classification,
+    };
+  });
+}
+
+export async function applyHrEmployeeDocumentLegalHold(input: {
+  organizationId: string;
+  documentId: string;
+  actorAuthUserId: string;
+}) {
+  return runWithOrganizationContext(input.organizationId, async (db) => {
+    const [document] = await db
+      .select({
+        id: hrEmployeeDocuments.id,
+        title: hrEmployeeDocuments.title,
+        legalHold: hrEmployeeDocuments.legalHold,
+        employeeId: hrEmployeeDocuments.employeeId,
+      })
+      .from(hrEmployeeDocuments)
+      .where(
+        and(
+          eq(hrEmployeeDocuments.organizationId, input.organizationId),
+          eq(hrEmployeeDocuments.id, input.documentId),
+        ),
+      )
+      .limit(1);
+
+    if (!document) {
+      throw new HrDocumentCommandError("document_not_found");
+    }
+
+    if (document.legalHold) {
+      return document;
+    }
+
+    await db
+      .update(hrEmployeeDocuments)
+      .set({ legalHold: true })
+      .where(eq(hrEmployeeDocuments.id, input.documentId));
+
+    await insertHrDocumentAuditEventInTx(db, {
+      organizationId: input.organizationId,
+      documentId: document.id,
+      employeeId: document.employeeId,
+      action: "hr.document.legal-hold",
+      actorUserId: input.actorAuthUserId,
+      summary: `Applied legal hold to document ${document.title}.`,
+    });
+
+    return document;
+  });
+}
+
 export async function replaceHrEmployeeDocument(input: {
   organizationId: string;
   documentId: string;
   title: string;
   blobUrl: string;
+  pathname: string;
   mimeType: string;
   sizeBytes: number;
   effectiveTo?: Date | null;
@@ -729,6 +1195,22 @@ export async function replaceHrEmployeeDocument(input: {
     }
 
     const newDocumentId = createEntityId("hr_doc");
+    const effectiveFrom = new Date();
+    let effectiveTo = input.effectiveTo ?? existing.effectiveTo ?? null;
+
+    if (input.effectiveTo === undefined && existing.effectiveTo == null) {
+      const policy = await resolveHrDocumentRetentionPolicyInTx(db, {
+        organizationId: input.organizationId,
+        documentType: existing.documentType,
+        documentGroup: existing.documentGroup,
+      });
+
+      effectiveTo = resolveEffectiveToFromRetentionDays(
+        effectiveFrom,
+        policy?.retentionDays ?? 2555,
+      );
+    }
+
     const payloadHash = hashHrDocumentPayload({
       blobUrl: input.blobUrl,
       title: input.title.trim(),
@@ -748,14 +1230,15 @@ export async function replaceHrEmployeeDocument(input: {
       documentGroup: existing.documentGroup,
       title: input.title.trim(),
       blobUrl: input.blobUrl.trim(),
+      pathname: input.pathname.trim(),
       payloadHash,
       mimeType: input.mimeType.trim(),
       sizeBytes: input.sizeBytes,
       classification: existing.classification,
       verificationStatus: "pending",
       lifecycleStatus: "active",
-      effectiveFrom: new Date(),
-      effectiveTo: input.effectiveTo ?? existing.effectiveTo,
+      effectiveFrom,
+      effectiveTo,
       supersedesDocumentId: existing.id,
       versionNumber: existing.versionNumber + 1,
       isLatestActive: true,

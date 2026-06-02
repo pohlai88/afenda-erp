@@ -1,7 +1,8 @@
 import "server-only";
 
 import type { BlobEnv } from "@afenda/config/env";
-import { issueSignedToken, presignUrl } from "@vercel/blob";
+import { uploadRouteCopy } from "@afenda/kernel";
+import { del, issueSignedToken, presignUrl } from "@vercel/blob";
 import type {
   ObjectStorePort,
   SignedDownloadInput,
@@ -47,6 +48,15 @@ export function createVercelBlobObjectStore(): ObjectStorePort {
         url: redirectUrl.toString(),
         validUntilMs: input.validUntilMs,
       };
+    },
+
+    async deleteObject(input: { pathname: string; blobUrl?: string }) {
+      const blobUrl = input.blobUrl?.trim();
+      if (!blobUrl) {
+        throw new UploadRouteError(400, uploadRouteCopy.invalidRequest);
+      }
+
+      await del(blobUrl);
     },
   };
 }

@@ -118,7 +118,7 @@ Provider selection is env-driven via `@afenda/object-storage`. Default on Vercel
 | Package | `@afenda/object-storage` — handlers in package, thin routes in `apps/erp` |
 | Upload route | `POST /api/internal/v1/uploads` |
 | Config route | `GET /api/internal/v1/uploads/config?moduleId=<moduleId>` — provider + tenant pathname prefix |
-| Download route | `GET /api/internal/v1/documents/[documentId]/download?moduleId=<moduleId>` (legacy `/api/documents/...` → 308 redirect) |
+| Download route | `GET /api/internal/v1/documents/[documentId]/download?moduleId=<moduleId>` |
 | Provider env | `OBJECT_STORAGE_PROVIDER=vercel-blob\|r2` (auto-detect when unset) |
 
 #### Vercel Blob (default)

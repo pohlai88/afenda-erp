@@ -156,7 +156,7 @@ export const BONUS_REQUIREMENT_COVERAGE: readonly BonusRequirementCoverage[] = [
     evidence: [
       "packages/db/src/hr-bonus-approval.ts (reviewHrBonusPayoutInTx)",
       "packages/features/hr-suite/.../policies/hr.payroll.bonus-access.policy.server.ts (requireHrBonusApprove)",
-      "apps/erp/src/app/api/hr/bonus/payouts/review/route.ts",
+      "apps/erp/src/app/api/internal/v1/hr/bonus/payouts/review/route.ts",
     ],
   },
   {

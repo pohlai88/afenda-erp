@@ -9,23 +9,36 @@ import {
   resolveVercelBlobCallbackUrl,
 } from "../src/_object-storage-integration/domain/object-storage-config.server";
 import {
+  assertDocumentScanPassed,
+  assertGateDecisionAllowed,
+  assertUploadQuotaAllowed,
+  recordEvidenceEvent,
+  recordGovernanceDeniedEvidenceEvent,
+  recordUploadRouteDeniedEvidence,
+} from "../src/_object-storage-integration/api/evidence-governance.server";
+import {
   UploadRouteError,
   getUploadRouteErrorResponse,
 } from "../src/_object-storage-integration/domain/upload-route.error.shared";
 import {
   OBJECT_STORAGE_HTTP_ROUTES,
+} from "../src/_object-storage-integration/contracts/index";
+import {
   assertUploadPathnameMatchesTenant,
   buildTenantObjectPathPrefix,
   buildTenantObjectPathname,
   formatDownloadContentDisposition,
   shouldUseMultipartUpload,
-} from "../src/client";
+} from "../src/_object-storage-integration/policies/tenant-pathnames.shared";
 import {
   assertUploadTokenMatchesSession,
   uploadAccessSchema,
+  uploadClassificationSchema,
   uploadPayloadSchema,
+  uploadRetentionClassSchema,
   type UploadTokenPayload,
 } from "../src/_object-storage-integration/schemas/upload-payload.shared";
+import { objectStorageGovernancePolicy } from "../src/metadata";
 
 describe("tenant object pathnames", () => {
   it("builds tenant-scoped object path prefixes", () => {
@@ -148,7 +161,78 @@ describe("upload payload schema", () => {
     });
 
     expect(payload.access).toBe("private");
+    expect(payload.classification).toBe("internal");
+    expect(payload.retentionClass).toBe("standard");
     expect(uploadAccessSchema.parse("public")).toBe("public");
+    expect(uploadClassificationSchema.parse("restricted")).toBe("restricted");
+    expect(uploadRetentionClassSchema.parse("legal-hold")).toBe("legal-hold");
+  });
+
+  it("exposes governance policy through the metadata door", () => {
+    expect(objectStorageGovernancePolicy).toMatchObject({
+      defaultClassification: "internal",
+      defaultRetentionClass: "standard",
+      classificationRequired: true,
+      retentionClassRequired: true,
+    });
+    expect(objectStorageGovernancePolicy.classifications).toContain(
+      "confidential",
+    );
+    expect(objectStorageGovernancePolicy.classifications).toContain(
+      "highly-restricted",
+    );
+    expect(objectStorageGovernancePolicy.retentionClasses).toContain(
+      "legal-hold",
+    );
+  });
+
+  it("identifies sensitive classifications for download governance", async () => {
+    const { isObjectStorageClassificationSensitive } = await import(
+      "../src/_object-storage-integration/policies/document-governance-policy.shared"
+    );
+
+    expect(isObjectStorageClassificationSensitive("internal")).toBe(false);
+    expect(isObjectStorageClassificationSensitive("confidential")).toBe(true);
+    expect(isObjectStorageClassificationSensitive("highly-restricted")).toBe(
+      true,
+    );
+  });
+
+  it("detects magic bytes for common upload types", async () => {
+    const {
+      detectContentTypeFromMagicBytes,
+      magicBytesMatchDeclaredContentType,
+    } = await import(
+      "../src/_object-storage-integration/policies/document-content-verification.shared"
+    );
+
+    const pdfPrefix = new Uint8Array([0x25, 0x50, 0x44, 0x46, 0x2d]);
+    expect(detectContentTypeFromMagicBytes(pdfPrefix)).toBe("application/pdf");
+    expect(
+      magicBytesMatchDeclaredContentType("application/pdf", pdfPrefix),
+    ).toBe(true);
+    expect(
+      magicBytesMatchDeclaredContentType("image/png", pdfPrefix),
+    ).toBe(false);
+  });
+
+  it("rejects stored content when magic bytes mismatch declared type", async () => {
+    const { assertStoredContentMatchesDeclared } = await import(
+      "../src/_object-storage-integration/api/upload-registration.server"
+    );
+
+    const pngDeclaredPdfBytes = new Uint8Array([
+      0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00, 0x00, 0x00, 0x0d,
+      0x49, 0x48, 0x44, 0x52,
+    ]);
+
+    expect(() =>
+      assertStoredContentMatchesDeclared({
+        storedContentType: "image/png",
+        declaredContentType: "application/pdf",
+        prefixBytes: pngDeclaredPdfBytes,
+      }),
+    ).toThrow(UploadRouteError);
   });
 
   it("maps upload route errors to status and message", () => {
@@ -186,6 +270,8 @@ describe("upload payload schema", () => {
       contentType: "application/pdf" as const,
       sizeBytes: 1024,
       access: "private" as const,
+      classification: "internal" as const,
+      retentionClass: "standard" as const,
       registerTenantDocument: true,
       organizationId: "org-a",
       uploadedByAuthUserId: "user-a",
@@ -198,6 +284,148 @@ describe("upload payload schema", () => {
         { id: "user-a" },
       ),
     ).toThrow(new UploadRouteError(403, uploadRouteCopy.tokenMismatch));
+  });
+});
+
+describe("evidence governance gates", () => {
+  it("blocks downloads until scan status is passed", () => {
+    expect(() => assertDocumentScanPassed({ scanStatus: "passed" })).not.toThrow();
+    expect(() => assertDocumentScanPassed({ scanStatus: undefined })).toThrow(
+      UploadRouteError,
+    );
+    expect(() => assertDocumentScanPassed({ scanStatus: "pending" })).toThrow(
+      UploadRouteError,
+    );
+  });
+
+  it("maps governance denials to upload route errors", () => {
+    expect(() => assertGateDecisionAllowed({ allowed: true })).not.toThrow();
+    expect(() =>
+      assertGateDecisionAllowed({
+        allowed: false,
+        status: 429,
+        reason: "Organization storage quota exceeded.",
+      }),
+    ).toThrow(new UploadRouteError(429, "Organization storage quota exceeded."));
+  });
+
+  it("records evidence events with a generated timestamp", async () => {
+    const events: unknown[] = [];
+
+    await recordEvidenceEvent({
+      sink: async (event) => {
+        events.push(event);
+      },
+      event: {
+        action: "DOCUMENT_UPLOADED",
+        organizationId: "org-a",
+        moduleId: moduleIds[0],
+        userId: "user-a",
+        pathname: "tenants/org-a/finance/file.pdf",
+      },
+    });
+
+    expect(events).toHaveLength(1);
+    expect(events[0]).toMatchObject({
+      action: "DOCUMENT_UPLOADED",
+      organizationId: "org-a",
+      userId: "user-a",
+    });
+    expect((events[0] as { timestamp?: string }).timestamp).toEqual(
+      expect.any(String),
+    );
+  });
+
+  it("records upload quota denials before throwing", async () => {
+    const events: unknown[] = [];
+
+    await expect(
+      assertUploadQuotaAllowed({
+        recordDenied: async (event) => {
+          events.push(event);
+        },
+        quotaInput: {
+          organizationId: "org-a",
+          moduleId: moduleIds[0],
+          pathname: "tenants/org-a/finance/file.pdf",
+          sizeBytes: 1024,
+          contentType: "application/pdf",
+          access: "private",
+          classification: "internal",
+          retentionClass: "standard",
+          uploadedByAuthUserId: "user-a",
+        },
+        quotaGate: async () => ({
+          allowed: false,
+          status: 429,
+          reason: "Organization storage quota exceeded.",
+        }),
+      }),
+    ).rejects.toThrow(UploadRouteError);
+
+    expect(events).toHaveLength(1);
+    expect(events[0]).toMatchObject({
+      action: "DOCUMENT_UPLOAD_DENIED",
+      metadata: {
+        denialStatus: 429,
+        denialReason: "Organization storage quota exceeded.",
+      },
+    });
+  });
+
+  it("records governance denials for blocked downloads", async () => {
+    const events: unknown[] = [];
+
+    await recordGovernanceDeniedEvidenceEvent({
+      sink: async (event) => {
+        events.push(event);
+      },
+      action: "DOCUMENT_DOWNLOAD_DENIED",
+      status: 423,
+      reason: "Document unavailable.",
+      event: {
+        organizationId: "org-a",
+        moduleId: moduleIds[0],
+        userId: "user-a",
+        documentId: "doc-a",
+        pathname: "tenants/org-a/finance/file.pdf",
+      },
+    });
+
+    expect(events).toHaveLength(1);
+    expect(events[0]).toMatchObject({
+      action: "DOCUMENT_DOWNLOAD_DENIED",
+      metadata: {
+        denialStatus: 423,
+        denialReason: "Document unavailable.",
+      },
+    });
+  });
+
+  it("records upload permission denials with 403 status", async () => {
+    const events: unknown[] = [];
+
+    await recordUploadRouteDeniedEvidence({
+      sink: async (event) => {
+        events.push(event);
+      },
+      error: new UploadRouteError(403, uploadRouteCopy.uploadNotAllowed),
+      context: {
+        organizationId: "org-a",
+        moduleId: moduleIds[0],
+        userId: "user-a",
+        pathname: "tenants/org-a/finance/file.pdf",
+      },
+    });
+
+    expect(events).toHaveLength(1);
+    expect(events[0]).toMatchObject({
+      action: "DOCUMENT_UPLOAD_DENIED",
+      metadata: {
+        denialStatus: 403,
+        denialReason: uploadRouteCopy.uploadNotAllowed,
+      },
+    });
   });
 });
 

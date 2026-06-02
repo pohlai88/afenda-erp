@@ -3,4 +3,4 @@ export {
   documentUploadContentTypes,
   documentUploadMaxSizeBytes,
   formatUploadLimit,
-} from "@/lib/document-upload-policy";
+} from "@afenda/object-storage/client";

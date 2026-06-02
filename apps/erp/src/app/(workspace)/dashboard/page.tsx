@@ -1,5 +1,5 @@
 import { getCachedModuleMetadata } from "@/lib/cached-module-metadata";
-import { DashboardRoutePage } from "@/workspace-routes/dashboard-route";
+import { DashboardRoutePage } from "@/routes/workspace/dashboard/dashboard-route";
 import { getErpModuleById } from "@afenda/kernel";
 import type { ModuleWorkspaceSearchParams } from "@afenda/kernel";
 import type { Metadata } from "next";

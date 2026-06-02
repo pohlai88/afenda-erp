@@ -1180,6 +1180,7 @@ export function buildLynxRunManagementListSurface(input: {
           ? {
               export: {
                 actionId: "lynx-runs-export",
+                kind: "download",
                 label: "Export CSV",
                 formats: ["csv"],
                 triggerElementId: input.exportTriggerElementId,

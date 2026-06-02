@@ -9,6 +9,7 @@ import {
   getTenantErpRecord,
   listAuditLogsForEntity,
   listTenantDocumentWindow,
+  listTenantModuleDocumentActivityWindow,
   listTenantErpRecordWindow,
   listTenantSavedViews,
   listTenantWorkItemWindow,
@@ -18,6 +19,8 @@ import {
   type TenantAuditLog,
   type TenantErpDocument,
   type TenantErpDocumentWindow,
+  type TenantDocumentEvidenceWindow,
+  type TenantDocumentEvidenceWindowRow,
   type TenantErpRecord,
   type TenantErpRecordWindow,
   type TenantErpSavedView,
@@ -35,6 +38,7 @@ import type { ModuleDataMode } from "./shared/workspace-data-mode";
 import {
   toRecordWindowQuery,
   toDocumentWindowQuery,
+  toDocumentActivityWindowQuery,
   toWorkItemWindowQuery,
   type ModuleWorkspaceListQuery,
 } from "./shared/module-workspace-query";
@@ -67,6 +71,7 @@ export {
   buildDashboardHardeningChecklistSurface,
   buildDashboardWorkflowListSurface,
   buildDocumentRegistryListSurface,
+  buildDocumentQuarantineInboxListSurface,
   buildDocumentActivityLinesListSurface,
   buildModuleRecordListSurface,
   buildModuleWorkItemListSurface,
@@ -111,6 +116,7 @@ export {
 } from "./modules/feature-metadata";
 export {
   resolveModuleWorkspaceListQuery,
+  toDocumentActivityWindowQuery,
   toDocumentWindowQuery,
   type ModuleWorkspaceListQuery,
   type ModuleWorkspaceSearchParams,
@@ -300,7 +306,20 @@ export type ModuleWorkspaceDocument = {
   contentType: string;
   size: string;
   access: string;
+  classification: string;
+  retentionClass: string;
+  scanStatus: string;
   createdAt: string;
+};
+
+export type ModuleWorkspaceDocumentActivityEvent = {
+  id: string;
+  summary: string;
+  actorLabel: string;
+  occurredAt: string;
+  evidenceHref?: string;
+  policyLabel?: string;
+  riskTone?: "default" | "positive" | "attention" | "critical";
 };
 
 export type ModuleWorkspace = {
@@ -314,6 +333,8 @@ export type ModuleWorkspace = {
   workItemWindow: ModuleWorkspaceWindow;
   documents: readonly ModuleWorkspaceDocument[];
   documentWindow: ModuleWorkspaceWindow;
+  documentActivityEvents: readonly ModuleWorkspaceDocumentActivityEvent[];
+  documentActivityWindow: ModuleWorkspaceWindow;
 };
 
 export type ModuleWorkspaceStats = {
@@ -575,6 +596,9 @@ function serializeDocument(
     contentType: document.contentType,
     size: formatSize(document.sizeBytes),
     access: document.access,
+    classification: document.classification,
+    retentionClass: document.retentionClass,
+    scanStatus: document.scanStatus,
     createdAt: document.createdAt.toISOString(),
   };
 }
@@ -643,6 +667,12 @@ function createMetadataWorkspace(
       totalCount: 0,
       hasNextPage: false,
     },
+    documentActivityEvents: [],
+    documentActivityWindow: {
+      pageSize: 0,
+      totalCount: 0,
+      hasNextPage: false,
+    },
   };
 }
 
@@ -679,6 +709,144 @@ function serializeDocumentWindow(
   };
 }
 
+function serializeDocumentActivityWindow(
+  window: TenantDocumentEvidenceWindow,
+): ModuleWorkspaceWindow {
+  return {
+    pageSize: window.pageSize,
+    totalCount: window.totalCount,
+    hasNextPage: window.hasNextPage,
+    ...(window.nextCursor ? { nextCursor: window.nextCursor } : {}),
+  };
+}
+
+const DOCUMENT_EVIDENCE_ACTIONS_WITH_HREF = new Set([
+  "DOCUMENT_UPLOADED",
+  "DOCUMENT_DOWNLOADED",
+]);
+
+function resolveDocumentEvidenceRiskTone(
+  action: string,
+): ModuleWorkspaceDocumentActivityEvent["riskTone"] {
+  if (action.endsWith("_DENIED") || action === "DOCUMENT_DELETED") {
+    return "critical";
+  }
+
+  if (action === "DOCUMENT_MALWARE_DETECTED") {
+    return "critical";
+  }
+
+  if (
+    action === "DOCUMENT_RETENTION_EXPIRED" ||
+    action === "DOCUMENT_LEGAL_HOLD_APPLIED" ||
+    action === "DOCUMENT_ORG_LEGAL_HOLD_CASCADED" ||
+    action === "hr.document.archive" ||
+    action === "hr.document.legal-hold"
+  ) {
+    return "attention";
+  }
+
+  if (
+    action === "DOCUMENT_UPLOADED" ||
+    action === "DOCUMENT_DOWNLOADED" ||
+    action === "DOCUMENT_LEGAL_HOLD_RELEASED" ||
+    action === "DOCUMENT_SCAN_QUARANTINE_RELEASED" ||
+    action === "hr.document.verify" ||
+    action === "hr.document.upload"
+  ) {
+    return "positive";
+  }
+
+  if (
+    action === "hr.document.reject" ||
+    action === "hr.document.delete"
+  ) {
+    return "critical";
+  }
+
+  return "default";
+}
+
+function formatDocumentEvidenceActionLabel(action: string) {
+  const normalized = action.startsWith("hr.document.")
+    ? action.replace(/^hr\.document\./, "")
+    : action.replace(/^DOCUMENT_/, "").toLowerCase();
+
+  return normalized
+    .split(/[._]/)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
+}
+
+function resolveDocumentEvidenceHref(input: {
+  action: string;
+  entityId: string;
+  moduleId: ModuleId;
+}) {
+  if (DOCUMENT_EVIDENCE_ACTIONS_WITH_HREF.has(input.action)) {
+    return `/api/internal/v1/documents/${input.entityId}/download?moduleId=${input.moduleId}`;
+  }
+
+  if (
+    input.action === "hr.document.download" &&
+    input.moduleId === "hr"
+  ) {
+    return `/api/internal/v1/documents/${input.entityId}/download?moduleId=hr`;
+  }
+
+  return undefined;
+}
+
+function resolveDocumentEvidenceActorLabel(
+  row: TenantDocumentEvidenceWindowRow,
+) {
+  const actorType = row.metadata.actorType;
+  if (actorType === "system") {
+    return "System";
+  }
+
+  if (actorType === "agent") {
+    return "Agent";
+  }
+
+  const actorId = row.actorAuthUserId.trim();
+  if (actorId.length <= 12) {
+    return actorId || "Operator";
+  }
+
+  return `${actorId.slice(0, 8)}…`;
+}
+
+function serializeDocumentActivityEvent(
+  row: TenantDocumentEvidenceWindowRow,
+  moduleId: ModuleId,
+): ModuleWorkspaceDocumentActivityEvent {
+  const retentionClass = row.metadata.retentionClass;
+  const policyLabel =
+    typeof retentionClass === "string" && retentionClass.length > 0
+      ? retentionClass
+          .split("-")
+          .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+          .join(" ")
+      : formatDocumentEvidenceActionLabel(row.action);
+
+  const evidenceHref = resolveDocumentEvidenceHref({
+    action: row.action,
+    entityId: row.entityId,
+    moduleId,
+  });
+
+  return {
+    id: row.id,
+    summary: row.summary.trim() || formatDocumentEvidenceActionLabel(row.action),
+    actorLabel: resolveDocumentEvidenceActorLabel(row),
+    occurredAt: row.createdAt.toISOString(),
+    ...(evidenceHref ? { evidenceHref } : {}),
+    ...(policyLabel ? { policyLabel } : {}),
+    riskTone: resolveDocumentEvidenceRiskTone(row.action),
+  };
+}
+
 export async function getModuleWorkspace(input: {
   organizationId: string;
   moduleId: ModuleId;
@@ -695,7 +863,7 @@ export async function getModuleWorkspace(input: {
     return createMetadataWorkspace(moduleDefinition);
   }
 
-  const [recordWindow, savedViews, workItemWindow, documentWindow] =
+  const [recordWindow, savedViews, workItemWindow, documentWindow, documentActivityWindow] =
     await Promise.all([
       listTenantErpRecordWindow({
         organizationId: input.organizationId,
@@ -716,13 +884,19 @@ export async function getModuleWorkspace(input: {
         moduleId: input.moduleId,
         query: toDocumentWindowQuery(input.query),
       }),
+      listTenantModuleDocumentActivityWindow({
+        organizationId: input.organizationId,
+        moduleId: input.moduleId,
+        query: toDocumentActivityWindowQuery(input.query),
+      }),
     ]);
 
   if (
     recordWindow.rows.length === 0 &&
     savedViews.length === 0 &&
     workItemWindow.rows.length === 0 &&
-    documentWindow.rows.length === 0
+    documentWindow.rows.length === 0 &&
+    documentActivityWindow.rows.length === 0
   ) {
     return createMetadataWorkspace(moduleDefinition, true);
   }
@@ -740,6 +914,12 @@ export async function getModuleWorkspace(input: {
     workItemWindow: serializeWorkItemWindow(workItemWindow),
     documents: documentWindow.rows.map(serializeDocument),
     documentWindow: serializeDocumentWindow(documentWindow),
+    documentActivityEvents: documentActivityWindow.rows.map((row) =>
+      serializeDocumentActivityEvent(row, input.moduleId),
+    ),
+    documentActivityWindow: serializeDocumentActivityWindow(
+      documentActivityWindow,
+    ),
   };
 }
 
@@ -797,6 +977,12 @@ export async function getDashboardWorkspace(input: {
     workItemWindow: serializeWorkItemWindow(workItemWindow),
     documents: [],
     documentWindow: {
+      pageSize: 0,
+      totalCount: 0,
+      hasNextPage: false,
+    },
+    documentActivityEvents: [],
+    documentActivityWindow: {
       pageSize: 0,
       totalCount: 0,
       hasNextPage: false,

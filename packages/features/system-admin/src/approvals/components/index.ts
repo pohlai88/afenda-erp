@@ -8,3 +8,4 @@ export {
   SystemAdminApprovalsAccessDenied,
   SystemAdminApprovalsSection,
 } from "./system-admin.approvals-section.component.server";
+export { SystemAdminApprovalsPage } from "./system-admin.approvals-page.component.server";

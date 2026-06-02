@@ -88,7 +88,7 @@ export const systemAdminBillingUiCopy = {
     portalPending: "Opening portal…",
     configurationTitle: "Stripe configuration",
     configurationBody:
-      "Set STRIPE_SECRET_KEY and STRIPE_WEBHOOK_SECRET in .secret.config, plan price IDs (STRIPE_PRICE_HOBBY, TEAM, PRO, BUSINESS) in .env.config, and NEXT_PUBLIC_SITE_URL. Forward webhooks to /api/webhooks/stripe (pnpm stripe:listen).",
+      "Set STRIPE_SECRET_KEY and STRIPE_WEBHOOK_SECRET in .secret.config, plan price IDs (STRIPE_PRICE_HOBBY, TEAM, PRO, BUSINESS) in .env.config, and NEXT_PUBLIC_SITE_URL. Forward webhooks to /api/internal/v1/webhooks/stripe (pnpm stripe:listen).",
   },
   marketplace: {
     title: "AI Gateway usage",

@@ -22,6 +22,14 @@
     {
       "path": "/api/internal/v1/cron/knowledge-sync",
       "schedule": "0 4 * * *"
+    },
+    {
+      "path": "/api/internal/v1/cron/document-retention-sweep",
+      "schedule": "0 5 * * *"
+    },
+    {
+      "path": "/api/internal/v1/cron/document-scan-sweep",
+      "schedule": "*/30 * * * *"
     }
   ]
 }

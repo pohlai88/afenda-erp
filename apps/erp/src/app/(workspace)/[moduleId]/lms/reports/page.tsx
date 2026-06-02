@@ -1,5 +1,5 @@
-import { renderHrLmsReportsPage } from "@/lib/hr-sections/lms.server";
-export { metadata } from "@/lib/hr-sections/lms.server";
+import { renderHrLmsReportsPage } from "@/section-adapters/hr/lms.server";
+export { metadata } from "@/section-adapters/hr/lms.server";
 
 export default async function HrLmsReportsPage({
   searchParams,

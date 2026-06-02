@@ -15,15 +15,31 @@ import {
 export type GovernedTrailingActionSlotProps = {
   trailingAction?: ListSurfaceRowTrailingAction;
   children: ReactNode;
+
   surfaceKey?: string;
+
   sectionKey?: string;
+
+  /**
+   * Stable component identity.
+   * Defaults to descriptor id, then row id.
+   */
   componentKey?: string;
+
+  /**
+   * Stable business/domain row identity.
+   */
   rowId?: string;
 };
 
 /**
- * Wraps Pattern C trailing-column mutation UI with consistent disabled chrome
- * and tooltip copy from row metadata (`disabledReason`).
+ * Governed wrapper for Pattern C row trailing actions.
+ *
+ * Responsibilities:
+ * - renders only valid trailing actions
+ * - exposes stable diagnostics and test identity
+ * - provides disabled affordance + disabled reason tooltip
+ * - prevents disabled row action children from receiving pointer interaction
  */
 export function GovernedTrailingActionSlot({
   trailingAction,
@@ -37,49 +53,64 @@ export function GovernedTrailingActionSlot({
     return null;
   }
 
+  const descriptorId = trailingAction.descriptor?.id;
+  const descriptorLabel = trailingAction.descriptor?.label;
+
+  const resolvedRowId = rowId ?? descriptorId ?? "unknown-row";
+  const resolvedSurfaceKey = surfaceKey ?? "governed-trailing-action";
+  const resolvedComponentKey =
+    componentKey ?? descriptorId ?? `${resolvedRowId}-trailing-action`;
+
   const disabled = trailingAction.state === "disabled";
-  const hasDisabledReason = disabled && Boolean(trailingAction.disabledReason);
-  const actionKey = trailingAction.descriptor?.id ?? componentKey ?? rowId;
+  const disabledReason = disabled ? trailingAction.disabledReason?.trim() : "";
+  const hasDisabledReason = Boolean(disabledReason);
+
+  const accessibleLabel =
+    hasDisabledReason || descriptorLabel
+      ? hasDisabledReason
+        ? disabledReason
+        : descriptorLabel
+      : undefined;
 
   const shell = (
     <span
-      className={disabled ? "inline-flex opacity-60" : "inline-flex"}
+      className={[
+        "inline-flex items-center",
+        disabled ? "cursor-not-allowed opacity-60 [&_*]:pointer-events-none" : "",
+      ]
+        .filter(Boolean)
+        .join(" ")}
       tabIndex={hasDisabledReason ? 0 : undefined}
+      role={hasDisabledReason ? "button" : undefined}
       aria-disabled={disabled || undefined}
-      aria-label={
-        hasDisabledReason
-          ? trailingAction.disabledReason
-          : trailingAction.descriptor?.label
-      }
-      data-row-id={rowId}
+      aria-label={accessibleLabel}
+      data-row-id={resolvedRowId}
       data-trailing-action-state={trailingAction.state}
-      data-action-descriptor-id={trailingAction.descriptor?.id}
+      data-action-descriptor-id={descriptorId}
       {...governedIdentityAttributes({
-        surfaceKey,
+        surfaceKey: resolvedSurfaceKey,
         sectionKey,
-        componentKey: componentKey ?? rowId,
+        componentKey: resolvedComponentKey,
       })}
       {...diagnosticsDataAttributes({
         state: trailingAction.state,
-        testId: actionKey
-          ? governedTestId("trailing-action", actionKey)
-          : undefined,
+        testId: governedTestId("trailing-action", resolvedComponentKey),
       })}
     >
       {children}
     </span>
   );
 
-  if (hasDisabledReason) {
-    return (
-      <Tooltip>
-        <TooltipTrigger asChild>{shell}</TooltipTrigger>
-        <TooltipContent side="top" className="max-w-xs text-pretty">
-          {trailingAction.disabledReason}
-        </TooltipContent>
-      </Tooltip>
-    );
+  if (!hasDisabledReason) {
+    return shell;
   }
 
-  return shell;
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>{shell}</TooltipTrigger>
+      <TooltipContent side="top" className="max-w-xs text-pretty">
+        {disabledReason}
+      </TooltipContent>
+    </Tooltip>
+  );
 }

@@ -34,7 +34,7 @@ Commercial authority: **Stripe** via platform package `@afenda/billing`.
 
 * One Stripe Customer per Afenda **organization** (`organization_billing` in `@afenda/db`).
 * Admins with `system-admin.billing.manage` open **Checkout** or **Customer Portal** from System Admin → Billing.
-* Webhooks: `POST /api/webhooks/stripe` sync subscription and invoice mirrors.
+* Webhooks: `POST /api/internal/v1/webhooks/stripe` sync subscription and invoice mirrors.
 * Setup: `packages/billing/README.md` and `.env.config.example` (Stripe section).
 
 Billing still does not implement card Element UI in Afenda; payment instruments stay in Stripe.
