@@ -4,7 +4,6 @@ import { Grid3X3 } from "lucide-react";
 import Link from "next/link";
 
 import {
-  Button,
   Card,
   CardContent,
   Popover,
@@ -39,15 +38,13 @@ export function AppShellLauncher({
     <Popover>
       <AppShellUtilityTriggerTooltip label="Open workspace launcher">
         <PopoverTrigger asChild>
-          <Button
+          <button
             aria-label="Open workspace launcher"
             className="af-appshell__icon-button"
-            size="icon-sm"
             type="button"
-            variant="outline"
           >
             <Grid3X3 aria-hidden="true" size={16} />
-          </Button>
+          </button>
         </PopoverTrigger>
       </AppShellUtilityTriggerTooltip>
       <PopoverContent align="start" className="w-80">

@@ -28,7 +28,6 @@ const chrome: AppShellChrome = {
   rail: {
     storageKey: "workspace",
     identity: {
-      initials: "AF",
       primary: "Afenda",
       secondary: "operator@example.com",
     },
@@ -55,7 +54,7 @@ const chrome: AppShellChrome = {
   },
   utilityBar: {
     brandHomeHref: "/dashboard",
-    commandPlaceholder: "Search commands",
+    commandPlaceholder: "search workspace",
     metadata: {
       version: 1,
       zones: [

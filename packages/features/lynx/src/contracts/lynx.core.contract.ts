@@ -1,8 +1,8 @@
 /**
- * Lynx canonical contract — ARCH-009
+ * Lynx canonical contract — ARCH-1005
  * All audits, routes, layers, and tests derive from this file.
  *
- * Doctrine: docs/architecture/009-machine-layer-doctrine.md
+ * Doctrine: docs/architecture/1005-infrastructure.md
  * Track: docs/roadmap/005-lynx-knowledge-substrate.md
  */
 
@@ -21,9 +21,10 @@ export type LynxAuditAction =
   (typeof LYNX_AUDIT_ACTIONS)[keyof typeof LYNX_AUDIT_ACTIONS];
 
 export const LYNX_ERP_HTTP_ROUTES = {
-  truthSearch: "/api/lynx/truth-search",
-  operator: "/api/lynx/operator",
-  runFeedback: "/api/lynx/runs/feedback",
+  truthSearch: "/api/internal/v1/lynx/queries/truth-search",
+  operator: "/api/internal/v1/lynx/queries/operator",
+  runFeedback: "/api/internal/v1/lynx/commands/record-run-feedback",
+  runLedgerExport: "/api/internal/v1/lynx/queries/run-ledger-export",
 } as const;
 export type LynxErpHttpRoute =
   (typeof LYNX_ERP_HTTP_ROUTES)[keyof typeof LYNX_ERP_HTTP_ROUTES];

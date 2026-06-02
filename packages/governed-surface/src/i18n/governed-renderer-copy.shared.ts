@@ -70,6 +70,27 @@ export const governedRendererCopy = {
       userDescription: "This section is not available in the current surface.",
     },
   },
+  detailTabs: {
+    tabLabels: {
+      relations: "Relations",
+      referrers: "Referrers",
+      revisions: "Revisions",
+      audit: "Audit",
+    },
+    overviewHidden: {
+      title: "Overview hidden",
+      description: "This overview section is marked hidden.",
+    },
+    revisions: {
+      emptyTitle: "No revision history.",
+      columns: {
+        when: "When",
+        verb: "Verb",
+        actor: "Actor",
+        narrative: "Narrative",
+      },
+    },
+  },
   empty: {
     statCard: {
       title: "No metrics configured.",

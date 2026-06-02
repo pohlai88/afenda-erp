@@ -1,12 +1,12 @@
 ---
 description: Lynx machine layer + Knowledge substrate — boundaries, import doors, contract files, brand contract for afenda-erp
-globs: "packages/features/knowledge/**,packages/features/lynx/**,apps/erp/src/app/api/lynx/**,apps/erp/src/app/**/knowledge/**,packages/ai/src/tools/**"
+globs: "packages/features/knowledge/**,packages/features/lynx/**,apps/erp/src/app/api/internal/v1/lynx/**,apps/erp/src/app/**/knowledge/**,packages/ai/src/tools/**"
 alwaysApply: false
 ---
 
 # Lynx + Knowledge directory contract
 
-**Canonical doctrine:** `docs/architecture/009-machine-layer-doctrine.md` (**ARCH-009**)
+**Canonical doctrine:** `docs/architecture/1005-infrastructure.md` (**ARCH-1005**)
 **Delivery plan:** `docs/roadmap/005-lynx-knowledge-substrate.md` (**TRACK-005**)
 
 ---
@@ -131,4 +131,4 @@ type GovernedToolMeta = {
 
 ## Contract changes
 
-Update `AGENTS.md`, `docs/architecture/009-machine-layer-doctrine.md`, and this rule together when Lynx or Knowledge boundaries change.
+Update `AGENTS.md`, `docs/architecture/1005-infrastructure.md`, and this rule together when Lynx or Knowledge boundaries change.

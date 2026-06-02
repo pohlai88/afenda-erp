@@ -1,6 +1,6 @@
 # @afenda/feature-knowledge
 
-Scaffold default: `packages/_template-definition`.
+Scaffold default: `packages/_scaffold/feature`.
 
 Boundary map: `../../README.md`.
 
@@ -21,10 +21,12 @@ without package-local server-only stubs.
 
 ## Bucket constraints
 
-- Remove scaffold buckets that remain empty after audit.
+- `commands/` — sync and cron sweep (`executeKnowledgeSyncOrgCommand`, `executeKnowledgeScheduledSyncSweepCommand`).
+- `domain/` — sync orchestration invariants (adapter purity enforced in `data/`).
+- `read-models/` — admin page model (`loadKnowledgeAdminPageModel`).
+- `contracts/`, `schemas/`, `data/`, `metadata.ts` — substrate implementation.
 - Do not introduce catch-all directories (`_shared`, `lib`, `utils`, `common`, etc).
-- Put Server Actions in `actions/` with `*.actions.server.ts`.
-- Keep substrate contracts in `contracts/`, runtime validation in `schemas/`, and server-heavy substrate implementation in `data/`.
+- Cron and routes call **commands**, not `syncOrgKnowledge` directly.
 - New retrieval callers should prefer `retrieveKnowledgeChunksWithDiagnostics`.
   Keep `retrieveKnowledgeChunks` as the row-only compatibility wrapper.
 - Use the package audit helper for sync, commit, retrieval degradation, rerank

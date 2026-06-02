@@ -1,6 +1,6 @@
 # Capabilities vertical
 
-Canonical architecture: [`docs/architecture/011-system-admin-capabilities-architecture.md`](../../../../docs/architecture/011-system-admin-capabilities-architecture.md) (parent **ARCH-011**).
+Canonical architecture: [`docs/architecture/1006-control-plane.md`](../../../../docs/architecture/1006-control-plane.md) (parent **ARCH-1006**).
 
 Package as-built supplement: [`capabilities-architecture.md`](./capabilities-architecture.md) — update when implementation changes; do not delete.
 

@@ -9,6 +9,6 @@ Template buckets: `actions`, `components`, `contracts`, `data`, `events`, `polic
 | `@afenda/feature-system-admin/client` | `SystemAdminAuditExportActions`, `RetentionPolicyForm` |
 | `@afenda/feature-system-admin/metadata` | list surface builders, surface keys, UI copy |
 
-Canonical architecture: [`docs/architecture/011-system-admin-audit-viewer-architecture.md`](../../../../docs/architecture/011-system-admin-audit-viewer-architecture.md) (parent **ARCH-011**).
+Canonical architecture: [`docs/architecture/1006-control-plane.md`](../../../../docs/architecture/1006-control-plane.md) (parent **ARCH-1006**).
 
 Package supplement: [`audit-viewer.md`](./audit-viewer.md) — update when implementation changes; do not delete.

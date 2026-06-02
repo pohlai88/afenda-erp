@@ -5,9 +5,9 @@ where code belongs before agents create new files or merge packages.
 
 Canonical references:
 
-- [ARCH-009 Machine Layer Doctrine](../docs/architecture/009-machine-layer-doctrine.md)
-- [ARCH-001 System Architecture](../docs/architecture/001-system-architecture.md)
-- [Feature scaffold](./_template-definition/README.md)
+- [ARCH-1005 Machine Layer Doctrine](../docs/architecture/1005-infrastructure.md)
+- [ARCH-1001 System Architecture](../docs/architecture/1001-afenda-platform-doctrine.md)
+- [Package scaffolds](./_scaffold/README.md) — feature vs platform templates
 - Vercel AI Gateway docs: https://vercel.com/docs/ai-gateway
 - Vercel AI SDK docs: https://ai-sdk.dev/docs
 
@@ -144,7 +144,7 @@ and proactive outcome workflows through explicit feature-template buckets.
 
 Refactor next:
 
-1. Keep `src/contracts/lynx.core.contract.ts` as the canonical ARCH-009 contract.
+1. Keep `src/contracts/lynx.core.contract.ts` as the canonical ARCH-1005 contract.
 2. Continue moving any new metadata implementation into named `surfaces/`
    modules, with `src/metadata.ts` as the only public metadata door.
 3. Keep server behavior in explicit `data/`, `tools/`, and `workflows/`

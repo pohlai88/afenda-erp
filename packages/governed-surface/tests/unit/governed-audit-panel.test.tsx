@@ -36,7 +36,25 @@ describe("GovernedAuditPanel", () => {
     expect(html).toContain('data-render-state="invalid"');
     expect(html).toContain('data-surface-key="hr.records.audit"');
     expect(html).toContain('data-component-key="employee-audit"');
+    expect(html).toContain('data-component-type="governed:audit-panel"');
     expect(html).toContain('data-empty-id="audit-panel-invalid"');
+  });
+
+  it("resolves componentKey from sectionKey before surfaceKey", () => {
+    const html = renderToStaticMarkup(
+      <GovernedAuditPanel
+        model={{
+          dataNature: "audit-trail",
+          headerTitle: "Audit",
+          rows: [],
+        }}
+        surfaceKey="hrm.employee-directory"
+        sectionKey="recent-activity"
+      />,
+    );
+
+    expect(html).toContain('data-component-key="recent-activity"');
+    expect(html).toContain('id="governed-audit-panel-recent-activity"');
   });
 
   it("renders empty state diagnostics and governed heading", () => {
@@ -72,9 +90,11 @@ describe("GovernedAuditPanel", () => {
     );
 
     expect(html).toContain('data-render-state="ready"');
+    expect(html).toContain('data-component-type="governed:audit-panel"');
     expect(html).toContain('data-testid="governed:audit-panel-table:employee-audit"');
     expect(html).toContain('data-audit-row-id="evt-1"');
     expect(html).toContain('data-audit-tone="default"');
+    expect(html).toContain('data-testid="governed:audit-action:evt-1"');
     expect(html).toContain('data-testid="governed:audit-evidence:evt-1"');
     expect(html).toContain('href="/hr/records/rec-1"');
     expect(html).toContain('aria-describedby="governed-audit-panel-employee-audit-description"');

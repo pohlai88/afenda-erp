@@ -1,16 +1,16 @@
 import type { ReactNode } from "react";
 
-import { ModulePageHeader } from "./module-page-header";
 import { Card, CardContent } from "@afenda/ui/card";
 import { cn } from "@afenda/ui/utils";
 
-import type { ListSurface } from "../schemas/list-surface.schema";
+import type { EmptyState, ListSurface } from "../schemas/list-surface.schema";
 import {
   buildGovernedListSurfaceDataAttributes,
   type GovernedListSurfaceRenderState,
 } from "../list-surface-identity.shared";
 
 import { GovernedEmpty } from "./governed-empty";
+import { ModulePageHeader } from "./module-page-header";
 
 export type GovernedListSurfaceProps = {
   model: ListSurface;
@@ -21,6 +21,7 @@ export type GovernedListSurfaceProps = {
   surfaceKey?: string;
   sectionKey?: string;
   componentKey?: string;
+  contentClassName?: string;
 };
 
 export function GovernedListSurface({
@@ -31,15 +32,19 @@ export function GovernedListSurface({
   surfaceKey,
   sectionKey,
   componentKey = surfaceKey ?? model.columnsId,
+  contentClassName,
 }: GovernedListSurfaceProps) {
   const listState: GovernedListSurfaceRenderState =
     rowCount === 0 ? "empty" : "ready";
+
   const contractAttrs = buildGovernedListSurfaceDataAttributes({
     surfaceKey,
     sectionKey,
     columnsId: model.columnsId,
     state: listState,
   });
+
+  const emptyModel = model.empty as EmptyState & { emptyId?: string };
 
   return (
     <div
@@ -50,18 +55,20 @@ export function GovernedListSurface({
         eyebrow={model.header.eyebrow}
         title={model.header.title}
         description={model.header.description}
-        surfaceKey={surfaceKey}
+        surfaceKey={surfaceKey ?? model.columnsId}
         sectionKey={sectionKey}
         componentKey={`${componentKey}-header`}
       />
+
       <Card size="default">
-        <CardContent className="pt-surface-2xl">
-          {rowCount === 0 ? (
+        <CardContent className={cn("pt-surface-2xl", contentClassName)}>
+          {listState === "empty" ? (
             <GovernedEmpty
               model={{
                 ...model.empty,
-                emptyId: `list-empty-${model.columnsId}`,
+                emptyId: emptyModel.emptyId ?? `list-empty-${model.columnsId}`,
               }}
+              testId={`governed-list-empty-${model.columnsId}`}
             />
           ) : (
             children

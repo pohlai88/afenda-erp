@@ -45,9 +45,9 @@ Run `pnpm typecheck` after TS config changes.
 | Topic                         | Source                                                |
 | ----------------------------- | ----------------------------------------------------- |
 | Next.js 16 breaking changes   | `node_modules/next/dist/docs/` (see `AGENTS.md`)      |
-| Afenda architecture           | `docs/architecture/README.md` (`ARCH-001`–`ARCH-008`) |
+| Afenda architecture           | `docs/architecture/README.md` (`ARCH-1001`–`ARCH-1005`) |
 | ERP app routes / handlers     | `AGENTS.md`, rule `afenda-erp-app`                    |
-| Governed UI                   | **ARCH-006**, **ARCH-007**, rule `afenda-governed-ui` |
+| Governed UI                   | **ARCH-1003**, **ARCH-1003**, rule `afenda-governed-ui` |
 | shadcn components in monorepo | `@afenda/ui`, `apps/erp/components.json` aliases      |
 | Environment sync            | `docs/development/env.md`, `.env.config.example`      |
 
@@ -61,6 +61,6 @@ Set **`CONTEXT7_API_KEY`** for reliable MCP (§L in `.env.config`, `pnpm env:syn
 
 ## Vercel (pre-link)
 
-- **Do not** `vercel link` until ARCH-001 stabilization gate passes — see `docs/development/vercel-link.md`.
+- **Do not** `vercel link` until ARCH-1001 stabilization gate passes — see `docs/development/vercel-link.md`.
 - Intended deploy: root `vercel.json` → `pnpm turbo build --filter=@afenda/erp`.
 - Legacy team project `afenda-vercel` is a different GitHub repo; ERROR deploys there are not ERP health signals.

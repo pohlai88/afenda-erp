@@ -13,7 +13,7 @@ describe("ActionFormErrors", () => {
     expect(renderToStaticMarkup(<ActionFormErrors result={null} />)).toBe("");
   });
 
-  it("defaults errorKind to system and uses governed test id", () => {
+  it("defaults errorKind to business-rule and uses governed test id", () => {
     const html = renderToStaticMarkup(
       <ActionFormErrors
         result={{
@@ -23,10 +23,11 @@ describe("ActionFormErrors", () => {
       />,
     );
 
-    expect(html).toContain('data-action-error-kind="system"');
+    expect(html).toContain('data-action-error-kind="business-rule"');
     expect(html).toContain(
-      'data-testid="governed:action-form-errors:system"',
+      'data-testid="governed:action-form-errors:business-rule"',
     );
+    expect(html).toContain('aria-live="polite"');
     expect(html).not.toContain("data-action-error-code");
   });
 

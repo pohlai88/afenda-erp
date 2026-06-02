@@ -4,7 +4,7 @@ import type { SchemaStability } from "./_stability.shared";
 
 export const SCHEMA_STABILITY: SchemaStability = "beta";
 
-/** Governed profile budget. See `docs/architecture/007-governed-metadata-architecture.md` §4.2. */
+/** Governed profile budget. See `docs/architecture/1003-frontend.md` §4.2. */
 export const GOVERNED_PRESENTATION_PROFILE_IDS = [
   "erp-operational-table",
   "erp-exception-table",

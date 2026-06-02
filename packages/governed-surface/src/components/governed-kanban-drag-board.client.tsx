@@ -1,7 +1,8 @@
 "use client";
 
-import { useTranslations } from "../i18n/governed-surface-copy.client";
+import { useMemo } from "react";
 
+import { useTranslations } from "../i18n/governed-surface-copy.client";
 import { KanbanBoardDragView } from "../metadata/renderers/kanban-board-drag-view.client";
 
 import {
@@ -15,7 +16,7 @@ import { GovernedEmpty } from "./governed-empty";
 export type GovernedKanbanDragBoardProps = {
   configuration: GovernedKanbanBoardConfigurationInput;
   surfaceKey?: string;
-  onCardMove: (payload: KanbanCardMovePayload) => void;
+  onCardMove: (payload: KanbanCardMovePayload) => void | Promise<void>;
   isMovePending?: boolean;
   pendingCardId?: string | null;
   showOperatorDiagnostics?: boolean;
@@ -34,7 +35,11 @@ export function GovernedKanbanDragBoard({
   showOperatorDiagnostics = false,
 }: GovernedKanbanDragBoardProps) {
   const t = useTranslations("Erp.GovernedSurface.kanban");
-  const parsed = parseGovernedKanbanBoardConfiguration(configuration);
+
+  const parsed = useMemo(
+    () => parseGovernedKanbanBoardConfiguration(configuration),
+    [configuration],
+  );
 
   if (!parsed.success) {
     return (
@@ -47,6 +52,7 @@ export function GovernedKanbanDragBoard({
             : t("invalidConfigDescription"),
           emptyId: "kanban-invalid-config",
         }}
+        testId="governed-kanban-invalid-config"
       />
     );
   }
@@ -60,6 +66,7 @@ export function GovernedKanbanDragBoard({
           description: t("invalidInteractionModeDrag"),
           emptyId: "kanban-invalid-interaction-mode-drag",
         }}
+        testId="governed-kanban-invalid-interaction-mode-drag"
       />
     );
   }

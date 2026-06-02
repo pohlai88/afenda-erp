@@ -6,7 +6,7 @@ alwaysApply: false
 
 # Afenda ERP app (`apps/erp`)
 
-Full agent context: `AGENTS.md` (repo root). System runtime: **ARCH-001**.
+Full agent context: `AGENTS.md` (repo root). System runtime: **ARCH-1001**.
 
 ## Next.js DevTools MCP
 
@@ -14,7 +14,7 @@ When working on `apps/erp` (routes, RSC, handlers, caching, or Next.js APIs), ca
 
 - Project MCP: `.cursor/mcp.json` → `next-devtools` (`npx -y next-devtools-mcp@latest`).
 - Still read `node_modules/next/dist/docs/` for breaking changes (see root `AGENTS.md`).
-- Repo doctrine (**ARCH-001**, tenancy, governed UI) overrides generic Next.js defaults from MCP.
+- Repo doctrine (**ARCH-1001**, tenancy, governed UI) overrides generic Next.js defaults from MCP.
 
 ## Route ownership
 
@@ -30,11 +30,19 @@ When working on `apps/erp` (routes, RSC, handlers, caching, or Next.js APIs), ca
 - Lazy-init DB/auth via package helpers (`getDb()`, `@afenda/auth/server`). No module-scope pools or SDK clients in new code.
 - Batch independent RSC reads with `Promise.all` where safe.
 
+## HTTP API (**ARCH-1004** — target only)
+
+- **Required tree:** `src/app/api/internal/v1/…` (Lynx, AI, cron, webhooks) and `public/v1/…` (partners). `src/app/api/auth/` is the Neon Auth exception.
+- **Wrong:** flat `src/app/api/lynx/`, `api/ai/`, `api/cron/` — hook **denies** writes (rule `afenda-agent-discipline`).
+- **`route.ts`:** ≤15 lines — auth, Zod parse, dispatch to `@afenda/feature-*/server` or `@afenda/api`. **No** `@afenda/db`, `streamText`, or domain logic in routes.
+- **`src/lib/api/`:** no module Zod, Lynx, or HR business logic — only shared non-module helpers (e.g. chat/solution-provider request schemas). Feature schemas live in `packages/features/*/schemas/`.
+- Lynx paths: **ARCH-1004** §5 and `packages/features/lynx/AGENTS.md`.
+
 ## Handlers and mutations
 
-- **Server Actions** — internal ERP mutations; check permissions before calling domain/feature services; narrow `revalidatePath` / `revalidateTag` / `updateTag` after writes.
-- **Route Handlers** — AI streams, webhooks, Blob uploads, cron (`CRON_SECRET`), observability drain.
-- **Cron** — use `authorizeCronRequest` / `runCronJob` from `src/lib/cron.ts`.
+- **Server Actions** — dispatch same `commands/` as HTTP; permissions before domain; narrow revalidation after writes.
+- **Route Handlers** — thin transport only (see above).
+- **Cron** — `POST /api/internal/v1/cron/<job>` + `CRON_SECRET` (`src/lib/cron.ts`). Flat `api/cron/*` is non-compliant.
 
 ## Caching (Next 16 Cache Components)
 
@@ -45,7 +53,7 @@ When working on `apps/erp` (routes, RSC, handlers, caching, or Next.js APIs), ca
 
 - Import `@afenda/feature-*` through public doors only (`.`, `./client`, `./server`, `./metadata`) — never `/src`, `/dist`, or `/internal`.
 - Routes and Server Components: prefer `./server` or `./metadata`; Client Components: `./client` only.
-- Adding a workspace dependency requires the same package in `afendaTranspilePackages` (`packages/config/src/next.ts`). **ARCH-008**.
+- Adding a workspace dependency requires the same package in `afendaTranspilePackages` (`packages/config/src/next.ts`). **ARCH-1005**.
 
 ## Governed lists in this app
 

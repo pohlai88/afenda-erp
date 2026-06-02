@@ -10,7 +10,7 @@ describe("Lynx run feedback schemas", () => {
       lynxRunContextMetadataSchema.parse({
         lynxRun: {
           runId: "lynxrun_1",
-          route: "/api/lynx/operator",
+          route: "/api/internal/v1/lynx/queries/operator",
           workflowId: "negative_pnl_recovery",
           workflowSessionId: "lynxwf_1",
         },
@@ -18,7 +18,7 @@ describe("Lynx run feedback schemas", () => {
     ).toEqual({
       lynxRun: {
         runId: "lynxrun_1",
-        route: "/api/lynx/operator",
+        route: "/api/internal/v1/lynx/queries/operator",
         workflowId: "negative_pnl_recovery",
         workflowSessionId: "lynxwf_1",
       },

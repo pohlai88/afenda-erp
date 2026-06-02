@@ -80,14 +80,14 @@ Scope: `packages/features/lynx`, excluding `node_modules`.
 
 | File                                            | Decision                                 |
 | ----------------------------------------------- | ---------------------------------------- |
-| `src/surfaces/index.ts`                         | Keep. Surface barrel.                    |
-| `src/surfaces/lynx.observability.surface.ts`    | Keep. Observability metadata facade.     |
-| `src/surfaces/lynx.outcome-monitor.surface.ts`  | Keep. Outcome monitor metadata facade.   |
-| `src/surfaces/lynx.readiness.surface.ts`        | Keep. Readiness metadata facade.         |
-| `src/surfaces/lynx.run-detail.surface.ts`       | Keep. Run detail metadata facade.        |
-| `src/surfaces/lynx.run-management.surface.ts`   | Keep. Run management metadata facade.    |
-| `src/surfaces/lynx.surface.shared.ts`           | Keep. Shared governed metadata builders. |
-| `src/surfaces/lynx.workflow-session.surface.ts` | Keep. Workflow-session metadata facade.  |
+| `src/surface/index.ts`                         | Keep. Surface barrel.                    |
+| `src/surface/lynx.observability.surface.ts`    | Keep. Observability metadata facade.     |
+| `src/surface/lynx.outcome-monitor.surface.ts`  | Keep. Outcome monitor metadata facade.   |
+| `src/surface/lynx.readiness.surface.ts`        | Keep. Readiness metadata facade.         |
+| `src/surface/lynx.run-detail.surface.ts`       | Keep. Run detail metadata facade.        |
+| `src/surface/lynx.run-management.surface.ts`   | Keep. Run management metadata facade.    |
+| `src/surface/lynx.surface.shared.ts`           | Keep. Shared governed metadata builders. |
+| `src/surface/lynx.workflow-session.surface.ts` | Keep. Workflow-session metadata facade.  |
 
 ## Tests
 

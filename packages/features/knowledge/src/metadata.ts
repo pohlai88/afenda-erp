@@ -75,6 +75,12 @@ export function buildLynxEvalRunListSurface(input: {
         failedCases: row.failedCases,
         ranAt: row.ranAt,
       },
+      cellKinds: {
+        qualityGate: {
+          kind: "badge",
+          tone: row.qualityGate === "Pass" ? "positive" : "attention",
+        },
+      },
     })),
   });
 }
@@ -136,7 +142,14 @@ function buildKnowledgeAdminListSurface(input: {
   title: string;
   emptyTitle: string;
   columns: readonly KnowledgeAdminListColumn[];
-  rows: ReadonlyArray<{ id: string; cells: Record<string, string> }>;
+  rows: ReadonlyArray<{
+    id: string;
+    cells: Record<string, string>;
+    cellKinds?: Record<
+      string,
+      { kind: "badge"; tone?: "positive" | "default" | "attention" | "critical" }
+    >;
+  }>;
 }): ListSurfaceRendererConfigurationResolvedInput {
   const rows = input.rows;
 
@@ -161,7 +174,11 @@ function buildKnowledgeAdminListSurface(input: {
       empty: { variant: "muted", title: input.emptyTitle },
     },
     columns: [...input.columns],
-    rows: [...rows],
+    rows: rows.map((row) => ({
+      id: row.id,
+      cells: row.cells,
+      ...(row.cellKinds ? { cellKinds: row.cellKinds } : {}),
+    })),
   });
 }
 
@@ -180,6 +197,12 @@ export function buildKnowledgeSourcesListSurface(input: {
         kind: row.kind,
         enabled: row.enabled,
         lastSynced: row.lastSynced,
+      },
+      cellKinds: {
+        enabled: {
+          kind: "badge",
+          tone: row.enabled === "Enabled" ? "positive" : "default",
+        },
       },
     })),
   });

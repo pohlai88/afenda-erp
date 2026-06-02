@@ -2,122 +2,111 @@
 
 # This is NOT the Next.js you know
 
-This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
+Read `node_modules/next/dist/docs/` for version-matched Next.js behavior. **Afenda doctrine (`docs/architecture/`) overrides generic MCP defaults.**
 
-When working with Next.js in `apps/erp`, call the **`init` tool** from the **next-devtools** MCP server at the start of the session (project config: `.cursor/mcp.json`) to load version-matched guidance. Afenda doctrine in `docs/architecture/` still wins over generic MCP defaults.
+When working in `apps/erp`, call **next-devtools** `init` once per session (`.cursor/mcp.json`).
 
 <!-- END:nextjs-agent-rules -->
 
-# Afenda ERP (`@afenda/erp`) — Agent Guide
+# Afenda ERP — Agent Guide
 
-You are working in the **deployable Next.js 16 App Router application** for Afenda ERP. Canonical architecture lives in `docs/architecture/` (`ARCH-###`). When docs disagree on package boundaries or deployment, follow **ARCH-002**, then **ARCH-001**, and update the other doc in the same change.
-
-## Canonical references
-
-| ID           | File                                                       | Use when                                                |
-| ------------ | ---------------------------------------------------------- | ------------------------------------------------------- |
-| **ARCH-001** | `docs/architecture/001-system-architecture.md`             | Runtime, auth, AI, Vercel deploy, tenancy, caching      |
-| **ARCH-002** | `docs/architecture/002-erp-kernel-package-architecture.md` | Feature packages, imports, extraction                   |
-| **ARCH-003** | `docs/architecture/003-directory-architecture-audit.md`    | Monorepo guards, outputs, UI boundary                   |
-| **ARCH-004** | `docs/architecture/004-naming-conventions.md`              | Routes, packages, exports, module IDs                   |
-| **ARCH-005** | `docs/architecture/005-database-scale-architecture.md`     | Schema ownership, promotion                             |
-| **ARCH-006** | `docs/architecture/006-metadata-driven-ui-architecture.md` | Metadata vs runtime authority, list windows             |
-| **ARCH-007** | `docs/architecture/007-governed-metadata-architecture.md`  | Renderer kernel, profiles, builders                     |
-| **ARCH-008** | `docs/architecture/008-workspace-package-discipline.md`    | Package classes, export doors, split discipline         |
-| **ARCH-009** | `docs/architecture/009-machine-layer-doctrine.md`          | Lynx machine layer, Knowledge substrate, brand contract |
-| **ARCH-013** | `docs/architecture/013-appshell-package-architecture.md`   | Workspace shell chrome package and command contracts    |
-
-Feature scaffold default: `packages/_template-definition`.
-
-Index: `docs/architecture/README.md`.
-
-## Machine layer (Lynx)
-
-Lynx is the ERP machine layer — every machine-assisted modality routes through it. When editing `packages/features/knowledge/**`, `packages/features/lynx/**`, `apps/erp/src/app/api/lynx/**`, or `packages/ai/src/tools/**`, read **ARCH-009** and `.cursor/rules/afenda-lynx-knowledge.mdc`. Key invariants:
-
-- Substrate (`@afenda/feature-knowledge`) and product (`@afenda/feature-lynx`) are separate packages. `@afenda/ai` is substrate-blind.
-- Banned user-facing vocabulary: "AI assistant", "chatbot", "copilot", "AI mode", "Thinking", "Processing", "Generating". Use **Lynx**, "resolving", "listening".
-- All operator tools declare `GovernedToolMeta` (risk, category, access, dataSensitivity, audit).
-- Retrieval: pgvector `vector(1536)` HNSW via Neon. No external vector databases.
-
-## What this app owns
-
-- App Router routes, layouts, `loading.tsx` / `error.tsx`, Route Handlers under `src/app/api/`.
-- Server-side session and organization resolution at page entry.
-- Thin adapters: call `@afenda/kernel`, `@afenda/feature-*` (when they exist), platform packages; compose governed sections.
-
-**Do not put here:** durable ERP business rules, Drizzle schema, cross-module workflow state, governed renderer implementations, or reusable UI primitives (`@afenda/ui`).
-
-## Non-negotiables
-
-1. **Tenancy** — Derive `organizationId` from server session/context (`@afenda/auth`, `@afenda/db` tenancy helpers). Never trust client-supplied org IDs.
-2. **Authorization** — `src/proxy.ts` refreshes Neon Auth sessions; **re-check capabilities** in Server Components, Server Actions, and Route Handlers before reads or mutations.
-3. **One app, one deploy** — Single Vercel project from repo root (`vercel.json` → `pnpm turbo build --filter=@afenda/erp`). No per-module Vercel projects. Linking is **deferred** until ARCH-001 stabilization gate passes.
-4. **Module routes** — Core modules use `(workspace)/[moduleId]/…` only. Route composition lives in `apps/erp/src/workspace-routes/`; App Router files stay thin. Do not add per-module route folders unless the URL tree genuinely differs.
-5. **Package discipline** — Feature packages stay flat at workspace level (`packages/features/<moduleId>`). Use nested internal folders for categories; do not create nested feature workspaces without updating ARCH-008 and the guard script.
-   - Feature scaffold follows `packages/_template-definition`. Run `pnpm scaffold:feature <moduleId>`. Avoid catch-all folders (`_shared`, `common`, `lib`, `utils`, `helpers`, `misc`).
-   - Feature server-only markers live at `src/server.ts` via `import "@afenda/kernel/server";`. Do not import `server-only` or `@afenda/kernel/server` from deep feature implementation files; local Vitest package tests import deep files without needing server-only stubs.
-6. **Governed UI** — Metadata declares intent; runtime owns authority. Lists use server windows and `GovernedPatternCListSection`; never ship full datasets to the client for pagination.
-   - **Shell viewport separation** — Treat desktop/tablet and mobile workspace shell views separately. Default shell previews and reviews to desktop/tablet only; do not care about, check, or optimize mobile in the same pass unless the user explicitly asks for a separate mobile shell view. Do not mix mobile-only controls into the desktop shell, or desktop-only chrome into the mobile shell.
-7. **Lazy clients** — Use `getDb()` and package auth doors; do not create Neon pools or SDK clients at module scope in new app code.
-8. **Caching** — `cacheComponents: true` via `@afenda/config`. Cache only shared/non-tenant data. Tenant dashboards and org-scoped lists stay dynamic.
-9. **Cron** — `/api/cron/*` must validate `Authorization: Bearer ${CRON_SECRET}` (`src/lib/cron.ts`).
-10. **AI** — Gateway auth: `AI_GATEWAY_API_KEY` or `VERCEL_OIDC_TOKEN`. Mutating AI tools require human approval and domain services, not direct table writes.
-11. **Repo root hygiene** — Generated test output only under **`.artifacts/`** (`pnpm artifacts:init`). Never create root **`artifacts/`** (no dot), `build-log.txt`, or Playwright MCP snapshots at the repo root. Committed audit baselines go in **`docs/testing/`** (see rule `afenda-repo-hygiene`).
-
-## As-built vs target
-
-| Area          | Today                                         | Target                                                   |
-| ------------- | --------------------------------------------- | -------------------------------------------------------- |
-| Module logic  | `@afenda/kernel`, route adapters              | `@afenda/feature-<moduleId>` under `packages/features/*` |
-| List builders | `packages/kernel/src/module-list-surfaces.ts` | Move to feature packages when threshold met (ARCH-002)   |
-| Schema        | Flat `packages/db/src/schema/*.ts`            | `schema/<moduleId>/` for ledger-grade tables             |
-
-Do not extend generic `erp_module_records` for posting-grade, inventory-grade, or statutory workflows.
-
-## Typical route shape
+You implement **target architecture only** (**ARCH-1001**–**ARCH-1006**). Deviations are **wrong**, not deferred legacy. Hooks enforce this (`guard-architecture-compliance.mjs`, `failClosed: true`). Rule: `.cursor/rules/afenda-agent-discipline.mdc`.
 
 ```txt
-src/app/
-  (auth)/sign-in, sign-up, …
-  (workspace)/layout.tsx          # @afenda/appshell + server-composed workspace chrome Suspense fallback
-  (workspace)/loading.tsx         # Page-level fallback (layout stays mounted)
-  (workspace)/dashboard/
-  (workspace)/lynx/
-  (workspace)/[moduleId]/page.tsx
-  (workspace)/[moduleId]/records/[recordId]/page.tsx
-src/workspace-routes/             # Governed composition (*.server.tsx) — outside app/
-  api/ai/*, api/lynx/*, api/uploads, api/cron/*, api/observability/drain
+Constitution: ARCH-1001
+Backend:      ARCH-1002  — features own truth; commands + kernel for writes
+Frontend:     ARCH-1003  — RSC; no self-fetch /api for page data
+API:          ARCH-1004  — app/api/{public|internal}/v1; thin routes only
+Platform:     ARCH-1005  — monorepo, guards, Neon, Vercel
+Control:      ARCH-1006  — system-admin feature
 ```
 
-Next.js layout discipline: route group `(workspace)` opts authenticated routes into the ERP shell without changing URLs; keep `app/` thin (pages only); stream tenant chrome via sibling `<Suspense>` in `layout.tsx`, not a single blocking `await` in the layout.
+Index: [`docs/architecture/README.md`](docs/architecture/README.md).
 
-Server Actions: internal mutations. Route Handlers: webhooks, uploads, AI streams, cron, public APIs.
+## Non-negotiables (do not re-litigate)
 
-## Before you finish
+1. **Target-only** — No “as-built OK,” no shims, no `git show` to resurrect fat routes. Read ARCH; implement ARCH.
+2. **Tenancy** — `organizationId` from server session only (`@afenda/auth`).
+3. **Writes** — `transport → command → kernel → domain → db → event` (**ARCH-1002** §3).
+4. **Reads** — `server query → read-model → db` in-process (**ARCH-1003**); not `fetch('/api/…')` for workspace pages.
+5. **HTTP API** — `apps/erp/src/app/api/internal/v1/…` or `public/v1/…` only. Flat `app/api/lynx/*` is **non-compliant** (**ARCH-1004** §7).
+6. **Routes** — ≤15 lines: auth, parse, dispatch to `@afenda/feature-*/server` or `@afenda/api`. No `@afenda/db` in `route.ts`.
+7. **Feature packages** — `packages/features/<moduleId>`; doors `.` / `./client` / `./server` / `./metadata` only.
+8. **No business logic in** `apps/erp/src/lib/` — app composes; features own module truth (**ARCH-1002** §6).
+9. **Governed lists** — server windows; never full datasets to the client.
+10. **Repo hygiene** — test output under `.artifacts/` only (rule `afenda-repo-hygiene`).
 
-Cursor hooks run drift checks on agent edits (`enforce-architecture-drift`, `guard-kernel-boundary-imports`, `guard-root-hygiene`); fix hook failures without asking the user to run commands. CI repeats the same guards on push.
+## Routing table (read one doc per task)
 
-### Validation discipline
+| Task | Rule | ARCH |
+| ---- | ---- | ---- |
+| App routes, `workspace-routes/` | `afenda-erp-app` | 1001, 1003 |
+| HTTP handlers | `afenda-erp-app`, `afenda-agent-discipline` | **1004** |
+| Feature package | `afenda-feature-packages`, `afenda-feature-shape` | **1002** |
+| Lynx / Knowledge | `afenda-lynx-knowledge` | **1005** §11, **1004** §5 |
+| DB schema | `afenda-database-migrations` | **1005**, **1002** |
+| Governed UI | `afenda-governed-ui` | **1003** |
+| System Admin | `afenda-system-admin` | **1006** |
 
-Default to the smallest validation that proves the change. Do **not** run repo-wide `pnpm test`, `pnpm typecheck`, full lint, full build, or e2e suites unless the change scope actually requires it or the user explicitly asks for it.
+Session inject: `.cursor/hooks/afenda-architecture-routing.md`.
 
-**STUPID AGENT behavior:** running a full test suite, full typecheck, full lint, or full build after a small text/doc/comment change. For docs-only edits, usually inspect the diff and stop.
+## Lynx HTTP (**ARCH-1004** §5)
 
-Use targeted checks instead:
+| Required path | Feature |
+| ------------- | ------- |
+| `POST …/internal/v1/lynx/queries/truth-search` | `handleLynxTruthSearchPost` |
+| `POST …/internal/v1/lynx/queries/operator` | `handleLynxOperatorPost` |
+| `POST …/internal/v1/lynx/commands/record-run-feedback` | `executeLynxRecordRunFeedbackCommand` |
+| `GET …/internal/v1/lynx/queries/run-ledger-export` | read-model export |
+
+Scaffold: `pnpm scaffold:feature <moduleId>` · `packages/_scaffold/README.md`.
+
+## Forbidden agent behavior
+
+| Behavior | Why |
+| -------- | --- |
+| Compliance review that blesses flat `/api/*` | **ARCH-1004** §7 lists it as wrong |
+| Restoring old routes from git instead of target shape | Laziness; violates §3 |
+| Fat `route.ts` or `apps/erp/src/lib/api` module logic | **ARCH-1004** §3 |
+| Full monorepo test/lint/build after tiny doc edit | Wastes time; see below |
+| “User can migrate later” in architecture docs | Docs are target-only |
+| Ask user to run `pnpm architecture:check` after hook failure | **You** fix hook output |
+
+## Validation (minimal)
 
 ```bash
-pnpm --filter <package> typecheck
-pnpm --filter <package> test
-pnpm architecture:check          # only when package boundaries, docs/architecture, guards, exports, or workspace structure changed
-pnpm lint:governed-renderers     # only when governed-surface or list metadata changed
-pnpm --filter @afenda/erp test:e2e:smoke  # only when routes/flows changed and browser verification is needed
+pnpm --filter <package> typecheck   # touched package
+pnpm --filter <package> test        # touched package
+pnpm architecture:check           # boundaries, docs/architecture, exports, guards
+pnpm lint:governed-renderers      # governed-surface only
 ```
 
-Escalate to broader checks only for cross-package API changes, shared config changes, DB/schema/auth/security changes, build pipeline changes, or when targeted checks cannot cover the risk. When running a broad command, state why it is necessary.
+Do **not** run repo-wide `pnpm test`, full build, or full typecheck after doc-only changes.
 
-DB changes: edit `packages/db/src/schema` only → `pnpm db:generate` → review SQL → `pnpm db:migrate`. Do not hand-write `packages/db/drizzle/*.sql` or run schema DDL via shell/MCP unless the user explicitly requires it (`.cursor/rules/afenda-database-migrations.mdc`). Security-sensitive paths: `pnpm security:review`.
+Schema: `packages/db/src/schema` → `pnpm db:generate` → review → `pnpm db:migrate` — no hand-written `drizzle/*.sql` unless the user explicitly requires it.
 
-## Programmatic agents (Cursor SDK)
+## App layout
 
-For CI, bots, or scripts outside the IDE, use `@cursor/sdk` or `cursor-sdk` with **explicit** `local: { cwd }` or `cloud: { repos }`, dispose agents (`await using` / `with`), and distinguish startup failures (`CursorAgentError`) from `result.status === "error"`. See [Cursor SDK docs](https://cursor.com/docs/sdk/typescript). Inline MCP on `Agent.resume` must be passed again.
+```txt
+apps/erp/src/app/
+  (auth)/…
+  (workspace)/…          # shell via @afenda/appshell
+  api/internal/v1/…        # required HTTP tree
+  api/public/v1/…          # partners (when added)
+  api/auth/[...path]/      # Neon Auth (framework)
+apps/erp/src/workspace-routes/   # governed composition — not fat pages
+packages/features/<moduleId>/src/
+  commands/ domain/ data/ read-models/ api/ schemas/ …
+```
+
+## Hooks (automatic)
+
+- `sessionStart` → architecture routing + discipline
+- `preToolUse` → `guard-architecture-compliance` (**failClosed**), kernel boundary, root hygiene, DDL
+- `postToolUse` → `enforce-architecture-drift`, feature shape validation
+
+Fix denials in-session. Do not argue that legacy paths are acceptable.
+
+## Programmatic agents
+
+[`Cursor SDK`](https://cursor.com/docs/sdk/typescript) — explicit `cwd`, dispose agents, pass MCP on `resume`.

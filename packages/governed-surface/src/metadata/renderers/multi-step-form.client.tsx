@@ -18,6 +18,10 @@ import {
 import { Textarea } from "@afenda/ui/textarea";
 import { resolveFormFieldRuleState, type FormRuleValues, GovernedEmpty } from "../../client";
 import { governedRendererCopy } from "../../i18n/governed-renderer-copy.shared";
+import {
+  GovernedFileUploadField,
+  resolveGovernedFormModuleId,
+} from "./governed-file-upload-field.client";
 import type {
   GovernedFormField,
   GovernedMultiStepFormConfiguration,
@@ -36,7 +40,7 @@ function buildInitialWizardValues(
   const initial: FormRuleValues = {};
   for (const step of form.steps) {
     for (const field of step.fields) {
-      initial[field.id] = field.kind === "checkbox" ? false : "";
+      initial[field.id] = field.kind === "checkbox" ? false : field.kind === "file-upload" ? "" : "";
     }
   }
   return initial;
@@ -123,6 +127,7 @@ export function MultiStepFormSurface({
               <WizardField
                 key={field.id}
                 field={field}
+                formModuleId={form.moduleId}
                 values={values}
                 onValueChange={setFieldValue}
               />
@@ -162,18 +167,52 @@ export function MultiStepFormSurface({
 
 function WizardField({
   field,
+  formModuleId,
   values,
   onValueChange,
 }: {
   field: GovernedFormField;
+  formModuleId?: string;
   values: FormRuleValues;
   onValueChange: (fieldId: string, next: unknown) => void;
 }) {
   const id = `wizard-field-${field.id}`;
   const { visible, enabled } = resolveFormFieldRuleState(field.rules, values);
+  const uploadModuleId = resolveGovernedFormModuleId(formModuleId);
 
   if (!visible) {
     return null;
+  }
+
+  if (field.kind === "file-upload") {
+    if (!uploadModuleId) {
+      return (
+        <p className="type-caption text-critical">
+          File upload requires a valid form moduleId.
+        </p>
+      );
+    }
+
+    return (
+      <div className="flex flex-col gap-1.5">
+        <Label htmlFor={id}>
+          {field.label}
+          {field.required ? (
+            <span className="text-critical" aria-hidden>
+              {" "}
+              *
+            </span>
+          ) : null}
+        </Label>
+        <GovernedFileUploadField
+          field={field}
+          moduleId={uploadModuleId}
+          enabled={enabled}
+          value={values[field.id]}
+          onValueChange={(next) => onValueChange(field.id, next)}
+        />
+      </div>
+    );
   }
 
   return (

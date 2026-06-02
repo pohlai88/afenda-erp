@@ -16,18 +16,58 @@ const checks: readonly Check[] = [
   },
   {
     name: "Uploads validate capability and content policy",
-    file: "apps/erp/src/app/api/uploads/route.ts",
+    file: "packages/object-storage/src/handlers/object-storage-handlers.server.ts",
     patterns: [
-      "assertBlobConfigured",
-      "requireBlobModuleAccess",
+      "assertObjectStorageConfigured",
+      "requireUploadModuleAccess",
       "assertUploadPathnameMatchesTenant",
       "documentUploadContentTypes",
-      "registerTenantDocument",
+      "registerUploadedDocument",
+    ],
+  },
+  {
+    name: "Document download validates tenant scope",
+    file: "packages/object-storage/src/handlers/object-storage-handlers.server.ts",
+    patterns: [
+      "handleObjectStorageDocumentDownloadGet",
+      "requireUploadModuleAccess",
+      "getTenantDocument",
+      "assertUploadPathnameMatchesTenant",
+      "getSignedDownloadUrl",
+    ],
+  },
+  {
+    name: "ERP upload route wires tenant document registration",
+    file: "apps/erp/src/app/api/internal/v1/uploads/route.ts",
+    patterns: [
+      "handleObjectStorageUploadPost",
+      "registerUploadedTenantDocumentCommand",
+      "registerUploadedDocument",
+    ],
+  },
+  {
+    name: "ERP document download delegates to object-storage handler",
+    file: "apps/erp/src/app/api/internal/v1/documents/[documentId]/download/route.ts",
+    patterns: ["handleObjectStorageDocumentDownloadGet"],
+  },
+  {
+    name: "Legacy document download redirects to internal route",
+    file: "apps/erp/src/app/api/documents/[documentId]/download/route.ts",
+    patterns: ["OBJECT_STORAGE_HTTP_ROUTES", "308"],
+  },
+  {
+    name: "Upload auth resolves session org",
+    file: "packages/object-storage/src/auth/upload-route-auth.server.ts",
+    patterns: [
+      "getSession",
+      "getActiveOrganization",
+      "hasDocumentWriteAccess",
+      "hasDocumentReadAccess",
     ],
   },
   {
     name: "AI routes require auth and usage logging",
-    file: "apps/erp/src/app/api/ai/chat/route.ts",
+    file: "apps/erp/src/app/api/internal/v1/ai/queries/erp-assistant/route.ts",
     patterns: [
       "getApiAuthContext",
       "createAiUsageEvent",
@@ -45,7 +85,7 @@ const checks: readonly Check[] = [
   },
   {
     name: "Document extraction is schema constrained",
-    file: "apps/erp/src/app/api/ai/extract/route.ts",
+    file: "apps/erp/src/app/api/internal/v1/ai/commands/extract-document/route.ts",
     patterns: [
       "Output.object",
       "documentExtractionSchema",

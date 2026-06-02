@@ -1,6 +1,6 @@
-**Parent:** [`docs/architecture/011-system-admin-enterprise-architecture.md`](../../../../docs/architecture/011-system-admin-enterprise-architecture.md)
+**Parent:** [`docs/architecture/1006-control-plane.md`](../../../../docs/architecture/1006-control-plane.md)
 
-**Canonical supplement:** [`docs/architecture/011-system-admin-users-architecture.md`](../../../../docs/architecture/011-system-admin-users-architecture.md)
+**Vertical supplement:** this file.
 
 ### 9.1 Users
 
@@ -357,7 +357,7 @@ cannot remove last active owner
 inspect access returns roles and effective permissions
 ```
 
-## As-built (ARCH-011 integration)
+## As-built (ARCH-1006 integration)
 
 ### Route split
 

@@ -2,7 +2,7 @@
 
 Shared **execution law** and **frozen** generic ERP compat for Afenda.
 
-Canonical doctrine: [ARCH-002 · ERP kernel & feature packages](../../docs/architecture/002-erp-kernel-package-architecture.md).
+Canonical doctrine: [ARCH-1002 · Backend](../../docs/architecture/1002-backend.md) (§7 kernel).
 
 ## Where to work
 

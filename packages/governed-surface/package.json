@@ -40,6 +40,8 @@
   },
   "dependencies": {
     "@afenda/auth": "workspace:*",
+    "@afenda/kernel": "workspace:*",
+    "@afenda/object-storage": "workspace:*",
     "@afenda/observability": "workspace:*",
     "@afenda/ui": "workspace:*",
     "@number-flow/react": "^0.6.0",

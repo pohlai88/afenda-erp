@@ -9,7 +9,7 @@ import {
   buildLynxConsoleStatGrid,
   buildLynxOperationalSkillsListSurface,
   buildLynxRecoveryPlaybookListSurface,
-} from "../../src/surfaces/lynx.console.surface";
+} from "../../src/surface/lynx.console.surface";
 
 describe("lynx console surface gallery", () => {
   it.each([

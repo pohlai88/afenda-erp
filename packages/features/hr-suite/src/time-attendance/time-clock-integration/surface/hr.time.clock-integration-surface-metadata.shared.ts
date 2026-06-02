@@ -77,7 +77,7 @@ export {
   hrTimeClockReportsColumnsId,
 };
 
-/** Canonical Pattern C list surface keys (ARCH-006 registry). */
+/** Canonical Pattern C list surface keys (ARCH-1003 registry). */
 export const HR_TIME_CLOCK_LIST_SURFACE_KEYS = [
   hrTimeClockDevicesSurfaceKey,
   hrTimeClockEmployeeMappingsSurfaceKey,

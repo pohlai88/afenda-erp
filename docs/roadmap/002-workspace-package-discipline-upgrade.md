@@ -1,17 +1,17 @@
 # TRACK-002 · Workspace Package Discipline Upgrade
 
-**Tracking ID:** `TRACK-002` · **File:** `002-workspace-package-discipline-upgrade.md` · **Status:** Active · **Owner:** Architecture · **Related:** **TRACK-004**, **ARCH-008**
+**Tracking ID:** `TRACK-002` · **File:** `002-workspace-package-discipline-upgrade.md` · **Status:** Active · **Owner:** Architecture · **Related:** **TRACK-004**, **ARCH-1005**
 
 This track implements the package discipline required before large module
 migrations such as HRM. Stable rules live in
-[ARCH-008](../architecture/008-workspace-package-discipline.md); this file
+[ARCH-1005](../architecture/1005-infrastructure.md); this file
 tracks rollout.
 
 ## Milestones
 
 | Milestone | Target outcome                                                                                 |
 | --------- | ---------------------------------------------------------------------------------------------- |
-| Doctrine  | ARCH-008, ADR-001, architecture index, and agent guide reference the package discipline         |
+| Doctrine  | ARCH-1005, ADR-001, architecture index, and agent guide reference the package discipline         |
 | Guards    | `pnpm architecture:check` enforces feature export doors, no nested feature workspaces, imports |
 | Inventory | Current workspace packages are classified and synced with `apps/erp` transpilation             |
 | Migration | HRM uses `@afenda/feature-hr-suite` with internal category folders before considering more packages   |

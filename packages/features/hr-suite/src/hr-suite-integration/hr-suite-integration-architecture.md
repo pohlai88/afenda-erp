@@ -1,6 +1,6 @@
 # HR Suite Integration
 
-> **Parent doctrine:** [ARCH-010](../../../../../docs/architecture/010-hr-feature-package-architecture.md) · [ARCH-006](../../../../../docs/architecture/006-metadata-driven-ui-architecture.md) · [ARCH-007](../../../../../docs/architecture/007-governed-metadata-architecture.md)
+> **Parent doctrine:** [ARCH-1002](../../../../../docs/architecture/1002-backend.md) · [ARCH-1003](../../../../../docs/architecture/1003-frontend.md) · [ARCH-1003](../../../../../docs/architecture/1003-frontend.md)
 
 ## Definition
 
@@ -41,7 +41,7 @@ governed-surface helper patterns used by multiple HR capability slices.**
 | Auth session storage and Neon Auth integration                      | `@afenda/auth`                                  |
 | One-off copy, one-off transforms, or slice-only helpers             | Owning HR capability slice                      |
 | Public package subpaths                                             | `@afenda/feature-hr-suite` package exports only |
-| Catch-all folders such as `utils`, `helpers`, `common`, or `shared` | Forbidden by ARCH-010                           |
+| Catch-all folders such as `utils`, `helpers`, `common`, or `shared` | Forbidden by ARCH-1002                           |
 
 ---
 
@@ -107,7 +107,7 @@ governed-surface helper patterns used by multiple HR capability slices.**
 |  17 | New reusable helper families are added only after repeated use across at least two HR slices or scaffold templates.                                               |
 |  18 | Scaffolded HR slices consume integration contracts instead of copying repeated helper code.                                                                       |
 |  19 | The package does not expose an `hr-suite-integration` public subpath in `package.json`.                                                                           |
-|  20 | Guard, docs, and ARCH-010 stay aligned when the integration contract changes.                                                                                     |
+|  20 | Guard, docs, and ARCH-1002 stay aligned when the integration contract changes.                                                                                     |
 
 ---
 
@@ -115,7 +115,7 @@ governed-surface helper patterns used by multiple HR capability slices.**
 
 **Location:** `packages/features/hr-suite/src/hr-suite-integration/`  
 **Public package API:** no public `hr-suite-integration` package subpath  
-**Canonical parent:** ARCH-010
+**Canonical parent:** ARCH-1002
 
 | Layer                    | Current files                                                                                                                                                                      |
 | ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -155,7 +155,7 @@ governed-surface helper patterns used by multiple HR capability slices.**
 | HRM-HSI-019 | **Shipped** - stable permission, list, trailing action, action-result, and guard contracts are ready for future HR slice scaffold repair mode.                                                      |
 | HRM-HSI-020 | **Shipped** - package exports do not expose an integration subpath.                                                                                                                                 |
 | HRM-HSI-021 | **Shipped** - HR vertical guard validates integration root shape.                                                                                                                                   |
-| HRM-HSI-022 | **Shipped** - ARCH-010 owns the change-control rule.                                                                                                                                                |
+| HRM-HSI-022 | **Shipped** - ARCH-1002 owns the change-control rule.                                                                                                                                                |
 | HRM-HSI-023 | **Shipped** - this as-built summary records shipped, partial, and future requirements.                                                                                                              |
 | HRM-HSI-024 | **Shipped** - scaffold-only integration behavior is not counted as shipped.                                                                                                                         |
 

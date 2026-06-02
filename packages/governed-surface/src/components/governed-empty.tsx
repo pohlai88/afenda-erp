@@ -17,13 +17,9 @@ export type GovernedEmptyProps = {
   testId?: string;
 };
 
-const variantClassName: Record<EmptyState["variant"], string> = {
+const variantClassName = {
   muted: "border-dashed border-border bg-transparent",
-  cta: cn(
-    "border-solid border-border bg-card",
-    ui.radius.card,
-    ui.elevation.card,
-  ),
+  cta: cn("border-solid border-border bg-card", ui.radius.card, ui.elevation.card),
   forbidden: cn(
     "border-solid border-border bg-muted/30",
     ui.radius.card,
@@ -33,31 +29,45 @@ const variantClassName: Record<EmptyState["variant"], string> = {
     "border-solid border-critical/40 bg-critical/5",
     ui.radius.card,
   ),
-};
+} satisfies Record<EmptyState["variant"], string>;
+
+const variantRole = {
+  muted: undefined,
+  cta: undefined,
+  forbidden: "status",
+  error: "alert",
+} satisfies Record<EmptyState["variant"], "status" | "alert" | undefined>;
 
 export function GovernedEmpty({ model, className, testId }: GovernedEmptyProps) {
+  const resolvedTestId =
+    testId ??
+    (model.emptyId ? governedTestId("empty", model.emptyId) : undefined);
+
+  const ctaHref = model.cta?.href
+    ? asGovernedRoute(model.cta.href)
+    : undefined;
+
   return (
     <Empty
+      role={variantRole[model.variant]}
       className={cn(
         "border p-8 text-center @sm:p-10",
         variantClassName[model.variant],
         className,
       )}
-      {...(model.emptyId ? { "data-empty-id": model.emptyId } : {})}
-      data-testid={
-        testId ??
-        (model.emptyId
-          ? governedTestId("empty", model.emptyId)
-          : undefined)
-      }
+      data-empty-id={model.emptyId}
+      data-empty-variant={model.variant}
+      data-testid={resolvedTestId}
     >
       <EmptyTitle>{model.title}</EmptyTitle>
+
       {model.description ? (
         <EmptyDescription>{model.description}</EmptyDescription>
       ) : null}
-      {model.cta ? (
+
+      {model.cta && ctaHref ? (
         <Button variant="secondary" size="sm" asChild>
-          <Link href={asGovernedRoute(model.cta.href)} prefetch={false}>
+          <Link href={ctaHref} prefetch={false}>
             {model.cta.label}
           </Link>
         </Button>

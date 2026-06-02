@@ -12,7 +12,6 @@ describe("AppShell contracts", () => {
         rail: {
           storageKey: "workspace",
           identity: {
-            initials: "AF",
             primary: "Afenda",
             secondary: "operator@example.com",
           },
@@ -39,7 +38,7 @@ describe("AppShell contracts", () => {
         },
         utilityBar: {
           brandHomeHref: "/dashboard",
-          commandPlaceholder: "Search commands",
+          commandPlaceholder: "search workspace",
           metadata: {
             version: 1,
             zones: [
@@ -80,7 +79,7 @@ describe("AppShell contracts", () => {
         rail: null,
         utilityBar: {
           brandHomeHref: "/dashboard",
-          commandPlaceholder: "Search commands",
+          commandPlaceholder: "search workspace",
           metadata: {
             version: 1,
             zones: [

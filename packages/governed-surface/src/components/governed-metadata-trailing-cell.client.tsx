@@ -1,12 +1,13 @@
 "use client";
 
-import { Button } from "@afenda/ui/button";
 import Link from "next/link";
+
+import { Button } from "@afenda/ui/button";
+
 import {
   GovernedTrailingActionSlot,
   isListSurfaceTrailingActionRenderable,
 } from "../client";
-
 import type { GovernedListTrailingCellProps } from "../governed-pattern-c-trailing-column.shared";
 import { asGovernedRoute } from "../utils/governed-safe-route";
 
@@ -15,17 +16,14 @@ export function GovernedMetadataTrailingCell({
   context,
 }: GovernedListTrailingCellProps) {
   const trailingAction = row.trailingAction;
+
   if (!isListSurfaceTrailingActionRenderable(trailingAction)) {
     return null;
   }
+
   const disabled = trailingAction.state === "disabled";
   const label = trailingAction.descriptor?.label ?? "Action";
   const surfaceKey = context?.surfaceKey;
-  const button = (
-    <Button type="button" size="sm" variant="secondary" disabled={disabled}>
-      {label}
-    </Button>
-  );
 
   return (
     <GovernedTrailingActionSlot
@@ -36,14 +34,19 @@ export function GovernedMetadataTrailingCell({
       rowId={row.id}
     >
       {!disabled && row.rowHref ? (
-        <Link
-          href={asGovernedRoute(row.rowHref)}
-          onClick={(event) => event.stopPropagation()}
-        >
-          {button}
-        </Link>
+        <Button asChild size="sm" variant="secondary">
+          <Link
+            href={asGovernedRoute(row.rowHref)}
+            onClick={(event) => event.stopPropagation()}
+            prefetch={false}
+          >
+            {label}
+          </Link>
+        </Button>
       ) : (
-        button
+        <Button type="button" size="sm" variant="secondary" disabled={disabled}>
+          {label}
+        </Button>
       )}
     </GovernedTrailingActionSlot>
   );

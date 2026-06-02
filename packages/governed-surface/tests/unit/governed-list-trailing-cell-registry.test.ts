@@ -45,6 +45,14 @@ describe("resolveGovernedTrailingColumn", () => {
     expect(result.Cell).toBe(GovernedMetadataTrailingCell);
   });
 
+  it("falls back to GovernedMetadataTrailingCell for unknown cellId", () => {
+    const result = resolveGovernedTrailingColumn({
+      header: "Action",
+      cellId: "governed.unknown" as never,
+    });
+    expect(result.Cell).toBe(GovernedMetadataTrailingCell);
+  });
+
   it("validates and passes through a valid context", () => {
     const result = resolveGovernedTrailingColumn({
       header: "Action",

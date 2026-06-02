@@ -24,6 +24,7 @@ export const governedFormFieldKindSchema = z.enum([
   "textarea",
   "select",
   "checkbox",
+  "file-upload",
 ]);
 
 export const governedFormFieldOptionSchema = z
@@ -41,6 +42,8 @@ export const governedFormFieldSchema = z
     required: z.boolean().default(false),
     placeholder: z.string().trim().min(1).optional(),
     options: z.array(governedFormFieldOptionSchema).optional(),
+    /** MIME accept string for file-upload fields (defaults to ERP document policy). */
+    accept: z.string().trim().min(1).optional(),
     /** Conditional visibility/enablement (JSON Forms–style; evaluated server + client). */
     rules: z.array(formRuleSchema).optional(),
   })
@@ -62,6 +65,22 @@ export const governedFormFieldSchema = z
         code: z.ZodIssueCode.custom,
         message: "Only select fields may define options.",
         path: ["options"],
+      });
+    }
+
+    if (field.kind === "file-upload" && field.options !== undefined) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "File-upload fields must not define select options.",
+        path: ["options"],
+      });
+    }
+
+    if (field.kind !== "file-upload" && field.accept !== undefined) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Only file-upload fields may define accept.",
+        path: ["accept"],
       });
     }
   });
@@ -96,12 +115,25 @@ export const governedMultiStepFormConfigurationSchema =
       dataNature: multiStepFormDataNatureSchema.default("wizard"),
       formId: z.string().trim().min(1),
       actionId: z.string().trim().min(1),
+      /** Required when any step includes a file-upload field. */
+      moduleId: z.string().trim().min(1).optional(),
       steps: z.array(governedFormStepSchema).min(1),
       submitLabel: z.string().trim().min(1).default("Submit"),
       chrome: governedSurfaceChromeSchema.optional(),
     })
     .superRefine((form, ctx) => {
       const seen = new Set<string>();
+      const hasFileUpload = form.steps.some((step) =>
+        step.fields.some((field) => field.kind === "file-upload"),
+      );
+
+      if (hasFileUpload && !form.moduleId) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "moduleId is required when the form includes file-upload fields.",
+          path: ["moduleId"],
+        });
+      }
 
       for (const [index, step] of form.steps.entries()) {
         if (seen.has(step.id)) {

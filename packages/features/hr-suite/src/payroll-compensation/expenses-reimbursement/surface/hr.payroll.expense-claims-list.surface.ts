@@ -28,9 +28,10 @@ export function buildHrExpenseClaimsListSurface(input: {
   window: HrExpenseClaimsWindow;
   searchValue?: string;
   canApprove?: boolean;
+  canWrite?: boolean;
 }) {
   const copy = hrExpenseUiCopy.claims;
-  const { window, searchValue, canApprove = false } = input;
+  const { window, searchValue, canApprove = false, canWrite = false } = input;
 
   return buildExpenseOperationalListSurface({
     primaryColumnId: "reference",
@@ -104,6 +105,8 @@ export function buildHrExpenseClaimsListSurface(input: {
         flags: formatExpenseFlagsCell(row),
         reimbursable: `${row.reimbursableAmount.toFixed(2)} ${row.currencyCode}`,
         statusValue: row.status,
+        employeeIdValue: row.employeeId,
+        claimReferenceValue: row.claimReference,
       },
       cellKinds: {
         status: {
@@ -114,6 +117,7 @@ export function buildHrExpenseClaimsListSurface(input: {
       },
       trailingAction: resolveExpenseClaimTrailingAction({
         canApprove,
+        canWrite,
         status: row.status,
       }),
     })),

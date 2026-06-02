@@ -27,4 +27,4 @@ export {
   lynxConsolePageMetadata,
   lynxConsoleSections,
   lynxConsoleUxCards,
-} from "./shell/lynx-console-copy.shared";
+} from "./surface/lynx.console-ui.copy.shared";

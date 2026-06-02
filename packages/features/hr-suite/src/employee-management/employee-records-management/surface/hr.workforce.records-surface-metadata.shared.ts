@@ -37,7 +37,7 @@ import {
   hrRecordsStatusHistoryColumnsId,
 } from "./hr.workforce.records-surface-columns.shared";
 
-/** Canonical Pattern C list surface keys (ARCH-006 registry). */
+/** Canonical Pattern C list surface keys (ARCH-1003 registry). */
 export const HR_RECORDS_LIST_SURFACE_KEYS = [
   hrRecordsIncompleteSurfaceKey,
   hrRecordsDirectorySurfaceKey,

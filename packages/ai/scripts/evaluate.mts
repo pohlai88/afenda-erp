@@ -12,7 +12,6 @@ import {
   createActionSandbox,
   createGatewayOptions,
   createErpAssistantTools,
-  createSolutionProviderTools,
   documentLookupToolInputSchema,
   documentExtractionSchema,
   estimateTokenCount,
@@ -23,15 +22,9 @@ import {
   hasAiGatewayRuntimeCredentials,
   redactGovernedToolAuditValue,
   scoreAiConfidence,
-  solutionProviderRunSchema,
-  businessProblemInputSchema,
-  recoveryPlaybookSchema,
   verifyAiGatewayModels,
   workspaceSummarySchema,
   AiSensitiveContentError,
-  getOperationalSkillById,
-  getOperationalSkillsForModule,
-  getStagedOperationalSkillById,
   rejectActionSandbox,
 } from "../src/index";
 
@@ -268,120 +261,6 @@ assert.equal(
   }).success,
   true,
 );
-assert.equal(
-  businessProblemInputSchema.safeParse({
-    problemType: "negative_pnl",
-    userGoal: "Recover negative P&L with evidence-backed actions.",
-  }).success,
-  true,
-);
-assert.equal(
-  recoveryPlaybookSchema.safeParse({
-    workflowId: "negative_pnl_recovery",
-    title: "Negative P&L recovery",
-    summary: "Recover profitability through accountable cross-module actions.",
-    orderedActions: [
-      {
-        id: "action-1",
-        title: "Review overdue receivables",
-        moduleId: "finance",
-        ownerTeam: "Finance Systems",
-        priority: "high",
-        expectedImpact:
-          "Improves cash recovery and exposes collection blockers.",
-        riskLevel: "high",
-        humanApproval: {
-          required: true,
-          state: "approval-required",
-          reason: "Customer-facing financial workflow requires review.",
-        },
-        sourceRecords: [
-          {
-            moduleId: "finance",
-            recordId: "FIN-001",
-            label: "AR aging",
-            signal: "Overdue balance remains open.",
-          },
-        ],
-      },
-    ],
-    kpisToWatch: ["Gross margin"],
-    assumptions: ["Tenant data is available to the current role."],
-  }).success,
-  true,
-);
-assert.equal(
-  solutionProviderRunSchema.safeParse({
-    problem: {
-      problemType: "negative_pnl",
-      workflowId: "negative_pnl_recovery",
-      userGoal: "Recover negative P&L with evidence-backed actions.",
-    },
-    diagnosis: [
-      {
-        id: "cause-1",
-        title: "Revenue leakage",
-        moduleId: "sales",
-        severity: "high",
-        confidence: "medium",
-        evidence: [
-          {
-            moduleId: "sales",
-            recordId: "SAL-001",
-            label: "Blocked order",
-            signal: "Order is blocked by stock allocation.",
-          },
-        ],
-        explanation: "Blocked orders may be reducing recognized revenue.",
-        missingData: [],
-      },
-    ],
-    recoveryPlan: {
-      workflowId: "negative_pnl_recovery",
-      title: "Negative P&L recovery",
-      summary: "Prioritize revenue recovery and cost-control actions.",
-      orderedActions: [
-        {
-          id: "action-1",
-          title: "Clear blocked order",
-          moduleId: "sales",
-          ownerTeam: "Commercial Operations",
-          priority: "high",
-          expectedImpact: "Restores invoice handoff.",
-          riskLevel: "medium",
-          humanApproval: {
-            required: true,
-            state: "approval-required",
-            reason: "Customer-facing change requires human review.",
-          },
-          sourceRecords: [
-            {
-              moduleId: "sales",
-              recordId: "SAL-001",
-              label: "Blocked order",
-              signal: "Order is blocked by stock allocation.",
-            },
-          ],
-        },
-      ],
-      kpisToWatch: ["Revenue leakage"],
-      assumptions: [],
-    },
-    anomalies: [],
-    confidence: "medium",
-    riskLevel: "high",
-    sourceRecords: [
-      {
-        moduleId: "sales",
-        recordId: "SAL-001",
-        label: "Blocked order",
-        signal: "Order is blocked by stock allocation.",
-      },
-    ],
-    requiresApproval: true,
-  }).success,
-  true,
-);
 
 const assembledContext = assembleAiContext({
   organizationId: "org_123",
@@ -457,23 +336,6 @@ assert.equal(actionSandboxSchema.parse(pendingSandbox).status, "pending");
 assert.equal(approvedSandbox.status, "approved");
 assert.equal(rejectedSandbox.status, "rejected");
 assert.throws(() => approveActionSandbox({ sandbox: approvedSandbox }));
-assert.equal(
-  getStagedOperationalSkillById("lms-training-designer")?.moduleId,
-  "lms",
-);
-assert.equal(getOperationalSkillsForModule("finance").length > 0, true);
-assert.equal(
-  getOperationalSkillById("audit-readiness")?.readToolNames[0],
-  "reviewAuditReadiness",
-);
-assert.equal(
-  getOperationalSkillById("revenue-leakage-recovery")?.moduleId,
-  "sales",
-);
-assert.equal(
-  getOperationalSkillById("cost-driver-control")?.moduleId,
-  "purchasing",
-);
 
 let approvalRecordedBy = "";
 const toolset = createErpAssistantTools({
@@ -555,130 +417,5 @@ const approvalResult = await approvalTool.execute({
 
 assert.equal(approvalRecordedBy, "user_123");
 assert.equal(approvalResult.approvalState, "human-approved");
-
-let solutionProposalRecordedBy = "";
-const solutionToolset = createSolutionProviderTools({
-  organization: {
-    id: "org_123",
-    capabilities: ["finance.view", "dashboard.view"],
-  },
-  session: { id: "user_123" },
-  model: "openai/gpt-5.4",
-  getModuleDefinition: () => ({
-    label: "Finance",
-    ownerTeam: "Finance Systems",
-    requiredCapability: "finance.view",
-  }),
-  getAllowedWorkspace: async () => ({
-    moduleDefinition: {
-      label: "Finance",
-      ownerTeam: "Finance Systems",
-      requiredCapability: "finance.view",
-    },
-    workspace: {
-      dataMode: "metadata",
-      workItems: [{ id: "work_123", subject: "Review margin" }],
-      records: [
-        {
-          id: "record_fin_1001",
-          reference: "FIN-1001",
-          title: "Margin review",
-          recordType: "financial-review",
-          status: "blocked",
-          owner: "Finance",
-          metadataSummary: "Gross margin below target",
-        },
-      ],
-      documents: [{ id: "doc_123", title: "P&L extract" }],
-    },
-  }),
-  getWorkspaceStats: () => ({
-    recordCount: 1,
-    workItemCount: 1,
-    highPriorityWorkItemCount: 1,
-    documentCount: 1,
-    savedViewCount: 1,
-  }),
-  registerSolutionActionProposal: async (proposal) => {
-    solutionProposalRecordedBy = proposal.requestedByAuthUserId;
-    return "solution_proposal_123";
-  },
-});
-
-const analyzeProfitAndLoss =
-  solutionToolset.analyzeProfitAndLoss as ExecutableTool<
-    {
-      problemType: "negative_pnl";
-      workflowId?: "negative_pnl_recovery";
-      userGoal: string;
-    },
-    { id: string; evidence: unknown[] }[]
-  >;
-const diagnosis = await analyzeProfitAndLoss.execute({
-  problemType: "negative_pnl",
-  userGoal: "Recover negative P&L with evidence-backed actions.",
-});
-
-assert.equal(diagnosis[0]?.id, "negative_pnl-1");
-assert.ok(diagnosis[0]?.evidence.length);
-assert.ok(
-  (
-    diagnosis[0] as {
-      confidenceBreakdown?: { overall: number };
-    }
-  ).confidenceBreakdown?.overall,
-);
-
-const draftRecoveryTasks = solutionToolset.draftRecoveryTasks as ExecutableTool<
-  {
-    problemType: "negative_pnl";
-    workflowId?: "negative_pnl_recovery";
-    userGoal: string;
-  },
-  { orderedActions: Array<{ actionSandbox?: { status: string } }> }
->;
-const recoveryDraft = await draftRecoveryTasks.execute({
-  problemType: "negative_pnl",
-  userGoal: "Recover negative P&L with evidence-backed actions.",
-});
-
-assert.equal(recoveryDraft.orderedActions[0]?.actionSandbox?.status, "pending");
-
-const proposeHumanApprovedAction =
-  solutionToolset.proposeHumanApprovedAction as ExecutableTool<
-    {
-      moduleId: "finance";
-      title: string;
-      rationale: string;
-      riskLevel: "high";
-      expectedImpact: string;
-      sourceRecordIds: string[];
-      requiredHumanChecks: string[];
-    },
-    { proposalId: string; approvalState: "human-approved" }
-  >;
-
-assert.equal(proposeHumanApprovedAction.needsApproval, true);
-const solutionProposalResult = await proposeHumanApprovedAction.execute({
-  moduleId: "finance",
-  title: "Review margin leakage",
-  rationale:
-    "Gross margin is below target and needs a human-approved recovery owner.",
-  riskLevel: "high",
-  expectedImpact: "Clarifies recovery owner and next review action.",
-  sourceRecordIds: ["record_fin_1001"],
-  requiredHumanChecks: ["Confirm margin driver and recovery owner"],
-});
-
-assert.equal(solutionProposalRecordedBy, "user_123");
-assert.equal(solutionProposalResult.approvalState, "human-approved");
-assert.equal(
-  (
-    solutionProposalResult as {
-      metadata?: { sandbox?: { status: string } };
-    }
-  ).metadata?.sandbox?.status,
-  "approved",
-);
 
 process.stdout.write("AI schema and guardrail evals passed.\n");

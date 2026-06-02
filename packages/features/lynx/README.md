@@ -17,9 +17,10 @@ them.
 - `schemas/` owns Zod runtime validation for Truth, readiness, ERP read tools,
   outcome monitors, and tool input payloads.
 - `components/` owns Lynx product UI exported through `@afenda/feature-lynx/client`.
-- `data/`, `tools/`, and `workflows/` are server-only and exported through
+- `data/` owns tenant-scoped queries; `read-models/` owns page/list composition.
+- `tools/` and `workflows/` are server-only Lynx extensions exported through
   `@afenda/feature-lynx/server`.
-- `surfaces/` owns governed metadata builders exported through
+- `surface/` owns governed metadata builders and console UI copy, exported through
   `@afenda/feature-lynx/metadata`.
 
 ## Component Inventory

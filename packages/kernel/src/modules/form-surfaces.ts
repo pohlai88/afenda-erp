@@ -9,7 +9,7 @@ import { documentWorkflowCopy } from "../shell/route-copy-metadata";
  * Metadata descriptor for the AI document extraction form.
  *
  * The form captures title, optional document ID, and raw document text for
- * submission to the `/api/ai/extract` route handler. Wiring the `actionId`
+ * submission to `/api/internal/v1/ai/commands/extract-document`. Wiring the `actionId`
  * to a Server Action requires the caller to register a handler for
  * `document.extraction.submit`.
  */

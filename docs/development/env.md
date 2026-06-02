@@ -20,6 +20,14 @@ pnpm env:sync:dry-run                # preview (values redacted)
 
 Run `pnpm env:sync:all` before the first `pnpm build` or `pnpm dev` on a fresh clone.
 
+### Neon Auth
+
+Branch-specific `NEON_AUTH_BASE_URL`, trusted origins, and Next.js proxy patterns: **[neon-auth.md](./neon-auth.md)**.
+
+```bash
+pnpm env:verify:neon-auth   # JWKS reachability + env alignment when Neon is on
+```
+
 ## Schema
 
 Runtime validation: [`packages/config/src/env.ts`](../../packages/config/src/env.ts).
@@ -101,17 +109,27 @@ Official references: [GitHub MCP setup](https://docs.github.com/en/copilot/how-t
 
 Project linking: [vercel-link.md](./vercel-link.md). Blob storage setup is below.
 
-### Vercel Blob (document uploads)
+### Object storage (document uploads)
+
+Provider selection is env-driven via `@afenda/object-storage`. Default on Vercel: **Vercel Blob**. Alternative: **Cloudflare R2** (S3-compatible).
+
+| Item | Value |
+| ---- | ----- |
+| Package | `@afenda/object-storage` — handlers in package, thin routes in `apps/erp` |
+| Upload route | `POST /api/internal/v1/uploads` |
+| Config route | `GET /api/internal/v1/uploads/config?moduleId=<moduleId>` — provider + tenant pathname prefix |
+| Download route | `GET /api/internal/v1/documents/[documentId]/download?moduleId=<moduleId>` (legacy `/api/documents/...` → 308 redirect) |
+| Provider env | `OBJECT_STORAGE_PROVIDER=vercel-blob\|r2` (auto-detect when unset) |
+
+#### Vercel Blob (default)
 
 | Item | Value |
 | ---- | ----- |
 | Store name | `afenda-erp-documents` (`store_Xj6sQ439ILZy4w8Y`) |
 | Access | `private` |
-| Upload route | `/api/uploads` (client upload via `@vercel/blob/client`) |
-| Config route | `GET /api/uploads/config?moduleId=<moduleId>` — tenant pathname prefix |
-| Download route | `GET /api/documents/[documentId]/download?moduleId=<moduleId>` |
+| Client SDK | `@vercel/blob/client` via object-storage handler |
 | Required env | `BLOB_READ_WRITE_TOKEN` (auto-provisioned when store is linked) |
-| Local callback (optional) | `VERCEL_BLOB_CALLBACK_URL` — tunnel URL ending in `/api/uploads` so `onUploadCompleted` runs locally |
+| Local callback (optional) | `VERCEL_BLOB_CALLBACK_URL` — tunnel URL ending in `/api/internal/v1/uploads` so `onUploadCompleted` runs locally |
 
 **Provision (linked project):**
 
@@ -122,6 +140,23 @@ vercel blob create-store afenda-erp-documents --access private --yes \
 
 Copy `BLOB_READ_WRITE_TOKEN` into `.env.config` §D, then `pnpm env:sync:all`. On Vercel preview/production the platform injects the token automatically.
 
-**Local `onUploadCompleted`:** Vercel Blob cannot call `localhost`. Use ngrok/cloudflared and set `VERCEL_BLOB_CALLBACK_URL=https://<tunnel>/api/uploads`. Without it, uploads still land in Blob but DB registration may not run until the callback succeeds on a reachable URL.
+**Local `onUploadCompleted`:** Vercel Blob cannot call `localhost`. Use ngrok/cloudflared and set `VERCEL_BLOB_CALLBACK_URL=https://<tunnel>/api/internal/v1/uploads`. Without it, uploads still land in Blob but DB registration may not run until the callback succeeds on a reachable URL.
 
-Canonical policy: [ARCH-001 § Files and Documents](../architecture/001-system-architecture.md).
+#### Cloudflare R2
+
+| Item | Value |
+| ---- | ----- |
+| Required env | `OBJECT_STORAGE_PROVIDER=r2`, `OBJECT_STORAGE_ENDPOINT`, `OBJECT_STORAGE_BUCKET`, `OBJECT_STORAGE_ACCESS_KEY_ID`, `OBJECT_STORAGE_SECRET_ACCESS_KEY` |
+| Legacy aliases | `R2_ENDPOINT`, `R2_BUCKET_NAME`, `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY` → normalized in `@afenda/config/env` |
+| Optional | `OBJECT_STORAGE_PUBLIC_URL_BASE` — R2 custom domain / CDN base URL (**required** when storing `access: public`; private downloads always use signed GET) |
+| Upload flow | `uploadTenantObject()` / `uploadTenantDocument()` on client — or raw `POST` with `{ intent: "presign" }` → PUT → `{ intent: "complete" }` |
+| CORS | Bucket CORS must allow ERP origin (include `http://localhost:3000` for local dev), `PUT`, `GET`, `HEAD`, `Content-Type`, `Content-Length`, expose `ETag` — see `packages/object-storage/AGENTS.md` |
+| Verify | `pnpm r2:verify` — env + S3 `HeadBucket` + presigned PUT smoke test · `pnpm r2:status` — wrangler + Cloudflare SDK snapshot |
+| SDK verify | `pnpm r2:cloudflare:verify` — `cloudflare-typescript` token + zone list (`CLOUDFLARE_API_TOKEN` in `.secret.config`) |
+| CORS apply | `pnpm r2:provision` — Cloudflare SDK when token set, else wrangler; origins from `NEXT_PUBLIC_SITE_URL`, `R2_CORS_EXTRA_ORIGINS`, localhost |
+| Public domain | Add `nexuscanon.com` to Cloudflare → `CLOUDFLARE_ZONE_ID` or SDK auto-resolve → `pnpm r2:domain:provision` (SDK + disable r2.dev) |
+| MCP checks | `cloudflare-bindings` → `r2_bucket_get` · `cloudflare` → `execute` / `search` (same REST paths as SDK) |
+| Provisioning | `npx wrangler r2 bucket create <name>` · API token (Object Read & Write) → `.secret.config` keys · `pnpm env:sync:all` |
+| Download | `GET /api/internal/v1/documents/[documentId]/download?moduleId=…` (signed redirect) |
+
+Canonical policy: [ARCH-1005 §10.2](../architecture/1005-infrastructure.md#102-object-storage-afendaobject-storage).

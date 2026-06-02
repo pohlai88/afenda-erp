@@ -11,7 +11,7 @@ describe("ModulePageHeader", () => {
 
     expect(html).not.toContain("ERP module");
     expect(html).toContain("Finance");
-    expect(html).toContain('data-testid="governed:page-header:finance"');
+    expect(html).toContain('data-testid="governed:page-header:finance-page-header"');
   });
 
   it("renders eyebrow when provided", () => {

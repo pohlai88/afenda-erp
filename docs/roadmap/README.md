@@ -27,5 +27,5 @@ convention as architecture docs.
 
 - Stable architecture doctrine → `docs/architecture/` (**ARCH-###**).
 - Roadmaps, drafts, and milestone plans → `docs/roadmap/` (**TRACK-###**).
-- Link to architecture docs by ID (for example **ARCH-001**, **ARCH-006**) and
+- Link to architecture docs by ID (for example **ARCH-1001**, **ARCH-1003**) and
   numbered filenames.

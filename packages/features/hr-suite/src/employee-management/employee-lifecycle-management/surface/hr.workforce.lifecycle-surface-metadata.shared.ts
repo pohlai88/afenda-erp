@@ -42,7 +42,7 @@ import {
   hrLifecycleProbationDueColumnsId,
 } from "./hr.workforce.lifecycle-surface-columns.shared";
 
-/** Canonical Pattern C list surface keys (ARCH-006 registry). */
+/** Canonical Pattern C list surface keys (ARCH-1003 registry). */
 export const HR_LIFECYCLE_LIST_SURFACE_KEYS = [
   hrLifecyclePendingTransitionsSurfaceKey,
   hrLifecycleProbationDueSurfaceKey,

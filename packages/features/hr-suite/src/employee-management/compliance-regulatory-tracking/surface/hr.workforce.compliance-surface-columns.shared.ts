@@ -1,4 +1,4 @@
-/** Governed list `surface.columnsId` values (ARCH-006 column registry). */
+/** Governed list `surface.columnsId` values (ARCH-1003 column registry). */
 export const hrComplianceObligationsColumnsId =
   "hr.workforce.compliance.obligations" as const;
 export const hrComplianceFilingsColumnsId =

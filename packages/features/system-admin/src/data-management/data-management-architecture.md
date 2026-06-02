@@ -1,7 +1,7 @@
 # Data Management
 
 Parent doctrine:
-[ARCH-011 Data Management](../../../../../docs/architecture/011-system-admin-data-management-architecture.md)
+[ARCH-1006 Data Management](../../../../../docs/architecture/1006-control-plane.md)
 and [System Admin local architecture](../overview/architecture.md).
 
 ## Definition
@@ -43,7 +43,7 @@ feature-module business services.
 
 | Excluded Area | Owned By |
 | ------------- | -------- |
-| Physical schema ownership and migration execution | `@afenda/db` under ARCH-005 |
+| Physical schema ownership and migration execution | `@afenda/db` under ARCH-1005 |
 | Long-running workflow runtime implementation | `@afenda/workflows` or future workflow runtime |
 | Runtime permission verdicts | Execution Kernel in `@afenda/kernel` |
 | Feature-module business rules for imported records | Owning `@afenda/feature-*` package |
@@ -144,7 +144,7 @@ Data Management uses existing System Admin package doors:
 | `@afenda/feature-system-admin/metadata` | Surface keys, metadata-safe copy, governed list/stat builders |
 | `@afenda/feature-system-admin` | Route paths and environment-neutral contracts only |
 
-Do not add a public `./data-management` subpath without updating ARCH-008 and
+Do not add a public `./data-management` subpath without updating ARCH-1005 and
 the architecture guard.
 
 ## Internal Artifact Placement

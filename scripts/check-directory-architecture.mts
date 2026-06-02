@@ -6,7 +6,7 @@ import {
   bannedBucketNames,
   featurePublicDoorFiles,
   readTemplateBuckets,
-} from "../packages/_template-definition/scripts/lib/feature-bucket-grammar.mts";
+} from "../packages/_scaffold/scripts/lib/scaffold-grammar.mts";
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 const problems: string[] = [];
@@ -106,6 +106,13 @@ const packageArchitectureRules: Record<string, PackageArchitectureRule> = {
     turboBuildOutputs: ["dist/**"],
   },
   "@afenda/observability": {
+    category: "runtime-library",
+    workspaceRoot: "packages",
+    requiresCompiledDistExports: true,
+    requiresPackageBuild: true,
+    turboBuildOutputs: ["dist/**"],
+  },
+  "@afenda/object-storage": {
     category: "runtime-library",
     workspaceRoot: "packages",
     requiresCompiledDistExports: true,
@@ -714,7 +721,7 @@ function checkFeatureBucketGrammar() {
       for (const door of featurePublicDoorFiles) {
         if (!topNames.has(door)) {
           problems.push(
-            `Feature ${featureEntry.name} must include public door ${door} (see packages/_template-definition)`,
+            `Feature ${featureEntry.name} must include public door ${door} (see packages/_scaffold/feature)`,
           );
         }
       }
@@ -724,7 +731,7 @@ function checkFeatureBucketGrammar() {
       );
       if (presentTemplateBuckets.length === 0) {
         problems.push(
-          `Feature ${featureEntry.name} must include at least one template bucket (see packages/_template-definition)`,
+          `Feature ${featureEntry.name} must include at least one template bucket (see packages/_scaffold/feature)`,
         );
       }
     }

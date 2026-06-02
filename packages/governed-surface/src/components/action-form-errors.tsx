@@ -30,7 +30,7 @@ export function ActionFormErrors<T>({
 }: ActionFormErrorsProps<T>) {
   if (!result || result.ok) return null;
 
-  const errorKind = result.errorKind ?? "system";
+  const errorKind = result.errorKind ?? "business-rule";
 
   const entries = result.fieldErrors
     ? Object.entries(result.fieldErrors).filter(
@@ -44,6 +44,7 @@ export function ActionFormErrors<T>({
       variant="destructive"
       className="w-full max-w-xl"
       role="alert"
+      aria-live="polite"
       data-action-error-kind={errorKind}
       {...(result.code ? { "data-action-error-code": result.code } : {})}
       data-testid={testId ?? governedTestId("action-form-errors", errorKind)}

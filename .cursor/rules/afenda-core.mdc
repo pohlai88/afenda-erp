@@ -5,15 +5,17 @@ alwaysApply: true
 
 # Afenda core architecture
 
-Canonical doctrine: `docs/architecture/` (`ARCH-001`–`ARCH-008`). Index: `docs/architecture/README.md`.
+Canonical doctrine: `docs/architecture/` (**ARCH-1001**–**ARCH-1006**). Index: `docs/architecture/README.md`.
 
-**Authority when docs conflict:** ARCH-002 (feature packages) → ARCH-001 (runtime) → update the other doc in the same PR. **ARCH-008** is the living rulebook for workspace package classes, export doors, and split policy (guarded by `pnpm architecture:check`).
+**Target-only:** Deviations from ARCH are **non-compliant**, not legacy OK. Agent discipline: `.cursor/rules/afenda-agent-discipline.mdc`. Hook: `guard-architecture-compliance.mjs` (`failClosed`).
+
+**Authority when docs conflict:** ARCH-1002 (feature packages) → ARCH-1001 (runtime) → update the other doc in the same PR. **ARCH-1005** — monorepo guards (`pnpm architecture:check`).
 
 ## Layout
 
 - `apps/erp` — only deployable Next.js app (`@afenda/erp`).
 - `packages/*` — workspace libraries; `@afenda/feature-*` under `packages/features/<moduleId>` (flat workspaces, grouped `src/` internals).
-- No nested `packages/features/<moduleId>/<category>/package.json` unless ARCH-008 and the guard script are updated together.
+- No nested `packages/features/<moduleId>/<category>/package.json` unless ARCH-1005 and the guard script are updated together.
 - No `apps/erp/src/components/ui/` — primitives live in `@afenda/ui`.
 - Library packages emit `dist/**`; app emits `.next/**` (exclude `.next/cache/**` from Turborepo cache).
 

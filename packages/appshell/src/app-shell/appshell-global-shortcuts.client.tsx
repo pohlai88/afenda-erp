@@ -71,7 +71,11 @@ export function AppShellGlobalShortcuts() {
       if (withinGChord() && key === "h") {
         event.preventDefault();
         clearGChord();
-        router.push("/dashboard");
+        try {
+          router.push("/dashboard");
+        } catch {
+          window.location.assign("/dashboard");
+        }
         return;
       }
 

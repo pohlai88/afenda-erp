@@ -1,10 +1,10 @@
 # System Admin
 
 Parent doctrine:
-[ARCH-011 System Admin](../../../../../docs/architecture/011-system-admin-enterprise-architecture.md),
-[ARCH-011 Data Management](../../../../../docs/architecture/011-system-admin-data-management-architecture.md),
-[ARCH-002 Execution Kernel](../../../../../docs/architecture/002-erp-kernel-package-architecture.md#5-execution-kernel),
-[ARCH-008 Workspace Package Discipline](../../../../../docs/architecture/008-workspace-package-discipline.md).
+[ARCH-1006 System Admin](../../../../../docs/architecture/1006-control-plane.md),
+[ARCH-1006 Data Management](../../../../../docs/architecture/1006-control-plane.md),
+[ARCH-1002 Execution Kernel](../../../../../docs/architecture/1002-backend.md),
+[ARCH-1005 Workspace Package Discipline](../../../../../docs/architecture/1005-infrastructure.md).
 
 ## Definition
 
@@ -55,7 +55,7 @@ migrations, or app route composition.
 | Global authentication provider behavior | `@afenda/auth` and platform identity providers |
 | App route composition and workspace shell | `apps/erp` |
 | Feature-module business rules | Owning `@afenda/feature-*` package |
-| Physical schema migrations | `@afenda/db` under ARCH-005 |
+| Physical schema migrations | `@afenda/db` under ARCH-1005 |
 | Long-running workflow engine | `@afenda/workflows` or future workflow runtime |
 | Governed renderer kernel | `@afenda/governed-surface` |
 | Shared UI primitives | `@afenda/ui` |
@@ -127,7 +127,7 @@ migrations, or app route composition.
 | 13 | Diagnostics and reliability surfaces expose failed webhooks, failed imports, stale invites, disabled modules, drift, and missing audit coverage. |
 | 14 | Support or break-glass access is time-bound, reviewed, and always audit-backed. |
 | 15 | Billing and entitlement surfaces show role, module, capability, plan, feature, and license impact. |
-| 16 | Lynx governance follows ARCH-009 vocabulary, approvals, tool metadata, and machine-layer boundaries. |
+| 16 | Lynx governance follows ARCH-1005 vocabulary, approvals, tool metadata, and machine-layer boundaries. |
 | 17 | All protected System Admin reads and mutations derive `organizationId` from server context. |
 | 18 | All protected System Admin actions re-check capabilities server-side before reading or mutating tenant data. |
 | 19 | Governed list pages use server-window pagination, filtering, sorting, and redaction. |
@@ -228,7 +228,7 @@ execution settings and must not grow route components or governed UI surfaces.
 
 Every new System Admin capability follows this pipeline:
 
-1. Update canonical doctrine in `docs/architecture/011-*` when the capability
+1. Update canonical doctrine in `docs/architecture/1006-control-plane.md` when the capability
    changes enterprise boundaries or control-plane meaning.
 2. Update or create package-local architecture in the owning vertical.
 3. Define contracts before UI: route paths, list rows, command inputs, result
@@ -237,7 +237,7 @@ Every new System Admin capability follows this pipeline:
 5. Add server policies that derive `organizationId` from session/execution
    context and re-check capability on the server.
 6. Add `@afenda/db` commands/queries only when durable persistence is required;
-   schema changes follow ARCH-005 migration rules.
+   schema changes follow ARCH-1005 migration rules.
 7. Build page models and bounded server windows.
 8. Add server actions: validate, authorize, execute, audit, dispatch optional
    webhook, revalidate.

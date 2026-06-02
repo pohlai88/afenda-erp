@@ -1,11 +1,11 @@
 /**
  * @afenda/ai — provider-agnostic agent, tool, and governance layer.
  *
- * Explicit buckets follow packages/_template-definition:
+ * Explicit buckets follow packages/_scaffold/feature (ARCH-1002 §8):
  * actions · components · contracts · data · events · policies · schemas.
  * Additional buckets are on demand: agents · catalogs · errors · prompts · tools.
  *
- * ARCH-009: substrate-blind — never imports @afenda/feature-knowledge.
+ * ARCH-1005: substrate-blind — never imports @afenda/feature-knowledge.
  * Lynx and Knowledge products compose this package; it does not compose them.
  */
 import "server-only";
@@ -28,7 +28,7 @@ export * from "./schemas";
 // ---------------------------------------------------------------------------
 
 export * from "./agents";
-export * from "./catalogs";
 export * from "./errors";
 export * from "./prompts";
 export * from "./tools";
+export { AI_ERP_HTTP_ROUTES } from "./contracts/ai.http.contract";

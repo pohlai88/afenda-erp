@@ -27,8 +27,10 @@
   },
   "dependencies": {
     "@afenda/ai": "workspace:*",
+    "@afenda/auth": "workspace:*",
     "@afenda/config": "workspace:*",
     "@afenda/db": "workspace:*",
+    "@afenda/observability": "workspace:*",
     "@afenda/kernel": "workspace:*",
     "@afenda/feature-knowledge": "workspace:*",
     "@afenda/governed-surface": "workspace:*",
@@ -44,9 +46,13 @@
     "build": "tsc -p tsconfig.build.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "lint": "tsc -p tsconfig.json --noEmit",
-    "test": "vitest run --config vitest.config.ts"
+    "test": "vitest run --config vitest.config.ts && tsx --conditions react-server --conditions development ./scripts/evaluate-solution-provider.mts"
   },
   "devDependencies": {
+    "@afenda/config": "workspace:*",
+    "@opentelemetry/api": "^1.9.0",
+    "next": "catalog:",
+    "server-only": "^0.0.1",
     "vitest": "catalog:"
   },
   "sideEffects": false

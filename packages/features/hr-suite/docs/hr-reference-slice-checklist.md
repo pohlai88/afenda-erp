@@ -1,6 +1,6 @@
 # HR reference slice checklist
 
-Canonical architecture: `docs/architecture/010-hr-feature-package-architecture.md`.
+Canonical architecture: `docs/architecture/1002-backend.md`.
 
 Run `pnpm scaffold:hr-slice <category> <capability-slug> <domain-key>` for every
 new scaffold-only HR capability. Use **`employee-management/compliance-regulatory-tracking`**
@@ -8,7 +8,7 @@ as the shipped reference before moving a slice to `shipped`. Agents: rule
 **`afenda-hr-reference-slice`**; enforcement:
 `scripts/check-hr-feature-vertical-naming.mts`.
 
-ARCH-010 defines the slice lifecycle states: `scaffold-only`, `repair`,
+ARCH-1002 defines the slice lifecycle states: `scaffold-only`, `repair`,
 `shipped`, and `deprecated`. This checklist applies when a slice is moving to
 or changing while in `shipped`.
 

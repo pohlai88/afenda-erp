@@ -80,19 +80,14 @@ export function resolveExpenseStatusBadgeTone(
 
 export function resolveExpenseClaimTrailingAction(input: {
   canApprove: boolean;
+  canWrite?: boolean;
   status: HrExpenseClaimStatus | string;
 }) {
-  if (!input.canApprove) {
-    return resolveHrSuiteListTrailingAction({
-      visible: false,
-      allowed: false,
-    });
-  }
-
   if (
-    input.status === "submitted" ||
-    input.status === "under_review" ||
-    input.status === "returned"
+    input.canApprove &&
+    (input.status === "submitted" ||
+      input.status === "under_review" ||
+      input.status === "returned")
   ) {
     return resolveHrSuiteListTrailingAction({
       visible: true,
@@ -101,6 +96,23 @@ export function resolveExpenseClaimTrailingAction(input: {
         id: "review-expense-claim",
         label: "Review",
         intent: "approval",
+      },
+    });
+  }
+
+  if (
+    input.canWrite &&
+    (input.status === "submitted" ||
+      input.status === "under_review" ||
+      input.status === "returned")
+  ) {
+    return resolveHrSuiteListTrailingAction({
+      visible: true,
+      allowed: true,
+      descriptor: {
+        id: "attach-expense-receipt",
+        label: "Receipt",
+        intent: "financial",
       },
     });
   }

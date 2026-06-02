@@ -3,7 +3,6 @@
 import { useState, type ReactNode } from "react";
 
 import {
-  Button,
   Popover,
   PopoverContent,
   PopoverTrigger,
@@ -49,15 +48,13 @@ export function AppShellUtilityDropdownTemplate({
     <Popover open={resolvedOpen} onOpenChange={handleOpenChange}>
       <AppShellUtilityTriggerTooltip label={triggerTooltip}>
         <PopoverTrigger asChild>
-          <Button
+          <button
             aria-label={triggerLabel}
             className={cn(APP_SHELL_UTILITY_ICON_BUTTON_CLASS, triggerClassName)}
-            size="icon-sm"
             type="button"
-            variant="outline"
           >
             {icon}
-          </Button>
+          </button>
         </PopoverTrigger>
       </AppShellUtilityTriggerTooltip>
       <PopoverContent

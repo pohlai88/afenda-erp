@@ -6,7 +6,7 @@ alwaysApply: false
 
 # System Admin (`@afenda/feature-system-admin`)
 
-**ARCH-011** (control plane) · **ARCH-002** §5 (execution enforcement) · **ARCH-006**/**ARCH-007** (governed UI). Do not extend frozen kernel compat (**ARCH-002** §3).
+**ARCH-1006** (control plane) · **ARCH-1002** §7 (execution enforcement) · **ARCH-1003** (governed UI). Do not extend frozen kernel compat (**ARCH-1002** §7).
 
 System Admin configures the law; Execution Kernel enforces it. Do not import `@afenda/feature-system-admin` from `@afenda/kernel`.
 
@@ -54,8 +54,8 @@ Export doors only: `.`, `./client`, `./server`, `./metadata` — never deep impo
 
 ## Architecture docs
 
-- Canonical doctrine: `docs/architecture/011-system-admin-*.md` and `011-system-admin-enterprise-architecture.md`.
-- Package vertical supplements: `packages/features/system-admin/src/<area>/*-architecture.md` link to parent ARCH-011 supplements — **do not delete**; update in place when as-built changes.
+- Canonical doctrine: [`docs/architecture/1006-control-plane.md`](../../docs/architecture/1006-control-plane.md) (**ARCH-1006**).
+- Package vertical supplements: `packages/features/system-admin/src/<area>/*-architecture.md` link to **ARCH-1006** — **do not delete**; update in place when as-built changes.
 - Do not duplicate full doctrine in package docs; link to `docs/architecture/` and record as-built deltas only.
 
 ## Verification

@@ -135,7 +135,7 @@ export const erpDocuments = pgTable(
     access: erpDocumentAccessEnum("access").notNull(),
     /** ETag returned by Vercel Blob on upload — the store's content integrity identifier. */
     blobEtag: text("blob_etag"),
-    /** Data-handling retention class (ARCH-001 §Files). */
+    /** Data-handling retention class (ARCH-1001 §Files). */
     retentionClass: erpDocumentRetentionEnum("retention_class")
       .notNull()
       .default("standard"),

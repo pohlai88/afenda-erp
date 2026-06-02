@@ -8,7 +8,7 @@ import {
 import {
   getLynxConsoleUxCards,
   lynxConsoleAgentCopy,
-} from "../shell/lynx-console-copy.shared";
+} from "../surface/lynx.console-ui.copy.shared";
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
 import {

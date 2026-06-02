@@ -1,5 +1,5 @@
 /**
  * @afenda-bucket actions
- * Scaffold placeholder from packages/_template-definition.
+ * Scaffold placeholder from packages/_scaffold/feature.
  */
 export {};

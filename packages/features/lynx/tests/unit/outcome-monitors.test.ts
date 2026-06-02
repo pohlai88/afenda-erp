@@ -70,6 +70,8 @@ function workspace(input: {
       owner: "Owner",
       due: "-",
       dueAt: "",
+      sourceRecordId: null,
+      metadata: {},
     })),
     workItemWindow: {
       pageSize: 10,

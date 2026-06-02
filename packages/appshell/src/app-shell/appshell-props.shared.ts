@@ -67,7 +67,7 @@ const appShellPreferenceSnapshotBaseSchema = z
 export const appShellPreferenceSnapshotSchema = appShellPreferenceSnapshotBaseSchema
   .transform((value) => ({
     ...value,
-    utilityOrder: normalizeCommandRecentIds(value.utilityOrder, 32),
+    utilityOrder: normalizeCommandRecentIds(value.utilityOrder, 64),
     commandRecents: normalizeCommandRecentIds(value.commandRecents),
   }));
 
@@ -77,7 +77,7 @@ export const appShellPreferenceUpdateSchema = appShellPreferenceSnapshotBaseSche
   .transform((value) => ({
     ...value,
     ...(value.utilityOrder
-      ? { utilityOrder: normalizeCommandRecentIds(value.utilityOrder, 32) }
+      ? { utilityOrder: normalizeCommandRecentIds(value.utilityOrder, 64) }
       : {}),
     ...(value.commandRecents
       ? { commandRecents: normalizeCommandRecentIds(value.commandRecents) }
@@ -112,13 +112,15 @@ export const appShellAccountSummarySchema = z
     subtitle: z.string().trim().max(160).optional(),
     email: z.string().trim().min(1).max(160),
     href: z.string().trim().min(1).optional(),
+    avatarSrc: z.string().trim().min(1).optional(),
   })
   .strict();
 
 export const appShellUtilityBarChromeSchema = z
   .object({
     brandHomeHref: z.string().trim().min(1),
-    commandPlaceholder: z.string().trim().min(1).default("Search commands"),
+    brandIconSrc: z.string().trim().min(1).optional(),
+    commandPlaceholder: z.string().trim().min(1).default("search workspace"),
     metadata: appShellUtilityBarMetadataSchema,
     organizations: z.array(appShellOrganizationOptionSchema).default([]),
     launcherItems: z.array(appShellLauncherItemSchema).default([]),

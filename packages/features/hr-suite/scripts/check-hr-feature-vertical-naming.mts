@@ -327,7 +327,7 @@ function validateReferenceSlicePattern(
     );
     if (!/_LIST_SURFACE_KEYS/.test(registryBody)) {
       problems.push(
-        `${capabilityRel}: surface registry must export *_LIST_SURFACE_KEYS (ARCH-006 workbench registry)`,
+        `${capabilityRel}: surface registry must export *_LIST_SURFACE_KEYS (ARCH-1003 workbench registry)`,
       );
     }
   }

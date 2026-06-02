@@ -1,7 +1,7 @@
 # TRACK-006 · Lynx Readiness Layer Enterprise Upgrade
 
 **Tracking ID:** `TRACK-006` · **Status:** Active  
-**Related:** **ARCH-009**, **TRACK-005**, **TRACK-001**
+**Related:** **ARCH-1005**, **TRACK-005**, **TRACK-001**
 
 ## Purpose
 

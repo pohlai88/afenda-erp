@@ -201,7 +201,9 @@ export const uploadRouteCopy = {
   organizationRequired: "An active organization is required.",
   uploadNotAllowed: "Document upload is not allowed.",
   blobNotConfigured:
-    "Document uploads are unavailable. Configure BLOB_READ_WRITE_TOKEN for this environment.",
+    "Document uploads are unavailable. Configure object storage for this environment.",
+  storageNotConfigured:
+    "Document uploads are unavailable. Configure object storage for this environment.",
   invalidRequest: "Invalid document upload request.",
   uploadFailed: "Document upload failed.",
   missingTokenPayload: "Upload token payload is missing.",

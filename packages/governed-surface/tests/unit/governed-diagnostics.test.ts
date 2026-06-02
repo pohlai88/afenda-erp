@@ -15,15 +15,17 @@ describe("governed diagnostics", () => {
     ).toBe("error");
   });
 
-  it("emits render state and test id only", () => {
+  it("emits render state, test id, and component type", () => {
     expect(
       diagnosticsDataAttributes({
         state: "ready",
         testId: "governed:list-surface:employee-table",
+        componentType: "governed:audit-panel",
       }),
     ).toEqual({
       "data-render-state": "ready",
       "data-testid": "governed:list-surface:employee-table",
+      "data-component-type": "governed:audit-panel",
     });
   });
 

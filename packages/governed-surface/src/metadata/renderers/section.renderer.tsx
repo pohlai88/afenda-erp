@@ -65,7 +65,7 @@ export function SectionRenderer({
       title={header.title}
       description={header.description}
       surfaceKey={surfaceKey}
-      sectionKey={surfaceKey}
+      sectionKey={surfaceKey ?? header.title}
       className={cn(
         "flex flex-col",
         gapClass,

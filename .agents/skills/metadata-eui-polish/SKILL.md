@@ -23,7 +23,7 @@ This skill applies when editing:
 - `packages/kernel/src/modules/list-surfaces.ts` (list surface builders — pre-feature-package; moves to `packages/features/<id>/` on extraction)
 - ERP pages using `GovernedComponentRenderer` or `GovernedPatternCListSection` (`layout="embedded"` when parent `Card` owns chrome)
 
-**Canonical docs:** **ARCH-006** `docs/architecture/006-metadata-driven-ui-architecture.md`, **ARCH-007** `docs/architecture/007-governed-metadata-architecture.md`. Index: `docs/architecture/README.md`.
+**Canonical docs:** **ARCH-1003** `docs/architecture/1003-frontend.md`, **ARCH-1003** `docs/architecture/1003-frontend.md`. Index: `docs/architecture/README.md`.
 
 ## Embedded skills (load in this order)
 
@@ -67,7 +67,7 @@ Optional review pass (attach manually): **frontend-design-review**, **wcag-acces
 - Client components → `@afenda/governed-surface/client`
 - Schemas → `@afenda/governed-surface/schemas`
 - UI primitives → `@afenda/ui`
-- List surface builders → `@afenda/kernel` (pre-extraction; move to `@afenda/feature-<id>` on extraction per ARCH-002)
+- List surface builders → `@afenda/kernel` (pre-extraction; move to `@afenda/feature-<id>` on extraction per ARCH-1002)
 
 ## Pattern map
 
@@ -83,7 +83,7 @@ Optional review pass (attach manually): **frontend-design-review**, **wcag-acces
 
 ## Next.js runtime contract (Afenda)
 
-**Canonical doc:** **ARCH-006** `docs/architecture/006-metadata-driven-ui-architecture.md` §runtime.
+**Canonical doc:** **ARCH-1003** `docs/architecture/1003-frontend.md` §runtime.
 
 | Check          | Requirement                                                                               |
 | -------------- | ----------------------------------------------------------------------------------------- |

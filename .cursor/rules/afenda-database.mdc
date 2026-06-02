@@ -6,7 +6,7 @@ alwaysApply: false
 
 # Afenda database (`@afenda/db`)
 
-**ARCH-005** (scale & promotion) · **ARCH-002** (package ownership).
+**ARCH-1005** (scale & promotion) · **ARCH-1002** (package ownership).
 
 ## Ownership
 

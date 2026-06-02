@@ -8,7 +8,8 @@ import {
   getExecutionCapability,
   writeExecutionAuditEvent,
 } from "@afenda/kernel/execution";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
+import { workspaceNavigationSettingsCacheTag } from "../../tenant-execution/contracts/system-admin.workspace-navigation-cache.shared";
 import { z } from "zod";
 import {
   systemAdminActionFailure,
@@ -59,8 +60,12 @@ const setCapabilityAvailabilityInputSchema = z.object({
   availability: systemAdminCapabilitySettingsActionSchema.shape.availability,
 });
 
-function revalidateSystemAdminPaths(...paths: readonly string[]) {
+function revalidateSystemAdminPaths(
+  organizationId: string,
+  ...paths: readonly string[]
+) {
   revalidatePath(systemAdminRoutePaths.hub);
+  revalidateTag(workspaceNavigationSettingsCacheTag(organizationId), "max");
   for (const path of paths) {
     revalidatePath(path);
   }
@@ -149,7 +154,10 @@ async function persistSystemAdminCapabilitySetting(input: {
     },
   });
 
-  revalidateSystemAdminPaths(systemAdminRoutePaths.capabilities);
+  revalidateSystemAdminPaths(
+    input.organizationId,
+    systemAdminRoutePaths.capabilities,
+  );
   revalidatePath("/");
   return systemAdminActionSuccess(undefined);
 }

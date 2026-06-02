@@ -19,6 +19,11 @@
     ],
     "preToolUse": [
       {
+        "command": "node .cursor/hooks/guard-architecture-compliance.mjs",
+        "matcher": "Write|StrReplace",
+        "failClosed": true
+      },
+      {
         "command": "node .cursor/hooks/guard-kernel-boundary-imports.mjs",
         "matcher": "Write|StrReplace",
         "failClosed": true

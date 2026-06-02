@@ -1,0 +1,60 @@
+---
+description: Mandatory agent discipline — target architecture only, no lazy or as-built excuses
+alwaysApply: true
+---
+
+# Agent discipline (mandatory)
+
+**ARCH-1001–1006 are law.** There is no “as-built OK,” no “migrate when touched,” no “good enough for now,” and no compliance review that lists gaps as optional follow-ups.
+
+Hook `guard-architecture-compliance.mjs` **denies** common violations at write time (`failClosed: true`).
+
+## Target-only
+
+| Required | Wrong (deny / fix in session) |
+| -------- | ----------------------------- |
+| `docs/architecture/ARCH-1001`–`1006` as written | “As-built vs target,” “tolerated until migrated,” “(target),” “Until packages/api exists” |
+| `app/api/{public,internal}/v1/…` (**ARCH-1004** §2) | Flat `app/api/lynx/*`, `app/api/ai/*`, `app/api/cron/*` (except `auth/`) |
+| Route ≤15 lines → `@afenda/feature-*/server` or `@afenda/api` | Fat `route.ts` with `@afenda/db`, AI orchestration, domain rules |
+| Mutations → `feature/*/commands/` → kernel → domain | Direct `record*` / `get*` from routes or fat handlers |
+| Page reads → `feature/*/server` in-process | Workspace `fetch('/api/…')` for tenant data |
+| Feature `schemas/`, `api/`, `commands/`, `read-models/` | Lynx/HR Zod or business logic in `apps/erp/src/lib/api/` |
+
+Phases in **ARCH-1001** §7 are **build order**, not permission to ship non-compliant shortcuts or shims.
+
+## Forbidden agent behaviors
+
+1. **Compliance theater** — Saying “as-built is fine” or “optional migration later” after the user set target-only doctrine.
+2. **Restore-from-git laziness** — `git show HEAD:…` to recreate old fat routes instead of implementing **ARCH-1004** §3/§5.
+3. **Shim layers** — Duplicate logic in app `lib/api` “until migration”; re-exports that hide feature ownership.
+4. **Over-validation** — Full `pnpm test` / `typecheck` / build after doc-only or single-file comment edits.
+5. **Under-validation** — Skipping `pnpm architecture:check` after boundary, export, or `docs/architecture/` edits.
+6. **Scope creep** — Refactors, “while we’re here,” or new abstractions the user did not request.
+7. **Asking the user to run guards** — Hooks failed: **you** fix violations in the same session.
+
+## Before writing code
+
+1. Read the **one** ARCH doc row for the layer you touch (`afenda-architecture-routing.md` table).
+2. State the **required** pattern in one sentence (route shape, command name, package bucket).
+3. Implement that pattern — not a “temporary” variant.
+
+## API (Lynx example — **ARCH-1004** §5)
+
+```txt
+apps/erp/src/app/api/internal/v1/lynx/queries/truth-search/route.ts   → export POST = handleLynxTruthSearchPost
+apps/erp/src/app/api/internal/v1/lynx/commands/record-run-feedback/route.ts → thin dispatch only
+packages/features/lynx/src/api/*.handler.server.ts  → orchestration; no @afenda/db
+packages/features/lynx/src/commands/*.command.server.ts → mutations
+```
+
+## Verification (minimal, not lazy)
+
+| Change | Run |
+| ------ | --- |
+| Docs only | Read diff; stop |
+| One package | `pnpm --filter <pkg> typecheck` and/or `test` |
+| Boundaries / architecture / exports | `pnpm architecture:check` |
+| Governed renderers | `pnpm lint:governed-renderers` |
+| Schema | `db:generate` → review → `db:migrate` (rule `afenda-database-migrations`) |
+
+Do not run repo-wide suites unless the user asks or the change truly spans the monorepo.

@@ -30,6 +30,34 @@ describe("GovernedDataTableClient", () => {
     expect(html).toContain('data-surface-key="hr.records"');
     expect(html).toContain('data-component-key="employee-table"');
     expect(html).toContain('data-testid="governed:data-table:employee-table"');
+    expect(html).toContain('data-component-type="governed:data-table"');
+  });
+
+  it("defaults testId from componentKey when testId is omitted", () => {
+    const html = renderToStaticMarkup(
+      <GovernedDataTableClient
+        data={[]}
+        columns={columns}
+        getRowId={(row) => row.id}
+        tableLabel="Employees"
+        componentKey="employee-table"
+      />,
+    );
+
+    expect(html).toContain('data-testid="governed:data-table:employee-table"');
+  });
+
+  it("uses colSpan 1 when columns are empty", () => {
+    const html = renderToStaticMarkup(
+      <GovernedDataTableClient
+        data={[]}
+        columns={[]}
+        getRowId={(row) => row.id}
+        tableLabel="Employees"
+      />,
+    );
+
+    expect(html).toContain('colSpan="1"');
   });
 
   it("renders rows with row index and ready diagnostics", () => {
@@ -55,6 +83,8 @@ describe("GovernedDataTableClient", () => {
     expect(html).toContain('data-row-index="1"');
     expect(html).toContain('data-render-state="ready"');
     expect(html).toContain('data-section-key="active"');
+    expect(html).toContain('data-testid="governed:data-table:active"');
+    expect(html).toContain('data-component-type="governed:data-table"');
     expect(html).toContain("min-w-full");
   });
 });

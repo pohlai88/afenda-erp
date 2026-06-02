@@ -1,6 +1,6 @@
 # Compliance & Regulatory Tracking
 
-> **Parent doctrine:** [ARCH-002](../../../../../docs/architecture/002-erp-kernel-package-architecture.md) · [ARCH-006](../../../../../docs/architecture/006-metadata-driven-ui-architecture.md) · [ARCH-007](../../../../../docs/architecture/007-governed-metadata-architecture.md)
+> **Parent doctrine:** [ARCH-1002](../../../../../docs/architecture/1002-backend.md) · [ARCH-1003](../../../../../docs/architecture/1003-frontend.md) · [ARCH-1003](../../../../../docs/architecture/1003-frontend.md)
 
 ## Definition
 

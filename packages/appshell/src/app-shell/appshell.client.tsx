@@ -6,6 +6,7 @@ import {
   useContext,
   useMemo,
   useState,
+  Suspense,
   type Dispatch,
   type SetStateAction,
 } from "react";
@@ -30,6 +31,7 @@ import {
 import { AppShellUtilityBar } from "./top-utils-bar/zones/utility-bar";
 import { CommandPalette } from "./top-utils-bar/command/command-palette.client";
 import { AppShellPrimaryLeftRail } from "./left-rail-bar/appshell-primary-left-rail.client";
+import { AppShellPrimaryLeftRailFooter } from "./left-rail-bar/appshell-primary-left-rail-footer.client";
 import { AppShellContextMenu } from "./left-rail-bar/appshell-context-menu.client";
 
 type AppShellRuntime = {
@@ -42,8 +44,6 @@ type AppShellRuntime = {
   commandRecents: readonly string[];
   setCommandRecents: Dispatch<SetStateAction<readonly string[]>>;
   recordCommand: (id: string) => void;
-  utilityOrder: readonly string[];
-  setUtilityOrder: Dispatch<SetStateAction<readonly string[]>>;
 };
 
 const AppShellRuntimeContext = createContext<AppShellRuntime | null>(null);
@@ -73,9 +73,6 @@ export function AppShellClient({
   const [commandRecents, setCommandRecents] = useState<readonly string[]>(() =>
     normalizeCommandRecentIds(chrome.preferences.commandRecents),
   );
-  const [utilityOrder, setUtilityOrder] = useState<readonly string[]>(() =>
-    normalizeCommandRecentIds(chrome.preferences.utilityOrder, 32),
-  );
 
   const recordCommand = useCallback((id: string) => {
     setCommandRecents((current) => normalizeCommandRecentIds([id, ...current]));
@@ -92,10 +89,8 @@ export function AppShellClient({
       commandRecents,
       setCommandRecents,
       recordCommand,
-      utilityOrder,
-      setUtilityOrder,
     }),
-    [commandOpen, commandRecents, density, railMode, recordCommand, utilityOrder],
+    [commandOpen, commandRecents, density, railMode, recordCommand],
   );
 
   return (
@@ -115,7 +110,6 @@ export function AppShellClient({
             recordCommand={recordCommand}
             setCommandOpen={setCommandOpen}
             setRailMode={setRailMode}
-            utilityOrder={utilityOrder}
             overlays={overlays}
             utilityPanels={utilityPanels}
           >
@@ -140,7 +134,6 @@ function AppShellChromeBody({
   setCommandOpen,
   commandRecents,
   recordCommand,
-  utilityOrder,
 }: AppShellChromeProps & {
   railMode: AppShellRailMode;
   setRailMode: Dispatch<SetStateAction<AppShellRailMode>>;
@@ -149,13 +142,8 @@ function AppShellChromeBody({
   setCommandOpen: Dispatch<SetStateAction<boolean>>;
   commandRecents: readonly string[];
   recordCommand: (id: string) => void;
-  utilityOrder: readonly string[];
 }) {
   const contextEntries = useAppShellOperationalContextEntries();
-  const orderedUtilityBar = useMemo(
-    () => applyUtilityOrder(chrome.utilityBar, utilityOrder),
-    [chrome.utilityBar, utilityOrder],
-  );
 
   return (
     <>
@@ -177,7 +165,7 @@ function AppShellChromeBody({
             )
           }
           railMode={railMode}
-          utilityBar={orderedUtilityBar}
+          utilityBar={chrome.utilityBar}
           utilityPanels={utilityPanels}
         />
         <div className="af-appshell__body">
@@ -187,21 +175,28 @@ function AppShellChromeBody({
               className="af-appshell__rail"
               data-rail-mode={railMode}
             >
-              <AppShellPrimaryLeftRail
-                config={chrome.rail}
-                displayMode={
-                  railMode === "collapsed" || railMode === "hover"
-                    ? "compact"
-                    : "full"
-                }
-              />
+              <div className="af-appshell__rail-scroll">
+                <AppShellPrimaryLeftRail
+                  config={chrome.rail}
+                  displayMode={
+                    railMode === "collapsed" || railMode === "hover"
+                      ? "compact"
+                      : "full"
+                  }
+                />
+              </div>
+              <div className="af-appshell__rail-footer">
+                <AppShellPrimaryLeftRailFooter />
+              </div>
             </aside>
           ) : null}
-          <AppShellContextMenu>
-            <main className="af-appshell__main" id="app-shell-main" tabIndex={-1}>
-              {children}
-            </main>
-          </AppShellContextMenu>
+          <div className="af-appshell__workspace">
+            <AppShellContextMenu>
+              <main className="af-appshell__main" id="app-shell-main" tabIndex={-1}>
+                {children}
+              </main>
+            </AppShellContextMenu>
+          </div>
         </div>
         <CommandPalette
           commandOpen={commandOpen}
@@ -215,39 +210,4 @@ function AppShellChromeBody({
       </div>
     </>
   );
-}
-
-function applyUtilityOrder(
-  utilityBar: AppShellChromeProps["chrome"]["utilityBar"],
-  utilityOrder: readonly string[],
-) {
-  if (utilityOrder.length === 0) {
-    return utilityBar;
-  }
-
-  const priorityById = new Map(utilityOrder.map((id, index) => [id, index]));
-
-  return {
-    ...utilityBar,
-    metadata: {
-      ...utilityBar.metadata,
-      zones: utilityBar.metadata.zones.map((zone) => ({
-        ...zone,
-        items: [...zone.items].sort((left, right) => {
-          const leftIndex = priorityById.get(left.id);
-          const rightIndex = priorityById.get(right.id);
-          if (leftIndex === undefined && rightIndex === undefined) {
-            return left.priority - right.priority;
-          }
-          if (leftIndex === undefined) {
-            return 1;
-          }
-          if (rightIndex === undefined) {
-            return -1;
-          }
-          return leftIndex - rightIndex;
-        }),
-      })),
-    },
-  };
 }

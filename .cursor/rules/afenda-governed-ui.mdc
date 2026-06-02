@@ -6,7 +6,7 @@ alwaysApply: false
 
 # Governed metadata UI
 
-**ARCH-006** (runtime authority) · **ARCH-007** (kernel layers). Skill: `.agents/skills/metadata-eui-polish/`.
+**ARCH-1003** (runtime authority) · **ARCH-1003** (kernel layers). Skill: `.agents/skills/metadata-eui-polish/`.
 
 ## Prime directive
 

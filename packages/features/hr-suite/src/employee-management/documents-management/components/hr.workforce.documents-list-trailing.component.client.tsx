@@ -18,6 +18,7 @@ import {
   replaceHrEmployeeDocumentAction,
   verifyHrEmployeeDocumentAction,
 } from "../actions/hr.workforce.documents.actions.server";
+import { HrObjectStorageFileField } from "../../../hr-suite-integration/client";
 import { hrDocumentsUiCopy } from "../surface/hr.workforce.documents-ui.copy.shared";
 
 function DocumentsTrailingForm({
@@ -90,25 +91,12 @@ export function HrDocumentsRepositoryTrailingCell({
               required
             />
           </Field>
-          <Field>
-            <FieldLabel htmlFor={`replace-blob-${row.id}`}>
-              {copy.formFieldBlobUrl}
-            </FieldLabel>
-            <Input
-              id={`replace-blob-${row.id}`}
-              name="blobUrl"
-              required
-            />
-          </Field>
-          <input
-            type="hidden"
-            name="mimeType"
-            value={String(row.cells.mimeTypeValue ?? "application/pdf")}
-          />
-          <input
-            type="hidden"
-            name="sizeBytes"
-            value={String(row.cells.sizeBytesValue ?? "1")}
+          <HrObjectStorageFileField
+            moduleId="hr"
+            idPrefix={`replace-${row.id}`}
+            label={copy.formFieldBlobUrl}
+            defaultTitle={String(row.cells.titleValue ?? "")}
+            onUploaded={() => undefined}
           />
         </DocumentsTrailingForm>
       </GovernedTrailingActionSlot>

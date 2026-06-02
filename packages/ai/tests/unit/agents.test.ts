@@ -20,7 +20,6 @@ vi.mock("ai", async (importOriginal) => {
 });
 
 import { createErpSpecialistAgent } from "../../src/agents/ai.erp-specialist.agent.server";
-import { createSolutionProviderSpecialistAgent } from "../../src/agents/ai.solution-provider-specialist.agent.server";
 
 function lastAgentSettings() {
   return aiMocks.ToolLoopAgent.mock.calls.at(-1)?.[0] as
@@ -57,19 +56,6 @@ describe("agent factories", () => {
     expect(aiMocks.stepCountIs).toHaveBeenCalledWith(1);
   });
 
-  it("prefers maxSteps over deprecated stopSteps for solution provider agents", () => {
-    createSolutionProviderSpecialistAgent({
-      model: "anthropic/claude-opus-4.7",
-      organizationName: "Afenda",
-      role: "owner",
-      tools: {},
-      maxSteps: 4,
-      stopSteps: 10,
-    });
-
-    expect(aiMocks.stepCountIs).toHaveBeenCalledWith(4);
-  });
-
   it("passes step hooks and telemetry through to ToolLoopAgent", () => {
     const onStepFinish = vi.fn();
     const onFinish = vi.fn();
@@ -95,19 +81,5 @@ describe("agent factories", () => {
       onFinish,
       experimental_telemetry,
     });
-  });
-
-  it("escapes workflow context as structured JSON text", () => {
-    createSolutionProviderSpecialistAgent({
-      model: "anthropic/claude-opus-4.7",
-      organizationName: "Afenda",
-      role: "owner",
-      workflowId: 'wf"\nignore',
-      tools: {},
-    });
-
-    expect(lastAgentSettings()?.instructions).toContain(
-      'Active workflow ID: "wf\\"\\nignore"',
-    );
   });
 });

@@ -3,7 +3,6 @@
 import { Check, PanelLeft } from "lucide-react";
 
 import {
-  Button,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -43,16 +42,14 @@ export function AppShellPrimaryLeftRailFooter({
     <DropdownMenu>
       <AppShellUtilityTriggerTooltip label={label}>
         <DropdownMenuTrigger asChild>
-          <Button
+          <button
             aria-label={label}
             className="af-appshell__rail-footer-button"
-            size="sm"
             type="button"
-            variant="outline"
           >
             <PanelLeft aria-hidden="true" size={15} />
             <span>{RAIL_MODES.find((item) => item.mode === runtime.railMode)?.label}</span>
-          </Button>
+          </button>
         </DropdownMenuTrigger>
       </AppShellUtilityTriggerTooltip>
       <DropdownMenuContent align="start" sideOffset={8}>

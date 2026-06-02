@@ -1,6 +1,6 @@
 # @afenda/feature-purchasing
 
-Scaffold default: `packages/_template-definition`.
+Scaffold default: `packages/_scaffold/feature`.
 
 ## Public doors
 - `src/index.ts`

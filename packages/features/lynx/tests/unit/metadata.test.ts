@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { LYNX_ERP_HTTP_ROUTES } from "../../src/contracts/lynx.core.contract";
 import {
   buildLynxActivityLedgerListSurface,
   buildLynxClaimValidationListSurface,
@@ -126,7 +127,7 @@ describe("Lynx metadata builders", () => {
           id: "run_1",
           kind: "run",
           label: "Lynx run completed",
-          detail: "/api/lynx/operator",
+          detail: LYNX_ERP_HTTP_ROUTES.operator,
           status: "completed",
           moduleId: "lynx",
           createdAt: "2026-05-28 10:00",
@@ -217,7 +218,7 @@ describe("Lynx metadata builders", () => {
         {
           id: "run_1",
           promptSummary: "Audit readiness",
-          route: "/api/lynx/operator",
+          route: LYNX_ERP_HTTP_ROUTES.operator,
           workflowId: "audit",
           model: "anthropic/test",
           status: "completed",
@@ -255,7 +256,7 @@ describe("Lynx metadata builders", () => {
       rows: [
         {
           id: "operator",
-          route: "/api/lynx/operator",
+          route: LYNX_ERP_HTTP_ROUTES.operator,
           workflowId: "audit_readiness",
           model: "openai/test",
           runCount: "4",
@@ -270,7 +271,7 @@ describe("Lynx metadata builders", () => {
         {
           id: "quality",
           workflowId: "audit_readiness",
-          route: "/api/lynx/operator",
+          route: LYNX_ERP_HTTP_ROUTES.operator,
           failedQualityGateCount: "1",
           unsupportedClaimCount: "2",
           lowCitationPrecisionCount: "1",
@@ -433,7 +434,7 @@ describe("Lynx metadata builders", () => {
         {
           id: "run_1",
           promptSummary: "Audit run",
-          route: "/api/lynx/operator",
+          route: LYNX_ERP_HTTP_ROUTES.operator,
           workflowId: "audit_readiness",
           model: "anthropic/test",
           status: "completed",

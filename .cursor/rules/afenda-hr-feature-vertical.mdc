@@ -6,7 +6,7 @@ alwaysApply: false
 
 # HR feature vertical slices (`@afenda/feature-hr-suite`)
 
-**ARCH-010** (HR package) · **ARCH-002** · **ARCH-008**. Reference implementation: `@afenda/feature-system-admin` (rule `afenda-system-admin`).
+**ARCH-1002** (HR package) · **ARCH-1002** · **ARCH-1005**. Reference implementation: `@afenda/feature-system-admin` (rule `afenda-system-admin`).
 
 ## Shipped capability layout
 

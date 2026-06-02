@@ -23,11 +23,9 @@ export type GovernedKanbanFooterSectionProps = {
   surfaceKey: string;
   title: string;
   description?: string;
-  /** Defaults to `governedKanbanSectionTestId(surfaceKey)`. */
   sectionTestId?: string;
   layout?: GovernedKanbanFooterSectionLayout;
   headerSlot?: ReactNode;
-  /** Query failure — renders error empty state instead of the board bridge. */
   loadError?: EmptyState;
   children: ReactNode;
   className?: string;
@@ -54,12 +52,13 @@ export function GovernedKanbanFooterSection({
   const testId = sectionTestId ?? governedKanbanSectionTestId(surfaceKey);
   const headingId = governedHeadingId("kanban-section", surfaceKey);
   const descriptionId = governedDescriptionId("kanban-section", surfaceKey);
-  const renderState = loadError ? "invalid" : "ready";
+
   const contractAttrs = buildKanbanSectionDataAttributes({
     surfaceKey,
-    state: renderState,
+    state: loadError ? "invalid" : "ready",
     testId,
   });
+
   const boardSlot = loadError ? (
     <GovernedEmpty
       model={{
@@ -84,19 +83,22 @@ export function GovernedKanbanFooterSection({
     <section
       className={className}
       aria-labelledby={headingId}
-      {...(description ? { "aria-describedby": descriptionId } : {})}
+      aria-describedby={description ? descriptionId : undefined}
       {...contractAttrs}
     >
       {headerSlot}
+
       <GovernedHeading level={2} variant="section" id={headingId}>
         {title}
       </GovernedHeading>
+
       {description ? (
-        <p className={cn("mb-3 type-muted", contentClassName)} id={descriptionId}>
+        <p className="mb-3 type-muted" id={descriptionId}>
           {description}
         </p>
       ) : null}
-      <div className={description ? undefined : contentClassName}>
+
+      <div className={cn(description ? undefined : "mt-3", contentClassName)}>
         {boardSlot}
       </div>
     </section>

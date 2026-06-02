@@ -1,0 +1,30 @@
+# @afenda/feature-__MODULE_ID__
+
+Canonical architecture: **ARCH-1002** §6–§8 · Scaffold: `packages/_scaffold/feature`.
+
+## Public doors
+
+- `src/index.ts` — neutral
+- `src/client.ts` — browser-safe
+- `src/server.ts` — server-only (imports `@afenda/kernel/server`)
+- `src/metadata.ts` — governed metadata, no tenant I/O
+
+## Buckets (horizontal)
+
+`actions/` · `commands/` · `api/` · `contracts/` · `components/` · `data/` · `domain/` · `events/` · `policies/` · `read-models/` · `schemas/` · `tests/`
+
+Vertical slice: `pnpm scaffold:vertical __MODULE_ID__ <capability>` — full bucket set under `src/<capability>/`.
+
+## Constraints
+
+- **Only** place for `@afenda/feature-__MODULE_ID__` module business truth (**ARCH-1002** §6).
+- Import public doors only — never deep paths from app or other packages.
+- No catch-all folders (`_shared`, `common`, `lib`, `utils`, `helpers`, `misc`).
+- `@afenda/db` owns schema; feature owns queries and domain.
+
+## After scaffold
+
+1. Add `__MODULE_ID__` to `packages/config/src/module-ids.ts` when it is a workspace module route.
+2. Add `@afenda/feature-__MODULE_ID__` to `packages/config/src/next.ts` `afendaTranspilePackages`.
+3. Add workspace dep in `apps/erp/package.json`.
+4. Run `pnpm architecture:check`.

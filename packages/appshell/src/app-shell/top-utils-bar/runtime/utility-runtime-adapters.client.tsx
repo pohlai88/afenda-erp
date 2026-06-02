@@ -4,7 +4,7 @@ import { CircleHelp, Settings } from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
 
-import { Alert, AlertDescription, AlertTitle, Button } from "@afenda/ui";
+import { Alert, AlertDescription, AlertTitle } from "@afenda/ui";
 import type { AppShellActions, AppShellUtilityPanelSlots } from "../../appshell-props.shared";
 import type { AppShellUtilityBarChrome } from "../../appshell-props.shared";
 import type {
@@ -202,17 +202,13 @@ export const APP_SHELL_UTILITY_RUNTIME_ADAPTERS: readonly AppShellUtilityRuntime
       render: (item) =>
         item.href ? (
           <AppShellUtilityTriggerTooltip label={item.tooltip ?? item.label}>
-            <Button
+            <Link
               aria-label={item.ariaLabel}
-              asChild
               className="af-appshell__icon-button"
-              size="icon-sm"
-              variant="outline"
+              href={item.href}
             >
-              <Link href={item.href}>
-                <CircleHelp aria-hidden="true" size={16} />
-              </Link>
-            </Button>
+              <CircleHelp aria-hidden="true" size={16} />
+            </Link>
           </AppShellUtilityTriggerTooltip>
         ) : null,
     },
@@ -222,17 +218,13 @@ export const APP_SHELL_UTILITY_RUNTIME_ADAPTERS: readonly AppShellUtilityRuntime
       render: (item) =>
         item.href ? (
           <AppShellUtilityTriggerTooltip label={item.tooltip ?? item.label}>
-            <Button
+            <Link
               aria-label={item.ariaLabel}
-              asChild
               className="af-appshell__icon-button"
-              size="icon-sm"
-              variant="outline"
+              href={item.href}
             >
-              <Link href={item.href}>
-                <Settings aria-hidden="true" size={16} />
-              </Link>
-            </Button>
+              <Settings aria-hidden="true" size={16} />
+            </Link>
           </AppShellUtilityTriggerTooltip>
         ) : null,
     },

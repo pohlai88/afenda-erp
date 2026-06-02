@@ -15,7 +15,9 @@ export * from "./ai.extraction.schema";
 export * from "./ai.recommendations.schema";
 
 // Solution provider schemas (problem input, recovery playbook, run)
-export * from "./ai.solution-provider.schema";
 
 // Tool input/output schemas
 export * from "./ai.tools.schema";
+
+// HTTP ingress schemas
+export * from "./ai.chat.schema";

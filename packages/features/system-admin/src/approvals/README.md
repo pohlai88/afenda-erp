@@ -8,6 +8,6 @@ Template buckets: `actions`, `components`, `contracts`, `data`, `events`, `polic
 | `@afenda/feature-system-admin/client` | `SystemAdminApprovalRuleEditor`, `SystemAdminApprovalTrailingCell` |
 | `@afenda/feature-system-admin/metadata` | `buildApprovalsListSurface`, trailing resolver, UI copy, surface key (via overview keys) |
 
-Canonical architecture: [`docs/architecture/011-system-admin-approvals-architecture.md`](../../../../docs/architecture/011-system-admin-approvals-architecture.md) (parent **ARCH-011**).
+Canonical architecture: [`docs/architecture/1006-control-plane.md`](../../../../docs/architecture/1006-control-plane.md) (parent **ARCH-1006**).
 
 Package as-built supplement: [`approvals-architecture.md`](./approvals-architecture.md) — update when implementation changes; do not delete.

@@ -20,12 +20,12 @@ export type {
 
 export type GovernedListTrailingCellId = "governed.metadata";
 
-export const GOVERNED_LIST_TRAILING_CELL_REGISTRY: Record<
+export const GOVERNED_LIST_TRAILING_CELL_REGISTRY = {
+  "governed.metadata": GovernedMetadataTrailingCell,
+} satisfies Record<
   GovernedListTrailingCellId,
   ComponentType<GovernedListTrailingCellProps>
-> = {
-  "governed.metadata": GovernedMetadataTrailingCell,
-};
+>;
 
 export function resolveGovernedTrailingColumn(
   spec: GovernedPatternCTrailingColumnSpec,
@@ -37,14 +37,15 @@ export function resolveGovernedTrailingColumn(
   const Cell =
     spec.Cell ??
     (spec.cellId
-      ? GOVERNED_LIST_TRAILING_CELL_REGISTRY[spec.cellId]
+      ? GOVERNED_LIST_TRAILING_CELL_REGISTRY[spec.cellId] ??
+        GovernedMetadataTrailingCell
       : GovernedMetadataTrailingCell);
 
-  // Validate context at the Pattern C boundary so callers receive schema errors
-  // in development before invalid context reaches the trailing Cell.
   let context: GovernedListTrailingCellContext | undefined;
+
   if (spec.context !== undefined) {
     const parsed = parseGovernedListTrailingCellContext(spec.context);
+
     if (parsed.success) {
       context = parsed.data;
     } else if (process.env.NODE_ENV === "development") {

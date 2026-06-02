@@ -1,5 +1,5 @@
 /**
- * FROZEN compat surface (ARCH-002 §3). Bugfix-only — do not add module business logic,
+ * FROZEN compat surface (ARCH-1002 §6.2). Bugfix-only — do not add module business logic,
  * list surfaces, or HITL here. New modules: @afenda/feature-* + @afenda/kernel/server.
  */
 import type { AppCapability, OrganizationRole } from "@afenda/auth";
@@ -67,6 +67,7 @@ export {
   buildDashboardHardeningChecklistSurface,
   buildDashboardWorkflowListSurface,
   buildDocumentRegistryListSurface,
+  buildDocumentActivityLinesListSurface,
   buildModuleRecordListSurface,
   buildModuleWorkItemListSurface,
   buildSavedViewsListSurface,
@@ -299,6 +300,7 @@ export type ModuleWorkspaceDocument = {
   contentType: string;
   size: string;
   access: string;
+  createdAt: string;
 };
 
 export type ModuleWorkspace = {
@@ -573,6 +575,7 @@ function serializeDocument(
     contentType: document.contentType,
     size: formatSize(document.sizeBytes),
     access: document.access,
+    createdAt: document.createdAt.toISOString(),
   };
 }
 

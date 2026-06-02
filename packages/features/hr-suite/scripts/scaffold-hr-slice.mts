@@ -227,7 +227,9 @@ function writeTemplateFile(input: {
 
 function isRepairableScaffold(existing: string): boolean {
   return (
+    existing.includes("Scaffold placeholder from packages/_scaffold") ||
     existing.includes("Scaffold placeholder from packages/_template-definition.") ||
+    existing.includes("@afenda-bucket")
     existing.includes("Scaffolded HR Suite workbench") ||
     existing.includes("Replace scaffold rows") ||
     existing.includes('status: z.literal("scaffold-only")') ||

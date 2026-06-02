@@ -59,7 +59,7 @@ export function seedHrExpenseDemoClaims(organizationId: string, actorUserId: str
         amount: 84.5,
         currencyCode: "MYR",
         description: "Client site taxi — receipt attached",
-        receiptReference: "receipt://demo/taxi-may12.pdf",
+        receiptReference: undefined,
         status: "under_review",
         employeeId: actorUserId,
         employeeDisplayName: "Demo Operator",

@@ -58,7 +58,7 @@ const ROUTES = [
     test: (p) =>
       p.startsWith("packages/features/knowledge/") ||
       p.startsWith("packages/features/lynx/") ||
-      p.startsWith("apps/erp/src/app/api/lynx/"),
+      p.startsWith("apps/erp/src/app/api/internal/v1/lynx/"),
     hint: [
       "**Lynx / Knowledge** — rule `afenda-lynx-knowledge`.",
       "Doctrine: **ARCH-009**. Substrate vs product split; banned AI-assistant vocabulary.",
@@ -150,7 +150,7 @@ const ROUTES = [
     test: (p) => /architecture[^/]*\.md$/i.test(p),
     hint: [
       "**architecture supplement** — rule `afenda-architecture-docs`.",
-      "Package vertical docs link to `docs/architecture/` — preserve file; update as-built section only.",
+      "Package vertical docs link to `docs/architecture/` — preserve file; document target compliance and §7-style gaps only (no 'as-built OK').",
     ].join(" "),
   },
   {

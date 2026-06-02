@@ -24,7 +24,7 @@ import type { LynxQualityGateResult } from "../schemas/lynx.evidence-trust.schem
 import type { LynxReadinessSnapshot } from "../schemas/lynx.readiness.schema";
 
 const LYNX_OUTCOME_SWEEP_ORIGIN = "proactive-outcome-sweep";
-const LYNX_OUTCOME_SWEEP_ROUTE = "/api/cron/lynx-outcomes";
+const LYNX_OUTCOME_SWEEP_ROUTE = "/api/internal/v1/cron/lynx-outcomes";
 const LYNX_OUTCOME_SWEEP_MODEL = "deterministic/lynx-outcome-monitor";
 const LYNX_OUTCOME_SWEEP_TARGET_CONCURRENCY = 4;
 const lynxOutcomeSweepCapabilities = [

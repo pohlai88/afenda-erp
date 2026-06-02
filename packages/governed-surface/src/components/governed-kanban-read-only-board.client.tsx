@@ -1,11 +1,15 @@
 "use client";
 
-import { useTranslations } from "../i18n/governed-surface-copy.client";
-import { parseGovernedKanbanBoardConfiguration } from "../client";
-import type { GovernedKanbanBoardConfigurationInput } from "../client";
+import { useMemo } from "react";
 
-import { GovernedEmpty } from "./governed-empty";
+import { useTranslations } from "../i18n/governed-surface-copy.client";
+import {
+  parseGovernedKanbanBoardConfiguration,
+  type GovernedKanbanBoardConfigurationInput,
+} from "../client";
+
 import { KanbanBoardView } from "../metadata/renderers/kanban-board-view";
+import { GovernedEmpty } from "./governed-empty";
 
 export type GovernedKanbanReadOnlyBoardProps = {
   configuration: GovernedKanbanBoardConfigurationInput;
@@ -23,7 +27,11 @@ export function GovernedKanbanReadOnlyBoard({
   showOperatorDiagnostics = false,
 }: GovernedKanbanReadOnlyBoardProps) {
   const t = useTranslations("Erp.GovernedSurface.kanban");
-  const parsed = parseGovernedKanbanBoardConfiguration(configuration);
+
+  const parsed = useMemo(
+    () => parseGovernedKanbanBoardConfiguration(configuration),
+    [configuration],
+  );
 
   if (!parsed.success) {
     return (
@@ -36,6 +44,21 @@ export function GovernedKanbanReadOnlyBoard({
             : t("invalidConfigDescription"),
           emptyId: "kanban-invalid-config",
         }}
+        testId="governed-kanban-invalid-config"
+      />
+    );
+  }
+
+  if (parsed.data.interactionMode !== "read-only") {
+    return (
+      <GovernedEmpty
+        model={{
+          variant: "error",
+          title: t("invalidConfigTitle"),
+          description: t("invalidInteractionModeReadOnly"),
+          emptyId: "kanban-invalid-interaction-mode-read-only",
+        }}
+        testId="governed-kanban-invalid-interaction-mode-read-only"
       />
     );
   }

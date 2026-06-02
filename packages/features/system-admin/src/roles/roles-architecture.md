@@ -1,6 +1,6 @@
-**Parent:** [`docs/architecture/011-system-admin-enterprise-architecture.md`](../../../../docs/architecture/011-system-admin-enterprise-architecture.md)
+**Parent:** [`docs/architecture/1006-control-plane.md`](../../../../docs/architecture/1006-control-plane.md)
 
-**Canonical supplement:** [`docs/architecture/011-system-admin-roles-architecture.md`](../../../../docs/architecture/011-system-admin-roles-architecture.md)
+**Vertical supplement:** this file.
 
 ### 9.3 Roles
 

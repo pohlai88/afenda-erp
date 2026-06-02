@@ -42,7 +42,10 @@ const AUDIT_COLUMNS = {
   actor: "Actor",
   resource: "Resource",
   details: "Details",
-} as const;
+} satisfies Record<
+  "when" | "action" | "actor" | "resource" | "details",
+  string
+>;
 
 const AUDIT_ROW_TONE_CLASS = {
   default: "",
@@ -60,13 +63,27 @@ const AUDIT_CHIP_VARIANT = {
 /**
  * Read-only audit/evidence table — label resolution stays in the owning module.
  */
+const AUDIT_PANEL_COMPONENT_TYPE = "governed:audit-panel";
+
 export function GovernedAuditPanel({
   model,
   surfaceKey,
   sectionKey,
-  componentKey = surfaceKey ?? "audit-panel",
+  componentKey: componentKeyProp,
   className,
 }: GovernedAuditPanelProps) {
+  const componentKey =
+    componentKeyProp ?? sectionKey ?? surfaceKey ?? "audit-panel";
+  const baseIdentity = {
+    surfaceKey,
+    sectionKey,
+    componentKey,
+  };
+  const identityAttrs = governedIdentityAttributes(baseIdentity);
+  const baseDiagnostics = {
+    testId: governedTestId("audit-panel", componentKey),
+    componentType: AUDIT_PANEL_COMPONENT_TYPE,
+  };
   const panelId = toGovernedDomId("governed-audit-panel", componentKey);
   const headingId = governedHeadingId("audit-panel", componentKey);
   const descriptionId = governedDescriptionId("audit-panel", componentKey);
@@ -78,14 +95,10 @@ export function GovernedAuditPanel({
         id={panelId}
         aria-labelledby={headingId}
         className={className}
-        {...governedIdentityAttributes({
-          surfaceKey,
-          sectionKey,
-          componentKey,
-        })}
+        {...identityAttrs}
         {...diagnosticsDataAttributes({
           state: "invalid",
-          testId: governedTestId("audit-panel", componentKey),
+          ...baseDiagnostics,
         })}
       >
         <GovernedHeading level={3} variant="card" id={headingId} className="sr-only">
@@ -107,14 +120,10 @@ export function GovernedAuditPanel({
   const resolved = parsed.data;
   const isEmpty = resolved.rows.length === 0;
   const contractAttrs = {
-    ...governedIdentityAttributes({
-      surfaceKey,
-      sectionKey,
-      componentKey,
-    }),
+    ...identityAttrs,
     ...diagnosticsDataAttributes({
       state: isEmpty ? "empty" : "ready",
-      testId: governedTestId("audit-panel", componentKey),
+      ...baseDiagnostics,
     }),
   };
 
@@ -206,6 +215,7 @@ export function GovernedAuditPanel({
                       <Link
                         href={asGovernedRoute(row.href)}
                         prefetch={false}
+                        data-testid={governedTestId("audit-action", row.id)}
                         className="text-primary hover:underline"
                       >
                         {row.action}

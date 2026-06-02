@@ -2,8 +2,8 @@
 
 import { ChevronRight } from "lucide-react";
 import Link from "next/link";
+import { Suspense, useState } from "react";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
 
 import { Button } from "@afenda/ui";
 import { cn } from "@afenda/ui/utils";
@@ -18,6 +18,43 @@ import {
 } from "./appshell-primary-left-rail-raw.shared.client";
 
 export function AppShellPrimaryLeftRailRaw({
+  item,
+  displayMode,
+}: {
+  item: AppShellPrimaryLeftRailNavItem;
+  displayMode: AppShellPrimaryLeftRailDisplayMode;
+}) {
+  const compact = displayMode === "compact";
+  const Icon = APP_SHELL_PRIMARY_LEFT_RAIL_RAW_NAV_ICON_MAP[item.icon];
+
+  return (
+    <Suspense
+      fallback={
+        <div className="af-appshell__nav-item">
+          <Link
+            className="af-appshell__nav-link"
+            href={item.href}
+            title={item.description}
+          >
+            <Icon aria-hidden="true" className="af-appshell__nav-icon" size={16} />
+            {!compact ? (
+              <span className="af-appshell__nav-copy">
+                <span className="af-appshell__nav-label">{item.label}</span>
+                {item.description ? (
+                  <span className="af-appshell__nav-description">{item.description}</span>
+                ) : null}
+              </span>
+            ) : null}
+          </Link>
+        </div>
+      }
+    >
+      <AppShellPrimaryLeftRailRawInner displayMode={displayMode} item={item} />
+    </Suspense>
+  );
+}
+
+function AppShellPrimaryLeftRailRawInner({
   item,
   displayMode,
 }: {
@@ -43,7 +80,12 @@ export function AppShellPrimaryLeftRailRaw({
           title={item.description}
         >
           <Icon aria-hidden="true" className="af-appshell__nav-icon" size={16} />
-          <span className="af-appshell__nav-label">{item.label}</span>
+          <span className="af-appshell__nav-copy">
+            <span className="af-appshell__nav-label">{item.label}</span>
+            {item.description && !compact ? (
+              <span className="af-appshell__nav-description">{item.description}</span>
+            ) : null}
+          </span>
           {item.badge ? (
             <span className="af-appshell__nav-badge" data-tone={item.badge.tone}>
               {item.badge.label}

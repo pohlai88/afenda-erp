@@ -36,7 +36,7 @@ import {
   hrDocumentsRetentionColumnsId,
 } from "./hr.workforce.documents-surface-columns.shared";
 
-/** Canonical Pattern C list surface keys for HR documents (ARCH-006 registry). */
+/** Canonical Pattern C list surface keys for HR documents (ARCH-1003 registry). */
 export const HR_DOCUMENTS_LIST_SURFACE_KEYS = [
   hrDocumentsRepositorySurfaceKey,
   hrDocumentsRequirementsSurfaceKey,

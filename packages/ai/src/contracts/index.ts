@@ -9,6 +9,9 @@
  * All tool factories must reference these schemas — never define tool I/O inline.
  */
 
+export { AI_ERP_HTTP_ROUTES, type AiErpHttpRoute } from "./ai.http.contract";
+export type { SandboxExecutorResult } from "../data/ai.context.contract";
+
 export type {
   GovernedToolMeta,
   ModuleSummaryToolInput,

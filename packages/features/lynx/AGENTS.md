@@ -1,30 +1,76 @@
 # @afenda/feature-lynx
 
-Scaffold default: `packages/_template-definition`.
+**Parent:** [ARCH-1005 §11](../../../../docs/architecture/1005-infrastructure.md) · [ARCH-1004 §5](../../../../docs/architecture/1004-api.md) (Lynx HTTP) · **TRACK-005** · rule `afenda-lynx-knowledge`.
 
-Boundary map: `../../README.md`.
+HTTP routes are **internal/v1** only (**ARCH-1004**). Flat `/api/lynx/*` is non-compliant.
 
-Role: Lynx product and brand layer. Compose `@afenda/ai` specialists and
-`@afenda/feature-knowledge` substrate through public doors; do not absorb either
-package.
+Lynx is the **machine-layer product** package. It composes `@afenda/ai` and `@afenda/feature-knowledge` through public doors only — it does not absorb them.
+
+Scaffold baseline: `packages/_scaffold/feature` + Lynx extensions below.
 
 ## Public doors
 
-- `src/index.ts`
-- `src/client.ts`
-- `src/server.ts`
-- `src/metadata.ts`
+| Door | Exports |
+| ---- | ------- |
+| `index.ts` | Neutral contracts (`lynx.core.contract`, …) |
+| `client.ts` | Client components, client-safe contracts |
+| `server.ts` | `api/`, `commands/`, `read-models/`, `data/`, `tools/`, `workflows/` |
+| `metadata.ts` | `surface/` governed builders + console UI copy |
 
-`src/server.ts` is the only Lynx server-boundary marker and imports
-`@afenda/kernel/server`. Deep `*.server.ts` implementation files do not import
-`server-only` or `@afenda/kernel/server` directly, so Vitest can import them
-without package-local server-only stubs.
+`src/server.ts` is the **only** `import "@afenda/kernel/server"` in this package.
 
-## Bucket constraints
+## Layout (ARCH-1002 aligned)
 
-- Keep all canonical buckets explicit.
-- Do not introduce catch-all directories (`_shared`, `lib`, `utils`, `common`, etc).
-- Put Server Actions in `actions/` with `*.actions.server.ts`.
-- Keep client-safe modules in `components/` and `hooks/`.
-- Put Zod runtime validation in `schemas/`; contracts may re-export schemas for
-  compatibility but should not own parser definitions.
+### Standard buckets
+
+| Bucket | Lynx owns |
+| ------ | --------- |
+| `actions/` | Server Actions → commands *(stub — wire as routes migrate)* |
+| `commands/` | Typed mutations — `executeLynxRecordRunFeedbackCommand` |
+| `api/` | Stream/query handlers — truth-search, operator, runs export |
+| `contracts/` | `lynx.*.contract.ts`, canonical constants |
+| `schemas/` | Zod parsers — **source of truth** for runtime validation |
+| `components/` | Lynx UI (truth panel, operator panel, chat elements) |
+| `data/` | Tenant-scoped queries (`*.query.server.ts`) |
+| `read-models/` | Page/list composition (`*.page-model.server.ts`) |
+| `domain/` | Invariants + orchestration behind commands |
+| `events/` | Audit action strings + domain event metadata |
+| `policies/` | Capability guards for routes and tools |
+| `tests/` | Package unit tests live in `/tests` at package root |
+
+### Lynx extensions (allowed at `src/` root)
+
+| Folder | Role |
+| ------ | ---- |
+| `surface/` | Governed metadata builders + `*.surface.ts` + UI copy (`lynx.console-ui.copy.shared.ts`) |
+| `tools/` | Governed operator tools (`GovernedToolMeta` in `lynx.tool-meta.ts`) |
+| `workflows/` | Cron-safe outcome monitors and durable sweeps |
+
+Do not add `surfaces/` (renamed → `surface/`) or `shell/` (merged into `surface/`).
+
+## Required HTTP mapping (**ARCH-1004** §5)
+
+| Required path | Handler / command |
+| ------------- | ----------------- |
+| `POST …/internal/v1/lynx/queries/truth-search` | `handleLynxTruthSearchPost` |
+| `POST …/internal/v1/lynx/queries/operator` | `handleLynxOperatorPost` |
+| `POST …/internal/v1/lynx/commands/record-run-feedback` | `executeLynxRecordRunFeedbackCommand` |
+| `GET …/internal/v1/lynx/queries/run-ledger-export` | read-model export (not raw `data/` from route) |
+
+App `route.ts` files: re-export handler only; use `@afenda/api` `withApiHandler` when the package exists.
+
+## Constraints
+
+- Banned folders: `_shared`, `common`, `lib`, `utils`, `helpers`, `misc`.
+- User-facing copy: **Lynx** vocabulary only — see `afenda-lynx-knowledge` rule.
+- `./client` must not import `@afenda/db`, `@afenda/auth/server`, or `node:*`.
+- Tools with `access: "write"` use approval/sandbox — no direct table writes.
+
+## Verify
+
+```bash
+pnpm --filter @afenda/feature-lynx test
+pnpm --filter @afenda/feature-lynx typecheck
+pnpm validate:feature-entry --feature lynx
+pnpm architecture:check
+```

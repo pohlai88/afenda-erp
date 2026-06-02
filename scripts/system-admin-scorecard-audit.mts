@@ -1,6 +1,6 @@
 #!/usr/bin/env tsx
 /**
- * Partial automation for ARCH-011 competitive scorecard refresh.
+ * Partial automation for ARCH-1006 competitive scorecard refresh.
  * Scans reliability/diagnostics instrumentation gaps and vertical test coverage.
  */
 import { readFileSync, readdirSync, statSync } from "node:fs";
@@ -89,7 +89,7 @@ for (const file of verticalTests) {
 
 const scorecardPath = join(
   repoRoot,
-  "docs/architecture/011-system-admin-competitive-scorecard.md",
+  "docs/testing/system-admin-competitive-scorecard.md",
 );
 console.log(`Scorecard doc: ${statSync(scorecardPath).mtime.toISOString().slice(0, 10)}`);
 

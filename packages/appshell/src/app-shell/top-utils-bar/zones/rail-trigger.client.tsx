@@ -1,30 +1,32 @@
 "use client";
 
-import { PanelLeft } from "lucide-react";
+import { PanelLeftClose, PanelLeftOpen } from "lucide-react";
 
-import { Button } from "@afenda/ui";
-
+import type { AppShellRailMode } from "../../appshell-props.shared";
 import { AppShellUtilityTriggerTooltip } from "../template/utility-trigger-tooltip.client";
 
 export function AppShellRailTrigger({
   label,
+  railMode,
   onToggle,
 }: {
   label: string;
+  railMode: AppShellRailMode;
   onToggle: () => void;
 }) {
+  const collapsed = railMode === "collapsed" || railMode === "hover";
+  const Icon = collapsed ? PanelLeftOpen : PanelLeftClose;
+
   return (
     <AppShellUtilityTriggerTooltip label={label}>
-      <Button
+      <button
         aria-label={label}
-        className="af-appshell__icon-button"
+        className="af-appshell__rail-trigger"
         onClick={onToggle}
-        size="icon-sm"
         type="button"
-        variant="outline"
       >
-        <PanelLeft aria-hidden="true" size={16} />
-      </Button>
+        <Icon aria-hidden="true" size={16} />
+      </button>
     </AppShellUtilityTriggerTooltip>
   );
 }

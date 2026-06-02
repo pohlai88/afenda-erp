@@ -4,7 +4,7 @@ import {
   lynxConsolePageMetadata,
   lynxConsoleSections,
   lynxConsoleUxCards,
-} from "../../src/shell/lynx-console-copy.shared";
+} from "../../src/surface/lynx.console-ui.copy.shared";
 
 describe("lynx console copy", () => {
   it("defines UX cards for the operator panel", () => {

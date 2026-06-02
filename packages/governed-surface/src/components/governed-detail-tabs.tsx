@@ -65,31 +65,85 @@ function detailSectionDescriptionId(
   return governedDescriptionId("detail-section", `${tabKind}-${sectionId}`);
 }
 
-function RevisionsTable({ rows }: { rows: GovernedRevisionEntry[] }) {
+const DETAIL_TABS_COMPONENT_TYPE = "governed:detail-tabs";
+const DETAIL_SECTION_COMPONENT_TYPE = "governed:detail-section";
+const REVISIONS_TABLE_COMPONENT_TYPE = "governed:revisions-table";
+
+function detailTabTestId(resolvedComponentKey: string, tab: string): string {
+  return governedTestId("detail-tab", `${resolvedComponentKey}-${tab}`);
+}
+
+function detailTabPanelTestId(
+  resolvedComponentKey: string,
+  tab: string,
+): string {
+  return governedTestId("detail-tab-panel", `${resolvedComponentKey}-${tab}`);
+}
+
+function RevisionsTable({
+  rows,
+  surfaceKey,
+  sectionKey,
+  componentKey,
+}: {
+  rows: GovernedRevisionEntry[];
+  surfaceKey?: string;
+  sectionKey?: string;
+  componentKey: string;
+}) {
+  const renderState = rows.length === 0 ? "empty" : "ready";
+  const revisionsComponentKey = `${componentKey}-revisions`;
+
   if (rows.length === 0) {
     return (
-      <GovernedEmpty
-        model={{
-          variant: "muted",
-          title: "No revision history.",
-          emptyId: "detail-revisions-empty",
-        }}
-      />
+      <div
+        {...governedIdentityAttributes({
+          surfaceKey,
+          sectionKey,
+          componentKey: revisionsComponentKey,
+        })}
+        {...diagnosticsDataAttributes({
+          state: renderState,
+          testId: governedTestId("revisions-table", revisionsComponentKey),
+          componentType: REVISIONS_TABLE_COMPONENT_TYPE,
+        })}
+      >
+        <GovernedEmpty
+          model={{
+            variant: "muted",
+            title: governedRendererCopy.detailTabs.revisions.emptyTitle,
+            emptyId: "detail-revisions-empty",
+          }}
+        />
+      </div>
     );
   }
 
   const headerCellClass = "type-table-header";
+  const columns = governedRendererCopy.detailTabs.revisions.columns;
 
   return (
-    <div className="rounded-section border">
+    <div
+      className="rounded-section border"
+      {...governedIdentityAttributes({
+        surfaceKey,
+        sectionKey,
+        componentKey: revisionsComponentKey,
+      })}
+      {...diagnosticsDataAttributes({
+        state: renderState,
+        testId: governedTestId("revisions-table", revisionsComponentKey),
+        componentType: REVISIONS_TABLE_COMPONENT_TYPE,
+      })}
+    >
       {/* audit-ds: ignore no-arbitrary-value — table minimum scroll width */}
       <Table className="min-w-[560px] text-left type-control">
         <TableHeader className="bg-muted/40">
           <TableRow>
-            <TableHead className={headerCellClass}>When</TableHead>
-            <TableHead className={headerCellClass}>Verb</TableHead>
-            <TableHead className={headerCellClass}>Actor</TableHead>
-            <TableHead className={headerCellClass}>Narrative</TableHead>
+            <TableHead className={headerCellClass}>{columns.when}</TableHead>
+            <TableHead className={headerCellClass}>{columns.verb}</TableHead>
+            <TableHead className={headerCellClass}>{columns.actor}</TableHead>
+            <TableHead className={headerCellClass}>{columns.narrative}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -150,14 +204,19 @@ function DetailTabSection({
   tabKind,
   section,
   surfaceKey,
+  sectionKey,
+  resolvedComponentKey,
 }: {
   tabKind: "relations" | "referrers";
   section: GovernedDetailSection;
   surfaceKey?: string;
+  sectionKey?: string;
+  resolvedComponentKey: string;
 }) {
   const headingId = detailSectionHeadingId(tabKind, section.id);
   const descriptionId = detailSectionDescriptionId(tabKind, section.id);
   const sectionComponentKey = `${tabKind}-${section.id}`;
+  const scopedSectionKey = `${resolvedComponentKey}-${sectionComponentKey}`;
 
   return (
     <section
@@ -166,12 +225,13 @@ function DetailTabSection({
       {...(section.description ? { "aria-describedby": descriptionId } : {})}
       {...governedIdentityAttributes({
         surfaceKey,
-        sectionKey: sectionComponentKey,
-        componentKey: sectionComponentKey,
+        sectionKey: sectionKey ?? scopedSectionKey,
+        componentKey: scopedSectionKey,
       })}
       {...diagnosticsDataAttributes({
         state: "ready",
-        testId: governedTestId("detail-section", sectionComponentKey),
+        testId: governedTestId("detail-section", scopedSectionKey),
+        componentType: DETAIL_SECTION_COMPONENT_TYPE,
       })}
     >
       <GovernedHeading level={3} variant="card" id={headingId}>
@@ -196,9 +256,12 @@ export function GovernedDetailTabs({
   const parsedModel = governedDetailTabsSchema.safeParse(model);
   const resolvedComponentKey =
     componentKey ??
+    sectionKey ??
     surfaceKey ??
-    (parsedModel.success ? parsedModel.data.entityId : "detail-tabs");
+    (parsedModel.success ? parsedModel.data.entityId : undefined) ??
+    "detail-tabs";
   const panelId = toGovernedDomId("governed-detail-tabs", resolvedComponentKey);
+  const tabLabels = governedRendererCopy.detailTabs.tabLabels;
 
   if (!parsedModel.success) {
     return (
@@ -212,6 +275,7 @@ export function GovernedDetailTabs({
         {...diagnosticsDataAttributes({
           state: "invalid",
           testId: governedTestId("detail-tabs", resolvedComponentKey),
+          componentType: DETAIL_TABS_COMPONENT_TYPE,
         })}
       >
         <GovernedEmpty
@@ -247,6 +311,7 @@ export function GovernedDetailTabs({
       {...diagnosticsDataAttributes({
         state: "ready",
         testId: governedTestId("detail-tabs", resolvedComponentKey),
+        componentType: DETAIL_TABS_COMPONENT_TYPE,
       })}
     >
       <Tabs defaultValue={defaultValue} className="gap-surface-lg">
@@ -257,7 +322,7 @@ export function GovernedDetailTabs({
           {kinds.includes("overview") ? (
             <TabsTrigger
               value="overview"
-              data-testid={governedTestId("detail-tab", "overview")}
+              data-testid={detailTabTestId(resolvedComponentKey, "overview")}
             >
               {normalizedModel.overview.label}
             </TabsTrigger>
@@ -265,33 +330,33 @@ export function GovernedDetailTabs({
           {kinds.includes("relations") ? (
             <TabsTrigger
               value="relations"
-              data-testid={governedTestId("detail-tab", "relations")}
+              data-testid={detailTabTestId(resolvedComponentKey, "relations")}
             >
-              Relations
+              {tabLabels.relations}
             </TabsTrigger>
           ) : null}
           {kinds.includes("referrers") ? (
             <TabsTrigger
               value="referrers"
-              data-testid={governedTestId("detail-tab", "referrers")}
+              data-testid={detailTabTestId(resolvedComponentKey, "referrers")}
             >
-              Referrers
+              {tabLabels.referrers}
             </TabsTrigger>
           ) : null}
           {kinds.includes("revisions") ? (
             <TabsTrigger
               value="revisions"
-              data-testid={governedTestId("detail-tab", "revisions")}
+              data-testid={detailTabTestId(resolvedComponentKey, "revisions")}
             >
-              Revisions
+              {tabLabels.revisions}
             </TabsTrigger>
           ) : null}
           {kinds.includes("audit") ? (
             <TabsTrigger
               value="audit"
-              data-testid={governedTestId("detail-tab", "audit")}
+              data-testid={detailTabTestId(resolvedComponentKey, "audit")}
             >
-              Audit
+              {tabLabels.audit}
             </TabsTrigger>
           ) : null}
         </TabsList>
@@ -299,34 +364,49 @@ export function GovernedDetailTabs({
         {kinds.includes("overview") ? (
           <TabsContent
             value="overview"
-            data-testid={governedTestId("detail-tab-panel", "overview")}
+            data-testid={detailTabPanelTestId(resolvedComponentKey, "overview")}
           >
-            {normalizedModel.overview.hidden ? (
-              <GovernedEmpty
-                model={{
-                  variant: "muted",
-                  title: "Overview hidden",
-                  description: "This overview section is marked hidden.",
-                  emptyId: "detail-overview-hidden",
-                }}
-              />
-            ) : (
-              <div className="flex flex-col gap-surface-lg">
-                {normalizedModel.overview.description ? (
-                  <p className="type-muted">
-                    {normalizedModel.overview.description}
-                  </p>
-                ) : null}
-                {renderSectionSlot(normalizedModel.overview)}
-              </div>
-            )}
+            <section
+              className="flex flex-col gap-surface-lg"
+              {...governedIdentityAttributes({
+                surfaceKey,
+                sectionKey,
+                componentKey: `${resolvedComponentKey}-overview`,
+              })}
+              {...diagnosticsDataAttributes({
+                state: normalizedModel.overview.hidden ? "empty" : "ready",
+                testId: detailTabPanelTestId(resolvedComponentKey, "overview"),
+                componentType: DETAIL_SECTION_COMPONENT_TYPE,
+              })}
+            >
+              {normalizedModel.overview.hidden ? (
+                <GovernedEmpty
+                  model={{
+                    variant: "muted",
+                    title: governedRendererCopy.detailTabs.overviewHidden.title,
+                    description:
+                      governedRendererCopy.detailTabs.overviewHidden.description,
+                    emptyId: "detail-overview-hidden",
+                  }}
+                />
+              ) : (
+                <>
+                  {normalizedModel.overview.description ? (
+                    <p className="type-muted">
+                      {normalizedModel.overview.description}
+                    </p>
+                  ) : null}
+                  {renderSectionSlot(normalizedModel.overview)}
+                </>
+              )}
+            </section>
           </TabsContent>
         ) : null}
 
         {kinds.includes("relations") ? (
           <TabsContent
             value="relations"
-            data-testid={governedTestId("detail-tab-panel", "relations")}
+            data-testid={detailTabPanelTestId(resolvedComponentKey, "relations")}
           >
             <div className="flex flex-col gap-surface-2xl">
               {relations.map((section) => (
@@ -335,6 +415,8 @@ export function GovernedDetailTabs({
                   tabKind="relations"
                   section={section}
                   surfaceKey={surfaceKey}
+                  sectionKey={sectionKey}
+                  resolvedComponentKey={resolvedComponentKey}
                 />
               ))}
             </div>
@@ -344,7 +426,7 @@ export function GovernedDetailTabs({
         {kinds.includes("referrers") ? (
           <TabsContent
             value="referrers"
-            data-testid={governedTestId("detail-tab-panel", "referrers")}
+            data-testid={detailTabPanelTestId(resolvedComponentKey, "referrers")}
           >
             <div className="flex flex-col gap-surface-2xl">
               {referrers.map((section) => (
@@ -353,6 +435,8 @@ export function GovernedDetailTabs({
                   tabKind="referrers"
                   section={section}
                   surfaceKey={surfaceKey}
+                  sectionKey={sectionKey}
+                  resolvedComponentKey={resolvedComponentKey}
                 />
               ))}
             </div>
@@ -362,16 +446,21 @@ export function GovernedDetailTabs({
         {kinds.includes("revisions") ? (
           <TabsContent
             value="revisions"
-            data-testid={governedTestId("detail-tab-panel", "revisions")}
+            data-testid={detailTabPanelTestId(resolvedComponentKey, "revisions")}
           >
-            <RevisionsTable rows={revisions} />
+            <RevisionsTable
+              rows={revisions}
+              surfaceKey={surfaceKey}
+              sectionKey={sectionKey}
+              componentKey={resolvedComponentKey}
+            />
           </TabsContent>
         ) : null}
 
         {kinds.includes("audit") ? (
           <TabsContent
             value="audit"
-            data-testid={governedTestId("detail-tab-panel", "audit")}
+            data-testid={detailTabPanelTestId(resolvedComponentKey, "audit")}
           >
             <GovernedAuditPanel
               model={{

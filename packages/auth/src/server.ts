@@ -1,5 +1,6 @@
 import "server-only";
 
+import { cache } from "react";
 import {
   bootstrapOrganizationForUser,
   ensureDevDemoTenant,
@@ -146,16 +147,20 @@ async function getSessionFromNeonAuth() {
       organizations.map((organization) => organization.role),
     );
 
-    const sessionOrganizations: OrganizationSummary[] = await Promise.all(
-      organizations.map((organization) =>
-        hydrateOrganizationSummary(organization, permissionsByRole),
-      ),
-    );
-
     const activeOrganizationId = resolveActiveOrganizationId({
       defaultOrganizationId: profile?.defaultOrganizationId,
-      organizations: sessionOrganizations,
+      organizations,
     });
+
+    const sessionOrganizations: OrganizationSummary[] = await Promise.all(
+      organizations.map((organization) =>
+        hydrateOrganizationSummary(organization, permissionsByRole, {
+          includeTenantOverrides:
+            organization.id === activeOrganizationId ||
+            (!activeOrganizationId && organization.id === organizations[0]?.id),
+        }),
+      ),
+    );
 
     return userSessionSchema.parse({
       source: "neon",
@@ -184,7 +189,7 @@ async function getSessionFromNeonAuth() {
 
 function resolveActiveOrganizationId(input: {
   defaultOrganizationId?: string | null;
-  organizations: readonly OrganizationSummary[];
+  organizations: readonly { id: string }[];
 }) {
   if (!input.defaultOrganizationId) {
     return input.organizations[0]?.id ?? "";
@@ -208,16 +213,28 @@ async function hydrateOrganizationSummary(
     role: OrganizationRole;
   },
   permissionsByRole: RolePermissionMap,
+  options?: { includeTenantOverrides?: boolean },
 ): Promise<OrganizationSummary> {
   const baseKeys =
     permissionsByRole.get(organization.role) ??
     capabilitiesForRole(organization.role);
-  const overrides = await listRoleOverridesForOrganization({
-    organizationId: organization.id,
-  });
-  const settings = await getTenantSettings({
-    organizationId: organization.id,
-  });
+
+  if (!options?.includeTenantOverrides) {
+    return {
+      ...organization,
+      locale: "en-MY",
+      capabilities: normalizeCapabilities(baseKeys, organization.role),
+    };
+  }
+
+  const [overrides, settings] = await Promise.all([
+    listRoleOverridesForOrganization({
+      organizationId: organization.id,
+    }),
+    getTenantSettings({
+      organizationId: organization.id,
+    }),
+  ]);
   const permissionKeys = applyRoleOverrides(
     baseKeys,
     overrides,
@@ -309,9 +326,9 @@ async function ensureDevSessionTenant(session: UserSession) {
   });
 }
 
-export async function getSession() {
+async function loadSession(): Promise<UserSession | null> {
   if (isDevAuthBypassEnabled()) {
-    await ensureDevSessionTenant(defaultSession);
+    // UI/dev loop: in-memory demo session only (no Neon, no tenant bootstrap queries).
     return defaultSession;
   }
 
@@ -334,6 +351,9 @@ export async function getSession() {
 
   return devSession;
 }
+
+/** Request-scoped session resolution (React.cache dedupes Neon hydration per render). */
+export const getSession = cache(loadSession);
 
 export function getPostSignInDestination(session: UserSession) {
   return session.organizations.length > 0 ? "/dashboard" : "/onboarding";
@@ -373,7 +393,7 @@ export function getActiveOrganization(session: UserSession) {
   );
 }
 
-export async function getOrganizationContext() {
+async function loadOrganizationContext() {
   const session = await requireSession();
   const organization = getActiveOrganization(session);
 
@@ -389,6 +409,9 @@ export async function getOrganizationContext() {
     },
   };
 }
+
+/** Request-scoped org context (dedupes shell, dashboard, and governed permission gates). */
+export const getOrganizationContext = cache(loadOrganizationContext);
 
 export async function requireCapability(capability: AppCapability) {
   const context = await getOrganizationContext();

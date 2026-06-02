@@ -19,7 +19,7 @@ const canonicalTruthResponse = [
 ].join("\n");
 
 describe("Lynx truth contract", () => {
-  it("validates the canonical ARCH-009 truth response shape", () => {
+  it("validates the canonical ARCH-1005 truth response shape", () => {
     const validation = validateLynxTruthResponse({
       text: canonicalTruthResponse,
       evidenceCount: 1,

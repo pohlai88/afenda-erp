@@ -63,7 +63,6 @@ export const appShellPrimaryLeftRailNavSectionSchema = z
 
 export const appShellPrimaryLeftRailIdentitySchema = z
   .object({
-    initials: z.string().trim().min(1).max(4),
     primary: z.string().trim().min(1).max(120),
     secondary: z.string().trim().max(160).optional(),
     href: z.string().trim().min(1).optional(),

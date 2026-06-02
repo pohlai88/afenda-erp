@@ -18,6 +18,8 @@ function main() {
     "<!-- afenda-architecture-hook: session -->",
     routing,
     "",
+    "Target-only: no as-built excuses. Rule afenda-agent-discipline. Hook guard-architecture-compliance denies flat /api/* and fat routes.",
+    "",
     "Do not read all ARCH docs up front — use the table above for the paths you touch.",
   ].join("\n");
 

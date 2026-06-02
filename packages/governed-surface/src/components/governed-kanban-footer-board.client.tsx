@@ -1,8 +1,8 @@
 "use client";
 
-import type { ReactNode } from "react";
-import { useTranslations } from "../i18n/governed-surface-copy.client";
+import { useMemo, type ReactNode } from "react";
 
+import { useTranslations } from "../i18n/governed-surface-copy.client";
 import { KanbanBoardView } from "../metadata/renderers/kanban-board-view";
 
 import {
@@ -10,13 +10,13 @@ import {
   type GovernedKanbanBoardConfigurationInput,
   type KanbanCard,
 } from "../client";
+
 import { GovernedEmpty } from "./governed-empty";
 
 export type GovernedKanbanFooterBoardProps = {
   configuration: GovernedKanbanBoardConfigurationInput;
   surfaceKey?: string;
   renderCardFooter?: (card: KanbanCard) => ReactNode;
-  /** When true, invalid-config copy includes schema id (dev / operator). */
   showOperatorDiagnostics?: boolean;
 };
 
@@ -31,7 +31,11 @@ export function GovernedKanbanFooterBoard({
   showOperatorDiagnostics = false,
 }: GovernedKanbanFooterBoardProps) {
   const t = useTranslations("Erp.GovernedSurface.kanban");
-  const parsed = parseGovernedKanbanBoardConfiguration(configuration);
+
+  const parsed = useMemo(
+    () => parseGovernedKanbanBoardConfiguration(configuration),
+    [configuration],
+  );
 
   if (!parsed.success) {
     return (
@@ -44,6 +48,7 @@ export function GovernedKanbanFooterBoard({
             : t("invalidConfigDescription"),
           emptyId: "kanban-invalid-config",
         }}
+        testId="governed-kanban-invalid-config"
       />
     );
   }
@@ -57,6 +62,7 @@ export function GovernedKanbanFooterBoard({
           description: t("invalidInteractionMode"),
           emptyId: "kanban-invalid-interaction-mode-footer",
         }}
+        testId="governed-kanban-invalid-interaction-mode-footer"
       />
     );
   }

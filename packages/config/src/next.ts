@@ -5,7 +5,7 @@ import { assertCiBuildEnv } from "./env.build.js";
 /**
  * Workspace packages compiled by Next during `apps/erp` build.
  * When adding `@afenda/feature-<moduleId>` or a first-class runtime package,
- * append it here (ARCH-002).
+ * append it here (ARCH-1002).
  */
 export const afendaTranspilePackages = [
   "@afenda/ai",
@@ -28,6 +28,7 @@ export const afendaTranspilePackages = [
   "@afenda/feature-sales",
   "@afenda/governed-surface",
   "@afenda/observability",
+  "@afenda/object-storage",
   "@afenda/ui",
   "@afenda/workflows",
 ] as const;
@@ -56,6 +57,13 @@ export function createAfendaNextConfig(overrides: NextConfig = {}): NextConfig {
 
   return {
     cacheComponents: true,
+    ...(process.env.NODE_ENV === "development"
+      ? {
+          experimental: {
+            instantNavigationDevToolsToggle: true,
+          },
+        }
+      : {}),
     transpilePackages: [...afendaTranspilePackages],
     images: {
       remotePatterns: [

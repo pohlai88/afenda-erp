@@ -1,0 +1,7 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "afenda-erp-r2-ops",
+  "compatibility_date": "2026-06-02",
+  "account_id": "c4a3b29bfa877132a1f16c5c628dc8a2"
+  // R2 public attachments: CLOUDFLARE_ZONE_ID + pnpm r2:domain:provision → attachments.nexuscanon.com
+}

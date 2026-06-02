@@ -5,7 +5,7 @@ alwaysApply: true
 
 # Architecture documentation
 
-Canonical index: `docs/architecture/README.md` (`ARCH-001`–`ARCH-011`; **ARCH-012** reserved).
+Canonical index: `docs/architecture/README.md` (`ARCH-1001`–`ARCH-1006`; **ARCH-012** reserved).
 
 ## Do not delete
 
@@ -22,7 +22,7 @@ If the user explicitly requests deletion of a specific architecture file in the 
 
 | Kind | Location |
 | ---- | -------- |
-| Canonical doctrine | `docs/architecture/ARCH-###-*.md` |
+| Canonical doctrine | `docs/architecture/100N-*.md` (**ARCH-1001**–**ARCH-1006**) |
 | Feature vertical supplement | `packages/features/<module>/src/<area>/*-architecture.md` — links to parent ARCH doc |
 | Agent routing (not doctrine) | `.cursor/hooks/afenda-architecture-routing.md` |
 
@@ -30,9 +30,15 @@ Do not create root-level `*-architecture.md` files outside `docs/architecture/`.
 
 ## Conflict order
 
-**ARCH-002** (feature packages) → **ARCH-001** (runtime) → update the other doc in the same PR.
+**ARCH-1002** (feature packages) → **ARCH-1001** (runtime) → update the other doc in the same PR.
 
-System Admin: **ARCH-011** + **ARCH-002** §§4–5 move together when control vs execution boundary changes. Kernel legacy compat is frozen (**ARCH-002** §3).
+System Admin: **ARCH-1006** + **ARCH-1002** §7–§8 move together when control vs execution boundary changes. Kernel legacy compat is frozen (**ARCH-1002** §7).
+
+## Target-only prose
+
+Architecture books describe **required** shape only. Use **§7 Non-compliance** tables for wrong patterns — never “as-built vs target,” “migrate when touched,” “(target),” or “tolerated until migrated.”
+
+`guard-architecture-compliance.mjs` **denies** writes that reintroduce lazy-doc phrases (`failClosed: true`).
 
 ## Hooks
 

@@ -12,6 +12,7 @@ const CURSOR_USER_ENV_KEYS = [
   "NEON_API_KEY",
   "GITHUB_TOKEN",
   "CONTEXT7_API_KEY",
+  "CLOUDFLARE_API_TOKEN",
 ] as const;
 
 function parseDotenv(content: string) {

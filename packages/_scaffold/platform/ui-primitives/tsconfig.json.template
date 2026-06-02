@@ -1,0 +1,4 @@
+{
+  "extends": "../config/tsconfig.library.base.json",
+  "include": ["${configDir}/src/**/*.ts", "${configDir}/src/**/*.tsx"]
+}

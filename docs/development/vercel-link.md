@@ -9,7 +9,7 @@ Local CLI link is active for this monorepo. Preview/production promotion still r
 | Intended deploy app       | `@afenda/erp` (`apps/erp`)                                                                        |
 | Build contract            | Root [`vercel.json`](../../vercel.json): `pnpm install` → `pnpm turbo build --filter=@afenda/erp` |
 | **Linked Vercel project** | `afenda-erp` (`prj_rEu23fWSlpHD3C7FzPnsxfWQHBfm`) on team `jacks-projects-7b3cfe94`               |
-| **Blob store**            | `afenda-erp-documents` (private, `iad1`) — linked to project; `BLOB_READ_WRITE_TOKEN` on all envs |
+| **Object storage**        | Vercel Blob (`afenda-erp-documents`, private, `iad1`) by default — or Cloudflare R2 via `@afenda/object-storage` |
 | Local link metadata       | `.vercel/project.json` (gitignored; created by `vercel link`)                                     |
 | Git integration           | `https://github.com/pohlai88/afenda-erp` (connected at link time)                                 |
 | Legacy project            | `afenda-vercel` — still points at `pohlai88/afenda-vercel`; do not use for this monorepo          |
@@ -98,4 +98,4 @@ Add these to the Vercel project via `vercel env add` or the dashboard.
 - Production domain and promotion
 - Reading production env values into committed files
 
-Canonical policy: [ARCH-001 § Platform linkage](../architecture/001-system-architecture.md).
+Canonical policy: [ARCH-1001 § Platform linkage](../architecture/1001-afenda-platform-doctrine.md).

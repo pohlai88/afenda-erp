@@ -2,20 +2,22 @@
 
 import { useEffect } from "react";
 
-import { useAppShellRuntime } from "../../appshell.client";
+import { useUtilityBarStore } from "../../../stores/utility-bar.store";
 
 export function AppShellUtilityRailHydrator({
   utilityOrder,
 }: {
   utilityOrder: readonly string[];
 }) {
-  const runtime = useAppShellRuntime();
+  const hydrateOrderFromPreference = useUtilityBarStore(
+    (state) => state.hydrateOrderFromPreference,
+  );
 
   useEffect(() => {
     if (utilityOrder.length > 0) {
-      runtime.setUtilityOrder([...utilityOrder]);
+      hydrateOrderFromPreference(utilityOrder);
     }
-  }, [runtime, utilityOrder]);
+  }, [hydrateOrderFromPreference, utilityOrder]);
 
   return null;
 }

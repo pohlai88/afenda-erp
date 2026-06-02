@@ -16,10 +16,6 @@ import type {
   GroundedEvidence,
 } from "../schemas/ai.operations.schema";
 import type {
-  RecoveryPlaybook,
-  SolutionProviderRun,
-} from "../schemas/ai.solution-provider.schema";
-import type {
   WorkspaceSummary,
   ApprovalRecommendation,
   AnomalyExplanation,
@@ -81,14 +77,3 @@ export type AiReportNarrativeComponentData = ReportNarrative & {
   generatedAt: string;
 };
 
-// ---------------------------------------------------------------------------
-// Solution provider run component contract
-// ---------------------------------------------------------------------------
-
-export type AiSolutionRunComponentData = {
-  run: SolutionProviderRun;
-  playbook: RecoveryPlaybook;
-  organizationId: string;
-  workflowId: string;
-  generatedAt: string;
-};

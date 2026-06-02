@@ -8,19 +8,22 @@ import { Button } from "@afenda/ui/button";
 import { Field, FieldLabel } from "@afenda/ui/field";
 import { Input } from "@afenda/ui/input";
 
-import { attachHrExpenseReceiptAction } from "../actions/hr.payroll.expense.actions.server";
+import { HrObjectStorageFileField } from "../../../hr-suite-integration/client";
+import { attachHrExpenseClaimReceiptAction } from "../actions/hr.payroll.expense-receipt.actions.server";
 import { hrExpenseUiCopy } from "../surface/hr.payroll.expense-ui.copy.shared";
 
-/** HRM-EXP-003 — client bridge for receipt reference capture after file pick. */
+/** HRM-EXP-003 — upload receipt via object storage, then attach to claim. */
 export function HrExpenseReceiptUploadForm({
   claimId,
-  defaultReference,
+  employeeId,
+  defaultTitle,
 }: {
   claimId: string;
-  defaultReference?: string;
+  employeeId: string;
+  defaultTitle?: string;
 }) {
   const [state, formAction, pending] = useActionState(
-    attachHrExpenseReceiptAction,
+    attachHrExpenseClaimReceiptAction,
     undefined,
   );
   const copy = hrExpenseUiCopy.receipt;
@@ -28,38 +31,29 @@ export function HrExpenseReceiptUploadForm({
   return (
     <form action={formAction} className="flex flex-col gap-surface-sm">
       <input type="hidden" name="claimId" value={claimId} />
+      <input type="hidden" name="employeeId" value={employeeId} />
+      <input type="hidden" name="kind" value="receipt" />
       <Field>
-        <FieldLabel htmlFor={`receipt-file-${claimId}`}>{copy.uploadLabel}</FieldLabel>
-        <Input
-          id={`receipt-file-${claimId}`}
-          name="receiptFile"
-          type="file"
-          accept=".pdf,.png,.jpg,.jpeg"
-          onChange={(event) => {
-            const file = event.target.files?.[0];
-            const referenceInput = document.getElementById(
-              `receipt-ref-${claimId}`,
-            ) as HTMLInputElement | null;
-            if (file && referenceInput) {
-              referenceInput.value = `receipt://${file.name}`;
-            }
-          }}
-        />
-        <p className="type-caption">{copy.uploadHint}</p>
-      </Field>
-      <Field>
-        <FieldLabel htmlFor={`receipt-ref-${claimId}`}>
+        <FieldLabel htmlFor={`receipt-title-${claimId}`}>
           {hrExpenseUiCopy.submit.formReferenceLabel}
         </FieldLabel>
         <Input
-          id={`receipt-ref-${claimId}`}
-          name="receiptReference"
-          defaultValue={defaultReference}
+          id={`receipt-title-${claimId}`}
+          name="title"
+          defaultValue={defaultTitle}
           required
         />
       </Field>
+      <HrObjectStorageFileField
+        moduleId="hr"
+        idPrefix={`receipt-${claimId}`}
+        label={copy.uploadLabel}
+        hint={copy.uploadHint}
+        defaultTitle={defaultTitle}
+        onUploaded={() => undefined}
+      />
       <Button type="submit" size="sm" variant="outline" disabled={pending}>
-        Save receipt reference
+        {pending ? "Saving receipt…" : "Attach receipt"}
       </Button>
       <ActionFormErrors result={state as ActionResult | undefined} />
     </form>

@@ -71,7 +71,7 @@ No new schema is invented for sandbox content — Zod schemas already exist in [
 - `transitionAiActionSandbox({ id, organizationId, to: 'approved' | 'rejected' | 'discarded', reason?, actorAuthUserId })`
 - `linkAiActionSandboxToApproval({ sandboxId, approvalProposalId, organizationId })`
 
-All helpers are tenant-scoped via `organizationId` and use existing GUC-based tenancy ([ARCH-005](../architecture/005-database-scale-architecture.md)).
+All helpers are tenant-scoped via `organizationId` and use existing GUC-based tenancy ([ARCH-1005](../architecture/1005-infrastructure.md)).
 
 ## AI tool wiring (no new tools)
 
@@ -79,7 +79,7 @@ Fix the existing tools — do not add new ones (YAGNI).
 
 | Tool                                                                                                                                                 | Today                                                                         | Change                                                                                                               |
 | ---------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| `proposeHumanApprovedAction` in [`ai.solution-provider-tools.tool.server.ts`](../../packages/ai/src/tools/ai.solution-provider-tools.tool.server.ts) | Builds `createActionSandbox(...)` in memory, never persists, never returns id | Persist via `createAiActionSandbox`, link to existing `ai_approval_proposals` row, return `sandboxId` in tool output |
+| `proposeHumanApprovedAction` in [`lynx.solution-provider-tools.tool.server.ts`](../../packages/features/lynx/src/tools/lynx.solution-provider-tools.tool.server.ts) | Builds `createActionSandbox(...)` in memory, never persists, never returns id | Persist via `createAiActionSandbox`, link to existing `ai_approval_proposals` row, return `sandboxId` in tool output |
 | `proposeApprovalDecision` in [`ai.erp-tools.tool.server.ts`](../../packages/ai/src/tools/ai.erp-tools.tool.server.ts)                                | Persists approval proposal only                                               | Also create a `pending` sandbox and link it; status transitions follow the human decision                            |
 
 `needsApproval: true` stays where it is. Domain writes never happen inside `execute`; they happen in a **separate domain executor** invoked after approval.
@@ -108,7 +108,7 @@ type SandboxExecutor<TInput, TOutput> = (input: {
 Reuse existing components — no new renderer infrastructure required.
 
 - **Lynx Console** ([`(app)/lynx`](<../../apps/erp/src/app/(app)/lynx>)) — show sandbox id and link to the admin list on each approval-required card.
-- **Admin/reports** — governed list of `ai_action_sandboxes` per tenant with status filter. Reuse `GovernedPatternCListSection` ([ARCH-006](../architecture/006-metadata-driven-ui-architecture.md)).
+- **Admin/reports** — governed list of `ai_action_sandboxes` per tenant with status filter. Reuse `GovernedPatternCListSection` ([ARCH-1003](../architecture/1003-frontend.md)).
 - **Module workspace** ([`module-screen.tsx`](<../../apps/erp/src/app/(app)/module-screen.tsx>)) — small "AI actions" affordance linking to sandboxes for the current `moduleId`.
 
 ## Test plan
@@ -168,7 +168,7 @@ Anything beyond this minimum is a separate roadmap item.
 This document supersedes the earlier draft that mixed LMS provisioning with execution-layer infrastructure and proposed a five-state machine (`pending|approved|rejected|executed|rolled_back`). The earlier shape conflicted with shipping code:
 
 - Code state machine was `pending|approved|rejected|discarded` ([`schemas/ai.operations.schema.ts`](../../packages/ai/src/schemas/ai.operations.schema.ts)).
-- In-memory sandboxes were created by `proposeHumanApprovedAction` and discarded with no persistence ([`ai.solution-provider-tools.tool.server.ts`](../../packages/ai/src/tools/ai.solution-provider-tools.tool.server.ts)).
+- In-memory sandboxes were created by `proposeHumanApprovedAction` and discarded with no persistence ([`lynx.solution-provider-tools.tool.server.ts`](../../packages/features/lynx/src/tools/lynx.solution-provider-tools.tool.server.ts)).
 
 Decisions:
 

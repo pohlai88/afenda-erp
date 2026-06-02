@@ -28,11 +28,11 @@ Stack versions and Context7 library hints: `.agents/stack-context.md`.
 
 **Authority:** global MCP is operator-owned (shared across Afenda repos); this repo does not ship a full project MCP manifest. Env: `.env.config` §L → `pnpm env:sync:cursor` (Windows User env for MCP keys). App env: `pnpm env:sync` only. Details and troubleshooting: `docs/development/env.md`. Skill: `context7-mcp`.
 
-TypeScript: `packages/config/tsconfig.base.json` (`strict`, `noUncheckedIndexedAccess`, unused-symbol checks). Vercel link deferred until ARCH-001 stabilization gate passes.
+TypeScript: `packages/config/tsconfig.base.json` (`strict`, `noUncheckedIndexedAccess`, unused-symbol checks). Vercel link deferred until ARCH-1001 stabilization gate passes.
 
 ## Do not use Context7 for
 
-- Tenancy, capabilities, org resolution (**ARCH-001**, `@afenda/auth`)
-- Governed list authority, metadata vs runtime (**ARCH-006**, **ARCH-007**)
-- Package boundaries, export doors, and imports (**ARCH-008**, **ARCH-002**, **ARCH-003**)
+- Tenancy, capabilities, org resolution (**ARCH-1001**, `@afenda/auth`)
+- Governed list authority, metadata vs runtime (**ARCH-1003**, **ARCH-1003**)
+- Package boundaries, export doors, and imports (**ARCH-1005**, **ARCH-1002**, **ARCH-1005**)
 - Afenda-specific shadcn paths — components live in `packages/ui`; use shadcn MCP from ERP `components.json` aliases

@@ -113,8 +113,8 @@ These do **not** block Now; do them when stabilization gate passes per [`vercel-
 1. **Domain executor** for an approved sandbox — single proof skill first (recommend: `revenue-leakage-recovery` against existing sales workspace).
 2. **Vercel Workflow DevKit** for multi-day approval reminders and "re-run recovery in 7 days" via `defineHook` + `sleep`.
 3. **LMS proof module** — only when sandbox execute path is boring. Initial cut = `lms_courses` + `lms_enrollments`. Drop `lms_assessments` and `lms_certifications` from TRACK-001 first scope (YAGNI).
-4. **Module tools migration** to `@afenda/feature-*` packages ([ARCH-002](docs/architecture/002-erp-kernel-package-architecture.md)).
-5. **Embeddings / semantic search** — direct provider, not Gateway, per ARCH-001. Only with a concrete operator query that requires it.
+4. **Module tools migration** to `@afenda/feature-*` packages ([ARCH-1002](docs/architecture/1002-backend.md)).
+5. **Embeddings / semantic search** — direct provider, not Gateway, per ARCH-1001. Only with a concrete operator query that requires it.
 
 ---
 
@@ -234,7 +234,7 @@ Item 1 is **markdown-only** and can happen in plan mode; items 2–4 require `Sw
 ## Key references
 
 - Execution layer doc (owns sandbox details): [TRACK-001](docs/roadmap/001-ai-operation-execution-layer.md)
-- Doctrine: [ARCH-001 § AI Architecture](docs/architecture/001-system-architecture.md)
+- Doctrine: [ARCH-1001 § AI Architecture](docs/architecture/1001-afenda-platform-doctrine.md)
 - Vercel link procedure: [vercel-link.md](docs/development/vercel-link.md)
 - AI package: [`packages/ai`](packages/ai)
 - DB schema (AI): [`packages/db/src/schema/ai.ts`](packages/db/src/schema/ai.ts)

@@ -1,5 +1,5 @@
 /**
- * Enforces ARCH-002 §3 / §5: @afenda/kernel stays execution-law + frozen compat.
+ * Enforces ARCH-1002 §6: @afenda/kernel stays execution-law + frozen compat.
  * Run via `pnpm kernel:check` (included in `pnpm architecture:check` and CI).
  */
 import fs from "node:fs";
@@ -46,7 +46,7 @@ function checkKernelImports() {
   const executionKernelDir = path.join(kernelSrc, "execution-kernel");
   if (!fs.existsSync(executionKernelDir)) {
     problems.push(
-      "packages/kernel/src/execution-kernel/ is missing (ARCH-002 §5).",
+      "packages/kernel/src/execution-kernel/ is missing (ARCH-1002 §6.1).",
     );
   }
 
@@ -58,14 +58,14 @@ function checkKernelImports() {
     for (const match of content.matchAll(featureImportPattern)) {
       const specifier = match[1] ?? match[2];
       problems.push(
-        `${rel(filePath)} must not import ${specifier}; feature logic belongs in @afenda/feature-* (ARCH-002 §3).`,
+        `${rel(filePath)} must not import ${specifier}; feature logic belongs in @afenda/feature-* (ARCH-1002 §6).`,
       );
     }
 
     for (const match of content.matchAll(appImportPattern)) {
       const specifier = match[1] ?? match[2] ?? match[3] ?? match[4];
       problems.push(
-        `${rel(filePath)} must not import ${specifier}; apps/erp composes kernel — not the reverse (ARCH-002 §3).`,
+        `${rel(filePath)} must not import ${specifier}; apps/erp composes kernel — not the reverse (ARCH-1002 §6).`,
       );
     }
   }
@@ -84,7 +84,7 @@ function checkExecutionKernelSurface() {
   for (const filePath of [serverPath, executionPath]) {
     if (!fs.readFileSync(filePath, "utf8").includes("server-only")) {
       problems.push(
-        `${rel(filePath)} must import "server-only" (ARCH-002 §5 server boundary).`,
+        `${rel(filePath)} must import "server-only" (ARCH-1002 §6.1 server boundary).`,
       );
     }
   }

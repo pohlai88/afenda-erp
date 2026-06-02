@@ -1,12 +1,12 @@
-**Parent:** [`docs/architecture/011-system-admin-enterprise-architecture.md`](../../../../docs/architecture/011-system-admin-enterprise-architecture.md)
+**Parent:** [`docs/architecture/1006-control-plane.md`](../../../../docs/architecture/1006-control-plane.md)
 
-**Canonical supplement:** [`docs/architecture/011-system-admin-capabilities-architecture.md`](../../../../docs/architecture/011-system-admin-capabilities-architecture.md)
+**Vertical supplement:** this file.
 
 ### 9.6 Capabilities
 
 ## Definition
 
-Capabilities represent governed ERP execution entry points declared by **ARCH-002 §5**.
+Capabilities represent governed ERP execution entry points declared by **ARCH-1002 §5**.
 
 A capability answers:
 
@@ -46,7 +46,7 @@ Capabilities does not own:
 Those belong to:
 
 ```txt
-Execution Kernel (ARCH-002 §5)
+Execution Kernel (ARCH-1002 §5)
 Permissions
 Modules
 Roles

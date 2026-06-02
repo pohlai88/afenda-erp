@@ -163,7 +163,7 @@ export const documentWorkflowCopy = {
     invalidTypeWarning: "This file type is not accepted for ERP documents.",
     sizeLimitWarning: (limitLabel: string) =>
       `Document size must be ${limitLabel} or less.`,
-    uploadingMessage: "Uploading document to Vercel Blob.",
+    uploadingMessage: "Uploading document to secure object storage.",
     successMessage:
       "Document uploaded. Registry will refresh after completion.",
     failureMessage: "Document upload failed.",

@@ -8,6 +8,7 @@ import {
 } from "./kanban-surfaces";
 import {
   buildDocumentRegistryListSurface,
+  buildDocumentActivityLinesListSurface,
   buildModuleRecordListSurface,
   buildModuleWorkItemListSurface,
   buildSavedViewsListSurface,
@@ -78,6 +79,15 @@ export function createModuleFeatureMetadata<TModuleId extends CoreModuleId>(
       >,
     ) {
       return buildDocumentRegistryListSurface({ moduleId, ...input });
+    },
+
+    buildDocumentActivityLinesListSurface(
+      input: Omit<
+        Parameters<typeof buildDocumentActivityLinesListSurface>[0],
+        "moduleId"
+      >,
+    ) {
+      return buildDocumentActivityLinesListSurface({ moduleId, ...input });
     },
 
     buildRecordDetailTabs(

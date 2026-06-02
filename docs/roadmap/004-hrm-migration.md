@@ -1,9 +1,9 @@
 # TRACK-004 · Enterprise HRM Migration
 
-**Tracking ID:** `TRACK-004` · **File:** `004-hrm-migration.md` · **Status:** Active workforce migration · **Owner:** Architecture / HR · **Related:** **ARCH-002**, **ARCH-005**, **ARCH-006**, **ARCH-008**
+**Tracking ID:** `TRACK-004` · **File:** `004-hrm-migration.md` · **Status:** Active workforce migration · **Owner:** Architecture / HR · **Related:** **ARCH-1002**, **ARCH-1005**, **ARCH-1003**, **ARCH-1005**
 
 This track grows `@afenda/feature-hr-suite` into full ERP HR capability using the
-current Afenda architecture (governed UI, ARCH-008 export doors, schema in
+current Afenda architecture (governed UI, ARCH-1005 export doors, schema in
 `@afenda/db`).
 
 Audience: engineers and agents implementing HR migration slices.
@@ -16,12 +16,12 @@ claiming completion before parity is proven.
 
 **Scaffold reset (2026-05-28–29):** Legacy `@afenda/feature-hr` and `packages/features/hrm`
 were removed. `@afenda/feature-hr-suite` (`packages/features/hr-suite`, moduleId `hr`)
-now owns ARCH-008 export doors; metadata delegates to `createModuleFeatureMetadata("hr")`.
+now owns ARCH-1005 export doors; metadata delegates to `createModuleFeatureMetadata("hr")`.
 Server doors export compatibility stubs until TRACK-004 slices land. App `hr-sections`
 adapters were removed; `/hr` uses the generic module workspace via kernel + feature metadata.
 
 - **Legacy input:** `packages/features/hrm` removed (2026-05-28); do not restore;
-- **Target package:** `packages/features/hr-suite` — see **ARCH-010**; no `schema/hr`
+- **Target package:** `packages/features/hr-suite` — see **ARCH-1002**; no `schema/hr`
   or production server queries until Slice 1 is accepted;
 - **Database:** migration `0030_revert_hr_migration_tables` drops tables from the
   withdrawn `0027` / `0029` attempt; run `pnpm db:migrate` on environments that
@@ -30,7 +30,7 @@ adapters were removed; `/hr` uses the generic module workspace via kernel + feat
   scaffold phase).
 
 Do not restore the deleted `packages/features/hrm` tree. New HR work lands only in
-`packages/features/hr-suite` with schema in `packages/db` per ARCH-005.
+`packages/features/hr-suite` with schema in `packages/db` per ARCH-1005.
 
 ## Audit Baseline
 
@@ -72,7 +72,7 @@ architecture alternative.
 - One workspace package only: `packages/features/hr`.
 - Internal nested folders are required for large HR domains.
 - Nested workspace packages such as `packages/features/hr/payroll/package.json`
-  are forbidden unless **ARCH-008** and `pnpm architecture:check` change in the
+  are forbidden unless **ARCH-1005** and `pnpm architecture:check` change in the
   same commit.
 - Feature package code may import public doors from `@afenda/kernel`,
   `@afenda/db`, `@afenda/auth`, `@afenda/governed-surface`, `@afenda/ui`,
@@ -703,7 +703,7 @@ validation output:
 - extra relevant commands:
   - pnpm install --filter @afenda/feature-hr...: passed, refreshed HR
     workspace links for the new @afenda/auth dependency
-  - packages/kernel tests normalized to current ARCH-009 Lynx Operator copy so
+  - packages/kernel tests normalized to current ARCH-1005 Lynx Operator copy so
     stale Solution Console assertions no longer block the root gate
 
 known gaps:
@@ -1234,10 +1234,10 @@ known gaps (deferred):
 Update this file whenever a slice changes status. Architecture docs change only
 when doctrine changes. Examples:
 
-- changing package boundaries updates **ARCH-002** and **ARCH-008**;
-- changing route doctrine updates **ARCH-002**, **AGENTS.md**, and route guards;
-- changing schema ownership updates **ARCH-005**;
-- changing governed renderer rules updates **ARCH-006** or **ARCH-007**.
+- changing package boundaries updates **ARCH-1002** and **ARCH-1005**;
+- changing route doctrine updates **ARCH-1002**, **AGENTS.md**, and route guards;
+- changing schema ownership updates **ARCH-1005**;
+- changing governed renderer rules updates **ARCH-1003** or **ARCH-1003**.
 
 Do not use documentation to claim implementation completion. Completion is proven
 by code, migrations, route behavior, tests, and security gates.

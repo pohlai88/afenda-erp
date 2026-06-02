@@ -45,7 +45,7 @@ export const hrDocumentsUiCopy = {
     formFieldClassification: "Classification",
     formFieldEffectiveFrom: "Effective from",
     formFieldEffectiveTo: "Expiry date",
-    formFieldBlobUrl: "Blob URL",
+    formFieldBlobUrl: "Document file",
     formFieldMimeType: "MIME type",
     formFieldSizeBytes: "Size (bytes)",
     formFieldEmployeePlaceholder: "Select employee",

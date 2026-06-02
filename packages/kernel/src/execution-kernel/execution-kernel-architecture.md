@@ -1,6 +1,6 @@
 # Execution kernel (supplement)
 
-> **Authority:** [ARCH-002 §5](../../../../docs/architecture/002-erp-kernel-package-architecture.md). Update §5 in the same PR when contracts here change.
+> **Authority:** [ARCH-1002 §7](../../../../docs/architecture/1002-backend.md). Update this doc when execution-kernel contracts change.
 
 ## Layout
 

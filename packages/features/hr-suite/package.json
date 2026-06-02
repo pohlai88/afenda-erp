@@ -30,6 +30,7 @@
     "@afenda/db": "workspace:*",
     "@afenda/governed-surface": "workspace:*",
     "@afenda/kernel": "workspace:*",
+    "@afenda/object-storage": "workspace:*",
     "@afenda/ui": "workspace:*",
     "drizzle-orm": "catalog:",
     "zod": "catalog:"

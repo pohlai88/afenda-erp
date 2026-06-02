@@ -19,7 +19,7 @@ export type GovernedSectionProps = {
   children: ReactNode;
   className?: string;
   surfaceKey?: string;
-  sectionKey?: string;
+  sectionKey: string;
   componentKey?: string;
   renderState?: GovernedRenderableState;
 };
@@ -31,7 +31,7 @@ export function GovernedSection({
   className,
   surfaceKey,
   sectionKey,
-  componentKey = sectionKey ?? surfaceKey ?? "section",
+  componentKey = sectionKey,
   renderState = "ready",
 }: GovernedSectionProps) {
   const sectionDomId = toGovernedDomId("governed-section", componentKey);
@@ -43,7 +43,7 @@ export function GovernedSection({
       id={sectionDomId}
       className={cn("flex flex-col gap-surface-md", className)}
       aria-labelledby={headingId}
-      {...(description ? { "aria-describedby": descriptionId } : {})}
+      aria-describedby={description ? descriptionId : undefined}
       {...governedIdentityAttributes({
         surfaceKey,
         sectionKey,
@@ -58,12 +58,14 @@ export function GovernedSection({
         <GovernedHeading level={3} variant="section" id={headingId}>
           {title}
         </GovernedHeading>
+
         {description ? (
           <p className="type-muted" id={descriptionId}>
             {description}
           </p>
         ) : null}
       </div>
+
       {children}
     </section>
   );

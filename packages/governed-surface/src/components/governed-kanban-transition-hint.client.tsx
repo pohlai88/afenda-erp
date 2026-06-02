@@ -5,9 +5,9 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@afenda/ui/tooltip";
 import { cn } from "@afenda/ui/utils";
 
 import type { KanbanCardTransitionAvailability } from "../schemas/kanban-board.schema";
+import { governedKanbanTransitionTestId } from "../kanban-surface-identity.shared";
 import { diagnosticsDataAttributes } from "../utils/governed-diagnostics.shared";
 import { governedIdentityAttributes } from "../utils/governed-identity.shared";
-import { governedKanbanTransitionTestId } from "../kanban-surface-identity.shared";
 
 export type GovernedKanbanTransitionHintProps = {
   transition: KanbanCardTransitionAvailability & {
@@ -26,19 +26,18 @@ export function GovernedKanbanTransitionHint({
   cardId,
 }: GovernedKanbanTransitionHintProps) {
   const disabled = transition.state === "disabled";
-  const badge = (
-    <Badge
-      variant="outline"
-      className={cn("type-caption font-normal", disabled && "opacity-60")}
-    >
-      {transition.label}
-    </Badge>
-  );
+  const hasDisabledReason = disabled && Boolean(transition.disabledReason);
 
   const shell = (
     <span
+      tabIndex={hasDisabledReason ? 0 : undefined}
       className="inline-flex"
       aria-disabled={disabled || undefined}
+      aria-label={
+        hasDisabledReason
+          ? `${transition.label}: ${transition.disabledReason}`
+          : transition.label
+      }
       data-kanban-transition-state={transition.state}
       data-transition-id={transition.transitionId}
       {...governedIdentityAttributes({
@@ -47,15 +46,20 @@ export function GovernedKanbanTransitionHint({
         componentKey: cardId,
       })}
       {...diagnosticsDataAttributes({
-        state: "ready",
+        state: transition.state,
         testId: governedKanbanTransitionTestId(transition.transitionId),
       })}
     >
-      {badge}
+      <Badge
+        variant="outline"
+        className={cn("type-caption font-normal", disabled && "opacity-60")}
+      >
+        {transition.label}
+      </Badge>
     </span>
   );
 
-  if (disabled && transition.disabledReason) {
+  if (hasDisabledReason) {
     return (
       <Tooltip>
         <TooltipTrigger asChild>{shell}</TooltipTrigger>

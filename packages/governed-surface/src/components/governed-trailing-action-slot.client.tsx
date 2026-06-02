@@ -4,10 +4,13 @@ import type { ReactNode } from "react";
 
 import { Tooltip, TooltipContent, TooltipTrigger } from "@afenda/ui/tooltip";
 
-import type { ListSurfaceRowTrailingAction } from "../schemas/list-surface-row-trailing-action.schema";
 import { isListSurfaceTrailingActionRenderable } from "../list-surface-trailing-action.shared";
+import type { ListSurfaceRowTrailingAction } from "../schemas/list-surface-row-trailing-action.schema";
 import { diagnosticsDataAttributes } from "../utils/governed-diagnostics.shared";
-import { governedIdentityAttributes } from "../utils/governed-identity.shared";
+import {
+  governedIdentityAttributes,
+  governedTestId,
+} from "../utils/governed-identity.shared";
 
 export type GovernedTrailingActionSlotProps = {
   trailingAction?: ListSurfaceRowTrailingAction;
@@ -35,10 +38,19 @@ export function GovernedTrailingActionSlot({
   }
 
   const disabled = trailingAction.state === "disabled";
+  const hasDisabledReason = disabled && Boolean(trailingAction.disabledReason);
+  const actionKey = trailingAction.descriptor?.id ?? componentKey ?? rowId;
+
   const shell = (
     <span
       className={disabled ? "inline-flex opacity-60" : "inline-flex"}
+      tabIndex={hasDisabledReason ? 0 : undefined}
       aria-disabled={disabled || undefined}
+      aria-label={
+        hasDisabledReason
+          ? trailingAction.disabledReason
+          : trailingAction.descriptor?.label
+      }
       data-row-id={rowId}
       data-trailing-action-state={trailingAction.state}
       data-action-descriptor-id={trailingAction.descriptor?.id}
@@ -47,13 +59,18 @@ export function GovernedTrailingActionSlot({
         sectionKey,
         componentKey: componentKey ?? rowId,
       })}
-      {...diagnosticsDataAttributes({ state: "ready" })}
+      {...diagnosticsDataAttributes({
+        state: trailingAction.state,
+        testId: actionKey
+          ? governedTestId("trailing-action", actionKey)
+          : undefined,
+      })}
     >
       {children}
     </span>
   );
 
-  if (disabled && trailingAction.disabledReason) {
+  if (hasDisabledReason) {
     return (
       <Tooltip>
         <TooltipTrigger asChild>{shell}</TooltipTrigger>

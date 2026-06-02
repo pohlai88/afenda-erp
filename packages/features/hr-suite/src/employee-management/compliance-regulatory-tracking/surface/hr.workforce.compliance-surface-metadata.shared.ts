@@ -76,7 +76,7 @@ import {
   hrComplianceReviewQueueColumnsId,
 } from "./hr.workforce.compliance-surface-columns.shared";
 
-/** Canonical Pattern C list surface keys for HR compliance (ARCH-006 registry). Order matches workbench scan priority. */
+/** Canonical Pattern C list surface keys for HR compliance (ARCH-1003 registry). Order matches workbench scan priority. */
 export const HR_COMPLIANCE_LIST_SURFACE_KEYS = [
   hrComplianceAlertsSurfaceKey,
   hrComplianceReviewQueueSurfaceKey,
@@ -126,7 +126,7 @@ export const HR_COMPLIANCE_LIST_SURFACE_COLUMNS_BY_KEY = {
   [hrComplianceAuditTrailSurfaceKey]: hrComplianceAuditTrailColumnsId,
 } as const;
 
-/** Per-list App Router search param keys (ARCH-006 toolbar registry). */
+/** Per-list App Router search param keys (ARCH-1003 toolbar registry). */
 export const HR_COMPLIANCE_LIST_SEARCH_PARAMS_BY_KEY = {
   [hrComplianceAlertsSurfaceKey]: hrComplianceAlertsSearchParam,
   [hrComplianceReviewQueueSurfaceKey]: hrComplianceReviewQueueSearchParam,
@@ -149,7 +149,7 @@ export const HR_COMPLIANCE_LIST_SEARCH_PARAMS_BY_KEY = {
   [hrComplianceAuditTrailSurfaceKey]: hrComplianceAuditTrailSearchParam,
 } as const;
 
-/** Pattern C workbench lists without trailing columns (ARCH-006). */
+/** Pattern C workbench lists without trailing columns (ARCH-1003). */
 export const HR_COMPLIANCE_WORKBENCH_READ_ONLY_SURFACE_KEYS = new Set<
   HrComplianceListSurfaceKey
 >([

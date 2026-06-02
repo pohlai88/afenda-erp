@@ -1,10 +1,18 @@
 import "server-only";
 
 import type { ReactNode } from "react";
+import { Suspense } from "react";
+
 import type { GovernedPatternCTrailingColumnSpec } from "../governed-pattern-c-trailing-column.shared";
-import { GovernedPatternCListTableHost } from "./governed-pattern-c-list-table-host.client";
 import { logUnexpectedServerError } from "../data/governed-logging.server";
+import { resolveGovernedErpPermissionAllowed } from "../data/governed-permission-gate.server";
 import { getGovernedSurfaceTranslations } from "../i18n/governed-surface-copy";
+import { logGovernedListSurfaceRender } from "../log-governed-list-surface-render.server";
+import {
+  governedListSectionDomId,
+  governedListSectionTestId as buildGovernedListSectionTestId,
+  summarizeListSurfaceTrailingActions,
+} from "../list-surface-identity.shared";
 
 import type { EmptyState } from "../schemas/list-surface.schema";
 import {
@@ -12,19 +20,16 @@ import {
   type ListSurfaceRendererConfiguration,
   type ListSurfaceRendererConfigurationInput,
 } from "../schemas/list-surface-renderer.schema";
-import { resolveGovernedErpPermissionAllowed } from "../data/governed-permission-gate.server";
-import { logGovernedListSurfaceRender } from "../log-governed-list-surface-render.server";
-import {
-  governedListSectionDomId,
-  governedListSectionTestId as buildGovernedListSectionTestId,
-  summarizeListSurfaceTrailingActions,
-} from "../list-surface-identity.shared";
-import { type GovernedSurfaceSectionCardBody } from "./governed-surface-section-card";
+import { GovernedPatternCListTableHost } from "./governed-pattern-c-list-table-host.client";
 import {
   renderGovernedPatternSectionShell,
   type GovernedPatternSectionDensity,
   type GovernedPatternSectionLayout,
+  type RenderGovernedPatternSectionShellInput,
 } from "./governed-pattern-section-shell.shared";
+import type { GovernedSurfaceSectionCardBody } from "./governed-surface-section-card";
+
+type GovernedPatternEmptyState = EmptyState & { emptyId?: string };
 
 export type GovernedPatternCListSectionLayout = GovernedPatternSectionLayout;
 
@@ -36,7 +41,7 @@ export type GovernedPatternCListSectionProps = {
   layout?: GovernedPatternCListSectionLayout;
   density?: GovernedPatternSectionDensity;
   /** Query/load failure before permission or parse — uses same card/embedded shell as other states. */
-  loadError?: EmptyState;
+  loadError?: GovernedPatternEmptyState;
   /**
    * Parent section already decided read access (e.g. page-level ERP permission).
    * Default `true`.
@@ -47,8 +52,8 @@ export type GovernedPatternCListSectionProps = {
    * `resolveGovernedErpPermissionAllowed`. Default `true`.
    */
   resolveConfiguredPermission?: boolean;
-  forbidden?: EmptyState;
-  invalid?: EmptyState;
+  forbidden?: GovernedPatternEmptyState;
+  invalid?: GovernedPatternEmptyState;
   headerSlot?: ReactNode;
   /** Action element rendered in the card header (Pattern C parity with Pattern B `headerAction`). Ignored when `layout="embedded"`. */
   cardHeaderAction?: ReactNode;
@@ -100,79 +105,95 @@ export async function GovernedPatternCListSection({
     description,
     cardClassName,
     contentClassName,
-  };
-
-  if (loadError) {
-    const body: GovernedSurfaceSectionCardBody = {
-      state: "invalid",
-      model: loadError,
-    };
-    return renderGovernedPatternSectionShell({ ...shellInput, body });
-  }
-
-  const [allowedFromConfig, parsed] = await Promise.all([
-    resolveConfiguredPermission
-      ? resolveGovernedErpPermissionAllowed(
-          listConfiguration.requiresErpPermission,
-        )
-      : Promise.resolve(true),
-    Promise.resolve(parseListSurfaceRendererConfiguration(listConfiguration)),
-  ]);
-  const allowed = parentAccessAllowed && allowedFromConfig;
-
-  const forbiddenModel: EmptyState = forbidden ?? {
-    variant: "forbidden",
-    title: t("GovernedSurface.forbiddenTitle"),
-    description: t("GovernedSurface.forbiddenDescription"),
-  };
-  const invalidModel: EmptyState = invalid ?? {
-    variant: "error",
-    title: t("GovernedSurface.invalidConfigTitle"),
-    description: t("GovernedSurface.invalidConfigDescription"),
-  };
+  } satisfies Omit<RenderGovernedPatternSectionShellInput, "body">;
 
   let body: GovernedSurfaceSectionCardBody;
-  if (!allowed) {
-    body = { state: "forbidden", model: forbiddenModel };
-  } else if (!parsed.success) {
-    logUnexpectedServerError(
-      "GovernedPatternCListSection invalid list configuration",
-      parsed.error,
-      { surfaceKey },
-    );
-    body = { state: "invalid", model: invalidModel };
-  } else {
-    const config: ListSurfaceRendererConfiguration = parsed.data;
-    const isEmpty = config.rows.length === 0;
-    const listState = isEmpty ? "empty" : "ready";
-    const tableDensity = config.presentation?.tableDensity ?? "compact";
-    const presentationVariant = config.presentation?.variant ?? "table-only";
 
-    logGovernedListSurfaceRender({
-      surfaceKey,
-      columnsId: config.surface.columnsId,
-      dataNature: config.dataNature,
-      presentationVariant,
-      density: tableDensity,
-      state: listState,
-      rowCount: config.rows.length,
-      trailing: summarizeListSurfaceTrailingActions(config.rows),
-    });
-
+  if (loadError) {
     body = {
-      state: listState,
-      children: (
-        <>
-          {contentBeforeList}
-          <GovernedPatternCListTableHost
-            surfaceKey={surfaceKey}
-            config={config}
-            trailingColumn={trailingColumn}
-          />
-          {contentAfterList}
-        </>
-      ),
+      state: "invalid",
+      model: {
+        ...loadError,
+        emptyId: loadError.emptyId ?? "pattern-c-load-error",
+      },
     };
+  } else {
+    const parsed = parseListSurfaceRendererConfiguration(listConfiguration);
+
+    if (!parsed.success) {
+      logUnexpectedServerError(
+        "GovernedPatternCListSection invalid list configuration",
+        parsed.error,
+        { surfaceKey },
+      );
+
+      body = {
+        state: "invalid",
+        model: {
+          variant: "error",
+          title: invalid?.title ?? t("GovernedSurface.invalidConfigTitle"),
+          description:
+            invalid?.description ?? t("GovernedSurface.invalidConfigDescription"),
+          emptyId: invalid?.emptyId ?? "pattern-c-invalid-config",
+        },
+      };
+    } else {
+      const allowedFromConfig = resolveConfiguredPermission
+        ? await resolveGovernedErpPermissionAllowed(
+            listConfiguration.requiresErpPermission,
+          )
+        : true;
+      const allowed = parentAccessAllowed && allowedFromConfig;
+
+      if (!allowed) {
+        body = {
+          state: "forbidden",
+          model: {
+            variant: "forbidden",
+            title: forbidden?.title ?? t("GovernedSurface.forbiddenTitle"),
+            description:
+              forbidden?.description ??
+              t("GovernedSurface.forbiddenDescription"),
+            emptyId: forbidden?.emptyId ?? "pattern-c-forbidden",
+          },
+        };
+      } else {
+        const config: ListSurfaceRendererConfiguration = parsed.data;
+        const isEmpty = config.rows.length === 0;
+        const listState = isEmpty ? "empty" : "ready";
+        const tableDensity = config.presentation?.tableDensity ?? "compact";
+        const presentationVariant =
+          config.presentation?.variant ?? "table-only";
+
+        logGovernedListSurfaceRender({
+          surfaceKey,
+          columnsId: config.surface.columnsId,
+          dataNature: config.dataNature,
+          presentationVariant,
+          density: tableDensity,
+          state: listState,
+          rowCount: config.rows.length,
+          trailing: summarizeListSurfaceTrailingActions(config.rows),
+        });
+
+        body = {
+          state: listState,
+          children: (
+            <>
+              {contentBeforeList}
+              <Suspense fallback={null}>
+                <GovernedPatternCListTableHost
+                  surfaceKey={surfaceKey}
+                  config={config}
+                  trailingColumn={trailingColumn}
+                />
+              </Suspense>
+              {contentAfterList}
+            </>
+          ),
+        };
+      }
+    }
   }
 
   return renderGovernedPatternSectionShell({

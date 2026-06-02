@@ -39,6 +39,37 @@ const blobEnvSchema = z.object({
   VERCEL_BLOB_CALLBACK_URL: z.url().optional(),
 });
 
+const objectStorageProviderSchema = z.enum(["vercel-blob", "r2"]);
+
+const optionalObjectStorageEnvString = z.preprocess(
+  (value) =>
+    typeof value === "string" && value.trim().length === 0 ? undefined : value,
+  z.string().min(1).optional(),
+);
+
+const optionalObjectStorageEnvUrl = z.preprocess(
+  (value) =>
+    typeof value === "string" && value.trim().length === 0 ? undefined : value,
+  z.url().optional(),
+);
+
+const optionalObjectStorageProvider = z.preprocess(
+  (value) =>
+    typeof value === "string" && value.trim().length === 0 ? undefined : value,
+  objectStorageProviderSchema.optional(),
+);
+
+const objectStorageEnvSchema = z.object({
+  OBJECT_STORAGE_PROVIDER: optionalObjectStorageProvider,
+  BLOB_READ_WRITE_TOKEN: optionalObjectStorageEnvString,
+  VERCEL_BLOB_CALLBACK_URL: optionalObjectStorageEnvUrl,
+  OBJECT_STORAGE_ENDPOINT: optionalObjectStorageEnvUrl,
+  OBJECT_STORAGE_BUCKET: optionalObjectStorageEnvString,
+  OBJECT_STORAGE_ACCESS_KEY_ID: optionalObjectStorageEnvString,
+  OBJECT_STORAGE_SECRET_ACCESS_KEY: optionalObjectStorageEnvString,
+  OBJECT_STORAGE_PUBLIC_URL_BASE: optionalObjectStorageEnvUrl,
+});
+
 const optionalNonEmptyEnvString = z.preprocess(
   (value) =>
     typeof value === "string" && value.trim().length === 0 ? undefined : value,
@@ -74,6 +105,23 @@ export type BlobEnv = {
   configured: boolean;
   BLOB_READ_WRITE_TOKEN?: string;
   VERCEL_BLOB_CALLBACK_URL?: string;
+};
+
+export type ObjectStorageProviderId = "vercel-blob" | "r2";
+
+export type ObjectStorageR2Env = {
+  endpoint: string;
+  bucket: string;
+  accessKeyId: string;
+  secretAccessKey: string;
+  publicUrlBase?: string;
+};
+
+export type ObjectStorageEnv = {
+  provider: ObjectStorageProviderId;
+  configured: boolean;
+  vercelBlob?: BlobEnv & { BLOB_READ_WRITE_TOKEN: string };
+  r2?: ObjectStorageR2Env;
 };
 
 export function getBaseEnv(input: NodeJS.ProcessEnv = process.env): BaseEnv {
@@ -156,6 +204,114 @@ export function getBlobEnv(input: NodeJS.ProcessEnv = process.env): BlobEnv {
     configured: Boolean(BLOB_READ_WRITE_TOKEN),
     BLOB_READ_WRITE_TOKEN,
     VERCEL_BLOB_CALLBACK_URL,
+  };
+}
+
+function parseR2Env(
+  data: z.infer<typeof objectStorageEnvSchema>,
+): ObjectStorageR2Env | undefined {
+  if (
+    !data.OBJECT_STORAGE_ENDPOINT ||
+    !data.OBJECT_STORAGE_BUCKET ||
+    !data.OBJECT_STORAGE_ACCESS_KEY_ID ||
+    !data.OBJECT_STORAGE_SECRET_ACCESS_KEY
+  ) {
+    return undefined;
+  }
+
+  return {
+    endpoint: data.OBJECT_STORAGE_ENDPOINT,
+    bucket: data.OBJECT_STORAGE_BUCKET,
+    accessKeyId: data.OBJECT_STORAGE_ACCESS_KEY_ID,
+    secretAccessKey: data.OBJECT_STORAGE_SECRET_ACCESS_KEY,
+    publicUrlBase: data.OBJECT_STORAGE_PUBLIC_URL_BASE,
+  };
+}
+
+function normalizeObjectStorageProcessEnv(
+  input: NodeJS.ProcessEnv = process.env,
+): NodeJS.ProcessEnv {
+  const env: NodeJS.ProcessEnv = { ...input };
+
+  const read = (key: string) => env[key]?.trim();
+
+  if (!read("OBJECT_STORAGE_ENDPOINT")) {
+    const legacyEndpoint = read("R2_ENDPOINT");
+    if (legacyEndpoint) {
+      env.OBJECT_STORAGE_ENDPOINT = legacyEndpoint;
+    } else {
+      const accountId = read("R2_ACCOUNT_ID");
+      if (accountId) {
+        env.OBJECT_STORAGE_ENDPOINT = `https://${accountId}.r2.cloudflarestorage.com`;
+      }
+    }
+  }
+
+  if (!read("OBJECT_STORAGE_BUCKET") && read("R2_BUCKET_NAME")) {
+    env.OBJECT_STORAGE_BUCKET = read("R2_BUCKET_NAME");
+  }
+
+  if (!read("OBJECT_STORAGE_ACCESS_KEY_ID") && read("R2_ACCESS_KEY_ID")) {
+    env.OBJECT_STORAGE_ACCESS_KEY_ID = read("R2_ACCESS_KEY_ID");
+  }
+
+  if (!read("OBJECT_STORAGE_SECRET_ACCESS_KEY") && read("R2_SECRET_ACCESS_KEY")) {
+    env.OBJECT_STORAGE_SECRET_ACCESS_KEY = read("R2_SECRET_ACCESS_KEY");
+  }
+
+  return env;
+}
+
+export function getObjectStorageEnv(
+  input: NodeJS.ProcessEnv = process.env,
+): ObjectStorageEnv {
+  const normalized = normalizeObjectStorageProcessEnv(input);
+  const parsed = objectStorageEnvSchema.safeParse(normalized);
+
+  if (!parsed.success) {
+    return { provider: "vercel-blob", configured: false };
+  }
+
+  const data = parsed.data;
+  const vercelBlob = getBlobEnv(normalized);
+  const r2 = parseR2Env(data);
+
+  const explicitProvider = data.OBJECT_STORAGE_PROVIDER;
+  let provider: ObjectStorageProviderId;
+
+  if (explicitProvider) {
+    provider = explicitProvider;
+  } else if (vercelBlob.configured) {
+    provider = "vercel-blob";
+  } else if (r2) {
+    provider = "r2";
+  } else {
+    return { provider: "vercel-blob", configured: false };
+  }
+
+  if (provider === "vercel-blob") {
+    if (!vercelBlob.configured || !vercelBlob.BLOB_READ_WRITE_TOKEN) {
+      return { provider, configured: false };
+    }
+
+    return {
+      provider,
+      configured: true,
+      vercelBlob: {
+        ...vercelBlob,
+        BLOB_READ_WRITE_TOKEN: vercelBlob.BLOB_READ_WRITE_TOKEN,
+      },
+    };
+  }
+
+  if (!r2) {
+    return { provider: "r2", configured: false };
+  }
+
+  return {
+    provider: "r2",
+    configured: true,
+    r2,
   };
 }
 

@@ -937,7 +937,7 @@ export async function registerTenantDocument(input: {
   access: ErpDocumentAccess;
   /** ETag returned by Vercel Blob on upload. */
   blobEtag?: string | null;
-  /** Retention class per org data-handling policy (ARCH-001). Defaults to 'standard'. */
+  /** Retention class per org data-handling policy (ARCH-1001). Defaults to 'standard'. */
   retentionClass?: ErpDocumentRetentionClass;
   uploadedByAuthUserId: string;
   metadata: Record<string, unknown>;

@@ -19,6 +19,7 @@ import {
   buildDashboardHardeningChecklistSurface,
   buildDashboardWorkflowListSurface,
   buildDocumentRegistryListSurface,
+  buildDocumentActivityLinesListSurface,
   buildModuleRecordListSurface,
   buildModuleWorkItemListSurface,
   buildSavedViewsListSurface,
@@ -271,6 +272,20 @@ describe("auxiliary list surface gallery fixtures", () => {
             contentType: "PDF",
             size: "120 KB",
             access: "internal",
+          },
+        ],
+        moduleId: "finance",
+      }),
+    ],
+    [
+      "document activity — document-lines",
+      buildDocumentActivityLinesListSurface({
+        events: [
+          {
+            id: "evt-1",
+            summary: "Document uploaded",
+            actorLabel: "Operator",
+            occurredAt: "2026-06-02T10:00:00.000Z",
           },
         ],
         moduleId: "finance",

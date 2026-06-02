@@ -4,8 +4,6 @@ import { CircleHelp, Grid3X3, Search, UserRound } from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
 
-import { Button } from "@afenda/ui";
-
 import { AppShellUtilityTriggerTooltip } from "./utility-trigger-tooltip.client";
 import { APP_SHELL_UTILITY_ICON_BUTTON_CLASS } from "./utility-chrome.shared";
 
@@ -14,32 +12,31 @@ function IconButton({
   tooltip,
   children,
   href,
+  onClick,
 }: {
   ariaLabel: string;
   tooltip: string;
   children: ReactNode;
   href?: string;
+  onClick?: () => void;
 }) {
   const content = href ? (
-    <Button
-      aria-label={ariaLabel}
-      asChild
-      className={APP_SHELL_UTILITY_ICON_BUTTON_CLASS}
-      size="icon-sm"
-      variant="outline"
-    >
-      <Link href={href}>{children}</Link>
-    </Button>
-  ) : (
-    <Button
+    <Link
       aria-label={ariaLabel}
       className={APP_SHELL_UTILITY_ICON_BUTTON_CLASS}
-      size="icon-sm"
-      type="button"
-      variant="outline"
+      href={href}
     >
       {children}
-    </Button>
+    </Link>
+  ) : (
+    <button
+      aria-label={ariaLabel}
+      className={APP_SHELL_UTILITY_ICON_BUTTON_CLASS}
+      onClick={onClick}
+      type="button"
+    >
+      {children}
+    </button>
   );
 
   return <AppShellUtilityTriggerTooltip label={tooltip}>{content}</AppShellUtilityTriggerTooltip>;
@@ -71,18 +68,13 @@ export function AppShellSearchMobileIcon({
   onClickAction: () => void;
 }) {
   return (
-    <AppShellUtilityTriggerTooltip label={tooltip}>
-      <Button
-        aria-label={ariaLabel}
-        className={APP_SHELL_UTILITY_ICON_BUTTON_CLASS}
-        size="icon-sm"
-        onClick={onClickAction}
-        type="button"
-        variant="outline"
-      >
-        <Search aria-hidden="true" size={16} />
-      </Button>
-    </AppShellUtilityTriggerTooltip>
+    <IconButton
+      ariaLabel={ariaLabel}
+      onClick={onClickAction}
+      tooltip={tooltip}
+    >
+      <Search aria-hidden="true" size={16} />
+    </IconButton>
   );
 }
 
@@ -96,18 +88,9 @@ export function AppShellAvatarDisc({
   onClickAction?: () => void;
 }) {
   return (
-    <AppShellUtilityTriggerTooltip label={tooltip}>
-      <Button
-        aria-label={ariaLabel}
-        className={APP_SHELL_UTILITY_ICON_BUTTON_CLASS}
-        size="icon-sm"
-        onClick={onClickAction}
-        type="button"
-        variant="outline"
-      >
-        <UserRound aria-hidden="true" size={16} />
-      </Button>
-    </AppShellUtilityTriggerTooltip>
+    <IconButton ariaLabel={ariaLabel} onClick={onClickAction} tooltip={tooltip}>
+      <UserRound aria-hidden="true" size={16} />
+    </IconButton>
   );
 }
 

@@ -70,7 +70,9 @@ export function AppShellUtilityRuntimeItems({
     [context.utilityBar.metadata.zones, zoneId],
   );
 
-  return items.map((item) => (
-    <span key={item.id}>{renderAppShellUtilityRuntimeItem(item, context)}</span>
-  ));
+  return items
+    .filter((item) => item.adapterKey !== "account")
+    .map((item) => (
+      <span key={item.id}>{renderAppShellUtilityRuntimeItem(item, context)}</span>
+    ));
 }

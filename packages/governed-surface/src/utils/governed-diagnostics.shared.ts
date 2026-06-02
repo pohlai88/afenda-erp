@@ -2,14 +2,18 @@ import type { GovernedRenderableState } from "../schemas/governed-component-stat
 
 export type { GovernedRenderableState } from "../schemas/governed-component-state.schema";
 
+export type GovernedDiagnosticState = GovernedRenderableState | "disabled";
+
 export type GovernedDiagnostics = {
-  state?: GovernedRenderableState;
+  state?: GovernedDiagnosticState;
   testId?: string;
+  componentType?: string;
 };
 
 export type GovernedDiagnosticsDataAttributes = {
-  "data-render-state"?: GovernedRenderableState;
+  "data-render-state"?: GovernedDiagnosticState;
   "data-testid"?: string;
+  "data-component-type"?: string;
 };
 
 export function diagnosticsDataAttributes(
@@ -26,6 +30,9 @@ export function diagnosticsDataAttributes(
   }
   if (diagnostics.testId) {
     attrs["data-testid"] = diagnostics.testId;
+  }
+  if (diagnostics.componentType) {
+    attrs["data-component-type"] = diagnostics.componentType;
   }
 
   return attrs;

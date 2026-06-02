@@ -11,6 +11,8 @@ import {
 import { KNOWLEDGE_AUDIT_ACTIONS } from "../contracts/knowledge.core.contract";
 import type { HybridRetrievalRow } from "../contracts/knowledge.retrieval.contract";
 import type { LynxSemanticClaimGrade } from "../schemas/knowledge.eval-dataset.schema";
+import { knowledgeEvalRunInputSchema } from "../schemas/knowledge.eval-run-input.schema";
+import { emitKnowledgeAuditEvent } from "./knowledge.audit.server";
 import { retrieveKnowledgeChunks } from "./knowledge.retrieve-hybrid.server";
 
 export type EvalCase = {
@@ -257,17 +259,6 @@ export function evaluateKnowledgeEvalGate(metrics: EvalRunMetrics): string[] {
   ].filter((reason): reason is string => Boolean(reason));
 }
 
-function auditLog(action: string, data: Record<string, unknown>): void {
-  console.log(
-    JSON.stringify({
-      ts: new Date().toISOString(),
-      audit: true,
-      action,
-      ...data,
-    }),
-  );
-}
-
 /**
  * Run an eval set against the knowledge retrieval system.
  * Returns retrieval and answer-quality metrics per case and aggregated.
@@ -282,18 +273,38 @@ export async function runKnowledgeEval(
     semanticGrader?: SemanticEvalGrader;
   },
 ): Promise<EvalRunResult> {
-  const topK = options?.topK ?? 8;
+  const parsed = knowledgeEvalRunInputSchema.safeParse({
+    organizationId,
+    evalSetId,
+    evalCases,
+    topK: options?.topK,
+    hybrid: options?.hybrid,
+  });
+  if (!parsed.success) {
+    emitKnowledgeAuditEvent({
+      action: KNOWLEDGE_AUDIT_ACTIONS.EVAL_RUN_FAIL,
+      organizationId,
+      result: "failed",
+      metadata: { evalSetId, issues: parsed.error.flatten() },
+    });
+    throw new Error(
+      `Invalid knowledge eval input: ${parsed.error.message}`,
+    );
+  }
+
+  const topK = parsed.data.topK ?? 8;
+  const hybrid = parsed.data.hybrid;
 
   const caseResults: EvalCaseResult[] = [];
   const semanticGrades = new Map<string, LynxSemanticClaimGrade>();
 
-  for (const evalCase of evalCases) {
+  for (const evalCase of parsed.data.evalCases) {
     let retrievedRows: HybridRetrievalRow[] = [];
     try {
       retrievedRows = await retrieveKnowledgeChunks(
         organizationId,
         evalCase.query,
-        { topK, hybrid: options?.hybrid },
+        { topK, hybrid },
       );
     } catch {
       // Eval should not crash on retrieval failure — record as zero recall
@@ -333,18 +344,22 @@ export async function runKnowledgeEval(
 
   const aggregated = averageMetrics(caseResults.map((r) => r.metrics));
 
-  auditLog(KNOWLEDGE_AUDIT_ACTIONS.EVAL_RUN, {
+  emitKnowledgeAuditEvent({
+    action: KNOWLEDGE_AUDIT_ACTIONS.EVAL_RUN,
     organizationId,
-    evalSetId,
-    caseCount: evalCases.length,
-    recallAtK: aggregated.recallAtK,
-    mrr: aggregated.mrr,
-    evidenceOverlap: aggregated.evidenceOverlap,
-    faithfulness: aggregated.faithfulness,
-    citationPrecision: aggregated.citationPrecision,
-    unsupportedClaimRate: aggregated.unsupportedClaimRate,
-    noAnswerCorrectness: aggregated.noAnswerCorrectness,
-    promptInjectionResilience: aggregated.promptInjectionResilience,
+    result: "completed",
+    metadata: {
+      evalSetId,
+      caseCount: parsed.data.evalCases.length,
+      recallAtK: aggregated.recallAtK,
+      mrr: aggregated.mrr,
+      evidenceOverlap: aggregated.evidenceOverlap,
+      faithfulness: aggregated.faithfulness,
+      citationPrecision: aggregated.citationPrecision,
+      unsupportedClaimRate: aggregated.unsupportedClaimRate,
+      noAnswerCorrectness: aggregated.noAnswerCorrectness,
+      promptInjectionResilience: aggregated.promptInjectionResilience,
+    },
   });
 
   const result: EvalRunResult = {
@@ -358,7 +373,7 @@ export async function runKnowledgeEval(
     organizationId,
     evalRunId,
     result,
-    evalCases,
+    parsed.data.evalCases,
     semanticGrades,
   );
 

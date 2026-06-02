@@ -35,5 +35,5 @@ coverage/
 apps/erp/test-results/
 apps/erp/playwright-report/
 
-.vercel
 .env*.local
+packages/object-storage/r2/cors.generated.json

@@ -21,14 +21,4 @@ export {
   type CreateActionSandboxInput,
 } from "./ai.sandbox.actions.server";
 
-// ---------------------------------------------------------------------------
-// Sandbox execution actions (DB-backed, runs after human approval)
-// ---------------------------------------------------------------------------
-
-export {
-  registerSandboxExecutor,
-  getSandboxExecutor,
-  resolveSandboxExecutor,
-  executeApprovedSandbox,
-  type SandboxExecutor,
-} from "./ai.sandbox-executors.actions.server";
+// Sandbox DB executors live in @afenda/feature-system-admin (lynx/data) per ARCH-1002.

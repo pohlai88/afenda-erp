@@ -1,6 +1,6 @@
 ### 9.8 Approvals
 
-Parent: [ARCH-011 System Admin control plane](../../../../docs/architecture/011-system-admin-enterprise-architecture.md).
+Parent: [ARCH-1006 System Admin control plane](../../../../docs/architecture/1006-control-plane.md).
 
 ## Definition
 

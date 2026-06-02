@@ -29,7 +29,7 @@ describe("system-admin reliability checks", () => {
     const issues = collectCronReliabilityIssues([
       {
         id: "housekeeping",
-        path: "/api/cron/housekeeping",
+        path: "/api/internal/v1/cron/housekeeping",
         schedule: "0 2 * * *",
         status: "failed",
         lastRun: "2026-05-01",
@@ -87,7 +87,7 @@ describe("system-admin reliability checks", () => {
       ...collectCronReliabilityIssues([
         {
           id: "syncs",
-          path: "/api/cron/syncs",
+          path: "/api/internal/v1/cron/syncs",
           schedule: "0 1 * * *",
           status: "configured",
           lastRun: "-",

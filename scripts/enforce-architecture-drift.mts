@@ -51,6 +51,14 @@ const RULES: DriftRule[] = [
     commands: [["pnpm", "architecture:check"]],
   },
   {
+    id: "architecture-compliance",
+    test: (p) =>
+      p.startsWith("apps/erp/src/app/api/") ||
+      p.startsWith("docs/architecture/") ||
+      p.startsWith("apps/erp/src/lib/api/"),
+    commands: [["pnpm", "exec", "tsx", "scripts/check-architecture-compliance.mts"]],
+  },
+  {
     id: "schema-journal",
     test: (p) =>
       p.startsWith("packages/db/src/schema/") ||

@@ -21,7 +21,7 @@ category organization. Nested feature workspaces and per-module Vercel projects
 are not part of the default architecture.
 
 The current source of truth is
-[ARCH-008 Workspace Package Discipline](../architecture/008-workspace-package-discipline.md).
+[ARCH-1005 Workspace Package Discipline](../architecture/1005-infrastructure.md).
 
 ## Alternatives Considered
 

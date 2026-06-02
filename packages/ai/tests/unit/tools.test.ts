@@ -6,12 +6,9 @@ import {
   createGovernedToolRegistry,
   redactGovernedToolAuditValue,
 } from "../../src/tools/ai.governance.tool.server";
-import { createSolutionProviderTools } from "../../src/tools/ai.solution-provider-tools.tool.server";
 import {
   ERP_ASSISTANT_TOOL_IDS,
-  SOLUTION_PROVIDER_TOOL_IDS,
   erpAssistantToolMeta,
-  solutionProviderToolMeta,
 } from "../../src/tools/ai.tool-meta";
 
 const baseOrg = {
@@ -78,51 +75,6 @@ describe("ERP assistant tools — needsApproval contracts", () => {
   });
 });
 
-describe("Solution provider tools — needsApproval contracts", () => {
-  const org = {
-    id: "org_sp",
-    name: "Afenda",
-    role: "owner" as const,
-    capabilities: [...baseOrg.capabilities],
-  };
-  const toolset = createSolutionProviderTools({
-    organization: org,
-    session: baseSession,
-    model: "anthropic/claude-opus-4.7",
-    getModuleDefinition: () => baseModuleDef,
-    getAllowedWorkspace: async () => ({
-      moduleDefinition: baseModuleDef,
-      workspace: {
-        dataMode: "metadata" as const,
-        workItems: [],
-        records: [],
-        documents: [],
-      },
-    }),
-    getWorkspaceStats: () => emptyWorkspaceStats,
-    registerSolutionActionProposal: async () => "proposal_sp",
-  });
-
-  it("proposeHumanApprovedAction has needsApproval=true", () => {
-    expect(toolset.proposeHumanApprovedAction.needsApproval).toBe(true);
-  });
-
-  it("analyzeProfitAndLoss does NOT have needsApproval", () => {
-    const tool = toolset.analyzeProfitAndLoss as { needsApproval?: boolean };
-    expect(tool.needsApproval).toBeFalsy();
-  });
-
-  it("passes runtime governed tool policy", () => {
-    expect(() =>
-      assertGovernedToolset({
-        tools: toolset,
-        meta: solutionProviderToolMeta,
-        capabilities: org.capabilities,
-      }),
-    ).not.toThrow();
-  });
-});
-
 describe("ERP assistant tool meta — id and meta stability", () => {
   it("ERP_ASSISTANT_TOOL_IDS matches expected tool list (stability anchor)", () => {
     expect([...ERP_ASSISTANT_TOOL_IDS]).toEqual([
@@ -172,51 +124,6 @@ describe("ERP assistant tool meta — id and meta stability", () => {
     ];
     for (const id of readTools) {
       expect(erpAssistantToolMeta[id]?.access, id).toBe("read");
-    }
-  });
-});
-
-describe("Solution provider tool meta — id and meta stability", () => {
-  it("SOLUTION_PROVIDER_TOOL_IDS matches expected tool list (stability anchor)", () => {
-    expect([...SOLUTION_PROVIDER_TOOL_IDS]).toEqual([
-      "analyzeProfitAndLoss",
-      "findRevenueLeakage",
-      "findCostDrivers",
-      "reviewCashConversion",
-      "assessInventoryRisk",
-      "reviewApprovalThroughput",
-      "reviewAuditReadiness",
-      "draftRecoveryTasks",
-      "proposeHumanApprovedAction",
-    ]);
-  });
-
-  it("every solution provider tool id has a GovernedToolMeta entry", () => {
-    for (const id of SOLUTION_PROVIDER_TOOL_IDS) {
-      expect(
-        solutionProviderToolMeta[id],
-        `Missing meta for ${id}`,
-      ).toBeDefined();
-    }
-  });
-
-  it("proposeHumanApprovedAction is write+high-risk+audit:record", () => {
-    const meta = solutionProviderToolMeta.proposeHumanApprovedAction;
-    expect(meta?.access).toBe("write");
-    expect(meta?.risk).toBe("high");
-    expect(meta?.audit).toBe("record");
-  });
-
-  it("analysis tools have access:read", () => {
-    const readTools: string[] = [
-      "analyzeProfitAndLoss",
-      "findRevenueLeakage",
-      "findCostDrivers",
-      "reviewCashConversion",
-      "assessInventoryRisk",
-    ];
-    for (const id of readTools) {
-      expect(solutionProviderToolMeta[id]?.access, id).toBe("read");
     }
   });
 });

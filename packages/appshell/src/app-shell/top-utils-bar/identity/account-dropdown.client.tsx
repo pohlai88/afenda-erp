@@ -3,9 +3,6 @@
 import Link from "next/link";
 
 import {
-  Avatar,
-  AvatarFallback,
-  Button,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroup,
@@ -29,17 +26,26 @@ export function AppShellAccountDropdown({
     <DropdownMenu>
       <AppShellUtilityTriggerTooltip label={account.title}>
         <DropdownMenuTrigger asChild>
-          <Button
+          <button
             aria-label={account.title}
-            className="af-appshell__account-button"
-            size="icon-sm"
+            className={
+              account.avatarSrc
+                ? "af-appshell__account-avatar"
+                : "af-appshell__brand"
+            }
             type="button"
-            variant="ghost"
           >
-            <Avatar className="size-8">
-              <AvatarFallback>{account.initials}</AvatarFallback>
-            </Avatar>
-          </Button>
+            {account.avatarSrc ? (
+              <img
+                alt=""
+                className="af-appshell__account-avatar-image"
+                decoding="async"
+                src={account.avatarSrc}
+              />
+            ) : (
+              account.initials
+            )}
+          </button>
         </DropdownMenuTrigger>
       </AppShellUtilityTriggerTooltip>
       <DropdownMenuContent align="end" sideOffset={8}>

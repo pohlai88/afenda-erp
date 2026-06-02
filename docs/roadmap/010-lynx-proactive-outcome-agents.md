@@ -13,7 +13,7 @@ Workflow, or Vercel Sandbox runtime dependencies.
 ## Scope
 
 - Add server-only outcome monitor contracts and monitor results.
-- Add `/api/cron/lynx-outcomes` using `CRON_SECRET`.
+- Add `/api/internal/v1/cron/lynx-outcomes` using `CRON_SECRET`.
 - Record one completed Lynx run per organization sweep.
 - Record one run event per monitor result.
 - Create or update proactive workflow sessions only for `watch` or `blocked`

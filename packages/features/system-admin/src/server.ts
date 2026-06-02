@@ -12,6 +12,7 @@ export * from "./data-management/server";
 export * from "./diagnostics/server";
 export * from "./integrations/server";
 export * from "./lynx/server";
+export * from "./platform-ai/server";
 export * from "./memberships/server";
 export * from "./modules/server";
 export * from "./organization/server";

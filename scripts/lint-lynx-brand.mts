@@ -10,7 +10,7 @@
  *   - apps/erp/src/workspace-routes/lynx-console-route.tsx
  *   - packages/kernel/src/shell/navigation-extensions.ts
  *   - packages/kernel/src/shell/route-copy-metadata.ts
- *   - packages/ai/src/prompts/ai.system-prompt.ts         (getSolutionProviderSystemPrompt)
+ *   - packages/features/lynx/src/prompts/lynx.solution-provider-prompt.server.ts
  *   - packages/features/lynx/**
  *
  * Non-flipped (allowlisted until Phase C):
@@ -31,7 +31,7 @@ const FLIPPED_PATHS = [
   "packages/kernel/src/shell/route-copy-metadata.ts",
   "packages/ai/src/prompts/ai.system-prompt.ts",
   "packages/features/lynx",
-  "apps/erp/src/app/api/lynx",
+  "apps/erp/src/app/api/internal/v1/lynx",
 ];
 
 const BANNED_TERMS = [

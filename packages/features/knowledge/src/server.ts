@@ -6,5 +6,8 @@ import "@afenda/kernel/server";
  * Never import from a "use client" file.
  */
 export * from "./contracts";
-export * from "./schemas/knowledge.eval-dataset.schema";
+export * from "./commands";
+export * from "./domain";
+export * from "./read-models";
+export * from "./schemas";
 export * from "./data";

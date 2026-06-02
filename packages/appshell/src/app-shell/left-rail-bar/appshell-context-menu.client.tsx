@@ -1,6 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
+import { Suspense } from "react";
 import { usePathname, useRouter } from "next/navigation";
 
 import {
@@ -12,6 +13,18 @@ import {
 } from "@afenda/ui";
 
 export function AppShellContextMenu({
+  children,
+}: {
+  children: ReactNode;
+}) {
+  return (
+    <Suspense fallback={<div className="contents">{children}</div>}>
+      <AppShellContextMenuInner>{children}</AppShellContextMenuInner>
+    </Suspense>
+  );
+}
+
+function AppShellContextMenuInner({
   children,
 }: {
   children: ReactNode;

@@ -23,6 +23,11 @@
       "types": "./src/metadata.ts",
       "development": "./src/metadata.ts",
       "default": "./dist/metadata.js"
+    },
+    "./platform-tools": {
+      "types": "./src/platform-tools.ts",
+      "development": "./src/platform-tools.ts",
+      "default": "./dist/platform-tools.js"
     }
   },
   "scripts": {
@@ -33,15 +38,18 @@
     "verify:gateway-models": "tsx --conditions react-server --conditions development ./scripts/verify-gateway-models.mts"
   },
   "dependencies": {
+    "@afenda/auth": "workspace:*",
     "@afenda/config": "workspace:*",
-    "@afenda/db": "workspace:*",
     "@afenda/kernel": "workspace:*",
+    "@afenda/observability": "workspace:*",
+    "@opentelemetry/api": "^1.9.1",
     "ai": "^6.0.191",
     "server-only": "^0.0.1",
     "zod": "catalog:"
   },
   "devDependencies": {
     "@vscode/ripgrep": "^1.15.11",
+    "next": "catalog:",
     "vitest": "catalog:"
   },
   "sideEffects": false

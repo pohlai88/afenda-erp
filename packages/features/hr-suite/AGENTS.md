@@ -1,9 +1,9 @@
 # @afenda/feature-hr-suite
 
-Canonical architecture: `docs/architecture/010-hr-feature-package-architecture.md`.
+Canonical architecture: `docs/architecture/1002-backend.md`.
 Scaffold default: `pnpm scaffold:hr-slice <category> <capability-slug> <domain-key>`.
 
-If this guide conflicts with ARCH-010, follow ARCH-010 and update this file in
+If this guide conflicts with ARCH-1002, follow ARCH-1002 and update this file in
 the same change.
 
 ## Public doors
@@ -16,7 +16,7 @@ the same change.
 ## Vertical slices (shipped capabilities)
 
 **Golden path:** run `pnpm scaffold:hr-slice <category> <capability-slug> <domain-key>`
-for new scaffold-only slices, then follow ARCH-010 and the reference slice before
+for new scaffold-only slices, then follow ARCH-1002 and the reference slice before
 moving the slice to `shipped`. Do not restore legacy `@afenda/feature-hr` layouts.
 
 - Cursor rules: `afenda-hr-reference-slice` (pattern), `afenda-hr-feature-vertical` (naming/buckets)
@@ -24,7 +24,7 @@ moving the slice to `shipped`. Do not restore legacy `@afenda/feature-hr` layout
 - CI guard: `scripts/check-hr-feature-vertical-naming.mts` (`SHIPPED_CAPABILITIES` + reference-slice pattern)
 - Scaffold command: `scripts/scaffold-hr-slice.mts`; use `--repair` to fill missing scaffold files without overwriting implementation
 - File prefix: `hr.<domain>.*` (e.g. `hr.workforce.compliance.actions.server.ts`); list surfaces in `surface/`, not `data/`
-- Lifecycle states: `scaffold-only`, `repair`, `shipped`, `deprecated` (defined in ARCH-010)
+- Lifecycle states: `scaffold-only`, `repair`, `shipped`, `deprecated` (defined in ARCH-1002)
 
 ## Buckets
 
@@ -50,7 +50,7 @@ Suite-level integration glue belongs in `src/hr-suite-integration/` and exposes 
 
 Consumers must import `hr-suite-integration`, `hr-suite-integration/client`, `hr-suite-integration/server`, or `hr-suite-integration/metadata`; do not deep-import its implementation folders.
 
-Allowed integration implementation folders are defined by ARCH-010:
+Allowed integration implementation folders are defined by ARCH-1002:
 `actions`, `components`, `contracts`, `navigation`, `policies`, and `surface`.
 The only non-door integration root file allowed is
 `hr-suite-integration-architecture.md`.

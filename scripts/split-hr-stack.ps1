@@ -137,7 +137,7 @@ Restore-FromSnapshot @(
     "packages/features/hr-suite/src/client.ts",
     "packages/features/hr-suite/src/server.ts",
     "packages/features/hr-suite/src/metadata.ts",
-    "packages/_template-definition/scripts/validate-feature-shape.mts",
+    "packages/_scaffold/scripts/validate-feature-shape.mts",
     "packages/kernel/src/execution-kernel/capabilities/execution-capabilities.ts",
     "packages/kernel/src/execution-kernel/audit/execution-audit.ts",
     "packages/governed-surface/src/metadata/renderers/list-surface-table.client.tsx"
@@ -152,7 +152,7 @@ New-StackCommit "feat(hr-suite): module metadata, nav, and vertical guardrails" 
     "packages/features/hr-suite/src/client.ts",
     "packages/features/hr-suite/src/server.ts",
     "packages/features/hr-suite/src/metadata.ts",
-    "packages/_template-definition/scripts/validate-feature-shape.mts",
+    "packages/_scaffold/scripts/validate-feature-shape.mts",
     "packages/kernel/src/execution-kernel",
     "packages/governed-surface/src/metadata/renderers/list-surface-table.client.tsx"
 )
@@ -308,7 +308,7 @@ Restore-FromSnapshot @(
     ".cursor/hooks/post-edit-architecture-hints.mjs",
     ".cursor/rules/afenda-hr-feature-vertical.mdc",
     ".cursor/rules/afenda-hr-reference-slice.mdc",
-    "docs/architecture/010-hr-feature-package-architecture.md",
+    "docs/architecture/1002-backend.md",
     "packages/governed-surface/scripts/audit-design-system-tokens.mts",
     "scripts/check-directory-architecture.mts"
 )
@@ -317,7 +317,7 @@ New-StackCommit "chore: HR vertical cursor rules and architecture docs" @(
     ".cursor/hooks/post-edit-architecture-hints.mjs",
     ".cursor/rules/afenda-hr-feature-vertical.mdc",
     ".cursor/rules/afenda-hr-reference-slice.mdc",
-    "docs/architecture/010-hr-feature-package-architecture.md",
+    "docs/architecture/1002-backend.md",
     "packages/governed-surface/scripts/audit-design-system-tokens.mts",
     "scripts/check-directory-architecture.mts"
 )

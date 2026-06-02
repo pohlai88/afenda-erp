@@ -96,6 +96,7 @@ export async function buildHrExpensePageModel(
         window: toWindow(filteredClaims),
         searchValue: input.claimsSearch,
         canApprove: input.canApprove,
+        canWrite: input.canWrite,
       }),
     ),
     Promise.resolve(

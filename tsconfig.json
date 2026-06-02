@@ -6,7 +6,7 @@
   },
   "include": [
     "scripts/**/*.mts",
-    "packages/_template-definition/scripts/**/*.mts",
+    "packages/_scaffold/scripts/**/*.mts",
     "packages/features/hr-suite/scripts/**/*.mts"
   ],
   "exclude": ["node_modules"]

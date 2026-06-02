@@ -49,7 +49,7 @@ Duplicate MCP files under `AppData\Roaming\Cursor\...` and `AppData\Roaming\.cur
 2. Copy `.env.config.example` → `.env.config`, fill secrets, then `pnpm env:sync:all` — see [`docs/development/env.md`](../docs/development/env.md)
 3. Confirm global + project MCP in **Cursor Settings → MCP**
 4. **Extensions: Show Recommended Extensions**
-5. **Indexing & Docs** — add `docs/architecture/` (ARCH-001–008), `docs/roadmap/`, `docs/testing/`
+5. **Indexing & Docs** — add `docs/architecture/` (ARCH-1001–008), `docs/roadmap/`, `docs/testing/`
 
 See rule `afenda-external-context` for Context7 vs ARCH doc priority.
 

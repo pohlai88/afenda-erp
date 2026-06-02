@@ -1,36 +1,39 @@
-# Afenda feature scaffold (`packages/features/**`)
+# Afenda package scaffolds (`packages/features/**`, `packages/*`)
 
-Scaffold default: [`packages/_template-definition`](../../packages/_template-definition).
+Scaffold index: [`packages/_scaffold`](../../packages/_scaffold) · **ARCH-1002** §6–§8.
 
-## Public doors (`src/`)
+## Feature packages (`@afenda/feature-*`)
+
+Template: [`packages/_scaffold/feature`](../../packages/_scaffold/feature).
+
+### Public doors (`src/`)
 
 - `src/index.ts` → export `.`
 - `src/client.ts` → export `./client`
-- `src/server.ts` → export `./server`
+- `src/server.ts` → export `./server` (imports `@afenda/kernel/server`)
 - `src/metadata.ts` → export `./metadata`
 
-## Template buckets
+### Template buckets
 
-- `src/actions/`
-- `src/components/`
-- `src/contracts/`
-- `src/data/`
-- `src/events/`
-- `src/policies/`
-- `src/schemas/`
-- `src/tests/`
+- `actions/` · `commands/` · `api/` · `contracts/` · `components/` · `data/` · `domain/` · `events/` · `policies/` · `read-models/` · `schemas/` · `tests/`
+
+Vertical slice: full bucket set under `src/<capability>/`.
+
+## Platform packages (`@afenda/*`, not under `features/`)
+
+Template: [`packages/_scaffold/platform`](../../packages/_scaffold/platform). **No ERP module business rules.**
 
 ## Non-negotiables
 
 - Do not add catch-all folders: `_shared`, `shared`, `common`, `lib`, `utils`, `helpers`, `misc`, `internal`.
-- Module components live in `src/components/`, not `apps/erp`.
-- TypeScript schemas live in `src/schemas/`; `@afenda/db` owns SQL and migrations.
-- Server Actions in `src/actions/**` (`*.actions.server.ts`).
-- Client components in `src/components/**` (`*.client.tsx`).
-- Feature packages never own Drizzle DDL; schema DDL remains in `@afenda/db`.
+- Module components live in feature `components/`, not `apps/erp`.
+- TypeScript schemas in feature `schemas/`; `@afenda/db` owns SQL and migrations.
+- Server Actions: `src/actions/**/*.actions.server.ts`.
+- Feature packages never own Drizzle DDL.
 
 ## Tools
 
-- `pnpm scaffold:feature <moduleId>` — delegate to `packages/_template-definition/scripts`
-- `pnpm scaffold:vertical <feature> <vertical>` — add template buckets under a vertical folder in `src/`
+- `pnpm scaffold:feature <moduleId>` — ERP module under `packages/features/`
+- `pnpm scaffold:vertical <feature> <capability>` — vertical slice buckets
+- `pnpm scaffold:platform <slug>` — platform package under `packages/`
 - `pnpm architecture:check` — before finishing scaffold changes

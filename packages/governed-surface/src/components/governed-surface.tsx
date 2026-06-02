@@ -1,11 +1,11 @@
 import type { ReactNode } from "react";
+import Link from "next/link";
 
 import { Button } from "@afenda/ui/button";
-import Link from "next/link";
 import { cn } from "@afenda/ui/utils";
 
-import type { PageHeader } from "../schemas/page-header.schema";
 import type { GovernedRenderableState } from "../schemas/governed-component-state.schema";
+import type { PageHeader } from "../schemas/page-header.schema";
 import { diagnosticsDataAttributes } from "../utils/governed-diagnostics.shared";
 import {
   governedIdentityAttributes,
@@ -13,6 +13,7 @@ import {
   toGovernedDomId,
 } from "../utils/governed-identity.shared";
 import { asGovernedRoute } from "../utils/governed-safe-route";
+
 import { ModulePageHeader } from "./module-page-header";
 
 export type GovernedSurfaceProps = {
@@ -20,7 +21,7 @@ export type GovernedSurfaceProps = {
   children: ReactNode;
   actions?: ReactNode;
   className?: string;
-  surfaceKey?: string;
+  surfaceKey: string;
   sectionKey?: string;
   componentKey?: string;
   renderState?: GovernedRenderableState;
@@ -37,11 +38,9 @@ export function GovernedSurface({
   className,
   surfaceKey,
   sectionKey,
-  componentKey = surfaceKey ?? "surface",
+  componentKey = surfaceKey,
   renderState = "ready",
 }: GovernedSurfaceProps) {
-  const backHref = header.backHref;
-  const backLabel = header.backLabel;
   const surfaceDomId = toGovernedDomId("governed-surface", componentKey);
 
   return (
@@ -68,20 +67,19 @@ export function GovernedSurface({
             sectionKey={sectionKey}
             componentKey={`${componentKey}-header`}
           />
-          {backHref && backLabel ? (
-            <Button
-              variant="link"
-              className="h-auto p-0 type-control"
-              asChild
-            >
-              <Link href={asGovernedRoute(backHref)} prefetch={false}>
-                {backLabel}
+
+          {header.backHref && header.backLabel ? (
+            <Button variant="link" className="h-auto p-0 type-control" asChild>
+              <Link href={asGovernedRoute(header.backHref)} prefetch={false}>
+                {header.backLabel}
               </Link>
             </Button>
           ) : null}
         </div>
+
         {actions ? <div className="shrink-0">{actions}</div> : null}
       </div>
+
       {children}
     </section>
   );

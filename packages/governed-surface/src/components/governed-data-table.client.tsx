@@ -57,8 +57,9 @@ export function GovernedDataTableClient<TData>({
   });
 
   const rows = table.getRowModel().rows;
-  const columnCount = table.getAllLeafColumns().length;
+  const columnCount = Math.max(table.getAllLeafColumns().length, 1);
   const renderState = rows.length === 0 ? "empty" : "ready";
+  const resolvedTestId = testId ?? `governed:data-table:${componentKey}`;
 
   return (
     <Table
@@ -72,7 +73,8 @@ export function GovernedDataTableClient<TData>({
       })}
       {...diagnosticsDataAttributes({
         state: renderState,
-        testId,
+        testId: resolvedTestId,
+        componentType: "governed:data-table",
       })}
     >
       <TableHeader>

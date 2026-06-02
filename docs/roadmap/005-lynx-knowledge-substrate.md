@@ -1,7 +1,7 @@
 # TRACK-005 · Lynx + Knowledge Substrate
 
 **Tracking ID:** `TRACK-005` · **File:** `005-lynx-knowledge-substrate.md` · **Status:** Active
-**Related:** **ARCH-009** (doctrine), **ARCH-001** (AI gateway, runtime), **ARCH-002** (feature packages), **ARCH-008** (package discipline), **TRACK-003** (AI Enterprise Uplift — supersedes its "Embeddings / RAG: Cancelled" row)
+**Related:** **ARCH-1005** (doctrine), **ARCH-1001** (AI gateway, runtime), **ARCH-1002** (feature packages), **ARCH-1005** (package discipline), **TRACK-003** (AI Enterprise Uplift — supersedes its "Embeddings / RAG: Cancelled" row)
 
 ---
 
@@ -41,7 +41,7 @@ The "Embeddings / RAG" row in **TRACK-003** was cancelled for the v1 uplift. **I
 
 **Deliverables:**
 
-- [x] `docs/architecture/009-machine-layer-doctrine.md` (**ARCH-009**)
+- [x] `docs/architecture/1005-infrastructure.md` (**ARCH-1005**)
 - [x] `docs/roadmap/004-lynx-knowledge-substrate.md` (this file, **TRACK-004**)
 - [x] `.cursor/rules/afenda-lynx-knowledge.mdc`
 - [x] Update `docs/architecture/README.md`
@@ -90,7 +90,7 @@ RLS policies on all five tables (mirrors `0013_ai_tenant_rls.sql`). All five tab
 **App routes and actions:**
 
 - `apps/erp/src/app/(app)/knowledge/page.tsx` — admin-only knowledge management (sources, manual ingest, recent chunks, org settings)
-- `apps/erp/src/app/api/cron/knowledge-sync/route.ts` — `Authorization: Bearer ${CRON_SECRET}`
+- `apps/erp/src/app/api/internal/v1/cron/knowledge-sync/route.ts` — `Authorization: Bearer ${CRON_SECRET}`
 
 **Tests:**
 
@@ -111,7 +111,7 @@ RLS policies on all five tables (mirrors `0013_ai_tenant_rls.sql`). All five tab
 
 ### Phase 2 — Governed tool envelope on existing AI
 
-Add `GovernedToolMeta` type to `packages/ai/src/contracts/ai.tools.contract.ts` and apply it to every tool in `ai.erp-tools.tool.server.ts` and `ai.solution-provider-tools.tool.server.ts`:
+Add `GovernedToolMeta` type to `packages/ai/src/contracts/ai.tools.contract.ts` and apply it to every tool in `ai.erp-tools.tool.server.ts` and `lynx.solution-provider-tools.tool.server.ts` (`@afenda/feature-lynx`):
 
 ```ts
 type GovernedToolMeta = {
@@ -188,7 +188,7 @@ Flip **Solution Console → "Lynx Operator"**:
 
 ---
 
-## Non-negotiables carried from ARCH-001
+## Non-negotiables carried from ARCH-1001
 
 - `organizationId` from server session only — never from model args or request body.
 - All cron sync routes validate `Authorization: Bearer ${CRON_SECRET}`.

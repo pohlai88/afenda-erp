@@ -6,7 +6,7 @@ import type {
 import type { ExecutionActorType } from "../actor/execution-actor";
 
 /**
- * Minimum authority contract (ARCH-002 §5.2). Use when passing context across
+ * Minimum authority contract (ARCH-1002 §5.2). Use when passing context across
  * package boundaries without leaking session-derived capability lists.
  */
 export type ExecutionAuthorityContext = {

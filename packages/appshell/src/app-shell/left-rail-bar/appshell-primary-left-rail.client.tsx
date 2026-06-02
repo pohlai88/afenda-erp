@@ -1,13 +1,12 @@
 "use client";
 
+import { Search } from "lucide-react";
+import Link from "next/link";
 import { useMemo, useState } from "react";
-
-import { Input } from "@afenda/ui";
 
 import type { AppShellPrimaryLeftRailConfig } from "./appshell-primary-left-rail.schema";
 import { filterAppShellPrimaryLeftRailNavSections } from "./appshell-primary-left-rail.shared";
 import { AppShellPrimaryLeftRailRaw } from "./appshell-primary-left-rail-raw.client";
-import { AppShellPrimaryLeftRailFooter } from "./appshell-primary-left-rail-footer.client";
 
 export type AppShellPrimaryLeftRailDisplayMode = "full" | "compact";
 
@@ -24,25 +23,40 @@ export function AppShellPrimaryLeftRail({
     [config.sections, query],
   );
 
+  const identity = config.identity.href ? (
+    <Link className="af-appshell__identity" href={config.identity.href}>
+      <span className="af-appshell__identity-copy">
+        <span className="af-appshell__identity-primary">{config.identity.primary}</span>
+        {config.identity.secondary ? (
+          <span className="af-appshell__identity-secondary">
+            {config.identity.secondary}
+          </span>
+        ) : null}
+      </span>
+    </Link>
+  ) : (
+    <div className="af-appshell__identity">
+      <span className="af-appshell__identity-copy">
+        <span className="af-appshell__identity-primary">{config.identity.primary}</span>
+        {config.identity.secondary ? (
+          <span className="af-appshell__identity-secondary">
+            {config.identity.secondary}
+          </span>
+        ) : null}
+      </span>
+    </div>
+  );
+
   return (
     <>
-      <div className="af-appshell__identity">
-        <div className="af-appshell__identity-mark">{config.identity.initials}</div>
-        <div className="af-appshell__identity-copy">
-          <div className="af-appshell__identity-primary">{config.identity.primary}</div>
-          {config.identity.secondary ? (
-            <div className="af-appshell__identity-secondary">
-              {config.identity.secondary}
-            </div>
-          ) : null}
-        </div>
-      </div>
+      {identity}
       <div className="af-appshell__rail-search">
-        <Input
+        <Search aria-hidden="true" className="af-appshell__rail-search-icon" size={14} />
+        <input
           aria-label={config.labels.searchAriaLabel}
-          className="bg-surface"
           onChange={(event) => setQuery(event.target.value)}
           placeholder={config.labels.searchPlaceholder}
+          spellCheck={false}
           type="search"
           value={query}
         />
@@ -69,9 +83,6 @@ export function AppShellPrimaryLeftRail({
           <div className="af-appshell__rail-empty">{config.labels.emptyState}</div>
         )}
       </nav>
-      <div className="af-appshell__rail-footer">
-        <AppShellPrimaryLeftRailFooter />
-      </div>
     </>
   );
 }

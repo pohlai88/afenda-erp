@@ -10,7 +10,8 @@ import {
   type ExecutionContext,
 } from "@afenda/kernel/execution";
 import { logServerEvent } from "@afenda/observability";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
+import { workspaceNavigationSettingsCacheTag } from "../../tenant-execution/contracts/system-admin.workspace-navigation-cache.shared";
 import { z } from "zod";
 import {
   systemAdminActionFailure,
@@ -37,8 +38,12 @@ const setModuleEnabledInputSchema = z.object({
   enabled: z.boolean(),
 });
 
-function revalidateSystemAdminPaths(...paths: readonly string[]) {
+function revalidateSystemAdminPaths(
+  organizationId: string,
+  ...paths: readonly string[]
+) {
   revalidatePath(systemAdminRoutePaths.hub);
+  revalidateTag(workspaceNavigationSettingsCacheTag(organizationId), "max");
   for (const path of paths) {
     revalidatePath(path);
   }
@@ -133,7 +138,10 @@ async function persistSystemAdminModuleSettings(input: {
     operation: "modules.update",
   });
 
-  revalidateSystemAdminPaths(systemAdminRoutePaths.modules);
+  revalidateSystemAdminPaths(
+    input.organizationId,
+    systemAdminRoutePaths.modules,
+  );
   revalidatePath("/");
   return systemAdminActionSuccess(undefined);
 }

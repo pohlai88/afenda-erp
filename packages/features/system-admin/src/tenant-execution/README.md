@@ -16,6 +16,6 @@ Cross-cutting infrastructure — not a System Admin route or nav vertical.
 
 `server.ts` side-imports `policies/register-tenant-execution-policies.server.ts` so kernel evaluators are registered when the package loads.
 
-Canonical doctrine: [ARCH-011](../../../../docs/architecture/011-system-admin-enterprise-architecture.md) · [ARCH-002 §5](../../../../docs/architecture/002-erp-kernel-package-architecture.md#5-execution-kernel).
+Canonical doctrine: [ARCH-1006](../../../../docs/architecture/1006-control-plane.md) · [ARCH-1002 §5](../../../../docs/architecture/1002-backend.md).
 
 Package as-built supplement: [`tenant-execution-architecture.md`](./tenant-execution-architecture.md) — update when implementation changes; do not delete.

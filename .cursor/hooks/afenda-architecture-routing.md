@@ -1,59 +1,51 @@
-# Afenda architecture & rules routing (injected once per agent session)
+# Afenda architecture routing (injected every session)
 
-Canonical index: `docs/architecture/README.md` (`ARCH-001`–`ARCH-011`; **ARCH-012** reserved).
+**Target-only.** ARCH-1001–1006 are law. Non-compliance = wrong (**ARCH-1004** §7, **ARCH-1002** §13). No “as-built OK.” No “migrate later.” Rule: `afenda-agent-discipline`.
 
-**When docs conflict:** ARCH-002 (features-first; execution §5) → ARCH-001 (runtime) → update the other doc in the same PR. **ARCH-011** + **ARCH-002** §§4–5 move together for System Admin vs execution enforcement.
+**Hooks (fail closed):** `guard-architecture-compliance` blocks flat `/api/*`, fat routes, lazy doc phrases, module logic in `apps/erp/src/lib/api/`. Fix denials yourself — do not ask the user to run pnpm.
 
-**Architecture docs:** never delete paths containing `architecture` — edit and link (rule `afenda-architecture-docs`; hook `guard-architecture-docs.mjs`).
+Index: `docs/architecture/README.md`.
 
-**Drift enforcement (automatic — do not ask the user to run pnpm):**
+## Path → rule → ARCH (read only what you touch)
 
-- `preToolUse` → `guard-kernel-boundary-imports.mjs` blocks `@afenda/feature-*` imports in `packages/kernel/`.
-- `postToolUse` → `enforce-architecture-drift.mjs` runs `scripts/enforce-architecture-drift.mts` for the edited path (kernel tests, `architecture:check`, schema journal).
-- CI runs the same guards on push/PR.
+| Editing… | Rule | Read |
+| -------- | ---- | ---- |
+| `apps/erp/**` routes, API | `afenda-erp-app`, `afenda-agent-discipline` | **1004**, **1001**, root `AGENTS.md` |
+| `apps/erp/src/workspace-routes/**` | `afenda-erp-app` | **1003**, **1001** |
+| `packages/features/**` | `afenda-feature-packages`, `afenda-feature-shape` | **1002**, **1005** |
+| `packages/features/lynx/**`, `knowledge/**` | `afenda-lynx-knowledge` | **1005** §11, **1004** §5 |
+| `packages/db/**` | `afenda-database-migrations` | **1005**, **1002** |
+| `packages/governed-surface/**` | `afenda-governed-ui` | **1003** |
+| `packages/features/system-admin/**` | `afenda-system-admin` | **1006** |
+| `packages/kernel/**` | `afenda-core` | **1002** §7 |
+| `docs/architecture/**` | `afenda-architecture-docs` | Same book you edit — §7 Non-compliance only |
 
-## Path → rule → doctrine (read only what matches the task)
+## HTTP (required)
 
-| If you are editing…                                                 | Cursor rule               | Read first                             |
-| ------------------------------------------------------------------- | ------------------------- | -------------------------------------- |
-| `apps/erp/**` (routes, handlers)                                    | `afenda-erp-app`          | **ARCH-001**, `AGENTS.md` (root)       |
-| `apps/erp/src/workspace-routes/**`                                  | `afenda-erp-app`          | **ARCH-001** §route composition        |
-| `apps/erp/src/lib/system-admin-sections/**`                         | `afenda-system-admin`     | **ARCH-011**, **ARCH-002** §§4–5       |
-| `packages/features/system-admin/**`                                 | `afenda-system-admin`     | **ARCH-011** (+ domain supplement)     |
-| `packages/features/knowledge/**`, `lynx/**`, `api/lynx/**`        | `afenda-lynx-knowledge`   | **ARCH-009**                           |
-| `packages/db/**`                                                    | `afenda-database`         | **ARCH-005**, **ARCH-002** (ownership) |
-| `packages/governed-surface/**` or domain `*surface*` / `*metadata*` | `afenda-governed-ui`      | **ARCH-006**, **ARCH-007**             |
-| `packages/features/**` (other modules)                            | `afenda-feature-packages` | **ARCH-008**, **ARCH-002**, **ARCH-004** |
-| `packages/kernel/src/execution-kernel/**`                           | `afenda-core`             | **ARCH-002** §5, **ARCH-011** (boundary) |
-| `packages/config/src/next.ts` (transpile list)                      | `afenda-core`             | **ARCH-008** (app ↔ transpile sync)    |
-| `scripts/check-directory-architecture.mts`                          | —                         | **ARCH-003**, **ARCH-008**             |
-| Monorepo layout, imports, exports, `packages/*` generally           | `afenda-core` (always on) | **ARCH-008**, **ARCH-002**, **ARCH-003** |
-| `docs/architecture/**` or `*architecture*.md`                       | `afenda-architecture-docs`| This README + authority table          |
+```txt
+apps/erp/src/app/api/internal/v1/...   # Lynx, AI, cron, webhooks
+apps/erp/src/app/api/public/v1/...    # partners
+apps/erp/src/app/api/auth/...        # Neon Auth only
+```
 
-## Verification (run before finishing when touching…)
+**Wrong:** `apps/erp/src/app/api/lynx/`, `api/ai/`, `api/cron/` without `internal/v1`.
 
-| Area                               | Command                                              |
-| ---------------------------------- | ---------------------------------------------------- |
-| Layout, exports, architecture docs | `pnpm architecture:check`                            |
-| Governed renderers / list metadata | `pnpm lint:governed-renderers`                       |
-| Drizzle schema                     | `pnpm db:generate` → review SQL → `pnpm db:migrate` (no hand-written `drizzle/*.sql`) |
-| System Admin surfaces / actions    | `pnpm test --filter=@afenda/feature-system-admin`    |
-| App routes / flows                 | `pnpm typecheck`, `pnpm test`, often `pnpm test:e2e` |
-| Any substantive change             | `pnpm typecheck`                                     |
+## Verification (minimal — not lazy)
 
-## External docs (framework only)
+| Touch | Command |
+| ----- | ------- |
+| One package | `pnpm --filter <pkg> typecheck` / `test` |
+| Boundaries, ARCH docs, exports | `pnpm architecture:check` |
+| Governed renderers | `pnpm lint:governed-renderers` |
+| Schema | `db:generate` → review → `db:migrate` |
+| Docs only | Read diff; stop |
 
-- Versions + Context7 library IDs: `.agents/stack-context.md`
-- Prompt with `use context7` for third-party APIs; rule `afenda-external-context`
-- MCP: global `context7` + `Neon`; project `shadcn` + **next-devtools** (`init` at session start for Next.js — see `afenda-erp-app`)
+Do **not** run full-repo test/build after small doc edits.
 
-## Non-negotiables (do not re-litigate)
+## Non-negotiables
 
-- Tenancy: `organizationId` from server session only.
-- One deployable app: `apps/erp` (`@afenda/erp`).
-- Module routes: `(workspace)/[moduleId]/…` only — composition in `workspace-routes/`; System Admin sections via `[...section]` + `system-admin-sections/`; no per-module route folders unless URL tree differs.
-- Governed lists: server windows / `GovernedPatternCListSection` — never ship full datasets for client pagination.
-- Feature packages: flat `packages/features/<moduleId>`; public doors `.` / `./client` / `./server` / `./metadata` only; never import `apps/erp`; `./client` stays server-graph-free.
-- App workspace deps ↔ `afendaTranspilePackages` must stay in sync (`pnpm architecture:check`).
-- Database schema: `packages/db/src/schema` → `pnpm db:generate` → `pnpm db:migrate` — no agent-authored DDL in `drizzle/*.sql` or live SQL unless the user explicitly requires it (rule `afenda-database-migrations`).
-- Architecture docs: preserve all `*architecture*` paths — update in place; do not delete without explicit user authorization.
+- Tenancy from server session only.
+- Writes: command → kernel → domain (**1002**).
+- Page reads: in-process feature server — no `fetch('/api/…')` for tenant lists.
+- Routes: thin transport only (**1004** §3).
+- Never delete `*architecture*` paths — update in place.

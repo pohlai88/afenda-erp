@@ -1,26 +1,26 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "installCommand": "pnpm install",
-  "buildCommand": "pnpm turbo build --filter=@afenda/erp",
+  "buildCommand": "pnpm turbo build --filter=@afenda/erp --concurrency=2",
   "crons": [
     {
-      "path": "/api/cron/reminders",
+      "path": "/api/internal/v1/cron/reminders",
       "schedule": "0 0 * * *"
     },
     {
-      "path": "/api/cron/syncs",
+      "path": "/api/internal/v1/cron/syncs",
       "schedule": "0 1 * * *"
     },
     {
-      "path": "/api/cron/housekeeping",
+      "path": "/api/internal/v1/cron/housekeeping",
       "schedule": "0 2 * * *"
     },
     {
-      "path": "/api/cron/lynx-outcomes",
+      "path": "/api/internal/v1/cron/lynx-outcomes",
       "schedule": "0 3 * * *"
     },
     {
-      "path": "/api/cron/knowledge-sync",
+      "path": "/api/internal/v1/cron/knowledge-sync",
       "schedule": "0 4 * * *"
     }
   ]

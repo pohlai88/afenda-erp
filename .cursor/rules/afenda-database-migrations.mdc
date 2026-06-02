@@ -44,4 +44,4 @@ pnpm db:migrate
 pnpm architecture:check   # includes drizzle journal guard
 ```
 
-Path-scoped detail: rule **`afenda-database`** · **ARCH-005**.
+Path-scoped detail: rule **`afenda-database`** · **ARCH-1005**.

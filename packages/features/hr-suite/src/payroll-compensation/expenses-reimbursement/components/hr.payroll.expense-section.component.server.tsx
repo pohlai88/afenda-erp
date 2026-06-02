@@ -93,7 +93,9 @@ export function HrExpenseWorkbenchSection({
         surfaceKey={hrExpenseClaimsSurfaceKey}
         listConfiguration={pageModel.claimsList}
         TrailingCell={
-          pageModel.canApprove ? HrExpenseClaimsTrailingCell : undefined
+          pageModel.canApprove || pageModel.canWrite
+            ? HrExpenseClaimsTrailingCell
+            : undefined
         }
       />
 

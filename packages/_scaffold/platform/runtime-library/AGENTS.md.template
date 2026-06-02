@@ -1,0 +1,19 @@
+# @afenda/__PACKAGE_NAME__
+
+Platform package — **ARCH-1002** §6 allowlist. **No ERP module business rules.**
+
+Category: `runtime-library` · Scaffold: `packages/_scaffold/platform/runtime-library`.
+
+## Allowed
+
+Shared infrastructure: contracts, server helpers, integration clients, cross-cutting utilities with **zero** module-specific posting or domain rules.
+
+## Forbidden
+
+Finance/HR/purchasing logic, module commands, tenant business policies, governed list surfaces for ERP modules.
+
+## After scaffold
+
+1. Register `@afenda/__PACKAGE_NAME__` in `scripts/check-directory-architecture.mts` `packageArchitectureRules`.
+2. Add to `packages/config/src/next.ts` `afendaTranspilePackages` if the app imports it.
+3. Run `pnpm architecture:check`.

@@ -5,7 +5,7 @@ import { Keyboard } from "lucide-react";
 import { AppShellUtilityDropdownTemplate } from "../../template/utility-dropdown-template.client";
 
 const SHORTCUTS = [
-  ["Command center", "Ctrl K"],
+  ["Command center", "⌘ K"],
   ["Quick create", "C"],
   ["Go home", "G H"],
   ["Toggle rail", "Alt ["],

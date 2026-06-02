@@ -1,0 +1,3 @@
+{
+  "extends": "../config/tsconfig.build.react.base.json"
+}

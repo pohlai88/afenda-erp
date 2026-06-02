@@ -1,6 +1,7 @@
 import "server-only";
 
 import type { ReactNode } from "react";
+
 import { GovernedComponentRenderer } from "../metadata/index";
 import { logUnexpectedServerError } from "../data/governed-logging.server";
 import { getGovernedSurfaceTranslations } from "../i18n/governed-surface-copy";
@@ -11,12 +12,15 @@ import {
   parseGovernedChartConfiguration,
   type GovernedChartConfigurationInput,
 } from "../schemas/chart.schema";
-import { type GovernedSurfaceSectionCardBody } from "./governed-surface-section-card";
 import {
   renderGovernedPatternSectionShell,
   type GovernedPatternSectionDensity,
   type GovernedPatternSectionLayout,
+  type RenderGovernedPatternSectionShellInput,
 } from "./governed-pattern-section-shell.shared";
+import type { GovernedSurfaceSectionCardBody } from "./governed-surface-section-card";
+
+type GovernedPatternEmptyState = EmptyState & { emptyId?: string };
 
 export type GovernedPatternBChartSectionLayout = GovernedPatternSectionLayout;
 
@@ -27,9 +31,9 @@ export type GovernedPatternBChartSectionProps = {
   chartConfiguration: GovernedChartConfigurationInput;
   layout?: GovernedPatternBChartSectionLayout;
   density?: GovernedPatternSectionDensity;
-  loadError?: EmptyState;
+  loadError?: GovernedPatternEmptyState;
   forbidden?: EmptyState;
-  invalid?: EmptyState;
+  invalid?: GovernedPatternEmptyState;
   headerSlot?: ReactNode;
   headerAction?: ReactNode;
   className?: string;
@@ -73,54 +77,62 @@ export async function GovernedPatternBChartSection({
     headerAction,
     cardClassName,
     contentClassName,
-  };
+  } satisfies Omit<RenderGovernedPatternSectionShellInput, "body">;
 
-  const invalidModel: EmptyState = invalid ?? {
-    variant: "error",
-    title: t("GovernedSurface.invalidConfigTitle"),
-    description: t("GovernedSurface.invalidConfigDescription"),
-  };
-
-  if (loadError) {
-    const body: GovernedSurfaceSectionCardBody = {
-      state: "invalid",
-      model: loadError,
-    };
-    return renderGovernedPatternSectionShell({ ...shellInput, body });
-  }
-
-  if (forbidden) {
-    return renderGovernedPatternSectionShell({
-      ...shellInput,
-      body: { state: "forbidden", model: forbidden },
-    });
-  }
-
-  const parsed = parseGovernedChartConfiguration(chartConfiguration);
   let body: GovernedSurfaceSectionCardBody;
 
-  if (!parsed.success) {
-    logUnexpectedServerError(
-      "GovernedPatternBChartSection invalid chart configuration",
-      parsed.error,
-      { surfaceKey },
-    );
-    body = { state: "invalid", model: invalidModel };
-  } else {
+  if (loadError) {
     body = {
-      state: "ready",
-      children: (
-        <GovernedComponentRenderer
-          surfaceKey={surfaceKey}
-          component={{
-            type: "governed:chart",
-            serverType: "governed:chart",
-            configuration: parsed.data,
-          }}
-        />
-      ),
+      state: "invalid",
+      model: {
+        ...loadError,
+        emptyId: loadError.emptyId ?? "chart-section-load-error",
+      },
     };
+  } else if (forbidden) {
+    body = {
+      state: "forbidden",
+      model: forbidden,
+    };
+  } else {
+    const parsed = parseGovernedChartConfiguration(chartConfiguration);
+
+    if (!parsed.success) {
+      logUnexpectedServerError(
+        "GovernedPatternBChartSection invalid chart configuration",
+        parsed.error,
+        { surfaceKey },
+      );
+
+      body = {
+        state: "invalid",
+        model: {
+          variant: "error",
+          title: invalid?.title ?? t("GovernedSurface.invalidConfigTitle"),
+          description:
+            invalid?.description ?? t("GovernedSurface.invalidConfigDescription"),
+          emptyId: invalid?.emptyId ?? "chart-section-invalid-config",
+        },
+      };
+    } else {
+      body = {
+        state: "ready",
+        children: (
+          <GovernedComponentRenderer
+            surfaceKey={surfaceKey}
+            component={{
+              type: "governed:chart",
+              serverType: "governed:chart",
+              configuration: parsed.data,
+            }}
+          />
+        ),
+      };
+    }
   }
 
-  return renderGovernedPatternSectionShell({ ...shellInput, body });
+  return renderGovernedPatternSectionShell({
+    ...shellInput,
+    body,
+  });
 }

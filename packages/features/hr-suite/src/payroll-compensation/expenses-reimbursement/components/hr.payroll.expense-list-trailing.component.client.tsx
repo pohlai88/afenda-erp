@@ -19,6 +19,7 @@ import {
   requestHrExpenseClarificationAction,
   returnHrExpenseClaimAction,
 } from "../actions/hr.payroll.expense.actions.server";
+import { HrExpenseReceiptUploadForm } from "./hr.payroll.expense-receipt-upload.component.client";
 import { hrExpenseUiCopy } from "../surface/hr.payroll.expense-ui.copy.shared";
 
 function ExpenseTrailingForm({
@@ -40,14 +41,7 @@ function ExpenseTrailingForm({
   const [state, formAction, pending] = useActionState(action, undefined);
 
   return (
-    <form
-      action={formAction}
-      className="flex flex-col gap-surface-sm"
-      onSubmit={(event) => {
-        event.preventDefault();
-        event.currentTarget.requestSubmit();
-      }}
-    >
+    <form action={formAction} className="flex flex-col gap-surface-sm">
       <input type="hidden" name="claimId" value={claimId} />
       {children}
       <Button
@@ -64,13 +58,30 @@ function ExpenseTrailingForm({
   );
 }
 
-/** HRM-EXP-018 — approve, reject, return, request clarification. */
+/** HRM-EXP-018 — approve/reject/return/clarify; HRM-EXP-003 — receipt attach for writers. */
 export function HrExpenseClaimsTrailingCell({ row }: GovernedListTrailingCellProps) {
   const trailingAction = row.trailingAction;
   const copy = hrExpenseUiCopy.claims;
 
   if (!isListSurfaceTrailingActionRenderable(trailingAction)) {
     return null;
+  }
+
+  const descriptorId = trailingAction.descriptor?.id;
+
+  if (descriptorId === "attach-expense-receipt") {
+    const employeeId = String(row.cells.employeeIdValue ?? "");
+    const claimReference = String(row.cells.claimReferenceValue ?? row.id);
+
+    return (
+      <GovernedTrailingActionSlot trailingAction={trailingAction}>
+        <HrExpenseReceiptUploadForm
+          claimId={row.id}
+          employeeId={employeeId}
+          defaultTitle={`Receipt — ${claimReference}`}
+        />
+      </GovernedTrailingActionSlot>
+    );
   }
 
   return (

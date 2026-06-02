@@ -6,10 +6,10 @@
   implementation boundary for `@afenda/feature-system-admin`.
 - `src/data-management/data-management-architecture.md` is the local vertical
   guide for the enterprise import/export workbench.
-- Canonical doctrine remains ARCH-011 and its supplements under
+- Canonical doctrine remains ARCH-1006 and its supplements under
   `docs/architecture/`.
 
-## Export doors (ARCH-008)
+## Export doors (ARCH-1005)
 
 | Door | Owns |
 | ---- | ---- |

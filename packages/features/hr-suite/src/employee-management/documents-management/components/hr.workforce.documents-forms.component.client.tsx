@@ -8,6 +8,8 @@ import { Button } from "@afenda/ui/button";
 import { Field, FieldGroup, FieldLabel } from "@afenda/ui/field";
 import { Input } from "@afenda/ui/input";
 
+import { HrObjectStorageFileField } from "../../../hr-suite-integration/client";
+
 import {
   registerHrEmployeeDocumentAction,
   recordHrDocumentAcknowledgmentAction,
@@ -105,35 +107,13 @@ export function HrDocumentsRegisterForm({
           <option value="restricted">Restricted</option>
         </select>
       </Field>
-      <Field>
-        <FieldLabel htmlFor="documents-register-blob">
-          {copy.formFieldBlobUrl}
-        </FieldLabel>
-        <Input id="documents-register-blob" name="blobUrl" required />
-      </Field>
-      <Field>
-        <FieldLabel htmlFor="documents-register-mime">
-          {copy.formFieldMimeType}
-        </FieldLabel>
-        <Input
-          id="documents-register-mime"
-          name="mimeType"
-          defaultValue="application/pdf"
-          required
-        />
-      </Field>
-      <Field>
-        <FieldLabel htmlFor="documents-register-size">
-          {copy.formFieldSizeBytes}
-        </FieldLabel>
-        <Input
-          id="documents-register-size"
-          name="sizeBytes"
-          type="number"
-          defaultValue="1024"
-          required
-        />
-      </Field>
+      <HrObjectStorageFileField
+        moduleId="hr"
+        idPrefix="documents-register"
+        label={copy.formFieldBlobUrl}
+        hint="Upload the workforce document before registering."
+        onUploaded={() => undefined}
+      />
       <Field>
         <FieldLabel htmlFor="documents-register-effective-from">
           {copy.formFieldEffectiveFrom}

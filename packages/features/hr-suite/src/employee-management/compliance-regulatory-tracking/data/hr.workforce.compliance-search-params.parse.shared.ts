@@ -95,7 +95,7 @@ export function parseHrComplianceSearchParams(
   return parsed;
 }
 
-/** Registry-driven bridge from App Router searchParams to the compliance page model (ARCH-006). */
+/** Registry-driven bridge from App Router searchParams to the compliance page model (ARCH-1003). */
 export function toHrCompliancePageModelInput(input: {
   organizationId: string;
   canWrite: boolean;

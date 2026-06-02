@@ -552,6 +552,7 @@ export function getModuleListSurfaceKeys(moduleId: ModuleId) {
     workItems: moduleSurfaceKey(moduleId, "work-items"),
     savedViews: `${moduleId}.saved-views.list`,
     documents: `${moduleId}.documents.list`,
+    documentActivity: `${moduleId}.documents.activity`,
   };
 }
 
@@ -927,8 +928,85 @@ export function buildDocumentRegistryListSurface(input: {
       cellKinds: {
         download: {
           kind: "link" as const,
-          href: `/api/documents/${doc.id}/download?moduleId=${input.moduleId}`,
+          href: `/api/internal/v1/documents/${doc.id}/download?moduleId=${input.moduleId}`,
         },
+      },
+    })),
+  });
+}
+
+type DocumentActivityLineRow = {
+  id: string;
+  summary: string;
+  actorLabel: string;
+  occurredAt: string;
+  evidenceHref?: string;
+  policyLabel?: string;
+  riskTone?: "default" | "positive" | "attention" | "critical";
+};
+
+const DOCUMENT_ACTIVITY_COLUMNS = [
+  {
+    id: "summary",
+    header: "Event",
+    priority: "primary" as const,
+    pin: "start" as const,
+    wrap: true,
+    minWidth: 220,
+  },
+  { id: "actorLabel", header: "Actor" },
+  { id: "occurredAt", header: "Occurred" },
+];
+
+/** Document audit / traceability lines — uses `document-lines` data nature. */
+export function buildDocumentActivityLinesListSurface(input: {
+  events: readonly DocumentActivityLineRow[];
+  moduleId: ModuleId;
+  window?: ModuleListWindow;
+  query?: ModuleWorkspaceListQuery;
+}): ListSurfaceRendererConfigurationResolvedInput {
+  const rows = input.events;
+
+  return buildGovernedListSurface({
+    __schemaVersion: GOVERNED_METADATA_SCHEMA_VERSION,
+    dataNature: "document-lines",
+    presentationProfile: "erp-audit-ledger",
+    requiresErpPermission: {
+      module: input.moduleId,
+      object: "documents",
+      function: "read",
+    },
+    pagination: buildPaginationWithHref({
+      moduleId: input.moduleId,
+      kind: "documents",
+      window: input.window,
+      rowCount: rows.length,
+      query: input.query,
+    }),
+    surface: {
+      header: { title: "Document activity" },
+      columnsId: `${input.moduleId}-document-activity`,
+      rowKey: "id",
+      empty: {
+        variant: "muted",
+        title: moduleScreenSections.documents.emptyState,
+      },
+    },
+    columns: DOCUMENT_ACTIVITY_COLUMNS,
+    rows: rows.map((event) => ({
+      id: event.id,
+      cells: {
+        summary: event.summary,
+        actorLabel: event.actorLabel,
+        occurredAt: event.occurredAt,
+      },
+      decisionLedger: {
+        reason: event.summary,
+        actorLabel: event.actorLabel,
+        occurredAt: event.occurredAt,
+        ...(event.evidenceHref ? { evidenceHref: event.evidenceHref } : {}),
+        ...(event.policyLabel ? { policyLabel: event.policyLabel } : {}),
+        ...(event.riskTone ? { riskTone: event.riskTone } : {}),
       },
     })),
   });
