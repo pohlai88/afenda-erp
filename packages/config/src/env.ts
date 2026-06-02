@@ -34,12 +34,20 @@ const observabilityEnvSchema = z.object({
   VERCEL_DRAIN_SECRET: z.string().min(1),
 });
 
+const logLevelSchema = z
+  .enum(["trace", "debug", "info", "warn", "error", "fatal"])
+  .default("info");
+
+const loggingEnvSchema = z.object({
+  LOG_LEVEL: logLevelSchema,
+});
+
 const blobEnvSchema = z.object({
   BLOB_READ_WRITE_TOKEN: z.string().min(1).optional(),
   VERCEL_BLOB_CALLBACK_URL: z.url().optional(),
 });
 
-const objectStorageProviderSchema = z.enum(["vercel-blob", "r2"]);
+const objectStorageProviderSchema = z.enum(["vercel-blob", "r2", "s3"]);
 
 const optionalObjectStorageEnvString = z.preprocess(
   (value) =>
@@ -68,6 +76,18 @@ const objectStorageEnvSchema = z.object({
   OBJECT_STORAGE_ACCESS_KEY_ID: optionalObjectStorageEnvString,
   OBJECT_STORAGE_SECRET_ACCESS_KEY: optionalObjectStorageEnvString,
   OBJECT_STORAGE_PUBLIC_URL_BASE: optionalObjectStorageEnvUrl,
+  AWS_S3_REGION: optionalObjectStorageEnvString,
+});
+
+const vaultEnvSchema = z.object({
+  VAULT_ADDR: optionalObjectStorageEnvUrl,
+  VAULT_TOKEN: optionalObjectStorageEnvString,
+  VAULT_TRANSIT_MOUNT: optionalObjectStorageEnvString,
+  VAULT_TRANSIT_KEY_PREFIX: optionalObjectStorageEnvString,
+});
+
+const awsKmsEnvSchema = z.object({
+  AWS_KMS_REGION: optionalObjectStorageEnvString,
 });
 
 const optionalNonEmptyEnvString = z.preprocess(
@@ -104,6 +124,7 @@ const documentAvEnvSchema = z.object({
 export type BaseEnv = z.infer<typeof baseEnvSchema>;
 export type DatabaseEnv = z.infer<typeof databaseEnvSchema>;
 export type AiEnv = z.infer<typeof aiEnvSchema>;
+export type LogLevel = z.infer<typeof logLevelSchema>;
 
 export type NeonAuthEnv = BaseEnv & {
   configured: boolean;
@@ -118,7 +139,7 @@ export type BlobEnv = {
   VERCEL_BLOB_CALLBACK_URL?: string;
 };
 
-export type ObjectStorageProviderId = "vercel-blob" | "r2";
+export type ObjectStorageProviderId = "vercel-blob" | "r2" | "s3";
 
 export type ObjectStorageR2Env = {
   endpoint: string;
@@ -128,11 +149,33 @@ export type ObjectStorageR2Env = {
   publicUrlBase?: string;
 };
 
+export type ObjectStorageS3Env = {
+  region: string;
+  bucket: string;
+  accessKeyId: string;
+  secretAccessKey: string;
+  publicUrlBase?: string;
+};
+
+export type VaultEnv = {
+  configured: boolean;
+  addr: string;
+  token: string;
+  transitMount: string;
+  transitKeyPrefix: string;
+};
+
+export type AwsKmsEnv = {
+  configured: boolean;
+  region: string;
+};
+
 export type ObjectStorageEnv = {
   provider: ObjectStorageProviderId;
   configured: boolean;
   vercelBlob?: BlobEnv & { BLOB_READ_WRITE_TOKEN: string };
   r2?: ObjectStorageR2Env;
+  s3?: ObjectStorageS3Env;
 };
 
 export type DocumentAvEnv = {
@@ -209,6 +252,10 @@ export function getVercelDrainSecret(
   return parsed.success ? parsed.data.VERCEL_DRAIN_SECRET : undefined;
 }
 
+export function getLogLevel(input: NodeJS.ProcessEnv = process.env): LogLevel {
+  return loggingEnvSchema.parse(input).LOG_LEVEL;
+}
+
 export function getDocumentAvEnv(
   input: NodeJS.ProcessEnv = process.env,
 ): DocumentAvEnv {
@@ -245,6 +292,26 @@ export function getBlobEnv(input: NodeJS.ProcessEnv = process.env): BlobEnv {
     configured: Boolean(BLOB_READ_WRITE_TOKEN),
     BLOB_READ_WRITE_TOKEN,
     VERCEL_BLOB_CALLBACK_URL,
+  };
+}
+
+function parseS3Env(
+  data: z.infer<typeof objectStorageEnvSchema>,
+): ObjectStorageS3Env | undefined {
+  if (
+    !data.OBJECT_STORAGE_BUCKET ||
+    !data.OBJECT_STORAGE_ACCESS_KEY_ID ||
+    !data.OBJECT_STORAGE_SECRET_ACCESS_KEY
+  ) {
+    return undefined;
+  }
+
+  return {
+    region: data.AWS_S3_REGION ?? "ap-southeast-1",
+    bucket: data.OBJECT_STORAGE_BUCKET,
+    accessKeyId: data.OBJECT_STORAGE_ACCESS_KEY_ID,
+    secretAccessKey: data.OBJECT_STORAGE_SECRET_ACCESS_KEY,
+    publicUrlBase: data.OBJECT_STORAGE_PUBLIC_URL_BASE,
   };
 }
 
@@ -316,6 +383,7 @@ export function getObjectStorageEnv(
   const data = parsed.data;
   const vercelBlob = getBlobEnv(normalized);
   const r2 = parseR2Env(data);
+  const s3 = parseS3Env(data);
 
   const explicitProvider = data.OBJECT_STORAGE_PROVIDER;
   let provider: ObjectStorageProviderId;
@@ -326,6 +394,8 @@ export function getObjectStorageEnv(
     provider = "vercel-blob";
   } else if (r2) {
     provider = "r2";
+  } else if (s3) {
+    provider = "s3";
   } else {
     return { provider: "vercel-blob", configured: false };
   }
@@ -345,6 +415,18 @@ export function getObjectStorageEnv(
     };
   }
 
+  if (provider === "s3") {
+    if (!s3) {
+      return { provider: "s3", configured: false };
+    }
+
+    return {
+      provider: "s3",
+      configured: true,
+      s3,
+    };
+  }
+
   if (!r2) {
     return { provider: "r2", configured: false };
   }
@@ -353,6 +435,43 @@ export function getObjectStorageEnv(
     provider: "r2",
     configured: true,
     r2,
+  };
+}
+
+export function getVaultEnv(
+  input: NodeJS.ProcessEnv = process.env,
+): VaultEnv {
+  const parsed = vaultEnvSchema.safeParse(input);
+
+  if (!parsed.success || !parsed.data.VAULT_ADDR || !parsed.data.VAULT_TOKEN) {
+    return {
+      configured: false,
+      addr: "",
+      token: "",
+      transitMount: "transit",
+      transitKeyPrefix: "afenda/org-",
+    };
+  }
+
+  return {
+    configured: true,
+    addr: parsed.data.VAULT_ADDR,
+    token: parsed.data.VAULT_TOKEN,
+    transitMount: parsed.data.VAULT_TRANSIT_MOUNT ?? "transit",
+    transitKeyPrefix: parsed.data.VAULT_TRANSIT_KEY_PREFIX ?? "afenda/org-",
+  };
+}
+
+export function getAwsKmsEnv(
+  input: NodeJS.ProcessEnv = process.env,
+): AwsKmsEnv {
+  const parsed = awsKmsEnvSchema.safeParse(input);
+
+  return {
+    configured: true,
+    region: parsed.success
+      ? (parsed.data.AWS_KMS_REGION ?? "ap-southeast-1")
+      : "ap-southeast-1",
   };
 }
 

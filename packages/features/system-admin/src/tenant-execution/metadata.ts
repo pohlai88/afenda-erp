@@ -10,7 +10,13 @@ export {
   documentLifecycleTrailingActionId,
   systemAdminDocumentActivityGalleryEvents,
   systemAdminDocumentActivityGallerySurfaceKey,
+  systemAdminDocumentActivityHrGalleryEvents,
+  systemAdminDocumentActivityHrGallerySurfaceKey,
   systemAdminDocumentRegistryGalleryModuleId,
   systemAdminDocumentRegistryGalleryRows,
   systemAdminDocumentRegistryGallerySurfaceKey,
+  systemAdminDocumentRegistrySensitiveGalleryModuleId,
+  buildSystemAdminOrganizationStorageQuotaStatGrid,
+  buildSystemAdminOrganizationStorageQuotaStatGroups,
+  systemAdminOrganizationStorageQuotaSurfaceKey,
 } from "./surface";

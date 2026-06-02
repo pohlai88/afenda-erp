@@ -14,7 +14,7 @@ import type {
   ObjectStorageGateDecision,
   ObjectStorageDownloadGovernanceInput,
 } from "../contracts/index";
-import { createObjectStore } from "../domain/create-object-store.server";
+import { createObjectStore, resolveObjectStorageProviderId } from "../domain/create-object-store.server";
 import { assertObjectStorageConfigured } from "../domain/object-storage-config.server";
 import {
   UploadRouteError,
@@ -33,10 +33,15 @@ import {
   MULTIPART_UPLOAD_THRESHOLD_BYTES,
 } from "../policies/tenant-pathnames.shared";
 import { handleR2UploadPost } from "../../r2/api/upload-handler.server";
+import { handleS3UploadPost } from "../../s3/api/upload-handler.server";
+import { handleServerEncryptedUploadPost, decryptStoredDocumentBody } from "./server-encrypted-upload.server";
+import { buildObjectStorageEncryptionContext, resolveUploadMode } from "../domain/create-key-management.server";
+import { parseDocumentEncryptionMetadata } from "../schemas/document-encryption-metadata.shared";
 import type {
   ObjectStorageHandlerResult,
   ObjectStorageUploadHandlerDeps,
 } from "./upload-registration.server";
+import { uploadPayloadSchema } from "../schemas/upload-payload.shared";
 import {
   assertDocumentScanPassed,
   assertGateDecisionAllowed,
@@ -60,6 +65,7 @@ export type ObjectStorageDownloadHandlerDeps = {
   resolveOrganizationObjectStorageProvider?: (
     organizationId: string,
   ) => Promise<ObjectStorageProviderId | null | undefined>;
+  resolveOrganizationEncryptionSettings?: ObjectStorageUploadHandlerDeps["resolveOrganizationEncryptionSettings"];
 };
 
 export type ObjectStorageHandlerDeps = ObjectStorageUploadHandlerDeps &
@@ -68,6 +74,63 @@ export type ObjectStorageHandlerDeps = ObjectStorageUploadHandlerDeps &
 export type { ObjectStorageHandlerResult, ObjectStorageUploadHandlerDeps };
 
 const SIGNED_URL_TTL_MS = 5 * 60 * 1000;
+const moduleIdSchema = z.enum(moduleIds);
+
+function peekUploadModuleId(
+  body: Record<string, unknown> | null,
+): ModuleId | null {
+  if (!body) {
+    return null;
+  }
+
+  if (body.intent !== "presign" && body.intent !== "complete") {
+    return null;
+  }
+
+  try {
+    const payloadSource =
+      body.intent === "complete" && typeof body.tokenPayload === "string"
+        ? body.tokenPayload
+        : typeof body.clientPayload === "string"
+          ? body.clientPayload
+          : null;
+
+    if (!payloadSource) {
+      return null;
+    }
+
+    const parsed = uploadPayloadSchema.parse(JSON.parse(payloadSource));
+    return moduleIdSchema.parse(parsed.moduleId);
+  } catch {
+    return null;
+  }
+}
+
+async function resolveEffectiveProviderForUploadRequest(
+  request: Request,
+  objectStorageEnv: ReturnType<typeof assertObjectStorageConfigured> & {
+    configured: true;
+  },
+  deps: Pick<ObjectStorageHandlerDeps, "resolveOrganizationObjectStorageProvider">,
+): Promise<ObjectStorageProviderId> {
+  const requestBody = (await request.clone().json().catch(() => null)) as
+    | Record<string, unknown>
+    | null;
+  const moduleId = peekUploadModuleId(requestBody);
+
+  if (!moduleId) {
+    return objectStorageEnv.provider;
+  }
+
+  const { organization } = await requireUploadModuleAccess(moduleId, "upload");
+  const organizationProviderId =
+    await deps.resolveOrganizationObjectStorageProvider?.(organization.id);
+
+  return resolveObjectStorageProviderId(
+    objectStorageEnv,
+    organizationProviderId,
+  );
+}
 
 export async function handleObjectStorageUploadPost(
   request: Request,
@@ -84,6 +147,28 @@ export async function handleObjectStorageUploadPost(
 
   try {
     const objectStorageEnv = assertObjectStorageConfigured();
+    const contentType = request.headers.get("content-type") ?? "";
+
+    if (contentType.includes("multipart/form-data")) {
+      const result = await handleServerEncryptedUploadPost(
+        request,
+        {
+          requestId,
+          route,
+          startedAt,
+        },
+        deps,
+      );
+
+      logServerEvent("info", "Upload route completed.", context, {
+        route,
+        durationMs: Date.now() - startedAt,
+        status: result.status,
+      });
+
+      return result;
+    }
+
     const requestBody = (await request.clone().json().catch(() => null)) as
       | Record<string, unknown>
       | null;
@@ -92,12 +177,20 @@ export async function handleObjectStorageUploadPost(
 
     logServerEvent("info", "Upload route started.", context, { route });
 
-    if (objectStorageEnv.provider === "r2") {
+    const effectiveProvider = await resolveEffectiveProviderForUploadRequest(
+      request,
+      objectStorageEnv,
+      deps,
+    );
+
+    if (effectiveProvider === "r2" || effectiveProvider === "s3") {
       if (!hasR2Intent) {
         throw new UploadRouteError(400, uploadRouteCopy.invalidRequest);
       }
 
-      const result = await handleR2UploadPost(request, {
+      const uploadHandler =
+        effectiveProvider === "s3" ? handleS3UploadPost : handleR2UploadPost;
+      const result = await uploadHandler(request, {
         requestId,
         route,
         startedAt,
@@ -197,22 +290,40 @@ export async function handleObjectStorageUploadPost(
   }
 }
 
-const moduleIdSchema = z.enum(moduleIds);
-
 export async function handleObjectStorageUploadConfigGet(
   request: Request,
+  deps: Pick<
+    ObjectStorageHandlerDeps,
+    | "resolveOrganizationObjectStorageProvider"
+    | "resolveOrganizationEncryptionSettings"
+  > = {},
 ): Promise<ObjectStorageHandlerResult> {
   try {
     const objectStorageEnv = assertObjectStorageConfigured();
     const url = new URL(request.url);
     const moduleId = moduleIdSchema.parse(url.searchParams.get("moduleId"));
     const { organization } = await requireUploadModuleAccess(moduleId, "upload");
+    const organizationProviderId =
+      await deps.resolveOrganizationObjectStorageProvider?.(organization.id);
+    const provider = resolveObjectStorageProviderId(
+      objectStorageEnv,
+      organizationProviderId,
+    );
+    const encryptionSettings =
+      (await deps.resolveOrganizationEncryptionSettings?.(organization.id)) ?? {
+        mode: "platform" as const,
+        kmsAdapter: null,
+        kmsKeyRef: null,
+      };
+    const uploadMode = resolveUploadMode(encryptionSettings);
 
     return {
       status: 200,
       body: {
         configured: true,
-        provider: objectStorageEnv.provider,
+        provider,
+        uploadMode,
+        encryptionMode: encryptionSettings.mode,
         pathnamePrefix: buildTenantObjectPathPrefix({
           organizationId: organization.id,
           moduleId,
@@ -222,7 +333,7 @@ export async function handleObjectStorageUploadConfigGet(
         contentTypes: [...documentUploadContentTypes],
         accept: documentUploadAccept,
         governance: objectStorageGovernancePolicy,
-        ...(objectStorageEnv.provider === "vercel-blob"
+        ...(provider === "vercel-blob"
           ? { multipartThresholdBytes: MULTIPART_UPLOAD_THRESHOLD_BYTES }
           : {}),
       },
@@ -288,9 +399,20 @@ export async function handleObjectStorageDocumentDownloadGet(
     );
     const organizationProviderId =
       await deps.resolveOrganizationObjectStorageProvider?.(organization.id);
+    const encryptionSettings =
+      (await deps.resolveOrganizationEncryptionSettings?.(organization.id)) ?? {
+        mode: "platform" as const,
+        kmsAdapter: null,
+        kmsKeyRef: null,
+      };
     const store = createObjectStore(objectStorageEnv, {
       organizationId: organization.id,
       organizationProviderId,
+      encryption: buildObjectStorageEncryptionContext({
+        organizationId: organization.id,
+        settings: encryptionSettings,
+      }),
+      sseKmsKeyId: encryptionSettings.kmsKeyRef,
     });
     const sourceIp = getRequestSourceIp(input.request);
     const document = await deps.getTenantDocument({
@@ -343,8 +465,77 @@ export async function handleObjectStorageDocumentDownloadGet(
       await deps.authorizeDocumentDownload?.(governanceInput),
     );
 
-    const validUntil = Date.now() + SIGNED_URL_TTL_MS;
     const contentDisposition = formatDownloadContentDisposition(document.title);
+    const envelopeEncryption = parseDocumentEncryptionMetadata(document.metadata);
+
+    if (envelopeEncryption) {
+      const plaintext = await decryptStoredDocumentBody({
+        organizationId: organization.id,
+        pathname: document.pathname,
+        metadata: document.metadata,
+        store,
+        deps,
+      });
+
+      if (!plaintext) {
+        throw new UploadRouteError(500, uploadRouteCopy.uploadFailed);
+      }
+
+      incrementObjectStorageMetric("encryption_unwrap_total", {
+        requestId,
+        organizationId: organization.id,
+        moduleId: document.moduleId,
+        provider: store.providerId,
+      });
+
+      await recordEvidenceEvent({
+        sink: deps.recordEvidenceEvent,
+        event: {
+          action: "DOCUMENT_DOWNLOADED",
+          organizationId: organization.id,
+          moduleId: document.moduleId,
+          documentId: document.id,
+          pathname: document.pathname,
+          classification: document.classification,
+          retentionClass: document.retentionClass,
+          userId: governanceInput.requestedByAuthUserId,
+          sessionId: session.id,
+          sourceIp,
+          metadata: {
+            access: document.access,
+            provider: store.providerId,
+            encryptionAdapter: envelopeEncryption.adapter,
+            delivery: "proxied-decrypt",
+          },
+        },
+      });
+
+      incrementObjectStorageMetric("encrypted_downloads_total", {
+        requestId,
+        organizationId: organization.id,
+        moduleId: document.moduleId,
+        provider: store.providerId,
+      });
+
+      incrementObjectStorageMetric("downloads_total", {
+        requestId,
+        organizationId: organization.id,
+        moduleId: document.moduleId,
+        provider: store.providerId,
+      });
+
+      return {
+        status: 200,
+        binaryBody: plaintext,
+        responseHeaders: {
+          "Content-Type": document.contentType ?? "application/octet-stream",
+          "Content-Disposition": contentDisposition,
+          "Cache-Control": "private, no-store",
+        },
+      };
+    }
+
+    const validUntil = Date.now() + SIGNED_URL_TTL_MS;
     const signed = await store.getSignedDownloadUrl({
       pathname: document.pathname,
       access: document.access,
@@ -367,7 +558,7 @@ export async function handleObjectStorageDocumentDownloadGet(
         sourceIp,
         metadata: {
           access: document.access,
-          provider: objectStorageEnv.provider,
+          provider: store.providerId,
           validUntilMs: validUntil,
         },
       },
@@ -388,7 +579,7 @@ export async function handleObjectStorageDocumentDownloadGet(
         documentId: document.id,
         pathname: document.pathname,
         validUntilMs: validUntil,
-        provider: objectStorageEnv.provider,
+        provider: store.providerId,
       },
     );
 
@@ -396,7 +587,7 @@ export async function handleObjectStorageDocumentDownloadGet(
       requestId,
       organizationId: organization.id,
       moduleId: document.moduleId,
-      provider: objectStorageEnv.provider,
+      provider: store.providerId,
     });
 
     return {

@@ -15,6 +15,14 @@ export async function GET(
     { request, documentId },
     createTenantObjectStorageDownloadDeps(),
   );
+
+  if (result.binaryBody) {
+    return new NextResponse(result.binaryBody as BodyInit, {
+      status: result.status,
+      headers: result.responseHeaders,
+    });
+  }
+
   return result.redirect
     ? NextResponse.redirect(result.redirect, 302)
     : NextResponse.json(result.body, { status: result.status });

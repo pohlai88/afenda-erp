@@ -277,7 +277,7 @@ Object-storage remains free of `@afenda/db`; audit writes happen in the app adap
 | ----- | ----------- | -------- |
 | In transit | TLS 1.3 mandatory | **Shipped** — HTTPS ingress + provider TLS |
 | At rest | Provider encryption mandatory | **Shipped** — Vercel Blob / R2 provider default |
-| Customer-managed keys | BYOK, KMS, HSM without redesign | **Future** — port abstraction allows provider swap |
+| Customer-managed keys | BYOK, KMS, HSM without redesign | **Shipped** — envelope encryption via Vault Transit + AWS KMS adapters; `KeyManagementPort` + server upload / proxied download; optional S3 SSE-KMS provider tier |
 
 ---
 
@@ -329,18 +329,18 @@ Migration must support `vercel-blob → r2 → (future provider)` without featur
 | Preserve audit history | **Required** — ledger append-only |
 | Preserve retention metadata | **Required** — `retentionClass` + HR policies |
 
-**As-built:** custom Vercel Blob → R2 copy documented in `AGENTS.md`; no in-product migration job.
+**As-built:** operator CLI **Shipped** — `pnpm blob:migrate:r2` (`packages/object-storage/scripts/migrate-vercel-blob-to-r2.mts`); registry rows drive copy; pathname preserved.
 
 ## Provider choice (deployment)
 
 One **active provider per deployment** via `getObjectStorageEnv()`. Dual credential sets require explicit `OBJECT_STORAGE_PROVIDER`.
 
-| Dimension | vercel-blob | r2 |
-| --------- | ----------- | -- |
-| Best fit | Vercel-native uploads | Cost, S3 API, Cloudflare edge |
-| Upload | `handleUpload` + client `upload()` | presign → PUT → complete |
-| Private download | Signed URL via port | Presigned GET |
-| Per-org provider preference | **Shipped** — `organizations.object_storage_provider` (migration 0051) + download resolver | **Shipped** — same column; upload falls back to env default when unset |
+| Dimension | vercel-blob | r2 | s3 |
+| --------- | ----------- | -- | -- |
+| Best fit | Vercel-native uploads | Cost, S3 API, Cloudflare edge | Enterprise SSE-KMS BYOK |
+| Upload | `handleUpload` + client `upload()` | presign → PUT → complete | presign → PUT (SSE-KMS) → complete |
+| Private download | Signed URL via port | Presigned GET | Presigned GET (S3 decrypts with CMK) |
+| Per-org provider preference | **Shipped** — `organizations.object_storage_provider` (migration 0051); upload/download/config resolver; System Admin → Security form | **Shipped** — same column and UI | **Shipped** — `s3` enum + CMK ARN via encryption settings |
 
 ---
 
@@ -437,7 +437,7 @@ Codes below apply to `@afenda/object-storage` only.
 | OSM-BLOB-001–003 | **Shipped** |
 | OSM-R2-001–006 | **Shipped** |
 | OSM-POL-001–003 | **Shipped** |
-| OSM-PRV-F01–F02 | Per-org provider preference — **Shipped** — `organizations.object_storage_provider` enum (migration 0051) + download resolver; upload route env default when org column unset |
+| OSM-PRV-F01–F02 | Per-org provider preference — **Shipped** — DB column + upload/download/config resolver + System Admin → Security form |
 
 ## Evidence platform (ARCH-OS-*)
 
@@ -468,7 +468,10 @@ Codes below apply to `@afenda/object-storage` only.
 | AV webhook | `apps/erp/src/app/api/internal/v1/webhooks/document-scan-result/route.ts` |
 | Legacy download redirect | `apps/erp/src/app/api/documents/[documentId]/download/route.ts` → **308** internal v1 |
 | Quarantine inbox | `packages/features/system-admin/…/document-quarantine-inbox.read-model.server.ts` |
-| Per-org provider | `organizations.object_storage_provider` (migration 0051) |
+| Per-org provider | `organizations.object_storage_provider` (migration 0051) + System Admin → Security form |
+| Blob→R2 migration CLI | `packages/object-storage/scripts/migrate-vercel-blob-to-r2.mts` — `pnpm blob:migrate:r2` |
+| BYOK hook | `_object-storage-integration/contracts/key-management.port.shared.ts` |
+| Document lifecycle trailing UI | `@afenda/feature-system-admin/client` — explicit `Cell` on Pattern C lists (not `governed-list-trailing-cell-registry`; ARCH-1002 feature ownership) |
 | DR runbook | `packages/object-storage/docs/object-storage-dr-runbook.md` |
 | Metrics | `_object-storage-integration/api/object-storage-metrics.server.ts` |
 | Ingress governance CI | `packages/object-storage/scripts/check-object-storage-ingress-governance.mts` |

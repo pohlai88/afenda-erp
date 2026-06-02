@@ -159,6 +159,45 @@ export function createR2ObjectStore(r2: ObjectStorageR2Env): ObjectStorePort {
       return new Uint8Array(await body.transformToByteArray());
     },
 
+    async putObject(input: {
+      pathname: string;
+      body: Uint8Array;
+      contentType: string;
+    }): Promise<StoredObjectMetadata> {
+      const response = await client.send(
+        new PutObjectCommand({
+          Bucket: r2.bucket,
+          Key: input.pathname,
+          Body: input.body,
+          ContentType: input.contentType,
+        }),
+      );
+
+      return headObjectMetadataFromR2Response({
+        pathname: input.pathname,
+        url: resolveR2ObjectUrl(input.pathname, r2),
+        contentType: input.contentType,
+        contentLength: input.body.byteLength,
+        etag: response.ETag,
+      });
+    },
+
+    async getObjectBody(pathname: string): Promise<Uint8Array> {
+      const response = await client.send(
+        new GetObjectCommand({
+          Bucket: r2.bucket,
+          Key: pathname,
+        }),
+      );
+
+      const body = response.Body;
+      if (!body) {
+        throw new UploadRouteError(400, uploadRouteCopy.invalidRequest);
+      }
+
+      return new Uint8Array(await body.transformToByteArray());
+    },
+
     async getSignedDownloadUrl(
       input: SignedDownloadInput,
     ): Promise<SignedDownloadResult> {

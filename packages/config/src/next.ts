@@ -52,6 +52,8 @@ export const afendaSecurityHeaders = [
   },
 ] as const;
 
+export const afendaServerExternalPackages = ["pino", "pino-pretty"] as const;
+
 export function createAfendaNextConfig(overrides: NextConfig = {}): NextConfig {
   assertCiBuildEnv();
 
@@ -83,5 +85,9 @@ export function createAfendaNextConfig(overrides: NextConfig = {}): NextConfig {
       ];
     },
     ...overrides,
+    serverExternalPackages: [
+      ...afendaServerExternalPackages,
+      ...(overrides.serverExternalPackages ?? []),
+    ],
   };
 }

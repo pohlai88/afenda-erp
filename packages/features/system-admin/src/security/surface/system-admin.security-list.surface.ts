@@ -7,6 +7,11 @@ import {
 import type { OrganizationSecuritySettings } from "../contracts/system-admin.security-settings.contract";
 import type { SecurityReadinessReport } from "../contracts/system-admin.security-readiness.contract";
 import { systemAdminSecurityUiCopy } from "./system-admin.security-ui.copy.shared";
+import { resolveEffectiveObjectStorageProviderLabel } from "../../tenant-execution/surface/system-admin.object-storage-provider.shared";
+import {
+  formatEncryptionModeLabel,
+  formatKmsAdapterLabel,
+} from "../schemas/system-admin.object-storage-encryption.schema";
 
 export const systemAdminSecuritySurfaceKey = "system-admin.security.list";
 
@@ -139,10 +144,44 @@ function buildSettingsRows(security: OrganizationSecuritySettings | null) {
 export function buildSystemAdminSecuritySettingsListSurface(input: {
   security: OrganizationSecuritySettings | null;
   readiness: SecurityReadinessReport;
+  objectStorageProvider: "vercel-blob" | "r2" | "s3" | null;
+  deploymentProvider: "vercel-blob" | "r2" | "s3";
+  encryptionSettings: {
+    mode: "platform" | "customer-managed";
+    kmsAdapter: "vault-transit" | "aws-kms" | null;
+    kmsKeyRef: string | null;
+  };
 }): ListSurfaceRendererConfigurationResolvedInput {
   const rows = [
     ...buildReadinessRows(input.readiness),
     ...buildSettingsRows(input.security),
+    {
+      id: "object-storage-provider",
+      cells: {
+        category: systemAdminSecurityUiCopy.objectStorageProvider.postureCategory,
+        setting: systemAdminSecurityUiCopy.objectStorageProvider.postureSetting,
+        value: resolveEffectiveObjectStorageProviderLabel({
+          organizationProvider: input.objectStorageProvider,
+          deploymentProvider: input.deploymentProvider,
+        }),
+      },
+    },
+    {
+      id: "object-storage-encryption-mode",
+      cells: {
+        category: systemAdminSecurityUiCopy.objectStorageEncryption.postureCategory,
+        setting: systemAdminSecurityUiCopy.objectStorageEncryption.postureSetting,
+        value: formatEncryptionModeLabel(input.encryptionSettings.mode),
+      },
+    },
+    {
+      id: "object-storage-kms-adapter",
+      cells: {
+        category: systemAdminSecurityUiCopy.objectStorageEncryption.postureCategory,
+        setting: systemAdminSecurityUiCopy.objectStorageEncryption.kmsAdapterPostureSetting,
+        value: formatKmsAdapterLabel(input.encryptionSettings.kmsAdapter),
+      },
+    },
   ];
 
   return buildLinkedControlListSurface({

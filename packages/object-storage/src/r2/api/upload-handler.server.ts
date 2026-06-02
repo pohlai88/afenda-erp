@@ -23,7 +23,9 @@ import {
   type UploadDeniedAuditContext,
 } from "../../_object-storage-integration/api/evidence-governance.server";
 import { requireUploadModuleAccess } from "../../_object-storage-integration/domain/upload-route-auth.server";
+import { buildObjectStorageEncryptionContext } from "../../_object-storage-integration/domain/create-key-management.server";
 import { createObjectStore } from "../../_object-storage-integration/domain/create-object-store.server";
+import { usesEnvelopeEncryption } from "../../_object-storage-integration/domain/envelope-encryption.server";
 import { assertObjectStorageConfigured } from "../../_object-storage-integration/domain/object-storage-config.server";
 import { UploadRouteError } from "../../_object-storage-integration/domain/upload-route.error.shared";
 import {
@@ -48,15 +50,29 @@ export async function handleR2UploadPost(
   deps: ObjectStorageUploadHandlerDeps,
 ): Promise<ObjectStorageHandlerResult> {
   const objectStorageEnv = assertObjectStorageConfigured();
-  const store = createObjectStore(objectStorageEnv);
-
-  if (!store.createPresignedUpload) {
-    throw new UploadRouteError(503, uploadRouteCopy.blobNotConfigured);
-  }
-
-  const createPresignedUpload = store.createPresignedUpload;
 
   const body = (await request.json()) as Record<string, unknown>;
+
+  async function createStoreForOrganization(organizationId: string) {
+    const organizationProviderId =
+      await deps.resolveOrganizationObjectStorageProvider?.(organizationId);
+    const encryptionSettings =
+      (await deps.resolveOrganizationEncryptionSettings?.(organizationId)) ?? {
+        mode: "platform" as const,
+        kmsAdapter: null,
+        kmsKeyRef: null,
+      };
+
+    return createObjectStore(objectStorageEnv, {
+      organizationId,
+      organizationProviderId,
+      encryption: buildObjectStorageEncryptionContext({
+        organizationId,
+        settings: encryptionSettings,
+      }),
+      sseKmsKeyId: encryptionSettings.kmsKeyRef,
+    });
+  }
 
   if (body.intent === "presign") {
     const parsed = r2PresignBodySchema.parse(body);
@@ -82,6 +98,17 @@ export async function handleR2UploadPost(
     );
     deniedContext.organizationId = organization.id;
     deniedContext.userId = session.id;
+
+    const encryptionSettings =
+      (await deps.resolveOrganizationEncryptionSettings?.(organization.id)) ?? {
+        mode: "platform" as const,
+        kmsAdapter: null,
+        kmsKeyRef: null,
+      };
+
+    if (usesEnvelopeEncryption(encryptionSettings)) {
+      throw new UploadRouteError(400, uploadRouteCopy.invalidRequest);
+    }
 
     assertUploadPathnameMatchesTenant({
       pathname: parsed.pathname,
@@ -116,7 +143,13 @@ export async function handleR2UploadPost(
       },
     });
 
-    const presigned = await createPresignedUpload({
+    const store = await createStoreForOrganization(organization.id);
+
+    if (!store.createPresignedUpload) {
+      throw new UploadRouteError(503, uploadRouteCopy.blobNotConfigured);
+    }
+
+    const presigned = await store.createPresignedUpload({
       pathname: storagePathname,
       contentType: parsedPayload.contentType,
       sizeBytes: parsedPayload.sizeBytes,
@@ -155,7 +188,7 @@ export async function handleR2UploadPost(
     return {
       status: 200,
       body: {
-        provider: "r2",
+        provider: store.providerId,
         ...presigned,
         pathname: storagePathname,
         tokenPayload,
@@ -204,6 +237,7 @@ export async function handleR2UploadPost(
       moduleId: parsedPayload.moduleId,
     });
 
+    const store = await createStoreForOrganization(organization.id);
     const stored = await store.headObject(parsed.pathname);
 
     if (stored.sizeBytes !== parsedPayload.sizeBytes) {
@@ -260,7 +294,7 @@ export async function handleR2UploadPost(
       return {
         status: 200,
         body: {
-          provider: "r2",
+          provider: store.providerId,
           registered: false,
           ...storedResult,
         },
@@ -287,7 +321,7 @@ export async function handleR2UploadPost(
     return {
       status: 200,
       body: {
-        provider: "r2",
+        provider: store.providerId,
         registered: true,
         ...storedResult,
       },

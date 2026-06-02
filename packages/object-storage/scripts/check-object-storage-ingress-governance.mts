@@ -41,6 +41,7 @@ assertPatterns("apps/erp/src/app/api/internal/v1/uploads/route.ts", [
 
 assertPatterns("apps/erp/src/app/api/internal/v1/uploads/config/route.ts", [
   "handleObjectStorageUploadConfigGet",
+  "createTenantObjectStorageUploadConfigDeps",
 ]);
 
 assertPatterns(
@@ -56,6 +57,16 @@ assertPatterns(
   [
     "createTenantObjectStorageDownloadDeps",
     "handleObjectStorageDocumentDownloadGet",
+    "binaryBody",
+  ],
+);
+
+assertPatterns(
+  "packages/features/system-admin/src/tenant-execution/domain/document-av-scanner.server.ts",
+  [
+    "decryptStoredDocumentBody",
+    "contentSampleBase64",
+    "parseDocumentEncryptionMetadata",
   ],
 );
 
@@ -68,6 +79,9 @@ assertPatterns(
     "assertTenantUploadQuota",
     "createTenantObjectStorageUploadDeps",
     "createTenantObjectStorageDownloadDeps",
+    "createTenantObjectStorageUploadConfigDeps",
+    "resolveOrganizationObjectStorageProvider",
+    "resolveOrganizationEncryptionSettings",
   ],
 );
 

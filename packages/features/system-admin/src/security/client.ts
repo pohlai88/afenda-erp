@@ -3,3 +3,4 @@
  * Browser-safe components and catalogs only.
  */
 export * from "./components/system-admin.security-form.component.client";
+export * from "./components/system-admin.object-storage-provider-form.component.client";

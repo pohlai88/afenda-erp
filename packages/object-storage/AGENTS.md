@@ -129,26 +129,39 @@ Cloudflare MCP checks: `execute` → `GET .../buckets/{bucket}/cors` (must allow
 | Quarantine inbox | System Admin → Security — `loadSystemAdminDocumentQuarantineInboxWindow` (`scanStatuses: failed`, `quarantined`); trailing **Review scan** / **Approve release** |
 | Structured metrics | `incrementObjectStorageMetric` in `_object-storage-integration/api/object-storage-metrics.server.ts` — logs `metric`, `metricValue: 1`, `metricType: "counter"`, `operation: metric.{name}`, optional `moduleId` / `provider` |
 | DR runbook | [`docs/object-storage-dr-runbook.md`](docs/object-storage-dr-runbook.md) — quarterly drills; linked from System Admin Reliability |
-| Per-org provider | Migration **0051** — `object_storage_provider` enum on `organizations`; download via `getOrganizationObjectStorageProvider` |
+| Per-org provider | Migration **0051** — `object_storage_provider` on `organizations`; upload/download/config honor org preference; System Admin → Security form (`updateOrganizationObjectStorageProviderAction`) |
 
 ## Data migration (Vercel Blob → R2)
 
-Cloudflare [data migration](https://developers.cloudflare.com/r2/data-migration/) tools:
+Operator CLI (registry-driven, preserves pathnames):
+
+```bash
+pnpm env:sync:all
+pnpm blob:migrate:r2 -- --organization-id <orgId> [--dry-run] [--limit 500] [--overwrite] [--set-org-provider]
+```
+
+| Flag | Purpose |
+| ---- | ------- |
+| `--dry-run` | Count objects that would copy; no PUT |
+| `--limit` | Cap rows from `erp_documents` (default 500) |
+| `--overwrite` | Re-copy when R2 object already exists |
+| `--set-org-provider` | Set `organizations.object_storage_provider = r2` after successful run |
+
+Requires `BLOB_READ_WRITE_TOKEN`, R2 credentials (`OBJECT_STORAGE_PROVIDER=r2`), and `DATABASE_URL`.
+
+Cloudflare [data migration](https://developers.cloudflare.com/r2/data-migration/) tools for S3-origin buckets (not Vercel Blob):
 
 | Tool | Use when | Afenda fit |
 | ---- | -------- | ---------- |
-| [Super Slurper](https://developers.cloudflare.com/r2/data-migration/super-slurper/) | One-time bulk copy from S3, GCS, or S3-compatible sources | **Not for Vercel Blob** — dashboard: [R2 data migration](https://dash.cloudflare.com/?to=/:account/r2/slurper) |
-| [Sippy](https://developers.cloudflare.com/r2/data-migration/sippy/) | Lazy copy on read from an S3-compatible source | **Not for Vercel Blob** — requires S3 source bucket behind R2 |
+| [Super Slurper](https://developers.cloudflare.com/r2/data-migration/super-slurper/) | One-time bulk copy from S3, GCS, or S3-compatible sources | **Not for Vercel Blob** |
+| [Sippy](https://developers.cloudflare.com/r2/data-migration/sippy/) | Lazy copy on read from an S3-compatible source | **Not for Vercel Blob** |
 
-**Vercel Blob → R2** needs a custom copy (Vercel Blob is not S3-compatible). No in-repo migration script yet — operator-run copy:
+**Cutover checklist** after `pnpm blob:migrate:r2`:
 
-1. **Preserve pathnames** — downloads resolve via `erp_documents.pathname` (signed GET from R2), not legacy `blob_url` hostnames.
-2. **Copy objects** — list from Vercel Blob (`@vercel/blob` + `BLOB_READ_WRITE_TOKEN`), `PUT` to R2 at the same key (`tenants/{orgId}/{moduleId}/…`).
-3. **Optional DB hygiene** — update `erp_documents.blob_url` / HR `blob_url` columns to the R2 object URL pattern after copy.
-4. **Cutover** — set `OBJECT_STORAGE_PROVIDER=r2`, run `pnpm r2:provision`, verify with `pnpm r2:verify`.
-5. **Validate** — sample download via `/api/internal/v1/documents/[id]/download` per org/module.
-
-For S3-origin buckets (not Vercel), use Super Slurper with destination `axis-attachments`, path prefix `tenants/` if needed, and **Skip** overwrite when objects already exist in R2.
+1. Preserve pathnames — downloads resolve via `erp_documents.pathname`.
+2. Optional DB hygiene — update legacy `blob_url` columns to R2 URL pattern if needed.
+3. Set org provider (form or `--set-org-provider`) and verify `pnpm r2:verify`.
+4. Validate sample download via `/api/internal/v1/documents/[id]/download` per module.
 
 ## Tenant usage
 

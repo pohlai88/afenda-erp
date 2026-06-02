@@ -1,6 +1,7 @@
 import {
   getHrEmployeeDocumentForDownload,
   getOrganizationDocumentStorageBytes,
+  getOrganizationEncryptionSettings,
   getOrganizationObjectStorageProvider,
   getTenantDocument,
 } from "@afenda/db";
@@ -219,6 +220,15 @@ export const tenantObjectStorageHandlerDeps: ObjectStorageHandlerDeps = {
   assertUploadQuota: assertTenantUploadQuota,
   resolveOrganizationObjectStorageProvider: async (organizationId) =>
     getOrganizationObjectStorageProvider({ organizationId }),
+  resolveOrganizationEncryptionSettings: async (organizationId) => {
+    const settings = await getOrganizationEncryptionSettings({ organizationId });
+
+    return {
+      mode: settings.mode,
+      kmsAdapter: settings.kmsAdapter,
+      kmsKeyRef: settings.kmsKeyRef,
+    };
+  },
 };
 
 export function createTenantObjectStorageUploadDeps(input: {
@@ -238,6 +248,8 @@ export function createTenantObjectStorageDownloadDeps(): Pick<
   | "recordEvidenceEvent"
   | "authorizeDocumentDownload"
   | "getDocumentScanStatus"
+  | "resolveOrganizationObjectStorageProvider"
+  | "resolveOrganizationEncryptionSettings"
 > {
   return {
     getTenantDocument: getTenantDocumentForDownload,
@@ -252,5 +264,22 @@ export function createTenantObjectStorageDownloadDeps(): Pick<
 
       return document?.scanStatus ?? null;
     },
+    resolveOrganizationObjectStorageProvider:
+      tenantObjectStorageHandlerDeps.resolveOrganizationObjectStorageProvider,
+    resolveOrganizationEncryptionSettings:
+      tenantObjectStorageHandlerDeps.resolveOrganizationEncryptionSettings,
+  };
+}
+
+export function createTenantObjectStorageUploadConfigDeps(): Pick<
+  ObjectStorageHandlerDeps,
+  | "resolveOrganizationObjectStorageProvider"
+  | "resolveOrganizationEncryptionSettings"
+> {
+  return {
+    resolveOrganizationObjectStorageProvider:
+      tenantObjectStorageHandlerDeps.resolveOrganizationObjectStorageProvider,
+    resolveOrganizationEncryptionSettings:
+      tenantObjectStorageHandlerDeps.resolveOrganizationEncryptionSettings,
   };
 }

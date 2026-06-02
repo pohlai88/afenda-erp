@@ -9,6 +9,10 @@ export const systemAdminSecurityAuditActions = {
   domainRemove: "system-admin.security.domain.remove",
   mfaRequirementUpdate: "system-admin.security.mfa_requirement.update",
   sessionPolicyUpdate: "system-admin.security.session_policy.update",
+  objectStorageProviderUpdate:
+    "system-admin.security.object_storage_provider.update",
+  encryptionSettingsUpdate:
+    "system-admin.security.encryption_settings.update",
 } as const;
 
 export type SystemAdminSecurityWebhookEvent =

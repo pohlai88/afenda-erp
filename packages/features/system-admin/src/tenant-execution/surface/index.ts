@@ -9,7 +9,15 @@ export {
   documentLifecycleTrailingActionId,
   systemAdminDocumentActivityGalleryEvents,
   systemAdminDocumentActivityGallerySurfaceKey,
+  systemAdminDocumentActivityHrGalleryEvents,
+  systemAdminDocumentActivityHrGallerySurfaceKey,
   systemAdminDocumentRegistryGalleryModuleId,
   systemAdminDocumentRegistryGalleryRows,
   systemAdminDocumentRegistryGallerySurfaceKey,
+  systemAdminDocumentRegistrySensitiveGalleryModuleId,
 } from "./system-admin.document-lifecycle-gallery.fixtures.shared";
+export {
+  buildSystemAdminOrganizationStorageQuotaStatGrid,
+  buildSystemAdminOrganizationStorageQuotaStatGroups,
+  systemAdminOrganizationStorageQuotaSurfaceKey,
+} from "./system-admin.organization-storage-quota-stat.surface";

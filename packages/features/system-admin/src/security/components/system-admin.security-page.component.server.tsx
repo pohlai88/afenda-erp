@@ -1,7 +1,7 @@
 import { hasExecutionPermission } from "@afenda/kernel/execution";
 import { isOrganizationDocumentLegalHoldActive } from "@afenda/db";
 
-import { updateSystemAdminSecuritySettingsAction } from "../actions";
+import { updateSystemAdminSecuritySettingsAction, updateOrganizationObjectStorageProviderAction, updateOrganizationEncryptionSettingsAction } from "../actions";
 import { buildSystemAdminSecurityPageModel } from "../data";
 import { requireSystemAdminSecurityRead } from "../policies";
 import {
@@ -22,7 +22,7 @@ export async function SystemAdminSecurityPage() {
     hasExecutionPermission(guard.context, "system-admin.security.manage") ||
     hasExecutionPermission(guard.context, "system-admin.settings.write");
 
-  const [{ security, readiness, recentChanges, quarantineWindow, storageQuota }, organizationLegalHoldActive] =
+  const [{ security, readiness, recentChanges, quarantineWindow, storageQuota, objectStorageProvider, deploymentProvider, encryptionSettings }, organizationLegalHoldActive] =
     await Promise.all([
       buildSystemAdminSecurityPageModel({
         organizationId: guard.organization.id,
@@ -39,10 +39,15 @@ export async function SystemAdminSecurityPage() {
       recentChanges={recentChanges}
       quarantineWindow={quarantineWindow}
       storageQuota={storageQuota}
+      objectStorageProvider={objectStorageProvider}
+      deploymentProvider={deploymentProvider}
+      encryptionSettings={encryptionSettings}
       capabilities={guard.context.capabilities}
       organizationLegalHoldActive={organizationLegalHoldActive}
       canMutate={canMutate}
       updateSecuritySettingsAction={updateSystemAdminSecuritySettingsAction}
+      updateObjectStorageProviderAction={updateOrganizationObjectStorageProviderAction}
+      updateEncryptionSettingsAction={updateOrganizationEncryptionSettingsAction}
     />
   );
 }

@@ -9,9 +9,15 @@ export type GovernedListTrailingCellProps = {
   context?: GovernedListTrailingCellContext;
 };
 
-/** Serializable Pattern C trailing column spec (Server → Client). Pass a Client Component as `Cell`. */
+/** Serializable Pattern C trailing column spec (Server → Client). */
 export type GovernedPatternCTrailingColumnSpec = {
   header: string;
+  /**
+   * Platform-resolved trailing cells registered in governed-surface.
+   * Feature-owned lifecycle cells (document registry, quarantine review) MUST
+   * pass explicit `Cell` from `@afenda/feature-system-admin/client` — they are
+   * intentionally excluded from the registry (ARCH-1002 feature ownership).
+   */
   cellId?: "governed.metadata";
   Cell?: ComponentType<GovernedListTrailingCellProps>;
   context?: GovernedListTrailingCellContext;

@@ -2296,9 +2296,57 @@ export async function getOrganizationProfile(input: {
 
 export async function getOrganizationObjectStorageProvider(input: {
   organizationId: string;
-}): Promise<"vercel-blob" | "r2" | null> {
+}): Promise<"vercel-blob" | "r2" | "s3" | null> {
   const profile = await getOrganizationProfile(input);
   return profile?.objectStorageProvider ?? null;
+}
+
+export async function getOrganizationEncryptionSettings(input: {
+  organizationId: string;
+}): Promise<{
+  mode: "platform" | "customer-managed";
+  kmsAdapter: "vault-transit" | "aws-kms" | null;
+  kmsKeyRef: string | null;
+}> {
+  const profile = await getOrganizationProfile(input);
+
+  return {
+    mode: profile?.objectStorageEncryptionMode ?? "platform",
+    kmsAdapter: profile?.objectStorageKmsAdapter ?? null,
+    kmsKeyRef: profile?.objectStorageKmsKeyRef ?? null,
+  };
+}
+
+export async function updateOrganizationObjectStorageProvider(input: {
+  organizationId: string;
+  objectStorageProvider: "vercel-blob" | "r2" | "s3" | null;
+}) {
+  return runWithOrganizationContext(input.organizationId, async (db) => {
+    await db
+      .update(organizations)
+      .set({
+        objectStorageProvider: input.objectStorageProvider,
+      })
+      .where(eq(organizations.id, input.organizationId));
+  });
+}
+
+export async function updateOrganizationEncryptionSettings(input: {
+  organizationId: string;
+  encryptionMode: "platform" | "customer-managed";
+  kmsAdapter: "vault-transit" | "aws-kms" | null;
+  kmsKeyRef: string | null;
+}) {
+  return runWithOrganizationContext(input.organizationId, async (db) => {
+    await db
+      .update(organizations)
+      .set({
+        objectStorageEncryptionMode: input.encryptionMode,
+        objectStorageKmsAdapter: input.kmsAdapter,
+        objectStorageKmsKeyRef: input.kmsKeyRef,
+      })
+      .where(eq(organizations.id, input.organizationId));
+  });
 }
 
 export async function createCronRunHistory(input: {

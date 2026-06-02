@@ -3,6 +3,7 @@ import {
   getModuleObservabilityIndicators,
   type ModuleObservabilityIndicator,
 } from "./module-indicators";
+import { emitServerLogEvent } from "./logger/emit-server-log-event";
 
 export {
   getModuleObservabilityIndicators,
@@ -150,27 +151,7 @@ export function logServerEvent(
   context: ServerLogContext,
   metadata: ServerLogMetadata = {},
 ) {
-  const event = {
-    level,
-    message,
-    ...context,
-    ...metadata,
-    timestamp: new Date().toISOString(),
-  } satisfies ServerLogEvent & Record<string, unknown>;
-
-  const line = JSON.stringify(event);
-
-  if (level === "error") {
-    console.error(line);
-    return;
-  }
-
-  if (level === "warn") {
-    console.warn(line);
-    return;
-  }
-
-  console.log(line);
+  emitServerLogEvent(level, message, context, metadata);
 }
 
 function timingSafeStringEqual(left: string, right: string) {

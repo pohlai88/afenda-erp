@@ -948,6 +948,7 @@ export async function getTenantDocument(input: {
         classification: erpDocuments.classification,
         retentionClass: erpDocuments.retentionClass,
         scanStatus: erpDocuments.scanStatus,
+        metadata: erpDocuments.metadata,
       })
       .from(erpDocuments)
       .where(

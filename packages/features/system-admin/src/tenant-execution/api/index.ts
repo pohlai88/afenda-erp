@@ -3,6 +3,7 @@ export {
   assertTenantUploadQuota,
   authorizeTenantDocumentDownload,
   createTenantObjectStorageDownloadDeps,
+  createTenantObjectStorageUploadConfigDeps,
   createTenantObjectStorageUploadDeps,
   recordTenantDocumentEvidenceEvent,
   tenantObjectStorageHandlerDeps,

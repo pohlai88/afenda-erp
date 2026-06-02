@@ -28,6 +28,12 @@ import { listSystemAdminImportTemplates } from "../../src/data-management/data/s
 import { buildUsersListSurface } from "../../src/users/surface/system-admin.users-list.surface";
 import { systemAdminUsersGalleryRows } from "../../src/users/surface/system-admin.users-gallery.fixtures.shared";
 
+const defaultEncryptionSettings = {
+  mode: "platform" as const,
+  kmsAdapter: null,
+  kmsKeyRef: null,
+};
+
 describe("system admin governed surfaces", () => {
   it("normalizes empty pagination to schema-safe server windows", () => {
     const parsed = parseListSurfaceRendererConfiguration(
@@ -431,6 +437,9 @@ describe("system admin governed surfaces", () => {
           updatedByUserId: "user_1",
           updatedAt: new Date("2026-01-01T00:00:00.000Z"),
         }),
+        objectStorageProvider: null,
+        deploymentProvider: "r2",
+        encryptionSettings: defaultEncryptionSettings,
       }),
     );
 
@@ -444,6 +453,12 @@ describe("system admin governed surfaces", () => {
       expect(parsed.data.dataNature).toBe("table");
       expect(parsed.data.rows.some((row) => row.id === "mfa")).toBe(true);
       expect(parsed.data.rows.some((row) => row.id === "readiness")).toBe(true);
+      expect(parsed.data.rows.some((row) => row.id === "object-storage-provider")).toBe(
+        true,
+      );
+      expect(
+        parsed.data.rows.some((row) => row.id === "object-storage-encryption-mode"),
+      ).toBe(true);
     }
   });
 
@@ -458,6 +473,9 @@ describe("system admin governed surfaces", () => {
       buildSystemAdminSecuritySettingsListSurface({
         security: null,
         readiness: evaluateSecurityReadiness(null),
+        objectStorageProvider: null,
+        deploymentProvider: "vercel-blob",
+        encryptionSettings: defaultEncryptionSettings,
       }),
       buildOrganizationDefaultsListSurface({
         settings: null,

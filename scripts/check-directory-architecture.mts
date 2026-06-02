@@ -294,7 +294,11 @@ function checkDocumentationNaming(filePath: string) {
       normalizedRel,
     );
   const isKernelVerticalArchitectureDoc =
-    /^packages\/kernel\/src\/[^/]+\/[^/]*architecture[^/]*\.md$/.test(
+    /^packages\/kernel\/src\/(?:[^/]+\/)+[^/]*architecture[^/]*\.md$/.test(
+      normalizedRel,
+    );
+  const isObservabilityArchitectureDoc =
+    /^packages\/observability\/src\/logger\/structural-logger-architecture\.md$/.test(
       normalizedRel,
     );
   const isKernelLegacyArchitectureRedirect =
@@ -309,6 +313,7 @@ function checkDocumentationNaming(filePath: string) {
     !isFeatureVerticalArchitectureDoc &&
     !isKernelVerticalArchitectureDoc &&
     !isKernelLegacyArchitectureRedirect &&
+    !isObservabilityArchitectureDoc &&
     !isObjectStorageArchitectureDoc
   ) {
     problems.push(

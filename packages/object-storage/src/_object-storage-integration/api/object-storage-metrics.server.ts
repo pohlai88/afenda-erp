@@ -12,6 +12,10 @@ export const objectStorageMetricNames = [
   "download_failures",
   "permission_denied",
   "malware_detected",
+  "encryption_wrap_total",
+  "encryption_unwrap_total",
+  "encrypted_uploads_total",
+  "encrypted_downloads_total",
 ] as const;
 
 export type ObjectStorageMetricName = (typeof objectStorageMetricNames)[number];

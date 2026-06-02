@@ -9,11 +9,13 @@ export type {
   ObjectStorageAccess,
   ObjectStorageDocumentScanStatus,
   ObjectStorageDownloadGovernanceInput,
+  ObjectStorageEncryptionMode,
   ObjectStorageEvidenceAction,
   ObjectStorageEvidenceAuditEvent,
   ObjectStorageEvidenceAuditSink,
   ObjectStorageGateDecision,
   ObjectStorageUploadQuotaInput,
+  KmsAdapterId,
 } from "./_object-storage-integration/contracts/index";
 
 export {
@@ -44,4 +46,19 @@ export {
   extractTenantPathnameFromObjectUrl,
 } from "./_object-storage-integration/policies/tenant-pathnames.shared";
 
-export const objectStorageProviderIds = ["vercel-blob", "r2"] as const;
+export {
+  documentEnvelopeEncryptionSchema,
+  parseDocumentEncryptionMetadata,
+  isCustomerManagedEnvelopeEncrypted,
+} from "./_object-storage-integration/schemas/document-encryption-metadata.shared";
+
+export const objectStorageProviderIds = ["vercel-blob", "r2", "s3"] as const;
+export type ObjectStorageProviderIdMetadata =
+  (typeof objectStorageProviderIds)[number];
+
+export const objectStorageUploadModes = ["presigned", "server"] as const;
+export type ObjectStorageUploadModeMetadata =
+  (typeof objectStorageUploadModes)[number];
+
+export const objectStorageEncryptionModes = ["platform", "customer-managed"] as const;
+export const objectStorageKmsAdapterIds = ["vault-transit", "aws-kms"] as const;

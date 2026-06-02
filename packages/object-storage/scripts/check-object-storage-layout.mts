@@ -16,7 +16,7 @@ const packageRoot = path.join(path.dirname(fileURLToPath(import.meta.url)), ".."
 const repoRoot = path.join(packageRoot, "../..");
 const srcDir = path.join(packageRoot, "src");
 
-const allowedTopDirs = new Set(["blob", "r2", "_object-storage-integration"]);
+const allowedTopDirs = new Set(["blob", "r2", "s3", "_object-storage-integration"]);
 const allowedRootFiles = new Set<string>(featurePublicDoorFiles);
 const templateBucketSet = new Set<string>(featureTemplateBuckets);
 
@@ -166,5 +166,5 @@ if (problems.length > 0) {
 }
 
 console.log(
-  "[object-storage:layout] ARCH-1002 §8 compliant (blob | r2 | _object-storage-integration)",
+  "[object-storage:layout] ARCH-1002 §8 compliant (blob | r2 | s3 | _object-storage-integration)",
 );

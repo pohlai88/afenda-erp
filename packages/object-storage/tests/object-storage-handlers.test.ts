@@ -37,6 +37,14 @@ const r2UploadMock = vi.hoisted(() => ({
   })),
 }));
 
+const serverEncryptedMock = vi.hoisted(() => ({
+  handleServerEncryptedUploadPost: vi.fn(async () => ({
+    status: 200,
+    body: { completed: true },
+  })),
+  decryptStoredDocumentBody: vi.fn(async () => new Uint8Array([0x25, 0x50, 0x44, 0x46])),
+}));
+
 const storeMocks = vi.hoisted(() => ({
   createObjectStore: vi.fn(() => ({
     providerId: "vercel-blob",
@@ -63,8 +71,22 @@ vi.mock(
 vi.mock("../src/blob/api/upload-handler.server", () => blobUploadMock);
 vi.mock("../src/r2/api/upload-handler.server", () => r2UploadMock);
 vi.mock(
+  "../src/_object-storage-integration/api/server-encrypted-upload.server",
+  () => serverEncryptedMock,
+);
+vi.mock(
   "../src/_object-storage-integration/domain/create-object-store.server",
-  () => storeMocks,
+  async (importOriginal) => {
+    const original =
+      await importOriginal<
+        typeof import("../src/_object-storage-integration/domain/create-object-store.server")
+      >();
+
+    return {
+      ...original,
+      createObjectStore: storeMocks.createObjectStore,
+    };
+  },
 );
 
 import {
@@ -82,6 +104,22 @@ const financeDocument = {
   classification: "internal" as const,
   retentionClass: "standard" as const,
   scanStatus: "passed" as const,
+  contentType: "application/pdf",
+  metadata: {} as Record<string, unknown>,
+};
+
+const envelopeEncryptedDocument = {
+  ...financeDocument,
+  metadata: {
+    encryption: {
+      mode: "customer-managed" as const,
+      adapter: "vault-transit" as const,
+      algorithm: "AES-256-GCM" as const,
+      iv: "iv-base64",
+      wrappedDek: "wrapped-dek-base64",
+      keyId: "afenda/org_a",
+    },
+  },
 };
 
 describe("object storage HTTP handlers", () => {
@@ -119,6 +157,27 @@ describe("object storage HTTP handlers", () => {
       });
       expect(blobUploadMock.handleVercelBlobUploadPost).toHaveBeenCalled();
       expect(r2UploadMock.handleR2UploadPost).not.toHaveBeenCalled();
+    });
+
+    it("delegates multipart server-upload to the encrypted upload handler", async () => {
+      const formData = new FormData();
+      formData.set("intent", "server-upload");
+      formData.set("pathname", "tenants/org_a/finance/invoice.pdf");
+      formData.set("clientPayload", JSON.stringify({ moduleId: "finance" }));
+
+      const request = new Request(`http://localhost${OBJECT_STORAGE_HTTP_ROUTES.upload}`, {
+        method: "POST",
+        body: formData,
+      });
+
+      const result = await handleObjectStorageUploadPost(request);
+
+      expect(result).toEqual({
+        status: 200,
+        body: { completed: true },
+      });
+      expect(serverEncryptedMock.handleServerEncryptedUploadPost).toHaveBeenCalled();
+      expect(blobUploadMock.handleVercelBlobUploadPost).not.toHaveBeenCalled();
     });
 
     it("records DOCUMENT_UPLOAD_DENIED on 403 upload failures", async () => {
@@ -181,6 +240,31 @@ describe("object storage HTTP handlers", () => {
       );
     });
 
+    it("returns server uploadMode for customer-managed encryption orgs", async () => {
+      const url = new URL(
+        `http://localhost${OBJECT_STORAGE_HTTP_ROUTES.uploadConfig}`,
+      );
+      url.searchParams.set("moduleId", "finance");
+
+      const result = await handleObjectStorageUploadConfigGet(
+        new Request(url.toString()),
+        {
+          resolveOrganizationEncryptionSettings: async () => ({
+            mode: "customer-managed",
+            kmsAdapter: "vault-transit",
+            kmsKeyRef: "afenda/org_a",
+          }),
+        },
+      );
+
+      expect(result.status).toBe(200);
+      expect(result.body).toMatchObject({
+        configured: true,
+        uploadMode: "server",
+        encryptionMode: "customer-managed",
+      });
+    });
+
     it("returns unauthorized config when module access is denied", async () => {
       authMocks.requireUploadModuleAccess.mockRejectedValueOnce(
         new UploadRouteError(403, uploadRouteCopy.uploadNotAllowed),
@@ -237,6 +321,48 @@ describe("object storage HTTP handlers", () => {
         documentId: "doc_a",
         userId: "user_a",
         sessionId: "user_a",
+      });
+    });
+
+    it("returns proxied binary body for envelope-encrypted documents", async () => {
+      const events: unknown[] = [];
+      const request = new Request(
+        "http://localhost/api/internal/v1/documents/doc_a/download?moduleId=finance",
+      );
+      const plaintext = new Uint8Array([0x25, 0x50, 0x44, 0x46]);
+      serverEncryptedMock.decryptStoredDocumentBody.mockResolvedValueOnce(plaintext);
+
+      const result = await handleObjectStorageDocumentDownloadGet(
+        { request, documentId: "doc_a" },
+        {
+          getTenantDocument: vi.fn(async () => envelopeEncryptedDocument),
+          authorizeDocumentDownload: vi.fn(
+            async (): Promise<ObjectStorageGateDecision | void> => undefined,
+          ),
+          getDocumentScanStatus: vi.fn(
+            async (): Promise<ObjectStorageDocumentScanStatus | null> => "passed",
+          ),
+          recordEvidenceEvent: async (event) => {
+            events.push(event);
+          },
+        },
+      );
+
+      expect(result.status).toBe(200);
+      expect(result.binaryBody).toEqual(plaintext);
+      expect(result.redirect).toBeUndefined();
+      expect(result.responseHeaders).toMatchObject({
+        "Content-Type": "application/pdf",
+        "Cache-Control": "private, no-store",
+      });
+      expect(serverEncryptedMock.decryptStoredDocumentBody).toHaveBeenCalled();
+      expect(events).toHaveLength(1);
+      expect(events[0]).toMatchObject({
+        action: "DOCUMENT_DOWNLOADED",
+        metadata: {
+          delivery: "proxied-decrypt",
+          encryptionAdapter: "vault-transit",
+        },
       });
     });
 

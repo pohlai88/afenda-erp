@@ -8,6 +8,7 @@ import type {
   ObjectStorageGateDecision,
   ObjectStorageUploadQuotaInput,
   UploadRegistrationInput,
+  OrganizationEncryptionSettings,
 } from "../contracts/index";
 import { UploadRouteError } from "../domain/upload-route.error.shared";
 import {
@@ -18,6 +19,7 @@ import {
   documentMagicBytePrefixBytes,
   magicBytesMatchDeclaredContentType,
 } from "../policies/document-content-verification.shared";
+import type { ObjectStorageProviderId } from "../domain/create-object-store.server";
 import { recordEvidenceEvent } from "./evidence-governance.server";
 import { incrementObjectStorageMetric } from "./object-storage-metrics.server";
 
@@ -25,6 +27,8 @@ export type ObjectStorageHandlerResult = {
   status: number;
   body?: unknown;
   redirect?: string;
+  binaryBody?: Uint8Array;
+  responseHeaders?: Record<string, string>;
 };
 
 export type ObjectStorageUploadHandlerDeps = {
@@ -35,6 +39,12 @@ export type ObjectStorageUploadHandlerDeps = {
     input: ObjectStorageUploadQuotaInput,
   ) => Promise<ObjectStorageGateDecision | void>;
   recordEvidenceEvent?: ObjectStorageEvidenceAuditSink;
+  resolveOrganizationObjectStorageProvider?: (
+    organizationId: string,
+  ) => Promise<ObjectStorageProviderId | null | undefined>;
+  resolveOrganizationEncryptionSettings?: (
+    organizationId: string,
+  ) => Promise<OrganizationEncryptionSettings>;
 };
 
 export function parseUploadTokenPayload(tokenPayload: string | null | undefined) {
@@ -119,6 +129,7 @@ export async function registerUploadedDocument(input: {
   etag?: string;
   source: string;
   sourceIp?: string;
+  registrationMetadata?: Record<string, unknown>;
 }) {
   if (!input.deps.registerUploadedDocument) {
     throw new UploadRouteError(503, uploadRouteCopy.uploadFailed);
@@ -142,6 +153,7 @@ export async function registerUploadedDocument(input: {
       source: input.source,
       declaredContentType: input.parsedPayload.contentType,
       declaredSizeBytes: input.parsedPayload.sizeBytes,
+      ...(input.registrationMetadata ?? {}),
     },
   });
 

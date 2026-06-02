@@ -6,6 +6,17 @@ import { userProfiles } from "./identity";
 export const objectStorageProviderEnum = pgEnum("object_storage_provider", [
   "vercel-blob",
   "r2",
+  "s3",
+]);
+
+export const objectStorageEncryptionModeEnum = pgEnum(
+  "object_storage_encryption_mode",
+  ["platform", "customer-managed"],
+);
+
+export const objectStorageKmsAdapterEnum = pgEnum("object_storage_kms_adapter", [
+  "vault-transit",
+  "aws-kms",
 ]);
 
 export const organizations = pgTable(
@@ -17,6 +28,18 @@ export const organizations = pgTable(
     ownerAuthUserId: text("owner_auth_user_id").notNull(),
     /** Per-org object storage provider override; null uses deployment default. */
     objectStorageProvider: objectStorageProviderEnum("object_storage_provider"),
+    /** BYOK envelope mode; default platform uses provider SSE only. */
+    objectStorageEncryptionMode: objectStorageEncryptionModeEnum(
+      "object_storage_encryption_mode",
+    )
+      .notNull()
+      .default("platform"),
+    /** KMS adapter when encryption mode is customer-managed. */
+    objectStorageKmsAdapter: objectStorageKmsAdapterEnum(
+      "object_storage_kms_adapter",
+    ),
+    /** Vault transit key path or AWS CMK ARN. */
+    objectStorageKmsKeyRef: text("object_storage_kms_key_ref"),
     ...timestampColumns,
   },
   (table) => [uniqueIndex("organizations_slug_idx").on(table.slug)],

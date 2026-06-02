@@ -9,6 +9,8 @@ context/   actor/   access/   policy/   audit/
 capabilities/   execution/   errors/   state/
 ```
 
+See also: [`audit/execution-audit-architecture.md`](./audit/execution-audit-architecture.md) for the audit sub-area.
+
 ## Server entry
 
 ```ts
@@ -24,6 +26,7 @@ import { runGuardedExecution } from "@afenda/kernel/server";
 5. Feature `execute`
 6. `writeExecutionAuditEvent` (unless `audit.skip`)
 7. Optional `revalidate`
+8. Optional runtime log emission via `@afenda/observability`
 
 Use `runGuardedExecution` to standardize steps 1–4 and 6–7; keep business rules in `@afenda/feature-*`.
 

@@ -165,6 +165,13 @@ const builders: Array<{
       buildSystemAdminSecuritySettingsListSurface({
         security: null,
         readiness: { verdict: "ready", issues: [] },
+        objectStorageProvider: null,
+        deploymentProvider: "r2",
+        encryptionSettings: {
+          mode: "platform" as const,
+          kmsAdapter: null,
+          kmsKeyRef: null,
+        },
       }),
   },
   {

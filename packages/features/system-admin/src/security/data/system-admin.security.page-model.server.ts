@@ -1,4 +1,9 @@
 import { writeExecutionAuditEvent } from "@afenda/kernel/execution";
+import {
+  getOrganizationEncryptionSettings,
+  getOrganizationObjectStorageProvider,
+} from "@afenda/db";
+import { assertObjectStorageConfigured } from "@afenda/object-storage/server";
 import { loadSystemAdminDocumentQuarantineInboxWindow } from "../../tenant-execution/data/system-admin.document-quarantine-inbox.read-model.server";
 import { loadOrganizationStorageQuotaSnapshot } from "../../tenant-execution/data/system-admin.organization-storage-quota.read-model.server";
 import { getSystemAdminOrganizationSecuritySettings } from "./system-admin.security.query.server";
@@ -11,7 +16,7 @@ export async function buildSystemAdminSecurityPageModel(input: {
   actorId: string;
   actorType: "user" | "system" | "agent";
 }) {
-  const [security, recentChanges, quarantineWindow, storageQuota] =
+  const [security, recentChanges, quarantineWindow, storageQuota, objectStorageProvider, encryptionSettings] =
     await Promise.all([
     getSystemAdminOrganizationSecuritySettings({
       organizationId: input.organizationId,
@@ -25,7 +30,18 @@ export async function buildSystemAdminSecurityPageModel(input: {
     loadOrganizationStorageQuotaSnapshot({
       organizationId: input.organizationId,
     }),
+    getOrganizationObjectStorageProvider({
+      organizationId: input.organizationId,
+    }),
+    getOrganizationEncryptionSettings({
+      organizationId: input.organizationId,
+    }),
   ]);
+
+  const objectStorageEnv = assertObjectStorageConfigured();
+  const deploymentProvider = objectStorageEnv.configured
+    ? objectStorageEnv.provider
+    : "vercel-blob";
 
   const readiness = evaluateSecurityReadiness(security);
 
@@ -49,5 +65,8 @@ export async function buildSystemAdminSecurityPageModel(input: {
     recentChanges,
     quarantineWindow,
     storageQuota,
+    objectStorageProvider,
+    encryptionSettings,
+    deploymentProvider,
   };
 }

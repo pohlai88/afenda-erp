@@ -126,7 +126,7 @@ export type SignedDownloadResult = {
 };
 
 export type ObjectStorePort = {
-  readonly providerId: "vercel-blob" | "r2";
+  readonly providerId: "vercel-blob" | "r2" | "s3";
 
   createPresignedUpload?(
     input: PresignedUploadInput,
@@ -138,6 +138,14 @@ export type ObjectStorePort = {
     pathname: string,
     maxBytes: number,
   ): Promise<Uint8Array>;
+
+  putObject?(input: {
+    pathname: string;
+    body: Uint8Array;
+    contentType: string;
+  }): Promise<StoredObjectMetadata>;
+
+  getObjectBody?(pathname: string): Promise<Uint8Array>;
 
   getSignedDownloadUrl(
     input: SignedDownloadInput,
@@ -173,9 +181,11 @@ export type TenantDocumentDownloadRecord = {
   pathname: string;
   access: ObjectStorageAccess;
   moduleId: ModuleId;
+  contentType?: string;
   classification?: ObjectStorageDocumentClassification;
   retentionClass?: ObjectStorageRetentionClass;
   scanStatus?: ObjectStorageDocumentScanStatus;
+  metadata?: Record<string, unknown>;
 };
 
 export type GetTenantDocumentForDownload = (input: {
@@ -183,3 +193,12 @@ export type GetTenantDocumentForDownload = (input: {
   documentId: string;
   moduleId: ModuleId;
 }) => Promise<TenantDocumentDownloadRecord | null>;
+
+export type {
+  KeyManagementPort,
+  KmsAdapterId,
+  ObjectStorageEncryptionContext,
+  ObjectStorageEncryptionMode,
+  OrganizationEncryptionSettings,
+  WrappedDataKey,
+} from "./key-management.port.shared";

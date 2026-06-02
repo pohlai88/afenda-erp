@@ -17,7 +17,9 @@ import type { UploadTokenPayload } from "../schemas/upload-payload.shared";
 export type ObjectStorageUploadConfig = {
   configured: boolean;
   authorized?: boolean;
-  provider?: "vercel-blob" | "r2";
+  provider?: "vercel-blob" | "r2" | "s3";
+  uploadMode?: "presigned" | "server";
+  encryptionMode?: "platform" | "customer-managed";
   pathnamePrefix?: string;
   uploadRoute?: string;
   maxSizeBytes?: number;
@@ -118,6 +120,41 @@ export async function fetchObjectStorageUploadConfig(
   });
 
   return (await response.json()) as ObjectStorageUploadConfig;
+}
+
+async function uploadViaServerEncrypted(
+  input: TenantDocumentUploadInput,
+  pathname: string,
+  clientPayload: Omit<
+    UploadTokenPayload,
+    "organizationId" | "uploadedByAuthUserId" | "pathname"
+  >,
+): Promise<TenantObjectUploadResult> {
+  const formData = new FormData();
+  formData.set("intent", "server-upload");
+  formData.set("pathname", pathname);
+  formData.set("clientPayload", JSON.stringify(clientPayload));
+  formData.set("file", input.file);
+
+  const response = await fetch(OBJECT_STORAGE_HTTP_ROUTES.upload, {
+    method: "POST",
+    credentials: "same-origin",
+    body: formData,
+  });
+
+  const payload = (await response.json()) as R2CompleteResponse;
+
+  if (!response.ok) {
+    throw new Error(readUploadError(payload, "Encrypted upload failed."));
+  }
+
+  return {
+    pathname: payload.pathname,
+    blobUrl: payload.blobUrl,
+    contentType: payload.contentType,
+    sizeBytes: payload.sizeBytes,
+    etag: payload.etag,
+  };
 }
 
 async function uploadViaR2(
@@ -231,7 +268,11 @@ export async function uploadTenantObject(
   const pathname = buildPathnameFromConfig(config, input.file.name);
   const clientPayload = buildClientPayload(input);
 
-  if (config.provider === "r2") {
+  if (config.uploadMode === "server") {
+    return uploadViaServerEncrypted(input, pathname, clientPayload);
+  }
+
+  if (config.provider === "r2" || config.provider === "s3") {
     return uploadViaR2(input, pathname, clientPayload);
   }
 

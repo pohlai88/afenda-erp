@@ -10,6 +10,8 @@ export {
   type ObjectStorageUploadHandlerDeps,
 } from "./_object-storage-integration/api/object-storage-handlers.server";
 
+export { decryptStoredDocumentBody } from "./_object-storage-integration/api/server-encrypted-upload.server";
+
 export {
   assertDocumentScanPassed,
   assertGateDecisionAllowed,
@@ -39,6 +41,11 @@ export {
   type CreateObjectStoreOptions,
   type ObjectStorageProviderId,
 } from "./_object-storage-integration/domain/create-object-store.server";
+
+export {
+  buildObjectStorageEncryptionContext,
+  resolveUploadMode,
+} from "./_object-storage-integration/domain/create-key-management.server";
 
 export {
   incrementObjectStorageMetric,

@@ -1,9 +1,16 @@
 import { getDocumentAvEnv } from "@afenda/config/env";
 import type { ModuleId } from "@afenda/kernel";
 import {
+  getOrganizationEncryptionSettings,
+  getOrganizationObjectStorageProvider,
+} from "@afenda/db";
+import {
   assertObjectStorageConfigured,
   createObjectStore,
+  decryptStoredDocumentBody,
+  buildObjectStorageEncryptionContext,
 } from "@afenda/object-storage/server";
+import { parseDocumentEncryptionMetadata } from "@afenda/object-storage/metadata";
 import type { ErpDocumentScanStatus } from "@afenda/db";
 
 export type DocumentAvScanJob = {
@@ -14,6 +21,7 @@ export type DocumentAvScanJob = {
   blobUrl: string;
   contentType: string;
   sizeBytes: number;
+  metadata?: Record<string, unknown>;
 };
 
 export type DocumentAvScanOutcome =
@@ -21,6 +29,7 @@ export type DocumentAvScanOutcome =
   | { mode: "deferred" };
 
 const AV_SCAN_DOWNLOAD_TTL_MS = 60 * 60 * 1000;
+const AV_SCAN_SAMPLE_BYTES = 512 * 1024;
 
 function resolveTerminalScanStatus(
   value: string,
@@ -32,17 +41,51 @@ function resolveTerminalScanStatus(
   return null;
 }
 
+async function createAvScanObjectStoreDeps(organizationId: string) {
+  const objectStorageEnv = assertObjectStorageConfigured();
+  const organizationProviderId = await getOrganizationObjectStorageProvider({
+    organizationId,
+  });
+  const encryptionSettings = await getOrganizationEncryptionSettings({
+    organizationId,
+  });
+
+  const store = createObjectStore(objectStorageEnv, {
+    organizationId,
+    organizationProviderId,
+    encryption: buildObjectStorageEncryptionContext({
+      organizationId,
+      settings: {
+        mode: encryptionSettings.mode,
+        kmsAdapter: encryptionSettings.kmsAdapter,
+        kmsKeyRef: encryptionSettings.kmsKeyRef,
+      },
+    }),
+    sseKmsKeyId: encryptionSettings.kmsKeyRef,
+  });
+
+  const deps = {
+    resolveOrganizationObjectStorageProvider: async () => organizationProviderId,
+    resolveOrganizationEncryptionSettings: async () => ({
+      mode: encryptionSettings.mode,
+      kmsAdapter: encryptionSettings.kmsAdapter,
+      kmsKeyRef: encryptionSettings.kmsKeyRef,
+    }),
+  };
+
+  return { store, deps };
+}
+
 async function runBuiltInObjectPresenceScan(
   job: DocumentAvScanJob,
 ): Promise<DocumentAvScanOutcome> {
-  const objectStorageEnv = assertObjectStorageConfigured();
-  const store = createObjectStore(objectStorageEnv);
+  const { store } = await createAvScanObjectStoreDeps(job.organizationId);
 
-  if (objectStorageEnv.provider === "vercel-blob") {
-    if (!job.blobUrl.trim()) {
-      return { mode: "resolved", status: "failed" };
-    }
+  if (!job.pathname.trim() && !job.blobUrl.trim()) {
+    return { mode: "resolved", status: "failed" };
+  }
 
+  if (!job.pathname.trim()) {
     return { mode: "resolved", status: "passed" };
   }
 
@@ -54,6 +97,29 @@ async function runBuiltInObjectPresenceScan(
   }
 }
 
+async function resolveAvScanPayloadBytes(job: DocumentAvScanJob) {
+  const encryption = parseDocumentEncryptionMetadata(job.metadata);
+
+  if (!encryption) {
+    return null;
+  }
+
+  const { store, deps } = await createAvScanObjectStoreDeps(job.organizationId);
+  const plaintext = await decryptStoredDocumentBody({
+    organizationId: job.organizationId,
+    pathname: job.pathname,
+    metadata: job.metadata,
+    store,
+    deps,
+  });
+
+  if (!plaintext) {
+    return null;
+  }
+
+  return plaintext.slice(0, Math.min(plaintext.byteLength, AV_SCAN_SAMPLE_BYTES));
+}
+
 async function runExternalAvScan(
   job: DocumentAvScanJob,
 ): Promise<DocumentAvScanOutcome> {
@@ -63,15 +129,18 @@ async function runExternalAvScan(
     return runBuiltInObjectPresenceScan(job);
   }
 
-  const objectStorageEnv = assertObjectStorageConfigured();
-  const store = createObjectStore(objectStorageEnv);
+  const { store } = await createAvScanObjectStoreDeps(job.organizationId);
   const validUntilMs = Date.now() + AV_SCAN_DOWNLOAD_TTL_MS;
-  const signed = await store.getSignedDownloadUrl({
-    pathname: job.pathname,
-    access: "private",
-    contentDisposition: "inline",
-    validUntilMs,
-  });
+  const envelopeSample = await resolveAvScanPayloadBytes(job);
+  const signed =
+    envelopeSample == null
+      ? await store.getSignedDownloadUrl({
+          pathname: job.pathname,
+          access: "private",
+          contentDisposition: "inline",
+          validUntilMs,
+        })
+      : null;
 
   const headers: Record<string, string> = {
     "content-type": "application/json",
@@ -91,8 +160,17 @@ async function runExternalAvScan(
       pathname: job.pathname,
       contentType: job.contentType,
       sizeBytes: job.sizeBytes,
-      downloadUrl: signed.url,
-      downloadValidUntil: new Date(validUntilMs).toISOString(),
+      ...(envelopeSample
+        ? {
+            contentSampleBase64: Buffer.from(envelopeSample).toString("base64"),
+            encryptionAdapter: parseDocumentEncryptionMetadata(job.metadata)?.adapter,
+          }
+        : signed
+          ? {
+              downloadUrl: signed.url,
+              downloadValidUntil: new Date(validUntilMs).toISOString(),
+            }
+          : {}),
     }),
   });
 

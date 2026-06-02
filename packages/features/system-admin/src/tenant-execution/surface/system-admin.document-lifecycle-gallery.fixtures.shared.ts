@@ -34,6 +34,17 @@ export const systemAdminDocumentRegistryGalleryRows: readonly SystemAdminDocumen
       createdAt: "2026-06-02T10:00:00.000Z",
     },
     {
+      id: "gallery-doc-pending",
+      title: "Draft contract",
+      contentType: "PDF",
+      size: "88 KB",
+      access: "private",
+      classification: "internal",
+      retentionClass: "standard",
+      scanStatus: "pending",
+      createdAt: "2026-06-02T11:00:00.000Z",
+    },
+    {
       id: "gallery-doc-quarantined",
       title: "Suspicious attachment",
       contentType: "PDF",
@@ -54,6 +65,42 @@ export const systemAdminDocumentRegistryGalleryRows: readonly SystemAdminDocumen
       retentionClass: "legal-hold",
       scanStatus: "passed",
       createdAt: "2026-06-02T14:00:00.000Z",
+    },
+    {
+      id: "gallery-doc-sensitive",
+      title: "Payroll packet",
+      contentType: "PDF",
+      size: "512 KB",
+      access: "private",
+      classification: "restricted",
+      retentionClass: "standard",
+      scanStatus: "passed",
+      createdAt: "2026-06-02T12:00:00.000Z",
+    },
+  ];
+
+export const systemAdminDocumentRegistrySensitiveGalleryModuleId = "hr" as const;
+
+export const systemAdminDocumentActivityHrGallerySurfaceKey =
+  `${systemAdminDocumentRegistrySensitiveGalleryModuleId}.documents.activity` as const;
+
+export const systemAdminDocumentActivityHrGalleryEvents: readonly SystemAdminDocumentActivityGalleryEvent[] =
+  [
+    {
+      id: "gallery-evt-hr-verify",
+      summary: "Contract verified",
+      actorLabel: "HR Admin",
+      occurredAt: "2026-06-02T11:00:00.000Z",
+      evidenceHref:
+        "/api/internal/v1/documents/hr_doc_a/download?moduleId=hr",
+      policyLabel: "Verify",
+      riskTone: "positive",
+    },
+    {
+      id: "gallery-evt-hr-upload",
+      summary: "Employee document uploaded",
+      actorLabel: "HR Admin",
+      occurredAt: "2026-06-02T10:30:00.000Z",
     },
   ];
 

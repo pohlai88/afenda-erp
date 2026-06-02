@@ -50,11 +50,14 @@ import {
   systemAdminAuditUiCopy,
   systemAdminDocumentActivityGalleryEvents,
   systemAdminDocumentActivityGallerySurfaceKey,
+  systemAdminDocumentActivityHrGalleryEvents,
+  systemAdminDocumentActivityHrGallerySurfaceKey,
   systemAdminDocumentQuarantineInboxGalleryRows,
   systemAdminDocumentQuarantineInboxSurfaceKey,
   systemAdminDocumentRegistryGalleryModuleId,
   systemAdminDocumentRegistryGalleryRows,
   systemAdminDocumentRegistryGallerySurfaceKey,
+  systemAdminDocumentRegistrySensitiveGalleryModuleId,
   buildSystemAdminDocumentQuarantineInboxListSurface,
   systemAdminMembersSurfaceKey,
   systemAdminMembershipsGalleryRows,
@@ -138,9 +141,13 @@ const GALLERY_WORK_ITEM_ESCALATED = {
 
 const GALLERY_DOCUMENT = systemAdminDocumentRegistryGalleryRows[0]!;
 
-const GALLERY_DOCUMENT_QUARANTINED = systemAdminDocumentRegistryGalleryRows[1]!;
+const GALLERY_DOCUMENT_PENDING = systemAdminDocumentRegistryGalleryRows[1]!;
 
-const GALLERY_DOCUMENT_LEGAL_HOLD = systemAdminDocumentRegistryGalleryRows[2]!;
+const GALLERY_DOCUMENT_QUARANTINED = systemAdminDocumentRegistryGalleryRows[2]!;
+
+const GALLERY_DOCUMENT_LEGAL_HOLD = systemAdminDocumentRegistryGalleryRows[3]!;
+
+const GALLERY_DOCUMENT_SENSITIVE = systemAdminDocumentRegistryGalleryRows[4]!;
 
 const GALLERY_VIEW = {
   id: "gallery-view-001",
@@ -210,6 +217,15 @@ export default function MetadataRendererGalleryPage() {
     canWrite: true,
     canViewSensitive: true,
   });
+  const documentListPendingSurface = buildDocumentRegistryListSurface({
+    moduleId: systemAdminDocumentRegistryGalleryModuleId,
+    documents: [GALLERY_DOCUMENT_PENDING],
+  });
+  const documentListSensitiveSurface = buildDocumentRegistryListSurface({
+    moduleId: systemAdminDocumentRegistrySensitiveGalleryModuleId,
+    documents: [GALLERY_DOCUMENT_SENSITIVE],
+    canViewSensitive: false,
+  });
   const emptyDocumentListSurface = buildDocumentRegistryListSurface({
     moduleId: systemAdminDocumentRegistryGalleryModuleId,
     documents: [],
@@ -217,6 +233,10 @@ export default function MetadataRendererGalleryPage() {
   const documentActivitySurface = buildDocumentActivityLinesListSurface({
     moduleId: systemAdminDocumentRegistryGalleryModuleId,
     events: systemAdminDocumentActivityGalleryEvents,
+  });
+  const documentActivityHrSurface = buildDocumentActivityLinesListSurface({
+    moduleId: systemAdminDocumentRegistrySensitiveGalleryModuleId,
+    events: systemAdminDocumentActivityHrGalleryEvents,
   });
   const emptyDocumentActivitySurface = buildDocumentActivityLinesListSurface({
     moduleId: systemAdminDocumentRegistryGalleryModuleId,
@@ -228,6 +248,16 @@ export default function MetadataRendererGalleryPage() {
       window: {
         pageSize: 25,
         totalCount: systemAdminDocumentQuarantineInboxGalleryRows.length,
+        hasNextPage: false,
+      },
+      canWrite: true,
+    });
+  const emptyDocumentQuarantineInboxSurface =
+    buildSystemAdminDocumentQuarantineInboxListSurface({
+      documents: [],
+      window: {
+        pageSize: 25,
+        totalCount: 0,
         hasNextPage: false,
       },
       canWrite: true,
@@ -378,6 +408,26 @@ export default function MetadataRendererGalleryPage() {
         />
       </GallerySection>
 
+      <GallerySection label="Pattern C — Document registry (pending scan)">
+        <GovernedPatternCListSection
+          title="Documents"
+          surfaceKey={`${systemAdminDocumentRegistryGallerySurfaceKey}.pending-scan`}
+          listConfiguration={documentListPendingSurface}
+          parentAccessAllowed
+          {...galleryPatternSection}
+        />
+      </GallerySection>
+
+      <GallerySection label="Pattern C — Document registry (sensitive masked)">
+        <GovernedPatternCListSection
+          title="Documents"
+          surfaceKey={`${systemAdminDocumentRegistryGallerySurfaceKey}.sensitive-masked`}
+          listConfiguration={documentListSensitiveSurface}
+          parentAccessAllowed
+          {...galleryPatternSection}
+        />
+      </GallerySection>
+
       <GallerySection label="Pattern C — Document registry (trailing — ready)">
         <GovernedPatternCListSection
           title="Documents"
@@ -473,6 +523,17 @@ export default function MetadataRendererGalleryPage() {
         />
       </GallerySection>
 
+      <GallerySection label="Pattern C — Document activity (hr vault union)">
+        <GovernedPatternCListSection
+          title="Document activity"
+          description="HR vault events with downloadable evidence links."
+          surfaceKey={systemAdminDocumentActivityHrGallerySurfaceKey}
+          listConfiguration={documentActivityHrSurface}
+          parentAccessAllowed
+          {...galleryPatternSection}
+        />
+      </GallerySection>
+
       <GallerySection label="Pattern C — Document activity (empty)">
         <GovernedPatternCListSection
           title="Document activity"
@@ -516,6 +577,16 @@ export default function MetadataRendererGalleryPage() {
               organizationLegalHoldActive: true,
             },
           }}
+        />
+      </GallerySection>
+
+      <GallerySection label="Pattern C — System admin quarantine inbox (empty)">
+        <GovernedPatternCListSection
+          title="Quarantine inbox"
+          surfaceKey={`${systemAdminDocumentQuarantineInboxSurfaceKey}.empty`}
+          listConfiguration={emptyDocumentQuarantineInboxSurface}
+          parentAccessAllowed
+          {...galleryPatternSection}
         />
       </GallerySection>
 

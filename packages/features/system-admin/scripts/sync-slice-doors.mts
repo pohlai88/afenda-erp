@@ -161,6 +161,23 @@ export { systemAdminMembershipsGalleryRows } from "./surface/system-admin.member
 
   if (slice === "tenant-execution") {
     return `${header}export type { SystemAdminActionResult } from "./contracts/system-admin.action-result.contract";
+export {
+  buildSystemAdminDocumentQuarantineInboxListSurface,
+  systemAdminDocumentQuarantineInboxGalleryRows,
+  systemAdminDocumentQuarantineInboxSurfaceKey,
+  documentLifecycleTrailingActionId,
+  systemAdminDocumentActivityGalleryEvents,
+  systemAdminDocumentActivityGallerySurfaceKey,
+  systemAdminDocumentActivityHrGalleryEvents,
+  systemAdminDocumentActivityHrGallerySurfaceKey,
+  systemAdminDocumentRegistryGalleryModuleId,
+  systemAdminDocumentRegistryGalleryRows,
+  systemAdminDocumentRegistryGallerySurfaceKey,
+  systemAdminDocumentRegistrySensitiveGalleryModuleId,
+  buildSystemAdminOrganizationStorageQuotaStatGrid,
+  buildSystemAdminOrganizationStorageQuotaStatGroups,
+  systemAdminOrganizationStorageQuotaSurfaceKey,
+} from "./surface";
 `;
   }
 
@@ -268,6 +285,7 @@ export const {
   buildOverviewStatGrid,
   buildSavedViewsListSurface,
   buildDocumentRegistryListSurface,
+  buildDocumentActivityLinesListSurface,
   buildRecordDetailTabs,
   buildWorkItemDetailTabs,
   buildWorkItemKanbanSurface,
@@ -302,6 +320,7 @@ ${slices
   .filter((s) => s !== "tenant-execution")
   .map((s) => `export * from "./${s}/client";`)
   .join("\n")}
+export * from "./tenant-execution/client";
 
 export { systemAdminRoutePaths } from "./overview/contracts/system-admin.route-paths.contract";
 export {

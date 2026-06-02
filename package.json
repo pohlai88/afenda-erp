@@ -13,6 +13,7 @@
     "r2:status": "pnpm --filter @afenda/object-storage r2:status",
     "r2:verify:presign": "pnpm --filter @afenda/object-storage r2:verify:presign",
     "r2:verify": "pnpm env:verify:object-storage && pnpm r2:verify:presign",
+    "blob:migrate:r2": "pnpm --filter @afenda/object-storage blob:migrate:r2",
     "ai:verify:gateway-models": "pnpm --filter @afenda/ai verify:gateway-models",
     "env:sync:cursor": "tsx scripts/sync-cursor-env.mts",
     "env:sync:dry-run": "tsx scripts/sync-env.mts --dry-run",

@@ -111,6 +111,12 @@ vi.mock("@afenda/db", () => ({
     classification: "confidential",
     employeeId: "emp_a",
   })),
+  getOrganizationObjectStorageProvider: vi.fn(async () => null),
+  getOrganizationEncryptionSettings: vi.fn(async () => ({
+    mode: "platform" as const,
+    kmsAdapter: null,
+    kmsKeyRef: null,
+  })),
 }));
 
 vi.mock("@afenda/object-storage/server", () => ({
@@ -133,6 +139,11 @@ vi.mock("@afenda/object-storage/server", () => ({
     })),
     deleteObject: vi.fn(async () => undefined),
   })),
+  buildObjectStorageEncryptionContext: vi.fn(() => ({
+    mode: "platform" as const,
+    kms: null,
+  })),
+  decryptStoredDocumentBody: vi.fn(async () => null),
 }));
 
 vi.mock("@afenda/kernel/execution", () => ({
@@ -198,6 +209,7 @@ describe("tenant document lifecycle commands", () => {
       classification: "internal",
       retentionClass: "standard",
       scanStatus: "scanning",
+      metadata: {},
     });
 
     const result = await processTenantDocumentScanCommand({

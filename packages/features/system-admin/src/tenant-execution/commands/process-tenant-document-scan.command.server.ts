@@ -90,6 +90,7 @@ export async function processTenantDocumentScanCommand(input: {
     blobUrl: document.blobUrl,
     contentType: document.contentType,
     sizeBytes: document.sizeBytes,
+    metadata: document.metadata,
   });
 
   if (outcome.mode === "deferred") {

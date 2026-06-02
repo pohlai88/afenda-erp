@@ -32,6 +32,12 @@ const dbMocks = vi.hoisted(() => ({
   listOrganizationsForCoreErpSeed: vi.fn(async () => [
     { id: "org_a", ownerAuthUserId: "user_owner" },
   ]),
+  getOrganizationObjectStorageProvider: vi.fn(async () => null),
+  getOrganizationEncryptionSettings: vi.fn(async () => ({
+    mode: "platform" as const,
+    kmsAdapter: null,
+    kmsKeyRef: null,
+  })),
 }));
 
 vi.mock("@afenda/db", () => dbMocks);
@@ -65,6 +71,11 @@ vi.mock("@afenda/object-storage/server", () => ({
     })),
   })),
   incrementObjectStorageMetric: vi.fn(),
+  buildObjectStorageEncryptionContext: vi.fn(() => ({
+    mode: "platform" as const,
+    kms: null,
+  })),
+  decryptStoredDocumentBody: vi.fn(async () => null),
 }));
 
 vi.mock("@afenda/kernel/execution", () => ({

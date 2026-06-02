@@ -38,7 +38,22 @@ import {
   uploadRetentionClassSchema,
   type UploadTokenPayload,
 } from "../src/_object-storage-integration/schemas/upload-payload.shared";
-import { objectStorageGovernancePolicy } from "../src/metadata";
+import {
+  objectStorageEncryptionModes,
+  objectStorageGovernancePolicy,
+  objectStorageKmsAdapterIds,
+  objectStorageProviderIds,
+  objectStorageUploadModes,
+} from "../src/metadata";
+
+describe("object storage metadata door", () => {
+  it("exports provider, upload, and encryption registry ids", () => {
+    expect(objectStorageProviderIds).toEqual(["vercel-blob", "r2", "s3"]);
+    expect(objectStorageUploadModes).toEqual(["presigned", "server"]);
+    expect(objectStorageEncryptionModes).toEqual(["platform", "customer-managed"]);
+    expect(objectStorageKmsAdapterIds).toEqual(["vault-transit", "aws-kms"]);
+  });
+});
 
 describe("tenant object pathnames", () => {
   it("builds tenant-scoped object path prefixes", () => {
