@@ -36,4 +36,4 @@ apps/erp/test-results/
 apps/erp/playwright-report/
 
 .env*.local
-packages/object-storage/r2/cors.generated.json
+packages/object-storage/src/r2/policies/cors.generated.json

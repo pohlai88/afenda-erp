@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import {
   appRouteAllowedTsxNames,
@@ -823,6 +824,32 @@ function checkFeatureBucketGrammar() {
   });
 }
 
+function checkObjectStorageBucketGrammar() {
+  const script = path.join(
+    root,
+    "packages/object-storage/scripts/check-object-storage-layout.mts",
+  );
+  if (!fs.existsSync(script)) {
+    problems.push(
+      "packages/object-storage/scripts/check-object-storage-layout.mts is required",
+    );
+    return;
+  }
+
+  const result = spawnSync("pnpm", ["exec", "tsx", script], {
+    cwd: root,
+    encoding: "utf8",
+    shell: process.platform === "win32",
+  });
+
+  if (result.status !== 0) {
+    const output = [result.stdout, result.stderr].filter(Boolean).join("\n").trim();
+    problems.push(
+      output || "[object-storage:layout] check failed (see script output)",
+    );
+  }
+}
+
 function checkAppRouteFileWhitelist() {
   const appRoot = path.join(root, "apps/erp/src");
   if (!fs.existsSync(appRoot)) {
@@ -1399,6 +1426,7 @@ checkAppUiBoundary();
 checkWorkspacePackageRegistry();
 checkFeatureWorkspaceDiscipline();
 checkFeatureBucketGrammar();
+checkObjectStorageBucketGrammar();
 checkPackageBuildPolicy();
 checkTypecheckIncludesVitestSources();
 checkTurboBuildOutputs();

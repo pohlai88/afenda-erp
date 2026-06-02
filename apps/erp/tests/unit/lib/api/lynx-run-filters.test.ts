@@ -1,3 +1,4 @@
+import { LYNX_ERP_HTTP_ROUTES } from "@afenda/feature-lynx";
 import { describe, expect, it } from "vitest";
 import {
   buildLynxRunFilterSearchParams,
@@ -16,13 +17,13 @@ describe("lynx run filters", () => {
     const params = buildLynxRunFilterSearchParams({
       filters: {
         status: "failed",
-        route: "/api/lynx/operator",
+        route: LYNX_ERP_HTTP_ROUTES.operator,
         toolName: "inspectLynxReadiness",
       },
     });
 
     expect(params.get("status")).toBe("failed");
-    expect(params.get("route")).toBe("/api/lynx/operator");
+    expect(params.get("route")).toBe(LYNX_ERP_HTTP_ROUTES.operator);
     expect(params.get("toolName")).toBe("inspectLynxReadiness");
   });
 

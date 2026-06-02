@@ -14,7 +14,8 @@ import {
   GovernedPatternBStatSection,
   GovernedPatternCListSection,
 } from "@afenda/governed-surface/server";
-import { loadKnowledgeAdminBundle } from "@/workspace-routes/workspace-route-cache";
+import { ERP_CRON_HTTP_ROUTES } from "@/contracts/erp-http.contract";
+import { loadKnowledgeAdminBundle } from "@/workspace-routes/knowledge-route-cache";
 import { SectionPanel, StatusBadge } from "@afenda/ui";
 
 const knowledgeOverviewStatSurfaceKey = "knowledge.admin.overview";
@@ -137,7 +138,7 @@ export async function KnowledgeSourcesSection() {
   return (
     <GovernedPatternCListSection
       title="Knowledge sources"
-      description="Configured ingestion adapters. Sync via /api/cron/knowledge-sync."
+      description={`Configured ingestion adapters. Scheduled sync: ${ERP_CRON_HTTP_ROUTES.knowledgeSync}.`}
       surfaceKey={surfaceKeys.sources}
       listConfiguration={sourcesListSurface}
       parentAccessAllowed
@@ -153,7 +154,7 @@ export async function KnowledgeChunksSection() {
     rows: recentChunks.map((chunk) => ({
       id: chunk.id,
       title: chunk.title,
-      excerpt: chunk.body,
+      excerpt: chunk.body.slice(0, 240),
       createdAt: chunk.createdAt.toLocaleDateString(),
     })),
   });

@@ -1,4 +1,6 @@
 import type { LynxRunLedgerFilters } from "@afenda/db";
+import { LYNX_ERP_HTTP_ROUTES } from "@afenda/feature-lynx";
+import { ERP_CRON_HTTP_ROUTES } from "@/contracts/erp-http.contract";
 import {
   buildLynxRunFilterSearchParams,
   parseLynxRunFilters,
@@ -61,13 +63,13 @@ function LynxRunsFiltersPanel({ filters }: { filters: LynxRunLedgerFilters }) {
             name="route"
           >
             <NativeSelectOption value="">Any route</NativeSelectOption>
-            <NativeSelectOption value="/api/lynx/operator">
+            <NativeSelectOption value={LYNX_ERP_HTTP_ROUTES.operator}>
               Operator
             </NativeSelectOption>
-            <NativeSelectOption value="/api/lynx/truth-search">
+            <NativeSelectOption value={LYNX_ERP_HTTP_ROUTES.truthSearch}>
               Truth Retrieval
             </NativeSelectOption>
-            <NativeSelectOption value="/api/cron/lynx-outcomes">
+            <NativeSelectOption value={ERP_CRON_HTTP_ROUTES.lynxOutcomes}>
               Outcome sweep
             </NativeSelectOption>
           </NativeSelect>
@@ -221,7 +223,7 @@ export function LynxRunsRoutePage({ searchParams }: LynxRunsRoutePageProps) {
             >
               {lynxRunsFilterSection(searchParams, (filters) => {
                 const filterParams = buildLynxRunFilterSearchParams({ filters });
-                const exportHref = `/api/lynx/runs/export${
+                const exportHref = `${LYNX_ERP_HTTP_ROUTES.runLedgerExport}${
                   filterParams.size > 0 ? `?${filterParams.toString()}` : ""
                 }`;
 

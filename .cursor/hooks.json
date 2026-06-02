@@ -14,7 +14,7 @@
     "beforeFileEdit": [
       {
         "command": "tsx scripts/validate-feature-shape.mts --path \"${file}\" --action edit",
-        "matcher": "packages/features/**|apps/erp/src/**"
+        "matcher": "packages/features/**|apps/erp/src/**|packages/object-storage/**"
       }
     ],
     "preToolUse": [
@@ -48,6 +48,10 @@
     ],
     "beforeShellExecution": [
       {
+        "command": "node .cursor/hooks/guard-object-storage-shell.mjs",
+        "failClosed": true
+      },
+      {
         "command": "node .cursor/hooks/guard-database-ddl.mjs",
         "matcher": "psql"
       }
@@ -66,12 +70,18 @@
         "failClosed": true
       },
       {
+        "command": "node .cursor/hooks/enforce-object-storage-after-shell.mjs",
+        "matcher": "Shell",
+        "timeout": 120,
+        "failClosed": true
+      },
+      {
         "command": "node .cursor/hooks/post-edit-architecture-hints.mjs",
         "matcher": "Write|StrReplace"
       },
       {
         "command": "tsx scripts/validate-feature-shape.mts --path \"${file}\" --action write",
-        "matcher": "packages/features/**|apps/erp/src/**"
+        "matcher": "packages/features/**|apps/erp/src/**|packages/object-storage/**"
       }
     ]
   }

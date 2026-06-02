@@ -18,12 +18,16 @@
       "types": "./src/server.ts",
       "development": "./src/server.ts",
       "default": "./dist/server.js"
+    },
+    "./metadata": {
+      "types": "./src/metadata.ts",
+      "development": "./src/metadata.ts",
+      "default": "./dist/metadata.js"
     }
   },
   "dependencies": {
     "@afenda/auth": "workspace:*",
     "@afenda/config": "workspace:*",
-    "@afenda/db": "workspace:*",
     "@afenda/kernel": "workspace:*",
     "@afenda/observability": "workspace:*",
     "@aws-sdk/client-s3": "^3.888.0",
@@ -36,6 +40,7 @@
     "build": "tsc -p tsconfig.build.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "lint": "tsc -p tsconfig.json --noEmit",
+    "layout:check": "tsx scripts/check-object-storage-layout.mts",
     "test": "vitest run --config vitest.config.ts"
   },
   "devDependencies": {

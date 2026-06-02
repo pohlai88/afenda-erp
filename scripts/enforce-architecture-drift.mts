@@ -40,6 +40,27 @@ const RULES: DriftRule[] = [
     commands: [["pnpm", "kernel:check"], ["pnpm", "--filter", "@afenda/kernel", "test"]],
   },
   {
+    id: "object-storage-shape",
+    test: (p) => p.startsWith("packages/object-storage/"),
+    commands: [
+      [
+        "pnpm",
+        "exec",
+        "tsx",
+        "packages/object-storage/scripts/check-object-storage-layout.mts",
+      ],
+      [
+        "pnpm",
+        "exec",
+        "tsx",
+        "scripts/validate-feature-shape.mts",
+        "--path",
+        rel,
+      ],
+      ["pnpm", "--filter", "@afenda/object-storage", "typecheck"],
+    ],
+  },
+  {
     id: "architecture-guard",
     test: (p) =>
       p.startsWith("packages/features/") ||

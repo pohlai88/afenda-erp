@@ -4,6 +4,37 @@ Platform package — **ARCH-1002** §6 allowlist. **No ERP module business rules
 
 Category: `runtime-library` · Multi-provider tenant object storage (Vercel Blob, Cloudflare R2).
 
+## Source layout (hard law)
+
+`src/` allows **exactly three top-level folders** plus four export doors:
+
+```txt
+src/
+  index.ts, client.ts, server.ts, metadata.ts   # four export doors (ARCH-1002 §8)
+  blob/                              # vercel-blob provider vertical slice
+    api/                             # upload-handler.server.ts
+    domain/                          # object-store.server.ts
+  r2/                                # Cloudflare R2 provider vertical slice
+    api/                             # upload-handler.server.ts
+    domain/                          # object-store.server.ts, presign.shared.ts
+    policies/                        # cors.json (browser PUT CORS template)
+  _object-storage-integration/        # shared platform wiring (horizontal buckets)
+    actions/, commands/, api/, contracts/, components/, data/, domain/,
+    events/, policies/, read-models/, schemas/, tests/
+    api/                             # HTTP handlers, upload registration
+    components/                      # upload-tenant-document.client.ts
+    contracts/                       # ports + HTTP route constants
+    data/                            # tenant-document.read-port.shared.ts
+    domain/                          # auth, config, factory, errors
+    policies/, schemas/
+```
+
+**Forbidden at `src/` root:** any folder other than `blob/`, `r2/`, `_object-storage-integration/`; any file other than the four export doors; legacy `providers/`, `handlers/`, custom buckets (`auth/`, `env/`, `errors/`, `client/`).
+
+Each slice (`blob/`, `r2/`, `_object-storage-integration/`) must contain **all** ARCH-1002 §8 template buckets. Download persistence uses an injected `GetTenantDocumentForDownload` port — **`@afenda/db` is forbidden** in object-storage `api/` handlers; apps/erp routes wire `getTenantDocument`.
+
+Guards: `.cursor/hooks/guard-architecture-compliance.mjs` (preToolUse deny) · `.cursor/hooks/guard-object-storage-shell.mjs` (shell deny) · `.cursor/rules/afenda-object-storage.mdc` · `packages/object-storage/scripts/check-object-storage-layout.mts` (CI) · `pnpm architecture:check`.
+
 ## Export doors
 
 | Door | Use |
@@ -11,6 +42,7 @@ Category: `runtime-library` · Multi-provider tenant object storage (Vercel Blob
 | `@afenda/object-storage` | Client-safe barrel (policies, schemas, HTTP routes) |
 | `@afenda/object-storage/client` | Upload helpers (`uploadTenantDocument`, `uploadTenantObject`), policies |
 | `@afenda/object-storage/server` | Upload/download handlers, auth, `createObjectStore` factory |
+| `@afenda/object-storage/metadata` | Registry-safe routes, upload policy limits, provider ids — no tenant reads |
 
 ## Providers
 
@@ -44,7 +76,7 @@ Set `OBJECT_STORAGE_PROVIDER` explicitly when both credential sets are present.
 }
 ```
 
-Apply via `pnpm r2:provision` or `npx wrangler r2 bucket cors set <bucket> --file packages/object-storage/r2/cors.json --force`.
+Apply via `pnpm r2:provision` or `npx wrangler r2 bucket cors set <bucket> --file packages/object-storage/src/r2/policies/cors.json --force`.
 
 5. **Public access** — R2 does not support per-object S3 ACL on PUT. Enable bucket public access + custom domain in Cloudflare, then set `OBJECT_STORAGE_PUBLIC_URL_BASE` to that domain. **`access: "private"`** (default) always uses signed GET URLs. Presign rejects `access: "public"` when `OBJECT_STORAGE_PUBLIC_URL_BASE` is unset.
 
@@ -60,7 +92,7 @@ Apply via `pnpm r2:provision` or `npx wrangler r2 bucket cors set <bucket> --fil
 | MCP `cloudflare-bindings` → `r2_bucket_get` | Bucket metadata (location, jurisdiction) |
 | MCP `cloudflare` → `execute` / `search` | Same REST paths as [cloudflare-typescript](https://github.com/cloudflare/cloudflare-typescript) |
 
-`wrangler.jsonc` pins the Cloudflare account id. CORS template: `packages/object-storage/r2/cors.json`; provision writes `cors.generated.json`.
+`wrangler.jsonc` pins the Cloudflare account id. CORS template: `packages/object-storage/src/r2/policies/cors.json`; provision writes `cors.generated.json` alongside it.
 
 Legacy env keys `R2_*` map to `OBJECT_STORAGE_*` in `@afenda/config/env`.
 
@@ -75,7 +107,7 @@ Follow [Cloudflare presigned URL doctrine](https://developers.cloudflare.com/r2/
 | S3 endpoint `https://<account_id>.r2.cloudflarestorage.com` | `OBJECT_STORAGE_ENDPOINT` — presigned URLs always use this host (not custom domains) |
 | `region: "auto"` | Enforced in `createR2Client` |
 | PUT presign with restricted `ContentType` | `PutObjectCommand({ ContentType })` — no signed `Content-Length`; size verified on `complete` via `HeadObject` |
-| `expiresIn: 3600` | `R2_PRESIGN_EXPIRES_SECONDS` in `r2-presign.shared.ts` |
+| `expiresIn: 3600` | `R2_PRESIGN_EXPIRES_SECONDS` in `r2/domain/presign.shared.ts` |
 | Browser CORS for cross-origin PUT | `pnpm r2:provision` — origins from `NEXT_PUBLIC_SITE_URL` + localhost |
 | Client PUT | `credentials: "omit"`; send only signed `Content-Type` header |
 | Private download | `GetObjectCommand` presigned GET via `getSignedDownloadUrl` |

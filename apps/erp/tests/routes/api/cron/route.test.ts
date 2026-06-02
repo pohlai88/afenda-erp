@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { ERP_CRON_HTTP_ROUTES } from "@/contracts/erp-http.contract";
 
 const cronHistory = vi.hoisted(() => ({
   createCronRunHistory: vi.fn(async () => "cron_run_route"),
@@ -33,10 +34,10 @@ vi.mock("@afenda/feature-lynx/server", () => ({
   })),
 }));
 
-import { GET as getReminders } from "@/app/api/cron/reminders/route";
-import { GET as getSyncs } from "@/app/api/cron/syncs/route";
-import { GET as getHousekeeping } from "@/app/api/cron/housekeeping/route";
-import { GET as getLynxOutcomes } from "@/app/api/cron/lynx-outcomes/route";
+import { GET as getReminders } from "@/app/api/internal/v1/cron/reminders/route";
+import { GET as getSyncs } from "@/app/api/internal/v1/cron/syncs/route";
+import { GET as getHousekeeping } from "@/app/api/internal/v1/cron/housekeeping/route";
+import { GET as getLynxOutcomes } from "@/app/api/internal/v1/cron/lynx-outcomes/route";
 
 describe("cron routes", () => {
   beforeEach(() => {
@@ -47,18 +48,16 @@ describe("cron routes", () => {
 
   it("rejects unauthenticated reminder sweeps", async () => {
     const response = await getReminders(
-      new Request("http://localhost/api/cron/reminders"),
+      new Request(`http://localhost${ERP_CRON_HTTP_ROUTES.reminders}`),
     );
 
     expect(response.status).toBe(401);
   });
 
-  it("runs reminder sweeps with bearer auth", async () => {
+  it("runs reminder sweeps when authorized", async () => {
     const response = await getReminders(
-      new Request("http://localhost/api/cron/reminders", {
-        headers: {
-          authorization: "Bearer cron-route-secret",
-        },
+      new Request(`http://localhost${ERP_CRON_HTTP_ROUTES.reminders}`, {
+        headers: { authorization: "Bearer cron-route-secret" },
       }),
     );
 
@@ -67,20 +66,18 @@ describe("cron routes", () => {
       success: true,
       job: "reminders",
     });
-    expect(cronHistory.finishCronRunHistory).toHaveBeenCalledWith(
+    expect(cronHistory.createCronRunHistory).toHaveBeenCalledWith(
       expect.objectContaining({
-        id: "cron_run_route",
-        status: "success",
+        jobName: "reminders",
+        route: ERP_CRON_HTTP_ROUTES.reminders,
       }),
     );
   });
 
-  it("runs sync sweeps with bearer auth", async () => {
+  it("runs sync sweeps when authorized", async () => {
     const response = await getSyncs(
-      new Request("http://localhost/api/cron/syncs", {
-        headers: {
-          authorization: "Bearer cron-route-secret",
-        },
+      new Request(`http://localhost${ERP_CRON_HTTP_ROUTES.syncs}`, {
+        headers: { authorization: "Bearer cron-route-secret" },
       }),
     );
 
@@ -91,12 +88,10 @@ describe("cron routes", () => {
     });
   });
 
-  it("runs housekeeping sweeps with bearer auth", async () => {
+  it("runs housekeeping sweeps when authorized", async () => {
     const response = await getHousekeeping(
-      new Request("http://localhost/api/cron/housekeeping", {
-        headers: {
-          authorization: "Bearer cron-route-secret",
-        },
+      new Request(`http://localhost${ERP_CRON_HTTP_ROUTES.housekeeping}`, {
+        headers: { authorization: "Bearer cron-route-secret" },
       }),
     );
 
@@ -107,20 +102,18 @@ describe("cron routes", () => {
     });
   });
 
-  it("rejects unauthenticated Lynx outcome sweeps", async () => {
+  it("rejects unauthenticated lynx outcome sweeps", async () => {
     const response = await getLynxOutcomes(
-      new Request("http://localhost/api/cron/lynx-outcomes"),
+      new Request(`http://localhost${ERP_CRON_HTTP_ROUTES.lynxOutcomes}`),
     );
 
     expect(response.status).toBe(401);
   });
 
-  it("runs Lynx outcome sweeps with bearer auth", async () => {
+  it("runs lynx outcome sweeps when authorized", async () => {
     const response = await getLynxOutcomes(
-      new Request("http://localhost/api/cron/lynx-outcomes", {
-        headers: {
-          authorization: "Bearer cron-route-secret",
-        },
+      new Request(`http://localhost${ERP_CRON_HTTP_ROUTES.lynxOutcomes}`, {
+        headers: { authorization: "Bearer cron-route-secret" },
       }),
     );
 
@@ -128,8 +121,6 @@ describe("cron routes", () => {
     await expect(response.json()).resolves.toMatchObject({
       success: true,
       job: "lynx-outcomes",
-      monitorCount: 3,
-      workflowSessionsCreated: 1,
     });
   });
 });

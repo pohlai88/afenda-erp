@@ -3,104 +3,48 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("server-only", () => ({}));
 
-vi.mock("@afenda/ai/server", () => ({
-  aiGatewayDefaultProviderOrder: ["openai", "anthropic"],
-  assertAiBudget: vi.fn(),
-  assertCapabilityAllowed: vi.fn(),
-  assertGovernedToolset: vi.fn(),
-  assertNoSensitiveCredentialContent: vi.fn(),
-  createErpSpecialistAgent: vi.fn(),
-  createErpAssistantTools: vi.fn(),
-  createGatewayOptions: vi.fn(),
-  estimateTokenCount: vi.fn(() => 80),
-  getAiGatewayEnvironment: vi.fn(() => "development"),
-  getAiModelForFeature: vi.fn(() => "openai/gpt-5.4"),
-  getAiRouteError: vi.fn(() => null),
-  getUsageMetrics: vi.fn(),
-  hasAiGatewayRuntimeCredentials: vi.fn(),
-  isAiBudgetError: vi.fn(() => false),
-  isAiPermissionError: vi.fn(() => false),
-  isAiSensitiveContentError: vi.fn(() => false),
+import { AI_ERP_HTTP_ROUTES } from "@afenda/ai";
+
+const { handleAiErpAssistantPost } = vi.hoisted(() => ({
+  handleAiErpAssistantPost: vi.fn(),
 }));
 
-vi.mock("@afenda/auth/server", () => ({
-  getApiAuthContext: vi.fn(),
+vi.mock("@afenda/feature-system-admin/server", () => ({
+  AI_ERP_ASSISTANT_MAX_DURATION: 30,
+  handleAiErpAssistantPost,
 }));
 
-vi.mock("@afenda/db", () => ({
-  createAiUsageEvent: vi.fn(),
-  registerAiApprovalProposal: vi.fn(),
-}));
+import { POST } from "@/app/api/internal/v1/ai/queries/erp-assistant/route";
+import { handleAiErpAssistantPost as assistantHandler } from "@afenda/feature-system-admin/server";
 
-vi.mock("@afenda/kernel", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("@afenda/kernel")>();
-
-  return {
-    ...actual,
-    getErpModuleById: vi.fn(),
-    getModuleWorkspace: vi.fn(async () => ({
-      dataMode: "metadata",
-      records: [],
-      workItems: [],
-      documents: [],
-    })),
-    getModuleWorkspaceStats: vi.fn(),
-    resolveWorkspaceDataMode: vi.fn(() => "metadata"),
-  };
-});
-
-vi.mock("@afenda/observability", () => ({
-  getRequestId: vi.fn(() => "req_test"),
-  logServerEvent: vi.fn(),
-}));
-
-vi.mock("ai", () => ({
-  createAgentUIStreamResponse: vi.fn(() =>
-    NextResponse.json({ ok: true, stream: true }),
-  ),
-}));
-
-import { hasAiGatewayRuntimeCredentials } from "@afenda/ai/server";
-import { getApiAuthContext } from "@afenda/auth/server";
-import { POST } from "@/app/api/ai/chat/route";
-
-describe("chat route", () => {
+describe("erp-assistant route", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it("returns 503 when AI gateway credentials are missing", async () => {
-    vi.mocked(hasAiGatewayRuntimeCredentials).mockReturnValue(false);
-
-    const response = await POST(
-      new Request("http://localhost/api/ai/chat", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({
-          messages: [{ role: "user", content: "Summarize finance queue." }],
-        }),
-      }),
-    );
-
-    expect(response.status).toBe(503);
+  it("re-exports the feature handler (thin transport)", () => {
+    expect(POST).toBe(assistantHandler);
   });
 
-  it("returns auth response when session is unavailable", async () => {
-    vi.mocked(hasAiGatewayRuntimeCredentials).mockReturnValue(true);
-    vi.mocked(getApiAuthContext).mockResolvedValue(
+  it("dispatches POST to the feature handler", async () => {
+    vi.mocked(handleAiErpAssistantPost).mockResolvedValue(
       NextResponse.json({ error: "Unauthorized" }, { status: 401 }),
     );
 
-    const response = await POST(
-      new Request("http://localhost/api/ai/chat", {
+    const request = new Request(
+      `http://localhost${AI_ERP_HTTP_ROUTES.erpAssistant}`,
+      {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
           messages: [{ role: "user", content: "Summarize finance queue." }],
         }),
-      }),
+      },
     );
 
+    const response = await POST(request);
+
+    expect(handleAiErpAssistantPost).toHaveBeenCalledWith(request);
     expect(response.status).toBe(401);
   });
 });

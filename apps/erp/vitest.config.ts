@@ -37,6 +37,14 @@ export default createVitestConfig("@afenda/erp", {
         __dirname,
         "../../packages/kernel/src/index.ts",
       ),
+      "@afenda/kernel/server": path.resolve(
+        __dirname,
+        "../../packages/kernel/src/server.ts",
+      ),
+      "@afenda/kernel/execution": path.resolve(
+        __dirname,
+        "../../packages/kernel/src/execution.ts",
+      ),
     },
   },
 });

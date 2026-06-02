@@ -57,7 +57,7 @@ const corsConfig = {
 
 const corsPath = resolve(
   rootDir,
-  "packages/object-storage/r2/cors.generated.json",
+  "packages/object-storage/src/r2/policies/cors.generated.json",
 );
 writeFileSync(corsPath, `${JSON.stringify(corsConfig, null, 2)}\n`);
 

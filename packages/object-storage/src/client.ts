@@ -5,7 +5,7 @@ export {
   type ObjectStorageUploadConfig,
   type TenantDocumentUploadInput,
   type TenantObjectUploadResult,
-} from "./upload-tenant-document.client";
+} from "./_object-storage-integration/components/upload-tenant-document.client";
 
 export {
   OBJECT_STORAGE_HTTP_ROUTES,
@@ -17,14 +17,16 @@ export {
   type SignedDownloadResult,
   type StoredObjectMetadata,
   type UploadRegistrationInput,
-} from "./contracts/index";
+  type GetTenantDocumentForDownload,
+  type TenantDocumentDownloadRecord,
+} from "./_object-storage-integration/contracts/index";
 
 export {
   documentUploadAccept,
   documentUploadContentTypes,
   documentUploadMaxSizeBytes,
   formatUploadLimit,
-} from "./policies/document-upload-policy.shared";
+} from "./_object-storage-integration/policies/document-upload-policy.shared";
 
 export {
   BLOB_MULTIPART_THRESHOLD_BYTES,
@@ -40,13 +42,13 @@ export {
   formatDownloadContentDisposition,
   sanitizeUploadFilename,
   shouldUseMultipartUpload,
-} from "./policies/tenant-pathnames.shared";
+} from "./_object-storage-integration/policies/tenant-pathnames.shared";
 
 export {
   UploadRouteError,
   getBlobRouteErrorResponse,
   getUploadRouteErrorResponse,
-} from "./errors/upload-route.error.shared";
+} from "./_object-storage-integration/domain/upload-route.error.shared";
 
 export {
   r2CompleteBodySchema,
@@ -54,4 +56,4 @@ export {
   uploadAccessSchema,
   uploadPayloadSchema,
   type UploadTokenPayload,
-} from "./schemas/upload-payload.shared";
+} from "./_object-storage-integration/schemas/upload-payload.shared";

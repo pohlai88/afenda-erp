@@ -10,14 +10,6 @@ import {
   roleOperatingPosture,
 } from "@afenda/kernel";
 import { requireCapability } from "@afenda/auth/server";
-import {
-  countKnowledgeChunks,
-  countKnowledgeDocuments,
-  getKnowledgeOrgSetting,
-  listKnowledgeSources,
-  listLynxEvalRuns,
-  listRecentKnowledgeChunks,
-} from "@afenda/feature-knowledge/server";
 import type { LynxRunLedgerFilters, LynxWorkflowSessionStatus } from "@afenda/db";
 import {
   getLynxLatencyAnalytics,
@@ -298,36 +290,6 @@ export const loadLynxRunsRepresentativeFailuresBundle = cache(async () => {
   });
 
   return { representativeEvalFailures };
-});
-
-export const loadKnowledgeAdminBundle = cache(async () => {
-  const { organization } = await requireCapability("system-admin.view");
-
-  const [
-    sources,
-    recentChunks,
-    chunkCount,
-    documentCount,
-    orgSetting,
-    evalRuns,
-  ] = await Promise.all([
-    listKnowledgeSources(organization.id),
-    listRecentKnowledgeChunks(organization.id, 10),
-    countKnowledgeChunks(organization.id),
-    countKnowledgeDocuments(organization.id),
-    getKnowledgeOrgSetting(organization.id),
-    listLynxEvalRuns(organization.id, 20),
-  ]);
-
-  return {
-    organization,
-    sources,
-    recentChunks,
-    chunkCount,
-    documentCount,
-    orgSetting,
-    evalRuns,
-  };
 });
 
 export const loadLynxRunDetailContext = cache(async (runId: string) => {

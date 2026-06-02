@@ -1,6 +1,12 @@
 import { NextResponse } from "next/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+vi.mock("server-only", () => ({}));
+vi.mock("@afenda/kernel/server", () => ({}));
+vi.mock("@afenda/kernel/execution", () => ({
+  writeExecutionAuditEvent: vi.fn(async () => undefined),
+}));
+
 const capturedChunks: unknown[] = [];
 const capturedMessageMetadata: unknown[] = [];
 
@@ -127,7 +133,8 @@ vi.mock("@/lib/ai-tracing", () => ({
   withAiSpan: vi.fn((_name, _attrs, run) => run()),
 }));
 
-import { POST } from "@/app/api/lynx/truth-search/route";
+import { LYNX_ERP_HTTP_ROUTES } from "@afenda/feature-lynx";
+import { POST } from "@/app/api/internal/v1/lynx/queries/truth-search/route";
 import {
   isAiFeatureEnabledForOrganization,
   recordLynxRunEvent,
@@ -175,7 +182,7 @@ describe("Lynx truth-search route", () => {
 
   it("emits evidence as AI SDK UI data parts", async () => {
     const response = await POST(
-      new Request("http://localhost/api/lynx/truth-search", {
+      new Request(`http://localhost${LYNX_ERP_HTTP_ROUTES.truthSearch}`, {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ query: "What policy applies?" }),
@@ -188,7 +195,7 @@ describe("Lynx truth-search route", () => {
       type: "data-lynx-run-context",
       data: {
         runId: "lynxrun_1",
-        route: "/api/lynx/truth-search",
+        route: LYNX_ERP_HTTP_ROUTES.truthSearch,
       },
     });
     expect(findChunk(payload, "data-lynx-retrieval-state")).toMatchObject({
@@ -217,7 +224,7 @@ describe("Lynx truth-search route", () => {
     expect(capturedMessageMetadata[0]).toEqual({
       lynxRun: {
         runId: "lynxrun_1",
-        route: "/api/lynx/truth-search",
+        route: LYNX_ERP_HTTP_ROUTES.truthSearch,
       },
     });
   });
@@ -235,7 +242,7 @@ describe("Lynx truth-search route", () => {
     });
 
     const response = await POST(
-      new Request("http://localhost/api/lynx/truth-search", {
+      new Request(`http://localhost${LYNX_ERP_HTTP_ROUTES.truthSearch}`, {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ query: "What policy applies?" }),
@@ -273,7 +280,7 @@ describe("Lynx truth-search route", () => {
     );
 
     const response = await POST(
-      new Request("http://localhost/api/lynx/truth-search", {
+      new Request(`http://localhost${LYNX_ERP_HTTP_ROUTES.truthSearch}`, {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ query: "What policy applies?" }),
@@ -308,7 +315,7 @@ describe("Lynx truth-search route", () => {
 
   it("rejects invalid request shape", async () => {
     const response = await POST(
-      new Request("http://localhost/api/lynx/truth-search", {
+      new Request(`http://localhost${LYNX_ERP_HTTP_ROUTES.truthSearch}`, {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ query: "" }),
@@ -322,7 +329,7 @@ describe("Lynx truth-search route", () => {
     vi.mocked(isAiFeatureEnabledForOrganization).mockResolvedValueOnce(false);
 
     const response = await POST(
-      new Request("http://localhost/api/lynx/truth-search", {
+      new Request(`http://localhost${LYNX_ERP_HTTP_ROUTES.truthSearch}`, {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ query: "What policy applies?" }),

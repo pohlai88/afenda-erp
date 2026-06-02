@@ -1,11 +1,11 @@
 import { uploadRouteCopy } from "@afenda/kernel";
 import { describe, expect, it } from "vitest";
-import { UploadRouteError } from "../src/errors/upload-route.error.shared";
+import { UploadRouteError } from "../src/_object-storage-integration/domain/upload-route.error.shared";
 import {
   headObjectMetadataFromR2Response,
   mapR2HeadObjectError,
-} from "../src/providers/r2-object-store.provider.server";
-import { addRandomPathSuffix } from "../src/policies/tenant-pathnames.shared";
+} from "../src/r2/domain/object-store.server";
+import { addRandomPathSuffix } from "../src/_object-storage-integration/policies/tenant-pathnames.shared";
 
 describe("R2 object store helpers", () => {
   it("maps head responses with required content length", () => {

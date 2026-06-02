@@ -1,0 +1,34 @@
+---
+description: Object-storage layout law — ARCH-1002 §8 slices, four doors, hook-enforced
+globs: "packages/object-storage/**"
+alwaysApply: false
+---
+
+# `@afenda/object-storage` (mandatory when editing this package)
+
+Canonical grammar: `packages/_scaffold/scripts/lib/scaffold-grammar.mts` (`featurePublicDoorFiles`, `featureTemplateBuckets`).
+
+## `src/` law
+
+```txt
+src/
+  index.ts, client.ts, server.ts, metadata.ts   # four export doors — all required
+  blob/ | r2/ | _object-storage-integration/    # only three top-level slices
+```
+
+Each slice contains **directories only** at slice root — one folder per ARCH-1002 §8 template bucket. **`components/` is a folder, never a filename.**
+
+Forbidden: `providers/`, `handlers/`, `auth/`, `env/`, `errors/`, `client/` as buckets; package-root `r2/` (use `src/r2/policies/`); `@afenda/db` in any `**/api/*.ts`.
+
+## Agent workflow (same turn as edits)
+
+1. Read `scaffold-grammar.mts` before structural changes.
+2. After edits: run and **paste output** (never claim pass without it):
+
+```bash
+pnpm --filter @afenda/object-storage layout:check
+pnpm --filter @afenda/object-storage typecheck
+pnpm --filter @afenda/object-storage test
+```
+
+Hooks deny invalid writes and fail the turn on drift — do not ask the user to run guards.

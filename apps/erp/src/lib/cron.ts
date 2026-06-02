@@ -2,6 +2,7 @@ import { getCronSecret } from "@afenda/config/env";
 import { createCronRunHistory, finishCronRunHistory } from "@afenda/db";
 import { getRequestId, logServerEvent } from "@afenda/observability";
 import { NextResponse } from "next/server";
+import { ERP_CRON_HTTP_ROUTES } from "@/contracts/erp-http.contract";
 
 export type CronJobName =
   | "reminders"
@@ -10,6 +11,15 @@ export type CronJobName =
   | "knowledge-sync"
   | "lynx-outcomes"
   | "hr-time-clock-sync";
+
+const CRON_JOB_ROUTE: Record<CronJobName, string> = {
+  reminders: ERP_CRON_HTTP_ROUTES.reminders,
+  syncs: ERP_CRON_HTTP_ROUTES.syncs,
+  housekeeping: ERP_CRON_HTTP_ROUTES.housekeeping,
+  "knowledge-sync": ERP_CRON_HTTP_ROUTES.knowledgeSync,
+  "lynx-outcomes": ERP_CRON_HTTP_ROUTES.lynxOutcomes,
+  "hr-time-clock-sync": ERP_CRON_HTTP_ROUTES.hrTimeClockSync,
+};
 
 export function authorizeCronRequest(request: Request) {
   const cronSecret = getCronSecret();
@@ -27,7 +37,7 @@ export async function runCronJob(input: {
   const startedAt = Date.now();
   const startedDate = new Date();
   const requestId = getRequestId(input.request);
-  const route = `/api/cron/${input.jobName}`;
+  const route = CRON_JOB_ROUTE[input.jobName];
   const context = {
     requestId,
     module: "cron",

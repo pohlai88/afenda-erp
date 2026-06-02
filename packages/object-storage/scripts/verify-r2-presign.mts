@@ -9,7 +9,7 @@ import { config } from "dotenv";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { getObjectStorageEnv } from "../../config/src/env.ts";
-import { R2_PRESIGN_EXPIRES_SECONDS } from "../src/providers/r2-presign.shared.ts";
+import { R2_PRESIGN_EXPIRES_SECONDS } from "../src/r2/domain/presign.shared.ts";
 
 const rootDir = resolve(dirname(fileURLToPath(import.meta.url)), "../../..");
 

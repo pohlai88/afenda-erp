@@ -2,6 +2,7 @@
 /**
  * preToolUse (Write | StrReplace): fail closed on target-architecture violations.
  * ARCH-1004 §7 · ARCH-1001 authority · no flat /api/* · no lazy doc rollback.
+ * object-storage: ONLY src/{blob,r2,_object-storage-integration}/ + export doors.
  */
 import { readFileSync, existsSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -35,6 +36,38 @@ const LAZY_DOC_PHRASES = [
 const APP_ROUTE = /^apps\/erp\/src\/app\/api\/.*\/route\.ts$/;
 
 const APP_LIB_API = /^apps\/erp\/src\/lib\/api\/.*\.ts$/;
+
+const OBJECT_STORAGE_SRC = /^packages\/object-storage\/src(?:\/|$)/;
+
+const OBJECT_STORAGE_ALLOWED_ROOT = new Set([
+  "packages/object-storage/src/index.ts",
+  "packages/object-storage/src/client.ts",
+  "packages/object-storage/src/server.ts",
+  "packages/object-storage/src/metadata.ts",
+]);
+
+const OBJECT_STORAGE_ALLOWED_TOP = new Set([
+  "blob",
+  "r2",
+  "_object-storage-integration",
+]);
+
+const OBJECT_STORAGE_PROVIDER_BUCKETS = new Set(["api", "domain"]);
+
+const OBJECT_STORAGE_TEMPLATE_BUCKETS = new Set([
+  "actions",
+  "commands",
+  "api",
+  "contracts",
+  "components",
+  "data",
+  "domain",
+  "events",
+  "policies",
+  "read-models",
+  "schemas",
+  "tests",
+]);
 
 const FORBIDDEN_ROUTE_IMPORTS = [
   /\bfrom\s+["']@afenda\/db["']/,
@@ -94,7 +127,7 @@ function deny(message) {
     JSON.stringify({
       permission: "deny",
       user_message: message,
-      agent_message: `${message} See rule afenda-agent-discipline and ARCH-1004 §7.`,
+      agent_message: `${message} object-storage law: src/ allows ONLY blob/, r2/, _object-storage-integration/ (+ index.ts, client.ts, server.ts, metadata.ts).`,
     }),
   );
   process.exit(2);
@@ -102,9 +135,103 @@ function deny(message) {
 
 /**
  * @param {string} rel
+ */
+function checkObjectStorageLayout(rel) {
+  if (!OBJECT_STORAGE_SRC.test(rel)) {
+    return;
+  }
+
+  if (
+    rel.startsWith("packages/object-storage/r2/") ||
+    rel === "packages/object-storage/r2"
+  ) {
+    deny(
+      `Blocked: ${rel} — forbidden package-root r2/. Use packages/object-storage/src/r2/ (e.g. policies/cors.json).`,
+    );
+  }
+
+  if (rel === "packages/object-storage/src") {
+    return;
+  }
+
+  const afterSrc = rel.replace(/^packages\/object-storage\/src\/?/, "");
+  if (!afterSrc) {
+    return;
+  }
+
+  const segments = afterSrc.split("/");
+  const top = segments[0] ?? "";
+
+  if (segments.length === 1 && afterSrc.includes(".")) {
+    if (!OBJECT_STORAGE_ALLOWED_ROOT.has(rel)) {
+      deny(
+        `Blocked: ${rel} — forbidden file at object-storage src root. Only index.ts, client.ts, server.ts, metadata.ts allowed. Move code into _object-storage-integration/, blob/, or r2/.`,
+      );
+    }
+    return;
+  }
+
+  if (!OBJECT_STORAGE_ALLOWED_TOP.has(top)) {
+    deny(
+      `Blocked: ${rel} — forbidden top-level folder "${top}/". object-storage src/ allows ONLY blob/, r2/, _object-storage-integration/.`,
+    );
+  }
+
+  if (
+    rel.includes("/_object-storage-integration/auth/") ||
+    rel.includes("/_object-storage-integration/env/") ||
+    rel.includes("/_object-storage-integration/errors/") ||
+    rel.includes("/_object-storage-integration/client/")
+  ) {
+    deny(
+      `Blocked: ${rel} — non-ARCH bucket. Use domain/, components/, schemas/ per ARCH-1002 §8.`,
+    );
+  }
+
+  if (top === "blob" || top === "r2" || top === "_object-storage-integration") {
+    // Bucket names are directories — never files (e.g. src/.../components with no extension).
+    if (segments.length === 2 && segments[1] && !segments[1].includes(".")) {
+      deny(
+        `Blocked: ${rel} — "${segments[1]}" must be a template bucket directory, not a file. Use ${segments[1]}/<module>.ts inside the slice.`,
+      );
+    }
+
+    if (segments.length >= 2) {
+      const bucket = segments[1] ?? "";
+      if (bucket && !OBJECT_STORAGE_TEMPLATE_BUCKETS.has(bucket)) {
+        deny(
+          `Blocked: ${rel} — "${bucket}/" is not an ARCH-1002 §8 template bucket.`,
+        );
+      }
+    }
+  }
+}
+
+/**
+ * @param {string} rel
+ * @param {string} content
+ */
+function checkObjectStorageDbImport(rel, content, fileBody) {
+  const body = content || fileBody || "";
+  if (
+    rel.startsWith("packages/object-storage/src/") &&
+    rel.includes("/api/") &&
+    rel.endsWith(".ts") &&
+    body.includes("@afenda/db")
+  ) {
+    deny(
+      `Blocked: ${rel} — api handlers must not import @afenda/db (ARCH-1004 §7). Inject getTenantDocument from apps/erp route via ObjectStorageDownloadHandlerDeps.`,
+    );
+  }
+}
+
+/**
+ * @param {string} rel
  * @param {string} content
  */
 function checkPath(rel, content) {
+  checkObjectStorageLayout(rel);
+
   if (ARCH_DOC.test(rel) && content) {
     for (const pattern of LAZY_DOC_PHRASES) {
       if (pattern.test(content)) {
@@ -185,6 +312,19 @@ function main() {
 
   const content = extractNewContent(input);
   checkPath(rel, content);
+
+  const hookDir = dirname(fileURLToPath(import.meta.url));
+  const root = join(hookDir, "..", "..");
+  const abs = join(root, rel);
+  let fileBody = "";
+  if (existsSync(abs)) {
+    try {
+      fileBody = readFileSync(abs, "utf8");
+    } catch {
+      fileBody = "";
+    }
+  }
+  checkObjectStorageDbImport(rel, content, fileBody);
 
   process.stdout.write('{"permission":"allow"}');
 }

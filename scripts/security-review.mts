@@ -16,7 +16,7 @@ const checks: readonly Check[] = [
   },
   {
     name: "Uploads validate capability and content policy",
-    file: "packages/object-storage/src/handlers/object-storage-handlers.server.ts",
+    file: "packages/object-storage/src/_object-storage-integration/api/object-storage-handlers.server.ts",
     patterns: [
       "assertObjectStorageConfigured",
       "requireUploadModuleAccess",
@@ -27,7 +27,7 @@ const checks: readonly Check[] = [
   },
   {
     name: "Document download validates tenant scope",
-    file: "packages/object-storage/src/handlers/object-storage-handlers.server.ts",
+    file: "packages/object-storage/src/_object-storage-integration/api/object-storage-handlers.server.ts",
     patterns: [
       "handleObjectStorageDocumentDownloadGet",
       "requireUploadModuleAccess",
@@ -46,9 +46,9 @@ const checks: readonly Check[] = [
     ],
   },
   {
-    name: "ERP document download delegates to object-storage handler",
+    name: "ERP document download wires db read port",
     file: "apps/erp/src/app/api/internal/v1/documents/[documentId]/download/route.ts",
-    patterns: ["handleObjectStorageDocumentDownloadGet"],
+    patterns: ["handleObjectStorageDocumentDownloadGet", "getTenantDocument"],
   },
   {
     name: "Legacy document download redirects to internal route",
@@ -57,7 +57,7 @@ const checks: readonly Check[] = [
   },
   {
     name: "Upload auth resolves session org",
-    file: "packages/object-storage/src/auth/upload-route-auth.server.ts",
+    file: "packages/object-storage/src/_object-storage-integration/domain/upload-route-auth.server.ts",
     patterns: [
       "getSession",
       "getActiveOrganization",

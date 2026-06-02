@@ -445,9 +445,45 @@ export async function POST(request: Request) {
 | Auth | Same tenancy as Server Actions — **ARCH-1003** §4 |
 | Vercel `onUploadCompleted` | **Does not fire on localhost** — use ngrok or similar to test the full webhook path |
 | R2 registration | `intent: "complete"` heads object, verifies size, then `registerUploadedTenantDocumentCommand` (wired from ERP upload route) |
-| Persistence | `@afenda/feature-system-admin` command wraps `registerTenantDocument`; download read still in object-storage handler (inject port when splitting `@afenda/db`) |
+| Persistence | `@afenda/feature-system-admin` command wraps `registerTenantDocument`; download reads via injected `getTenantDocument` from apps/erp route (`ObjectStorageDownloadHandlerDeps`) — **no `@afenda/db` in object-storage `api/`** |
 | Access | Prefer `access: 'private'` for tenant attachments; signed download routes for reads |
 | Import law | Features use `@afenda/object-storage/client` or `/server` — never provider SDKs |
+
+**Source layout (`packages/object-storage/src/`)** — enforced by `layout:check` and `guard-architecture-compliance.mjs`:
+
+```txt
+src/
+  index.ts, client.ts, server.ts, metadata.ts   # four export doors (ARCH-1002 §8)
+  blob/                              # vercel-blob provider slice
+  r2/                                # Cloudflare R2 provider slice
+  _object-storage-integration/       # shared HTTP wiring + ports
+```
+
+Each slice contains **only** ARCH-1002 §8 template buckets (`actions`, `commands`, `api`, `contracts`, `components`, `data`, `domain`, `events`, `policies`, `read-models`, `schemas`, `tests`). No loose files at slice root. Bucket names (`components/`, `api/`, …) are **directories only**. Forbidden legacy buckets: `providers/`, `handlers/`, `auth/`, `env/`, `errors/`, `client/`. Package-root `r2/` forbidden — use `src/r2/`.
+
+**Agent enforcement:** `.cursor/rules/afenda-object-storage.mdc` · `guard-architecture-compliance.mjs` (deny bucket-as-file writes) · `guard-object-storage-shell.mjs` (deny shell bypass) · post-edit `layout:check` + `typecheck`.
+
+| Slice | Responsibility |
+| ----- | -------------- |
+| `blob/` | Vercel Blob `handleUpload` adapter |
+| `r2/` | S3-compatible presign PUT / signed GET |
+| `_object-storage-integration/` | HTTP handlers, upload auth, config, client upload helpers, contracts |
+
+Download route wiring (required):
+
+```ts
+import { getTenantDocument } from "@afenda/db";
+import { handleObjectStorageDocumentDownloadGet } from "@afenda/object-storage/server";
+
+export async function GET(request: Request, context: RouteContext) {
+  const { documentId } = await context.params;
+  const result = await handleObjectStorageDocumentDownloadGet(
+    { request, documentId },
+    { getTenantDocument },
+  );
+  // ...
+}
+```
 
 ### 10.3 Edge Config (optional)
 

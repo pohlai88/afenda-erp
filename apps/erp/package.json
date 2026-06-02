@@ -42,6 +42,7 @@
     "@afenda/feature-sales": "workspace:*",
     "@afenda/feature-system-admin": "workspace:*",
     "@afenda/governed-surface": "workspace:*",
+    "@afenda/object-storage": "workspace:*",
     "@afenda/observability": "workspace:*",
     "@afenda/ui": "workspace:*",
     "@afenda/workflows": "workspace:*",

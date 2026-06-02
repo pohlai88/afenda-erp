@@ -1,5 +1,6 @@
 "use client";
 
+import { AI_ERP_HTTP_ROUTES } from "@afenda/ai";
 import { documentWorkflowCopy } from "@afenda/kernel";
 import type { ModuleId } from "@afenda/kernel";
 import { useState, type FormEvent } from "react";
@@ -186,7 +187,7 @@ export function DocumentExtractionForm({ moduleId }: { moduleId: ModuleId }) {
     });
 
     try {
-      const response = await fetch("/api/ai/extract", {
+      const response = await fetch(AI_ERP_HTTP_ROUTES.extractDocument, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

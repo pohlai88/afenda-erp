@@ -1,5 +1,6 @@
 "use client";
 
+import { AI_ERP_HTTP_ROUTES } from "@afenda/ai";
 import {
   erpAssistantPanelCopy,
   getAssistantEmptyStateHint,
@@ -22,7 +23,7 @@ export function ErpAssistantPanel({
   const [input, setInput] = useState("");
   const { addToolApprovalResponse, messages, sendMessage, status } = useChat({
     transport: new DefaultChatTransport({
-      api: "/api/ai/chat",
+      api: AI_ERP_HTTP_ROUTES.erpAssistant,
       body: contextModuleId ? { contextModuleId } : undefined,
     }),
   });

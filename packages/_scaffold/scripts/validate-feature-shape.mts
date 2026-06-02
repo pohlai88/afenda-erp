@@ -5,6 +5,7 @@ import {
   appRouteAllowedTsxNames,
   bannedBucketNames,
   featurePublicDoorFiles,
+  featureTemplateBuckets,
   getRepositoryRoot,
   isBannedBucketName,
   readFeatureTemplateBuckets,
@@ -116,6 +117,82 @@ function validateFeaturePath(relativePath: string) {
   }
 }
 
+const objectStorageAllowedTop = new Set([
+  "blob",
+  "r2",
+  "_object-storage-integration",
+]);
+const objectStorageDoorFiles = new Set<string>(featurePublicDoorFiles);
+const objectStorageTemplateBuckets = new Set<string>(featureTemplateBuckets);
+
+function validateObjectStoragePath(relativePath: string) {
+  if (!relativePath.startsWith("packages/object-storage/src/")) {
+    return;
+  }
+
+  for (const banned of bannedBucketNames) {
+    if (
+      relativePath.includes(`/${banned}/`) ||
+      relativePath.endsWith(`/${banned}`)
+    ) {
+      problems.push(
+        `Banned folder "${banned}" in object-storage path: ${relativePath}`,
+      );
+    }
+  }
+
+  if (
+    relativePath.includes("/src/handlers/") ||
+    relativePath.includes("/src/providers/") ||
+    relativePath.includes("/src/auth/") ||
+    relativePath.includes("/src/env/") ||
+    relativePath.includes("/src/errors/") ||
+    relativePath.includes("/_object-storage-integration/auth/") ||
+    relativePath.includes("/_object-storage-integration/env/") ||
+    relativePath.includes("/_object-storage-integration/errors/") ||
+    relativePath.includes("/_object-storage-integration/client/")
+  ) {
+    problems.push(
+      `Non-ARCH bucket path in object-storage (use ARCH-1002 §8 template buckets): ${relativePath}`,
+    );
+  }
+
+  const afterSrc = relativePath.replace(/^packages\/object-storage\/src\//, "");
+  const segments = afterSrc.split("/");
+  const top = segments[0] ?? "";
+
+  if (segments.length === 1 && afterSrc.includes(".")) {
+    if (!objectStorageDoorFiles.has(segments[0] ?? "")) {
+      problems.push(
+        `Forbidden top-level file in object-storage src/ (only ${featurePublicDoorFiles.join(", ")}): ${relativePath}`,
+      );
+    }
+    return;
+  }
+
+  if (top && !objectStorageAllowedTop.has(top)) {
+    problems.push(
+      `Forbidden top-level folder "${top}/" — object-storage src/ allows ONLY blob/, r2/, _object-storage-integration/: ${relativePath}`,
+    );
+    return;
+  }
+
+  if (objectStorageAllowedTop.has(top) && segments.length >= 2) {
+    if (segments.length === 2 && segments[1] && !segments[1].includes(".")) {
+      problems.push(
+        `Slice ${top}/ bucket "${segments[1]}" must be a directory, not a file: ${relativePath}`,
+      );
+    }
+
+    const bucket = segments[1] ?? "";
+    if (bucket && !objectStorageTemplateBuckets.has(bucket)) {
+      problems.push(
+        `Slice ${top}/ bucket "${bucket}/" is not an ARCH-1002 §8 template bucket: ${relativePath}`,
+      );
+    }
+  }
+}
+
 function validateAppPath(relativePath: string) {
   if (
     !relativePath.startsWith("apps/erp/src/app/") ||
@@ -136,6 +213,10 @@ function validateAppPath(relativePath: string) {
 
 if (isFeaturePath(rel)) {
   validateFeaturePath(rel);
+}
+
+if (rel.startsWith("packages/object-storage/src/")) {
+  validateObjectStoragePath(rel);
 }
 
 if (rel.startsWith("apps/erp/src/")) {

@@ -7,11 +7,11 @@ import {
   assertObjectStorageConfigured,
   resolveUploadedDocumentSize,
   resolveVercelBlobCallbackUrl,
-} from "../src/env/object-storage-config.server";
+} from "../src/_object-storage-integration/domain/object-storage-config.server";
 import {
   UploadRouteError,
   getUploadRouteErrorResponse,
-} from "../src/errors/upload-route.error.shared";
+} from "../src/_object-storage-integration/domain/upload-route.error.shared";
 import {
   OBJECT_STORAGE_HTTP_ROUTES,
   assertUploadPathnameMatchesTenant,
@@ -25,7 +25,7 @@ import {
   uploadAccessSchema,
   uploadPayloadSchema,
   type UploadTokenPayload,
-} from "../src/schemas/upload-payload.shared";
+} from "../src/_object-storage-integration/schemas/upload-payload.shared";
 
 describe("tenant object pathnames", () => {
   it("builds tenant-scoped object path prefixes", () => {

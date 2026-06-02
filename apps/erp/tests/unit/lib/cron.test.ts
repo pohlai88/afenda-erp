@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
+import { ERP_CRON_HTTP_ROUTES } from "@/contracts/erp-http.contract";
 import { authorizeCronRequest, runCronJob } from "@/lib/cron";
 
 const { createCronRunHistory, finishCronRunHistory } = vi.hoisted(() => ({
@@ -22,7 +23,7 @@ describe("cron authorization", () => {
 
     expect(
       authorizeCronRequest(
-        new Request("http://localhost/api/cron/reminders", {
+        new Request(`http://localhost${ERP_CRON_HTTP_ROUTES.reminders}`, {
           headers: {
             authorization: "Bearer cron-test-secret",
           },
@@ -35,7 +36,7 @@ describe("cron authorization", () => {
     process.env.CRON_SECRET = "cron-test-secret";
 
     expect(
-      authorizeCronRequest(new Request("http://localhost/api/cron/reminders")),
+      authorizeCronRequest(new Request(`http://localhost${ERP_CRON_HTTP_ROUTES.reminders}`)),
     ).toBe(false);
   });
 });
@@ -46,7 +47,7 @@ describe("runCronJob", () => {
     createCronRunHistory.mockClear();
 
     const response = await runCronJob({
-      request: new Request("http://localhost/api/cron/reminders"),
+      request: new Request(`http://localhost${ERP_CRON_HTTP_ROUTES.reminders}`),
       jobName: "reminders",
       operation: "cron.reminders",
       execute: async () => ({ processed: 0 }),
@@ -88,6 +89,7 @@ describe("runCronJob", () => {
       expect.objectContaining({
         jobName: "reminders",
         status: "started",
+        route: ERP_CRON_HTTP_ROUTES.reminders,
       }),
     );
     expect(finishCronRunHistory).toHaveBeenCalledWith(

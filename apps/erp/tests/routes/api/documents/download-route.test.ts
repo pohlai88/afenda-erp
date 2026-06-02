@@ -28,6 +28,7 @@ describe("document download routes", () => {
     expect(response.status).toBe(302);
     expect(downloadHandler.handleObjectStorageDocumentDownloadGet).toHaveBeenCalledWith(
       expect.objectContaining({ documentId: "doc_1" }),
+      expect.objectContaining({ getTenantDocument: expect.any(Function) }),
     );
   });
 
