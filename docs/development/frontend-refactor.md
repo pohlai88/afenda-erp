@@ -117,9 +117,9 @@ Catalog source of truth: `packages/auth/src/contracts/auth.flows.ts` (`@afenda/a
 
 ## Key patterns
 
-- `app/**` contains only Next.js route convention files. Pages delegate to `routes/**` composers or `@afenda/auth/ingress/*` for auth.
+- `app/**` contains only Next.js route convention files. Pages delegate to `routes/**` composers or `@/auth/pages/*` for auth.
 - `(auth)/layout.tsx` is an app segment layout (`connection()`, `robots: noindex`, `unstable_instant = false`); auth pages delegate to `@/auth/pages/*`.
-- Server Components are default. Client Components stay at leaf files ending in `.client.tsx` or under `packages/auth/src/client/components/`.
+- Server Components are default. Client Components stay at leaf files ending in `.client.tsx` or under `apps/erp/src/auth/`.
 - Server Actions live in dedicated `.server.ts` action files, authenticate/authorize first, parse input, dispatch commands, then use narrow `updateTag`, `revalidateTag(tag, "max")`, or `revalidatePath`.
 - Route Handlers are only for ARCH-1004 HTTP surfaces: external APIs, webhooks, cron, uploads, streaming. They stay thin and import feature `./server` doors only.
 - Workspace pages never self-fetch `/api/...`; reads go RSC → read model → repository in-process.
@@ -133,7 +133,7 @@ Catalog source of truth: `packages/auth/src/contracts/auth.flows.ts` (`@afenda/a
 | Item | Status |
 | ---- | ------ |
 | `routes/**` grouped by `onboarding`, `workspace/{shell,dashboard,modules,lynx,knowledge,shared}` | Done |
-| Auth in `@afenda/auth/{ingress,client}`; `(auth)/**/page.tsx` thin re-exports to `./ingress/*` | Done |
+| Auth in `apps/erp/src/auth/`; `(auth)/**/page.tsx` thin re-exports to `@/auth/pages/*` | Done |
 | Neon Auth: sign-in (passwordless), sign-up, verify-email, forgot-password, account, API proxy, webhooks, sign-out | Done |
 | `(auth)/layout.tsx` with `robots: noindex` | Done |
 | App root: `app-root.config.ts`, typed metadata/viewport, global-error with `globals.css` | Done |
@@ -148,6 +148,7 @@ Catalog source of truth: `packages/auth/src/contracts/auth.flows.ts` (`@afenda/a
 
 - `pnpm --filter @afenda/erp typecheck`
 - `pnpm --filter @afenda/auth test`
+- `pnpm --filter @afenda/neon-auth test`
 - `pnpm --filter @afenda/feature-hr-suite typecheck`
 - `pnpm --filter @afenda/feature-system-admin typecheck`
 - `pnpm env:verify:neon-auth` when Neon is enabled

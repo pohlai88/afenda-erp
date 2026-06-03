@@ -1,4 +1,4 @@
-# ERP auth (Phase 4)
+# ERP auth
 
 Product auth UI, ingress chrome, forms, recovery flows, and Neon webhook side effects live in the ERP app — not in `@afenda/auth`.
 
@@ -13,7 +13,7 @@ Product auth UI, ingress chrome, forms, recovery flows, and Neon webhook side ef
 | `copy/` | Auth copy helpers |
 | `recovery/` | Password reset client services |
 | `contracts/` | ERP auth routes, action schemas, capability policy |
-| `client.ts` | Browser door for forms + re-export `neonAuthClient` |
+| `client.ts` | Browser door for forms + re-export `@afenda/neon-auth/client` |
 | `neon-webhook-bridge.server.ts` | Registers `onUserCreated` → `upsertUserProfile` |
 
 ## App wiring
@@ -23,11 +23,12 @@ Product auth UI, ingress chrome, forms, recovery flows, and Neon webhook side ef
 export { default, metadata } from "@/auth/pages/auth.sign-in-page.server";
 ```
 
-Session and tenant APIs remain on `@afenda/auth/server` until session extraction to a shared package.
+Neon runtime: `@afenda/neon-auth/server` and `@afenda/neon-auth/client`. Tenant session and capabilities: `@afenda/auth/server`.
 
 ## Verify
 
 ```bash
 pnpm --filter @afenda/erp typecheck
+pnpm --filter @afenda/neon-auth test
 pnpm --filter @afenda/auth test
 ```

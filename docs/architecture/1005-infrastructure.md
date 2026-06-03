@@ -367,7 +367,7 @@ Feature packages own query/command **services**; app routes do not assemble SQL.
 
 | Piece | Location |
 | ----- | -------- |
-| Identity | Neon Auth (`@afenda/auth`) |
+| Identity | Neon Auth (`@afenda/neon-auth`); tenant session (`@afenda/auth`) |
 | Session refresh | `apps/erp/src/proxy.ts` |
 | Org resolution | Server session — never client-supplied org as source of truth |
 | Env schema | `@afenda/config`, `.env.config` / sync scripts |
