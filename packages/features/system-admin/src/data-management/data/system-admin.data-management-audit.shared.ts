@@ -15,11 +15,16 @@ export async function writeSystemAdminDataManagementAudit(input: {
 }) {
   await writeExecutionAuditEvent({
     organizationId: input.organizationId,
+    module: "system-admin",
+    surface: "data-management",
+    route: "/system-admin/data-management",
     actorId: input.actorId,
     actorType: input.actorType,
     action: input.action,
+    outcome: "success",
     targetType: SYSTEM_ADMIN_DATA_MANAGEMENT_AUDIT_TARGET_TYPE,
     targetId: input.targetId,
+    channel: "server_action",
     metadata: input.metadata,
   });
 }

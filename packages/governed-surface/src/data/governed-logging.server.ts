@@ -1,6 +1,6 @@
 import "server-only";
 
-import { logServerEvent } from "@afenda/observability";
+import { logServerEvent } from "@afenda/observability/server";
 
 const GOVERNED_SURFACE_MODULE = "governed-surface";
 

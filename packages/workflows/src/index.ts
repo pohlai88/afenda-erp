@@ -8,6 +8,7 @@ import {
   type TenantWorkflowSweepResult,
 } from "@afenda/db";
 import { getWorkflowAutomationDefinitions } from "@afenda/kernel";
+import type { ServerLogContext } from "@afenda/observability/server";
 import { runWorkflowWithRetry } from "./durable-runner";
 
 export const workflowNamespaces = ["approvals", "reminders", "sync"] as const;
@@ -112,27 +113,15 @@ function getWorkflowRequestId(request: Request) {
   );
 }
 
-function logWorkflowEvent(
+async function logWorkflowEvent(
   level: "info" | "warn" | "error",
   message: string,
-  context: Record<string, unknown>,
+  context: ServerLogContext,
   metadata: Record<string, unknown> = {},
 ) {
-  const line = JSON.stringify({
-    level,
-    message,
-    ...context,
-    ...metadata,
-    timestamp: new Date().toISOString(),
-  });
+  const { logServerEvent } = await import("@afenda/observability/server");
 
-  if (level === "error") {
-    console.error(line);
-  } else if (level === "warn") {
-    console.warn(line);
-  } else {
-    console.log(line);
-  }
+  logServerEvent(level, message, context, metadata);
 }
 
 export async function runCronJob(input: {
@@ -164,7 +153,7 @@ export async function runCronJob(input: {
       durationMs: Date.now() - startedAt,
       errorMessage: "Unauthorized cron request.",
     });
-    logWorkflowEvent("warn", "Cron request rejected.", context, {
+    await logWorkflowEvent("warn", "Cron request rejected.", context, {
       route: input.route,
       status: 401,
     });
@@ -172,7 +161,7 @@ export async function runCronJob(input: {
   }
 
   try {
-    logWorkflowEvent("info", "Cron job started.", context, {
+    await logWorkflowEvent("info", "Cron job started.", context, {
       route: input.route,
     });
     cronRunId = await safeCreateCronRunHistory({
@@ -196,7 +185,7 @@ export async function runCronJob(input: {
       });
     }
 
-    logWorkflowEvent("info", "Cron job completed.", context, {
+    await logWorkflowEvent("info", "Cron job completed.", context, {
       route: input.route,
       status: 200,
       durationMs,
@@ -227,7 +216,7 @@ export async function runCronJob(input: {
       });
     }
 
-    logWorkflowEvent("error", "Cron job failed.", context, {
+    await logWorkflowEvent("error", "Cron job failed.", context, {
       route: input.route,
       status: 500,
       durationMs,
@@ -246,7 +235,7 @@ async function safeCreateCronRunHistory(
   try {
     return await createCronRunHistory(input);
   } catch (error) {
-    logWorkflowEvent(
+    await logWorkflowEvent(
       "warn",
       "Cron run history write failed.",
       {
@@ -269,7 +258,7 @@ async function safeFinishCronRunHistory(
   try {
     await finishCronRunHistory(input);
   } catch (error) {
-    logWorkflowEvent(
+    await logWorkflowEvent(
       "warn",
       "Cron run history update failed.",
       {

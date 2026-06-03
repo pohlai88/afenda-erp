@@ -3,7 +3,7 @@ import {
   type UploadRegistrationInput,
   uploadRetentionClassSchema,
 } from "@afenda/object-storage";
-import { logServerEvent } from "@afenda/observability";
+import { logServerEvent } from "@afenda/observability/server";
 
 import { processTenantDocumentScanCommand } from "./process-tenant-document-scan.command.server";
 

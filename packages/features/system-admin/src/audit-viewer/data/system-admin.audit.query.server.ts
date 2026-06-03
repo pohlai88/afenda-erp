@@ -24,15 +24,40 @@ export function resolveAuditModuleKey(action: string) {
   return moduleKey && moduleKey.length > 0 ? moduleKey : "system";
 }
 
+function resolveAuditOccurredAt(log: TenantAuditLog) {
+  return log.occurredAt ?? log.createdAt;
+}
+
+function resolveAuditTargetLabel(log: TenantAuditLog) {
+  if (log.targetDisplayName) {
+    return log.targetDisplayName;
+  }
+
+  if (log.targetType && log.targetId) {
+    return `${log.targetType}:${log.targetId}`;
+  }
+
+  return `${log.entityType}:${log.entityId}`;
+}
+
+function resolveAuditModuleKeyForLog(log: TenantAuditLog) {
+  return log.module ?? resolveAuditModuleKey(log.action);
+}
+
 export function mapTenantAuditLogToRow(log: TenantAuditLog): SystemAdminAuditEventRow {
   return {
     id: log.id,
-    occurredAt: formatErpDateTime(log.createdAt),
+    occurredAt: formatErpDateTime(resolveAuditOccurredAt(log)),
     actorId: log.actorAuthUserId,
+    actorType: log.actorType ?? undefined,
     action: log.action,
-    target: `${log.entityType}:${log.entityId}`,
-    moduleKey: resolveAuditModuleKey(log.action),
-    result: "recorded",
+    target: resolveAuditTargetLabel(log),
+    targetType: log.targetType ?? log.entityType,
+    targetId: log.targetId ?? log.entityId,
+    targetDisplayName: log.targetDisplayName ?? undefined,
+    outcome: log.outcome ?? undefined,
+    moduleKey: resolveAuditModuleKeyForLog(log),
+    result: log.outcome ?? "recorded",
     summary: log.summary,
   };
 }
@@ -42,16 +67,44 @@ export function mapTenantAuditLogToDetail(
   timeline: readonly SystemAdminAuditEventRow[] = [],
 ): SystemAdminAuditEventDetail {
   const metadata = redactAuditMetadata(log.metadata) as Record<string, unknown>;
+  const beforeJson = log.beforeJson
+    ? (redactAuditMetadata(log.beforeJson) as Record<string, unknown>)
+    : null;
+  const afterJson = log.afterJson
+    ? (redactAuditMetadata(log.afterJson) as Record<string, unknown>)
+    : null;
+  const diffJson = log.diffJson
+    ? (redactAuditMetadata(log.diffJson) as readonly Record<string, unknown>[])
+    : null;
   const { policyKeys, approvalKeys } = extractAuditCorrelationRefs(metadata);
 
   return {
     id: log.id,
-    occurredAt: formatErpDateTime(log.createdAt),
+    occurredAt: formatErpDateTime(resolveAuditOccurredAt(log)),
     actorId: log.actorAuthUserId,
+    actorType: log.actorType ?? undefined,
+    actorRole: log.actorRole ?? undefined,
+    subjectType: log.subjectType ?? undefined,
+    subjectId: log.subjectId ?? undefined,
     action: log.action,
     entityType: log.entityType,
     entityId: log.entityId,
-    moduleKey: resolveAuditModuleKey(log.action),
+    targetType: log.targetType ?? log.entityType,
+    targetId: log.targetId ?? log.entityId,
+    targetDisplayName: log.targetDisplayName ?? undefined,
+    moduleKey: resolveAuditModuleKeyForLog(log),
+    surface: log.surface ?? undefined,
+    route: log.route ?? undefined,
+    channel: log.channel ?? undefined,
+    outcome: log.outcome ?? undefined,
+    reason: log.reason ?? undefined,
+    policyReference: log.policyReference ?? undefined,
+    approvalId: log.approvalId ?? undefined,
+    requestId: log.requestId ?? undefined,
+    operationId: log.operationId ?? undefined,
+    beforeJson,
+    afterJson,
+    diffJson,
     summary: log.summary,
     metadata,
     policyKeys,
@@ -86,17 +139,26 @@ export async function searchSystemAdminAuditEvents(input: {
 
 export async function listSystemAdminAuditTargetTimeline(input: {
   organizationId: string;
-  entityType: string;
-  entityId: string;
+  targetType?: string;
+  targetId?: string;
+  entityType?: string;
+  entityId?: string;
   limit?: number;
 }) {
+  const targetType = input.targetType ?? input.entityType;
+  const targetId = input.targetId ?? input.entityId;
+
+  if (!targetType || !targetId) {
+    return [];
+  }
+
   const { rows } = await searchTenantAuditLogs({
     organizationId: input.organizationId,
     limit: input.limit ?? SYSTEM_ADMIN_AUDIT_TARGET_TIMELINE_DEFAULT_LIMIT,
     offset: 0,
     filters: {
-      entityType: input.entityType as TenantAuditLog["entityType"],
-      entityId: input.entityId,
+      targetType,
+      targetId,
       sortDirection: "asc",
     },
   });
@@ -119,8 +181,8 @@ export async function getSystemAdminAuditEventDetail(input: {
 
   const timeline = await listSystemAdminAuditTargetTimeline({
     organizationId: input.organizationId,
-    entityType: log.entityType,
-    entityId: log.entityId,
+    targetType: log.targetType ?? log.entityType,
+    targetId: log.targetId ?? log.entityId,
   });
 
   return {

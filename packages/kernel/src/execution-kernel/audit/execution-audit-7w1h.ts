@@ -5,7 +5,10 @@ import {
   type NormalizedExecutionAuditEvent,
 } from "./execution-audit.types";
 import { buildExecutionAuditDiff } from "./execution-audit-diff";
-import { redactExecutionAuditRecord } from "./execution-audit-redaction";
+import {
+  redactExecutionAuditDiff,
+  redactExecutionAuditRecord,
+} from "./execution-audit-redaction";
 
 const auditEntityTypeByTargetType: Record<string, AuditEntityType> = {
   organization: "organization",
@@ -28,9 +31,11 @@ function buildExecutionAuditSummary(input: ExecutionAuditEvent) {
     return input.summary.trim();
   }
 
-  const targetLabel = input.targetId
-    ? `${input.targetType}:${input.targetId}`
-    : input.targetType;
+  const targetLabel = input.targetDisplayName
+    ? input.targetDisplayName
+    : input.targetId
+      ? `${input.targetType}:${input.targetId}`
+      : input.targetType;
 
   return `${input.action} executed against ${targetLabel}.`;
 }
@@ -43,7 +48,7 @@ export function normalizeExecutionAuditEvent(
   const before = redactExecutionAuditRecord(input.before);
   const after = redactExecutionAuditRecord(input.after);
   const diff =
-    input.diff ??
+    redactExecutionAuditDiff(input.diff) ??
     (before || after ? buildExecutionAuditDiff(before, after) : []);
 
   return {
@@ -95,4 +100,3 @@ export function buildExecutionAuditDbInput(
     occurredAt: input.occurredAt,
   };
 }
-

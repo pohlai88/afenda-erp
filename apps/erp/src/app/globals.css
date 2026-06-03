@@ -1,11 +1,14 @@
 @import "tailwindcss";
 @import "shadcn/tailwind.css";
+@import "@neondatabase/auth-ui/tailwind";
 @import "@afenda/appshell/styles.css";
 
 @source "../../../../packages/appshell/src/**/*.{tsx,ts}";
+@source "../../../../packages/public-homepage/src/**/*.{tsx,ts}";
 @source "../../../../packages/ui/src/**/*.{tsx,ts}";
 @source "../../../../packages/governed-surface/src/**/*.{tsx,ts}";
 @source "../../../../packages/features/*/src/**/*.{tsx,ts}";
+@source "../../../../packages/auth/src/neon-auth/**/*.{tsx,ts}";
 @source "../../../../packages/features/lynx/node_modules/streamdown/dist/*.js";
 
 @custom-variant dark (&:where(.dark, .dark *));

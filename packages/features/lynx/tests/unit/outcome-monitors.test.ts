@@ -80,8 +80,11 @@ function workspace(input: {
     },
     documents: (input.documents ?? []).map((document) => ({
       ...document,
+      classification: "internal",
       contentType: "application/pdf",
       createdAt: new Date().toISOString(),
+      retentionClass: "standard",
+      scanStatus: "passed",
       size: "1 KB",
       access: "private",
     })),

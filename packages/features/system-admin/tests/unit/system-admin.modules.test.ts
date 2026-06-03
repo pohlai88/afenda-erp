@@ -56,7 +56,7 @@ vi.mock("next/cache", () => ({
   revalidateTag: vi.fn(),
 }));
 
-vi.mock("@afenda/observability", () => ({
+vi.mock("@afenda/observability/server", () => ({
   logServerEvent: vi.fn(),
 }));
 

@@ -1,3 +1,5 @@
+import type { AuditDiff } from "./execution-audit.types";
+
 const REDACTED = "[redacted]";
 const TRUNCATED = "[truncated]";
 const MAX_DEPTH = 6;
@@ -93,3 +95,21 @@ export function redactExecutionAuditRecord<T extends Record<string, unknown>>(
   return redact(record) as T;
 }
 
+export function redactExecutionAuditDiff(
+  diff: readonly AuditDiff[] | undefined,
+): AuditDiff[] | undefined {
+  if (!diff) {
+    return diff;
+  }
+
+  return diff.map((entry) => ({
+    path: entry.path,
+    change: entry.change,
+    ...(entry.before === undefined
+      ? {}
+      : { before: redact(entry.before) }),
+    ...(entry.after === undefined
+      ? {}
+      : { after: redact(entry.after) }),
+  }));
+}

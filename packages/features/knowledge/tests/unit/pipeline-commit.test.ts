@@ -1,5 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+vi.mock("server-only", () => ({}));
+
+vi.mock("@afenda/kernel/execution", () => ({
+  writeExecutionAuditEvent: vi.fn(async () => undefined),
+  writeExecutionAuditEventInTransaction: vi.fn(async () => undefined),
+}));
+
 // Mock @afenda/db
 vi.mock("@afenda/db", () => {
   const mockDb = {

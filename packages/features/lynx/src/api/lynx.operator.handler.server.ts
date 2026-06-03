@@ -53,7 +53,7 @@ import {
   createLynxReadinessTools,
   lynxToolMeta,
 } from "../tools";
-import { getRequestId, logServerEvent } from "@afenda/observability";
+import { getRequestId, logServerEvent } from "@afenda/observability/server";
 import { solutionWorkflowIds, type SolutionWorkflowId } from "@afenda/kernel";
 import { createAgentUIStreamResponse, type UIMessage } from "ai";
 import { NextResponse } from "next/server";

@@ -2,7 +2,7 @@ import "server-only";
 
 import { moduleIds } from "@afenda/config/module-ids";
 import { uploadRouteCopy, type ModuleId } from "@afenda/kernel";
-import { getRequestId, logServerEvent } from "@afenda/observability";
+import { getRequestId, logServerEvent } from "@afenda/observability/server";
 import { z } from "zod";
 import { handleVercelBlobUploadPost } from "../../blob/api/upload-handler.server";
 import { requireUploadModuleAccess } from "../domain/upload-route-auth.server";
@@ -75,6 +75,26 @@ export type { ObjectStorageHandlerResult, ObjectStorageUploadHandlerDeps };
 
 const SIGNED_URL_TTL_MS = 5 * 60 * 1000;
 const moduleIdSchema = z.enum(moduleIds);
+
+export function toObjectStorageResponse(result: ObjectStorageHandlerResult): Response {
+  if (result.binaryBody) {
+    const body = result.binaryBody.buffer.slice(
+      result.binaryBody.byteOffset,
+      result.binaryBody.byteOffset + result.binaryBody.byteLength,
+    ) as ArrayBuffer;
+
+    return new Response(body, {
+      status: result.status,
+      headers: result.responseHeaders,
+    });
+  }
+
+  if (result.redirect) {
+    return Response.redirect(result.redirect, result.status);
+  }
+
+  return Response.json(result.body ?? null, { status: result.status });
+}
 
 function peekUploadModuleId(
   body: Record<string, unknown> | null,

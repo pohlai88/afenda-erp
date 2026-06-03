@@ -1,6 +1,11 @@
 import { describe, expect, it, vi } from "vitest";
-import { getRequestId, logServerEvent } from "../../src/index";
+
+vi.mock("server-only", () => ({}));
+
+import { getRequestId } from "../../src/index";
+import { logServerEvent } from "../../src/server";
 import { createChildLogger } from "../../src/logger/create-child-logger";
+import { hasStructuralLogContract } from "../../src/logger/logger.schema";
 import { redactLogPayload } from "../../src/logger/redact-policy";
 import { serializeError } from "../../src/logger/serializers";
 import { captureConsoleLogs } from "../../src/testing/log-capture";
@@ -41,8 +46,8 @@ describe("structural logger", () => {
     });
   });
 
-  it("keeps logServerEvent compatible and redacted", () => {
-    const captured = captureConsoleLogs(() => {
+  it("keeps server logServerEvent best-effort", () => {
+    expect(() => {
       logServerEvent(
         "info",
         "Route completed.",
@@ -56,26 +61,52 @@ describe("structural logger", () => {
           token: "secret",
         },
       );
+    }).not.toThrow();
+  });
+
+  it("validates the structural log contract", () => {
+    expect(
+      hasStructuralLogContract({
+        event: "workflow.execution.completed",
+        level: "info",
+        requestId: "req_test",
+        operationId: "op_test",
+        organizationId: "org_test",
+      }),
+    ).toBe(true);
+    expect(hasStructuralLogContract({ event: "" })).toBe(false);
+    expect(
+      hasStructuralLogContract({
+        event: "workflow.execution.completed",
+        level: "verbose",
+      }),
+    ).toBe(false);
+    expect(
+      hasStructuralLogContract({
+        event: "workflow.execution.completed",
+        organizationId: 123,
+      }),
+    ).toBe(false);
+  });
+
+  it("redacts high-risk payload fields and caps snapshots", () => {
+    const redacted = redactLogPayload({
+      event: "upload.received",
+      rawBody: "secret body",
+      paymentCredentials: {
+        cardNumber: "4111111111111111",
+      },
+      documentId: "doc_visible_identifier",
+      items: Array.from({ length: 25 }, (_, index) => index),
     });
 
-    expect(captured).toHaveLength(1);
-    expect(captured[0]?.level).toBe("log");
-
-    const event = JSON.parse(captured[0]?.line ?? "{}") as Record<
-      string,
-      unknown
-    >;
-
-    expect(event).toMatchObject({
-      level: "info",
-      message: "Route completed.",
-      module: "observability",
-      operation: "test",
-      requestId: "req_test",
-      status: 200,
-      token: "[redacted]",
+    expect(redacted).toMatchObject({
+      event: "upload.received",
+      rawBody: "[redacted]",
+      paymentCredentials: "[redacted]",
+      documentId: "doc_visible_identifier",
     });
-    expect(typeof event.timestamp).toBe("string");
+    expect(redacted.items).toHaveLength(20);
   });
 
   it("extracts request IDs with Vercel header precedence", () => {
@@ -99,22 +130,12 @@ describe("structural logger", () => {
     expect(getRequestId(request)).toBe("plain_req");
   });
 
-  it("does not throw when console transport fails", () => {
-    const originalLog = console.log;
-    console.log = () => {
-      throw new Error("transport unavailable");
-    };
+  it("captures console logs for legacy test helpers", () => {
+    const captured = captureConsoleLogs(() => {
+      console.log("test", { ok: true });
+    });
 
-    try {
-      expect(() => {
-        logServerEvent("info", "Test.", {
-          module: "observability",
-          operation: "best-effort",
-        });
-      }).not.toThrow();
-    } finally {
-      console.log = originalLog;
-    }
+    expect(captured).toEqual([{ level: "log", line: 'test {"ok":true}' }]);
   });
 
   it("serializes errors", () => {

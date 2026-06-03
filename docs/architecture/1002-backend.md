@@ -153,7 +153,7 @@ Enforced categories: **1005** §5. Import law: §9 below.
 | `@afenda/kernel` | runtime-library | Execution law — context, permission, policy, audit, idempotency; **frozen** list compat (bugfix only, §7) | Module domain rules; importing `@afenda/feature-*` |
 | `@afenda/db` | database | Schema, migrations, tenancy helpers, `getDb()` | Business invariants; module posting logic |
 | `@afenda/auth` | runtime-library | Session, org resolution, capability **primitives** | Module permission matrices; System Admin config (→ feature); Neon SDK |
-| `@afenda/neon-auth` | runtime-library | Neon Auth SDK runtime, JWT/webhook verify, browser client | ERP UI; tenant org hydration (`@afenda/auth`) |
+| `@afenda/auth/neon-auth` | runtime-library | Neon Auth SDK runtime, JWT/webhook verify, browser client | ERP UI; tenant org hydration (`@afenda/auth`) |
 | `@afenda/workflows` | runtime-library | Cron plumbing, durable job helpers, outbound webhook **delivery** | Domain commands; module orchestration |
 | `@afenda/ai` | runtime-library | Substrate-blind tools, gateway clients, shared AI utilities | Lynx product surfaces, retrieval policy (→ `feature-lynx`, `feature-knowledge`) |
 | `@afenda/governed-surface` | runtime-library | Metadata renderer kernel, governed list/section chrome | Tenant authority; module queries |

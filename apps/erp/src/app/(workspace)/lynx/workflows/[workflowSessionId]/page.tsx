@@ -1,9 +1,6 @@
 import { LynxWorkflowSessionDetailRoutePage } from "@/routes/workspace/lynx/lynx-workflow-session-detail-route";
 
-export const unstable_instant = {
-  prefetch: "static",
-  unstable_disableValidation: true,
-};
+export const unstable_instant = false;
 
 type PageProps = {
   params: Promise<{ workflowSessionId: string }>;

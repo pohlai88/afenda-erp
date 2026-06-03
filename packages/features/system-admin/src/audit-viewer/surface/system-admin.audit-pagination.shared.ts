@@ -31,6 +31,10 @@ function appendAuditSearchParams(
     search.set("auditModule", params.auditModule);
   }
 
+  if (params.auditOutcome) {
+    search.set("auditOutcome", params.auditOutcome);
+  }
+
   if (params.auditFrom) {
     search.set("auditFrom", params.auditFrom);
   }

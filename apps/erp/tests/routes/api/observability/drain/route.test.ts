@@ -1,8 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createHmac } from "node:crypto";
 
-vi.mock("@afenda/observability", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("@afenda/observability")>();
+vi.mock("server-only", () => ({}));
+
+vi.mock("@afenda/observability/server", async (importOriginal) => {
+  const actual =
+    await importOriginal<typeof import("@afenda/observability/server")>();
 
   return {
     ...actual,
@@ -16,7 +19,7 @@ vi.mock("@afenda/observability", async (importOriginal) => {
   };
 });
 
-import { verifyVercelSignature } from "@afenda/observability";
+import { verifyVercelSignature } from "@afenda/observability/server";
 import { POST } from "@/app/api/internal/v1/observability/drain/route";
 
 describe("observability drain route", () => {

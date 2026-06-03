@@ -1,6 +1,5 @@
-import { randomUUID } from "node:crypto";
 import type { ModuleId } from "@afenda/kernel";
-import { uploadRouteCopy } from "@afenda/kernel";
+import { objectStorageRouteCopy } from "../contracts/upload-route-copy.shared";
 import { UploadRouteError } from "../domain/upload-route.error.shared";
 
 export const TENANT_OBJECT_ROOT = "tenants";
@@ -38,11 +37,11 @@ export function sanitizeUploadFilename(filename: string) {
     trimmed.includes("..") ||
     /[/\\]/.test(trimmed)
   ) {
-    throw new UploadRouteError(400, uploadRouteCopy.invalidRequest);
+    throw new UploadRouteError(400, objectStorageRouteCopy.invalidRequest);
   }
 
   if (trimmed.length > 200) {
-    throw new UploadRouteError(400, uploadRouteCopy.invalidRequest);
+    throw new UploadRouteError(400, objectStorageRouteCopy.invalidRequest);
   }
 
   return trimmed;
@@ -66,21 +65,6 @@ export function buildTenantObjectPathname(input: {
   return `${buildTenantObjectPathPrefix(input)}/${sanitizeUploadFilename(input.filename)}`;
 }
 
-/** Collision-safe key suffix (mirrors Vercel Blob `addRandomSuffix`). */
-export function addRandomPathSuffix(pathname: string) {
-  const lastSlash = pathname.lastIndexOf("/");
-  const directory = lastSlash >= 0 ? pathname.slice(0, lastSlash + 1) : "";
-  const filename = lastSlash >= 0 ? pathname.slice(lastSlash + 1) : pathname;
-  const dotIndex = filename.lastIndexOf(".");
-  const suffix = randomUUID().slice(0, 8);
-
-  if (dotIndex > 0) {
-    return `${directory}${filename.slice(0, dotIndex)}-${suffix}${filename.slice(dotIndex)}`;
-  }
-
-  return `${directory}${filename}-${suffix}`;
-}
-
 /** @deprecated Use buildTenantObjectPathname */
 export const buildTenantBlobPathname = buildTenantObjectPathname;
 
@@ -92,7 +76,7 @@ export function assertUploadPathnameMatchesTenant(input: {
   const expectedPrefix = `${buildTenantObjectPathPrefix(input)}/`;
 
   if (!input.pathname.startsWith(expectedPrefix)) {
-    throw new UploadRouteError(403, uploadRouteCopy.invalidRequest);
+    throw new UploadRouteError(403, objectStorageRouteCopy.invalidRequest);
   }
 
   sanitizeUploadFilename(input.pathname.slice(expectedPrefix.length));

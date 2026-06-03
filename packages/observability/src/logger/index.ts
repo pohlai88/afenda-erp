@@ -2,9 +2,14 @@ export { createChildLogger } from "./create-child-logger";
 export { createDomainLogger } from "./create-domain-logger";
 export { createLogger } from "./create-logger.server";
 export { createPackageLogger } from "./create-package-logger";
-export { emitServerLogEvent } from "./emit-server-log-event";
 export { resolveLogLevel } from "./log-level";
-export { isStructuralLogLevel, structuralLogLevels } from "./logger.schema";
+export {
+  hasStructuralLogContract,
+  hasStructuredLogEvent,
+  isStructuralLogLevel,
+  structuralLogLevels,
+  type StructuralLogContract,
+} from "./logger.schema";
 export { redactLogPayload } from "./redact-policy";
 export { getRequestContext, withRequestContext } from "./request-context.server";
 export { serializeError } from "./serializers";

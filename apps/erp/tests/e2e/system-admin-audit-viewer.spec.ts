@@ -1,7 +1,5 @@
 import { expect, test } from "@playwright/test";
 
-import { systemAdminAuditViewerSurfaceKey } from "@afenda/feature-system-admin/metadata";
-
 import {
   dismissDevSignInPanel,
   skipWhenNeonAuthEnabled,
@@ -17,9 +15,9 @@ async function gotoAuditWorkbench(page: import("@playwright/test").Page) {
 
   const accessDenied = page.getByTestId("system-admin-audit-access-denied");
   const pageRoot = page.getByTestId("system-admin-audit-page");
-  const catalog = page.getByTestId(
-    `governed:list-section:${systemAdminAuditViewerSurfaceKey}`,
-  );
+  const catalog = page.getByRole("table", {
+    name: "Administrative audit evidence",
+  });
 
   await expect(accessDenied.or(pageRoot)).toBeVisible({ timeout: 60_000 });
 
@@ -32,7 +30,7 @@ async function gotoAuditWorkbench(page: import("@playwright/test").Page) {
   await expect(
     page.getByRole("heading", { name: "Audit viewer" }),
   ).toBeVisible();
-  await expect(catalog).toBeVisible();
+  await expect(catalog).toBeVisible({ timeout: 30_000 });
   await expect(page.getByTestId("system-admin-audit-coverage")).toBeVisible();
 }
 

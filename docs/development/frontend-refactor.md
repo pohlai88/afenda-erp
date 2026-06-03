@@ -84,7 +84,7 @@ apps/erp/src/
 | `app/**/page.tsx` | Thin delegate to `routes/**` or `@/auth/pages/*` | Domain logic, Drizzle, large JSX |
 | `routes/**` | RSC composers: `Promise.all`, Suspense, governed sections | Raw SQL, business rules, `@afenda/db` |
 | `apps/erp/src/auth/` | ERP auth ingress, forms, dev panel, webhook bridge | Business rules, tenant provisioning |
-| `packages/neon-auth/` | Neon Auth SDK module (`@afenda/neon-auth`) | ERP UI, tenant session |
+| `packages/auth/src/neon-auth/` | Neon Auth SDK module (`@afenda/auth/neon-auth`) | ERP UI, tenant session |
 | `section-adapters/**` | Thin section ID → feature server entry | Cross-module workflows, domain rules |
 | `app/**` (non-route) | Next.js convention files only | Auth forms, shell panels, upload UI |
 | `lib/` | Shrink toward zero — shared transport helpers only | Module logic, section registries, fat adapters |
@@ -113,7 +113,7 @@ Catalog source of truth: `packages/auth/src/contracts/auth.flows.ts` (`@afenda/a
 
 **UI gate:** `isNeonAuthUiReady()` = server `AFENDA_NEON_AUTH_ENABLED` + `NEXT_PUBLIC_AFENDA_NEON_AUTH_ENABLED` (unset public flag follows server).
 
-**`@afenda/auth` exports:** `.`, `./client`, `./server`, `./auth-flows` — session + capability primitives only. **`@afenda/neon-auth` exports:** `.`, `./client`, `./server`, `./neon-cookies`, `./neon-session`, `./paths`. ERP auth UI: `@/auth/*` in `apps/erp`.
+**`@afenda/auth` exports:** `.`, `./client`, `./server`, `./auth-flows` — session + capability primitives only. **`@afenda/auth/neon-auth` exports:** `.`, `./client`, `./server`, `./neon-cookies`, `./neon-session`, `./paths`. ERP auth UI: `@/auth/*` in `apps/erp`.
 
 ## Key patterns
 
@@ -148,7 +148,7 @@ Catalog source of truth: `packages/auth/src/contracts/auth.flows.ts` (`@afenda/a
 
 - `pnpm --filter @afenda/erp typecheck`
 - `pnpm --filter @afenda/auth test`
-- `pnpm --filter @afenda/neon-auth test`
+- `pnpm --filter @afenda/auth test`
 - `pnpm --filter @afenda/feature-hr-suite typecheck`
 - `pnpm --filter @afenda/feature-system-admin typecheck`
 - `pnpm env:verify:neon-auth` when Neon is enabled

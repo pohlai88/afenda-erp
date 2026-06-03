@@ -3,7 +3,7 @@
 import type { OrganizationRole } from "@afenda/auth";
 import { upsertRoleOverride } from "@afenda/db";
 import { writeExecutionAuditEvent } from "@afenda/kernel/execution";
-import { logServerEvent } from "@afenda/observability";
+import { logServerEvent } from "@afenda/observability/server";
 import { revalidatePath } from "next/cache";
 import { dispatchSystemAdminWebhook } from "../../integrations/events/system-admin.webhook-dispatch.event";
 import { requireSystemAdminPermissionsManage } from "../policies/system-admin.permissions.policy.server";

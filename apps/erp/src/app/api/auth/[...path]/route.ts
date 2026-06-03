@@ -2,7 +2,7 @@
 import {
   getNeonAuthServer,
   isNeonAuthReady,
-} from "@afenda/neon-auth/server";
+} from "@afenda/auth/neon-auth/server";
 import { authApiRouteCopy } from "@afenda/kernel";
 import { getRequestId, logServerEvent } from "@afenda/observability/server";
 

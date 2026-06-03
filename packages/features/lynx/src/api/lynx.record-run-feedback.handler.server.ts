@@ -1,6 +1,6 @@
 import { isAiPermissionError } from "@afenda/ai/server";
 import { getApiAuthContext } from "@afenda/auth/server";
-import { getRequestId, logServerEvent } from "@afenda/observability";
+import { getRequestId, logServerEvent } from "@afenda/observability/server";
 import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 

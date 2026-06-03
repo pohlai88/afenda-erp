@@ -30,6 +30,7 @@ export function parseSystemAdminAuditSearchParams(
     auditTargetType: readSearchParam(searchParams, "auditTargetType"),
     auditTargetId: readSearchParam(searchParams, "auditTargetId"),
     auditModule: readSearchParam(searchParams, "auditModule"),
+    auditOutcome: readSearchParam(searchParams, "auditOutcome"),
     auditFrom: readSearchParam(searchParams, "auditFrom"),
     auditTo: readSearchParam(searchParams, "auditTo"),
     auditSort: readSearchParam(searchParams, "auditSort"),

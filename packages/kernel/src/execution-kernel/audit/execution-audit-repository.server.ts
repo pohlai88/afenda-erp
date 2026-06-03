@@ -9,7 +9,6 @@ import {
 } from "./execution-audit-7w1h";
 import type {
   ExecutionAuditEvent,
-  NormalizedExecutionAuditEvent,
 } from "./execution-audit.types";
 
 export async function createExecutionAuditEvent(input: ExecutionAuditEvent) {
@@ -22,5 +21,8 @@ export async function insertExecutionAuditEvent(
   db: AfendaTransaction,
   input: ExecutionAuditEvent,
 ) {
-  await insertAuditLog(db, buildExecutionAuditDbInput(normalizeExecutionAuditEvent(input)));
+  await insertAuditLog(
+    db,
+    buildExecutionAuditDbInput(normalizeExecutionAuditEvent(input)),
+  );
 }

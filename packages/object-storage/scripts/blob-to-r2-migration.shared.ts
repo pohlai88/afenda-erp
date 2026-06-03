@@ -14,6 +14,17 @@ export type BlobToR2MigrationDocumentRow = {
   sizeBytes: number;
 };
 
+export type BlobToR2MigrationRawDocumentRow = {
+  id: string;
+  pathname: string;
+  blob_url?: string | null;
+  blobUrl?: string | null;
+  content_type?: string | null;
+  contentType?: string | null;
+  size_bytes?: number | string | bigint | null;
+  sizeBytes?: number | string | bigint | null;
+};
+
 export type BlobToR2MigrationResult = {
   organizationId: string;
   dryRun: boolean;
@@ -84,6 +95,54 @@ export function assertTenantPathnameForOrganization(input: {
       `Pathname ${input.pathname} is outside tenants/${input.organizationId}/`,
     );
   }
+}
+
+function normalizeSizeBytes(value: number | string | bigint | null | undefined) {
+  if (typeof value === "number") {
+    return value;
+  }
+
+  if (typeof value === "bigint") {
+    return Number(value);
+  }
+
+  if (typeof value === "string" && value.trim()) {
+    return Number.parseInt(value, 10);
+  }
+
+  return Number.NaN;
+}
+
+export function normalizeBlobToR2MigrationDocumentRow(
+  row: BlobToR2MigrationRawDocumentRow,
+): BlobToR2MigrationDocumentRow {
+  const blobUrl = row.blobUrl ?? row.blob_url;
+  const sizeBytes = normalizeSizeBytes(row.sizeBytes ?? row.size_bytes);
+
+  if (!blobUrl?.trim() || !Number.isSafeInteger(sizeBytes) || sizeBytes < 0) {
+    throw new Error(`Invalid migration row for document ${row.id}.`);
+  }
+
+  return {
+    id: row.id,
+    pathname: row.pathname,
+    blobUrl,
+    contentType: row.contentType ?? row.content_type ?? null,
+    sizeBytes,
+  };
+}
+
+export function isS3ObjectNotFoundError(error: unknown) {
+  const candidate = error as {
+    name?: string;
+    $metadata?: { httpStatusCode?: number };
+  };
+
+  return (
+    candidate.name === "NotFound" ||
+    candidate.name === "NoSuchKey" ||
+    candidate.$metadata?.httpStatusCode === 404
+  );
 }
 
 export function formatObjectStorageProviderLabel(

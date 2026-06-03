@@ -193,13 +193,13 @@ function createRetrievalDiagnostics(input: {
   };
 }
 
-function emitRetrievalDegraded(input: {
+async function emitRetrievalDegraded(input: {
   organizationId: string;
   degradedReason: string;
   queryText: string;
   metadata?: Record<string, unknown>;
 }) {
-  emitKnowledgeAuditEvent({
+  await emitKnowledgeAuditEvent({
     action: KNOWLEDGE_AUDIT_ACTIONS.RETRIEVAL_DEGRADED,
     organizationId: input.organizationId,
     result: "failed",
@@ -211,7 +211,7 @@ function emitRetrievalDegraded(input: {
   });
 }
 
-function emitRerankAuditEvent(input: {
+async function emitRerankAuditEvent(input: {
   action:
     | typeof KNOWLEDGE_AUDIT_ACTIONS.RERANK_SKIPPED
     | typeof KNOWLEDGE_AUDIT_ACTIONS.RERANK_UNAVAILABLE
@@ -222,7 +222,7 @@ function emitRerankAuditEvent(input: {
   reason: string;
   metadata?: Record<string, unknown>;
 }) {
-  emitKnowledgeAuditEvent({
+  await emitKnowledgeAuditEvent({
     action: input.action,
     organizationId: input.organizationId,
     result: input.result,
@@ -266,7 +266,7 @@ export async function retrieveKnowledgeChunksWithDiagnostics(
       fusedRank: 1 / (60 + i + 1),
     }));
     if (options?.rerank) {
-      emitRerankAuditEvent({
+      await emitRerankAuditEvent({
         action: KNOWLEDGE_AUDIT_ACTIONS.RERANK_SKIPPED,
         organizationId,
         queryText,
@@ -298,7 +298,7 @@ export async function retrieveKnowledgeChunksWithDiagnostics(
     lexicalRows = await retrieveLexical(organizationId, queryText, topK * 2);
   } catch (error) {
     degradedReason = "lexical-retrieval-failed";
-    emitRetrievalDegraded({
+    await emitRetrievalDegraded({
       organizationId,
       degradedReason,
       queryText,
@@ -312,7 +312,7 @@ export async function retrieveKnowledgeChunksWithDiagnostics(
   const merged = rrfMerge(semanticRows, lexicalRows, topK);
 
   if (options?.rerank && merged.length === 0) {
-    emitRerankAuditEvent({
+    await emitRerankAuditEvent({
       action: KNOWLEDGE_AUDIT_ACTIONS.RERANK_SKIPPED,
       organizationId,
       queryText,
@@ -336,7 +336,7 @@ export async function retrieveKnowledgeChunksWithDiagnostics(
   if (!options?.rerank || !process.env.RERANK_MODEL?.trim()) {
     if (options?.rerank && !process.env.RERANK_MODEL?.trim()) {
       degradedReason = degradedReason ?? "rerank-model-unavailable";
-      emitRerankAuditEvent({
+      await emitRerankAuditEvent({
         action: KNOWLEDGE_AUDIT_ACTIONS.RERANK_UNAVAILABLE,
         organizationId,
         queryText,
@@ -344,7 +344,7 @@ export async function retrieveKnowledgeChunksWithDiagnostics(
         reason: "rerank-model-unavailable",
         metadata: { topK, mergedCount: merged.length },
       });
-      emitRetrievalDegraded({
+      await emitRetrievalDegraded({
         organizationId,
         degradedReason: "rerank-model-unavailable",
         queryText,
@@ -401,7 +401,7 @@ export async function retrieveKnowledgeChunksWithDiagnostics(
     };
   } catch (error) {
     degradedReason = degradedReason ?? "rerank-failed";
-    emitRerankAuditEvent({
+    await emitRerankAuditEvent({
       action: KNOWLEDGE_AUDIT_ACTIONS.RERANK_FAILED,
       organizationId,
       queryText,
@@ -413,7 +413,7 @@ export async function retrieveKnowledgeChunksWithDiagnostics(
         error: error instanceof Error ? error.message : String(error),
       },
     });
-    emitRetrievalDegraded({
+    await emitRetrievalDegraded({
       organizationId,
       degradedReason: "rerank-failed",
       queryText,

@@ -35,7 +35,7 @@ vi.mock("@afenda/kernel/execution", () => ({
   writeExecutionAuditEvent: (...args: unknown[]) => mockWriteAudit(...args),
 }));
 
-vi.mock("@afenda/observability", () => ({
+vi.mock("@afenda/observability/server", () => ({
   logServerEvent: (...args: unknown[]) => mockLogServerEvent(...args),
 }));
 

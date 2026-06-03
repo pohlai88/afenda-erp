@@ -2,17 +2,15 @@ import {
   runCronJob as runWorkflowCronJob,
   type CronJobName,
 } from "@afenda/workflows";
-import { ERP_CRON_HTTP_ROUTES } from "@/contracts/erp-http.contract";
-
 const CRON_JOB_ROUTE: Record<CronJobName, string> = {
-  reminders: ERP_CRON_HTTP_ROUTES.reminders,
-  syncs: ERP_CRON_HTTP_ROUTES.syncs,
-  housekeeping: ERP_CRON_HTTP_ROUTES.housekeeping,
-  "knowledge-sync": ERP_CRON_HTTP_ROUTES.knowledgeSync,
-  "lynx-outcomes": ERP_CRON_HTTP_ROUTES.lynxOutcomes,
-  "hr-time-clock-sync": ERP_CRON_HTTP_ROUTES.hrTimeClockSync,
-  "document-retention-sweep": ERP_CRON_HTTP_ROUTES.documentRetentionSweep,
-  "document-scan-sweep": ERP_CRON_HTTP_ROUTES.documentScanSweep,
+  reminders: "/api/internal/v1/cron/reminders",
+  syncs: "/api/internal/v1/cron/syncs",
+  housekeeping: "/api/internal/v1/cron/housekeeping",
+  "knowledge-sync": "/api/internal/v1/cron/knowledge-sync",
+  "lynx-outcomes": "/api/internal/v1/cron/lynx-outcomes",
+  "hr-time-clock-sync": "/api/internal/v1/cron/hr-time-clock-sync",
+  "document-retention-sweep": "/api/internal/v1/cron/document-retention-sweep",
+  "document-scan-sweep": "/api/internal/v1/cron/document-scan-sweep",
 };
 
 export type { CronJobName };

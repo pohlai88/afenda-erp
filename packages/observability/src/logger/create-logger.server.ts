@@ -3,7 +3,7 @@ import "server-only";
 import pino, { type Logger as PinoLogger } from "pino";
 import { loggerServiceName } from "./logger.constants";
 import { resolveLogLevel } from "./log-level";
-import { redactLogPayload } from "./redact-policy";
+import { safelyRedactLogPayload } from "./redact-policy";
 import { serializeError } from "./serializers";
 import { createLoggerTransport } from "./transport";
 
@@ -20,11 +20,14 @@ export function createLogger() {
           err: serializeError,
         },
         formatters: {
+          level(label) {
+            return { level: label };
+          },
           bindings(bindings) {
-            return redactLogPayload(bindings);
+            return safelyRedactLogPayload(bindings);
           },
           log(log) {
-            return redactLogPayload(log);
+            return safelyRedactLogPayload(log);
           },
         },
       },

@@ -1,7 +1,7 @@
 import "server-only";
 
 import { uploadRouteCopy } from "@afenda/kernel";
-import { logServerEvent } from "@afenda/observability";
+import { logServerEvent } from "@afenda/observability/server";
 import { handleUpload, type HandleUploadBody } from "@vercel/blob/client";
 import type {
   ObjectStorageHandlerResult,

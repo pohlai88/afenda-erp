@@ -45,7 +45,7 @@ vi.mock("@afenda/db", async (importOriginal) => {
   };
 });
 
-vi.mock("@afenda/observability", () => ({
+vi.mock("@afenda/observability/server", () => ({
   logServerEvent: vi.fn(),
 }));
 

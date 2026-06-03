@@ -106,13 +106,23 @@ async function getTenantDocumentForDownload(input: {
 export async function recordTenantDocumentEvidenceEvent(
   event: ObjectStorageEvidenceAuditEvent,
 ): Promise<void> {
+  const targetId = event.documentId ?? event.pathname;
+
   await writeExecutionAuditEvent({
     organizationId: event.organizationId,
+    module: event.moduleId,
+    surface: "object-storage-governance",
+    route: event.moduleId === "system-admin" ? "/system-admin/security" : `/${event.moduleId}`,
     actorId: event.userId,
     actorType: "user",
     action: event.action,
+    summary: targetId
+      ? `${event.action} for document ${targetId}.`
+      : `${event.action} for tenant document.`,
+    outcome: "success",
     targetType: "document",
-    targetId: event.documentId ?? event.pathname,
+    targetId,
+    channel: "server_action",
     metadata: {
       moduleId: event.moduleId,
       pathname: event.pathname,

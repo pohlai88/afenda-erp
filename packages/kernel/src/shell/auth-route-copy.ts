@@ -18,6 +18,10 @@ export const authPageMetadataCopy = {
     title: "Sign in",
     description: "Sign in to your Afenda ERP workspace.",
   },
+  otp: {
+    title: "Sign in with code",
+    description: "Request a one-time email code to sign in.",
+  },
   signUp: {
     title: "Create account",
     description:
@@ -26,6 +30,14 @@ export const authPageMetadataCopy = {
   forgotPassword: {
     title: "Reset password",
     description: "Request a verification code and set a new password.",
+  },
+  resetPassword: {
+    title: "Set new password",
+    description: "Choose a new password using the link from your email.",
+  },
+  verifyEmail: {
+    title: "Verify email",
+    description: "Enter the one-time code sent to your inbox to activate your account.",
   },
   onboarding: {
     title: "Create workspace",
@@ -42,6 +54,13 @@ export const authPageShellCopy = {
     suspenseDescription:
       "Sign in with email, Google, or your development session.",
   },
+  otp: {
+    title: "Sign in with a one-time code",
+    description:
+      "Request an email code for an existing operator account and use it to enter the workspace.",
+    suspenseDescription:
+      "Request an email code for an existing operator account.",
+  },
   signUp: {
     title: "Create account",
     description:
@@ -54,6 +73,17 @@ export const authPageShellCopy = {
     description: "Request a verification code and choose a new password.",
     suspenseDescription:
       "Request a verification code and choose a new password.",
+  },
+  resetPassword: {
+    title: "Set new password",
+    description: "Enter a new password from your reset email link.",
+    suspenseDescription: "Confirm your new password to finish resetting access.",
+  },
+  verifyEmail: {
+    title: "Verify your email",
+    description:
+      "Production tenants require a verified email before organization onboarding.",
+    suspenseDescription: "Confirm your operator email with a one-time code.",
   },
   onboarding: {
     title: "Organization onboarding",
@@ -101,6 +131,29 @@ export const neonAuthFormCopy = {
     signUp: "Unable to create account.",
     generic: "Authentication failed.",
   },
+  passwordless: {
+    sectionTitle: "Other sign-in options",
+    magicLink: {
+      title: "Email me a sign-in link",
+      description: "We send a one-time link to your inbox. Existing accounts only.",
+      button: "Send sign-in link",
+      success: "Check your email for the sign-in link.",
+    },
+    emailOtp: {
+      title: "Sign in with a code",
+      description: "Use a one-time code sent to your email. Existing accounts only.",
+      sendButton: "Send code",
+      verifyButton: "Sign in with code",
+      codeLabel: "Sign-in code",
+      success: "Signed in. Loading your workspace.",
+    },
+    errors: {
+      sendFailed: "Unable to send the sign-in code or link.",
+      verifyFailed: "Unable to sign in with that code.",
+      missingEmail: "Enter your email address.",
+      missingCode: "Enter the code from your email.",
+    },
+  },
 } as const;
 
 export const devSignInCopy = {
@@ -124,20 +177,88 @@ export const devSignInCopy = {
 export const signInEnvironmentCopy = {
   disabledMessage:
     "Development sign-in is disabled in this environment. Configure Neon Auth or enable an approved e2e auth flag for smoke testing.",
+  emailOtpDisabledMessage:
+    "Email code sign-in is not enabled for this environment. Enable Neon Auth, email delivery, and AFENDA_AUTH_EMAIL_OTP_ENABLED to use this flow.",
 } as const;
 
 export const signUpEnvironmentCopy = {
   title: "Neon Auth is not configured",
   description:
     "Account creation requires Neon Auth in this environment. Use the development sign-in flow instead.",
+  devHint:
+    "Neon Auth is off in this environment. Sign in with a development session to reach onboarding.",
   actionLabel: "Go to development sign-in",
+} as const;
+
+export const verifyEmailCopy = {
+  title: "Verify your email",
+  description:
+    "Enter the one-time code from your email, or open the verification link we sent. Codes expire after 15 minutes; use resend if needed.",
+  fields: {
+    email: "Email",
+    verificationCode: "Verification code",
+  },
+  actions: {
+    verify: "Verify email",
+    verifying: "Verifying...",
+    resendCode: "Resend code",
+    resendingCode: "Sending...",
+  },
+  footerPrompt: "Already verified?",
+  footerAction: "Back to sign in",
+  messages: {
+    codeSent: "A new verification code has been sent when an account exists for this email.",
+    verified: "Email verified. Continuing to onboarding.",
+    verifiedSignIn: "Email verified. You can sign in now.",
+    missingEmail: "Enter the email address you used when creating your account.",
+    sendCodeError: "Unable to send a verification code right now.",
+    sendCodeFailed: "Unable to send verification code.",
+    verifyFailed: "Unable to verify that code.",
+    verifyError: "Email verification failed.",
+  },
+} as const;
+
+export const authNotFoundCopy = {
+  title: "Page not found",
+  description: "This sign-in route does not exist. Return to sign in to continue.",
+  actionLabel: "Back to sign in",
+} as const;
+
+export const resetPasswordCopy = {
+  title: "Set a new password",
+  description:
+    "Open the link from your reset email, then choose a new password below.",
+  fields: {
+    newPassword: "New password",
+    confirmPassword: "Confirm password",
+    passwordHint: "Use at least 8 characters.",
+  },
+  actions: {
+    submit: "Update password",
+    submitting: "Updating...",
+    requestNewLink: "Request a new reset link",
+  },
+  footerPrompt: "Remembered your password?",
+  footerAction: "Back to sign in",
+  messages: {
+    missingToken:
+      "This reset link is invalid or expired. Request a new link from forgot password.",
+    mismatch: "Passwords do not match.",
+    passwordUpdated:
+      "Password updated. You can sign in with your new password.",
+    passwordUpdatedSignedIn:
+      "Password updated. Continuing to your workspace.",
+    resetFailed: "Unable to reset password with this link.",
+    resetFailedGeneric: "Password reset failed.",
+  },
 } as const;
 
 export const forgotPasswordCopy = {
   title: "Reset your password",
   requestDescription:
-    "We will email a one-time code you can use to choose a new password.",
-  resetDescription: "Enter the code from your email and set a new password.",
+    "We will email a reset link or one-time code (expires in 15 minutes). Open the link or enter the code below to choose a new password.",
+  resetDescription:
+    "Enter the code from your email and set a new password. Request a new code if it expired.",
   fields: {
     email: "Email",
     verificationCode: "Verification code",
@@ -155,13 +276,57 @@ export const forgotPasswordCopy = {
   footerAction: "Back to sign in",
   messages: {
     codeSent:
-      "If an account exists for this email, a verification code has been sent.",
+      "If an account exists for this email, a reset link or code has been sent.",
+    linkSent:
+      "If an account exists for this email, check your inbox for a reset link.",
     passwordUpdated:
       "Password updated. You can sign in with your new password.",
+    passwordUpdatedSignedIn:
+      "Password updated. Continuing to your workspace.",
     sendCodeError: "Unable to send a reset code right now.",
     sendCodeFailed: "Unable to send reset code.",
     resetFailed: "Unable to reset password with that code.",
     passwordResetFailed: "Password reset failed.",
+  },
+} as const;
+
+export const accountSettingsCopy = {
+  page: {
+    title: "Account settings",
+    description:
+      "Update your operator display name and password for this Neon Auth identity.",
+  },
+  profile: {
+    title: "Profile",
+    description: "Display name shown in the workspace shell and audit trails.",
+    nameLabel: "Display name",
+    submitLabel: "Save profile",
+    success: "Profile updated.",
+    updateFailed: "Profile update failed.",
+  },
+  password: {
+    title: "Password",
+    description:
+      "Change your password while signed in. Use forgot password if you cannot sign in.",
+    currentLabel: "Current password",
+    newLabel: "New password",
+    confirmLabel: "Confirm new password",
+    revokeLabel: "Sign out other devices",
+    revokeHint: "Ends sessions on other browsers after this change.",
+    submitLabel: "Change password",
+    success: "Password changed successfully.",
+    changeFailed: "Password change failed.",
+    mismatch: "New passwords do not match.",
+    forgotHref: "/forgot-password",
+    forgotLabel: "Forgot your password?",
+  },
+  emailNote:
+    "Email address is managed by Neon Auth and cannot be changed here. Contact your administrator if you need a different login email.",
+  unavailable: {
+    devSession:
+      "Profile and password changes apply to Neon Auth accounts. Use a Neon sign-in session or update the dev cookie from the floating panel.",
+    neonDisabled:
+      "Neon Auth is not enabled in this environment.",
   },
 } as const;
 

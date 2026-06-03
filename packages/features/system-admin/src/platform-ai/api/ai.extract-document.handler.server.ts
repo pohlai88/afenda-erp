@@ -1,6 +1,6 @@
 import { getApiAuthContext, requireCapability } from "@afenda/auth/server";
 import { getErpModuleById } from "@afenda/kernel";
-import { getRequestId, logServerEvent } from "@afenda/observability";
+import { getRequestId, logServerEvent } from "@afenda/observability/server";
 import { generateText, Output } from "ai";
 import { NextResponse } from "next/server";
 import { z } from "zod";

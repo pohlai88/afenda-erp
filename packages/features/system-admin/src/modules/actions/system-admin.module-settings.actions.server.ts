@@ -9,7 +9,7 @@ import {
   writeExecutionAuditEvent,
   type ExecutionContext,
 } from "@afenda/kernel/execution";
-import { logServerEvent } from "@afenda/observability";
+import { logServerEvent } from "@afenda/observability/server";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { workspaceNavigationSettingsCacheTag } from "../../tenant-execution/contracts/system-admin.workspace-navigation-cache.shared";
 import { z } from "zod";

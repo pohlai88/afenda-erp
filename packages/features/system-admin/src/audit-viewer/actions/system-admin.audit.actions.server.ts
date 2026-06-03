@@ -2,7 +2,7 @@
 
 import { searchTenantAuditLogs, getRetentionPolicy, upsertRetentionPolicy } from "@afenda/db";
 import { writeExecutionAuditEvent } from "@afenda/kernel/execution";
-import { logServerEvent } from "@afenda/observability";
+import { logServerEvent } from "@afenda/observability/server";
 import { revalidatePath } from "next/cache";
 import {
   systemAdminActionSuccess,

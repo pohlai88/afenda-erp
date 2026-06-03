@@ -5,10 +5,7 @@ import type { ModuleWorkspaceSearchParams } from "@afenda/kernel";
 import type { Metadata } from "next";
 
 // Dashboard list windows read many searchParams; declare samples when re-enabling validation.
-export const unstable_instant = {
-  prefetch: "static",
-  unstable_disableValidation: true,
-};
+export const unstable_instant = false;
 
 export async function generateMetadata(): Promise<Metadata> {
   const cachedMetadata = await getCachedModuleMetadata("dashboard");

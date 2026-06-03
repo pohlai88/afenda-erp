@@ -11,8 +11,8 @@ import {
   DEMO_USER_ID,
   DEMO_USER_NAME,
   DEV_SESSION_MAX_AGE_SECONDS,
-  userSessionSchema,
-} from "@afenda/auth";
+} from "@/auth/contracts/auth.constants.shared";
+import { userSessionSchema } from "@/auth/contracts/auth.session-contracts.shared";
 
 import { baseURL, PLAYWRIGHT_ARTIFACTS } from "./playwright.shared.cjs";
 

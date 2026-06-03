@@ -11,7 +11,7 @@ import {
   writeExecutionAuditEvent,
   type ExecutionActorType,
 } from "@afenda/kernel/execution";
-import { logServerEvent } from "@afenda/observability";
+import { logServerEvent } from "@afenda/observability/server";
 import { revalidatePath } from "next/cache";
 import { systemAdminRoutePaths } from "../../overview/contracts/system-admin.route-paths.contract";
 import {

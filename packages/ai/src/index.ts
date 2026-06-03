@@ -8,7 +8,6 @@
  * ARCH-1005: substrate-blind — never imports @afenda/feature-knowledge.
  * Lynx and Knowledge products compose this package; it does not compose them.
  */
-import "server-only";
 
 // ---------------------------------------------------------------------------
 // Explicit bucket entrypoints

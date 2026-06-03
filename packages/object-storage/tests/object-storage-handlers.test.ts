@@ -55,7 +55,7 @@ const storeMocks = vi.hoisted(() => ({
   })),
 }));
 
-vi.mock("@afenda/observability", () => ({
+vi.mock("@afenda/observability/server", () => ({
   getRequestId: vi.fn(() => "req_handler_test"),
   logServerEvent: vi.fn(),
 }));

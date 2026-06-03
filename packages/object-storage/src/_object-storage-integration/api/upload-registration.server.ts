@@ -1,7 +1,7 @@
 import "server-only";
 
 import { uploadRouteCopy } from "@afenda/kernel";
-import { logServerEvent } from "@afenda/observability";
+import { logServerEvent } from "@afenda/observability/server";
 import { z } from "zod";
 import type {
   ObjectStorageEvidenceAuditSink,

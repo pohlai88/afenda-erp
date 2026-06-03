@@ -1,22 +1,30 @@
 import "server-only";
 
-import type { Logger as PinoLogger } from "pino";
+import { randomUUID } from "node:crypto";
 import { createChildLogger } from "../logger/create-child-logger";
 import { createLogger } from "../logger/create-logger.server";
-import type { LoggerContext } from "../logger/logger.types";
+import type { LoggerContext, StructuralLogger } from "../logger/logger.types";
+import { getRequestContext } from "../logger/request-context.server";
 
 export function createNextRequestLogger(
   request: Request,
   context: LoggerContext = {},
-): PinoLogger {
+): StructuralLogger {
+  const activeContext = getRequestContext();
+  const loggerContext = {
+    ...activeContext,
+    ...context,
+  };
   const requestId =
     request.headers.get("x-vercel-id") ??
     request.headers.get("x-request-id") ??
-    context.requestId;
+    loggerContext.requestId ??
+    randomUUID();
 
   return createChildLogger(createLogger(), {
-    ...context,
+    ...loggerContext,
     requestId,
-    correlationId: context.correlationId ?? requestId,
+    correlationId: loggerContext.correlationId ?? requestId,
+    operationId: loggerContext.operationId ?? randomUUID(),
   });
 }

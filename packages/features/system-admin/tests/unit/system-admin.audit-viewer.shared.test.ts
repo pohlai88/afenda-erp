@@ -23,8 +23,8 @@ describe("audit viewer shared helpers", () => {
     expect(filters).toEqual({
       actorAuthUserId: "actor_1",
       action: "finance.invoice.create",
-      entityType: "erp-record",
-      entityId: "inv_1",
+      targetType: "erp-record",
+      targetId: "inv_1",
       moduleKey: "finance",
       query: "invoice",
       createdAfter: new Date("2026-01-01"),

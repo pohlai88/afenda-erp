@@ -4,6 +4,7 @@ export {
   handleObjectStorageDocumentDownloadGet,
   handleObjectStorageUploadConfigGet,
   handleObjectStorageUploadPost,
+  toObjectStorageResponse,
   type ObjectStorageDownloadHandlerDeps,
   type ObjectStorageHandlerDeps,
   type ObjectStorageHandlerResult,

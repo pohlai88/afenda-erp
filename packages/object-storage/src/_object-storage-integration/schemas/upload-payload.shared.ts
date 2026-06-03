@@ -1,6 +1,6 @@
 import { moduleIds } from "@afenda/config/module-ids";
-import { uploadRouteCopy } from "@afenda/kernel";
 import { z } from "zod";
+import { objectStorageRouteCopy } from "../contracts/upload-route-copy.shared";
 import { UploadRouteError } from "../domain/upload-route.error.shared";
 import {
   documentUploadContentTypes,
@@ -64,6 +64,6 @@ export function assertUploadTokenMatchesSession(
     payload.organizationId !== organization.id ||
     payload.uploadedByAuthUserId !== session.id
   ) {
-    throw new UploadRouteError(403, uploadRouteCopy.tokenMismatch);
+    throw new UploadRouteError(403, objectStorageRouteCopy.tokenMismatch);
   }
 }

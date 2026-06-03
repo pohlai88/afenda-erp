@@ -1,8 +1,12 @@
 "use client";
 
+import { ActionFormErrors } from "@afenda/governed-surface/client";
 import { Button, Field, FieldGroup, FieldLabel, NativeSelect, NativeSelectOption } from "@afenda/ui";
 import { useState, useTransition } from "react";
-import type { SystemAdminActionResult } from "../../tenant-execution/contracts/system-admin.action-result.contract";
+import {
+  systemAdminActionFailure,
+  type SystemAdminActionResult,
+} from "../../tenant-execution/contracts/system-admin.action-result.contract";
 import type { SystemAdminBillingPlanRow } from "../contracts/system-admin.billing-plans.contract";
 import { systemAdminBillingUiCopy } from "../surface/system-admin.billing-ui.copy.shared";
 
@@ -30,6 +34,9 @@ export function SystemAdminBillingPlanCheckout({
   const [planKey, setPlanKey] = useState(
     defaultPlanKey ?? plans[0]?.key ?? "pro",
   );
+  const [lastResult, setLastResult] = useState<
+    SystemAdminActionResult<{ url: string }> | undefined
+  >();
   const [checkoutPending, startCheckout] = useTransition();
   const [portalPending, startPortal] = useTransition();
 
@@ -38,13 +45,17 @@ export function SystemAdminBillingPlanCheckout({
   }
 
   const redirect = (result: SystemAdminActionResult<{ url: string }>) => {
-    if (!result.ok || !result.data?.url) {
-      if (!result.ok) {
-        console.error(result.error);
-      }
+    if (!result.ok) {
+      setLastResult(result);
       return;
     }
 
+    if (!result.data?.url) {
+      setLastResult(systemAdminActionFailure("Stripe redirect URL was missing."));
+      return;
+    }
+
+    setLastResult(undefined);
     window.location.assign(result.data.url);
   };
 
@@ -97,6 +108,7 @@ export function SystemAdminBillingPlanCheckout({
       <p className="type-caption">
         {systemAdminBillingUiCopy.plans.checkoutHint}
       </p>
+      <ActionFormErrors result={lastResult} />
     </div>
   );
 }

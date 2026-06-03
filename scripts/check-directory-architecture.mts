@@ -71,13 +71,6 @@ const packageArchitectureRules: Record<string, PackageArchitectureRule> = {
     requiresPackageBuild: true,
     turboBuildOutputs: ["dist/**"],
   },
-  "@afenda/neon-auth": {
-    category: "runtime-library",
-    workspaceRoot: "packages",
-    requiresCompiledDistExports: true,
-    requiresPackageBuild: true,
-    turboBuildOutputs: ["dist/**"],
-  },
   "@afenda/billing": {
     category: "runtime-library",
     workspaceRoot: "packages",
@@ -887,8 +880,6 @@ function checkAppRouteFileWhitelist() {
 
   const transitionAllowList = new Set([
     "apps/erp/src/app/app-analytics.tsx",
-    "apps/erp/src/app/onboarding/onboarding-form.tsx",
-    "apps/erp/src/app/interface-lab/primitives/dialog-open-fixture.client.tsx",
   ]);
 
   walkSourceFiles(appRoot, (filePath) => {

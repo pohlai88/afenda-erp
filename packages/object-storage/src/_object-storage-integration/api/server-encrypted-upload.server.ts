@@ -1,7 +1,7 @@
 import "server-only";
 
 import { uploadRouteCopy } from "@afenda/kernel";
-import { logServerEvent } from "@afenda/observability";
+import { logServerEvent } from "@afenda/observability/server";
 import type {
   ObjectStorageHandlerResult,
   ObjectStorageUploadHandlerDeps,
@@ -32,6 +32,8 @@ import {
 } from "../../_object-storage-integration/api/upload-registration.server";
 import {
   addRandomPathSuffix,
+} from "../policies/tenant-pathnames.server";
+import {
   assertUploadPathnameMatchesTenant,
 } from "../../_object-storage-integration/policies/tenant-pathnames.shared";
 import {

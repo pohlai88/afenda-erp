@@ -1,5 +1,5 @@
 import type { AfendaTransaction } from "@afenda/db";
-import type { WriteExecutionAuditEventInput as ExecutionAuditEvent } from "./execution-audit.types";
+import type { WriteExecutionAuditEventInput } from "./execution-audit.types";
 import { resolveExecutionAuditEntityType } from "./execution-audit-7w1h";
 import {
   createExecutionAuditEvent,
@@ -11,7 +11,6 @@ export type {
   ExecutionAuditActorType,
   ExecutionAuditChannel,
   ExecutionAuditOutcome,
-  ExecutionAuditEvent,
   NormalizedExecutionAuditEvent,
   WriteExecutionAuditEventInput,
 } from "./execution-audit.types";
@@ -24,6 +23,7 @@ export { executionAuditEventSchema } from "./execution-audit.schema";
 export { redactExecutionAuditRecord } from "./execution-audit-redaction";
 export { resolveExecutionAuditEntityType };
 
+export type ExecutionAuditEvent = WriteExecutionAuditEventInput;
 export type ExecutionAuditInput = ExecutionAuditEvent;
 
 export async function writeExecutionAuditEvent(input: ExecutionAuditEvent) {

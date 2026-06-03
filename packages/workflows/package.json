@@ -13,7 +13,8 @@
   "dependencies": {
     "@afenda/config": "workspace:*",
     "@afenda/db": "workspace:*",
-    "@afenda/kernel": "workspace:*"
+    "@afenda/kernel": "workspace:*",
+    "@afenda/observability": "workspace:*"
   },
   "scripts": {
     "build": "tsc -p tsconfig.build.json",

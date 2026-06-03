@@ -20,7 +20,7 @@ vi.mock("@afenda/db", () => ({
   finishCronRunHistory: cronHistory.finishCronRunHistory,
 }));
 
-vi.mock("@afenda/observability", () => ({
+vi.mock("@afenda/observability/server", () => ({
   getRequestId: vi.fn(() => "req_retention_cron"),
   logServerEvent: vi.fn(),
 }));

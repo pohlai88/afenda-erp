@@ -8,15 +8,24 @@ export function captureConsoleLogs(callback: () => void) {
   const originalLog = console.log;
   const originalWarn = console.warn;
   const originalError = console.error;
+  const capture = (
+    level: CapturedLogLine["level"],
+    values: readonly unknown[],
+  ) => {
+    captured.push({
+      level,
+      line: values.map(formatConsoleValue).join(" "),
+    });
+  };
 
-  console.log = (line: string) => {
-    captured.push({ level: "log", line });
+  console.log = (...values: unknown[]) => {
+    capture("log", values);
   };
-  console.warn = (line: string) => {
-    captured.push({ level: "warn", line });
+  console.warn = (...values: unknown[]) => {
+    capture("warn", values);
   };
-  console.error = (line: string) => {
-    captured.push({ level: "error", line });
+  console.error = (...values: unknown[]) => {
+    capture("error", values);
   };
 
   try {
@@ -28,4 +37,16 @@ export function captureConsoleLogs(callback: () => void) {
   }
 
   return captured;
+}
+
+function formatConsoleValue(value: unknown) {
+  if (typeof value === "string") {
+    return value;
+  }
+
+  try {
+    return JSON.stringify(value) ?? String(value);
+  } catch {
+    return String(value);
+  }
 }

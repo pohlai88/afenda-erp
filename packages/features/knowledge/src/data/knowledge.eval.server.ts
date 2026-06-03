@@ -281,7 +281,7 @@ export async function runKnowledgeEval(
     hybrid: options?.hybrid,
   });
   if (!parsed.success) {
-    emitKnowledgeAuditEvent({
+    await emitKnowledgeAuditEvent({
       action: KNOWLEDGE_AUDIT_ACTIONS.EVAL_RUN_FAIL,
       organizationId,
       result: "failed",
@@ -344,7 +344,7 @@ export async function runKnowledgeEval(
 
   const aggregated = averageMetrics(caseResults.map((r) => r.metrics));
 
-  emitKnowledgeAuditEvent({
+  await emitKnowledgeAuditEvent({
     action: KNOWLEDGE_AUDIT_ACTIONS.EVAL_RUN,
     organizationId,
     result: "completed",

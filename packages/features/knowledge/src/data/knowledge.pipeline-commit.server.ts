@@ -11,7 +11,10 @@ import {
 
 import { KNOWLEDGE_AUDIT_ACTIONS } from "../contracts/knowledge.core.contract";
 import type { RawKnowledgeDocument } from "../contracts/knowledge.retrieval.contract";
-import { emitKnowledgeAuditEvent } from "./knowledge.audit.server";
+import {
+  emitKnowledgeAuditEvent,
+  emitKnowledgeAuditEventInTransaction,
+} from "./knowledge.audit.server";
 import { embedKnowledgeBatch } from "./knowledge.embeddings.server";
 import type { KnowledgeChunk } from "./knowledge.chunker.server";
 import { chunkKnowledgeDocument } from "./knowledge.chunker.server";
@@ -72,7 +75,7 @@ export async function commitKnowledgeDocument(
   const existing = existingRows[0];
 
   if (existing?.inputDigest === newDigest) {
-    emitKnowledgeAuditEvent({
+    await emitKnowledgeAuditEvent({
       action: KNOWLEDGE_AUDIT_ACTIONS.DOCUMENT_EMBEDDED,
       organizationId,
       sourceId,
@@ -215,7 +218,7 @@ export async function commitKnowledgeDocument(
         ),
       );
 
-    emitKnowledgeAuditEvent({
+    await emitKnowledgeAuditEventInTransaction(tx, {
       action: KNOWLEDGE_AUDIT_ACTIONS.DOCUMENT_EMBEDDED,
       organizationId,
       sourceId,

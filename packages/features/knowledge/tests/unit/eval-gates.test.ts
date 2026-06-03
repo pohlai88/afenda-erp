@@ -1,6 +1,13 @@
 import { describe, expect, it, vi } from "vitest";
 import type { EvalRunMetrics } from "../../src/data/knowledge.eval.server";
 
+vi.mock("server-only", () => ({}));
+
+vi.mock("@afenda/kernel/execution", () => ({
+  writeExecutionAuditEvent: vi.fn(async () => undefined),
+  writeExecutionAuditEventInTransaction: vi.fn(async () => undefined),
+}));
+
 vi.mock("../../src/data/knowledge.retrieve-hybrid.server", () => ({
   retrieveKnowledgeChunks: vi.fn(),
 }));

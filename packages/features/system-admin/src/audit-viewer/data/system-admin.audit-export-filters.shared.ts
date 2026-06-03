@@ -10,6 +10,7 @@ export function buildSystemAdminAuditExportFilterFields(
     auditTargetType: params.auditTargetType ?? "",
     auditTargetId: params.auditTargetId ?? "",
     auditModule: params.auditModule ?? "",
+    auditOutcome: params.auditOutcome ?? "",
     auditFrom: params.auditFrom ?? "",
     auditTo: params.auditTo ?? "",
     auditSort: params.auditSort ?? "",

@@ -16,6 +16,21 @@ export function SystemAdminAuditDetailPanel({
   const fields = copy.fields;
   const hasCorrelation =
     detail.policyKeys.length > 0 || detail.approvalKeys.length > 0;
+  const hasValue = (value: unknown) =>
+    value !== undefined && value !== null && value !== "";
+
+  const renderField = (label: string, value: string | number | undefined) => {
+    if (!hasValue(value)) {
+      return null;
+    }
+
+    return (
+      <div>
+        <dt className="type-muted">{label}</dt>
+        <dd className="break-words">{value}</dd>
+      </div>
+    );
+  };
 
   return (
     <Card data-testid={`system-admin-audit-detail:${detail.id}`}>
@@ -38,6 +53,11 @@ export function SystemAdminAuditDetailPanel({
             <dd className="type-mono-cell">{detail.actorId}</dd>
           </div>
           <div>
+            <dt className="type-muted">{fields.actorType}</dt>
+            <dd>{detail.actorType ?? "not recorded"}</dd>
+          </div>
+          {renderField(fields.actorRole, detail.actorRole)}
+          <div>
             <dt className="type-muted">{fields.action}</dt>
             <dd>{detail.action}</dd>
           </div>
@@ -45,12 +65,112 @@ export function SystemAdminAuditDetailPanel({
             <dt className="type-muted">{fields.module}</dt>
             <dd>{detail.moduleKey}</dd>
           </div>
+          <div>
+            <dt className="type-muted">{fields.outcome}</dt>
+            <dd>{detail.outcome ?? "not recorded"}</dd>
+          </div>
           <div className="@sm:col-span-2">
             <dt className="type-muted">{fields.target}</dt>
             <dd>
-              {detail.entityType}:{detail.entityId}
+              {detail.targetDisplayName ??
+                `${detail.targetType ?? detail.entityType}:${detail.targetId ?? detail.entityId}`}
             </dd>
           </div>
+          <div>
+            <dt className="type-muted">{fields.targetType}</dt>
+            <dd>{detail.targetType ?? detail.entityType}</dd>
+          </div>
+          <div>
+            <dt className="type-muted">{fields.targetId}</dt>
+            <dd className="type-mono-cell">{detail.targetId ?? detail.entityId}</dd>
+          </div>
+          {detail.subjectType || detail.subjectId ? (
+            <div className="@sm:col-span-2">
+              <dt className="type-muted">{fields.subject}</dt>
+              <dd className="type-mono-cell">
+                {detail.subjectType ?? "subject"}
+                {detail.subjectId ? `:${detail.subjectId}` : ""}
+              </dd>
+            </div>
+          ) : null}
+          {detail.targetDisplayName ? (
+            <div className="@sm:col-span-2">
+              <dt className="type-muted">{fields.targetDisplayName}</dt>
+              <dd>{detail.targetDisplayName}</dd>
+            </div>
+          ) : null}
+          {detail.surface ? (
+            <div>
+              <dt className="type-muted">{fields.surface}</dt>
+              <dd>{detail.surface}</dd>
+            </div>
+          ) : null}
+          {detail.route ? (
+            <div>
+              <dt className="type-muted">{fields.route}</dt>
+              <dd className="type-mono-cell">{detail.route}</dd>
+            </div>
+          ) : null}
+          {detail.channel ? (
+            <div>
+              <dt className="type-muted">{fields.channel}</dt>
+              <dd>{detail.channel}</dd>
+            </div>
+          ) : null}
+          {detail.reason ? (
+            <div className="@sm:col-span-2">
+              <dt className="type-muted">{fields.reason}</dt>
+              <dd>{detail.reason}</dd>
+            </div>
+          ) : null}
+          {detail.policyReference ? (
+            <div>
+              <dt className="type-muted">{fields.policyReference}</dt>
+              <dd className="type-mono-cell">{detail.policyReference}</dd>
+            </div>
+          ) : null}
+          {detail.approvalId ? (
+            <div>
+              <dt className="type-muted">{fields.approvalId}</dt>
+              <dd className="type-mono-cell">{detail.approvalId}</dd>
+            </div>
+          ) : null}
+          {detail.requestId ? (
+            <div>
+              <dt className="type-muted">{fields.requestId}</dt>
+              <dd className="type-mono-cell">{detail.requestId}</dd>
+            </div>
+          ) : null}
+          {detail.operationId ? (
+            <div>
+              <dt className="type-muted">{fields.operationId}</dt>
+              <dd className="type-mono-cell">{detail.operationId}</dd>
+            </div>
+          ) : null}
+          {detail.beforeJson ? (
+            <div className="@sm:col-span-2">
+              <dt className="type-muted">{fields.before}</dt>
+              <pre className="mt-1 max-h-64 overflow-auto rounded-control border border-border bg-muted/20 p-3 type-mono-cell">
+                {JSON.stringify(detail.beforeJson, null, 2)}
+              </pre>
+            </div>
+          ) : null}
+          {detail.afterJson ? (
+            <div className="@sm:col-span-2">
+              <dt className="type-muted">{fields.after}</dt>
+              <pre className="mt-1 max-h-64 overflow-auto rounded-control border border-border bg-muted/20 p-3 type-mono-cell">
+                {JSON.stringify(detail.afterJson, null, 2)}
+              </pre>
+            </div>
+          ) : null}
+          {detail.diffJson && detail.diffJson.length > 0 ? (
+            <div className="@sm:col-span-2">
+              <dt className="type-muted">{fields.diff}</dt>
+              <pre className="mt-1 max-h-64 overflow-auto rounded-control border border-border bg-muted/20 p-3 type-mono-cell">
+                {JSON.stringify(detail.diffJson, null, 2)}
+              </pre>
+            </div>
+          ) : null}
           <div className="@sm:col-span-2">
             <dt className="type-muted">{fields.summary}</dt>
             <dd>{detail.summary}</dd>

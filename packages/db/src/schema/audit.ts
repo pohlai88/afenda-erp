@@ -16,6 +16,8 @@ export const auditLogs = pgTable(
     actorAuthUserId: text("actor_auth_user_id").notNull(),
     actorType: text("actor_type"),
     actorRole: text("actor_role"),
+    subjectType: text("subject_type"),
+    subjectId: text("subject_id"),
     entityType: entityTypeEnum("entity_type").notNull(),
     entityId: text("entity_id").notNull(),
     action: text("action").notNull(),
@@ -51,6 +53,11 @@ export const auditLogs = pgTable(
       table.organizationId,
       table.targetType,
       table.targetId,
+    ),
+    index("audit_logs_org_subject_idx").on(
+      table.organizationId,
+      table.subjectType,
+      table.subjectId,
     ),
     index("audit_logs_org_entity_idx").on(
       table.organizationId,

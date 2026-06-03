@@ -2,7 +2,7 @@
 
 Pino-backed structural logger architecture for `@afenda/observability`.
 
-Canonical doctrine: [ARCH-1005 - Infrastructure](../../docs/architecture/1005-infrastructure.md) and [ARCH-1002 - Backend](../../docs/architecture/1002-backend.md).
+Canonical doctrine: [ARCH-1005 - Infrastructure](../../../../docs/architecture/1005-infrastructure.md) and [ARCH-1002 - Backend](../../../../docs/architecture/1002-backend.md).
 
 ## Decision
 
@@ -203,6 +203,9 @@ Event names should remain understandable outside the codebase.
 ```txt
 packages/observability/
   src/
+    index.ts
+    server.ts
+
     logger/
       index.ts
       create-logger.server.ts
@@ -218,6 +221,7 @@ packages/observability/
       serializers.ts
       log-level.ts
       transport.ts
+      structural-logger-architecture.md
 
     middleware/
       route-handler-logger.server.ts
@@ -326,7 +330,7 @@ Forbidden:
 Use:
 
 ```ts
-import { createDomainLogger } from "@afenda/observability";
+import { createDomainLogger } from "@afenda/observability/server";
 ```
 
 Do not use:

@@ -2,10 +2,7 @@ import { assertHrModuleId } from "@/lib/hr-route.shared";
 import HrCompetencySkillsAuditPage from "@/routes/workspace/modules/hr-competency-skills-audit.server";
 export { metadata } from "@/routes/workspace/modules/hr-competency-skills-audit.server";
 
-export const unstable_instant = {
-  prefetch: "static",
-  unstable_disableValidation: true,
-};
+export const unstable_instant = false;
 
 type PageProps = {
   params: Promise<{ moduleId: string }>;

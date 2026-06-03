@@ -51,7 +51,7 @@ export type TenantObjectUploadResult = {
 };
 
 type R2PresignResponse = {
-  provider: "r2";
+  provider: "r2" | "s3";
   uploadUrl: string;
   pathname: string;
   method: "PUT";
@@ -61,10 +61,161 @@ type R2PresignResponse = {
 };
 
 type R2CompleteResponse = TenantObjectUploadResult & {
-  provider: "r2";
+  provider: "r2" | "s3";
   registered: boolean;
   error?: string;
 };
+
+const objectStorageProviders = new Set(["vercel-blob", "r2", "s3"]);
+const objectStorageUploadModes = new Set(["presigned", "server"]);
+const objectStorageEncryptionModes = new Set(["platform", "customer-managed"]);
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null;
+}
+
+async function readJsonPayload(response: Response) {
+  try {
+    return await response.json();
+  } catch {
+    return undefined;
+  }
+}
+
+function readStringArray(payload: Record<string, unknown>, key: string) {
+  const value = payload[key];
+  return Array.isArray(value) && value.every((item) => typeof item === "string")
+    ? value
+    : undefined;
+}
+
+function normalizeUploadConfigPayload(payload: unknown): ObjectStorageUploadConfig {
+  if (!isRecord(payload) || typeof payload.configured !== "boolean") {
+    throw new Error("Object storage upload configuration response is invalid.");
+  }
+
+  const error = typeof payload.error === "string" ? payload.error : undefined;
+
+  if (!payload.configured) {
+    return {
+      configured: false,
+      error,
+    };
+  }
+
+  const authorized =
+    typeof payload.authorized === "boolean" ? payload.authorized : undefined;
+
+  if (authorized === false) {
+    return {
+      configured: true,
+      authorized,
+      error,
+    };
+  }
+
+  if (
+    typeof payload.provider !== "string" ||
+    !objectStorageProviders.has(payload.provider) ||
+    typeof payload.uploadMode !== "string" ||
+    !objectStorageUploadModes.has(payload.uploadMode) ||
+    typeof payload.encryptionMode !== "string" ||
+    !objectStorageEncryptionModes.has(payload.encryptionMode) ||
+    typeof payload.pathnamePrefix !== "string" ||
+    typeof payload.uploadRoute !== "string" ||
+    typeof payload.maxSizeBytes !== "number" ||
+    typeof payload.accept !== "string"
+  ) {
+    throw new Error("Object storage upload configuration response is invalid.");
+  }
+
+  const contentTypes = readStringArray(payload, "contentTypes");
+  if (!contentTypes) {
+    throw new Error("Object storage upload configuration response is invalid.");
+  }
+
+  const provider = payload.provider as ObjectStorageUploadConfig["provider"];
+  const uploadMode = payload.uploadMode as ObjectStorageUploadConfig["uploadMode"];
+  const encryptionMode =
+    payload.encryptionMode as ObjectStorageUploadConfig["encryptionMode"];
+  const multipartThresholdBytes =
+    typeof payload.multipartThresholdBytes === "number"
+      ? payload.multipartThresholdBytes
+      : undefined;
+
+  return {
+    configured: true,
+    authorized,
+    provider,
+    uploadMode,
+    encryptionMode,
+    pathnamePrefix: payload.pathnamePrefix,
+    uploadRoute: payload.uploadRoute,
+    maxSizeBytes: payload.maxSizeBytes,
+    contentTypes,
+    accept: payload.accept,
+    multipartThresholdBytes,
+    governance: isRecord(payload.governance)
+      ? objectStorageGovernancePolicy
+      : undefined,
+    error,
+  };
+}
+
+function normalizePresignPayload(payload: unknown): R2PresignResponse {
+  if (
+    !isRecord(payload) ||
+    (payload.provider !== "r2" && payload.provider !== "s3") ||
+    typeof payload.uploadUrl !== "string" ||
+    typeof payload.pathname !== "string" ||
+    payload.method !== "PUT" ||
+    !isRecord(payload.headers) ||
+    typeof payload.tokenPayload !== "string"
+  ) {
+    throw new Error("Object storage presign response is invalid.");
+  }
+
+  const headers = Object.fromEntries(
+    Object.entries(payload.headers).filter(
+      (entry): entry is [string, string] => typeof entry[1] === "string",
+    ),
+  );
+
+  return {
+    provider: payload.provider,
+    uploadUrl: payload.uploadUrl,
+    pathname: payload.pathname,
+    method: payload.method,
+    headers,
+    tokenPayload: payload.tokenPayload,
+    error: typeof payload.error === "string" ? payload.error : undefined,
+  };
+}
+
+function normalizeUploadResultPayload(payload: unknown): R2CompleteResponse {
+  if (
+    !isRecord(payload) ||
+    (payload.provider !== "r2" && payload.provider !== "s3") ||
+    typeof payload.registered !== "boolean" ||
+    typeof payload.pathname !== "string" ||
+    typeof payload.blobUrl !== "string" ||
+    typeof payload.contentType !== "string" ||
+    typeof payload.sizeBytes !== "number"
+  ) {
+    throw new Error("Object storage upload completion response is invalid.");
+  }
+
+  return {
+    provider: payload.provider,
+    registered: payload.registered,
+    pathname: payload.pathname,
+    blobUrl: payload.blobUrl,
+    contentType: payload.contentType,
+    sizeBytes: payload.sizeBytes,
+    etag: typeof payload.etag === "string" ? payload.etag : undefined,
+    error: typeof payload.error === "string" ? payload.error : undefined,
+  };
+}
 
 function isAllowedContentType(contentType: string) {
   return documentUploadContentTypes.some((allowed) => allowed === contentType);
@@ -119,7 +270,13 @@ export async function fetchObjectStorageUploadConfig(
     credentials: "same-origin",
   });
 
-  return (await response.json()) as ObjectStorageUploadConfig;
+  const payload = await readJsonPayload(response);
+
+  if (!response.ok && !payload) {
+    throw new Error(`Upload configuration failed (${response.status}).`);
+  }
+
+  return normalizeUploadConfigPayload(payload);
 }
 
 async function uploadViaServerEncrypted(
@@ -142,18 +299,20 @@ async function uploadViaServerEncrypted(
     body: formData,
   });
 
-  const payload = (await response.json()) as R2CompleteResponse;
+  const payload = await readJsonPayload(response);
 
   if (!response.ok) {
     throw new Error(readUploadError(payload, "Encrypted upload failed."));
   }
 
+  const completed = normalizeUploadResultPayload(payload);
+
   return {
-    pathname: payload.pathname,
-    blobUrl: payload.blobUrl,
-    contentType: payload.contentType,
-    sizeBytes: payload.sizeBytes,
-    etag: payload.etag,
+    pathname: completed.pathname,
+    blobUrl: completed.blobUrl,
+    contentType: completed.contentType,
+    sizeBytes: completed.sizeBytes,
+    etag: completed.etag,
   };
 }
 
@@ -178,11 +337,13 @@ async function uploadViaR2(
     }),
   });
 
-  const presigned = (await presignResponse.json()) as R2PresignResponse;
+  const presignPayload = await readJsonPayload(presignResponse);
 
   if (!presignResponse.ok) {
-    throw new Error(readUploadError(presigned, "Upload presign failed."));
+    throw new Error(readUploadError(presignPayload, "Upload presign failed."));
   }
+
+  const presigned = normalizePresignPayload(presignPayload);
 
   const putResponse = await fetch(presigned.uploadUrl, {
     method: presigned.method,
@@ -211,18 +372,20 @@ async function uploadViaR2(
     }),
   });
 
-  const completePayload = (await completeResponse.json()) as R2CompleteResponse;
+  const completePayload = await readJsonPayload(completeResponse);
 
   if (!completeResponse.ok) {
     throw new Error(readUploadError(completePayload, "Upload registration failed."));
   }
 
+  const completed = normalizeUploadResultPayload(completePayload);
+
   return {
-    pathname: completePayload.pathname,
-    blobUrl: completePayload.blobUrl,
-    contentType: completePayload.contentType,
-    sizeBytes: completePayload.sizeBytes,
-    etag: completePayload.etag,
+    pathname: completed.pathname,
+    blobUrl: completed.blobUrl,
+    contentType: completed.contentType,
+    sizeBytes: completed.sizeBytes,
+    etag: completed.etag,
   };
 }
 

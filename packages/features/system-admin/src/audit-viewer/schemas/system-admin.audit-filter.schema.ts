@@ -20,6 +20,7 @@ export const systemAdminAuditSearchParamsSchema = z.object({
   auditTargetType: auditEntityTypeSchema.optional(),
   auditTargetId: z.string().trim().max(120).optional(),
   auditModule: z.string().trim().max(80).optional(),
+  auditOutcome: z.enum(["success", "failure", "denied"]).optional(),
   auditFrom: z.string().trim().max(40).optional(),
   auditTo: z.string().trim().max(40).optional(),
   auditSort: z.enum(["asc", "desc"]).optional(),

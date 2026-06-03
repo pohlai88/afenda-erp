@@ -1,9 +1,13 @@
 "use client";
 
+import { ActionFormErrors } from "@afenda/governed-surface/client";
 import { Button } from "@afenda/ui";
 import { DownloadIcon } from "lucide-react";
-import { useTransition } from "react";
-import type { SystemAdminActionResult } from "../../tenant-execution/contracts/system-admin.action-result.contract";
+import { useState, useTransition } from "react";
+import {
+  systemAdminActionFailure,
+  type SystemAdminActionResult,
+} from "../../tenant-execution/contracts/system-admin.action-result.contract";
 import { systemAdminDiagnosticsUiCopy } from "../surface/system-admin.diagnostics-ui.copy.shared";
 
 export type ExportSystemAdminDiagnosticsAction = () => Promise<
@@ -16,35 +20,47 @@ export function SystemAdminDiagnosticsExportButton({
   exportDiagnosticsAction: ExportSystemAdminDiagnosticsAction;
 }) {
   const [pending, startTransition] = useTransition();
+  const [lastResult, setLastResult] = useState<
+    SystemAdminActionResult<{ csv: string; rowCount: number }> | undefined
+  >();
 
   return (
-    <Button
-      type="button"
-      variant="outline"
-      disabled={pending}
-      onClick={() => {
-        startTransition(async () => {
-          const result = await exportDiagnosticsAction();
+    <div className="flex flex-col items-start gap-surface-sm">
+      <Button
+        type="button"
+        variant="outline"
+        disabled={pending}
+        onClick={() => {
+          startTransition(async () => {
+            const result = await exportDiagnosticsAction();
 
-          if (!result.ok || !result.data) {
-            console.error(result.ok ? "Missing export payload" : result.error);
-            return;
-          }
+            if (!result.ok) {
+              setLastResult(result);
+              return;
+            }
 
-          const blob = new Blob([result.data.csv], { type: "text/csv" });
-          const url = URL.createObjectURL(blob);
-          const anchor = document.createElement("a");
-          anchor.href = url;
-          anchor.download = `system-admin-diagnostics-${new Date().toISOString().slice(0, 10)}.csv`;
-          anchor.click();
-          URL.revokeObjectURL(url);
-        });
-      }}
-    >
-      <DownloadIcon data-icon="inline-start" />
-      {pending
-        ? systemAdminDiagnosticsUiCopy.export.pendingLabel
-        : systemAdminDiagnosticsUiCopy.export.label}
-    </Button>
+            if (!result.data) {
+              setLastResult(systemAdminActionFailure("Export payload was missing."));
+              return;
+            }
+
+            setLastResult(undefined);
+            const blob = new Blob([result.data.csv], { type: "text/csv" });
+            const url = URL.createObjectURL(blob);
+            const anchor = document.createElement("a");
+            anchor.href = url;
+            anchor.download = `system-admin-diagnostics-${new Date().toISOString().slice(0, 10)}.csv`;
+            anchor.click();
+            URL.revokeObjectURL(url);
+          });
+        }}
+      >
+        <DownloadIcon data-icon="inline-start" />
+        {pending
+          ? systemAdminDiagnosticsUiCopy.export.pendingLabel
+          : systemAdminDiagnosticsUiCopy.export.label}
+      </Button>
+      <ActionFormErrors result={lastResult} />
+    </div>
   );
 }

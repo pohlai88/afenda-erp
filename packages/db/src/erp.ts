@@ -12,7 +12,7 @@ import {
   sum,
   type SQL,
 } from "drizzle-orm";
-import { createAuditLog } from "./audit";
+import { insertAuditLog } from "./audit";
 import {
   isErpDocumentRowOnLegalHold,
   isOrganizationDocumentLegalHoldActive,
@@ -1015,51 +1015,31 @@ export async function registerTenantDocument(input: {
   uploadedByAuthUserId: string;
   metadata: Record<string, unknown>;
 }) {
-  return runWithOrganizationContext(input.organizationId, async (db) => {
-    const documentId = createEntityId("doc");
-    const existingDocument = await db
-      .select({ id: erpDocuments.id })
-      .from(erpDocuments)
-      .where(
-        and(
-          eq(erpDocuments.organizationId, input.organizationId),
-          eq(erpDocuments.pathname, input.pathname),
-        ),
-      )
-      .limit(1);
+  return runWithOrganizationContext(input.organizationId, (db) =>
+    db.transaction(async (tx) => {
+      const documentId = createEntityId("doc");
+      const existingDocument = await tx
+        .select({ id: erpDocuments.id })
+        .from(erpDocuments)
+        .where(
+          and(
+            eq(erpDocuments.organizationId, input.organizationId),
+            eq(erpDocuments.pathname, input.pathname),
+          ),
+        )
+        .limit(1);
 
-    if (existingDocument[0]) {
-      return existingDocument[0].id;
-    }
+      if (existingDocument[0]) {
+        return existingDocument[0].id;
+      }
 
-    await db.insert(erpDocuments).values({
-      id: documentId,
-      organizationId: input.organizationId,
-      moduleId: input.moduleId,
-      ownerEntityId: input.ownerEntityId ?? null,
-      title: input.title,
-      blobUrl: input.blobUrl,
-      pathname: input.pathname,
-      contentType: input.contentType,
-      sizeBytes: input.sizeBytes,
-      access: input.access,
-      blobEtag: input.blobEtag ?? null,
-      classification: input.classification ?? "internal",
-      retentionClass: input.retentionClass ?? "standard",
-      scanStatus: input.scanStatus ?? "pending",
-      uploadedByAuthUserId: input.uploadedByAuthUserId,
-      metadata: input.metadata,
-    });
-
-    await createAuditLog({
-      organizationId: input.organizationId,
-      actorAuthUserId: input.uploadedByAuthUserId,
-      entityType: "document",
-      entityId: documentId,
-      action: "document.register",
-      summary: `Registered document ${input.title}.`,
-      metadata: {
+      await tx.insert(erpDocuments).values({
+        id: documentId,
+        organizationId: input.organizationId,
         moduleId: input.moduleId,
+        ownerEntityId: input.ownerEntityId ?? null,
+        title: input.title,
+        blobUrl: input.blobUrl,
         pathname: input.pathname,
         contentType: input.contentType,
         sizeBytes: input.sizeBytes,
@@ -1068,11 +1048,33 @@ export async function registerTenantDocument(input: {
         classification: input.classification ?? "internal",
         retentionClass: input.retentionClass ?? "standard",
         scanStatus: input.scanStatus ?? "pending",
-      },
-    });
+        uploadedByAuthUserId: input.uploadedByAuthUserId,
+        metadata: input.metadata,
+      });
 
-    return documentId;
-  });
+      await insertAuditLog(tx, {
+        organizationId: input.organizationId,
+        actorAuthUserId: input.uploadedByAuthUserId,
+        entityType: "document",
+        entityId: documentId,
+        action: "document.register",
+        summary: `Registered document ${input.title}.`,
+        metadata: {
+          moduleId: input.moduleId,
+          pathname: input.pathname,
+          contentType: input.contentType,
+          sizeBytes: input.sizeBytes,
+          access: input.access,
+          blobEtag: input.blobEtag ?? null,
+          classification: input.classification ?? "internal",
+          retentionClass: input.retentionClass ?? "standard",
+          scanStatus: input.scanStatus ?? "pending",
+        },
+      });
+
+      return documentId;
+    }),
+  );
 }
 
 export async function updateTenantDocumentScanStatus(input: {
@@ -1314,56 +1316,58 @@ export async function applyTenantDocumentLegalHold(input: {
   documentId: string;
   actorAuthUserId: string;
 }) {
-  return runWithOrganizationContext(input.organizationId, async (db) => {
-    const rows = await db
-      .select({
-        id: erpDocuments.id,
-        title: erpDocuments.title,
-        retentionClass: erpDocuments.retentionClass,
-      })
-      .from(erpDocuments)
-      .where(
-        and(
-          eq(erpDocuments.organizationId, input.organizationId),
-          eq(erpDocuments.id, input.documentId),
-        ),
-      )
-      .limit(1);
+  return runWithOrganizationContext(input.organizationId, (db) =>
+    db.transaction(async (tx) => {
+      const rows = await tx
+        .select({
+          id: erpDocuments.id,
+          title: erpDocuments.title,
+          retentionClass: erpDocuments.retentionClass,
+        })
+        .from(erpDocuments)
+        .where(
+          and(
+            eq(erpDocuments.organizationId, input.organizationId),
+            eq(erpDocuments.id, input.documentId),
+          ),
+        )
+        .limit(1);
 
-    const document = rows[0];
-    if (!document) {
-      throw new TenantDocumentMutationError("not_found");
-    }
+      const document = rows[0];
+      if (!document) {
+        throw new TenantDocumentMutationError("not_found");
+      }
 
-    if (document.retentionClass === "legal-hold") {
+      if (document.retentionClass === "legal-hold") {
+        return document;
+      }
+
+      await tx
+        .update(erpDocuments)
+        .set({ retentionClass: "legal-hold" })
+        .where(
+          and(
+            eq(erpDocuments.organizationId, input.organizationId),
+            eq(erpDocuments.id, input.documentId),
+          ),
+        );
+
+      await insertAuditLog(tx, {
+        organizationId: input.organizationId,
+        actorAuthUserId: input.actorAuthUserId,
+        entityType: "document",
+        entityId: document.id,
+        action: "document.legal-hold",
+        summary: `Applied legal hold to document ${document.title}.`,
+        metadata: {
+          previousRetentionClass: document.retentionClass,
+          retentionClass: "legal-hold",
+        },
+      });
+
       return document;
-    }
-
-    await db
-      .update(erpDocuments)
-      .set({ retentionClass: "legal-hold" })
-      .where(
-        and(
-          eq(erpDocuments.organizationId, input.organizationId),
-          eq(erpDocuments.id, input.documentId),
-        ),
-      );
-
-    await createAuditLog({
-      organizationId: input.organizationId,
-      actorAuthUserId: input.actorAuthUserId,
-      entityType: "document",
-      entityId: document.id,
-      action: "document.legal-hold",
-      summary: `Applied legal hold to document ${document.title}.`,
-      metadata: {
-        previousRetentionClass: document.retentionClass,
-        retentionClass: "legal-hold",
-      },
-    });
-
-    return document;
-  });
+    }),
+  );
 }
 
 function parseAuditMetadataPreviousRetentionClass(
@@ -1395,80 +1399,82 @@ export async function releaseTenantDocumentLegalHold(input: {
   documentId: string;
   actorAuthUserId: string;
 }) {
-  return runWithOrganizationContext(input.organizationId, async (db) => {
-    const rows = await db
-      .select({
-        id: erpDocuments.id,
-        title: erpDocuments.title,
-        retentionClass: erpDocuments.retentionClass,
-      })
-      .from(erpDocuments)
-      .where(
-        and(
-          eq(erpDocuments.organizationId, input.organizationId),
-          eq(erpDocuments.id, input.documentId),
-        ),
-      )
-      .limit(1);
+  return runWithOrganizationContext(input.organizationId, (db) =>
+    db.transaction(async (tx) => {
+      const rows = await tx
+        .select({
+          id: erpDocuments.id,
+          title: erpDocuments.title,
+          retentionClass: erpDocuments.retentionClass,
+        })
+        .from(erpDocuments)
+        .where(
+          and(
+            eq(erpDocuments.organizationId, input.organizationId),
+            eq(erpDocuments.id, input.documentId),
+          ),
+        )
+        .limit(1);
 
-    const document = rows[0];
-    if (!document) {
-      throw new TenantDocumentMutationError("not_found");
-    }
+      const document = rows[0];
+      if (!document) {
+        throw new TenantDocumentMutationError("not_found");
+      }
 
-    if (!isErpDocumentRowOnLegalHold(document.retentionClass)) {
-      throw new TenantDocumentMutationError("not_on_legal_hold");
-    }
+      if (!isErpDocumentRowOnLegalHold(document.retentionClass)) {
+        throw new TenantDocumentMutationError("not_on_legal_hold");
+      }
 
-    const holdAuditRows = await db
-      .select({ metadata: auditLogs.metadata })
-      .from(auditLogs)
-      .where(
-        and(
-          eq(auditLogs.organizationId, input.organizationId),
-          eq(auditLogs.entityId, input.documentId),
-          eq(auditLogs.action, "document.legal-hold"),
-        ),
-      )
-      .orderBy(desc(auditLogs.createdAt))
-      .limit(1);
+      const holdAuditRows = await tx
+        .select({ metadata: auditLogs.metadata })
+        .from(auditLogs)
+        .where(
+          and(
+            eq(auditLogs.organizationId, input.organizationId),
+            eq(auditLogs.entityId, input.documentId),
+            eq(auditLogs.action, "document.legal-hold"),
+          ),
+        )
+        .orderBy(desc(auditLogs.createdAt))
+        .limit(1);
 
-    const restoredRetentionClass: ErpDocumentRetentionClass =
-      (parseAuditMetadataPreviousRetentionClass(holdAuditRows[0]?.metadata) ??
-        "standard") as ErpDocumentRetentionClass;
+      const restoredRetentionClass: ErpDocumentRetentionClass =
+        (parseAuditMetadataPreviousRetentionClass(holdAuditRows[0]?.metadata) ??
+          "standard") as ErpDocumentRetentionClass;
 
-    await db
-      .update(erpDocuments)
-      .set({
+      await tx
+        .update(erpDocuments)
+        .set({
+          retentionClass: restoredRetentionClass,
+          updatedAt: new Date(),
+        })
+        .where(
+          and(
+            eq(erpDocuments.organizationId, input.organizationId),
+            eq(erpDocuments.id, input.documentId),
+          ),
+        );
+
+      await insertAuditLog(tx, {
+        organizationId: input.organizationId,
+        actorAuthUserId: input.actorAuthUserId,
+        entityType: "document",
+        entityId: document.id,
+        action: "document.legal-hold-released",
+        summary: `Released legal hold on document ${document.title}.`,
+        metadata: {
+          previousRetentionClass: "legal-hold",
+          retentionClass: restoredRetentionClass,
+        },
+      });
+
+      return {
+        id: document.id,
+        title: document.title,
         retentionClass: restoredRetentionClass,
-        updatedAt: new Date(),
-      })
-      .where(
-        and(
-          eq(erpDocuments.organizationId, input.organizationId),
-          eq(erpDocuments.id, input.documentId),
-        ),
-      );
-
-    await createAuditLog({
-      organizationId: input.organizationId,
-      actorAuthUserId: input.actorAuthUserId,
-      entityType: "document",
-      entityId: document.id,
-      action: "document.legal-hold-released",
-      summary: `Released legal hold on document ${document.title}.`,
-      metadata: {
-        previousRetentionClass: "legal-hold",
-        retentionClass: restoredRetentionClass,
-      },
-    });
-
-    return {
-      id: document.id,
-      title: document.title,
-      retentionClass: restoredRetentionClass,
-    };
-  });
+      };
+    }),
+  );
 }
 
 const SCAN_QUARANTINE_STATUSES = new Set<ErpDocumentScanStatus>([
@@ -1481,71 +1487,73 @@ export async function releaseTenantDocumentFromScanQuarantine(input: {
   documentId: string;
   actorAuthUserId: string;
 }) {
-  return runWithOrganizationContext(input.organizationId, async (db) => {
-    const rows = await db
-      .select({
-        id: erpDocuments.id,
-        title: erpDocuments.title,
-        moduleId: erpDocuments.moduleId,
-        pathname: erpDocuments.pathname,
-        classification: erpDocuments.classification,
-        retentionClass: erpDocuments.retentionClass,
-        scanStatus: erpDocuments.scanStatus,
-      })
-      .from(erpDocuments)
-      .where(
-        and(
-          eq(erpDocuments.organizationId, input.organizationId),
-          eq(erpDocuments.id, input.documentId),
-        ),
-      )
-      .limit(1);
+  return runWithOrganizationContext(input.organizationId, (db) =>
+    db.transaction(async (tx) => {
+      const rows = await tx
+        .select({
+          id: erpDocuments.id,
+          title: erpDocuments.title,
+          moduleId: erpDocuments.moduleId,
+          pathname: erpDocuments.pathname,
+          classification: erpDocuments.classification,
+          retentionClass: erpDocuments.retentionClass,
+          scanStatus: erpDocuments.scanStatus,
+        })
+        .from(erpDocuments)
+        .where(
+          and(
+            eq(erpDocuments.organizationId, input.organizationId),
+            eq(erpDocuments.id, input.documentId),
+          ),
+        )
+        .limit(1);
 
-    const document = rows[0];
-    if (!document) {
-      throw new TenantDocumentMutationError("not_found");
-    }
+      const document = rows[0];
+      if (!document) {
+        throw new TenantDocumentMutationError("not_found");
+      }
 
-    if (!SCAN_QUARANTINE_STATUSES.has(document.scanStatus)) {
-      throw new TenantDocumentMutationError("scan_not_releasable");
-    }
+      if (!SCAN_QUARANTINE_STATUSES.has(document.scanStatus)) {
+        throw new TenantDocumentMutationError("scan_not_releasable");
+      }
 
-    await db
-      .update(erpDocuments)
-      .set({
-        scanStatus: "passed",
-        updatedAt: new Date(),
-      })
-      .where(
-        and(
-          eq(erpDocuments.organizationId, input.organizationId),
-          eq(erpDocuments.id, input.documentId),
-        ),
-      );
+      await tx
+        .update(erpDocuments)
+        .set({
+          scanStatus: "passed",
+          updatedAt: new Date(),
+        })
+        .where(
+          and(
+            eq(erpDocuments.organizationId, input.organizationId),
+            eq(erpDocuments.id, input.documentId),
+          ),
+        );
 
-    await createAuditLog({
-      organizationId: input.organizationId,
-      actorAuthUserId: input.actorAuthUserId,
-      entityType: "document",
-      entityId: document.id,
-      action: "document.scan-released",
-      summary: `Operator released document ${document.title} from scan quarantine.`,
-      metadata: {
+      await insertAuditLog(tx, {
+        organizationId: input.organizationId,
+        actorAuthUserId: input.actorAuthUserId,
+        entityType: "document",
+        entityId: document.id,
+        action: "document.scan-released",
+        summary: `Operator released document ${document.title} from scan quarantine.`,
+        metadata: {
+          previousScanStatus: document.scanStatus,
+          scanStatus: "passed",
+        },
+      });
+
+      return {
+        id: document.id,
+        title: document.title,
+        moduleId: document.moduleId,
+        pathname: document.pathname,
+        classification: document.classification,
+        retentionClass: document.retentionClass,
         previousScanStatus: document.scanStatus,
-        scanStatus: "passed",
-      },
-    });
-
-    return {
-      id: document.id,
-      title: document.title,
-      moduleId: document.moduleId,
-      pathname: document.pathname,
-      classification: document.classification,
-      retentionClass: document.retentionClass,
-      previousScanStatus: document.scanStatus,
-    };
-  });
+      };
+    }),
+  );
 }
 
 export async function deleteTenantDocument(input: {
@@ -1553,66 +1561,68 @@ export async function deleteTenantDocument(input: {
   documentId: string;
   actorAuthUserId: string;
 }) {
-  return runWithOrganizationContext(input.organizationId, async (db) => {
-    const rows = await db
-      .select({
-        id: erpDocuments.id,
-        title: erpDocuments.title,
-        moduleId: erpDocuments.moduleId,
-        pathname: erpDocuments.pathname,
-        classification: erpDocuments.classification,
-        retentionClass: erpDocuments.retentionClass,
-        scanStatus: erpDocuments.scanStatus,
-      })
-      .from(erpDocuments)
-      .where(
-        and(
-          eq(erpDocuments.organizationId, input.organizationId),
-          eq(erpDocuments.id, input.documentId),
-        ),
-      )
-      .limit(1);
+  return runWithOrganizationContext(input.organizationId, (db) =>
+    db.transaction(async (tx) => {
+      const rows = await tx
+        .select({
+          id: erpDocuments.id,
+          title: erpDocuments.title,
+          moduleId: erpDocuments.moduleId,
+          pathname: erpDocuments.pathname,
+          classification: erpDocuments.classification,
+          retentionClass: erpDocuments.retentionClass,
+          scanStatus: erpDocuments.scanStatus,
+        })
+        .from(erpDocuments)
+        .where(
+          and(
+            eq(erpDocuments.organizationId, input.organizationId),
+            eq(erpDocuments.id, input.documentId),
+          ),
+        )
+        .limit(1);
 
-    const document = rows[0];
-    if (!document) {
-      throw new TenantDocumentMutationError("not_found");
-    }
+      const document = rows[0];
+      if (!document) {
+        throw new TenantDocumentMutationError("not_found");
+      }
 
-    if (isErpDocumentRowOnLegalHold(document.retentionClass)) {
-      throw new TenantDocumentMutationError("legal_hold");
-    }
+      if (isErpDocumentRowOnLegalHold(document.retentionClass)) {
+        throw new TenantDocumentMutationError("legal_hold");
+      }
 
-    if (await isOrganizationDocumentLegalHoldActive(input.organizationId)) {
-      throw new TenantDocumentMutationError("legal_hold");
-    }
+      if (await isOrganizationDocumentLegalHoldActive(input.organizationId)) {
+        throw new TenantDocumentMutationError("legal_hold");
+      }
 
-    await db
-      .delete(erpDocuments)
-      .where(
-        and(
-          eq(erpDocuments.organizationId, input.organizationId),
-          eq(erpDocuments.id, input.documentId),
-        ),
-      );
+      await tx
+        .delete(erpDocuments)
+        .where(
+          and(
+            eq(erpDocuments.organizationId, input.organizationId),
+            eq(erpDocuments.id, input.documentId),
+          ),
+        );
 
-    await createAuditLog({
-      organizationId: input.organizationId,
-      actorAuthUserId: input.actorAuthUserId,
-      entityType: "document",
-      entityId: document.id,
-      action: "document.delete",
-      summary: `Deleted document ${document.title}.`,
-      metadata: {
-        moduleId: document.moduleId,
-        pathname: document.pathname,
-        classification: document.classification,
-        retentionClass: document.retentionClass,
-        scanStatus: document.scanStatus,
-      },
-    });
+      await insertAuditLog(tx, {
+        organizationId: input.organizationId,
+        actorAuthUserId: input.actorAuthUserId,
+        entityType: "document",
+        entityId: document.id,
+        action: "document.delete",
+        summary: `Deleted document ${document.title}.`,
+        metadata: {
+          moduleId: document.moduleId,
+          pathname: document.pathname,
+          classification: document.classification,
+          retentionClass: document.retentionClass,
+          scanStatus: document.scanStatus,
+        },
+      });
 
-    return document;
-  });
+      return document;
+    }),
+  );
 }
 
 export async function listOrganizationsForCoreErpSeed() {

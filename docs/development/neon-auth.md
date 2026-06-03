@@ -2,27 +2,49 @@
 
 Neon Auth is provisioned on the **`afenda`** Neon project (`snowy-dawn-60990429`). Each **database branch** has its own auth endpoint, JWKS URL, and trusted-origin allowlist. The Next.js app proxies browser traffic through **`/api/auth`** while the server uses the **hosted Neon Auth `base_url`** for session verification and upstream `get-session`.
 
-Official quickstart: [Use Neon Auth with Next.js (API methods)](https://neon.com/docs/auth/quick-start/nextjs-api-methods). Afenda maps that guide to **`@afenda/neon-auth`** (runtime) + **`apps/erp/src/auth`** (UI) — not `lib/auth/*`.
+Official quickstart: [Use Neon Auth with Next.js (API methods)](https://neon.com/docs/auth/quick-start/nextjs-api-methods). Afenda uses **`@afenda/auth/neon-auth`** (runtime + **`@neondatabase/auth-ui`**) wired from **`apps/erp/src/app/(auth)/*`**.
 
-## Branch endpoints (from Neon MCP)
+## Branch (production only)
+
+Single Neon branch for local dev, preview, and production. Preview branch `vercel-dev` was removed (Jun 2026).
 
 | Branch | `branch_id` | `NEON_AUTH_BASE_URL` (suffix `/neondb/auth`) |
 | ------ | ----------- | -------------------------------------------- |
 | **production** (default) | `br-young-term-aobkvd38` | `https://ep-snowy-hat-aof9n5iw.neonauth.c-2.ap-southeast-1.aws.neon.tech/neondb/auth` |
-| **vercel-dev** | `br-purple-fog-aob4j2cf` | `https://ep-purple-cherry-aom2t8km.neonauth.c-2.ap-southeast-1.aws.neon.tech/neondb/auth` |
 
-JWKS for each branch: `{base_url}/.well-known/jwks.json`.
+JWKS: `{base_url}/.well-known/jwks.json`
 
-**Trusted origins** (CSRF + redirect allowlist) must include every origin users sign in from:
+**Trusted origins** (MCP `get_neon_auth_config`):
 
-| Branch | Origins (as configured) |
-| ------ | ------------------------ |
-| production | `https://www.nexuscanon.com`, `http://localhost:3000` |
-| vercel-dev | `http://localhost:3000`, `https://www.nexuscanon.com` |
+| Setting | Value |
+| ------- | ----- |
+| Origins | `https://www.nexuscanon.com`, `https://nexuscanon.com`, `http://localhost:3000` |
+| `allow_localhost` | **`true`** (local dev via `NEXT_PUBLIC_AUTH_URL=http://localhost:3000/api/auth`) |
 
-Add Vercel preview origins when you deploy previews (e.g. `https://<project>-<hash>.vercel.app`) via Neon console or MCP `configure_neon_auth` → `add_trusted_origin`. Prefer narrow origins over wildcards.
+No `https://*.vercel.app` wildcard (prod-only tightening). Disable localhost before hard prod lockdown:
 
-Email verification differs by branch: **production** requires verification on sign-up; **vercel-dev** does not (faster local/preview iteration).
+```text
+configure_neon_auth → remove_trusted_origin → http://localhost:3000
+configure_neon_auth → set_allow_localhost → false
+```
+
+**Active auth flows (production):** email/password, email OTP (verify + sign-in), magic link, forgot/reset password, **Google OAuth only**. Phone OTP **off**. Shared Neon email (`auth@mail.myneon.app`).
+
+**UI:** `@neondatabase/auth-ui` via [`@afenda/auth/neon-auth/ui`](../../packages/auth/src/neon-auth/ui) + [`pages`](../../packages/auth/src/neon-auth/pages). ERP `(auth)` routes mount Neon page components directly.
+
+### Pre-login routes (phase before tenant session C)
+
+| URL | Gate | Neon UI |
+| --- | ---- | ------- |
+| `/` | public | `@afenda/public-homepage` |
+| `/sign-in`, `/sign-up` | `requireNeonGuestSession` → `/account` if signed in | `AuthView` |
+| `/verify-email`, `/otp`, `/magic-link` | guest | `AuthView` |
+| `/forgot-password`, `/reset-password` | guest | `AuthView` |
+| `/callback` | none (OAuth return) | `AuthView` callback |
+| `/sign-out` | none | `AuthView` sign-out |
+| `/account`, `/account/security` | `requireNeonAuthSession` | `AccountView` |
+
+Post-Neon-sign-in default: **`/account`** (`erpPreLoginPostAuthPath`). Workspace `/dashboard` remains blocked until tenant `getSession()` returns (phase C).
 
 ## Environment variables
 
@@ -31,16 +53,16 @@ Validated in [`packages/config/src/env.ts`](../../packages/config/src/env.ts). E
 | Variable | Required when Neon on | Role |
 | -------- | --------------------- | ---- |
 | `AFENDA_NEON_AUTH_ENABLED` | `1` | Master switch |
-| `NEXT_PUBLIC_AFENDA_NEON_AUTH_ENABLED` | `1` (unset → follow server) | Ingress UI gate via `isNeonAuthUiReady()` in `@afenda/neon-auth/server` |
+| `NEXT_PUBLIC_AFENDA_NEON_AUTH_ENABLED` | `1` (unset → follow server) | Ingress UI gate via `isNeonAuthUiReady()` in `@afenda/auth/neon-auth/server` |
 | `NEON_AUTH_BASE_URL` | Yes | **Hosted** Neon Auth URL for the **same DB branch** as `DATABASE_URL` — not `http://localhost:3000/api/auth` |
 | `NEON_AUTH_COOKIE_SECRET` | Yes | ≥32 chars; signs session cookies (`openssl rand -base64 32`) |
 | `NEON_AUTH_SESSION_CACHE_TTL` | No (default `300`) | Server `session_data` cookie cache TTL (seconds) |
 | `NEON_AUTH_LOG_LEVEL` | No (default `warn`) | Server SDK: `silent` \| `warn` \| `debug` |
 | `NEXT_PUBLIC_AUTH_URL` | **Yes** when Neon on | Browser client → same-origin `/api/auth` proxy (e.g. `http://localhost:3000/api/auth`) |
-| `AFENDA_AUTH_GOOGLE_ENABLED` | No (default `0`) | Shows Google OAuth only after the branch provider is configured |
-| `AFENDA_AUTH_EMAIL_DELIVERY_READY` | No (default `0`) | Allows email-delivered optional methods after provider/delivery validation |
-| `AFENDA_AUTH_EMAIL_OTP_ENABLED` | No (default `0`) | Shows passwordless email OTP only when email delivery is ready |
-| `AFENDA_AUTH_MAGIC_LINK_ENABLED` | No (default `0`) | Shows magic link sign-in only when email delivery is ready |
+| `AFENDA_AUTH_GOOGLE_ENABLED` | No (default **`1`** in example) | Legacy gate; Neon UI provider always lists Google when Neon branch has Google OAuth |
+| `AFENDA_AUTH_EMAIL_DELIVERY_READY` | No (default **`1`**) | Legacy gate for custom forms; Neon shared SMTP active |
+| `AFENDA_AUTH_EMAIL_OTP_ENABLED` | No (default **`1`**) | Email OTP sign-in via Neon UI |
+| `AFENDA_AUTH_MAGIC_LINK_ENABLED` | No (default **`1`**) | Magic link via Neon UI (`magicLink: true` on provider) |
 | `AFENDA_AUTH_FORGOT_PASSWORD_ENABLED` | No (default ready) | Hides forgot-password if branch reset delivery is intentionally unavailable |
 | `AFENDA_AUTH_EMAIL_VERIFICATION_ENABLED` | No (default ready) | Marks verification as unavailable if branch verification delivery is broken |
 
@@ -48,9 +70,9 @@ Validated in [`packages/config/src/env.ts`](../../packages/config/src/env.ts). E
 
 ### Branch alignment rule
 
-`DATABASE_URL` and `NEON_AUTH_BASE_URL` must refer to the **same Neon branch**. Mixing production DB with vercel-dev auth (or vice versa) produces missing users, failed `get-session`, or stale JWT validation.
+`DATABASE_URL` and `NEON_AUTH_BASE_URL` must refer to the **production** branch (`br-young-term-aobkvd38`).
 
-Local dev against **production** data:
+Local dev (production branch data):
 
 ```env
 AFENDA_NEON_AUTH_ENABLED=1
@@ -58,13 +80,15 @@ NEXT_PUBLIC_AFENDA_NEON_AUTH_ENABLED=1
 NEON_AUTH_BASE_URL=https://ep-snowy-hat-aof9n5iw.neonauth.c-2.ap-southeast-1.aws.neon.tech/neondb/auth
 NEON_AUTH_COOKIE_SECRET=<your-secret>
 NEXT_PUBLIC_AUTH_URL=http://localhost:3000/api/auth
+AFENDA_AUTH_GOOGLE_ENABLED=1
+AFENDA_AUTH_EMAIL_DELIVERY_READY=1
+AFENDA_AUTH_EMAIL_OTP_ENABLED=1
+AFENDA_AUTH_MAGIC_LINK_ENABLED=1
 ```
-
-Local dev against **vercel-dev** branch: swap `NEON_AUTH_BASE_URL` and `DATABASE_URL` to the vercel-dev pair from Neon console / MCP `get_neon_auth_config`.
 
 ## SDK install
 
-`@neondatabase/auth@0.4.1-beta` (workspace catalog; matches [npm latest](https://www.npmjs.com/package/@neondatabase/auth)). Declared on `@afenda/neon-auth`.
+`@neondatabase/auth@0.4.1-beta` (workspace catalog; matches [npm latest](https://www.npmjs.com/package/@neondatabase/auth)). Declared on `@afenda/auth/neon-auth`.
 
 ## Verify locally
 
@@ -79,12 +103,12 @@ Exits non-zero when Neon is enabled but misconfigured, `NEON_AUTH_BASE_URL` look
 
 | Neon quickstart step | Afenda implementation |
 | -------------------- | --------------------- |
-| `npm install @neondatabase/auth` | Catalog `0.4.1-beta` on `@afenda/neon-auth` |
+| `npm install @neondatabase/auth` | Catalog `0.4.1-beta` on `@afenda/auth/neon-auth` |
 | `.env.local`: `NEON_AUTH_BASE_URL`, `NEON_AUTH_COOKIE_SECRET` | Same + `AFENDA_NEON_AUTH_ENABLED`, `NEXT_PUBLIC_AUTH_URL` via `pnpm env:sync` |
-| `lib/auth/server.ts` → `createNeonAuth()` | [`packages/neon-auth/src/runtime/neon-auth.server.ts`](../../packages/neon-auth/src/runtime/neon-auth.server.ts) — `getNeonAuthServer()` / export alias `auth` |
+| `lib/auth/server.ts` → `createNeonAuth()` | [`packages/auth/src/neon-auth/runtime/neon-auth.server.ts`](../../packages/auth/src/neon-auth/runtime/neon-auth.server.ts) — `getNeonAuthServer()` / export alias `auth` |
 | `app/api/auth/[...path]/route.ts` → `auth.handler()` | [`apps/erp/src/app/api/auth/[...path]/route.ts`](../../apps/erp/src/app/api/auth/[...path]/route.ts) — all HTTP methods + 503 when disabled + observability |
 | `proxy.ts` → `auth.middleware({ loginUrl })` | [`apps/erp/src/proxy.ts`](../../apps/erp/src/proxy.ts) — `loginUrl: "/sign-in"`; skips `/api/*` and dev cookie |
-| `lib/auth/client.ts` → `createAuthClient()` | [`packages/neon-auth/src/runtime/neon-auth.client.ts`](../../packages/neon-auth/src/runtime/neon-auth.client.ts) — `neonAuthClient` / `authClient`; `baseURL` from `NEXT_PUBLIC_AUTH_URL` env |
+| `lib/auth/client.ts` → `createAuthClient()` | [`packages/auth/src/neon-auth/runtime/neon-auth.client.ts`](../../packages/auth/src/neon-auth/runtime/neon-auth.client.ts) — `neonAuthClient` / `authClient`; `baseURL` from `NEXT_PUBLIC_AUTH_URL` env |
 | Sign-in/up via **Server Actions** + `auth.signIn.email` | **Client forms** call `neonAuthClient.signIn.email` / `signUp.email` (valid per Neon: client SDK on auth pages) |
 | Home `auth.getSession()` | `getSession()` from `@afenda/auth/server` — uses SDK `getSession()` then **hydrates tenant org** from `@afenda/db` |
 | Routes `/auth/sign-in` | ERP routes `/sign-in`, `/sign-up`, `/verify-email`, `/forgot-password` (ARCH URLs) |
@@ -97,25 +121,25 @@ Exits non-zero when Neon is enabled but misconfigured, `NEON_AUTH_BASE_URL` look
 | Layer | Location | Pattern |
 | ----- | -------- | ------- |
 | Route Handler proxy | `apps/erp/src/app/api/auth/[...path]/route.ts` | `getNeonAuthServer().handler()` |
-| Server SDK | `packages/neon-auth/src/runtime/neon-auth.server.ts` | `createNeonAuth({ baseUrl, cookies, logLevel })` |
+| Server SDK | `packages/auth/src/neon-auth/runtime/neon-auth.server.ts` | `createNeonAuth({ baseUrl, cookies, logLevel })` |
 | Proxy (session refresh) | `apps/erp/src/proxy.ts` | `getNeonAuthServer().middleware({ loginUrl: "/sign-in" })` |
-| Session read | `packages/neon-auth/src/runtime/neon-session.server.ts` | SDK `getSession()` → JWT cookie → upstream `get-session` |
+| Session read | `packages/auth/src/neon-auth/runtime/neon-session.server.ts` | SDK `getSession()` → JWT cookie → upstream `get-session` |
 | Tenant session | `packages/auth/src/session/auth.session.server.ts` | `React.cache(getSession)` + org hydration |
-| Client | `packages/neon-auth/src/runtime/neon-auth.client.ts` | `createAuthClient()` + `NEXT_PUBLIC_AUTH_URL` |
+| Client | `packages/auth/src/neon-auth/runtime/neon-auth.client.ts` | `createAuthClient()` + `NEXT_PUBLIC_AUTH_URL` |
 | Flow catalog | `packages/auth/src/contracts/auth.flows.ts` | Implemented vs deferred flows |
 
 ### Next.js Server SDK (`@neondatabase/auth/next/server`)
 
-Official reference: [Next.js Server SDK](https://neon.com/docs/auth/reference/nextjs-server). Afenda catalog: [`packages/neon-auth/src/contracts/server-sdk.catalog.ts`](../../packages/neon-auth/src/contracts/server-sdk.catalog.ts).
+Official reference: [Next.js Server SDK](https://neon.com/docs/auth/reference/nextjs-server). Afenda catalog: [`packages/auth/src/neon-auth/contracts/server-sdk.catalog.ts`](../../packages/auth/src/neon-auth/contracts/server-sdk.catalog.ts).
 
 | Neon SDK surface | Afenda implementation |
 | ---------------- | --------------------- |
-| `createNeonAuth({ baseUrl, cookies, logLevel })` | [`getNeonAuthServer()`](../../packages/neon-auth/src/runtime/neon-auth.server.ts) — `NEON_AUTH_BASE_URL`, `NEON_AUTH_COOKIE_SECRET`, `NEON_AUTH_SESSION_CACHE_TTL`, `NEON_AUTH_LOG_LEVEL`; **`cookies.sameSite: "lax"`** (not Neon default `strict`) |
+| `createNeonAuth({ baseUrl, cookies, logLevel })` | [`getNeonAuthServer()`](../../packages/auth/src/neon-auth/runtime/neon-auth.server.ts) — `NEON_AUTH_BASE_URL`, `NEON_AUTH_COOKIE_SECRET`, `NEON_AUTH_SESSION_CACHE_TTL`, `NEON_AUTH_LOG_LEVEL`; **`cookies.sameSite: "lax"`** (not Neon default `strict`) |
 | `auth.handler()` | [`apps/erp/src/app/api/auth/[...path]/route.ts`](../../apps/erp/src/app/api/auth/[...path]/route.ts) — **GET, POST, PUT, PATCH, DELETE**; 503 when Neon disabled; `@afenda/observability` logging |
 | `auth.middleware({ loginUrl })` | [`apps/erp/src/proxy.ts`](../../apps/erp/src/proxy.ts) — `loginUrl: "/sign-in"` (not `/auth/sign-in`); skips `/api/*`, dev cookie, guest-only auth pages without session token |
-| `auth.getSession()` | [`readNeonAuthSessionPayload`](../../packages/neon-auth/src/runtime/neon-session.server.ts) inside [`getSession()`](../../packages/auth/src/session/auth.session.server.ts) — **`React.cache`** + **`@afenda/db` org hydration**; workspace/pages call **`getSession` from `@afenda/auth/server`**, not raw `auth.getSession()` |
+| `auth.getSession()` | [`readNeonAuthSessionPayload`](../../packages/auth/src/neon-auth/runtime/neon-session.server.ts) inside [`getSession()`](../../packages/auth/src/session/auth.session.server.ts) — **`React.cache`** + **`@afenda/db` org hydration**; workspace/pages call **`getSession` from `@afenda/auth/server`**, not raw `auth.getSession()` |
 | `signOutAction` | [`signOut()`](../../packages/auth/src/session/auth.session.server.ts) + [`signOutAction`](../../apps/erp/src/auth/dev/auth.dev-actions.server.ts) for appshell |
-| `auth.signIn.email` / `signUp.email` (Server Actions) | **Not used** — [`neonAuthClient`](../../packages/neon-auth/src/runtime/neon-auth.client.ts) on auth forms in `apps/erp/src/auth/forms/` |
+| `auth.signIn.email` / `signUp.email` (Server Actions) | **Not used** — [`neonAuthClient`](../../packages/auth/src/neon-auth/runtime/neon-auth.client.ts) on auth forms in `apps/erp/src/auth/forms/` |
 | `auth.organization.*`, `auth.admin.*`, `deleteUser`, session revoke APIs | **Deferred** — proxied via handler if called; ERP uses tenant DB + system-admin |
 | Session cache (`session_data` cookie, HMAC) | Enabled via `sessionDataTtl` (default 300s); HS256 verify in `readNeonAuthSessionPayload` |
 | Upstream `NETWORK_*` error codes | Surface on client/server SDK `error.code`; use `logLevel: 'debug'` locally |
@@ -126,7 +150,7 @@ Official reference: [Next.js Server SDK](https://neon.com/docs/auth/reference/ne
 
 | Neon recommends | Afenda |
 | --------------- | ------ |
-| `lib/auth/server.ts` | `packages/neon-auth/src/runtime/neon-auth.server.ts` |
+| `lib/auth/server.ts` | `packages/auth/src/neon-auth/runtime/neon-auth.server.ts` |
 | `app/auth/[path]/page.tsx` | `app/(auth)/*/page.tsx` → `@/auth/pages/*` |
 | `app/dashboard` + `force-dynamic` | `(workspace)/*` + `(auth)/layout` `connection()` |
 | `proxy.ts` / `middleware.ts` | `apps/erp/src/proxy.ts` |
@@ -165,7 +189,7 @@ Auth UI readiness gates are intentionally stricter than env verification: option
 
 ### Email OTP plugin (Neon guide mapping)
 
-Neon enables the Better Auth Email OTP plugin automatically. Afenda does **not** use `NeonAuthUIProvider` `emailOTP` or `@neondatabase/auth-ui`; custom forms call `neonAuthClient` directly. Catalog: [`auth.neon-email-otp.ts`](../../packages/neon-auth/src/plugins/email-otp/catalog.ts).
+Neon enables the Better Auth Email OTP plugin automatically. Afenda does **not** use `NeonAuthUIProvider` `emailOTP` or `@neondatabase/auth-ui`; custom forms call `neonAuthClient` directly. Catalog: [`auth.neon-email-otp.ts`](../../packages/auth/src/neon-auth/plugins/email-otp/catalog.ts).
 
 **Console:** Auth → enable **Sign-up and Sign-in with Email**. For sign-up verification codes: **Verify at Sign-up** + **Verification method: Verification code** (production branch). Delivery is Neon-managed unless you subscribe to webhook `send.otp` (see § Webhooks).
 
@@ -182,21 +206,21 @@ Neon enables the Better Auth Email OTP plugin automatically. Afenda does **not**
 
 ### Magic Link plugin (Neon guide mapping)
 
-Passwordless sign-in via email link (`signIn.magicLink`). Afenda does **not** use `NeonAuthUIProvider` `magicLink`; it renders a custom passwordless form on `/sign-in` beside email+password and Google OAuth. Catalog: [`auth.neon-magic-link.ts`](../../packages/neon-auth/src/plugins/magic-link/catalog.ts).
+Passwordless sign-in via email link (`signIn.magicLink`). Afenda does **not** use `NeonAuthUIProvider` `magicLink`; it renders a custom passwordless form on `/sign-in` beside email+password and Google OAuth. Catalog: [`auth.neon-magic-link.ts`](../../packages/auth/src/neon-auth/plugins/magic-link/catalog.ts).
 
 | Neon guide step | Afenda |
 | --------------- | ------ |
 | Enable plugin | Neon Console → **Auth** → **Plugins** → **Magic Link**, or `PATCH …/auth/plugins/magic-link` (`enabled`, `expires_in`, `disable_sign_up`) — **operator**; off by default until enabled per branch |
 | `signIn.magicLink({ email, callbackURL })` | `/sign-in` → `NeonPasswordlessSignIn`; `callbackURL` is site origin `/` |
 | Link verify / session | Proxied upstream path `magic-link/verify` on `/api/auth` when plugin is on; ERP does not host a dedicated verify page |
-| Custom delivery | Webhook `send.magic_link` → **400** from [`handleNeonAuthWebhookPost`](../../packages/neon-auth/src/webhooks/handler.server.ts) until implemented (see § Webhooks) |
+| Custom delivery | Webhook `send.magic_link` → **400** from [`handleNeonAuthWebhookPost`](../../packages/auth/src/neon-auth/webhooks/handler.server.ts) until implemented (see § Webhooks) |
 | Production email | Same as Email OTP — dedicated Neon email provider, not shared dev SMTP |
 
 **If enabling later:** add optional “Email me a sign-in link” on `/sign-in`, set `callbackURL` to `getPostSignInDestination`, and ensure trusted origins include your deployment host.
 
 ### Organization plugin (Neon guide mapping)
 
-Neon Auth can host **Better Auth organizations** on the auth branch (owner/admin/member, invitations, `organization.setActive`). **Afenda does not use this for ERP tenancy.** Tenant workspaces, memberships, roles, and capabilities are owned by **`@afenda/db`** and **`@afenda/feature-system-admin`** (ARCH-1002 / ARCH-1006). Catalog: [`auth.neon-organization.ts`](../../packages/neon-auth/src/plugins/organization/catalog.ts).
+Neon Auth can host **Better Auth organizations** on the auth branch (owner/admin/member, invitations, `organization.setActive`). **Afenda does not use this for ERP tenancy.** Tenant workspaces, memberships, roles, and capabilities are owned by **`@afenda/db`** and **`@afenda/feature-system-admin`** (ARCH-1002 / ARCH-1006). Catalog: [`auth.neon-organization.ts`](../../packages/auth/src/neon-auth/plugins/organization/catalog.ts).
 
 | Neon Organization API | Afenda equivalent |
 | --------------------- | ----------------- |
@@ -213,7 +237,7 @@ Neon limitations (Teams, custom permissions, hooks) apply only if you adopt Neon
 
 ### Phone Number plugin (Neon guide mapping)
 
-Sign-in **only** for **existing** users with a linked E.164 phone (`+15551234567`). No phone-first sign-up. Neon does not send SMS — you must handle webhook `send.otp` with `delivery_preference: "sms"` (Twilio, etc.). Catalog: [`auth.neon-phone-number.ts`](../../packages/neon-auth/src/plugins/phone-number/catalog.ts).
+Sign-in **only** for **existing** users with a linked E.164 phone (`+15551234567`). No phone-first sign-up. Neon does not send SMS — you must handle webhook `send.otp` with `delivery_preference: "sms"` (Twilio, etc.). Catalog: [`auth.neon-phone-number.ts`](../../packages/auth/src/neon-auth/plugins/phone-number/catalog.ts).
 
 | Neon guide capability | Afenda |
 | --------------------- | ------ |
@@ -221,7 +245,7 @@ Sign-in **only** for **existing** users with a linked E.164 phone (`+15551234567
 | `phoneNumber.sendOtp` → `phoneNumber.verify` (sign-in) | **Deferred** — no phone form on `/sign-in` (email+password + Google) |
 | Link phone (`verify` + `updatePhoneNumber: true`) | **Deferred** — not on `/account` |
 | `send.otp` + `delivery_preference: "sms"` | **400** from webhook handler until SMS integration — **required** if plugin is enabled |
-| `phone_number.verified` | **200** ack ([`handleNeonAuthWebhookPost`](../../packages/neon-auth/src/webhooks/handler.server.ts)); no side effects yet |
+| `phone_number.verified` | **200** ack ([`handleNeonAuthWebhookPost`](../../packages/auth/src/neon-auth/webhooks/handler.server.ts)); no side effects yet |
 | `@neondatabase/auth-ui` phone UI | **Not available** — custom form beside sign-in per Neon docs |
 
 **Before enabling in Neon:** implement `send.otp` SMS branch on `POST /api/internal/v1/webhooks/neon-auth` (signature verify already in place). Reference: [nextjs-phone-login](https://github.com/neondatabase/neon-js/tree/main/examples/nextjs-phone-login).
@@ -230,15 +254,15 @@ Sign-in **only** for **existing** users with a linked E.164 phone (`+15551234567
 
 ### JWT plugin (Neon guide mapping)
 
-Neon exposes short-lived **access JWTs** (EdDSA / Ed25519, ~15 minutes) for non-browser callers. **Afenda ERP pages use HTTP-only session cookies** via `neonAuthClient.signIn.*` and `getNeonAuthServer().getSession()` — not `authClient.token()`. Catalog: [`auth.neon-jwt.ts`](../../packages/neon-auth/src/plugins/jwt/catalog.ts).
+Neon exposes short-lived **access JWTs** (EdDSA / Ed25519, ~15 minutes) for non-browser callers. **Afenda ERP pages use HTTP-only session cookies** via `neonAuthClient.signIn.*` and `getNeonAuthServer().getSession()` — not `authClient.token()`. Catalog: [`auth.neon-jwt.ts`](../../packages/auth/src/neon-auth/plugins/jwt/catalog.ts).
 
 | Neon guide capability | Afenda |
 | --------------------- | ------ |
-| Browser sessions (recommended) | [`readNeonAuthSessionPayload`](../../packages/neon-auth/src/runtime/neon-session.server.ts) → SDK `getSession()` → signed `session_data` cookie (HS256 + `NEON_AUTH_COOKIE_SECRET`) → upstream `{NEON_AUTH_BASE_URL}/get-session` |
+| Browser sessions (recommended) | [`readNeonAuthSessionPayload`](../../packages/auth/src/neon-auth/runtime/neon-session.server.ts) → SDK `getSession()` → signed `session_data` cookie (HS256 + `NEON_AUTH_COOKIE_SECRET`) → upstream `{NEON_AUTH_BASE_URL}/get-session` |
 | `authClient.token()` | **Deferred** in UI — no client code fetches Bearer tokens for workspace pages |
 | `set-auth-jwt` response header on `getSession` | **Deferred** — not read in forms |
-| Verify access JWT (JWKS) | [`verifyNeonAuthAccessToken`](../../packages/neon-auth/src/security/jwt-verify.server.ts) — `jose` + `{NEON_AUTH_BASE_URL}/.well-known/jwks.json`, `issuer`/`audience` = auth URL **origin**; export from `@afenda/neon-auth/server` for future `Authorization: Bearer` routes (**ARCH-1004**), not used on `(workspace)` reads today |
-| Webhook signatures | Separate Ed25519 path in [`webhook-verify.server.ts`](../../packages/neon-auth/src/security/webhook-verify.server.ts) |
+| Verify access JWT (JWKS) | [`verifyNeonAuthAccessToken`](../../packages/auth/src/neon-auth/security/jwt-verify.server.ts) — `jose` + `{NEON_AUTH_BASE_URL}/.well-known/jwks.json`, `issuer`/`audience` = auth URL **origin**; export from `@afenda/auth/neon-auth/server` for future `Authorization: Bearer` routes (**ARCH-1004**), not used on `(workspace)` reads today |
+| Webhook signatures | Separate Ed25519 path in [`webhook-verify.server.ts`](../../packages/auth/src/neon-auth/security/webhook-verify.server.ts) |
 
 **When to add Bearer JWT routes:** partner APIs, CLI, or a frontend on another origin that cannot send ERP cookies. Refresh tokens by calling `token()` again before expiry. Custom JWT claims are not supported by Neon.
 
@@ -279,8 +303,8 @@ Neon Auth sends signed HTTPS POSTs to your app when subscribed per branch (Neon 
 | Item | Value |
 | ---- | ----- |
 | ERP endpoint | `POST /api/internal/v1/webhooks/neon-auth` (**ARCH-1004** `internal/v1/webhooks`) |
-| Handler | [`handleNeonAuthWebhookPost`](../../packages/neon-auth/src/webhooks/handler.server.ts) via [`apps/erp/.../neon-auth/route.ts`](../../apps/erp/src/app/api/internal/v1/webhooks/neon-auth/route.ts) |
-| Signature | Ed25519 detached JWS — [`verifyNeonAuthWebhookPayload`](../../packages/neon-auth/src/security/webhook-verify.server.ts) using `NEON_AUTH_BASE_URL/.well-known/jwks.json` |
+| Handler | [`handleNeonAuthWebhookPost`](../../packages/auth/src/neon-auth/webhooks/handler.server.ts) via [`apps/erp/.../neon-auth/route.ts`](../../apps/erp/src/app/api/internal/v1/webhooks/neon-auth/route.ts) |
+| Signature | Ed25519 detached JWS — [`verifyNeonAuthWebhookPayload`](../../packages/auth/src/neon-auth/security/webhook-verify.server.ts) using `NEON_AUTH_BASE_URL/.well-known/jwks.json` |
 | Catalog | [`auth.flows.ts`](../../packages/auth/src/contracts/auth.flows.ts) `implementedNeonWebhookEventHandlers` / `deferredNeonWebhookEventHandlers` |
 
 | Neon event | Afenda behavior |
@@ -303,7 +327,7 @@ Neon ships the [Better Auth Admin plugin](https://neon.com/docs/auth/guides/plug
 | Concern | Afenda owner |
 | ------- | ------------ |
 | Invite / suspend / remove **tenant** members | `@afenda/feature-system-admin` → `/system-admin/users` (`system-admin.users.*` capabilities, `@afenda/db` memberships) |
-| Create / ban / impersonate **Neon Auth** users | **Deferred** — [`deferredNeonAdminClientMethods`](../../packages/neon-auth/src/plugins/admin/catalog.ts) |
+| Create / ban / impersonate **Neon Auth** users | **Deferred** — [`deferredNeonAdminClientMethods`](../../packages/auth/src/neon-auth/plugins/admin/catalog.ts) |
 | Operator updates own name/password | `/account` → `updateUser` / `changePassword` (self-service, not `admin.*`) |
 
 | Neon `admin` API | Status in Afenda |
@@ -315,7 +339,7 @@ Neon ships the [Better Auth Admin plugin](https://neon.com/docs/auth/guides/plug
 
 **Why deferred:** Admin APIs must run in a browser context that sends Neon session cookies to `/api/auth` (same site as ERP). Afenda does not expose a Neon-admin console in the app yet; mixing them into system-admin would blur **tenant control plane** (ARCH-1006) vs **Neon identity plane**.
 
-**When implementing:** add a gated internal surface (e.g. platform ops) that calls `neonAuthClient.admin.*` from `@afenda/neon-auth/client` only after verifying a Neon `admin` role on `getSession()`, audit every mutation, and never use `admin.updateUser` for tenant capability changes.
+**When implementing:** add a gated internal surface (e.g. platform ops) that calls `neonAuthClient.admin.*` from `@afenda/auth/neon-auth/client` only after verifying a Neon `admin` role on `getSession()`, audit every mutation, and never use `admin.updateUser` for tenant capability changes.
 
 ### Next.js best practices applied here
 
@@ -346,5 +370,5 @@ Neon ships the [Better Auth Admin plugin](https://neon.com/docs/auth/guides/plug
 - [Environment sync](./env.md)
 - [Fast UI dev (bypass)](./fast-ui-dev.md)
 - [`packages/auth/src/README.md`](../../packages/auth/src/README.md)
-- [`packages/neon-auth/README.md`](../../packages/neon-auth/README.md)
+- [`packages/auth/src/neon-auth/README.md`](../../packages/auth/src/neon-auth/README.md)
 - [ARCH-1001 § Neon Auth](../architecture/1001-afenda-platform-doctrine.md)

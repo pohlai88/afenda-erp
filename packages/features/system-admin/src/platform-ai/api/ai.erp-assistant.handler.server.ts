@@ -7,7 +7,7 @@ import {
   resolveWorkspaceDataMode,
   type ModuleId,
 } from "@afenda/kernel";
-import { getRequestId, logServerEvent } from "@afenda/observability";
+import { getRequestId, logServerEvent } from "@afenda/observability/server";
 import { createAgentUIStreamResponse, type UIMessage } from "ai";
 import { NextResponse } from "next/server";
 import { z } from "zod";

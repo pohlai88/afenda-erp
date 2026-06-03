@@ -2,10 +2,7 @@ import { loadModuleWorkItemDetailContext } from "@/routes/workspace/shared/works
 import { WorkItemDetailRoutePage } from "@/routes/workspace/modules/work-item-detail-route";
 import type { Metadata } from "next";
 
-export const unstable_instant = {
-  prefetch: "static",
-  unstable_disableValidation: true,
-};
+export const unstable_instant = false;
 
 type WorkItemDetailPageProps = {
   params: Promise<{

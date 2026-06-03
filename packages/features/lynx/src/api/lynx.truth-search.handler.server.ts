@@ -33,7 +33,7 @@ import {
   type LynxTruthRetrievalStateData,
   validateLynxTruthResponse,
 } from "../contracts";
-import { getRequestId, logServerEvent } from "@afenda/observability";
+import { getRequestId, logServerEvent } from "@afenda/observability/server";
 import {
   createUIMessageStream,
   createUIMessageStreamResponse,

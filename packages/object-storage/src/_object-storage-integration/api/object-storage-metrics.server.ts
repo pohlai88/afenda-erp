@@ -3,7 +3,7 @@ import "server-only";
 import {
   logServerEvent,
   type ServerLogContext,
-} from "@afenda/observability";
+} from "@afenda/observability/server";
 
 export const objectStorageMetricNames = [
   "uploads_total",

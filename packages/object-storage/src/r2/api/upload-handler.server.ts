@@ -1,7 +1,7 @@
 import "server-only";
 
 import { uploadRouteCopy } from "@afenda/kernel";
-import { logServerEvent } from "@afenda/observability";
+import { logServerEvent } from "@afenda/observability/server";
 import type {
   ObjectStorageHandlerResult,
   ObjectStorageUploadHandlerDeps,
@@ -28,10 +28,8 @@ import { createObjectStore } from "../../_object-storage-integration/domain/crea
 import { usesEnvelopeEncryption } from "../../_object-storage-integration/domain/envelope-encryption.server";
 import { assertObjectStorageConfigured } from "../../_object-storage-integration/domain/object-storage-config.server";
 import { UploadRouteError } from "../../_object-storage-integration/domain/upload-route.error.shared";
-import {
-  addRandomPathSuffix,
-  assertUploadPathnameMatchesTenant,
-} from "../../_object-storage-integration/policies/tenant-pathnames.shared";
+import { addRandomPathSuffix } from "../../_object-storage-integration/policies/tenant-pathnames.server";
+import { assertUploadPathnameMatchesTenant } from "../../_object-storage-integration/policies/tenant-pathnames.shared";
 import {
   assertUploadTokenMatchesSession,
   r2CompleteBodySchema,

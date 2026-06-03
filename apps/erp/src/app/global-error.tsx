@@ -1,5 +1,9 @@
 "use client";
 
+import { routeErrorCopy } from "@afenda/kernel";
+
+import "./globals.css";
+
 export default function GlobalError({
   error,
   reset,
@@ -7,26 +11,24 @@ export default function GlobalError({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  const copy = routeErrorCopy.rootError;
+  const description = error.digest
+    ? `${copy.description} Reference: ${error.digest}.`
+    : copy.description;
+
   return (
-    <html lang="en">
-      {/* audit-ds: ignore no-arbitrary-value — global-error renders outside app theme shell */}
-      <body className="min-h-full bg-[#f6f7f9] font-sans text-[#131922] antialiased">
-        <main className="flex min-h-screen items-center justify-center px-surface-2xl py-16">
-          <div className="w-full max-w-lg rounded-panel border border-black/10 bg-white p-8 shadow-elevation-1">
-            <div className="type-caption uppercase tracking-wide">
-              Afenda ERP
-            </div>
-            <h1 className="mt-3 type-section-title font-semibold">Application error</h1>
-            <p className="mt-3 type-muted leading-6">
-              A critical error prevented the app shell from rendering.
-              {error.digest ? ` Reference: ${error.digest}.` : null}
-            </p>
+    <html lang="en" suppressHydrationWarning>
+      <body className="min-h-full bg-background font-sans text-foreground antialiased">
+        <main className="flex min-h-full items-center justify-center p-6">
+          <div className="max-w-md space-y-3 text-center">
+            <h1 className="text-lg font-semibold">{copy.title}</h1>
+            <p className="text-sm text-muted-foreground">{description}</p>
             <button
-              className="mt-surface-2xl inline-flex rounded-section border border-line bg-surface px-surface-lg py-2 type-body font-medium text-foreground transition hover:bg-surface-hover"
+              className="text-sm font-medium text-primary underline-offset-4 hover:underline"
               onClick={reset}
               type="button"
             >
-              Reload application
+              {copy.actionLabel}
             </button>
           </div>
         </main>

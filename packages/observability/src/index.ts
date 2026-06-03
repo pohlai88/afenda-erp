@@ -3,45 +3,23 @@ import {
   getModuleObservabilityIndicators,
   type ModuleObservabilityIndicator,
 } from "./module-indicators";
-import { emitServerLogEvent } from "./logger/emit-server-log-event";
 
 export {
   getModuleObservabilityIndicators,
   type ModuleObservabilityIndicator,
   type ModuleTone,
 } from "./module-indicators";
+export type {
+  ServerLogContext,
+  ServerLogEvent,
+  ServerLogLevel,
+  ServerLogMetadata,
+} from "./logger/logger.types";
 
 export const telemetry = {
   serviceName: "afenda-erp",
   analyticsNamespace: "afenda.erp",
 };
-
-export type ServerLogContext = {
-  requestId?: string;
-  organizationId?: string;
-  userId?: string;
-  module: string;
-  operation: string;
-};
-
-export type ServerLogLevel = "info" | "warn" | "error";
-
-export type ServerLogEvent = ServerLogContext & {
-  level: ServerLogLevel;
-  message: string;
-  durationMs?: number;
-  status?: number;
-  route?: string;
-  timestamp: string;
-};
-
-type ServerLogMetadata = Partial<
-  Omit<
-    ServerLogEvent,
-    keyof ServerLogContext | "level" | "message" | "timestamp"
-  >
-> &
-  Record<string, unknown>;
 
 export type ObservabilityIndicator = ModuleObservabilityIndicator;
 
@@ -145,15 +123,6 @@ export function getRequestId(request: Request) {
   );
 }
 
-export function logServerEvent(
-  level: ServerLogLevel,
-  message: string,
-  context: ServerLogContext,
-  metadata: ServerLogMetadata = {},
-) {
-  emitServerLogEvent(level, message, context, metadata);
-}
-
 function timingSafeStringEqual(left: string, right: string) {
   if (left.length !== right.length) {
     return false;
@@ -238,65 +207,4 @@ export function summarizeDrainPayload(rawBody: string): DrainPayloadSummary {
       payloadType: "ndjson",
     };
   }
-}
-
-export async function handleObservabilityDrainPost(request: Request): Promise<Response> {
-  const startedAt = Date.now();
-  const route = "/api/internal/v1/observability/drain";
-  const requestId = getRequestId(request);
-  const context = {
-    requestId,
-    module: "observability",
-    operation: "drain.ingest",
-  };
-  const { getVercelDrainSecret } = await import("@afenda/config/env");
-  const signatureSecret = getVercelDrainSecret();
-
-  if (!signatureSecret) {
-    logServerEvent("error", "Drain secret is not configured.", context, {
-      route,
-      status: 503,
-    });
-
-    return Response.json(
-      { error: "Drain endpoint is not configured." },
-      { status: 503 },
-    );
-  }
-
-  const rawBody = await request.text();
-  const signature = request.headers.get("x-vercel-signature");
-
-  if (
-    !(await verifyVercelSignature({
-      rawBody,
-      signature,
-      secret: signatureSecret,
-    }))
-  ) {
-    logServerEvent("warn", "Drain signature rejected.", context, {
-      route,
-      status: 403,
-      durationMs: Date.now() - startedAt,
-    });
-
-    return Response.json(
-      { code: "invalid_signature", error: "Invalid drain signature." },
-      { status: 403 },
-    );
-  }
-
-  const payloadSummary = summarizeDrainPayload(rawBody);
-
-  logServerEvent("info", "Drain payload accepted.", context, {
-    route,
-    status: 200,
-    durationMs: Date.now() - startedAt,
-    ...payloadSummary,
-  });
-
-  return Response.json({
-    success: true,
-    ...payloadSummary,
-  });
 }

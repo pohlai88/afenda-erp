@@ -8,7 +8,7 @@ Category: `runtime-library` · Multi-provider tenant object storage (Vercel Blob
 
 ## Source layout (hard law)
 
-`src/` allows **exactly three top-level folders** plus four export doors:
+`src/` allows **exactly four top-level folders** plus four export doors:
 
 ```txt
 src/
@@ -20,6 +20,9 @@ src/
     api/                             # upload-handler.server.ts
     domain/                          # object-store.server.ts, presign.shared.ts
     policies/                        # cors.json (browser PUT CORS template)
+  s3/                                # AWS S3 SSE-KMS provider vertical slice
+    api/                             # upload-handler.server.ts
+    domain/                          # object-store.server.ts
   _object-storage-integration/        # shared platform wiring (horizontal buckets)
     actions/, commands/, api/, contracts/, components/, data/, domain/,
     events/, policies/, read-models/, schemas/, tests/
@@ -31,7 +34,7 @@ src/
     policies/, schemas/
 ```
 
-**Forbidden at `src/` root:** any folder other than `blob/`, `r2/`, `_object-storage-integration/`; any file other than the four export doors; legacy `providers/`, `handlers/`, custom buckets (`auth/`, `env/`, `errors/`, `client/`).
+**Forbidden at `src/` root:** any folder other than `blob/`, `r2/`, `s3/`, `_object-storage-integration/`; any file other than the four export doors; legacy `providers/`, `handlers/`, custom buckets (`auth/`, `env/`, `errors/`, `client/`).
 
 Each slice (`blob/`, `r2/`, `_object-storage-integration/`) must contain **all** ARCH-1002 §8 template buckets. Download persistence uses an injected `GetTenantDocumentForDownload` port — **`@afenda/db` is forbidden** in object-storage `api/` handlers; apps/erp routes wire `getTenantDocument`.
 

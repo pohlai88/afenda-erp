@@ -12,6 +12,37 @@ export type AuditExportBody = {
   encoding: "utf8" | "base64";
 };
 
+type AuditExportRow = {
+  id: string;
+  time: string;
+  actor: string;
+  actorType: string;
+  actorRole: string;
+  action: string;
+  targetType: string;
+  target: string;
+  targetId: string;
+  targetDisplayName: string;
+  entityType: string;
+  entityId: string;
+  module: string;
+  surface: string;
+  route: string;
+  channel: string;
+  result: string;
+  outcome: string;
+  reason: string;
+  policyReference: string;
+  approvalId: string;
+  requestId: string;
+  operationId: string;
+  summary: string;
+  before: unknown;
+  after: unknown;
+  diff: unknown;
+  metadata: unknown;
+};
+
 function escapeCsvCell(value: string) {
   if (/[",\n]/.test(value)) {
     return `"${value.replace(/"/g, '""')}"`;
@@ -30,22 +61,99 @@ function serializeRedactedMetadata(value: unknown) {
   }
 }
 
-function mapExportRows(rows: readonly TenantAuditLog[]) {
+function mapExportRows(rows: readonly TenantAuditLog[]): AuditExportRow[] {
   const metadataById = new Map(
     rows.map((row) => [row.id, redactAuditMetadata(row.metadata)]),
   );
-  const mapped = rows.map(mapTenantAuditLogToRow);
+  const mapped = rows.map((row) => {
+    const rowView = mapTenantAuditLogToRow(row);
+
+    return {
+      ...rowView,
+      actorType: row.actorType ?? "",
+      actorRole: row.actorRole ?? "",
+      targetType: rowView.targetType ?? row.targetType ?? row.entityType,
+      targetId: rowView.targetId ?? row.targetId ?? row.entityId,
+      targetDisplayName: row.targetDisplayName ?? "",
+      entityType: row.entityType,
+      entityId: row.entityId,
+      surface: row.surface ?? "",
+      route: row.route ?? "",
+      channel: row.channel ?? "",
+      reason: row.reason ?? "",
+      policyReference: row.policyReference ?? "",
+      approvalId: row.approvalId ?? "",
+      requestId: row.requestId ?? "",
+      operationId: row.operationId ?? "",
+      outcome: row.outcome ?? rowView.result ?? "",
+      beforeJson: row.beforeJson ?? null,
+      afterJson: row.afterJson ?? null,
+      diffJson: row.diffJson ?? null,
+    };
+  });
 
   return mapped.map((row) => ({
+    id: row.id,
     time: row.occurredAt,
     actor: row.actorId,
+    actorType: row.actorType,
+    actorRole: row.actorRole,
     action: row.action,
+    targetType: row.targetType,
     target: row.target,
+    targetId: row.targetId,
+    targetDisplayName: row.targetDisplayName,
+    entityType: row.entityType,
+    entityId: row.entityId,
     module: row.moduleKey,
-    result: row.result,
+    surface: row.surface,
+    route: row.route,
+    channel: row.channel,
+    result: row.outcome || row.result,
+    outcome: row.outcome,
+    reason: row.reason,
+    policyReference: row.policyReference,
+    approvalId: row.approvalId,
+    requestId: row.requestId,
+    operationId: row.operationId,
     summary: row.summary,
-    metadata: serializeRedactedMetadata(metadataById.get(row.id) ?? {}),
+    before: row.beforeJson ?? null,
+    after: row.afterJson ?? null,
+    diff: row.diffJson ?? null,
+    metadata: metadataById.get(row.id) ?? {},
   }));
+}
+
+function serializeTabularRow(row: AuditExportRow) {
+  return {
+    time: row.time,
+    actor: row.actor,
+    actorType: row.actorType,
+    actorRole: row.actorRole,
+    action: row.action,
+    targetType: row.targetType,
+    target: row.target,
+    targetId: row.targetId,
+    targetDisplayName: row.targetDisplayName,
+    entityType: row.entityType,
+    entityId: row.entityId,
+    module: row.module,
+    surface: row.surface,
+    route: row.route,
+    channel: row.channel,
+    result: row.result,
+    outcome: row.outcome,
+    reason: row.reason,
+    policyReference: row.policyReference,
+    approvalId: row.approvalId,
+    requestId: row.requestId,
+    operationId: row.operationId,
+    summary: row.summary,
+    before: serializeRedactedMetadata(row.before),
+    after: serializeRedactedMetadata(row.after),
+    diff: serializeRedactedMetadata(row.diff),
+    metadata: serializeRedactedMetadata(row.metadata),
+  };
 }
 
 function buildTruncationNotice(input: {
@@ -62,7 +170,7 @@ function buildTruncationNotice(input: {
 }
 
 async function buildPdfExport(
-  rows: ReturnType<typeof mapExportRows>,
+  rows: readonly ReturnType<typeof serializeTabularRow>[],
   truncationNotice: string | null,
 ) {
   const pdf = await PDFDocument.create();
@@ -103,7 +211,10 @@ async function buildPdfExport(
 
   for (const row of rows) {
     drawLine(
-      `${row.time} | ${row.actor} | ${row.action} | ${row.target} | ${row.summary}`,
+      `${row.time} | ${row.actor} | ${row.action} | ${row.target} | ${row.result} | ${row.summary}`,
+    );
+    drawLine(
+      `targetType=${row.targetType} targetId=${row.targetId} module=${row.module}`,
     );
   }
 
@@ -125,24 +236,20 @@ export function buildAuditExportBody(input: {
   rowLimit?: number;
 }): AuditExportBody | Promise<AuditExportBody> {
   const exportRows = mapExportRows(input.rows);
+  const tabularRows = exportRows.map(serializeTabularRow);
   const truncationNotice = buildTruncationNotice({
     truncated: input.truncated ?? false,
-    rowCount: exportRows.length,
+    rowCount: tabularRows.length,
     totalCount: input.totalCount ?? exportRows.length,
-    rowLimit: input.rowLimit ?? exportRows.length,
+    rowLimit: input.rowLimit ?? tabularRows.length,
   });
 
   if (input.format === "json") {
-    const payload = exportRows.map((row) => ({
-      ...row,
-      metadata: JSON.parse(row.metadata) as Record<string, unknown>,
-    }));
-
     return {
       content: JSON.stringify(
         {
           ...(truncationNotice ? { exportNotice: truncationNotice } : {}),
-          rows: payload,
+          rows: exportRows,
         },
         null,
         2,
@@ -155,7 +262,7 @@ export function buildAuditExportBody(input: {
 
   if (input.format === "xlsx") {
     const workbook = XLSX.utils.book_new();
-    const worksheet = XLSX.utils.json_to_sheet(exportRows);
+    const worksheet = XLSX.utils.json_to_sheet(tabularRows);
     XLSX.utils.book_append_sheet(workbook, worksheet, "Audit evidence");
     const buffer = XLSX.write(workbook, {
       type: "buffer",
@@ -172,28 +279,66 @@ export function buildAuditExportBody(input: {
   }
 
   if (input.format === "pdf") {
-    return buildPdfExport(exportRows, truncationNotice);
+    return buildPdfExport(tabularRows, truncationNotice);
   }
 
   const header = [
     "time",
     "actor",
+    "actorType",
+    "actorRole",
     "action",
+    "targetType",
     "target",
+    "targetId",
+    "targetDisplayName",
+    "entityType",
+    "entityId",
     "module",
+    "surface",
+    "route",
+    "channel",
     "result",
+    "outcome",
+    "reason",
+    "policyReference",
+    "approvalId",
+    "requestId",
+    "operationId",
     "summary",
+    "before",
+    "after",
+    "diff",
     "metadata",
   ];
-  const lines = exportRows.map((row) =>
+  const lines = tabularRows.map((row) =>
     [
       row.time,
       row.actor,
+      row.actorType,
+      row.actorRole,
       row.action,
+      row.targetType,
       row.target,
+      row.targetId,
+      row.targetDisplayName,
+      row.entityType,
+      row.entityId,
       row.module,
+      row.surface,
+      row.route,
+      row.channel,
       row.result,
+      row.outcome,
+      row.reason,
+      row.policyReference,
+      row.approvalId,
+      row.requestId,
+      row.operationId,
       row.summary,
+      row.before,
+      row.after,
+      row.diff,
       row.metadata,
     ]
       .map((cell) => escapeCsvCell(String(cell)))

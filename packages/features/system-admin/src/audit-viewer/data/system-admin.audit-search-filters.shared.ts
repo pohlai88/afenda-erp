@@ -36,15 +36,21 @@ export function buildSystemAdminAuditSearchFilters(
   const createdBefore = parseAuditFilterDate(params.auditTo);
   const normalizedDates = normalizeAuditDateRange(createdAfter, createdBefore);
 
-  return {
+  const filters: TenantAuditLogSearchFilters = {
     actorAuthUserId: params.auditActor,
     action: params.auditAction,
-    entityType: params.auditTargetType,
-    entityId: params.auditTargetId,
+    targetType: params.auditTargetType,
+    targetId: params.auditTargetId,
     moduleKey: params.auditModule,
     query: params.auditQ,
     createdAfter: normalizedDates.createdAfter,
     createdBefore: normalizedDates.createdBefore,
     sortDirection: params.auditSort ?? "desc",
   };
+
+  if (params.auditOutcome) {
+    filters.outcome = params.auditOutcome;
+  }
+
+  return filters;
 }

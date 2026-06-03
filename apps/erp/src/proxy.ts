@@ -1,34 +1,24 @@
-import { AFENDA_SESSION_COOKIE } from "@afenda/auth";
-import { hasNeonAuthSessionToken } from "@afenda/neon-auth/neon-cookies";
+import {
+  erpPreLoginAuthPathPrefixes,
+  NEON_AUTH_SESSION_TOKEN_COOKIE,
+} from "@afenda/auth/neon-auth/server";
 import { isDevCookieAuthEnabled, isNeonAuthEnabled } from "@afenda/config/env";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
-const SESSION_REFRESH_ONLY_PREFIXES = [
-  "/sign-in",
-  "/sign-up",
-  "/verify-email",
-  "/forgot-password",
-  "/reset-password",
-] as const;
+const AFENDA_SESSION_COOKIE = "afenda-dev-session";
 
-function shouldRefreshSessionOnly(pathname: string) {
-  return SESSION_REFRESH_ONLY_PREFIXES.some((prefix) =>
+function isPreLoginAuthPath(pathname: string) {
+  return erpPreLoginAuthPathPrefixes.some((prefix) =>
     pathname.startsWith(prefix),
   );
 }
 
-function isPublicLandingRoute(pathname: string) {
-  return pathname === "/";
-}
+type NeonAuthProxyHandler = (
+  request: NextRequest,
+) => Promise<NextResponse> | NextResponse;
 
-function isApiRoute(pathname: string) {
-  return pathname.startsWith("/api/");
-}
-
-function hasDevSessionCookie(request: NextRequest) {
-  return request.cookies.has(AFENDA_SESSION_COOKIE);
-}
+let neonAuthMiddleware: NeonAuthProxyHandler | undefined;
 
 export async function proxy(request: NextRequest) {
   if (!isNeonAuthEnabled()) {
@@ -37,31 +27,35 @@ export async function proxy(request: NextRequest) {
 
   const pathname = request.nextUrl.pathname;
 
-  if (isApiRoute(pathname)) {
+  if (pathname === "/") {
     return NextResponse.next();
   }
 
-  if (isPublicLandingRoute(pathname)) {
-    return NextResponse.next();
-  }
-
-  if (isDevCookieAuthEnabled() && hasDevSessionCookie(request)) {
+  if (isDevCookieAuthEnabled() && request.cookies.has(AFENDA_SESSION_COOKIE)) {
     return NextResponse.next();
   }
 
   if (
-    shouldRefreshSessionOnly(pathname) &&
-    !hasNeonAuthSessionToken(request.headers.get("cookie") ?? "")
+    isPreLoginAuthPath(pathname) &&
+    !request.cookies.has(NEON_AUTH_SESSION_TOKEN_COOKIE)
   ) {
     return NextResponse.next();
   }
 
-  const { getNeonAuthServer } = await import("@afenda/neon-auth/server");
-  return getNeonAuthServer().middleware({ loginUrl: "/sign-in" })(request);
+  neonAuthMiddleware ??= (
+    await import("@afenda/auth/neon-auth/server")
+  ).getNeonAuthServer().middleware({ loginUrl: "/sign-in" });
+
+  return neonAuthMiddleware(request);
 }
 
 export const config = {
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    /*
+     * Skip API routes, static assets, and metadata files so proxy only runs on
+     * navigations that may need Neon session refresh.
+     * @see https://nextjs.org/docs/app/api-reference/file-conventions/proxy#matcher
+     */
+    "/((?!api|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 };

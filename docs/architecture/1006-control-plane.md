@@ -74,7 +74,7 @@ Route: `/system-admin/*` via `(workspace)/[moduleId]` where `moduleId = system-a
 | Excluded | Owner |
 | -------- | ----- |
 | Runtime permission verdicts on protected actions | `@afenda/kernel` |
-| Neon Auth provider implementation | `@afenda/neon-auth` |
+| Neon Auth provider implementation | `@afenda/auth/neon-auth` |
 | HR/Finance/… business rules | `@afenda/feature-*` |
 | Schema DDL and migrations | `@afenda/db` (**ARCH-1005** §9) |
 | Workflow engine internals | `@afenda/workflows` |

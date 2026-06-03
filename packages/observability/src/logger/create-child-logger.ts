@@ -1,10 +1,9 @@
-import type { Logger as PinoLogger } from "pino";
-import type { LoggerContext } from "./logger.types";
+import type { LoggerContext, StructuralLogger } from "./logger.types";
 import { redactLogPayload } from "./redact-policy";
 
 export function createChildLogger(
-  logger: PinoLogger,
+  logger: StructuralLogger,
   context: LoggerContext,
-) {
+): StructuralLogger {
   return logger.child(redactLogPayload(context));
 }

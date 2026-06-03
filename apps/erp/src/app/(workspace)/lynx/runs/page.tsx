@@ -1,9 +1,6 @@
 import { LynxRunsRoutePage } from "@/routes/workspace/lynx/lynx-runs-route";
 
-export const unstable_instant = {
-  prefetch: "static",
-  unstable_disableValidation: true,
-};
+export const unstable_instant = false;
 
 type LynxRunsPageProps = {
   searchParams: Promise<Record<string, string | string[] | undefined>>;

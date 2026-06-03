@@ -19,6 +19,7 @@ export function parseSystemAdminAuditExportFormData(formData: FormData) {
     auditTargetType: readField("auditTargetType"),
     auditTargetId: readField("auditTargetId"),
     auditModule: readField("auditModule"),
+    auditOutcome: readField("auditOutcome"),
     auditFrom: readField("auditFrom"),
     auditTo: readField("auditTo"),
     auditSort: readField("auditSort"),

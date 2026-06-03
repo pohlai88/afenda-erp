@@ -1,0 +1,4 @@
+{
+  "extends": "../config/tsconfig.build.react.base.json",
+  "include": ["src/**/*.ts", "src/**/*.tsx", "types/**/*.d.ts"]
+}

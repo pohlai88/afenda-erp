@@ -1,9 +1,6 @@
 import { LynxRunDetailRoutePage } from "@/routes/workspace/lynx/lynx-run-detail-route";
 
-export const unstable_instant = {
-  prefetch: "static",
-  unstable_disableValidation: true,
-};
+export const unstable_instant = false;
 
 type PageProps = {
   params: Promise<{ runId: string }>;

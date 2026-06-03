@@ -1,5 +1,5 @@
 import { getUsageMetrics } from "../data/ai.gateway.data.server";
-import { logServerEvent } from "@afenda/observability";
+import { logServerEvent } from "@afenda/observability/server";
 import type {
   TelemetrySettings,
   ToolLoopAgentOnStepFinishCallback,

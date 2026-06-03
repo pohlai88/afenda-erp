@@ -1,11 +1,17 @@
 import { authLoadingCopy } from "@afenda/kernel";
-import { RouteStatePanel } from "@/app-route-state/route-states";
 
 export default function AuthLoading() {
   return (
-    <RouteStatePanel
-      description={authLoadingCopy.description}
-      title={authLoadingCopy.title}
-    />
+    <main
+      aria-busy="true"
+      className="neon-auth-ui-page flex min-h-[50vh] w-full items-center justify-center p-6"
+    >
+      <div className="max-w-md space-y-3 text-center">
+        <h1 className="text-lg font-semibold">{authLoadingCopy.title}</h1>
+        <p className="text-sm text-muted-foreground">
+          {authLoadingCopy.description}
+        </p>
+      </div>
+    </main>
   );
 }

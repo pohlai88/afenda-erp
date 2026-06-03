@@ -5,7 +5,7 @@ import {
   headObjectMetadataFromR2Response,
   mapR2HeadObjectError,
 } from "../src/r2/domain/object-store.server";
-import { addRandomPathSuffix } from "../src/_object-storage-integration/policies/tenant-pathnames.shared";
+import { addRandomPathSuffix } from "../src/_object-storage-integration/policies/tenant-pathnames.server";
 
 describe("R2 object store helpers", () => {
   it("maps head responses with required content length", () => {

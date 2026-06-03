@@ -134,18 +134,33 @@ describe("object storage config", () => {
   });
 
   it("throws when object storage is not configured", () => {
-    const originalToken = process.env.BLOB_READ_WRITE_TOKEN;
-    const originalProvider = process.env.OBJECT_STORAGE_PROVIDER;
-    delete process.env.BLOB_READ_WRITE_TOKEN;
-    delete process.env.OBJECT_STORAGE_PROVIDER;
-    delete process.env.OBJECT_STORAGE_ENDPOINT;
-
-    expect(() => assertObjectStorageConfigured()).toThrow(
-      new UploadRouteError(503, uploadRouteCopy.blobNotConfigured),
+    const touchedKeys = [
+      "BLOB_READ_WRITE_TOKEN",
+      "OBJECT_STORAGE_PROVIDER",
+      "OBJECT_STORAGE_ENDPOINT",
+    ] as const;
+    const originalEnv = Object.fromEntries(
+      touchedKeys.map((key) => [key, process.env[key]]),
     );
 
-    process.env.BLOB_READ_WRITE_TOKEN = originalToken;
-    process.env.OBJECT_STORAGE_PROVIDER = originalProvider;
+    try {
+      for (const key of touchedKeys) {
+        delete process.env[key];
+      }
+
+      expect(() => assertObjectStorageConfigured()).toThrow(
+        new UploadRouteError(503, uploadRouteCopy.blobNotConfigured),
+      );
+    } finally {
+      for (const key of touchedKeys) {
+        const value = originalEnv[key];
+        if (value === undefined) {
+          delete process.env[key];
+        } else {
+          process.env[key] = value;
+        }
+      }
+    }
   });
 
   it("validates uploaded object size against declared payload", () => {

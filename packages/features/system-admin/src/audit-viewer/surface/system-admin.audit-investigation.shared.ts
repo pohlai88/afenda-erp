@@ -26,14 +26,14 @@ export function buildSystemAdminActorInvestigationHref(actorId: string) {
 }
 
 export function buildSystemAdminTargetInvestigationHref(input: {
-  entityType: string;
-  entityId: string;
+  targetType: string;
+  targetId: string;
 }) {
   return buildSystemAdminAuditPageHref(
     {
       ...INVESTIGATION_BASE,
-      auditTargetType: input.entityType as SystemAdminAuditSearchParams["auditTargetType"],
-      auditTargetId: input.entityId,
+      auditTargetType: input.targetType as SystemAdminAuditSearchParams["auditTargetType"],
+      auditTargetId: input.targetId,
     },
     1,
   );
@@ -59,6 +59,8 @@ export function buildSystemAdminAuditInvestigationLinks(
     action: string;
     entityType: string;
     entityId: string;
+    targetType?: string;
+    targetId?: string;
     moduleKey: string;
   },
 ): readonly SystemAdminAuditInvestigationLink[] {
@@ -72,8 +74,8 @@ export function buildSystemAdminAuditInvestigationLinks(
       kind: "target",
       label: "Target history",
       href: buildSystemAdminTargetInvestigationHref({
-        entityType: detail.entityType,
-        entityId: detail.entityId,
+        targetType: detail.targetType ?? detail.entityType,
+        targetId: detail.targetId ?? detail.entityId,
       }),
     },
     {

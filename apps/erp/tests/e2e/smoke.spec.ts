@@ -11,28 +11,26 @@ async function gotoApp(page: Page, path: string) {
 }
 
 test.describe("Afenda ERP public smoke", () => {
-  test("redirects unauthenticated home traffic to sign in @public", async ({
+  test("renders the public home landing page @public", async ({
     page,
   }) => {
     await gotoApp(page, "/");
-    await expect(page).toHaveURL(/\/sign-in/);
-    await expect(page.getByRole("heading", { level: 1 })).toContainText(
-      "Tenant-aware ERP access",
-    );
+    await expect(page).toHaveURL(/\/$/);
+    await expect(
+      page.getByRole("heading", { level: 1, name: "Afenda project" }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: "Sign in" }).first(),
+    ).toHaveAttribute("href", "/sign-in");
   });
 
   test("renders the sign-in page @public", async ({ page }) => {
     await gotoApp(page, "/sign-in");
     await expect(page).toHaveURL(/\/sign-in/);
-    await expect(
-      page.getByRole("heading", {
-        level: 2,
-        name: /Sign in to your workspace|Enter the workspace/,
-      }),
-    ).toBeVisible();
-    await expect(
-      page.getByRole("button", { name: /Sign in|Continue to dashboard/ }),
-    ).toBeVisible();
+    await expect(page.getByText("Sign In", { exact: true })).toBeVisible({
+      timeout: 20_000,
+    });
+    await expect(page.getByRole("button", { name: /^Login$/ })).toBeVisible();
   });
 
   test("shows floating dev sign-in on pre-sign-in shell pages @public", async ({
@@ -185,11 +183,11 @@ test.describe("Neon Auth smoke", () => {
 
     await gotoApp(page, "/sign-in");
     await expect(
-      page.getByRole("heading", {
-        level: 2,
-        name: "Sign in to your workspace",
-      }),
+      page.getByText("Sign In", { exact: true }),
+    ).toBeVisible({ timeout: 20_000 });
+    await expect(page.getByRole("button", { name: /^Login$/ })).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: "Sign in with Google" }),
     ).toBeVisible();
-    await expect(page.getByRole("button", { name: "Sign in" })).toBeVisible();
   });
 });

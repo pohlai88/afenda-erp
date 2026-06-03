@@ -1,7 +1,7 @@
-import { emitServerLogEvent } from "../logger/emit-server-log-event";
+import { logServerEvent } from "../server";
 
 export function createTestLogger() {
   return {
-    emit: emitServerLogEvent,
+    emit: logServerEvent,
   };
 }

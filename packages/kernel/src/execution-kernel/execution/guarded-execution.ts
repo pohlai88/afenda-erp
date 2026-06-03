@@ -75,6 +75,7 @@ export async function runGuardedExecution<TInput, TParsed, TResult>(
       organizationId: context.organizationId,
       actorId: context.userId,
       actorType: context.actorType,
+      module: definition.action.split(".")[0],
       action: definition.action,
       targetType: target.targetType,
       targetId: target.targetId,

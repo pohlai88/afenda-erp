@@ -27,7 +27,6 @@
     "@afenda/ai": "workspace:*",
     "@afenda/appshell": "workspace:*",
     "@afenda/auth": "workspace:*",
-    "@afenda/neon-auth": "workspace:*",
     "@afenda/billing": "workspace:*",
     "@afenda/db": "workspace:*",
     "@afenda/kernel": "workspace:*",

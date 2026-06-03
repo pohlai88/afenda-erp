@@ -4,8 +4,11 @@ import { neon } from "@neondatabase/serverless";
 import { loadAfendaEnv } from "./load-afenda-env.mts";
 import {
   assertTenantPathnameForOrganization,
+  isS3ObjectNotFoundError,
+  normalizeBlobToR2MigrationDocumentRow,
   parseBlobToR2MigrationArgs,
   type BlobToR2MigrationDocumentRow,
+  type BlobToR2MigrationRawDocumentRow,
   type BlobToR2MigrationResult,
 } from "./blob-to-r2-migration.shared.ts";
 
@@ -52,13 +55,19 @@ const r2Client = new S3Client({
   },
 });
 
-const documents = (await sql`
-  SELECT id, pathname, blob_url, content_type, size_bytes
+const rawDocuments = (await sql`
+  SELECT
+    id,
+    pathname,
+    blob_url AS "blobUrl",
+    content_type AS "contentType",
+    size_bytes AS "sizeBytes"
   FROM erp_documents
   WHERE organization_id = ${args.organizationId}
   ORDER BY created_at ASC
   LIMIT ${args.limit}
-`) as BlobToR2MigrationDocumentRow[];
+`) as BlobToR2MigrationRawDocumentRow[];
+const documents = rawDocuments.map(normalizeBlobToR2MigrationDocumentRow);
 
 const result: BlobToR2MigrationResult = {
   organizationId: args.organizationId,
@@ -87,7 +96,10 @@ for (const document of documents) {
         );
         result.skippedExisting += 1;
         continue;
-      } catch {
+      } catch (error) {
+        if (!isS3ObjectNotFoundError(error)) {
+          throw error;
+        }
         // Object absent — proceed with copy.
       }
     }
@@ -105,11 +117,17 @@ for (const document of documents) {
       );
     }
 
-    const body = Buffer.from(await sourceResponse.arrayBuffer());
+    const contentLength = Number.parseInt(
+      sourceResponse.headers.get("content-length") ?? "",
+      10,
+    );
 
-    if (body.byteLength !== document.sizeBytes) {
+    if (
+      Number.isSafeInteger(contentLength) &&
+      contentLength !== document.sizeBytes
+    ) {
       throw new Error(
-        `Size mismatch for ${document.pathname}: expected ${document.sizeBytes}, got ${body.byteLength}`,
+        `Size mismatch for ${document.pathname}: expected ${document.sizeBytes}, got ${contentLength}`,
       );
     }
 
@@ -117,7 +135,8 @@ for (const document of documents) {
       new PutObjectCommand({
         Bucket: storageEnv.r2.bucket,
         Key: document.pathname,
-        Body: body,
+        Body: sourceResponse.body ?? undefined,
+        ContentLength: document.sizeBytes,
         ContentType: document.contentType ?? "application/octet-stream",
       }),
     );

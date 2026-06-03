@@ -2,6 +2,6 @@ import { createVitestConfig } from "@afenda/config/vitest";
 
 export default createVitestConfig("@afenda/auth", {
   test: {
-    include: ["tests/**/*.test.ts"],
+    include: ["src/neon-auth/tests/**/*.test.ts"],
   },
 });

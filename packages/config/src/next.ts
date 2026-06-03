@@ -11,7 +11,6 @@ export const afendaTranspilePackages = [
   "@afenda/ai",
   "@afenda/appshell",
   "@afenda/auth",
-  "@afenda/neon-auth",
   "@afenda/billing",
   "@afenda/config",
   "@afenda/db",

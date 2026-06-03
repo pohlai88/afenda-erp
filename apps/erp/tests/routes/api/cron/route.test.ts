@@ -2,8 +2,16 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { ERP_CRON_HTTP_ROUTES } from "@/contracts/erp-http.contract";
 
 const cronHistory = vi.hoisted(() => ({
-  createCronRunHistory: vi.fn(async () => "cron_run_route"),
-  finishCronRunHistory: vi.fn(async () => undefined),
+  createCronRunHistory: vi.fn(
+    async (_input: {
+      jobName: string;
+      route: string;
+      status: string;
+    }) => "cron_run_route",
+  ),
+  finishCronRunHistory: vi.fn(
+    async (_input: { id: string; status: string }) => undefined,
+  ),
 }));
 
 vi.mock("@afenda/db", () => ({
@@ -11,12 +19,51 @@ vi.mock("@afenda/db", () => ({
   finishCronRunHistory: cronHistory.finishCronRunHistory,
 }));
 
-vi.mock("@afenda/observability", () => ({
+vi.mock("@afenda/observability/server", () => ({
   getRequestId: vi.fn(() => "req_cron_route"),
   logServerEvent: vi.fn(),
 }));
 
 vi.mock("@afenda/workflows", () => ({
+  runCronJob: vi.fn(
+    async ({
+      execute,
+      jobName,
+      request,
+      route,
+    }: {
+      execute: () => Promise<Record<string, unknown>>;
+      jobName: string;
+      request: Request;
+      route: string;
+    }) => {
+      const secret = process.env.CRON_SECRET;
+      const authorization = request.headers.get("authorization");
+
+      if (!secret || authorization !== `Bearer ${secret}`) {
+        return Response.json({ error: "Unauthorized" }, { status: 401 });
+      }
+
+      await cronHistory.createCronRunHistory({
+        jobName,
+        route,
+        status: "running",
+      });
+
+      const result = await execute();
+
+      await cronHistory.finishCronRunHistory({
+        id: "cron_run_route",
+        status: "success",
+      });
+
+      return Response.json({
+        success: true,
+        job: jobName,
+        ...result,
+      });
+    },
+  ),
   runReminderSweep: vi.fn(async () => ({ processedOrganizations: 1 })),
   runSyncSweep: vi.fn(async () => ({ syncedOrganizations: 1 })),
   runHousekeepingSweep: vi.fn(async () => ({ cleanedOrganizations: 1 })),

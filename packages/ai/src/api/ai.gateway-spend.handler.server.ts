@@ -1,5 +1,5 @@
 import { getApiAuthContext } from "@afenda/auth/server";
-import { getRequestId, logServerEvent } from "@afenda/observability";
+import { getRequestId, logServerEvent } from "@afenda/observability/server";
 import { NextResponse } from "next/server";
 
 import { AI_ERP_HTTP_ROUTES } from "../contracts/ai.http.contract";

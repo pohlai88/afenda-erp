@@ -131,7 +131,7 @@ export async function syncKnowledgeSource(
       }
     }
 
-    emitKnowledgeAuditEvent({
+    await emitKnowledgeAuditEvent({
       action: KNOWLEDGE_AUDIT_ACTIONS.SOURCE_SYNC_COMPLETE,
       organizationId,
       sourceId,
@@ -147,7 +147,7 @@ export async function syncKnowledgeSource(
     });
   } catch (err) {
     const errorMsg = err instanceof Error ? err.message : String(err);
-    emitKnowledgeAuditEvent({
+    await emitKnowledgeAuditEvent({
       action: KNOWLEDGE_AUDIT_ACTIONS.SOURCE_SYNC_FAIL,
       organizationId,
       sourceId,

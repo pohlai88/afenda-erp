@@ -9,30 +9,62 @@
       "development": "./src/index.ts",
       "default": "./dist/index.js"
     },
-    "./client": {
-      "types": "./src/client.ts",
-      "development": "./src/client.ts",
-      "default": "./dist/client.js"
-    },
     "./server": {
       "types": "./src/server.ts",
       "development": "./src/server.ts",
       "default": "./dist/server.js"
     },
-    "./auth-flows": {
-      "types": "./src/contracts/auth.flows.ts",
-      "development": "./src/contracts/auth.flows.ts",
-      "default": "./dist/contracts/auth.flows.js"
+    "./client": {
+      "types": "./src/client.ts",
+      "development": "./src/client.ts",
+      "default": "./dist/client.js"
+    },
+    "./neon-auth": {
+      "types": "./src/neon-auth/index.ts",
+      "development": "./src/neon-auth/index.ts",
+      "default": "./dist/neon-auth/index.js"
+    },
+    "./neon-auth/server": {
+      "types": "./src/neon-auth/server.ts",
+      "development": "./src/neon-auth/server.ts",
+      "default": "./dist/neon-auth/server.js"
+    },
+    "./neon-auth/client": {
+      "types": "./src/neon-auth/client.ts",
+      "development": "./src/neon-auth/client.ts",
+      "default": "./dist/neon-auth/client.js"
+    },
+    "./neon-auth/neon-cookies": {
+      "types": "./src/neon-auth/runtime/neon-cookies.shared.ts",
+      "development": "./src/neon-auth/runtime/neon-cookies.shared.ts",
+      "default": "./dist/neon-auth/runtime/neon-cookies.shared.js"
+    },
+    "./neon-auth/neon-session": {
+      "types": "./src/neon-auth/runtime/neon-session.server.ts",
+      "development": "./src/neon-auth/runtime/neon-session.server.ts",
+      "default": "./dist/neon-auth/runtime/neon-session.server.js"
+    },
+    "./neon-auth/paths": {
+      "types": "./src/neon-auth/contracts/paths.shared.ts",
+      "development": "./src/neon-auth/contracts/paths.shared.ts",
+      "default": "./dist/neon-auth/contracts/paths.shared.js"
+    },
+    "./neon-auth/ui": {
+      "types": "./src/neon-auth/ui/index.ts",
+      "development": "./src/neon-auth/ui/index.ts",
+      "default": "./dist/neon-auth/ui/index.js"
+    },
+    "./neon-auth/pages": {
+      "types": "./src/neon-auth/pages/index.ts",
+      "development": "./src/neon-auth/pages/index.ts",
+      "default": "./dist/neon-auth/pages/index.js"
     }
   },
   "dependencies": {
     "@afenda/config": "workspace:*",
-    "@afenda/db": "workspace:*",
-    "@afenda/kernel": "workspace:*",
-    "@afenda/neon-auth": "workspace:*",
-    "@afenda/observability": "workspace:*",
-    "@afenda/ui": "workspace:*",
-    "drizzle-orm": "catalog:",
+    "@neondatabase/auth": "0.4.1-beta",
+    "@neondatabase/auth-ui": "0.2.0-beta",
+    "jose": "^6.1.2",
     "zod": "catalog:"
   },
   "peerDependencies": {
@@ -46,6 +78,7 @@
     "test": "vitest run"
   },
   "devDependencies": {
+    "@afenda/config": "workspace:*",
     "server-only": "^0.0.1",
     "vitest": "catalog:"
   },

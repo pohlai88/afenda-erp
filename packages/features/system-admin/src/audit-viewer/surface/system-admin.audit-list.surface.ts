@@ -22,6 +22,12 @@ const AUDIT_MODULE_FILTER_OPTIONS = [
   { label: "Inventory", value: "inventory" },
 ] as const;
 
+const AUDIT_OUTCOME_FILTER_OPTIONS = [
+  { label: "Success", value: "success" },
+  { label: "Failure", value: "failure" },
+  { label: "Denied", value: "denied" },
+] as const;
+
 const AUDIT_VIEWER_COLUMNS = [
   {
     id: "occurredAt",
@@ -40,6 +46,19 @@ const AUDIT_VIEWER_COLUMNS = [
     cellKind: { kind: "link" as const },
   },
 ] as const;
+
+function resolveAuditResultTone(result: string) {
+  switch (result) {
+    case "success":
+      return "positive" as const;
+    case "failure":
+      return "critical" as const;
+    case "denied":
+      return "attention" as const;
+    default:
+      return "default" as const;
+  }
+}
 
 export function buildSystemAdminAuditViewerListSurface(input: {
   rows: readonly SystemAdminAuditEventRow[];
@@ -76,6 +95,12 @@ export function buildSystemAdminAuditViewerListSurface(input: {
         param: "auditModule",
         options: [...AUDIT_MODULE_FILTER_OPTIONS],
       },
+      {
+        id: "outcome",
+        label: "Outcome",
+        param: "auditOutcome",
+        options: [...AUDIT_OUTCOME_FILTER_OPTIONS],
+      },
     ],
   });
 
@@ -98,6 +123,7 @@ export function buildSystemAdminAuditViewerListSurface(input: {
           "auditPage",
           "auditPageSize",
           "auditId",
+          "auditOutcome",
         ],
       },
     },
@@ -146,7 +172,7 @@ export function buildSystemAdminAuditViewerListSurface(input: {
       rowHref: buildSystemAdminAuditEventDetailHref(input.params, row.id),
       linkColumnId: "summary",
       cellKinds: {
-        result: { kind: "badge", tone: "default" },
+        result: { kind: "badge", tone: resolveAuditResultTone(row.result) },
         summary: {
           kind: "link",
           href: buildSystemAdminAuditEventDetailHref(input.params, row.id),

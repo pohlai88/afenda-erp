@@ -42,7 +42,7 @@ vi.mock("@afenda/db", () => ({
   updateLynxOutcomeMonitorSetting: mocks.updateLynxOutcomeMonitorSetting,
 }));
 
-vi.mock("@afenda/observability", () => ({
+vi.mock("@afenda/observability/server", () => ({
   logServerEvent: mocks.logServerEvent,
 }));
 

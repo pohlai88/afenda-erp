@@ -77,6 +77,7 @@ describe("runGuardedExecution", () => {
       expect.objectContaining({
         organizationId: "org_123",
         actorId: "user_123",
+        module: "hr",
         action: "hr.employee.update",
         targetType: "hr-employee",
         targetId: "emp_1",

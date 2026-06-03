@@ -1,9 +1,6 @@
 import { LynxWorkflowsRoutePage } from "@/routes/workspace/lynx/lynx-workflows-route";
 
-export const unstable_instant = {
-  prefetch: "static",
-  unstable_disableValidation: true,
-};
+export const unstable_instant = false;
 
 type LynxWorkflowsPageProps = {
   searchParams: Promise<Record<string, string | string[] | undefined>>;

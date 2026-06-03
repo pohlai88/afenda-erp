@@ -2,10 +2,7 @@ import { assertHrModuleId } from "@/lib/hr-route.shared";
 import HrCompensationPlanningAuditPage from "@/routes/workspace/modules/hr-compensation-planning-audit.server";
 export { metadata } from "@/routes/workspace/modules/hr-compensation-planning-audit.server";
 
-export const unstable_instant = {
-  prefetch: "static",
-  unstable_disableValidation: true,
-};
+export const unstable_instant = false;
 
 type PageProps = {
   params: Promise<{ moduleId: string }>;

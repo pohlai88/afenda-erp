@@ -43,10 +43,23 @@ if (
   );
 }
 
-let jwks: { ok: boolean; status?: number; error?: string } = { ok: false };
+/** Trusted origins for production branch (MCP — prod + localhost dev). */
+const expectedTrustedOrigins = [
+  "https://www.nexuscanon.com",
+  "https://nexuscanon.com",
+  "http://localhost:3000",
+] as const;
+
+let jwks: {
+  ok: boolean;
+  status?: number;
+  error?: string;
+  url?: string;
+} = { ok: false };
 
 if (enabled && baseUrl) {
   const jwksUrl = `${baseUrl.replace(/\/$/, "")}/.well-known/jwks.json`;
+  jwks.url = jwksUrl;
   try {
     const response = await fetch(jwksUrl, {
       signal: AbortSignal.timeout(8_000),
@@ -69,6 +82,29 @@ if (enabled && !publicAuthUrl) {
   );
 }
 
+if (enabled) {
+  hints.push(
+    `Neon MCP trusted origins: ${expectedTrustedOrigins.join(", ")}; allow_localhost=true for local dev. Remove localhost before prod-only lockdown.`,
+  );
+  hints.push(
+    "Optional hardening: replace shared SMTP with custom email provider via configure_neon_auth update_email_provider.",
+  );
+}
+
+const authUiFlags = {
+  AFENDA_AUTH_GOOGLE_ENABLED: process.env.AFENDA_AUTH_GOOGLE_ENABLED ?? "(unset)",
+  AFENDA_AUTH_EMAIL_DELIVERY_READY:
+    process.env.AFENDA_AUTH_EMAIL_DELIVERY_READY ?? "(unset)",
+  AFENDA_AUTH_EMAIL_OTP_ENABLED:
+    process.env.AFENDA_AUTH_EMAIL_OTP_ENABLED ?? "(unset)",
+  AFENDA_AUTH_MAGIC_LINK_ENABLED:
+    process.env.AFENDA_AUTH_MAGIC_LINK_ENABLED ?? "(unset)",
+  AFENDA_AUTH_FORGOT_PASSWORD_ENABLED:
+    process.env.AFENDA_AUTH_FORGOT_PASSWORD_ENABLED ?? "(unset)",
+  AFENDA_AUTH_EMAIL_VERIFICATION_ENABLED:
+    process.env.AFENDA_AUTH_EMAIL_VERIFICATION_ENABLED ?? "(unset)",
+} as const;
+
 const report = {
   neonAuthEnabled: enabled,
   configured: env.configured,
@@ -77,6 +113,7 @@ const report = {
     NEXT_PUBLIC_AFENDA_NEON_AUTH_ENABLED:
       process.env.NEXT_PUBLIC_AFENDA_NEON_AUTH_ENABLED ?? "(unset)",
     AFENDA_DEV_AUTH_BYPASS: env.AFENDA_DEV_AUTH_BYPASS,
+    ...authUiFlags,
   },
   presence: {
     NEON_AUTH_BASE_URL: Boolean(baseUrl),
@@ -86,6 +123,10 @@ const report = {
   },
   baseUrlHost: baseUrl ? new URL(baseUrl).host : null,
   jwks,
+  neonMcp: {
+    projectId: process.env.NEON_PROJECT_ID?.trim() || "snowy-dawn-60990429",
+    expectedTrustedOrigins,
+  },
   hints,
   errors,
   doc: "docs/development/neon-auth.md",

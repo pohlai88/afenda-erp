@@ -107,6 +107,20 @@ packages/features/<moduleId>/src/
 
 Fix denials in-session. Do not argue that legacy paths are acceptable.
 
+## `packages/auth` rebuild discipline
+
+**`packages/auth` may be deleted entirely and rebuilt from scratch.** If an agent ranks speed over instructions, the cycle repeats: scaffold → copy/recover from staging or legacy → user hard-deletes → start again. **Speed without compliance is not completion.**
+
+When `packages/auth` is missing or being rebuilt:
+
+1. **No recovery** — Do not copy, robocopy, `git show`, or transcribe from `packages/auth/neon-auth/` staging, deleted trees, prior session implementation, or legacy `src/neon/`, `src/session/`, `src/pages/`, etc.
+2. **Neon SDK docs only** — Implement from [Neon Next.js API methods quickstart](https://neon.com/docs/auth/quick-start/nextjs-api-only) and [Next.js Server SDK reference](https://neon.com/docs/auth/reference/nextjs-server). `/user-Neon/setup-neon-auth` is not authoritative (often 404 / Vite template).
+3. **Neon-only in `@afenda/auth`** — Default Neon capabilities (`createNeonAuth`, `createAuthClient`, `getSession`, handler, middleware, webhooks/JWT as documented). No Afenda tenant session, capability hydration, or ERP UI in this package.
+4. **No wiring until asked** — Do not update `apps/erp`, `@afenda/kernel`, or feature imports until the user explicitly requests integration.
+5. **Stop on prohibition** — If the user forbids copy/recover, stop immediately. Do not pivot to manual rewrite of the same forbidden source.
+
+Failure mode: agent “finishes fast” by recovering old code → user deletes `packages/auth` again → nothing shippable. **Follow process or stop; do not substitute outcome for instruction.**
+
 ## Programmatic agents
 
 [`Cursor SDK`](https://cursor.com/docs/sdk/typescript) — explicit `cwd`, dispose agents, pass MCP on `resume`.

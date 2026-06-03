@@ -1,3 +1,9 @@
+import type { AfendaTransaction } from "@afenda/db";
+import {
+  writeExecutionAuditEvent,
+  writeExecutionAuditEventInTransaction,
+  type ExecutionAuditEvent,
+} from "@afenda/kernel/execution";
 import { KNOWLEDGE_AUDIT_ACTIONS } from "../contracts/knowledge.core.contract";
 
 export type KnowledgeAuditAction =
@@ -95,14 +101,85 @@ export function createKnowledgeAuditEvent(input: KnowledgeAuditEventInput) {
   };
 }
 
-export function emitKnowledgeAuditEvent(input: KnowledgeAuditEventInput): void {
-  const event = createKnowledgeAuditEvent(input);
-  const line = JSON.stringify(event);
-
-  if (event.level === "error") {
-    console.error(line);
-    return;
+function resolveKnowledgeAuditTarget(input: KnowledgeAuditEventInput) {
+  if (input.documentId) {
+    return {
+      targetType: "document",
+      targetId: input.documentId,
+      subjectType: "knowledge-document",
+      subjectId: input.documentId,
+    };
   }
 
-  console.log(line);
+  if (input.sourceId) {
+    return {
+      targetType: "system",
+      targetId: input.sourceId,
+      subjectType: "knowledge-source",
+      subjectId: input.sourceId,
+      targetDisplayName: `knowledge-source:${input.sourceId}`,
+    };
+  }
+
+  return {
+    targetType: "system",
+    targetId: input.organizationId,
+    subjectType: "knowledge",
+    subjectId: input.organizationId,
+  };
+}
+
+function resolveKnowledgeAuditChannel(input: KnowledgeAuditEventInput) {
+  if (
+    input.action === KNOWLEDGE_AUDIT_ACTIONS.SOURCE_SYNC_COMPLETE ||
+    input.action === KNOWLEDGE_AUDIT_ACTIONS.SOURCE_SYNC_FAIL
+  ) {
+    return "cron";
+  }
+
+  return "server_action";
+}
+
+export function createKnowledgeExecutionAuditEvent(
+  input: KnowledgeAuditEventInput,
+): ExecutionAuditEvent {
+  const event = createKnowledgeAuditEvent(input);
+  const metadata = {
+    result: input.result,
+    level: event.level,
+    ...(event.durationMs ? { durationMs: event.durationMs } : {}),
+    ...(event.metadata ? event.metadata : {}),
+    ...(event.error ? { error: event.error } : {}),
+  };
+  const target = resolveKnowledgeAuditTarget(input);
+
+  return {
+    organizationId: input.organizationId,
+    module: "knowledge",
+    surface: "knowledge-audit",
+    actorId: "system:knowledge",
+    actorType: "service",
+    action: input.action,
+    outcome: input.result === "failed" ? "failure" : "success",
+    channel: resolveKnowledgeAuditChannel(input),
+    summary: `${input.action} ${input.result}.`,
+    metadata,
+    ...target,
+  };
+}
+
+export async function emitKnowledgeAuditEvent(
+  input: KnowledgeAuditEventInput,
+): Promise<void> {
+  await writeExecutionAuditEvent(createKnowledgeExecutionAuditEvent(input));
+}
+
+export async function emitKnowledgeAuditEventInTransaction(
+  db: AfendaTransaction,
+  input: KnowledgeAuditEventInput,
+): Promise<void> {
+  await writeExecutionAuditEventInTransaction(
+    db,
+    createKnowledgeExecutionAuditEvent(input),
+  );
 }

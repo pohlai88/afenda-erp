@@ -1,7 +1,7 @@
 "use server";
 
 import { updateLynxOutcomeMonitorSetting } from "@afenda/db";
-import { logServerEvent } from "@afenda/observability";
+import { logServerEvent } from "@afenda/observability/server";
 import { revalidatePath } from "next/cache";
 import {
   systemAdminActionFailure,

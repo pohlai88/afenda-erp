@@ -1,5 +1,7 @@
 import {
   maxLoggedStringLength,
+  maxLoggedArrayLength,
+  maxLoggedObjectEntries,
   maxRedactionDepth,
   redactedValue,
   sensitiveLogKeyFragments,
@@ -50,7 +52,9 @@ function redactValue(value: unknown, depth: number, seen: WeakSet<object>): unkn
   }
 
   if (Array.isArray(value)) {
-    return value.map((entry) => redactValue(entry, depth + 1, seen));
+    return value
+      .slice(0, maxLoggedArrayLength)
+      .map((entry) => redactValue(entry, depth + 1, seen));
   }
 
   if (typeof value === "object") {
@@ -60,14 +64,16 @@ function redactValue(value: unknown, depth: number, seen: WeakSet<object>): unkn
 
     seen.add(value);
 
-    return Object.fromEntries(
-      Object.entries(value).map(([key, entry]) => [
+    const redactedEntries = Object.entries(value)
+      .slice(0, maxLoggedObjectEntries)
+      .map(([key, entry]) => [
         key,
         isSensitiveKey(key)
           ? redactedValue
           : redactValue(entry, depth + 1, seen),
-      ]),
-    );
+      ]);
+
+    return Object.fromEntries(redactedEntries);
   }
 
   return String(value);
@@ -75,4 +81,16 @@ function redactValue(value: unknown, depth: number, seen: WeakSet<object>): unkn
 
 export function redactLogPayload<T>(payload: T): T {
   return redactValue(payload, 0, new WeakSet()) as T;
+}
+
+export function safelyRedactLogPayload<T>(payload: T): T | Record<string, unknown> {
+  try {
+    return redactLogPayload(payload);
+  } catch (error) {
+    return {
+      event: "logger.redaction.failed",
+      outcome: "failure",
+      error: error instanceof Error ? error.message : String(error),
+    };
+  }
 }
