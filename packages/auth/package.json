@@ -19,21 +19,6 @@
       "development": "./src/server.ts",
       "default": "./dist/server.js"
     },
-    "./neon-auth-server": {
-      "types": "./src/neon-auth-server.ts",
-      "development": "./src/neon-auth-server.ts",
-      "default": "./dist/neon-auth-server.js"
-    },
-    "./neon-cookies": {
-      "types": "./src/neon-cookies.ts",
-      "development": "./src/neon-cookies.ts",
-      "default": "./dist/neon-cookies.js"
-    },
-    "./neon-session": {
-      "types": "./src/neon-session.ts",
-      "development": "./src/neon-session.ts",
-      "default": "./dist/neon-session.js"
-    },
     "./auth-flows": {
       "types": "./src/contracts/auth.flows.ts",
       "development": "./src/contracts/auth.flows.ts",
@@ -47,10 +32,7 @@
     "@afenda/neon-auth": "workspace:*",
     "@afenda/observability": "workspace:*",
     "@afenda/ui": "workspace:*",
-    "@neondatabase/auth": "0.4.1-beta",
-    "@neondatabase/serverless": "^1.1.0",
     "drizzle-orm": "catalog:",
-    "jose": "^6.1.2",
     "zod": "catalog:"
   },
   "peerDependencies": {

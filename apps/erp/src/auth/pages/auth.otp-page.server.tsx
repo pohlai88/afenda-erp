@@ -9,7 +9,7 @@ import {
   AuthShell,
   createAuthPageMetadata,
 } from "../ingress/auth-shell.server";
-import { isNeonAuthUiReady } from "@afenda/auth/neon-auth-server";
+import { isNeonAuthUiReady } from "@afenda/neon-auth/server";
 import { resolveAuthMethodReadiness } from "../policy/auth-method-readiness.shared";
 
 const shellCopy = getAuthPageShellCopy("otp");

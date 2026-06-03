@@ -20,7 +20,7 @@ import { redirect } from "next/navigation";
 import {
   isNeonAuthReady,
   getNeonAuthServer,
-} from "@afenda/auth/neon-auth-server";
+} from "@afenda/neon-auth/server";
 import {
   bootstrapDevSessionTenant,
   createDevSessionCookie,

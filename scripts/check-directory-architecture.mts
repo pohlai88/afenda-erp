@@ -71,6 +71,13 @@ const packageArchitectureRules: Record<string, PackageArchitectureRule> = {
     requiresPackageBuild: true,
     turboBuildOutputs: ["dist/**"],
   },
+  "@afenda/neon-auth": {
+    category: "runtime-library",
+    workspaceRoot: "packages",
+    requiresCompiledDistExports: true,
+    requiresPackageBuild: true,
+    turboBuildOutputs: ["dist/**"],
+  },
   "@afenda/billing": {
     category: "runtime-library",
     workspaceRoot: "packages",
@@ -114,6 +121,13 @@ const packageArchitectureRules: Record<string, PackageArchitectureRule> = {
     turboBuildOutputs: ["dist/**"],
   },
   "@afenda/object-storage": {
+    category: "runtime-library",
+    workspaceRoot: "packages",
+    requiresCompiledDistExports: true,
+    requiresPackageBuild: true,
+    turboBuildOutputs: ["dist/**"],
+  },
+  "@afenda/public-homepage": {
     category: "runtime-library",
     workspaceRoot: "packages",
     requiresCompiledDistExports: true,
@@ -307,6 +321,10 @@ function checkDocumentationNaming(filePath: string) {
     /^packages\/object-storage\/docs\/[^/]*architecture[^/]*\.md$/.test(
       normalizedRel,
     );
+  const isPublicHomepageArchitectureDoc =
+    /^packages\/public-homepage\/docs\/[^/]*architecture[^/]*\.md$/.test(
+      normalizedRel,
+    );
   if (
     isArchitectureDoc &&
     !rel.startsWith("docs/architecture/") &&
@@ -314,7 +332,8 @@ function checkDocumentationNaming(filePath: string) {
     !isKernelVerticalArchitectureDoc &&
     !isKernelLegacyArchitectureRedirect &&
     !isObservabilityArchitectureDoc &&
-    !isObjectStorageArchitectureDoc
+    !isObjectStorageArchitectureDoc &&
+    !isPublicHomepageArchitectureDoc
   ) {
     problems.push(
       `Architecture docs must live under docs/architecture/, an allowed package architecture supplement, or a feature vertical bucket: ${rel}`,

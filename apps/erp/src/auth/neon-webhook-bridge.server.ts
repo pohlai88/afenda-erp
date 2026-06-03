@@ -1,8 +1,8 @@
 import "server-only";
 
 import { upsertUserProfile } from "@afenda/db";
-import { registerNeonAuthWebhookHooks } from "@afenda/auth/server";
-import type { NeonAuthWebhookEnvelope } from "@afenda/auth/server";
+import { registerNeonAuthWebhookHooks } from "@afenda/neon-auth/server";
+import type { NeonAuthWebhookEnvelope } from "@afenda/neon-auth/server";
 
 async function handleUserCreated(payload: NeonAuthWebhookEnvelope) {
   const user = payload.user;

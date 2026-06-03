@@ -6,7 +6,7 @@ import { redirect } from "next/navigation";
 import { VerifyEmailForm } from "../forms/auth.verify-email-form.client";
 import { AuthPageFrame } from "../ingress/auth-page-frame.server";
 import { AuthShell, createAuthPageMetadata } from "../ingress/auth-shell.server";
-import { isNeonAuthUiReady } from "@afenda/auth/neon-auth-server";
+import { isNeonAuthUiReady } from "@afenda/neon-auth/server";
 import {
   getPostSignInDestination,
   getSession,

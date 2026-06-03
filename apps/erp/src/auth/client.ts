@@ -1,4 +1,4 @@
-export { neonAuthClient, authClient } from "@afenda/auth/client";
+export { neonAuthClient, authClient } from "@afenda/neon-auth/client";
 export {
   AuthDivider,
   AuthCheckboxField,

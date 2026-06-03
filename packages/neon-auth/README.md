@@ -7,7 +7,6 @@ Canonical Neon Auth module for Afenda.
 ## Status
 
 - Phase 5: extracted as standalone workspace package `@afenda/neon-auth`
-- `@afenda/auth` re-exports Neon doors for backward compatibility
 
 ## Public doors
 
@@ -56,4 +55,4 @@ pnpm --filter @afenda/auth typecheck
 pnpm --filter @afenda/auth test
 ```
 
-See [TREE.md](./TREE.md) for full layout and [`docs/development/neon-auth.md`](../../docs/development/neon-auth.md) for Afenda-wide Neon Auth operations.
+See [tree.md](./tree.md) for full layout and [`docs/development/neon-auth.md`](../../docs/development/neon-auth.md) for Afenda-wide Neon Auth operations.

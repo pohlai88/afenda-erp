@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-vi.mock("@afenda/auth/neon-auth-server", () => ({
+vi.mock("@afenda/neon-auth/server", () => ({
   getNeonAuthServer: vi.fn(),
   isNeonAuthReady: vi.fn(),
 }));
@@ -14,7 +14,7 @@ import { authApiRouteCopy } from "@afenda/kernel";
 import {
   getNeonAuthServer,
   isNeonAuthReady,
-} from "@afenda/auth/neon-auth-server";
+} from "@afenda/neon-auth/server";
 import { GET } from "@/app/api/auth/[...path]/route";
 
 describe("auth proxy route", () => {

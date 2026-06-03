@@ -5,7 +5,7 @@ Phase 5 standalone package layout under `packages/neon-auth/`.
 ```
 packages/neon-auth/
 ├── README.md
-├── TREE.md
+├── tree.md
 ├── package.json
 ├── tsconfig.json
 ├── vitest.config.ts

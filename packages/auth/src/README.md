@@ -13,7 +13,7 @@ Neon Auth runtime lives in **`@afenda/neon-auth`** (`packages/neon-auth/`). ERP 
 
 ## Import paths
 
-- **Neon server:** `@afenda/neon-auth/server` or `@afenda/auth/neon-auth-server` (shim)
-- **Neon client:** `@afenda/neon-auth/client` or `@afenda/auth/client` (shim)
+- **Neon server / client / cookies:** `@afenda/neon-auth/server`, `@afenda/neon-auth/client`, `@afenda/neon-auth/neon-cookies`
 - **Session / capabilities:** `@afenda/auth/server`, `@afenda/auth`
+- **Browser-safe contracts:** `@afenda/auth/client`, `@afenda/auth`
 - **ERP auth pages:** `@/auth/pages/*` in `apps/erp`

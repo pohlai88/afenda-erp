@@ -124,7 +124,7 @@ export const deferredNeonWebhookEventHandlers = [
   "send.magic_link",
 ] as const;
 
-/** Browser-facing flows live in apps/erp/src/auth (pages, forms, ingress). Neon SDK client: @afenda/auth/client. */
+/** Browser-facing flows live in apps/erp/src/auth (pages, forms, ingress). Neon SDK client: @afenda/neon-auth/client. */
 export const implementedNeonClientFlows = [
   "signIn.email",
   "signIn.social.google",

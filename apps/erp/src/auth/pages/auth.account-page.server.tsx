@@ -6,7 +6,7 @@ import { SectionPanel } from "@afenda/ui";
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { AccountSettingsPanel } from "../forms/auth.account-settings-panel.client";
-import { isNeonAuthUiReady } from "@afenda/auth/neon-auth-server";
+import { isNeonAuthUiReady } from "@afenda/neon-auth/server";
 import { getSession } from "@afenda/auth/server";
 
 export const metadata: Metadata = {

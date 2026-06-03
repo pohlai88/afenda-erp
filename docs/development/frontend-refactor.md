@@ -113,7 +113,7 @@ Catalog source of truth: `packages/auth/src/contracts/auth.flows.ts` (`@afenda/a
 
 **UI gate:** `isNeonAuthUiReady()` = server `AFENDA_NEON_AUTH_ENABLED` + `NEXT_PUBLIC_AFENDA_NEON_AUTH_ENABLED` (unset public flag follows server).
 
-**`packages/auth` exports:** `.`, `./client`, `./server`, `./neon-auth-server`, `./neon-session`, `./neon-cookies`, `./auth-flows` — session + shim re-exports of `@afenda/neon-auth`. ERP auth UI: `@/auth/*` in `apps/erp`.
+**`@afenda/auth` exports:** `.`, `./client`, `./server`, `./auth-flows` — session + capability primitives only. **`@afenda/neon-auth` exports:** `.`, `./client`, `./server`, `./neon-cookies`, `./neon-session`, `./paths`. ERP auth UI: `@/auth/*` in `apps/erp`.
 
 ## Key patterns
 

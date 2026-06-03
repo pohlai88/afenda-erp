@@ -11,6 +11,7 @@ export const afendaTranspilePackages = [
   "@afenda/ai",
   "@afenda/appshell",
   "@afenda/auth",
+  "@afenda/neon-auth",
   "@afenda/billing",
   "@afenda/config",
   "@afenda/db",
@@ -29,6 +30,7 @@ export const afendaTranspilePackages = [
   "@afenda/governed-surface",
   "@afenda/observability",
   "@afenda/object-storage",
+  "@afenda/public-homepage",
   "@afenda/ui",
   "@afenda/workflows",
 ] as const;

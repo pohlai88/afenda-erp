@@ -11,7 +11,7 @@ import { AuthFormAlert } from "../ui/auth-form-alert.client";
 import { AuthSubmitButton } from "../ui/auth-submit-button.client";
 import { authPendingCopy } from "../copy/auth-pending-copy.shared";
 import { authSuccessCopy } from "../copy/auth-success-copy.shared";
-import { neonAuthClient } from "@afenda/auth/client";
+import { neonAuthClient } from "@afenda/neon-auth/client";
 import {
   AuthField,
   AuthFieldGroup,

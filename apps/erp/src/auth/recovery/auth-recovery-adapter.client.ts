@@ -1,6 +1,6 @@
 "use client";
 
-import { neonAuthClient } from "@afenda/auth/client";
+import { neonAuthClient } from "@afenda/neon-auth/client";
 
 type AuthAdapterError = { message?: string } | null | undefined;
 

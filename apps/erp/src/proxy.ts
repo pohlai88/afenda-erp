@@ -1,5 +1,5 @@
 import { AFENDA_SESSION_COOKIE } from "@afenda/auth";
-import { hasNeonAuthSessionToken } from "@afenda/auth/neon-cookies";
+import { hasNeonAuthSessionToken } from "@afenda/neon-auth/neon-cookies";
 import { isDevCookieAuthEnabled, isNeonAuthEnabled } from "@afenda/config/env";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
@@ -56,7 +56,7 @@ export async function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const { getNeonAuthServer } = await import("@afenda/auth/neon-auth-server");
+  const { getNeonAuthServer } = await import("@afenda/neon-auth/server");
   return getNeonAuthServer().middleware({ loginUrl: "/sign-in" })(request);
 }
 
