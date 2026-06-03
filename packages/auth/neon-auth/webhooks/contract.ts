@@ -10,8 +10,6 @@ export const neonAuthWebhookEventTypes = [
 
 export type NeonAuthWebhookEventType = (typeof neonAuthWebhookEventTypes)[number];
 
-export const neonAuthWebhookHttpPath = "/api/internal/v1/webhooks/neon-auth" as const;
-
 const neonWebhookUserSchema = z
   .object({
     id: z.string().optional(),
@@ -25,13 +23,45 @@ const neonWebhookUserSchema = z
   })
   .passthrough();
 
+const neonWebhookContextSchema = z
+  .object({
+    endpoint_id: z.string().optional(),
+    project_name: z.string().optional(),
+  })
+  .passthrough()
+  .optional();
+
+const neonSendOtpEventDataSchema = z
+  .object({
+    otp: z.string().optional(),
+    delivery_preference: z.enum(["email", "sms"]).optional(),
+    email: z.string().email().optional(),
+    phone_number: z.string().optional(),
+  })
+  .passthrough();
+
+const neonSendMagicLinkEventDataSchema = z
+  .object({
+    url: z.string().url().optional(),
+    email: z.string().email().optional(),
+  })
+  .passthrough();
+
+const neonUserEventDataSchema = z.record(z.string(), z.unknown()).optional();
+
+export const neonAuthWebhookEventDataSchema = z.union([
+  neonSendOtpEventDataSchema,
+  neonSendMagicLinkEventDataSchema,
+  neonUserEventDataSchema,
+]);
+
 export const neonAuthWebhookEnvelopeSchema = z.object({
   event_id: z.string().min(1),
   event_type: z.enum(neonAuthWebhookEventTypes),
   timestamp: z.string(),
-  context: z.record(z.string(), z.unknown()).optional(),
+  context: neonWebhookContextSchema,
   user: neonWebhookUserSchema.optional(),
-  event_data: z.record(z.string(), z.unknown()).optional(),
+  event_data: neonAuthWebhookEventDataSchema.optional(),
 });
 
 export type NeonAuthWebhookEnvelope = z.infer<typeof neonAuthWebhookEnvelopeSchema>;
@@ -45,3 +75,13 @@ export const neonAuthWebhookBeforeCreateResponseSchema = z.object({
 export type NeonAuthWebhookBeforeCreateResponse = z.infer<
   typeof neonAuthWebhookBeforeCreateResponseSchema
 >;
+
+export function isNeonSmsOtpWebhook(payload: NeonAuthWebhookEnvelope) {
+  return (
+    payload.event_type === "send.otp" &&
+    payload.event_data != null &&
+    typeof payload.event_data === "object" &&
+    "delivery_preference" in payload.event_data &&
+    payload.event_data.delivery_preference === "sms"
+  );
+}

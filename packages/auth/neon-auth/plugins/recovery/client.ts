@@ -2,12 +2,16 @@
 
 import { neonAuthClient } from "../../runtime/neon-auth.client";
 
-export type NeonAuthClientResult = { error?: { message?: string } | null };
+type AuthAdapterError = { message?: string } | null | undefined;
+
+export type AuthAdapterResult = {
+  error?: AuthAdapterError;
+};
 
 type ForgetPasswordEmailFn = (input: {
   email: string;
   redirectTo?: string;
-}) => Promise<NeonAuthClientResult>;
+}) => Promise<AuthAdapterResult>;
 
 function resolveForgetPasswordEmail(): ForgetPasswordEmailFn | null {
   const forgetPassword = neonAuthClient.forgetPassword as { email?: ForgetPasswordEmailFn };
@@ -18,20 +22,41 @@ export function isNeonEmailResetAvailable() {
   return resolveForgetPasswordEmail() !== null;
 }
 
-export async function requestPasswordResetViaEmail(email: string, redirectTo: string) {
+export async function neonHasActiveSession(): Promise<boolean> {
+  const result = await neonAuthClient.getSession();
+  return Boolean(result.data?.session);
+}
+
+export async function neonRequestResetViaEmail(
+  email: string,
+  redirectTo: string,
+): Promise<AuthAdapterResult> {
   const fn = resolveForgetPasswordEmail();
   if (!fn) throw new Error("Email reset is not available.");
   return fn({ email, redirectTo });
 }
 
-export function requestPasswordResetViaOtp(email: string) {
+export async function neonRequestResetViaOtp(email: string): Promise<AuthAdapterResult> {
   return neonAuthClient.forgetPassword.emailOtp({ email });
 }
 
-export function completePasswordResetViaOtp(input: { email: string; otp: string; password: string }) {
+export async function neonCompleteResetViaOtp(input: {
+  email: string;
+  otp: string;
+  password: string;
+}) {
   return neonAuthClient.emailOtp.resetPassword(input);
 }
 
 export function resetPasswordWithToken(input: { token: string; newPassword: string }) {
   return neonAuthClient.resetPassword(input);
 }
+
+/** @deprecated Use neonRequestResetViaEmail */
+export const requestPasswordResetViaEmail = neonRequestResetViaEmail;
+
+/** @deprecated Use neonRequestResetViaOtp */
+export const requestPasswordResetViaOtp = neonRequestResetViaOtp;
+
+/** @deprecated Use neonCompleteResetViaOtp */
+export const completePasswordResetViaOtp = neonCompleteResetViaOtp;

@@ -1,6 +1,6 @@
 import "server-only";
 
-import { isNeonAuthEnabled } from "@afenda/config/env";
+import { getNeonAuthEnv, isNeonAuthEnabled } from "@afenda/config/env";
 import { verifyNeonAuthWebhookPayload } from "../security/webhook-verify.server";
 import { neonAuthWebhookEnvelopeSchema } from "./contract";
 import { getNeonAuthWebhookHooks } from "./hooks.server";
@@ -16,7 +16,7 @@ const CUSTOM_DELIVERY_BODY = {
 } as const;
 
 function blockedDomains() {
-  return parseBlockedSignupEmailDomains(process.env.NEON_AUTH_WEBHOOK_BLOCKED_EMAIL_DOMAINS);
+  return parseBlockedSignupEmailDomains(getNeonAuthEnv().NEON_AUTH_WEBHOOK_BLOCKED_EMAIL_DOMAINS);
 }
 
 /** @see https://neon.com/docs/auth/guides/webhooks */

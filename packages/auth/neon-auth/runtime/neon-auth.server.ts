@@ -1,3 +1,5 @@
+import "server-only";
+
 import {
   getNeonAuthEnv,
   isNeonAuthEnabled,
@@ -15,6 +17,10 @@ export function isNeonAuthReady() {
 /** Neon SDK forms in ingress/account UI (server + `NEXT_PUBLIC_AFENDA_NEON_AUTH_ENABLED`). */
 export function isNeonAuthUiReady() {
   return isNeonAuthUiEnabled();
+}
+
+export function resetNeonAuthServerForTests() {
+  neonAuthServer = null;
 }
 
 export function getNeonAuthServer() {
@@ -50,3 +56,7 @@ export function getNeonAuthServer() {
 
 /** Neon quickstart alias for `getNeonAuthServer()` (unified server SDK instance). */
 export { getNeonAuthServer as auth };
+
+export async function signOutNeonSession() {
+  return getNeonAuthServer().signOut();
+}

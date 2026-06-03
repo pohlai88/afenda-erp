@@ -2,30 +2,15 @@ import "server-only";
 
 import { getNeonAuthEnv } from "@afenda/config/env";
 import crypto from "node:crypto";
+import { getNeonAuthJwkByKid } from "./jwks.shared.server";
 
-const JWKS_CACHE_TTL_MS = 5 * 60 * 1000;
 const MAX_WEBHOOK_AGE_MS = 5 * 60 * 1000;
-
-type JwkKey = crypto.JsonWebKey & { kid?: string };
-
-let jwksCache: { fetchedAt: number; keys: JwkKey[] } | undefined;
+const MAX_WEBHOOK_FUTURE_SKEW_MS = 60 * 1000;
 
 function readHeader(headers: Headers, name: string): string {
   const value = headers.get(name);
   if (!value) throw new Error(`Missing ${name} header.`);
   return value;
-}
-
-async function fetchJwksKeys(baseUrl: string): Promise<JwkKey[]> {
-  const now = Date.now();
-  if (jwksCache && now - jwksCache.fetchedAt < JWKS_CACHE_TTL_MS) return jwksCache.keys;
-  const jwksUrl = new URL(".well-known/jwks.json", baseUrl.endsWith("/") ? baseUrl : `${baseUrl}/`);
-  const response = await fetch(jwksUrl, { cache: "no-store" });
-  if (!response.ok) throw new Error(`Failed to fetch Neon Auth JWKS (${response.status}).`);
-  const body = (await response.json()) as { keys?: JwkKey[] };
-  const keys = body.keys ?? [];
-  jwksCache = { fetchedAt: now, keys };
-  return keys;
 }
 
 /** @see https://neon.com/docs/auth/guides/webhooks#signature-verification */
@@ -44,11 +29,13 @@ export async function verifyNeonAuthWebhookPayload(input: {
   if (!Number.isFinite(ageMs) || ageMs > MAX_WEBHOOK_AGE_MS) {
     throw new Error("Webhook timestamp is too old.");
   }
+  if (ageMs < -MAX_WEBHOOK_FUTURE_SKEW_MS) {
+    throw new Error("Webhook timestamp is in the future.");
+  }
 
-  const jwk = (await fetchJwksKeys(baseUrl)).find((key) => key.kid === kid);
-  if (!jwk) throw new Error(`JWKS key ${kid} not found.`);
-
+  const jwk = await getNeonAuthJwkByKid(kid);
   const publicKey = crypto.createPublicKey({ key: jwk, format: "jwk" });
+
   const parts = signature.split(".");
   if (parts.length !== 3) throw new Error("Expected detached JWS format.");
   const [headerB64, emptyPayload, signatureB64] = parts;

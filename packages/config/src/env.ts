@@ -20,10 +20,14 @@ const migrationDatabaseEnvSchema = z.object({
   DATABASE_URL: z.url().optional(),
 });
 
+const neonAuthLogLevelSchema = z.enum(["silent", "warn", "debug"]).default("warn");
+
 const neonAuthConfigSchema = z.object({
   NEON_AUTH_BASE_URL: z.url(),
   NEON_AUTH_COOKIE_SECRET: z.string().min(32),
   NEON_AUTH_SESSION_CACHE_TTL: z.coerce.number().int().positive().default(300),
+  NEON_AUTH_LOG_LEVEL: neonAuthLogLevelSchema,
+  NEON_AUTH_WEBHOOK_BLOCKED_EMAIL_DOMAINS: z.string().optional(),
 });
 
 const cronEnvSchema = z.object({
@@ -126,11 +130,15 @@ export type DatabaseEnv = z.infer<typeof databaseEnvSchema>;
 export type AiEnv = z.infer<typeof aiEnvSchema>;
 export type LogLevel = z.infer<typeof logLevelSchema>;
 
+export type NeonAuthLogLevel = z.infer<typeof neonAuthLogLevelSchema>;
+
 export type NeonAuthEnv = BaseEnv & {
   configured: boolean;
   NEON_AUTH_BASE_URL?: string;
   NEON_AUTH_COOKIE_SECRET?: string;
   NEON_AUTH_SESSION_CACHE_TTL: number;
+  NEON_AUTH_LOG_LEVEL: NeonAuthLogLevel;
+  NEON_AUTH_WEBHOOK_BLOCKED_EMAIL_DOMAINS?: string;
 };
 
 export type BlobEnv = {
@@ -228,6 +236,7 @@ export function getNeonAuthEnv(
       ...baseEnv,
       configured: false,
       NEON_AUTH_SESSION_CACHE_TTL: 300,
+      NEON_AUTH_LOG_LEVEL: "warn",
     };
   }
 
@@ -570,6 +579,30 @@ export function describeAiGatewayCredentialSources(
 export function isNeonAuthEnabled(input: NodeJS.ProcessEnv = process.env) {
   const env = getNeonAuthEnv(input);
   return env.AFENDA_NEON_AUTH_ENABLED === "1" && env.configured;
+}
+
+/** Browser flag — when unset, Neon UI follows server `isNeonAuthEnabled`. */
+export function isNeonAuthPublicUiEnabled(
+  input: NodeJS.ProcessEnv = process.env,
+) {
+  const value = input.NEXT_PUBLIC_AFENDA_NEON_AUTH_ENABLED?.trim();
+  if (!value) {
+    return true;
+  }
+  return value === "1";
+}
+
+/** Server Neon configured and client flag allows Neon SDK forms. */
+export function isNeonAuthUiEnabled(input: NodeJS.ProcessEnv = process.env) {
+  return isNeonAuthEnabled(input) && isNeonAuthPublicUiEnabled(input);
+}
+
+/** Browser auth client target (Neon quickstart: `NEXT_PUBLIC_AUTH_URL` → `/api/auth` proxy). */
+export function getNeonAuthPublicUrl(
+  input: NodeJS.ProcessEnv = process.env,
+): string | undefined {
+  const value = input.NEXT_PUBLIC_AUTH_URL?.trim();
+  return value && value.length > 0 ? value : undefined;
 }
 
 export function isDevAuthBypassEnabled(input: NodeJS.ProcessEnv = process.env) {

@@ -2,16 +2,21 @@ import "server-only";
 
 import { getNeonAuthEnv } from "@afenda/config/env";
 import { createRemoteJWKSet, jwtVerify, type JWTPayload } from "jose";
+import { neonAuthJwksUrl } from "./jwks.shared.server";
 
 let cachedJwks: ReturnType<typeof createRemoteJWKSet> | undefined;
 let cachedJwksBaseUrl: string | undefined;
 
 function jwksFor(baseUrl: string) {
   if (cachedJwks && cachedJwksBaseUrl === baseUrl) return cachedJwks;
-  const url = new URL(".well-known/jwks.json", baseUrl.endsWith("/") ? baseUrl : `${baseUrl}/`);
-  cachedJwks = createRemoteJWKSet(url);
+  cachedJwks = createRemoteJWKSet(neonAuthJwksUrl(baseUrl));
   cachedJwksBaseUrl = baseUrl;
   return cachedJwks;
+}
+
+export function resetNeonAuthJwtVerifyCacheForTests() {
+  cachedJwks = undefined;
+  cachedJwksBaseUrl = undefined;
 }
 
 /** @see https://neon.com/docs/auth/guides/plugins/jwt */

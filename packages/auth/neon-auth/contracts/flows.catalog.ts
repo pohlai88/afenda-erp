@@ -1,8 +1,4 @@
-import { neonAuthWebhookHttpPath } from "../webhooks/contract";
-
-export const neonAuthHttpProxyPath = "/api/auth/[...path]" as const;
-
-export { neonAuthWebhookHttpPath };
+import { neonAuthHttpProxyPath } from "./paths.shared";
 
 export const implementedNeonClientFlows = [
   "signIn.email",
@@ -56,3 +52,12 @@ export const implementedNeonWebhookEventHandlers = [
 ] as const;
 
 export const deferredNeonWebhookEventHandlers = ["send.otp", "send.magic_link"] as const;
+
+export const neonAuthFlowCatalog = {
+  httpProxyPath: neonAuthHttpProxyPath,
+  implementedClientFlows: implementedNeonClientFlows,
+  deferredClientFlows: deferredNeonClientFlows,
+  upstreamPaths: neonAuthUpstreamPaths,
+  implementedWebhookHandlers: implementedNeonWebhookEventHandlers,
+  deferredWebhookHandlers: deferredNeonWebhookEventHandlers,
+} as const;
