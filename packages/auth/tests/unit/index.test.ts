@@ -2,6 +2,8 @@ import { describe, expect, it } from "vitest";
 import {
   isDevAuthBypassEnabled,
   isDevCookieAuthEnabled,
+  isNeonAuthPublicUiEnabled,
+  isNeonAuthUiEnabled,
 } from "@afenda/config/env";
 import {
   buildOperatingContextSwitchOptions,
@@ -14,11 +16,40 @@ import {
   resolveOrganizationOperatingContext,
 } from "../../src/index";
 
+describe("neon auth UI gate", () => {
+  const neonEnv = {
+    NODE_ENV: "development",
+    AFENDA_NEON_AUTH_ENABLED: "1",
+    NEON_AUTH_BASE_URL: "https://example.com/neondb/auth",
+    NEON_AUTH_COOKIE_SECRET: "x".repeat(32),
+  } as const;
+
+  it("follows server when public flag is unset", () => {
+    expect(isNeonAuthPublicUiEnabled(neonEnv)).toBe(true);
+    expect(isNeonAuthUiEnabled(neonEnv)).toBe(true);
+  });
+
+  it("hides Neon UI when public flag is 0", () => {
+    expect(
+      isNeonAuthUiEnabled({
+        ...neonEnv,
+        NEXT_PUBLIC_AFENDA_NEON_AUTH_ENABLED: "0",
+      }),
+    ).toBe(false);
+  });
+});
+
 describe("auth capabilities", () => {
   it("returns full access for owner role", () => {
     expect(capabilitiesForRole("owner")).toContain("system-admin.view");
     expect(capabilitiesForRole("owner")).toContain("system-admin.roles.manage");
     expect(capabilitiesForRole("owner")).toContain("finance.view");
+  });
+
+  it("keeps the capability catalog unique", () => {
+    expect(new Set(capabilitiesForRole("owner")).size).toBe(
+      capabilitiesForRole("owner").length,
+    );
   });
 
   it("does not grant granular admin permissions to non-admin roles", () => {

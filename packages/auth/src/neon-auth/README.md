@@ -2,15 +2,14 @@
 
 Canonical Neon Auth module for `@afenda/auth`.
 
-**Staging:** `packages/auth/neon-auth/`  
-**Promotion target:** `packages/auth/src/neon-auth/`
+**Production:** `packages/auth/src/neon-auth/`
 
 ## Status
 
 - Phase 1: directory scaffold (committed)
 - Phase 2: fresh implementation per [Neon Next.js quickstart](https://neon.com/docs/auth/quick-start/nextjs-api-only.md)
-- Phase 2.5: stabilization — typecheck, tests, catalog parity, security hardening (this phase)
-- Legacy `packages/auth/src/` unchanged until promotion phase
+- Phase 2.5: stabilization (typecheck, tests, catalog parity)
+- Phase 3: promoted to `src/neon-auth/`; package exports wired
 
 ## Public doors
 

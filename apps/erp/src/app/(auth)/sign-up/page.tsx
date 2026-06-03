@@ -1,4 +1,1 @@
-export {
-  default,
-  metadata,
-} from "@/routes/auth/sign-up-route.server";
+export { default, metadata } from "@/auth/pages/auth.sign-up-page.server";

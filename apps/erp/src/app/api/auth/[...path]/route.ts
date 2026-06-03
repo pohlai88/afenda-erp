@@ -1,9 +1,10 @@
+/** Flow catalog: @afenda/auth/auth-flows — ARCH-1004 exception; not internal/v1. */
 import {
   getNeonAuthServer,
   isNeonAuthReady,
 } from "@afenda/auth/neon-auth-server";
 import { authApiRouteCopy } from "@afenda/kernel";
-import { getRequestId, logServerEvent } from "@afenda/observability";
+import { getRequestId, logServerEvent } from "@afenda/observability/server";
 
 type AuthMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 type AuthRouteContext = { params: Promise<{ path: string[] }> };

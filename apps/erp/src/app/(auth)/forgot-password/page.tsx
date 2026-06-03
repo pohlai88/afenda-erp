@@ -1,4 +1,1 @@
-export {
-  default,
-  metadata,
-} from "@/routes/auth/forgot-password-route.server";
+export { default, metadata } from "@/auth/pages/auth.forgot-password-page.server";

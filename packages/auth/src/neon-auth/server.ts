@@ -24,4 +24,5 @@ export {
   resetNeonAuthWebhookHooksForTests,
   type NeonAuthWebhookHooks,
 } from "./webhooks/hooks.server";
+export type { NeonAuthWebhookEnvelope } from "./webhooks/contract";
 export * from "./contracts";

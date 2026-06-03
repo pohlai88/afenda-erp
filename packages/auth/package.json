@@ -14,30 +14,38 @@
       "development": "./src/client.ts",
       "default": "./dist/client.js"
     },
-    "./neon-auth-server": {
-      "types": "./src/neon-auth-server.ts",
-      "development": "./src/neon-auth-server.ts",
-      "default": "./dist/neon-auth-server.js"
-    },
-    "./neon-cookies": {
-      "types": "./src/neon-cookies.ts",
-      "development": "./src/neon-cookies.ts",
-      "default": "./dist/neon-cookies.js"
-    },
-    "./neon-session": {
-      "types": "./src/neon-session.ts",
-      "development": "./src/neon-session.ts",
-      "default": "./dist/neon-session.js"
-    },
     "./server": {
       "types": "./src/server.ts",
       "development": "./src/server.ts",
       "default": "./dist/server.js"
+    },
+    "./neon-auth-server": {
+      "types": "./src/neon-auth/server.ts",
+      "development": "./src/neon-auth/server.ts",
+      "default": "./dist/neon-auth/server.js"
+    },
+    "./neon-cookies": {
+      "types": "./src/neon-auth/runtime/neon-cookies.shared.ts",
+      "development": "./src/neon-auth/runtime/neon-cookies.shared.ts",
+      "default": "./dist/neon-auth/runtime/neon-cookies.shared.js"
+    },
+    "./neon-session": {
+      "types": "./src/neon-auth/runtime/neon-session.server.ts",
+      "development": "./src/neon-auth/runtime/neon-session.server.ts",
+      "default": "./dist/neon-auth/runtime/neon-session.server.js"
+    },
+    "./auth-flows": {
+      "types": "./src/contracts/auth.flows.ts",
+      "development": "./src/contracts/auth.flows.ts",
+      "default": "./dist/contracts/auth.flows.js"
     }
   },
   "dependencies": {
     "@afenda/config": "workspace:*",
     "@afenda/db": "workspace:*",
+    "@afenda/kernel": "workspace:*",
+    "@afenda/observability": "workspace:*",
+    "@afenda/ui": "workspace:*",
     "@neondatabase/auth": "0.4.1-beta",
     "@neondatabase/serverless": "^1.1.0",
     "drizzle-orm": "catalog:",

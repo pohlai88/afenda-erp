@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { resolveDevSignInRedirectPath } from "@/routes/auth/dev-sign-in-redirect";
+import { resolveDevSignInRedirectPath } from "@/auth/dev/auth.dev-sign-in-redirect";
 
 describe("developer sign-in redirect", () => {
   it("falls back to dashboard when no current route is available", () => {

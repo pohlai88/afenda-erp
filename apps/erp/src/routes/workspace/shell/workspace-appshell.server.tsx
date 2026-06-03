@@ -11,7 +11,7 @@ import type { ErpModuleDefinition, NavigationExtension } from "@afenda/kernel";
 import Link from "next/link";
 import type { ReactNode } from "react";
 
-import { signOutAction } from "@/routes/auth/actions.server";
+import { signOutAction } from "@/auth/dev/auth.dev-actions.server";
 import { loadWorkspaceShellNavigation } from "@/routes/workspace/shared/workspace-route-cache";
 import {
   persistWorkspaceAppShellPreferencesAction,
@@ -135,7 +135,7 @@ function buildWorkspaceAppShellChrome(
         title: session.name,
         subtitle: `${organization.name} · ${posture.title}`,
         email: session.email,
-        href: "/dashboard",
+        href: "/account",
       },
       hrefs: {
         help: "/knowledge",

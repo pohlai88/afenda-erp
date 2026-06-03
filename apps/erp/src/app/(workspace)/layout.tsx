@@ -1,13 +1,10 @@
-import { DevSignInFloatingPanel } from "@/routes/auth/_components/dev-sign-in-floating-panel";
+import { DevSignInFloatingPanel } from "@/auth/ingress";
 import { WorkspaceSkeleton } from "@/app-route-state/route-states";
 import { WorkspaceAppShell } from "@/routes/workspace/shell/workspace-appshell.server";
 import { Toaster } from "@afenda/ui/sonner";
 import { Suspense } from "react";
 
-export const unstable_instant = {
-  prefetch: "static",
-  unstable_disableValidation: true,
-};
+export const unstable_instant = false;
 
 /**
  * Authenticated ERP shell (Next.js route group — URL unchanged).

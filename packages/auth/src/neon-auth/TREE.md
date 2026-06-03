@@ -1,6 +1,6 @@
 # neon-auth directory tree
 
-Phase 2.5 stabilization layout (staging before promotion to `src/neon-auth/`).
+Phase 3 production layout under `packages/auth/src/neon-auth/`.
 
 ```
 packages/auth/neon-auth/

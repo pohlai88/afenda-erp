@@ -5,7 +5,7 @@ vi.mock("@afenda/auth/neon-auth-server", () => ({
   isNeonAuthReady: vi.fn(),
 }));
 
-vi.mock("@afenda/observability", () => ({
+vi.mock("@afenda/observability/server", () => ({
   getRequestId: vi.fn(() => "req_auth_test"),
   logServerEvent: vi.fn(),
 }));

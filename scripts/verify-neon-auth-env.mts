@@ -64,8 +64,8 @@ if (enabled && baseUrl) {
 }
 
 if (enabled && !publicAuthUrl) {
-  hints.push(
-    "Set NEXT_PUBLIC_AUTH_URL=http://localhost:3000/api/auth for local dev (or your deployed /api/auth origin).",
+  errors.push(
+    "NEXT_PUBLIC_AUTH_URL is required when Neon Auth is enabled (e.g. http://localhost:3000/api/auth). Browser client proxies to this origin; server uses NEON_AUTH_BASE_URL.",
   );
 }
 

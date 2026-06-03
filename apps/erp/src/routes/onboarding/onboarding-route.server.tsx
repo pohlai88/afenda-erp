@@ -6,7 +6,7 @@ import { Suspense } from "react";
 import {
   AuthShell,
   createAuthPageMetadata,
-} from "@/routes/auth/_components/auth-shell";
+} from "@/auth/ingress";
 import { OnboardingForm } from "@/routes/onboarding/onboarding-form";
 
 const shellCopy = getAuthPageShellCopy("onboarding");
