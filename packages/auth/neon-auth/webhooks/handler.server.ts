@@ -1,2 +1,71 @@
-/** @placeholder Scaffold — migrate in Phase 2. See README.md */
-export {};
+import "server-only";
+
+import { isNeonAuthEnabled } from "@afenda/config/env";
+import { verifyNeonAuthWebhookPayload } from "../security/webhook-verify.server";
+import { neonAuthWebhookEnvelopeSchema } from "./contract";
+import { getNeonAuthWebhookHooks } from "./hooks.server";
+import {
+  parseBlockedSignupEmailDomains,
+  resolveUserBeforeCreateResponse,
+} from "./policy.server";
+
+const CUSTOM_DELIVERY_BODY = {
+  error: "custom_delivery_not_implemented",
+  message:
+    "Custom OTP, magic link, or SMS delivery is not implemented. Use Neon built-in email or register onCustomDeliveryRequired.",
+} as const;
+
+function blockedDomains() {
+  return parseBlockedSignupEmailDomains(process.env.NEON_AUTH_WEBHOOK_BLOCKED_EMAIL_DOMAINS);
+}
+
+/** @see https://neon.com/docs/auth/guides/webhooks */
+export async function handleNeonAuthWebhookPost(request: Request): Promise<Response> {
+  if (!isNeonAuthEnabled()) {
+    return Response.json({ error: "neon_auth_disabled" }, { status: 503 });
+  }
+
+  const rawBody = await request.text();
+  let parsedBody: unknown;
+  try {
+    parsedBody = await verifyNeonAuthWebhookPayload({ rawBody, headers: request.headers });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Webhook verification failed.";
+    return Response.json({ error: message }, { status: 401 });
+  }
+
+  const parsed = neonAuthWebhookEnvelopeSchema.safeParse(parsedBody);
+  if (!parsed.success) {
+    return Response.json({ error: "invalid_payload", issues: parsed.error.flatten() }, { status: 400 });
+  }
+
+  const payload = parsed.data;
+  const hooks = getNeonAuthWebhookHooks();
+
+  switch (payload.event_type) {
+    case "user.before_create":
+      return Response.json(
+        resolveUserBeforeCreateResponse({ email: payload.user?.email, blockedDomains: blockedDomains() }),
+      );
+
+    case "user.created": {
+      void hooks.onUserCreated?.(payload);
+      return Response.json({ ok: true });
+    }
+
+    case "phone_number.verified": {
+      void hooks.onPhoneNumberVerified?.(payload);
+      return Response.json({ ok: true });
+    }
+
+    case "send.otp":
+    case "send.magic_link": {
+      const custom = hooks.onCustomDeliveryRequired?.(payload);
+      if (custom) return custom instanceof Promise ? await custom : custom;
+      return Response.json(CUSTOM_DELIVERY_BODY, { status: 400 });
+    }
+
+    default:
+      return Response.json({ error: "unsupported_event" }, { status: 400 });
+  }
+}

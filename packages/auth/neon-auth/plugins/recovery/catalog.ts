@@ -1,2 +1,7 @@
-/** @placeholder Scaffold — migrate in Phase 2. See README.md */
-export {};
+/** @see https://neon.com/docs/auth/guides/password-reset */
+export const implementedNeonRecoveryClientMethods = [
+  "forgetPassword.email",
+  "forgetPassword.emailOtp",
+  "emailOtp.resetPassword",
+  "resetPassword",
+] as const;

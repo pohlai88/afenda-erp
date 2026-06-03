@@ -1,2 +1,8 @@
-/** @placeholder Scaffold — migrate in Phase 2. See README.md */
-export {};
+/** @see https://neon.com/docs/auth/guides/plugins/admin */
+export const deferredNeonAdminClientMethods = [
+  "admin.createUser",
+  "admin.listUsers",
+  "admin.setRole",
+  "admin.banUser",
+  "admin.impersonateUser",
+] as const;

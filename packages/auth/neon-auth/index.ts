@@ -1,2 +1,12 @@
-/** @placeholder Scaffold — migrate in Phase 2. See README.md */
-export {};
+export * from "./contracts";
+export * from "./webhooks/contract";
+export * from "./plugins/email-password/catalog";
+export * from "./plugins/email-otp/catalog";
+export * from "./plugins/magic-link/catalog";
+export * from "./plugins/oauth/catalog";
+export * from "./plugins/recovery/catalog";
+export * from "./plugins/account/catalog";
+export * from "./plugins/jwt/catalog";
+export * from "./plugins/admin/catalog";
+export * from "./plugins/organization/catalog";
+export * from "./plugins/phone-number/catalog";

@@ -1,2 +1,3 @@
-/** @placeholder Scaffold — migrate in Phase 2. See README.md */
-export {};
+/** @see https://neon.com/docs/auth/guides/plugins/jwt */
+export const implementedNeonJwtServerPatterns = ["verifyNeonAuthAccessToken.jose.jwks.EdDSA"] as const;
+export const deferredNeonJwtClientMethods = ["token"] as const;

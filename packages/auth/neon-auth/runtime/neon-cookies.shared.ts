@@ -1,2 +1,5 @@
-/** @placeholder Scaffold — migrate in Phase 2. See README.md */
-export {};
+export const NEON_AUTH_SESSION_TOKEN_COOKIE = "__Secure-neon-auth.session_token";
+
+export function hasNeonAuthSessionToken(cookieHeader: string) {
+  return cookieHeader.includes(NEON_AUTH_SESSION_TOKEN_COOKIE);
+}

@@ -1,53 +1,28 @@
-# neon-auth (scaffold)
+# neon-auth
 
-**Status:** Git review scaffold — placeholder `.ts` files materialized. No runtime implementation yet.
+Canonical Neon Auth module for `@afenda/auth`.
 
-See also: [TREE.md](./TREE.md) (full tree + migration map).
+**Staging:** `packages/auth/neon-auth/`  
+**Promotion target:** `packages/auth/src/neon-auth/`
 
-Staging path: `packages/auth/neon-auth/`  
-Promotion target: `packages/auth/src/neon-auth/` (sole child of `packages/auth/src/` after migration)
+## Status
 
-Plan: [neon-auth_module_layout_28c930ef.plan.md](file:///c:/Users/dlbja/.cursor/plans/neon-auth_module_layout_28c930ef.plan.md)
+- Phase 1: directory scaffold (committed)
+- Phase 2: fresh implementation per [Neon Next.js quickstart](https://neon.com/docs/auth/quick-start/nextjs-api-only.md) — **no legacy file migration**
+- Legacy `packages/auth/src/` unchanged until promotion phase
 
-## Layout
+## Public doors
 
-```
-neon-auth/
-├── server.ts              @afenda/auth/server
-├── client.ts              @afenda/auth/client
-├── index.ts               @afenda/auth (catalogs)
-├── runtime/               SDK singleton, session, cookies
-├── security/              JWT + webhook signature verification
-├── contracts/             Shared catalogs and env contract
-├── plugins/               One folder per Neon Auth plugin or flow
-├── webhooks/              Platform webhook handler + hooks registry
-└── tests/
-```
+| File | Export |
+| ---- | ------ |
+| `server.ts` | `@afenda/auth/server` (future) |
+| `client.ts` | `@afenda/auth/client` (future) |
+| `index.ts` | catalogs |
 
-## Plugin folders
+## ERP wiring (unchanged until promotion)
 
-| Folder | Neon surface | Migrate from |
-| ------ | ------------ | ------------ |
-| `email-password/` | `signIn.email`, `signUp.email` | core auth methods (not a plugin toggle) |
-| `email-otp/` | `emailOtp.*`, `signIn.emailOtp` | `src/contracts/auth.neon-email-otp.ts` |
-| `magic-link/` | `signIn.magicLink` | `src/contracts/auth.neon-magic-link.ts` |
-| `oauth/` | `signIn.social` | OAuth guides |
-| `recovery/` | `forgetPassword.*`, `emailOtp.resetPassword` | `src/recovery/auth-recovery-adapter.client.ts` |
-| `account/` | `updateUser`, `changePassword`, `resetPassword` | user management guide |
-| `jwt/` | access JWT / Bearer (deferred in UI) | `src/contracts/auth.neon-jwt.ts` |
-| `admin/` | `admin.*` (deferred) | `src/contracts/auth.neon-admin.ts` |
-| `organization/` | unused — Afenda tenancy in `@afenda/db` | `src/contracts/auth.neon-organization.ts` |
-| `phone-number/` | deferred until SMS webhook | `src/contracts/auth.neon-phone-number.ts` |
+- `apps/erp/src/app/api/auth/[...path]/route.ts` — `getNeonAuthServer().handler()`
+- `apps/erp/src/proxy.ts` — `auth.middleware({ loginUrl: "/sign-in" })`
+- Webhook side effects: register via `registerNeonAuthWebhookHooks()` in ERP
 
-## Stays outside this module
-
-- `apps/erp/src/app/api/auth/[...path]/route.ts` — `auth.handler()` proxy
-- `apps/erp/src/proxy.ts` — `auth.middleware()`
-- `apps/erp/src/auth/` — ingress, forms, session/tenant, dev bypass (Phase 4)
-
-## Next steps
-
-1. Migrate implementation from `packages/auth/src/neon/` and contracts
-2. Promote tree to `packages/auth/src/neon-auth/`
-3. Delete legacy `packages/auth/src/*`
-4. Rewire `@afenda/auth` package exports
+See [TREE.md](./TREE.md) for full layout.
