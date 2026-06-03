@@ -5,7 +5,7 @@ import { clampPageSize } from "./hr-benefits.shared";
 import {
   hrExpenseAuditActionEnum,
   hrExpenseAuditEvents,
-} from "./schema/hr-expense";
+} from "./hr-expense";
 
 export type HrExpenseAuditTrailWindow = {
   rows: readonly {

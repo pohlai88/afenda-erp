@@ -32,7 +32,7 @@ import {
   hrOvertimePolicies,
   hrOvertimeRequests,
   hrPositions,
-} from "./schema/hr";
+} from "./hr";
 
 export type ExecuteHrOvertimeApprovalInput = {
   organizationId: string;

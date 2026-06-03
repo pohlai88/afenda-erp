@@ -11,7 +11,7 @@ Index: `docs/architecture/README.md`.
 | Editing… | Rule | Read |
 | -------- | ---- | ---- |
 | `apps/erp/**` routes, API | `afenda-erp-app`, `afenda-agent-discipline` | **1004**, **1001**, root `AGENTS.md` |
-| `apps/erp/src/workspace-routes/**` | `afenda-erp-app` | **1003**, **1001** |
+| `apps/erp/src/routes/**`, `apps/erp/src/kitchen-sinks/**` | `afenda-erp-app` | **1003**, **1001** |
 | `packages/features/**` | `afenda-feature-packages`, `afenda-feature-shape` | **1002**, **1005** |
 | `packages/features/lynx/**`, `knowledge/**` | `afenda-lynx-knowledge` | **1005** §11, **1004** §5 |
 | `packages/db/**` | `afenda-database-migrations` | **1005**, **1002** |
@@ -34,6 +34,9 @@ apps/erp/src/app/api/auth/...        # Neon Auth only
 
 | Touch | Command |
 | ----- | ------- |
+| ERP app layout (run first) | `pnpm guard:erp` (GUARD 1 + GUARD 2) |
+| GUARD 4 routes naming | `pnpm guard:routes` — doc: `.cursor/hooks/afenda-guard-routes.md` |
+| ERP lint + types (after GUARD 1) | `pnpm verify:erp` |
 | One package | `pnpm --filter <pkg> typecheck` / `test` |
 | Boundaries, ARCH docs, exports | `pnpm architecture:check` |
 | Governed renderers | `pnpm lint:governed-renderers` |

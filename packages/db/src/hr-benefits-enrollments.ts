@@ -19,8 +19,8 @@ import {
   hrBenefitEnrollmentDependents,
   hrBenefitEnrollments,
   hrBenefitPlans,
-} from "./schema/hr-benefits";
-import { hrEmployees } from "./schema/hr";
+} from "./hr-benefits";
+import { hrEmployees } from "./hr";
 
 export async function listHrBenefitEnrollmentsWindow(input: {
   organizationId: string;

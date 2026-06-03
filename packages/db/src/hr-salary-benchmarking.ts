@@ -7,8 +7,8 @@ import { HrSbsCommandError, parseNumeric } from "./hr-salary-benchmarking.shared
 import {
   hrCompensationCycleParticipants,
   hrCompensationSalaryBands,
-} from "./schema/hr-compensation-planning";
-import { hrEmployees } from "./schema/hr";
+} from "./hr-compensation-planning";
+import { hrEmployees } from "./hr";
 import {
   hrSbsBenchmarkEntries,
   hrSbsBenchmarkMappings,
@@ -16,7 +16,7 @@ import {
   hrSbsCompensationAnalyses,
   type HrSbsAnalysisSnapshotPayload,
   type HrSbsThresholdConfigPayload,
-} from "./schema/hr-salary-benchmarking";
+} from "./hr-salary-benchmarking";
 
 export {
   HrSbsCommandError,

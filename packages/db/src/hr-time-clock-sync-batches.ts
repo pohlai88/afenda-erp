@@ -5,7 +5,7 @@ import { buildPaginatedWindow, clampPageSize } from "./list-window.shared";
 import {
   hrTimeClockDevices,
   hrTimeClockSyncBatches,
-} from "./schema/hr-time-clock";
+} from "./hr-time-clock";
 
 export type HrTimeClockSyncBatchRow = {
   id: string;

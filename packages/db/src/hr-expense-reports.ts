@@ -3,8 +3,8 @@ import { runWithOrganizationContext } from "./client";
 import { formatEmployeeLabel } from "./hr-benefits.shared";
 import { HR_EXPENSE_REPORT_EXPORT_ROW_CAP } from "./hr-expense.shared";
 import type { HrExpenseReportFilter } from "./hr-expense-reports.shared";
-import { hrExpenseClaims } from "./schema/hr-expense";
-import { hrDepartments, hrEmployees } from "./schema/hr";
+import { hrExpenseClaims } from "./hr-expense";
+import { hrDepartments, hrEmployees } from "./hr";
 
 function escapeCsvCell(value: string) {
   if (/[",\n]/.test(value)) {

@@ -6,7 +6,7 @@ import { HrExpenseCommandError } from "./hr-expense.shared";
 import {
   hrExpenseClaims,
   hrExpensePaymentReferences,
-} from "./schema/hr-expense";
+} from "./hr-expense";
 
 export type HrExpensePaymentChannel = "payroll" | "accounts_payable";
 

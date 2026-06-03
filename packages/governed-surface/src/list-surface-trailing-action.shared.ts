@@ -1,4 +1,4 @@
-import type { ActionDescriptor } from "./schemas/action.schema";
+import type { ActionDescriptor } from "./gov-action-schema";
 import type { ListSurfaceRowTrailingAction } from "./schemas/list-surface-row-trailing-action.schema";
 
 export type ResolveListSurfaceRowTrailingActionInput = {

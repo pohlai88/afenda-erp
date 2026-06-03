@@ -10,7 +10,7 @@ import type { HrBenefitOpenEnrollmentWindowList } from "./hr-benefits.types";
 import {
   hrBenefitOpenEnrollmentPlans,
   hrBenefitOpenEnrollmentWindows,
-} from "./schema/hr-benefits";
+} from "./hr-benefits";
 
 export function isOpenEnrollmentWindowActive(input: {
   status: (typeof hrBenefitOpenEnrollmentWindows.$inferSelect)["status"];

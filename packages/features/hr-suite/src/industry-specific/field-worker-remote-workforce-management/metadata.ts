@@ -9,25 +9,25 @@ export {
   hrIndustryFrmAuditTrailSurfaceKey,
   hrIndustryFrmOverviewKpiSurfaceKey,
   type HrIndustryFrmListSurfaceKey,
-} from "./surface/hr.industry.frm-surface-metadata.shared";
+} from "./hr.industry.frm-surface-metadata.shared";
 
-export { hrIndustryFrmUiCopy } from "./surface/hr.industry.frm-ui.copy.shared";
+export { hrIndustryFrmUiCopy } from "./hr.industry.frm-ui.copy.shared";
 
 export {
   parseHrIndustryFrmSearchParams,
   toHrIndustryFrmPageModelInput,
   type HrIndustryFrmPageModelInput,
   type HrIndustryFrmSearchParams,
-} from "./data/hr.industry.frm-search-params.parse.shared";
+} from "./hr.industry.frm-search-params.parse.shared";
 
 export {
   hrIndustryFrmRoutePaths,
   type HrIndustryFrmRoutePath,
-} from "./contracts/hr.industry.frm-route.contract";
+} from "./hr.industry.frm-route.contract";
 
 export {
   HR_INDUSTRY_FRM_ACCEPTANCE_CRITERIA_COVERAGE,
   HR_INDUSTRY_FRM_REQUIREMENT_COVERAGE,
   assertHrIndustryFrmEnterpriseCoverage,
   assertHrIndustryFrmScaffoldOnly,
-} from "./data/hr.industry.frm-coverage.shared";
+} from "./hr.industry.frm-coverage.shared";

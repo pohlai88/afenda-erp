@@ -27,8 +27,8 @@ import {
   hrBenefitEnrollments,
   hrBenefitLifeEvents,
   hrBenefitPlans,
-} from "./schema/hr-benefits";
-import { hrEmployees } from "./schema/hr";
+} from "./hr-benefits";
+import { hrEmployees } from "./hr";
 
 function mapEnrollmentValidationError(error: unknown): never {
   if (!(error instanceof Error)) {

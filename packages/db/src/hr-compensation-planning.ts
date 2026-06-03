@@ -35,8 +35,8 @@ import {
   hrCompensationScenarios,
   type HrCompensationApprovalRules,
   type HrCompensationEligibilityRuleConfig,
-} from "./schema/hr-compensation-planning";
-import { hrEmployees } from "./schema/hr";
+} from "./hr-compensation-planning";
+import { hrEmployees } from "./hr";
 
 export {
   HrCompensationCommandError,

@@ -71,12 +71,12 @@ curl -sf -X POST "$PREVIEW_URL/api/ai/extract" \
   -H "Content-Type: application/json" \
   -d '{"moduleId":"finance","documentId":"doc_test","documentText":"Invoice INV-001 total 1000 MYR"}'
 
-curl -sf -X POST "$PREVIEW_URL/api/lynx/operator" \
+curl -sf -X POST "$PREVIEW_URL/api/internal/v1/lynx/queries/operator" \
   -b "$COOKIE_JAR" \
   -H "Content-Type: application/json" \
   -d '{"messages":[{"role":"user","parts":[{"type":"text","text":"Analyze revenue"}]}]}'
 
-# Legacy (deprecated — prefer /api/lynx/operator):
+# Legacy (deprecated — prefer /api/internal/v1/lynx/queries/operator):
 # curl -sf -X POST "$PREVIEW_URL/api/ai/solution-provider" ...
 ```
 

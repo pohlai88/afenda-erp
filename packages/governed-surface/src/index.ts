@@ -21,7 +21,7 @@ export {
   actionDescriptorSchema,
   parseActionDescriptorData,
   type ActionDescriptor,
-} from "./schemas/action.schema";
+} from "./gov-action-schema";
 
 export {
   GOVERNED_ACTION_ID_FIELD,
@@ -203,7 +203,7 @@ export {
   type GovernedChartConfiguration,
   type GovernedChartConfigurationInput,
   type GovernedChartKind,
-} from "./schemas/chart.schema";
+} from "./gov-chart-schema";
 
 export {
   GOVERNED_APPROVAL_TIMELINE_SCHEMA_ID,
@@ -259,7 +259,7 @@ export {
   parseGovernedSectionConfiguration,
   type GovernedSectionConfiguration,
   type GovernedSectionConfigurationInput,
-} from "./schemas/section.schema";
+} from "./gov-section-schema";
 
 export {
   GOVERNED_STACK_CONFIGURATION_SCHEMA_ID,
@@ -271,7 +271,7 @@ export {
   type GovernedStackConfiguration,
   type GovernedStackConfigurationInput,
   type GovernedStackDirection,
-} from "./schemas/stack.schema";
+} from "./gov-stack-schema";
 
 export {
   GOVERNED_SURFACE_CHROME_SCHEMA_ID,

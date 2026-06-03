@@ -1,7 +1,12 @@
 /**
- * Client-safe exports for @afenda/feature-knowledge.
- * Serializable DTOs, client-safe constants, and Zod schemas only.
- * No server-only, no next/headers, no @afenda/db, no @afenda/ai.
+ * Client public door.
  */
-export * from "./contracts";
-export * from "./schemas";
+"use client";
+
+export * from "./kno-core.contract";
+export * from "./kno-eval-dataset.schema";
+export * from "./kno-eval-run-input.schema";
+export * from "./kno-retrieval.contract";
+export * from "./kno-source-adapter.contract";
+export * from "./kno-source-github-repo.schema";
+export * from "./kno-source-manual.schema";

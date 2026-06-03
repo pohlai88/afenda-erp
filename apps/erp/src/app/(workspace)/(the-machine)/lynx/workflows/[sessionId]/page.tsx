@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import { LynxWorkflowDetailRoute } from "@/workspace-routes/lynx/lynx-workflow-detail-route.server";
-import type { LynxWorkflowSessionDetailPageProps } from "../../_route-props";
+import { LynxWorkflowDetailRoute } from "@/routes/lynx-workflow-detail-route.server";
+import type { LynxWorkflowSessionDetailPageProps } from "@/routes/lynx-route-props";
 
 export const metadata: Metadata = {
   title: "Lynx workflow",

@@ -30,9 +30,9 @@ export {
   hrWorkforceEssShiftSchedulesSurfaceKey,
   hrWorkforceEssTrainingSurfaceKey,
   type HrWorkforceEssListSurfaceKey,
-} from "./surface/hr.workforce.ess-surface-metadata.shared";
+} from "./hr.workforce.ess-surface-metadata.shared";
 
-export { hrWorkforceEssUiCopy } from "./surface/hr.workforce.ess-ui.copy.shared";
+export { hrWorkforceEssUiCopy } from "./hr.workforce.ess-ui.copy.shared";
 
 export {
   hrWorkforceEssReportGroupByParam,
@@ -41,12 +41,12 @@ export {
   toHrWorkforceEssPageModelInput,
   type HrWorkforceEssPageModelInput,
   type HrWorkforceEssSearchParams,
-} from "./data/hr.workforce.ess-search-params.parse.shared";
+} from "./hr.workforce.ess-search-params.parse.shared";
 
 export {
   hrWorkforceEssRoutePaths,
   type HrWorkforceEssRoutePath,
-} from "./contracts/hr.workforce.ess-route.contract";
+} from "./hr.workforce.ess-route.contract";
 
 export {
   HR_WORKFORCE_ESS_ACCEPTANCE_CRITERIA_COVERAGE,
@@ -55,4 +55,4 @@ export {
   type HrWorkforceEssCoverageEntry,
   type HrWorkforceEssCoverageStatus,
   type HrWorkforceEssRequirementCode,
-} from "./data/hr.workforce.ess-coverage.shared";
+} from "./hr.workforce.ess-coverage.shared";

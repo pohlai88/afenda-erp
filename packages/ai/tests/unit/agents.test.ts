@@ -19,7 +19,7 @@ vi.mock("ai", async (importOriginal) => {
   };
 });
 
-import { createErpSpecialistAgent } from "../../src/agents/ai.erp-specialist.agent.server";
+import { createErpSpecialistAgent } from "../../src/ai-erp-specialist.agent.server";
 
 function lastAgentSettings() {
   return aiMocks.ToolLoopAgent.mock.calls.at(-1)?.[0] as
@@ -44,13 +44,13 @@ describe("agent factories", () => {
     expect(aiMocks.stepCountIs).toHaveBeenCalledWith(12);
   });
 
-  it("keeps deprecated stopSteps working with a lower bound", () => {
+  it("applies a lower bound when maxSteps is below the minimum", () => {
     createErpSpecialistAgent({
       model: "openai/gpt-5.5",
       organizationName: "Afenda",
       role: "owner",
       tools: {},
-      stopSteps: 0,
+      maxSteps: 0,
     });
 
     expect(aiMocks.stepCountIs).toHaveBeenCalledWith(1);

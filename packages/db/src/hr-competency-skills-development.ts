@@ -11,7 +11,7 @@ import {
 import {
   hrCsfDevelopmentLinks,
   hrCsfDevelopmentRecommendations,
-} from "./schema/hr-competency-skills";
+} from "./hr-competency-skills";
 
 export async function createHrCsfDevelopmentRecommendationsInTx(
   db: AfendaTransaction,

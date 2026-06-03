@@ -6,7 +6,7 @@ import {
   hrBonusAcceleratorRules,
   hrBonusCommissionTiers,
   hrBonusPayoutFormulas,
-} from "./schema/hr-bonus-incentive";
+} from "./hr-bonus-incentive";
 
 export type UpsertHrBonusPayoutFormulaInput = {
   organizationId: string;

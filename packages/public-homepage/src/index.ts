@@ -1,1 +1,1 @@
-export type { HomepageContent } from "./schemas/homepage.schema";
+export type { HomepageContent } from "./pub-homepage-schema";

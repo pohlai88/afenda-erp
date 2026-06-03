@@ -1,4 +1,4 @@
-import type { HrCompensationEligibilityRuleConfig } from "./schema/hr-compensation-planning";
+import type { HrCompensationEligibilityRuleConfig } from "./hr-compensation-planning";
 
 export class HrCompensationCalculationError extends Error {
   constructor(message: string) {

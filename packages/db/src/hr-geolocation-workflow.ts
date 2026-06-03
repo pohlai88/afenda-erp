@@ -7,12 +7,12 @@ import {
   publishHrGeoOutcomeToLam,
   startOfUtcDay,
 } from "./hr-geolocation";
-import { hrEmployees } from "./schema/hr";
+import { hrEmployees } from "./hr";
 import {
   hrGeoCheckinOutcomes,
   hrGeoExceptions,
   hrGeoRawCheckins,
-} from "./schema/hr-geolocation";
+} from "./hr-geolocation";
 
 export class HrGeoWorkflowError extends Error {
   readonly code:

@@ -25,8 +25,8 @@ import {
   hrPayrollRunLines,
   hrPayrollRuns,
   hrPayrollValidations,
-} from "./schema/hr-payroll-processing";
-import { hrEmployees } from "./schema/hr";
+} from "./hr-payroll-processing";
+import { hrEmployees } from "./hr";
 
 const DEFAULT_BASIC_SALARY = 5000;
 

@@ -12,8 +12,8 @@ import {
   hrBonusCycles,
   hrBonusPlans,
   hrBonusTargets,
-} from "./schema/hr-bonus-incentive";
-import { hrDepartments, hrEmployees } from "./schema/hr";
+} from "./hr-bonus-incentive";
+import { hrDepartments, hrEmployees } from "./hr";
 
 export async function listHrBonusTargetsWindow(input: {
   organizationId: string;

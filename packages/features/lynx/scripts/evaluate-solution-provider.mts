@@ -1,5 +1,5 @@
 import { strict as assert } from "node:assert";
-import { assembleAiContext, scoreAiConfidence } from "@afenda/ai/platform-tools";
+import { assembleAiContext, scoreAiConfidence } from "@afenda/ai/server";
 import {
   businessProblemInputSchema,
   recoveryPlaybookSchema,

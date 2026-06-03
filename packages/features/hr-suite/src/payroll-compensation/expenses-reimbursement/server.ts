@@ -1,67 +1,54 @@
+/**
+ * Server-only public door.
+ */
+import "server-only";
 
-import React from "react";
-
-import {
-  ExecutionAccessDeniedError,
-  ExecutionContextRequiredError,
-} from "@afenda/kernel/execution";
-
-import {
-  HrExpenseAccessDeniedPanel,
-  HrExpenseWorkbenchSection,
-} from "./components/hr.payroll.expense-section.component.server";
-import { buildHrExpensePageModel } from "./data/hr.payroll.expense.page-model.server";
-import { toHrExpensePageModelInput } from "./data/hr.payroll.expense-search-params.parse.shared";
-import { requireHrExpenseRead } from "./policies/hr.payroll.expense-access.policy.server";
-
-export {
-  HrExpenseAccessDeniedPanel,
-  HrExpenseWorkbenchSection,
-} from "./components/hr.payroll.expense-section.component.server";
-
-export { buildHrExpensePageModel } from "./data/hr.payroll.expense.page-model.server";
-export { toHrExpensePageModelInput } from "./data/hr.payroll.expense-search-params.parse.shared";
-
-export {
-  requireHrExpenseApprove,
-  requireHrExpenseRead,
-  requireHrExpenseWrite,
-} from "./policies/hr.payroll.expense-access.policy.server";
-
-function isExpenseAccessFailure(error: unknown) {
-  return (
-    error instanceof ExecutionAccessDeniedError ||
-    error instanceof ExecutionContextRequiredError
-  );
-}
-
-export async function renderHrExpensePage(
-  searchParams?: Promise<Record<string, string | string[] | undefined>>,
-) {
-  let guard: Awaited<ReturnType<typeof requireHrExpenseRead>>;
-  let resolvedSearchParams: Record<string, string | string[] | undefined> | undefined;
-
-  try {
-    [guard, resolvedSearchParams] = await Promise.all([
-      requireHrExpenseRead(),
-      searchParams ?? Promise.resolve(undefined),
-    ]);
-  } catch (error) {
-    if (isExpenseAccessFailure(error)) {
-      return React.createElement(HrExpenseAccessDeniedPanel);
-    }
-    throw error;
-  }
-
-  const pageModel = await buildHrExpensePageModel(
-    toHrExpensePageModelInput({
-      organizationId: guard.organization.id,
-      canWrite: guard.hasCapability("hr.expense.write"),
-      canApprove: guard.canApprove,
-      actorUserId: guard.session.id,
-      searchParams: resolvedSearchParams,
-    }),
-  );
-
-  return React.createElement(HrExpenseWorkbenchSection, { pageModel });
-}
+export * from "./hr.payroll.exp-access.policy.server";
+export * from "./hr.payroll.exp-approval-routing.shared";
+export * from "./hr.payroll.exp-approval.actions.server";
+export * from "./hr.payroll.exp-approval.schema";
+export * from "./hr.payroll.exp-constants.shared";
+export * from "./hr.payroll.exp-lifecycle.shared";
+export * from "./hr.payroll.exp.contract";
+export * from "./hr.payroll.exp.event";
+export * from "./hr.payroll.expense-access.policy.server";
+export * from "./hr.payroll.expense-accounting.schema";
+export * from "./hr.payroll.expense-action-result.shared";
+export * from "./hr.payroll.expense-audit-trail-list.surface";
+export * from "./hr.payroll.expense-calculation.shared";
+export * from "./hr.payroll.expense-claim.schema";
+export * from "./hr.payroll.expense-claims-list.surface";
+export * from "./hr.payroll.expense-constants.shared";
+export * from "./hr.payroll.expense-exchange-rate.shared";
+export * from "./hr.payroll.expense-form.shared";
+export * from "./hr.payroll.expense-integration-adapters.shared";
+export * from "./hr.payroll.expense-integration.actions.server";
+export * from "./hr.payroll.expense-integration.contract";
+export * from "./hr.payroll.expense-line-item.schema";
+export * from "./hr.payroll.expense-list.shared";
+export * from "./hr.payroll.expense-notification-templates.shared";
+export * from "./hr.payroll.expense-org-scope.shared";
+export * from "./hr.payroll.expense-payment.schema";
+export * from "./hr.payroll.expense-permission-matrix.shared";
+export * from "./hr.payroll.expense-policy.schema";
+export * from "./hr.payroll.expense-receipt.actions.server";
+export * from "./hr.payroll.expense-receipt.schema";
+export * from "./hr.payroll.expense-report.schema";
+export * from "./hr.payroll.expense-reports-list.surface";
+export * from "./hr.payroll.expense-route.contract";
+export * from "./hr.payroll.expense-search-params.parse.shared";
+export * from "./hr.payroll.expense-section.component.server";
+export * from "./hr.payroll.expense-store.shared";
+export * from "./hr.payroll.expense-surface-columns.shared";
+export * from "./hr.payroll.expense-ui.copy.shared";
+export * from "./hr.payroll.expense-validation.shared";
+export * from "./hr.payroll.expense.actions.server";
+export * from "./hr.payroll.expense.contract";
+export * from "./hr.payroll.expense.event";
+export * from "./hr.payroll.expense.mutation.shared.server";
+export * from "./hr.payroll.expense.page-model.server";
+export * from "./hrs-hr-payroll-expense-audit-server";
+export * from "./hrs-hr-payroll-expense-integration-server";
+export * from "./hrs-hr-payroll-expense-notification-server";
+export * from "./hrs-hr-payroll-expense-reports-server";
+export * from "./hrs-hr-payroll-expense-validation-server";

@@ -3,6 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "afenda": {
+    "layout": "multi-feature"
+  },
   "exports": {
     ".": {
       "types": "./src/index.ts",

@@ -1,6 +1,6 @@
 import { runHrTimeClockScheduledSyncSweep } from "@afenda/feature-hr-suite/server";
 
-import { runCronJob } from "@/app-cron/run";
+import { runCronJob } from "@/kitchen-sinks/cron.run";
 
 /** HRM-TCI-011 ÔÇö scheduled sync from external time clock systems. */
 export function GET(request: Request) {

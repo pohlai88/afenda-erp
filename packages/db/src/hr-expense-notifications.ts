@@ -2,7 +2,7 @@ import { and, eq } from "drizzle-orm";
 import { runWithOrganizationContext } from "./client";
 import { createEntityId } from "./ids";
 import { resolveAuthUserIdForHrEmployee } from "./hr-aat-advanced";
-import { hrExpenseNotifications } from "./schema/hr-expense";
+import { hrExpenseNotifications } from "./hr-expense";
 
 export async function enqueueHrExpenseNotification(input: {
   organizationId: string;

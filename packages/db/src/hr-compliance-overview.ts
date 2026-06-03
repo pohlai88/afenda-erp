@@ -23,7 +23,7 @@ import {
   hrComplianceObligations,
   hrDepartments,
   hrEmployees,
-} from "./schema/hr";
+} from "./hr";
 
 function dimensionLabel(
   dimension: HrComplianceOverviewDimension,

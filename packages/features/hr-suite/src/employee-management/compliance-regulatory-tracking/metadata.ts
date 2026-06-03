@@ -25,18 +25,18 @@ export {
   hrComplianceEvidenceLinksSurfaceKey,
   hrComplianceAuditTrailSurfaceKey,
   type HrComplianceListSurfaceKey,
-} from "./surface/hr.workforce.compliance-surface-metadata.shared";
+} from "./hr.workforce.compliance-surface-metadata.shared";
 
-export { hrComplianceUiCopy } from "./surface/hr.workforce.compliance-ui.copy.shared";
+export { hrComplianceUiCopy } from "./hr.workforce.compliance-ui.copy.shared";
 
 export {
   hrComplianceOverviewStatSurfaceKey,
   buildHrComplianceOverviewStatGroups,
-} from "./surface/hr.workforce.compliance-overview-stat.surface";
+} from "./hr.workforce.compliance-overview-stat.surface";
 
 export {
   hrComplianceOverviewBreakdownSurfaceKey,
-} from "./surface/hr.workforce.compliance-overview-breakdown-list.surface";
+} from "./hr.workforce.compliance-overview-breakdown-list.surface";
 
 export {
   HR_WORKFORCE_COMPLIANCE_ACCEPTANCE_CRITERIA_COVERAGE,
@@ -45,7 +45,7 @@ export {
   type HrComplianceCoverageEntry,
   type HrComplianceCoverageStatus,
   type HrComplianceRequirementCode,
-} from "./data/hr.workforce.compliance-coverage.shared";
+} from "./hr.workforce.compliance-coverage.shared";
 
 export {
   parseHrComplianceSearchParams,
@@ -66,4 +66,4 @@ export {
   hrComplianceEvidenceLinksSearchParam,
   hrComplianceAuditTrailSearchParam,
   hrComplianceReviewQueueSearchParam,
-} from "./data/hr.workforce.compliance-search-params.parse.shared";
+} from "./hr.workforce.compliance-search-params.parse.shared";

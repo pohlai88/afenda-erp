@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("server-only", () => ({}));
 
-import { AI_ERP_HTTP_ROUTES } from "@afenda/ai";
+import { AI_ERP_HTTP_ROUTES } from "@afenda/ai/client";
 
 const { handleAiExtractDocumentPost } = vi.hoisted(() => ({
   handleAiExtractDocumentPost: vi.fn(),

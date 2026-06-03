@@ -26,7 +26,7 @@ import {
   hrDocumentRetentionPolicies,
   hrEmployeeDocuments,
   hrEmployees,
-} from "./schema/hr";
+} from "./hr";
 import { listOrganizationsForCoreErpSeed } from "./erp";
 import { listHrEmployeeDirectoryWindow } from "./hr";
 

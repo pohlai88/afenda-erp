@@ -9,64 +9,64 @@ export {
   HR_LIFECYCLE_LIST_SURFACE_KEYS,
   HR_LIFECYCLE_WORKBENCH_READ_ONLY_SURFACE_KEYS,
   type HrLifecycleListSurfaceKey,
-} from "./surface/hr.workforce.lifecycle-surface-metadata.shared";
+} from "./hr.workforce.lifecycle-surface-metadata.shared";
 
 export {
   hrLifecycleOverviewSurfaceKey,
   hrLifecycleOverviewSearchParam,
   hrLifecycleEmploymentStatusFilterParam,
-} from "./surface/hr.workforce.lifecycle-overview-list.surface";
+} from "./hr.workforce.lifecycle-overview-list.surface";
 
 export {
   hrLifecyclePendingTransitionsSurfaceKey,
   hrLifecyclePendingTransitionsSearchParam,
-} from "./surface/hr.workforce.lifecycle-pending-transitions-list.surface";
+} from "./hr.workforce.lifecycle-pending-transitions-list.surface";
 
 export {
   hrLifecycleProbationDueSurfaceKey,
   hrLifecycleProbationDueSearchParam,
-} from "./surface/hr.workforce.lifecycle-probation-due-list.surface";
+} from "./hr.workforce.lifecycle-probation-due-list.surface";
 
 export {
   hrLifecycleContractReviewsSurfaceKey,
   hrLifecycleContractReviewsSearchParam,
-} from "./surface/hr.workforce.lifecycle-contract-reviews-list.surface";
+} from "./hr.workforce.lifecycle-contract-reviews-list.surface";
 
 export {
   hrLifecycleAuditTrailSurfaceKey,
   hrLifecycleAuditTrailSearchParam,
-} from "./surface/hr.workforce.lifecycle-audit-trail-list.surface";
+} from "./hr.workforce.lifecycle-audit-trail-list.surface";
 
 export {
   hrLifecycleOnboardingCasesSurfaceKey,
   hrLifecycleOnboardingCasesSearchParam,
-} from "./surface/hr.workforce.lifecycle-onboarding-cases-list.surface";
+} from "./hr.workforce.lifecycle-onboarding-cases-list.surface";
 
 export {
   hrLifecycleNoticePeriodSurfaceKey,
   hrLifecycleNoticePeriodSearchParam,
-} from "./surface/hr.workforce.lifecycle-notice-period-list.surface";
+} from "./hr.workforce.lifecycle-notice-period-list.surface";
 
 export {
   hrLifecycleOffboardingCasesSurfaceKey,
   hrLifecycleOffboardingCasesSearchParam,
-} from "./surface/hr.workforce.lifecycle-offboarding-cases-list.surface";
+} from "./hr.workforce.lifecycle-offboarding-cases-list.surface";
 
-export { hrLifecycleUiCopy } from "./surface/hr.workforce.lifecycle-ui.copy.shared";
+export { hrLifecycleUiCopy } from "./hr.workforce.lifecycle-ui.copy.shared";
 
 export {
   hrLifecycleOverviewStatSurfaceKey,
   buildHrLifecycleOverviewStatGroups,
-} from "./surface/hr.workforce.lifecycle-overview-stat.surface";
+} from "./hr.workforce.lifecycle-overview-stat.surface";
 
 export {
   parseHrLifecycleSearchParams,
   toHrLifecyclePageModelInput,
   type HrLifecycleSearchParams,
-} from "./data/hr.workforce.lifecycle-search-params.parse.shared";
+} from "./hr.workforce.lifecycle-search-params.parse.shared";
 
 export {
   HR_WORKFORCE_LIFECYCLE_ACCEPTANCE_CRITERIA_COVERAGE,
   HR_WORKFORCE_LIFECYCLE_REQUIREMENT_COVERAGE,
   assertHrWorkforceLifecycleEnterpriseCoverage,
-} from "./data/hr.workforce.lifecycle-coverage.shared";
+} from "./hr.workforce.lifecycle-coverage.shared";

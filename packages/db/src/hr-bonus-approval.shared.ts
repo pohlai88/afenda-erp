@@ -1,7 +1,7 @@
 import type {
   HrBonusApprovalRoutingConfig,
   HrBonusApprovalRoutingStep,
-} from "./schema/hr-bonus-incentive";
+} from "./hr-bonus-incentive";
 
 export type HrBonusApprovalRouteContext = {
   planType: string;

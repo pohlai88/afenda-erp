@@ -2,7 +2,7 @@ import { and, count, desc, eq, ilike, isNull, or } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import { runWithOrganizationContext } from "./client";
 import { createEntityId } from "./ids";
-import { hrDepartments, hrEmployees, hrPositions } from "./schema/hr";
+import { hrDepartments, hrEmployees, hrPositions } from "./hr";
 
 const HR_DEFAULT_PAGE_SIZE = 25;
 const HR_MAX_PAGE_SIZE = 100;

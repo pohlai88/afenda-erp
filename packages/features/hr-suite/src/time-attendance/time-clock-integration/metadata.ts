@@ -28,22 +28,22 @@ export {
   hrTimeClockPayrollRefsSearchParam,
   hrTimeClockReportsColumnsId,
   type HrTimeClockListSurfaceKey,
-} from "./surface/hr.time.clock-integration-surface-metadata.shared";
+} from "./hr.time.clock-integration-surface-metadata.shared";
 
-export { hrTimeClockUiCopy } from "./surface/hr.time.clock-integration-ui.copy.shared";
+export { hrTimeClockUiCopy } from "./hr.time.clock-integration-ui.copy.shared";
 
 export {
   parseHrTimeClockSearchParams,
   toHrTimeClockPageModelInput,
   type HrTimeClockSearchParams,
   type HrTimeClockPageModelInput,
-} from "./data/hr.time.clock-integration-search-params.parse.shared";
+} from "./hr.time.clock-integration-search-params.parse.shared";
 
 export {
   hrTimeClockRoutePaths,
   hrTimeClockCapabilities,
   type HrTimeClockRoutePath,
-} from "./contracts/hr.time.clock-integration.contract";
+} from "./hr.time.clock-integration.contract";
 
 export {
   buildHrTimeClockDevicesListSurface,
@@ -57,4 +57,4 @@ export {
   buildHrTimeClockLamExportListSurface,
   buildHrTimeClockOvertimeRefsListSurface,
   buildHrTimeClockPayrollRefsListSurface,
-} from "./surface/hr.time.clock-integration-surface-builders.shared";
+} from "./hr.time.clock-integration-surface-builders.shared";

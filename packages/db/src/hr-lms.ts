@@ -14,7 +14,7 @@ import {
   hrLmsProgress,
   hrLmsReminders,
   hrLmsAuditEvents,
-} from "./schema/hr-lms";
+} from "./hr-lms";
 
 export {
   HrLmsCommandError,

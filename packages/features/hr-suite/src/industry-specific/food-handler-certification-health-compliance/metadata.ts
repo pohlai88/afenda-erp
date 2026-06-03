@@ -10,9 +10,9 @@ export {
   HR_INDUSTRY_FHC_LIST_SURFACE_KEYS,
   HR_INDUSTRY_FHC_READ_ONLY_LIST_SURFACE_KEYS,
   type HrIndustryFhcListSurfaceKey,
-} from "./surface/hr.industry.fhc-surface-metadata.shared";
+} from "./hr.industry.fhc-surface-metadata.shared";
 
-export { hrIndustryFhcUiCopy } from "./surface/hr.industry.fhc-ui.copy.shared";
+export { hrIndustryFhcUiCopy } from "./hr.industry.fhc-ui.copy.shared";
 
 export {
   parseHrIndustryFhcSearchParams,
@@ -20,16 +20,16 @@ export {
   type HrIndustryFhcStatusFilter,
   type HrIndustryFhcPageModelInput,
   type HrIndustryFhcSearchParams,
-} from "./data/hr.industry.fhc-search-params.parse.shared";
+} from "./hr.industry.fhc-search-params.parse.shared";
 
 export {
   hrIndustryFhcRoutePaths,
   type HrIndustryFhcRoutePath,
-} from "./contracts/hr.industry.fhc-route.contract";
+} from "./hr.industry.fhc-route.contract";
 
 export {
   HR_INDUSTRY_FHC_ACCEPTANCE_CRITERIA_COVERAGE,
   HR_INDUSTRY_FHC_REQUIREMENT_COVERAGE,
   assertHrIndustryFhcEnterpriseCoverage,
   assertHrIndustryFhcScaffoldOnly,
-} from "./data/hr.industry.fhc-coverage.shared";
+} from "./hr.industry.fhc-coverage.shared";

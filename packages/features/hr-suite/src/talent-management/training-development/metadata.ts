@@ -16,12 +16,12 @@ export {
   hrTrainingOverviewKpiSurfaceKey,
   type HrTalentTrainingListSurfaceKey,
   type HrTrainingListSurfaceKey,
-} from "./surface/hr.talent.training-surface-metadata.shared";
+} from "./hr.talent.training-surface-metadata.shared";
 
 export {
   hrTalentTrainingUiCopy,
   hrTrainingUiCopy,
-} from "./surface/hr.talent.training-ui.copy.shared";
+} from "./hr.talent.training-ui.copy.shared";
 
 export {
   parseHrTrainingSearchParams,
@@ -32,14 +32,14 @@ export {
   type HrTalentTrainingSearchParams,
   type HrTrainingPageModelInput,
   type HrTrainingSearchParams,
-} from "./data/hr.talent.training-search-params.parse.shared";
+} from "./hr.talent.training-search-params.parse.shared";
 
 export {
   hrTrainingRoutePaths,
   hrTalentTrainingRoutePaths,
   type HrTalentTrainingRoutePath,
   type HrTrainingRoutePath,
-} from "./contracts/hr.talent.training-route.contract";
+} from "./hr.talent.training-route.contract";
 
 export {
   assertHrTalentTrainingEnterpriseCoverage,
@@ -47,4 +47,4 @@ export {
   HR_TALENT_TRAINING_ACCEPTANCE_CRITERIA_COVERAGE,
   HR_TALENT_TRAINING_REQUIREMENT_COVERAGE,
   assertHrTalentTrainingScaffoldOnly,
-} from "./data/hr.talent.training-coverage.shared";
+} from "./hr.talent.training-coverage.shared";

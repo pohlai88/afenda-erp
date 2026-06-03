@@ -20,7 +20,7 @@ import type { HrWorkAuthorizationDocumentWindow } from "./hr-compliance.types";
 import {
   hrComplianceWorkAuthorizationDocuments,
   hrEmployees,
-} from "./schema/hr";
+} from "./hr";
 
 function normalizeWorkAuthDocumentTypeSearch(search: string): string {
   return search.trim().toLowerCase().replace(/[\s-]+/g, "_");

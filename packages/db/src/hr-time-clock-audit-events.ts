@@ -2,11 +2,11 @@ import { and, count, desc, eq, ilike, or } from "drizzle-orm";
 
 import { runWithOrganizationContext } from "./client";
 import { buildPaginatedWindow, clampPageSize } from "./list-window.shared";
-import { hrEmployees } from "./schema/hr";
+import { hrEmployees } from "./hr";
 import {
   hrTimeClockAuditEvents,
   hrTimeClockDevices,
-} from "./schema/hr-time-clock";
+} from "./hr-time-clock";
 
 export type HrTimeClockAuditEventRow = {
   id: string;

@@ -9,7 +9,7 @@ import {
   hrLeaveBalanceLedger,
   hrLeaveBalances,
   hrOvertimeAuditEvents,
-} from "./schema/hr";
+} from "./hr";
 
 const COMPENSATORY_LEAVE_TYPES = new Set<HrLeaveType>([
   "replacement",

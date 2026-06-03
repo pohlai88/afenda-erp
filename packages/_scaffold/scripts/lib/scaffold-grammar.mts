@@ -10,7 +10,7 @@ export const scaffoldRootRelativePath = "packages/_scaffold";
 export const featureTemplateRelativePath = `${scaffoldRootRelativePath}/feature`;
 export const platformTemplateRelativePath = `${scaffoldRootRelativePath}/platform`;
 
-/** Canonical feature buckets — ARCH-1002 §8. Guards and scaffold read this list. */
+/** Legacy ARCH-1002 bucket names — grandfathered in existing features + object-storage layout checks. */
 export const featureTemplateBuckets = [
   "actions",
   "commands",
@@ -27,6 +27,16 @@ export const featureTemplateBuckets = [
 ] as const;
 
 export type FeatureTemplateBucket = (typeof featureTemplateBuckets)[number];
+
+/** Extra legacy folders seen in mature feature packages. */
+export const legacyFeatureSliceFolders = [
+  "surface",
+  "surfaces",
+  "tools",
+  "workflows",
+  "agents",
+  "prompts",
+] as const;
 
 export const featurePublicDoorFiles = [
   "index.ts",
@@ -69,6 +79,44 @@ export const clientOnlyImportBans = [
   "node:",
 ] as const;
 
+/**
+ * Flat feature file naming:
+ *   {code}-{topic}.{artifact}.{canonical}.{ext}
+ *   {code}-{topic}.{artifact}.{ext}
+ *
+ * code — first 3 letters of module id (letters/digits only)
+ * artifact — command | handler | contract | schema | read-model | policy | ...
+ * canonical — server | client | types | shared (optional)
+ */
+export const FEATURE_FLAT_FILE_PATTERN =
+  /^[a-z]{3}-[a-z0-9-]+(\.[a-z0-9-]+)*\.(ts|tsx)$/;
+
+export const FEATURE_FLAT_ARTIFACTS = [
+  "action",
+  "agent",
+  "command",
+  "component",
+  "contract",
+  "domain",
+  "event",
+  "handler",
+  "policy",
+  "prompt",
+  "read-model",
+  "repository",
+  "schema",
+  "surface",
+  "tool",
+  "workflow",
+] as const;
+
+export const FEATURE_FLAT_CANONICALS = [
+  "server",
+  "client",
+  "types",
+  "shared",
+] as const;
+
 export function getRepositoryRoot() {
   return repositoryRoot;
 }
@@ -89,23 +137,12 @@ export function getPlatformTemplateDir(root = repositoryRoot) {
   return path.join(root, platformTemplateRelativePath);
 }
 
-/** Buckets on disk under feature template src/, else canonical ARCH-1002 list. */
-export function readFeatureTemplateBuckets(root = repositoryRoot): readonly string[] {
-  const templateSrcDir = getFeatureTemplateSrcDir(root);
-  if (!fs.existsSync(templateSrcDir)) {
-    return featureTemplateBuckets;
-  }
-
-  const buckets = fs
-    .readdirSync(templateSrcDir, { withFileTypes: true })
-    .filter((entry) => entry.isDirectory())
-    .map((entry) => entry.name)
-    .sort();
-
-  return buckets.length > 0 ? buckets : featureTemplateBuckets;
+/** @deprecated Legacy bucket list for object-storage + grandfathered features. Scaffold is flat. */
+export function readFeatureTemplateBuckets(_root = repositoryRoot): readonly string[] {
+  return featureTemplateBuckets;
 }
 
-/** @deprecated Use readFeatureTemplateBuckets — import compat for guards during migration. */
+/** @deprecated Use readFeatureTemplateBuckets */
 export function readTemplateBuckets(root = repositoryRoot) {
   return readFeatureTemplateBuckets(root);
 }
@@ -114,17 +151,73 @@ export function isBannedBucketName(name: string) {
   return bannedBucketNames.has(name);
 }
 
-export function createBucketPlaceholder(bucketName: string, templateLabel = scaffoldRootRelativePath) {
-  if (bucketName === "tests") {
-    return null;
-  }
+export function isFeaturePublicDoor(fileName: string) {
+  return featurePublicDoorFiles.includes(
+    fileName as (typeof featurePublicDoorFiles)[number],
+  );
+}
 
-  return `/**
- * @afenda-bucket ${bucketName}
- * Scaffold placeholder from ${templateLabel}.
+export function isLegacyFeatureFolder(name: string) {
+  return (
+    featureTemplateBuckets.includes(name as FeatureTemplateBucket) ||
+    legacyFeatureSliceFolders.includes(
+      name as (typeof legacyFeatureSliceFolders)[number],
+    )
+  );
+}
+
+/** First three alphanumeric characters of the module id — package code prefix. */
+export function featurePackageCode(moduleId: string) {
+  const normalized = moduleId.toLowerCase().replace(/[^a-z0-9]/g, "");
+  return `${normalized}xxx`.slice(0, 3);
+}
+
+export function isFeatureFlatFileName(fileName: string) {
+  if (isFeaturePublicDoor(fileName)) return true;
+  if (fileName === "index.ts") return true;
+  return FEATURE_FLAT_FILE_PATTERN.test(fileName);
+}
+
+export function featureFlatFileViolation(fileName: string): string | null {
+  if (isFeatureFlatFileName(fileName)) return null;
+
+  return `invalid flat feature file "${fileName}" — use {code}-{topic}.{artifact}.{canonical}.{ext} (code = 3-letter module prefix). Examples: ${featurePackageCode("purchasing")}-order-create.command.server.ts, ${featurePackageCode("purchasing")}-order.schema.ts`;
+}
+
+export function listFeatureFlatTemplateFiles(root = repositoryRoot) {
+  const templateSrcDir = getFeatureTemplateSrcDir(root);
+  if (!fs.existsSync(templateSrcDir)) return [] as string[];
+
+  return fs
+    .readdirSync(templateSrcDir, { withFileTypes: true })
+    .filter((entry) => entry.isFile())
+    .map((entry) => entry.name)
+    .filter((name) => name.includes("__CODE__") || isFeaturePublicDoor(name));
+}
+
+export function createFlatFeaturePlaceholder(input: {
+  code: string;
+  slice?: string;
+  artifact: string;
+  canonical?: string;
+  ext?: "ts" | "tsx";
+}) {
+  const topic = input.slice
+    ? `${input.slice}-example`
+    : "example";
+  const middle = input.canonical
+    ? `${input.artifact}.${input.canonical}`
+    : input.artifact;
+  const fileName = `${input.code}-${topic}.${middle}.${input.ext ?? "ts"}`;
+  return {
+    fileName,
+    contents: `/**
+ * @afenda-feature-flat ${input.code}-${topic}.${middle}
+ * Scaffold placeholder — flat src layout (${scaffoldRootRelativePath}/feature).
  */
 export {};
-`;
+`,
+  };
 }
 
 export function applyTemplateTokens(content: string, tokens: Record<string, string>) {

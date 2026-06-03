@@ -145,7 +145,7 @@ export {
 export {
   getModuleObservabilityIndicators,
   type ModuleObservabilityIndicator,
-} from "./modules/observability";
+} from "./ker-observability";
 export {
   getAssistantEmptyStateHint,
   getAssistantPromptDefinitions,
@@ -213,7 +213,7 @@ import {
   getErpModuleById,
   moduleByHref,
   moduleById,
-} from "./modules/definitions";
+} from "./ker-definitions";
 
 export {
   erpModules,

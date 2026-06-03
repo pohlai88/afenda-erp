@@ -1,15 +1,17 @@
+import { Skeleton } from "@afenda/ui";
+
+import { RouteStateShell } from "@/routes/route-state";
+
 export default function LynxLoading() {
   return (
-    <main aria-busy="true" className="surface-page text-foreground">
-      <div className="page-shell page-stack">
-        <div className="h-24 rounded-section border border-border bg-muted/40" />
-        <div className="grid gap-surface-md">
-          <div className="h-28 rounded-section border border-border bg-muted/40" />
-          <div className="h-28 rounded-section border border-border bg-muted/40" />
-          <div className="h-28 rounded-section border border-border bg-muted/40" />
-        </div>
-        <div className="h-80 rounded-section border border-border bg-muted/40" />
+    <RouteStateShell ariaBusy layout="workspace">
+      <Skeleton className="h-24 rounded-section" />
+      <div className="grid gap-surface-md">
+        <Skeleton className="h-28 rounded-section" />
+        <Skeleton className="h-28 rounded-section" />
+        <Skeleton className="h-28 rounded-section" />
       </div>
-    </main>
+      <Skeleton className="h-80 rounded-section" />
+    </RouteStateShell>
   );
 }

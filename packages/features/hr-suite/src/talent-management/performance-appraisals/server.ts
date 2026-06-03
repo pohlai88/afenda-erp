@@ -1,82 +1,22 @@
-import React from "react";
-import {
-  ExecutionAccessDeniedError,
-  ExecutionContextRequiredError,
-} from "@afenda/kernel/execution";
+/**
+ * Server-only public door.
+ */
+import "server-only";
 
-import {
-  parseHrPerformanceAppraisalsSearchParams,
-  toHrPerformanceAppraisalsPageModelInput,
-} from "./data/hr.talent.performance-search-params.parse.shared";
-
-type HrRawSearchParams = Record<string, string | string[] | undefined> | undefined;
-type HrSearchParamsInput = HrRawSearchParams | Promise<HrRawSearchParams>;
-
-export * from "./actions";
-export * from "./data";
-export * from "./events";
-export * from "./policies";
-export * from "./schemas";
-export * from "./contracts";
-
-export {
-  buildHrPerformanceAppraisalsPageModel,
-  type HrPerformanceAppraisalsPageModel,
-} from "./data/hr.talent.performance.page-model.server";
-
-export {
-  HrPerformanceAppraisalsAccessDeniedPanel,
-  HrPerformanceAppraisalsSection,
-} from "./components";
-
-import { buildHrPerformanceAppraisalsPageModel } from "./data/hr.talent.performance.page-model.server";
-import { requireHrPerformanceRead } from "./policies/hr.talent.performance-access.policy.server";
-import {
-  HrPerformanceAppraisalsAccessDeniedPanel,
-  HrPerformanceAppraisalsSection,
-} from "./components";
-
-function isHrPerformanceAccessFailure(error: unknown) {
-  return (
-    error instanceof ExecutionContextRequiredError ||
-    error instanceof ExecutionAccessDeniedError
-  );
-}
-
-export async function buildHrPerformanceAppraisalsPageModelForRequest(
-  searchParams?: HrSearchParamsInput,
-) {
-  const [guard, resolvedSearchParams] = await Promise.all([
-    requireHrPerformanceRead(),
-    searchParams ?? Promise.resolve(undefined),
-  ]);
-  const visibleEmployeeIds = await guard.resolveVisibleEmployeeIds({
-    scope: guard.canWritePerformance ? "org" : "team",
-  });
-
-  return buildHrPerformanceAppraisalsPageModel(
-    toHrPerformanceAppraisalsPageModelInput({
-      organizationId: guard.organization.id,
-      visibleEmployeeIds,
-      canWritePerformance: guard.canWritePerformance,
-      canReadAudit: guard.canReadAudit,
-      canReadCompensationOutcome: guard.canReadCompensationOutcome,
-      searchParams: parseHrPerformanceAppraisalsSearchParams(resolvedSearchParams),
-    }),
-  );
-}
-
-export async function renderHrPerformanceAppraisalsPage(
-  searchParams?: HrSearchParamsInput,
-) {
-  try {
-    const pageModel =
-      await buildHrPerformanceAppraisalsPageModelForRequest(searchParams);
-    return React.createElement(HrPerformanceAppraisalsSection, { pageModel });
-  } catch (error) {
-    if (isHrPerformanceAccessFailure(error)) {
-      return React.createElement(HrPerformanceAppraisalsAccessDeniedPanel);
-    }
-    throw error;
-  }
-}
+export * from "./hr.talent.performance-access.policy.server";
+export * from "./hr.talent.performance-constants.shared";
+export * from "./hr.talent.performance-coverage.shared";
+export * from "./hr.talent.performance-integration.shared";
+export * from "./hr.talent.performance-lists.surface";
+export * from "./hr.talent.performance-reports.shared";
+export * from "./hr.talent.performance-route.contract";
+export * from "./hr.talent.performance-search-params.parse.shared";
+export * from "./hr.talent.performance-section.component.server";
+export * from "./hr.talent.performance-store.shared";
+export * from "./hr.talent.performance-surface-metadata.shared";
+export * from "./hr.talent.performance-ui.copy.shared";
+export * from "./hr.talent.performance.actions.server";
+export * from "./hr.talent.performance.contract";
+export * from "./hr.talent.performance.event";
+export * from "./hr.talent.performance.page-model.server";
+export * from "./hr.talent.performance.schema";

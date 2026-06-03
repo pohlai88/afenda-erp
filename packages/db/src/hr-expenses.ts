@@ -26,8 +26,8 @@ import {
   hrExpenseEligibilityRules,
   hrExpensePolicies,
   hrExpensePolicyCategoryRules,
-} from "./schema/hr-expense";
-import { hrEmployees } from "./schema/hr";
+} from "./hr-expense";
+import { hrEmployees } from "./hr";
 
 export {
   buildExpenseReceiptFingerprint,

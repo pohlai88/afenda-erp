@@ -24,7 +24,7 @@ import {
   hrLifecycleEvents,
   hrLifecycleTransitions,
   hrOffboardingCases,
-} from "./schema/hr";
+} from "./hr";
 
 export type HrEmploymentStatus =
   (typeof hrEmployees.$inferSelect)["employmentStatus"];

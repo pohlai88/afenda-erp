@@ -1,7 +1,7 @@
 import type {
   HrPayrollRunLineComponent,
   HrPayrollRunLineSnapshot,
-} from "./schema/hr-payroll-processing";
+} from "./hr-payroll-processing";
 import { formatPayrollNumeric } from "./hr-payroll-processing.shared";
 
 function formatNumeric(value: number, scale = 2): string {

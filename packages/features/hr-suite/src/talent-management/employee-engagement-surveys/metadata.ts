@@ -24,9 +24,9 @@ export {
   hrTalentEngSurveysSurfaceKey,
   hrTalentEngTemplatesSurfaceKey,
   type HrTalentEngListSurfaceKey,
-} from "./surface/hr.talent.eng-surface-metadata.shared";
+} from "./hr.talent.eng-surface-metadata.shared";
 
-export { hrTalentEngUiCopy } from "./surface/hr.talent.eng-ui.copy.shared";
+export { hrTalentEngUiCopy } from "./hr.talent.eng-ui.copy.shared";
 
 export {
   hrTalentEngReportGroupByParam,
@@ -37,15 +37,15 @@ export {
   toHrTalentEngPageModelInput,
   type HrTalentEngPageModelInput,
   type HrTalentEngSearchParams,
-} from "./data/hr.talent.eng-search-params.parse.shared";
+} from "./hr.talent.eng-search-params.parse.shared";
 
 export {
   hrTalentEngRoutePaths,
   type HrTalentEngRoutePath,
-} from "./contracts/hr.talent.eng-route.contract";
+} from "./hr.talent.eng-route.contract";
 
 export {
   HR_TALENT_ENG_ACCEPTANCE_CRITERIA_COVERAGE,
   HR_TALENT_ENG_REQUIREMENT_COVERAGE,
   assertHrTalentEngEnterpriseCoverage,
-} from "./data/hr.talent.eng-coverage.shared";
+} from "./hr.talent.eng-coverage.shared";

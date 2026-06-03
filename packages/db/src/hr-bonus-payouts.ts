@@ -21,9 +21,9 @@ import {
   collectHrBonusPayoutValidationFlagsInTx,
 } from "./hr-bonus-payout-validation";
 import type { BonusPayoutCalculationInput } from "./hr-bonus-incentive-payout.shared";
-import { hrBonusCycles, hrBonusPlans } from "./schema/hr-bonus-incentive";
-import { hrBonusPayouts } from "./schema/hr-bonus";
-import { hrEmployees } from "./schema/hr";
+import { hrBonusCycles, hrBonusPlans } from "./hr-bonus-incentive";
+import { hrBonusPayouts } from "./hr-bonus";
+import { hrEmployees } from "./hr";
 
 export type PrepareHrBonusPayoutInput = {
   organizationId: string;

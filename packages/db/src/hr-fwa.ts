@@ -28,7 +28,7 @@ import {
   hrFwaSchedulePatterns,
   hrPositions,
   type HrFwaSchedulePatternDetails,
-} from "./schema/hr";
+} from "./hr";
 
 export type HrFwaArrangementKind =
   (typeof hrFwaArrangementKindEnum.enumValues)[number];

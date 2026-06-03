@@ -3,7 +3,7 @@ import { runWithOrganizationContext, type AfendaTransaction } from "./client";
 import { createEntityId } from "./ids";
 import { buildPaginatedWindow, clampPageSize } from "./hr-benefits.shared";
 import type { HrBenefitAuditTrailWindow } from "./hr-benefits.types";
-import { hrBenefitAuditEvents } from "./schema/hr-benefits";
+import { hrBenefitAuditEvents } from "./hr-benefits";
 
 export async function appendHrBenefitAuditEventInTx(
   db: AfendaTransaction,

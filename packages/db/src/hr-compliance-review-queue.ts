@@ -17,7 +17,7 @@ import {
   hrComplianceWorkEligibility,
   hrEmployeeDocuments,
   hrEmployees,
-} from "./schema/hr";
+} from "./hr";
 
 type ReviewQueueDraft = {
   id: string;

@@ -30,15 +30,20 @@ GET  /api/internal/v1/ai/queries/gateway-spend
 POST /api/internal/v1/ai/commands/extract-document
 ```
 
-Canonical paths: `AI_ERP_HTTP_ROUTES` in `src/contracts/ai.http.contract.ts`.
+Canonical paths: `AI_ERP_HTTP_ROUTES` in `src/ai-http.contract.ts`.
 
 Flat `/api/ai/*` is **non-compliant**.
 
 ## Public doors
 
-- `@afenda/ai` / `@afenda/ai/server` — server runtime + handlers
-- `@afenda/ai/client` — metadata, components, contracts, schemas
+- `@afenda/ai/server` — server runtime, handlers, agents, tools, sandbox, gateway
+- `@afenda/ai/client` — metadata, components, contracts, schemas (browser-safe)
 - `@afenda/ai/metadata` — platform feature flags only
+- `@afenda/ai` — alias of `@afenda/ai/client` (prefer explicit doors in new code)
+
+## Flat src layout (GUARD 5)
+
+Single-feature package — flat `src/` only. Run `pnpm guard:packages`.
 
 ## Agent naming
 

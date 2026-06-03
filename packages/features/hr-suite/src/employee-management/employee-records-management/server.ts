@@ -1,143 +1,35 @@
-import React from "react";
-
-import {
-  ExecutionAccessDeniedError,
-  ExecutionContextRequiredError,
-} from "@afenda/kernel/execution";
-import { SectionPanel } from "@afenda/ui";
-
-import {
-  HrRecordsAccessDeniedPanel,
-  HrRecordsDetailNotFoundPanel,
-  HrRecordsDetailSection,
-  HrRecordsWorkbenchSection,
-} from "./components";
-import {
-  buildHrEmployeeRecordDetailPageModel,
-  buildHrRecordsPageModel,
-  toHrEmployeeRecordDetailPageModelInput,
-  toHrRecordsPageModelInput,
-} from "./data";
-import { requireHrRecordsRead } from "./policies/hr.workforce.records-access.policy.server";
-
 /**
- * Server door — employee-management/employee-records-management
+ * Server-only public door.
  */
-export * from "./actions";
-export * from "./data";
-export * from "./events";
-export * from "./policies";
-export * from "./schemas";
-export {
-  hrWorkforceRecordsReadPermission,
-  hrWorkforceRecordsWritePermission,
-  hrWorkforceRecordsSensitiveReadPermission,
-} from "./contracts/hr.workforce.records.contract";
-export {
-  hrRecordsRoutePaths,
-  type HrRecordsRoutePath,
-} from "./contracts/hr.workforce.records-route.contract";
+import "server-only";
 
-export {
-  HrRecordsAccessDeniedPanel,
-  HrRecordsDetailNotFoundPanel,
-  HrRecordsDetailSection,
-  HrRecordsWorkbenchSection,
-};
-
-export function HrRecordsAccessDenied() {
-  return React.createElement(HrRecordsAccessDeniedPanel);
-}
-
-export function HrEmployeesSection({
-  title,
-  description,
-  children,
-}: {
-  title: string;
-  description?: string;
-  children: React.ReactNode;
-}) {
-  return React.createElement(
-    SectionPanel,
-    { headingLevel: 2, title, description },
-    children,
-  );
-}
-
-function isRecordsAccessFailure(error: unknown) {
-  return (
-    error instanceof ExecutionAccessDeniedError ||
-    error instanceof ExecutionContextRequiredError
-  );
-}
-
-export async function renderHrRecordsPage(
-  searchParams?: Promise<Record<string, string | string[] | undefined>>,
-) {
-  let guard: Awaited<ReturnType<typeof requireHrRecordsRead>>;
-  let resolvedSearchParams: Record<string, string | string[] | undefined> | undefined;
-
-  try {
-    [guard, resolvedSearchParams] = await Promise.all([
-      requireHrRecordsRead(),
-      searchParams ?? Promise.resolve(undefined),
-    ]);
-  } catch (error) {
-    if (isRecordsAccessFailure(error)) {
-      return React.createElement(HrRecordsAccessDeniedPanel);
-    }
-    throw error;
-  }
-
-  const model = await buildHrRecordsPageModel(
-    toHrRecordsPageModelInput({
-      organizationId: guard.organization.id,
-      canWrite: guard.hasCapability("hr.employees.write"),
-      canViewSensitive: guard.canViewSensitive,
-      searchParams: resolvedSearchParams,
-    }),
-  );
-
-  return React.createElement(HrRecordsWorkbenchSection, { model });
-}
-
-export async function renderHrEmployeesPage(
-  searchParams?: Promise<Record<string, string | string[] | undefined>>,
-) {
-  return renderHrRecordsPage(searchParams);
-}
-
-export async function renderHrEmployeeRecordDetailPage(recordId: string) {
-  let guard: Awaited<ReturnType<typeof requireHrRecordsRead>>;
-
-  try {
-    guard = await requireHrRecordsRead();
-  } catch (error) {
-    if (isRecordsAccessFailure(error)) {
-      return React.createElement(HrRecordsAccessDeniedPanel);
-    }
-    throw error;
-  }
-
-  const model = await buildHrEmployeeRecordDetailPageModel(
-    toHrEmployeeRecordDetailPageModelInput({
-      organizationId: guard.organization.id,
-      employeeId: recordId,
-      canViewSensitive: guard.canViewSensitive,
-    }),
-  );
-
-  return model
-    ? React.createElement(HrRecordsDetailSection, { model })
-    : null;
-}
-
-/** @deprecated Use requireHrRecordsRead from this slice. */
-export { requireHrRecordsRead as requireHrEmployeesRead } from "./policies/hr.workforce.records-access.policy.server";
-/** @deprecated Use requireHrRecordsWrite from this slice. */
-export { requireHrRecordsWrite as requireHrEmployeesWrite } from "./policies/hr.workforce.records-access.policy.server";
-/** @deprecated Use buildHrRecordsPageModel from this slice. */
-export { buildHrRecordsPageModel as buildHrEmployeesPageModel } from "./data/hr.workforce.records.page-model.server";
-/** @deprecated Use HrRecordsAccessDeniedPanel from this slice. */
-export { HrRecordsAccessDeniedPanel as HrEmployeesAccessDenied } from "./components/hr.workforce.records-section.component.server";
+export * from "./hr.workforce.records-access.policy.server";
+export * from "./hr.workforce.records-action-result.shared";
+export * from "./hr.workforce.records-assignments-list.surface";
+export * from "./hr.workforce.records-audit-trail-list.surface";
+export * from "./hr.workforce.records-coverage.shared";
+export * from "./hr.workforce.records-detail-section.component.server";
+export * from "./hr.workforce.records-directory-list.surface";
+export * from "./hr.workforce.records-document-references-list.surface";
+export * from "./hr.workforce.records-employment-status.schema";
+export * from "./hr.workforce.records-form.shared";
+export * from "./hr.workforce.records-incomplete-list.surface";
+export * from "./hr.workforce.records-list-load.shared";
+export * from "./hr.workforce.records-list.shared";
+export * from "./hr.workforce.records-overview-stat.surface";
+export * from "./hr.workforce.records-overview.shared";
+export * from "./hr.workforce.records-route.contract";
+export * from "./hr.workforce.records-search-params.parse.shared";
+export * from "./hr.workforce.records-section.component.server";
+export * from "./hr.workforce.records-sensitive-access.shared";
+export * from "./hr.workforce.records-separated-list.surface";
+export * from "./hr.workforce.records-status-history-list.surface";
+export * from "./hr.workforce.records-surface-columns.shared";
+export * from "./hr.workforce.records-surface-metadata.shared";
+export * from "./hr.workforce.records-ui.copy.shared";
+export * from "./hr.workforce.records.actions.server";
+export * from "./hr.workforce.records.contract";
+export * from "./hr.workforce.records.detail.page-model.server";
+export * from "./hr.workforce.records.event";
+export * from "./hr.workforce.records.mutation.shared.server";
+export * from "./hr.workforce.records.page-model.server";

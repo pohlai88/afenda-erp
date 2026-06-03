@@ -1,4 +1,4 @@
 /**
- * Client door — browser-safe components and hooks only.
+ * Client door — browser-safe components only.
  */
 export {};

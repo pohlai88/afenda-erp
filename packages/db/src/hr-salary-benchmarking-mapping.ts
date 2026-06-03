@@ -10,7 +10,7 @@ import {
   hrSbsBenchmarkVersions,
   hrSbsCpmRecommendationRefs,
   hrSbsMappingApprovals,
-} from "./schema/hr-salary-benchmarking";
+} from "./hr-salary-benchmarking";
 
 export type CreateHrSbsBenchmarkMappingInput = {
   organizationId: string;

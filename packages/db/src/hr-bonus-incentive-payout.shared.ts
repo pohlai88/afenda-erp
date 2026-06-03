@@ -1,6 +1,6 @@
 import type {
   hrBonusPayoutFormulaKindEnum,
-} from "./schema/hr-bonus-incentive";
+} from "./hr-bonus-incentive";
 
 export type BonusPayoutFormulaKind =
   (typeof hrBonusPayoutFormulaKindEnum.enumValues)[number];

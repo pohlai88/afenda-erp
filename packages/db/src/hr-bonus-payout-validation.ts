@@ -16,7 +16,7 @@ import {
   hrBonusPlanParticipants,
   hrBonusTargetAchievements,
   hrBonusTargets,
-} from "./schema/hr-bonus-incentive";
+} from "./hr-bonus-incentive";
 
 export {
   HR_BONUS_PAYOUT_VALIDATION_FLAGS,

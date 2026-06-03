@@ -7,7 +7,7 @@ import {
 } from "./hr-otm";
 import { buildOtmCalculationSnapshot } from "./hr-otm-calculation.shared";
 import type { HrOvertimeType } from "./hr-otm.shared";
-import { hrOvertimeRequests } from "./schema/hr";
+import { hrOvertimeRequests } from "./hr";
 
 export { buildOtmCalculationSnapshot } from "./hr-otm-calculation.shared";
 export * from "./hr-otm-calculation.shared";

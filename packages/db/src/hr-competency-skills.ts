@@ -19,7 +19,7 @@ import {
   hrCsfProficiencyScales,
   hrCsfSkillRequirements,
   hrCsfSkills,
-} from "./schema/hr-competency-skills";
+} from "./hr-competency-skills";
 
 export {
   HrCsfCommandError,

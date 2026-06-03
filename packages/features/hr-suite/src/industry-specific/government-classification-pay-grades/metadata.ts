@@ -19,9 +19,9 @@ export {
   hrIndustryGpgStepEligibilityRulesSurfaceKey,
   hrIndustryGpgStepIncreaseCandidatesSurfaceKey,
   type HrIndustryGpgListSurfaceKey,
-} from "./surface/hr.industry.gpg-surface-metadata.shared";
+} from "./hr.industry.gpg-surface-metadata.shared";
 
-export { hrIndustryGpgUiCopy } from "./surface/hr.industry.gpg-ui.copy.shared";
+export { hrIndustryGpgUiCopy } from "./hr.industry.gpg-ui.copy.shared";
 
 export {
   hrIndustryGpgReportGroupByParam,
@@ -31,12 +31,12 @@ export {
   type HrIndustryGpgPageModelInput,
   type HrIndustryGpgSearchParams,
   type HrIndustryGpgStatusFilter,
-} from "./data/hr.industry.gpg-search-params.parse.shared";
+} from "./hr.industry.gpg-search-params.parse.shared";
 
 export {
   hrIndustryGpgRoutePaths,
   type HrIndustryGpgRoutePath,
-} from "./contracts/hr.industry.gpg-route.contract";
+} from "./hr.industry.gpg-route.contract";
 
 export {
   HR_INDUSTRY_GPG_ACCEPTANCE_CRITERIA_COVERAGE,
@@ -44,4 +44,4 @@ export {
   assertHrIndustryGpgAcceptanceCriteriaComplete,
   assertHrIndustryGpgCoverageComplete,
   assertHrIndustryGpgEnterpriseCoverage,
-} from "./data/hr.industry.gpg-coverage.shared";
+} from "./hr.industry.gpg-coverage.shared";

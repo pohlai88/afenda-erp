@@ -7,7 +7,7 @@ import {
   hrPayrollJournalRefs,
   hrPayrollRunLines,
   hrPayrollRuns,
-} from "./schema/hr-payroll-processing";
+} from "./hr-payroll-processing";
 
 /** PAY-028 — generate payroll journal / finance posting reference. */
 export async function generateHrPayrollJournalRefInTx(

@@ -141,14 +141,14 @@ Extend `packages/ai/tests/unit/tools.test.ts` to assert tool-id stability and me
 
 **New routes:**
 
-- `apps/erp/src/app/api/lynx/truth-search/route.ts` — embed → similarity search → four-section system prompt → AI SDK UI stream with evidence metadata parts
-- `apps/erp/src/app/api/lynx/operator/route.ts` — governed tool registry + `org_search_knowledge` + `org_recent_knowledge_chunks` tools from `@afenda/feature-knowledge`
+- `apps/erp/src/app/api/internal/v1/lynx/queries/truth-search/route.ts` — embed → similarity search → four-section system prompt → AI SDK UI stream with evidence metadata parts
+- `apps/erp/src/app/api/internal/v1/lynx/queries/operator/route.ts` — governed tool registry + `org_search_knowledge` + `org_recent_knowledge_chunks` tools from `@afenda/feature-knowledge`
 
 **Knowledge admin page** (moved from Phase 1 if not complete): `apps/erp/src/app/(app)/knowledge/page.tsx`
 
 **Brand:** UI copy stays "ERP Assistant" / "Solution Console" — Phase A of brand ladder.
 
-**Verification:** `pnpm typecheck`, `pnpm test`, smoke `/api/lynx/truth-search` with seeded chunks
+**Verification:** `pnpm typecheck`, `pnpm test`, smoke `/api/internal/v1/lynx/queries/truth-search` with seeded chunks
 
 ---
 

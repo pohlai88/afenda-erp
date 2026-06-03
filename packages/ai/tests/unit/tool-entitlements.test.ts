@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { createErpAssistantTools } from "../../src/tools/ai.erp-tools.tool.server";
+import { createErpAssistantTools } from "../../src/ai-erp-tools.tool.server";
 
 function createWorkspace() {
   return {

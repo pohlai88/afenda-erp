@@ -1,4 +1,4 @@
-import { HR_CSF_LIST_SURFACE_KEYS } from "./data/hr.talent.csf-search-params.parse.shared";
+import { HR_CSF_LIST_SURFACE_KEYS } from "./hr.talent.csf-search-params.parse.shared";
 
 export {
   HR_CSF_LIST_SURFACE_KEYS,
@@ -24,7 +24,7 @@ export {
   toHrCsfMatchingPageModelInput,
   type HrCsfListSurfaceKey,
   type HrCsfSearchParams,
-} from "./data/hr.talent.csf-search-params.parse.shared";
+} from "./hr.talent.csf-search-params.parse.shared";
 
 export const HR_CSF_LIST_SURFACE_COLUMNS_BY_KEY = {
   "hr.talent.csf.competencies.list": "hr.talent.csf.competencies.columns",
@@ -39,7 +39,7 @@ export function getHrCsfListSurfaceKeys() {
   return HR_CSF_LIST_SURFACE_KEYS;
 }
 
-export { hrCsfUiCopy } from "./surface/hr.talent.csf-ui.copy.shared";
+export { hrCsfUiCopy } from "./hr.talent.csf-ui.copy.shared";
 
 export {
   hrCsfCompetenciesColumnsId,
@@ -48,16 +48,16 @@ export {
   hrCsfReportsColumnsId,
   hrCsfAuditColumnsId,
   hrCsfMatchingColumnsId,
-} from "./surface/hr.talent.csf-surface-columns.shared";
+} from "./hr.talent.csf-surface-columns.shared";
 
 export {
   hrCsfRoutePaths,
   type HrCsfRoutePath,
-} from "./contracts/hr.talent.csf-route.contract";
+} from "./hr.talent.csf-route.contract";
 
 export {
   CSF_REQUIREMENT_COVERAGE,
   CSF_ACCEPTANCE_CRITERIA_COVERAGE,
   assertCsfCoverageComplete,
   assertCsfAcceptanceCriteriaComplete,
-} from "./data/hr.talent.csf-acceptance-coverage.shared";
+} from "./hr.talent.csf-acceptance-coverage.shared";

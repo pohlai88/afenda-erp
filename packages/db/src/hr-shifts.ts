@@ -9,11 +9,11 @@ import {
   resolveShiftBounds,
   toUtcDayStart,
 } from "./hr-shifts.shared";
-import { hrEmployees } from "./schema/hr";
+import { hrEmployees } from "./hr";
 import {
   hrShiftAssignments,
   hrShiftTemplates,
-} from "./schema/hr-shift-scheduling";
+} from "./hr-shift-scheduling";
 
 export {
   HrShiftCommandError,

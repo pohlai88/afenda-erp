@@ -9,7 +9,7 @@ import {
 import { activeEmployeeFilters, clampPageSize } from "./hr-compliance.internal";
 import { HrComplianceCommandError } from "./hr-compliance.types";
 import type { HrWorkEligibilityWindow } from "./hr-compliance.types";
-import { hrComplianceWorkEligibility, hrEmployees } from "./schema/hr";
+import { hrComplianceWorkEligibility, hrEmployees } from "./hr";
 
 export async function ensureHrWorkEligibilityTrackingInTx(
   db: AfendaTransaction,

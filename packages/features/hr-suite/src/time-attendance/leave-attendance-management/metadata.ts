@@ -17,35 +17,35 @@ export {
   hrLamReportsSurfaceKey,
   hrLamAuditTrailSurfaceKey,
   type HrLamListSurfaceKey,
-} from "./surface/hr.time.lam-surface-metadata.shared";
+} from "./hr.time.lam-surface-metadata.shared";
 
-export { hrLamUiCopy } from "./surface/hr.time.lam-ui.copy.shared";
+export { hrLamUiCopy } from "./hr.time.lam-ui.copy.shared";
 
 export {
   parseHrLamSearchParams,
   toHrLamPageModelInput,
   type HrLamSearchParams,
-} from "./data/hr.time.lam-search-params.parse.shared";
+} from "./hr.time.lam-search-params.parse.shared";
 
 export {
   hrLamRoutePaths,
   type HrLamRoutePath,
-} from "./contracts/hr.time.lam-route.contract";
+} from "./hr.time.lam-route.contract";
 
 export {
   buildHrLamExceptionsListSurface,
-} from "./surface/hr.time.attendance.lam-exceptions-list.surface";
+} from "./hr.time.attendance.lam-exceptions-list.surface";
 export {
   buildHrLamCorrectionsListSurface,
-} from "./surface/hr.time.attendance.lam-corrections-list.surface";
+} from "./hr.time.attendance.lam-corrections-list.surface";
 export {
   buildHrLamPayrollRefsListSurface,
-} from "./surface/hr.time.attendance.lam-payroll-refs-list.surface";
+} from "./hr.time.attendance.lam-payroll-refs-list.surface";
 export {
   buildHrLamReportsListSurface,
-} from "./surface/hr.time.attendance.lam-reports-list.surface";
+} from "./hr.time.attendance.lam-reports-list.surface";
 export {
   buildHrLamAuditTrailListSurface,
-} from "./surface/hr.time.attendance.lam-audit-trail-list.surface";
+} from "./hr.time.attendance.lam-audit-trail-list.surface";
 
-export { assertLamCoverageComplete, LAM_REQUIREMENT_COVERAGE } from "./data/hr.time.lam-acceptance-coverage.shared";
+export { assertLamCoverageComplete, LAM_REQUIREMENT_COVERAGE } from "./hr.time.lam-acceptance-coverage.shared";

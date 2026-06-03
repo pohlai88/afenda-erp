@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
 
-import { hrComplianceObligations } from "./schema/hr";
+import { hrComplianceObligations } from "./hr";
 
 export const HR_COMPLIANCE_POLICY_ACKNOWLEDGEMENT_REQUIREMENT_KIND =
   "policy_acknowledgement" as const;

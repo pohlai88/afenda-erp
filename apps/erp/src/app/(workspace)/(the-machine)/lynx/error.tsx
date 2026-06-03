@@ -1,5 +1,11 @@
 "use client";
 
+import {
+  RouteStatePanel,
+  RouteStateShell,
+} from "@/routes/route-state";
+import { RouteStateRetryButton } from "@/routes/route-state.client";
+
 export default function LynxError({
   error,
   reset,
@@ -8,24 +14,18 @@ export default function LynxError({
   reset: () => void;
 }) {
   return (
-    <main className="surface-page text-foreground">
-      <section className="page-shell section-stack">
-        <div className="surface-section p-surface-lg">
-          <p className="type-section-label">Lynx</p>
-          <h1 className="type-section-title">Lynx workspace failed to load</h1>
-          <p className="type-muted">
-            {error.message ||
-              "The tenant-scoped Lynx model could not be resolved."}
-          </p>
-          <button
-            className="mt-surface-md inline-flex h-9 w-fit items-center rounded-control border border-border px-surface-sm type-control outline-none hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-            onClick={reset}
-            type="button"
-          >
-            Retry
-          </button>
-        </div>
-      </section>
-    </main>
+    <RouteStateShell layout="workspace">
+      <RouteStatePanel
+        action={<RouteStateRetryButton onClick={reset}>Retry</RouteStateRetryButton>}
+        align="start"
+        description={
+          error.message ||
+          "The tenant-scoped Lynx model could not be resolved."
+        }
+        kind="error"
+        label="Lynx"
+        title="Lynx workspace failed to load"
+      />
+    </RouteStateShell>
   );
 }

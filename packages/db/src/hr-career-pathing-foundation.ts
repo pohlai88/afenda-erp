@@ -9,7 +9,7 @@ import {
   assertPlanInOrg,
   HrCareerPathingCommandError,
 } from "./hr-career-pathing.shared";
-import { hrEmployees, hrPositions } from "./schema/hr";
+import { hrEmployees, hrPositions } from "./hr";
 import {
   hrmCareerDiscussions,
   hrmCareerPathFrameworks,
@@ -27,14 +27,14 @@ import {
   hrmEmployeeTargetRoles,
   type HrmCareerCompetencyRequirement,
   type HrmCareerSkillRequirement,
-} from "./schema/hr-career-pathing";
+} from "./hr-career-pathing";
 import {
   hrCsfCompetencies,
   hrCsfEmployeeCompetencyProfiles,
   hrCsfEmployeeSkillProfiles,
   hrCsfProficiencyLevels,
   hrCsfSkills,
-} from "./schema/hr-competency-skills";
+} from "./hr-competency-skills";
 
 export type HrCareerSkillGapRow = {
   skillCode: string;

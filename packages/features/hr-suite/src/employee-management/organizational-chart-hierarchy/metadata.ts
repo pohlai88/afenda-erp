@@ -12,14 +12,14 @@ export {
   hrOrgHeadcountSurfaceKey,
   hrOrgAuditTrailSurfaceKey,
   type HrOrgListSurfaceKey,
-} from "./surface/hr.workforce.org-surface-metadata.shared";
+} from "./hr.workforce.org-surface-metadata.shared";
 
-export { hrOrgUiCopy } from "./surface/hr.workforce.org-ui.copy.shared";
+export { hrOrgUiCopy } from "./hr.workforce.org-ui.copy.shared";
 
 export {
   hrOrgOverviewStatSurfaceKey,
   buildHrOrgOverviewStatGroups,
-} from "./surface/hr.workforce.org-overview-stat.surface";
+} from "./hr.workforce.org-overview-stat.surface";
 
 export {
   parseHrOrgSearchParams,
@@ -35,4 +35,4 @@ export {
   hrOrgStatusFilterParam,
   hrOrgLocationFilterParam,
   hrOrgLegalEntityFilterParam,
-} from "./data/hr.workforce.org-search-params.parse.shared";
+} from "./hr.workforce.org-search-params.parse.shared";

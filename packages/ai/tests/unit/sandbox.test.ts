@@ -4,7 +4,7 @@ import {
   createActionSandbox,
   discardActionSandbox,
   rejectActionSandbox,
-} from "../../src/actions/ai.sandbox.actions.server";
+} from "../../src/ai-sandbox.action.server";
 
 const baseSandbox = () =>
   createActionSandbox({

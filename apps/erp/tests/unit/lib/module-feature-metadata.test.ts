@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   getModuleFeatureMetadata,
   resolveModuleFeatureMetadata,
-} from "@/lib/module-feature-metadata";
+} from "@/kitchen-sinks/module-feature.metadata";
 
 describe("module feature metadata resolver", () => {
   it("resolves HR metadata through @afenda/feature-hr-suite/metadata", () => {

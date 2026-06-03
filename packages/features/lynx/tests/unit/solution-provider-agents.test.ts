@@ -32,17 +32,16 @@ describe("solution provider agent factory", () => {
     vi.clearAllMocks();
   });
 
-  it("prefers maxSteps over deprecated stopSteps", () => {
+  it("applies a lower bound when maxSteps is below the minimum", () => {
     createSolutionProviderSpecialistAgent({
       model: "anthropic/claude-opus-4.7",
       organizationName: "Afenda",
       role: "owner",
       tools: {},
-      maxSteps: 4,
-      stopSteps: 10,
+      maxSteps: 0,
     });
 
-    expect(aiMocks.stepCountIs).toHaveBeenCalledWith(4);
+    expect(aiMocks.stepCountIs).toHaveBeenCalledWith(1);
   });
 
   it("escapes workflow context as structured JSON text", () => {

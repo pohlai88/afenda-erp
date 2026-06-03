@@ -1,77 +1,45 @@
-import React from "react";
-import {
-  ExecutionAccessDeniedError,
-  ExecutionContextRequiredError,
-} from "@afenda/kernel/execution";
+/**
+ * Server-only public door.
+ */
+import "server-only";
 
-import {
-  buildHrGeoPageModel,
-} from "./data/hr.time.geo.page-model.server";
-import { toHrGeoPageModelInput } from "./data/hr.time.geo-search-params.parse.shared";
-import { requireHrGeoRead } from "./policies/hr.time.geo-access.policy.server";
-
-export * from "./actions";
-export * from "./data";
-export * from "./schemas";
-export * from "./contracts";
-export * from "./events";
-export * from "./policies";
-export * from "./data/geolocation-acceptance-coverage.shared";
-
-export {
-  HrGeoAccessDeniedPanel,
-  HrGeoWorkbenchSection,
-} from "./components/hr.time.geo-section.component.server";
-
-import { HrGeoAccessDeniedPanel } from "./components/hr.time.geo-section.component.server";
-import { HrGeoWorkbenchSection } from "./components/hr.time.geo-section.component.server";
-
-export function HrGeoAccessDenied() {
-  return React.createElement(HrGeoAccessDeniedPanel);
-}
-
-type HrRawSearchParams = Record<string, string | string[] | undefined> | undefined;
-type HrSearchParamsInput = HrRawSearchParams | Promise<HrRawSearchParams>;
-
-function isHrGeoAccessFailure(error: unknown) {
-  return (
-    error instanceof ExecutionContextRequiredError ||
-    error instanceof ExecutionAccessDeniedError
-  );
-}
-
-export async function buildHrGeoPageModelForRequest(
-  searchParams?: HrSearchParamsInput,
-) {
-  const [guard, resolvedSearchParams] = await Promise.all([
-    requireHrGeoRead(),
-    searchParams ?? Promise.resolve(undefined),
-  ]);
-
-  const visibleEmployeeIds = await guard.resolveVisibleEmployeeIds({
-    scope: guard.canWriteGeo ? "org" : "team",
-  });
-
-  return buildHrGeoPageModel(
-    toHrGeoPageModelInput({
-      organizationId: guard.organization.id,
-      canWriteGeo: guard.canWriteGeo,
-      canViewDetailedLocation: guard.canViewDetailedLocation,
-      canReadAudit: guard.canReadAudit,
-      visibleEmployeeIds,
-      searchParams: resolvedSearchParams,
-    }),
-  );
-}
-
-export async function renderHrGeoPage(searchParams?: HrSearchParamsInput) {
-  try {
-    const pageModel = await buildHrGeoPageModelForRequest(searchParams);
-    return React.createElement(HrGeoWorkbenchSection, { model: pageModel });
-  } catch (error) {
-    if (isHrGeoAccessFailure(error)) {
-      return React.createElement(HrGeoAccessDeniedPanel);
-    }
-    throw error;
-  }
-}
+export * from "./hr.time.geo-access.policy.server";
+export * from "./hr.time.geo-admin.schema";
+export * from "./hr.time.geo-audit-trail-list.surface";
+export * from "./hr.time.geo-capture.schema";
+export * from "./hr.time.geo-devices-list.surface";
+export * from "./hr.time.geo-geofences-list.surface";
+export * from "./hr.time.geo-history-list.surface";
+export * from "./hr.time.geo-lam-exposure-list.surface";
+export * from "./hr.time.geo-list-load.shared";
+export * from "./hr.time.geo-list-window-types.shared";
+export * from "./hr.time.geo-list.shared";
+export * from "./hr.time.geo-overtime-ref-list.surface";
+export * from "./hr.time.geo-payroll-ref-list.surface";
+export * from "./hr.time.geo-pending-list.surface";
+export * from "./hr.time.geo-policies-list.surface";
+export * from "./hr.time.geo-policy-resolution.policy.server";
+export * from "./hr.time.geo-privacy.shared";
+export * from "./hr.time.geo-raw-vs-approved-list.surface";
+export * from "./hr.time.geo-route.contract";
+export * from "./hr.time.geo-search-params.parse.shared";
+export * from "./hr.time.geo-section.component.server";
+export * from "./hr.time.geo-spoofing.shared";
+export * from "./hr.time.geo-stats.surface";
+export * from "./hr.time.geo-surface-builders.shared";
+export * from "./hr.time.geo-surface-metadata.shared";
+export * from "./hr.time.geo-ui.copy.shared";
+export * from "./hr.time.geo-validation.shared";
+export * from "./hr.time.geo.actions.server";
+export * from "./hr.time.geo.page-model.server";
+export * from "./hrs-geolocation-acceptance-coverage-shared";
+export * from "./hrs-geolocation-contract";
+export * from "./hrs-geolocation-spec-map-shared";
+export * from "./hrs-hr-time-geo-admin-server";
+export * from "./hrs-hr-time-geo-audit-trail-server";
+export * from "./hrs-hr-time-geo-capture-server";
+export * from "./hrs-hr-time-geo-events";
+export * from "./hrs-hr-time-geo-integration-windows-server";
+export * from "./hrs-hr-time-geo-lam-integration-server";
+export * from "./hrs-hr-time-geo-overtime-ref-server";
+export * from "./hrs-hr-time-geo-payroll-ref-server";

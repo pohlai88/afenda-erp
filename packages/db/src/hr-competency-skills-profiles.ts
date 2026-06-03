@@ -3,7 +3,7 @@ import { runWithOrganizationContext, type AfendaTransaction } from "./client";
 import { appendHrCsfAuditEventInTx } from "./hr-competency-skills-audit";
 import { HrCsfCommandError } from "./hr-competency-skills.shared";
 import { createEntityId } from "./ids";
-import { hrEmployees } from "./schema/hr";
+import { hrEmployees } from "./hr";
 import {
   hrCsfAssessments,
   hrCsfAssessmentEvidence,
@@ -12,7 +12,7 @@ import {
   hrCsfEmployeeSkillProfiles,
   hrCsfProficiencyLevels,
   hrCsfSkills,
-} from "./schema/hr-competency-skills";
+} from "./hr-competency-skills";
 
 async function assertHrEmployeeExistsInTx(
   db: AfendaTransaction,

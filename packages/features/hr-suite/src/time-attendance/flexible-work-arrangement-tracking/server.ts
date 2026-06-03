@@ -1,94 +1,54 @@
-import React from "react";
-import {
-  ExecutionAccessDeniedError,
-  ExecutionContextRequiredError,
-} from "@afenda/kernel/execution";
+/**
+ * Server-only public door.
+ */
+import "server-only";
 
-import { buildHrFwaPageModel } from "./data/hr.time.fwa.page-model.server";
-import { toHrFwaPageModelInput } from "./data/hr.time.fwa-search-params.parse.shared";
-import { requireHrFwaRead } from "./policies/hr.time.fwa-access.policy.server";
-
-export * from "./actions";
-export * from "./data";
-export * from "./schemas";
-export * from "./policies/hr.time.fwa-routing.policy.server";
-export * from "./policies/hr.time.fwa-access.policy.server";
-export * from "./data/hr.time.fwa.page-model.server";
-export * from "./data/hr.time.fwa-review.server";
-export * from "./data/hr.time.fwa-notifications.server";
-export * from "./data/hr.time.fwa-report.server";
-export * from "./data/hr.time.fwa-audit-trail.server";
-export * from "./data/hr.time.fwa-acceptance-coverage.shared";
-export * from "./policies/hr.time.fwa-access.policy.server";
-export * from "./contracts/hr.time.fwa.contract";
-export * from "./events/hr.time.fwa.events";
-
-export {
-  HrFwaAccessDeniedPanel,
-  HrFwaWorkbenchSection,
-} from "./components/hr.time.fwa-section.component.server";
-
-export {
-  buildHrFwaArrangementsListSurface,
-  hrFwaArrangementsSurfaceKey,
-} from "./surface/hr.time.fwa-arrangements-list.surface";
-export {
-  buildHrFwaRequestsListSurface,
-  hrFwaRequestsSurfaceKey,
-} from "./surface/hr.time.fwa-requests-list.surface";
-export {
-  buildHrFwaComplianceListSurface,
-  hrFwaComplianceSurfaceKey,
-} from "./surface/hr.time.fwa-compliance-list.surface";
-
-import { HrFwaAccessDeniedPanel } from "./components/hr.time.fwa-section.component.server";
-import { HrFwaWorkbenchSection } from "./components/hr.time.fwa-section.component.server";
-
-export function HrFwaAccessDenied() {
-  return React.createElement(HrFwaAccessDeniedPanel);
-}
-
-type HrRawSearchParams = Record<string, string | string[] | undefined> | undefined;
-type HrSearchParamsInput = HrRawSearchParams | Promise<HrRawSearchParams>;
-
-function isHrFwaAccessFailure(error: unknown) {
-  return (
-    error instanceof ExecutionContextRequiredError ||
-    error instanceof ExecutionAccessDeniedError
-  );
-}
-
-export async function buildHrFwaPageModelForRequest(
-  searchParams?: HrSearchParamsInput,
-) {
-  const [guard, resolvedSearchParams] = await Promise.all([
-    requireHrFwaRead(),
-    searchParams ?? Promise.resolve(undefined),
-  ]);
-
-  const visibleEmployeeIds = await guard.resolveVisibleEmployeeIds({
-    scope: guard.canWriteFwa ? "org" : "team",
-  });
-
-  return buildHrFwaPageModel(
-    toHrFwaPageModelInput({
-      organizationId: guard.organization.id,
-      canReadCompliance: guard.canReadCompliance,
-      canReadAudit: guard.canReadAudit,
-      visibleEmployeeIds,
-      searchParams: resolvedSearchParams,
-    }),
-  );
-}
-
-export async function renderHrFwaPage(searchParams?: HrSearchParamsInput) {
-  try {
-    const pageModel = await buildHrFwaPageModelForRequest(searchParams);
-    return React.createElement(HrFwaWorkbenchSection, { model: pageModel });
-  } catch (error) {
-    if (isHrFwaAccessFailure(error)) {
-      return React.createElement(HrFwaAccessDeniedPanel);
-    }
-    throw error;
-  }
-}
+export * from "./hr.time.fwa-acceptance-coverage.shared";
+export * from "./hr.time.fwa-access.policy.server";
+export * from "./hr.time.fwa-action-result.shared";
+export * from "./hr.time.fwa-approver-context.shared.server";
+export * from "./hr.time.fwa-arrangement-types.schema";
+export * from "./hr.time.fwa-arrangements-list.surface";
+export * from "./hr.time.fwa-compliance-list.surface";
+export * from "./hr.time.fwa-compliance.schema";
+export * from "./hr.time.fwa-db.shared.server";
+export * from "./hr.time.fwa-eligibility.policy.server";
+export * from "./hr.time.fwa-eligibility.schema";
+export * from "./hr.time.fwa-list-load.shared";
+export * from "./hr.time.fwa-list.shared";
+export * from "./hr.time.fwa-location.schema";
+export * from "./hr.time.fwa-request.schema";
+export * from "./hr.time.fwa-requests-list.surface";
+export * from "./hr.time.fwa-route.contract";
+export * from "./hr.time.fwa-routing.policy.server";
+export * from "./hr.time.fwa-schedule.schema";
+export * from "./hr.time.fwa-search-params.parse.shared";
+export * from "./hr.time.fwa-section.component.server";
+export * from "./hr.time.fwa-surface-metadata.shared";
+export * from "./hr.time.fwa-ui.copy.shared";
+export * from "./hr.time.fwa-workflow.schema";
+export * from "./hr.time.fwa.actions.server";
+export * from "./hr.time.fwa.contract";
+export * from "./hr.time.fwa.mutation.shared.server";
+export * from "./hr.time.fwa.page-model.server";
+export * from "./hrs-hr-time-fwa-approval-server";
+export * from "./hrs-hr-time-fwa-attendance-compare-server";
+export * from "./hrs-hr-time-fwa-audit-trail-server";
+export * from "./hrs-hr-time-fwa-compliance-events";
+export * from "./hrs-hr-time-fwa-compliance-server";
+export * from "./hrs-hr-time-fwa-eligibility-server";
+export * from "./hrs-hr-time-fwa-events";
+export * from "./hrs-hr-time-fwa-exception-server";
+export * from "./hrs-hr-time-fwa-leave-validate-server";
+export * from "./hrs-hr-time-fwa-location-server";
+export * from "./hrs-hr-time-fwa-notifications-server";
+export * from "./hrs-hr-time-fwa-overtime-ref-server";
+export * from "./hrs-hr-time-fwa-payroll-ref-server";
+export * from "./hrs-hr-time-fwa-remote-checkin-compare-server";
+export * from "./hrs-hr-time-fwa-report-server";
+export * from "./hrs-hr-time-fwa-request-server";
+export * from "./hrs-hr-time-fwa-review-server";
+export * from "./hrs-hr-time-fwa-schedule-ref-server";
+export * from "./hrs-hr-time-fwa-schedule-server";
+export * from "./hrs-hr-time-fwa-workflow-events";
+export * from "./hrs-hr-time-fwa-workflow-server";

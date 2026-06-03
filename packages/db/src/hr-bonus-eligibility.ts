@@ -18,8 +18,8 @@ import {
   hrBonusEligibilityRules,
   hrBonusPlanParticipants,
   hrBonusPlans,
-} from "./schema/hr-bonus-incentive";
-import { hrDepartments, hrEmployees } from "./schema/hr";
+} from "./hr-bonus-incentive";
+import { hrDepartments, hrEmployees } from "./hr";
 
 export type HrBonusEligibilityDetermination = {
   employeeId: string;

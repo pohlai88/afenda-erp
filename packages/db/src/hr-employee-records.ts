@@ -23,7 +23,7 @@ import {
   hrEmployees,
   hrLifecycleEvents,
   hrPositions,
-} from "./schema/hr";
+} from "./hr";
 
 const HR_RECORDS_DEFAULT_PAGE_SIZE = 25;
 const HR_RECORDS_MAX_PAGE_SIZE = 100;

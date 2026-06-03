@@ -6,7 +6,7 @@ import {
   hrTimeClockPunchExceptions,
   hrTimeClockRawPunches,
   hrTimeClockSyncBatches,
-} from "./schema/hr-time-clock";
+} from "./hr-time-clock";
 
 export type HrTimeClockOverviewSnapshot = {
   deviceCount: number;

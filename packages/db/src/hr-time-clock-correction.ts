@@ -6,7 +6,7 @@ import { appendHrTimeClockAuditEvent } from "./hr-time-clock-devices";
 import { HrTimeClockCommandError } from "./hr-time-clock.types";
 import { runHrTimeClockPunchValidationPipeline } from "./hr-time-clock-validation";
 import type { HrTimeClockPunchType } from "./hr-time-clock.types";
-import { hrTimeClockRawPunches } from "./schema/hr-time-clock";
+import { hrTimeClockRawPunches } from "./hr-time-clock";
 
 export type CreateHrTimeClockCorrectionPunchInput = {
   organizationId: string;

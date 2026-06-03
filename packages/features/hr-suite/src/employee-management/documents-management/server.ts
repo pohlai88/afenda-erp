@@ -1,86 +1,34 @@
-import React from "react";
-
-import {
-  ExecutionAccessDeniedError,
-  ExecutionContextRequiredError,
-} from "@afenda/kernel/execution";
-import { SectionPanel } from "@afenda/ui";
-
-import {
-  HrDocumentsAccessDeniedPanel,
-  HrDocumentsWorkbenchSection,
-} from "./components/hr.workforce.documents-section.component.server";
-import {
-  buildHrDocumentsPageModel,
-  toHrDocumentsPageModelInput,
-} from "./data";
-import { requireHrDocumentsRead } from "./policies/hr.workforce.documents-access.policy.server";
-
 /**
- * Server door — employee-management/documents-management
+ * Server-only public door.
  */
-export * from "./actions";
-export * from "./data";
-export * from "./events";
-export * from "./policies";
-export * from "./schemas";
-export * from "./contracts";
+import "server-only";
 
-export { HrDocumentsAccessDeniedPanel, HrDocumentsWorkbenchSection };
-
-export function HrDocumentsAccessDenied() {
-  return React.createElement(HrDocumentsAccessDeniedPanel);
-}
-
-export function HrDocumentsSection({
-  title,
-  description,
-  children,
-}: {
-  title: string;
-  description?: string;
-  children: React.ReactNode;
-}) {
-  return React.createElement(
-    SectionPanel,
-    { headingLevel: 2, title, description },
-    children,
-  );
-}
-
-function isDocumentsAccessFailure(error: unknown) {
-  return (
-    error instanceof ExecutionAccessDeniedError ||
-    error instanceof ExecutionContextRequiredError
-  );
-}
-
-export async function renderHrDocumentsPage(
-  searchParams?: Promise<Record<string, string | string[] | undefined>>,
-) {
-  let guard: Awaited<ReturnType<typeof requireHrDocumentsRead>>;
-  let resolvedSearchParams: Record<string, string | string[] | undefined> | undefined;
-
-  try {
-    [guard, resolvedSearchParams] = await Promise.all([
-      requireHrDocumentsRead(),
-      searchParams ?? Promise.resolve(undefined),
-    ]);
-  } catch (error) {
-    if (isDocumentsAccessFailure(error)) {
-      return React.createElement(HrDocumentsAccessDeniedPanel);
-    }
-    throw error;
-  }
-
-  const model = await buildHrDocumentsPageModel(
-    toHrDocumentsPageModelInput({
-      organizationId: guard.organization.id,
-      canWrite: guard.hasCapability("hr.documents.write"),
-      canViewSensitive: guard.canViewSensitive,
-      searchParams: resolvedSearchParams,
-    }),
-  );
-
-  return React.createElement(HrDocumentsWorkbenchSection, { model });
-}
+export * from "./hr.workforce.documents-access.policy.server";
+export * from "./hr.workforce.documents-acknowledgments-list.surface";
+export * from "./hr.workforce.documents-action-result.shared";
+export * from "./hr.workforce.documents-audit-trail-list.surface";
+export * from "./hr.workforce.documents-coverage.shared";
+export * from "./hr.workforce.documents-expiring-list.surface";
+export * from "./hr.workforce.documents-form.shared";
+export * from "./hr.workforce.documents-list-load.shared";
+export * from "./hr.workforce.documents-list.shared";
+export * from "./hr.workforce.documents-missing-list.surface";
+export * from "./hr.workforce.documents-org-scope.shared";
+export * from "./hr.workforce.documents-overview-stat.surface";
+export * from "./hr.workforce.documents-repository-list.surface";
+export * from "./hr.workforce.documents-repository.schema";
+export * from "./hr.workforce.documents-requirements-list.surface";
+export * from "./hr.workforce.documents-retention-list.surface";
+export * from "./hr.workforce.documents-route.contract";
+export * from "./hr.workforce.documents-search-params.parse.shared";
+export * from "./hr.workforce.documents-section.component.server";
+export * from "./hr.workforce.documents-sensitive-access.shared";
+export * from "./hr.workforce.documents-status.shared";
+export * from "./hr.workforce.documents-surface-columns.shared";
+export * from "./hr.workforce.documents-surface-metadata.shared";
+export * from "./hr.workforce.documents-ui.copy.shared";
+export * from "./hr.workforce.documents.actions.server";
+export * from "./hr.workforce.documents.contract";
+export * from "./hr.workforce.documents.event";
+export * from "./hr.workforce.documents.mutation.shared.server";
+export * from "./hr.workforce.documents.page-model.server";

@@ -1,13 +1,27 @@
-import "@afenda/kernel/server";
-
 /**
- * Server-only exports for @afenda/feature-knowledge.
- * Includes DB queries, pipeline, sync, eval, and retrieval.
- * Never import from a "use client" file.
+ * Server-only public door.
  */
-export * from "./contracts";
-export * from "./commands";
-export * from "./domain";
-export * from "./read-models";
-export * from "./schemas";
-export * from "./data";
+import "server-only";
+
+export * from "./kno-admin.page-model.server";
+export * from "./kno-audit.server";
+export * from "./kno-chunker.server";
+export * from "./kno-core.contract";
+export * from "./kno-embeddings.server";
+export * from "./kno-eval-dataset.schema";
+export * from "./kno-eval-run-input.schema";
+export * from "./kno-eval.server";
+export * from "./kno-pipeline-commit.server";
+export * from "./kno-queries.server";
+export * from "./kno-retrieval.contract";
+export * from "./kno-retrieve-hybrid.server";
+export * from "./kno-scheduled-sync-sweep.command.server";
+export * from "./kno-source-adapter-registry.server";
+export * from "./kno-source-adapter.contract";
+export * from "./kno-source-github-repo.schema";
+export * from "./kno-source-github-repo.server";
+export * from "./kno-source-manual.schema";
+export * from "./kno-source-manual.server";
+export * from "./kno-sync-org.command.server";
+export * from "./kno-sync-org.domain.server";
+export * from "./kno-sync.server";

@@ -1,4 +1,4 @@
-import { HR_SBS_LIST_SURFACE_KEYS } from "./data/hr.payroll.sbs-search-params.parse.shared";
+import { HR_SBS_LIST_SURFACE_KEYS } from "./hr.payroll.sbs-search-params.parse.shared";
 
 export {
   HR_SBS_LIST_SURFACE_KEYS,
@@ -20,7 +20,7 @@ export {
   toHrSbsReportsPageModelInput,
   type HrSbsListSurfaceKey,
   type HrSbsSearchParams,
-} from "./data/hr.payroll.sbs-search-params.parse.shared";
+} from "./hr.payroll.sbs-search-params.parse.shared";
 
 export {
   hrSbsAnalysesColumnsId,
@@ -30,7 +30,7 @@ export {
   hrSbsPayEquityReportColumnsId,
   hrSbsVersionsColumnsId,
   hrSbsUiCopy,
-} from "./surface/hr.payroll.sbs-ui.copy.shared";
+} from "./hr.payroll.sbs-ui.copy.shared";
 
 export const HR_SBS_LIST_SURFACE_COLUMNS_BY_KEY = {
   "hr.payroll.sbs.versions.list": "hr.payroll.sbs.versions.list",
@@ -48,7 +48,7 @@ export function getHrSbsListSurfaceKeys() {
 export {
   hrSbsRoutePaths,
   type HrSbsRoutePath,
-} from "./contracts/hr.payroll.sbs-route.contract";
+} from "./hr.payroll.sbs-route.contract";
 
 export {
   buildHrSbsVersionsListSurface,
@@ -57,4 +57,4 @@ export {
   buildHrSbsBenchmarkReportListSurface,
   buildHrSbsPayEquityReportListSurface,
   buildHrSbsAuditListSurface,
-} from "./surface/hr.payroll.sbs-lists.surface";
+} from "./hr.payroll.sbs-lists.surface";

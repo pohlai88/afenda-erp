@@ -56,5 +56,11 @@
   "devDependencies": {
     "vitest": "catalog:"
   },
-  "sideEffects": false
+  "sideEffects": false,
+  "afenda": {
+    "layout": "tiered-feature",
+    "tiered": {
+      "featureDomains": ["blob", "r2", "s3", "_object-storage-integration"]
+    }
+  }
 }

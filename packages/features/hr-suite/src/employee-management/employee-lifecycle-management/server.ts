@@ -1,92 +1,41 @@
-import React from "react";
-
-import {
-  ExecutionAccessDeniedError,
-  ExecutionContextRequiredError,
-} from "@afenda/kernel/execution";
-import { SectionPanel } from "@afenda/ui";
-
-import {
-  HrLifecycleAccessDeniedPanel,
-  HrLifecycleWorkbenchSection,
-} from "./components/hr.workforce.lifecycle-section.component.server";
-import {
-  buildHrLifecyclePageModel,
-  toHrLifecyclePageModelInput,
-} from "./data";
-import { requireHrLifecycleRead } from "./policies/hr.workforce.lifecycle-access.policy.server";
-
 /**
- * Server door — employee-management/employee-lifecycle-management
+ * Server-only public door.
  */
-export * from "./actions";
-export * from "./data";
-export * from "./events";
-export * from "./policies";
-export * from "./schemas";
-export {
-  hrWorkforceLifecycleReadPermission,
-  hrWorkforceLifecycleWritePermission,
-} from "./contracts/hr.workforce.lifecycle.contract";
-export {
-  hrLifecycleRoutePaths,
-  type HrLifecycleRoutePath,
-} from "./contracts/hr.workforce.lifecycle-route.contract";
+import "server-only";
 
-export { HrLifecycleAccessDeniedPanel, HrLifecycleWorkbenchSection };
-
-export function HrLifecycleAccessDenied() {
-  return React.createElement(HrLifecycleAccessDeniedPanel);
-}
-
-export function HrLifecycleSection({
-  title,
-  description,
-  children,
-}: {
-  title: string;
-  description?: string;
-  children: React.ReactNode;
-}) {
-  return React.createElement(
-    SectionPanel,
-    { headingLevel: 2, title, description },
-    children,
-  );
-}
-
-function isLifecycleAccessFailure(error: unknown) {
-  return (
-    error instanceof ExecutionAccessDeniedError ||
-    error instanceof ExecutionContextRequiredError
-  );
-}
-
-export async function renderHrLifecyclePage(
-  searchParams?: Promise<Record<string, string | string[] | undefined>>,
-) {
-  let guard: Awaited<ReturnType<typeof requireHrLifecycleRead>>;
-  let resolvedSearchParams: Record<string, string | string[] | undefined> | undefined;
-
-  try {
-    [guard, resolvedSearchParams] = await Promise.all([
-      requireHrLifecycleRead(),
-      searchParams ?? Promise.resolve(undefined),
-    ]);
-  } catch (error) {
-    if (isLifecycleAccessFailure(error)) {
-      return React.createElement(HrLifecycleAccessDeniedPanel);
-    }
-    throw error;
-  }
-
-  const model = await buildHrLifecyclePageModel(
-    toHrLifecyclePageModelInput({
-      organizationId: guard.organization.id,
-      canWrite: guard.hasCapability("hr.lifecycle.write"),
-      searchParams: resolvedSearchParams,
-    }),
-  );
-
-  return React.createElement(HrLifecycleWorkbenchSection, { model });
-}
+export * from "./hr.workforce.lifecycle-access.policy.server";
+export * from "./hr.workforce.lifecycle-action-result.shared";
+export * from "./hr.workforce.lifecycle-audit-trail-list.surface";
+export * from "./hr.workforce.lifecycle-contract-reviews-list.surface";
+export * from "./hr.workforce.lifecycle-contract.schema";
+export * from "./hr.workforce.lifecycle-contract.shared";
+export * from "./hr.workforce.lifecycle-coverage.shared";
+export * from "./hr.workforce.lifecycle-employment-status.schema";
+export * from "./hr.workforce.lifecycle-exit.schema";
+export * from "./hr.workforce.lifecycle-list-load.shared";
+export * from "./hr.workforce.lifecycle-list.shared";
+export * from "./hr.workforce.lifecycle-movement.schema";
+export * from "./hr.workforce.lifecycle-notice-period-list.surface";
+export * from "./hr.workforce.lifecycle-offboarding-cases-list.surface";
+export * from "./hr.workforce.lifecycle-onboarding-cases-list.surface";
+export * from "./hr.workforce.lifecycle-overview-list.surface";
+export * from "./hr.workforce.lifecycle-overview-stat.surface";
+export * from "./hr.workforce.lifecycle-overview.shared";
+export * from "./hr.workforce.lifecycle-pending-transitions-list.surface";
+export * from "./hr.workforce.lifecycle-probation-due-list.surface";
+export * from "./hr.workforce.lifecycle-probation.schema";
+export * from "./hr.workforce.lifecycle-probation.shared";
+export * from "./hr.workforce.lifecycle-read.shared";
+export * from "./hr.workforce.lifecycle-route.contract";
+export * from "./hr.workforce.lifecycle-search-params.parse.shared";
+export * from "./hr.workforce.lifecycle-section.component.server";
+export * from "./hr.workforce.lifecycle-surface-columns.shared";
+export * from "./hr.workforce.lifecycle-surface-metadata.shared";
+export * from "./hr.workforce.lifecycle-transition.schema";
+export * from "./hr.workforce.lifecycle-transition.shared";
+export * from "./hr.workforce.lifecycle-ui.copy.shared";
+export * from "./hr.workforce.lifecycle.actions.server";
+export * from "./hr.workforce.lifecycle.contract";
+export * from "./hr.workforce.lifecycle.event";
+export * from "./hr.workforce.lifecycle.mutation.shared.server";
+export * from "./hr.workforce.lifecycle.page-model.server";

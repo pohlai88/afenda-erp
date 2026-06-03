@@ -6,12 +6,12 @@ export {
   HR_PERFORMANCE_APPRAISALS_WORKBENCH_READ_ONLY_SURFACE_KEYS,
   getHrPerformanceAppraisalsListSurfaceKeys,
   type HrPerformanceAppraisalsListSurfaceKey,
-} from "./surface/hr.talent.performance-surface-metadata.shared";
+} from "./hr.talent.performance-surface-metadata.shared";
 
 export {
   hrPerformanceAppraisalsUiCopy,
   hrPerformanceAppraisalsUiCopy as hrTalentPerformanceUiCopy,
-} from "./surface/hr.talent.performance-ui.copy.shared";
+} from "./hr.talent.performance-ui.copy.shared";
 
 export {
   hrPerformanceAppraisalsApprovalsSearchParam,
@@ -33,9 +33,9 @@ export {
   toHrPerformanceAppraisalsPageModelInput,
   type HrPerformanceAppraisalsPageModelInput,
   type HrPerformanceAppraisalsSearchParams,
-} from "./data/hr.talent.performance-search-params.parse.shared";
+} from "./hr.talent.performance-search-params.parse.shared";
 
 export {
   hrPerformanceRoutePaths,
   type HrPerformanceRoutePath,
-} from "./contracts/hr.talent.performance-route.contract";
+} from "./hr.talent.performance-route.contract";

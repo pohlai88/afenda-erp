@@ -26,7 +26,7 @@ import {
   hrComplianceWorkAuthorizationDocuments,
   hrComplianceWorkEligibility,
   hrEmployees,
-} from "./schema/hr";
+} from "./hr";
 
 type ExceptionGapCandidate = {
   sourceReferenceId: string;

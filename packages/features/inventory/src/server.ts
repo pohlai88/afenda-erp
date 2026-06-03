@@ -1,7 +1,6 @@
-import "@afenda/kernel/server";
-
 /**
- * Server-only exports for @afenda/feature-inventory.
- * Safe to import database helpers, auth server modules, and Node-only SDKs.
+ * Server-only public door.
  */
-export * from "./metadata";
+import "server-only";
+
+

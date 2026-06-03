@@ -1,82 +1,32 @@
-import React from "react";
+/**
+ * Server-only public door.
+ */
+import "server-only";
 
-import {
-  ExecutionAccessDeniedError,
-  ExecutionContextRequiredError,
-} from "@afenda/kernel/execution";
-import { SectionPanel } from "@afenda/ui";
-
-import {
-  HrOffboardingAccessDeniedPanel,
-  HrOffboardingWorkbenchSection,
-} from "./components/hr.workforce.offboarding-section.component.server";
-import {
-  buildHrOffboardingPageModel,
-  toHrOffboardingPageModelInput,
-} from "./data";
-import { requireHrOffboardingRead } from "./policies/hr.workforce.offboarding-access.policy.server";
-
-export * from "./actions";
-export * from "./data";
-export * from "./policies";
-export * from "./schemas";
-export * from "./contracts";
-
-export { HrOffboardingAccessDeniedPanel, HrOffboardingWorkbenchSection };
-
-export function HrOffboardingAccessDenied() {
-  return React.createElement(HrOffboardingAccessDeniedPanel);
-}
-
-export function HrOffboardingSection({
-  title,
-  description,
-  children,
-}: {
-  title: string;
-  description?: string;
-  children: React.ReactNode;
-}) {
-  return React.createElement(
-    SectionPanel,
-    { headingLevel: 2, title, description },
-    children,
-  );
-}
-
-function isOffboardingAccessFailure(error: unknown) {
-  return (
-    error instanceof ExecutionAccessDeniedError ||
-    error instanceof ExecutionContextRequiredError
-  );
-}
-
-export async function renderHrOffboardingPage(
-  searchParams?: Promise<Record<string, string | string[] | undefined>>,
-) {
-  let guard: Awaited<ReturnType<typeof requireHrOffboardingRead>>;
-  let resolvedSearchParams: Record<string, string | string[] | undefined> | undefined;
-
-  try {
-    [guard, resolvedSearchParams] = await Promise.all([
-      requireHrOffboardingRead(),
-      searchParams ?? Promise.resolve(undefined),
-    ]);
-  } catch (error) {
-    if (isOffboardingAccessFailure(error)) {
-      return React.createElement(HrOffboardingAccessDeniedPanel);
-    }
-    throw error;
-  }
-
-  const model = await buildHrOffboardingPageModel(
-    toHrOffboardingPageModelInput({
-      organizationId: guard.organization.id,
-      canWrite: guard.hasCapability("hr.offboarding.write"),
-      canViewSensitive: guard.canViewSensitive,
-      searchParams: resolvedSearchParams,
-    }),
-  );
-
-  return React.createElement(HrOffboardingWorkbenchSection, { model });
-}
+export * from "./hr.workforce.offboarding-access.policy.server";
+export * from "./hr.workforce.offboarding-action-result.shared";
+export * from "./hr.workforce.offboarding-approvals-list.surface";
+export * from "./hr.workforce.offboarding-assets-list.surface";
+export * from "./hr.workforce.offboarding-audit-trail-list.surface";
+export * from "./hr.workforce.offboarding-cases-list.surface";
+export * from "./hr.workforce.offboarding-clearance-list.surface";
+export * from "./hr.workforce.offboarding-exit-type.schema";
+export * from "./hr.workforce.offboarding-form.shared";
+export * from "./hr.workforce.offboarding-list-load.shared";
+export * from "./hr.workforce.offboarding-list.shared";
+export * from "./hr.workforce.offboarding-overdue-list.surface";
+export * from "./hr.workforce.offboarding-overview-stat.surface";
+export * from "./hr.workforce.offboarding-overview.shared";
+export * from "./hr.workforce.offboarding-route.contract";
+export * from "./hr.workforce.offboarding-search-params.parse.shared";
+export * from "./hr.workforce.offboarding-section.component.server";
+export * from "./hr.workforce.offboarding-sensitive-access.shared";
+export * from "./hr.workforce.offboarding-settlement-list.surface";
+export * from "./hr.workforce.offboarding-surface-columns.shared";
+export * from "./hr.workforce.offboarding-surface-metadata.shared";
+export * from "./hr.workforce.offboarding-ui.copy.shared";
+export * from "./hr.workforce.offboarding.actions.server";
+export * from "./hr.workforce.offboarding.contract";
+export * from "./hr.workforce.offboarding.event";
+export * from "./hr.workforce.offboarding.mutation.shared.server";
+export * from "./hr.workforce.offboarding.page-model.server";

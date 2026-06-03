@@ -2,7 +2,7 @@ import { and, count, desc, eq, gte, ilike, inArray, lte, or } from "drizzle-orm"
 
 import { runWithOrganizationContext } from "./client";
 import { createEntityId } from "./ids";
-import { hrAttendanceDays, hrDepartments, hrEmployees } from "./schema/hr";
+import { hrAttendanceDays, hrDepartments, hrEmployees } from "./hr";
 import {
   hrShiftAssignments,
   hrShiftAuditEvents,
@@ -11,7 +11,7 @@ import {
   hrShiftRosterReportDefinitions,
   hrShiftTemplates,
   type HrShiftRosterReportFilterPayload,
-} from "./schema/hr-shift-scheduling";
+} from "./hr-shift-scheduling";
 
 const DEFAULT_PAGE_SIZE = 25;
 const MAX_PAGE_SIZE = 100;

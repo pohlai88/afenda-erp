@@ -3,8 +3,8 @@ import { and, eq, inArray, ne } from "drizzle-orm";
 import { createAuditLog } from "./audit";
 import { runWithOrganizationContext } from "./client";
 import { erpDocuments } from "./schema";
-import { hrEmployeeDocuments } from "./schema/hr";
-import { retentionPolicies } from "./schema/system-admin";
+import { hrEmployeeDocuments } from "./hr";
+import { retentionPolicies } from "./system-admin";
 
 const DOCUMENT_LEGAL_HOLD_ENTITY_TYPES = [
   "document",

@@ -20,7 +20,7 @@ import {
   hrOrgStructureAuditEvents,
   hrPositions,
   hrReportingRelationships,
-} from "./schema/hr";
+} from "./hr";
 
 const HR_DEFAULT_PAGE_SIZE = 25;
 const HR_MAX_PAGE_SIZE = 100;

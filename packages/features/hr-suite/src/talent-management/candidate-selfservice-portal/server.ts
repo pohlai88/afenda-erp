@@ -1,79 +1,21 @@
-import React from "react";
-import {
-  ExecutionAccessDeniedError,
-  ExecutionContextRequiredError,
-} from "@afenda/kernel/execution";
+/**
+ * Server-only public door.
+ */
+import "server-only";
 
-import {
-  parseHrTalentRssSearchParams,
-  toHrTalentRssPageModelInput,
-} from "./data/hr.talent.rss-search-params.parse.shared";
-
-type HrRawSearchParams = Record<string, string | string[] | undefined> | undefined;
-type HrSearchParamsInput = HrRawSearchParams | Promise<HrRawSearchParams>;
-
-export * from "./actions";
-export * from "./contracts";
-export * from "./data";
-export * from "./events";
-export * from "./policies";
-export * from "./schemas";
-
-export {
-  buildHrTalentRssPageModel,
-  type HrTalentRssPageModel,
-} from "./data/hr.talent.rss.page-model.server";
-
-export {
-  HrTalentRssAccessDeniedPanel,
-  HrTalentRssSection,
-} from "./components";
-
-export {
-  requireHrTalentRssApprove,
-  requireHrTalentRssRead,
-  requireHrTalentRssWrite,
-} from "./policies";
-
-import { buildHrTalentRssPageModel } from "./data/hr.talent.rss.page-model.server";
-import { requireHrTalentRssRead } from "./policies";
-import {
-  HrTalentRssAccessDeniedPanel,
-  HrTalentRssSection,
-} from "./components";
-
-function isHrTalentRssAccessFailure(error: unknown) {
-  return (
-    error instanceof ExecutionContextRequiredError ||
-    error instanceof ExecutionAccessDeniedError
-  );
-}
-
-export async function renderHrTalentRssPage(searchParams?: HrSearchParamsInput) {
-  try {
-    const [guard, resolvedSearchParams] = await Promise.all([
-      requireHrTalentRssRead(),
-      searchParams ?? Promise.resolve(undefined),
-    ]);
-    const visibleCandidateIds = await guard.resolveVisibleCandidateIds();
-    const pageModel = await buildHrTalentRssPageModel(
-      toHrTalentRssPageModelInput({
-        organizationId: guard.organization.id,
-        visibleCandidateIds,
-        canWrite: guard.canWrite,
-        canApprove: guard.canApprove,
-        canReadAudit: guard.canReadAudit,
-        canReadRestricted: guard.canReadRestricted,
-        canExposeIntegrations: guard.canExposeIntegrations,
-        searchParams: parseHrTalentRssSearchParams(resolvedSearchParams),
-      }),
-    );
-
-    return React.createElement(HrTalentRssSection, { pageModel });
-  } catch (error) {
-    if (isHrTalentRssAccessFailure(error)) {
-      return React.createElement(HrTalentRssAccessDeniedPanel);
-    }
-    throw error;
-  }
-}
+export * from "./hr.talent.rss-access.policy.server";
+export * from "./hr.talent.rss-constants.shared";
+export * from "./hr.talent.rss-coverage.shared";
+export * from "./hr.talent.rss-lists.surface";
+export * from "./hr.talent.rss-overview-stat.surface";
+export * from "./hr.talent.rss-route.contract";
+export * from "./hr.talent.rss-search-params.parse.shared";
+export * from "./hr.talent.rss-section.component.server";
+export * from "./hr.talent.rss-store.shared";
+export * from "./hr.talent.rss-surface-metadata.shared";
+export * from "./hr.talent.rss-ui.copy.shared";
+export * from "./hr.talent.rss.actions.server";
+export * from "./hr.talent.rss.contract";
+export * from "./hr.talent.rss.event";
+export * from "./hr.talent.rss.page-model.server";
+export * from "./hr.talent.rss.schema";

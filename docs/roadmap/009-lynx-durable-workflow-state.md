@@ -10,7 +10,7 @@ Workflow sessions are current-state pointers. The Lynx Run Ledger remains the im
 
 - Persist tenant-scoped Lynx workflow sessions with status, stage, prompt summary, latest run, evidence summary, quality gate summary, next recommended step, and timestamps.
 - Link operator runs to workflow sessions.
-- Allow `/api/lynx/operator` to create a session when one is not supplied and resume an existing tenant session when `workflowSessionId` is supplied.
+- Allow `/api/internal/v1/lynx/queries/operator` to create a session when one is not supplied and resume an existing tenant session when `workflowSessionId` is supplied.
 - Add Agent Management Console workflow-session list and detail views.
 - Add Vercel AI Gateway and OTel metadata for `workflowSession:<id>` correlation.
 

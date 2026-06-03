@@ -22,8 +22,8 @@ import {
   hrCsfProficiencyLevels,
   hrCsfSkillRequirements,
   hrCsfSkills,
-} from "./schema/hr-competency-skills";
-import { hrEmployees } from "./schema/hr";
+} from "./hr-competency-skills";
+import { hrEmployees } from "./hr";
 
 export {
   HrCsfGapCalculationError,

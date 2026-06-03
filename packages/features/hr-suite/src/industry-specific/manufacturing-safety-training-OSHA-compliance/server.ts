@@ -1,81 +1,21 @@
-import React from "react";
-import {
-  ExecutionAccessDeniedError,
-  ExecutionContextRequiredError,
-} from "@afenda/kernel/execution";
+/**
+ * Server-only public door.
+ */
+import "server-only";
 
-import {
-  parseHrIndustryMscSearchParams,
-  toHrIndustryMscPageModelInput,
-} from "./data/hr.industry.msc-search-params.parse.shared";
-
-type HrRawSearchParams = Record<string, string | string[] | undefined> | undefined;
-type HrSearchParamsInput = HrRawSearchParams | Promise<HrRawSearchParams>;
-
-export * from "./actions";
-export * from "./contracts";
-export * from "./data";
-export * from "./events";
-export * from "./policies";
-export * from "./schemas";
-
-export {
-  buildHrIndustryMscPageModel,
-  type HrIndustryMscPageModel,
-} from "./data/hr.industry.msc.page-model.server";
-
-export {
-  HrIndustryMscAccessDeniedPanel,
-  HrIndustryMscSection,
-} from "./components";
-
-import { buildHrIndustryMscPageModel } from "./data/hr.industry.msc.page-model.server";
-import { requireHrIndustryMscRead } from "./policies/hr.industry.msc-access.policy.server";
-import {
-  HrIndustryMscAccessDeniedPanel,
-  HrIndustryMscSection,
-} from "./components";
-
-function isHrIndustryMscAccessFailure(error: unknown) {
-  return (
-    error instanceof ExecutionContextRequiredError ||
-    error instanceof ExecutionAccessDeniedError
-  );
-}
-
-export async function buildHrIndustryMscPageModelForRequest(
-  searchParams?: HrSearchParamsInput,
-) {
-  const [guard, resolvedSearchParams] = await Promise.all([
-    requireHrIndustryMscRead(),
-    searchParams ?? Promise.resolve(undefined),
-  ]);
-  const visibleEmployeeIds = await guard.resolveVisibleEmployeeIds({
-    scope: guard.canWrite || guard.canApprove ? "org" : "team",
-  });
-
-  return buildHrIndustryMscPageModel(
-    toHrIndustryMscPageModelInput({
-      organizationId: guard.organization.id,
-      visibleEmployeeIds,
-      canWrite: guard.canWrite,
-      canApprove: guard.canApprove,
-      canReadAudit: guard.canReadAudit,
-      canReadRestricted: guard.canReadRestricted,
-      canExposeIntegrations: guard.canExposeIntegrations,
-      searchParams: parseHrIndustryMscSearchParams(resolvedSearchParams),
-    }),
-  );
-}
-
-export async function renderHrIndustryMscPage(searchParams?: HrSearchParamsInput) {
-  try {
-    const pageModel = await buildHrIndustryMscPageModelForRequest(searchParams);
-    return React.createElement(HrIndustryMscSection, { pageModel });
-  } catch (error) {
-    if (isHrIndustryMscAccessFailure(error)) {
-      return React.createElement(HrIndustryMscAccessDeniedPanel);
-    }
-    throw error;
-  }
-}
+export * from "./hr.industry.msc-access.policy.server";
+export * from "./hr.industry.msc-constants.shared";
+export * from "./hr.industry.msc-coverage.shared";
+export * from "./hr.industry.msc-lists.surface";
+export * from "./hr.industry.msc-overview-stat.surface";
+export * from "./hr.industry.msc-route.contract";
+export * from "./hr.industry.msc-search-params.parse.shared";
+export * from "./hr.industry.msc-section.component.server";
+export * from "./hr.industry.msc-store.shared";
+export * from "./hr.industry.msc-surface-metadata.shared";
+export * from "./hr.industry.msc-ui.copy.shared";
+export * from "./hr.industry.msc.actions.server";
+export * from "./hr.industry.msc.contract";
+export * from "./hr.industry.msc.event";
+export * from "./hr.industry.msc.page-model.server";
+export * from "./hr.industry.msc.schema";

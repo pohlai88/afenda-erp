@@ -8,10 +8,11 @@ This checklist governs Lynx enterprise operation on Vercel.
 - Ensure deployments receive `VERCEL_OIDC_TOKEN`; local and CI flows may use
   `AI_GATEWAY_API_KEY`.
 - Keep Gateway feature/module/workflow/organization tags on every Lynx route.
-- Keep `/api/lynx/truth-search`, `/api/lynx/operator`, and Knowledge sync routes
-  covered by logs and OTel spans.
+- Keep `/api/internal/v1/lynx/queries/truth-search`,
+  `/api/internal/v1/lynx/queries/operator`, and Knowledge sync routes covered by
+  logs and OTel spans.
 - Enable Vercel Agent Code Review in the project AI settings for PRs that touch
-  `apps/erp/src/app/api/lynx/**`, `packages/features/lynx/**`,
+  `apps/erp/src/app/api/internal/v1/lynx/**`, `packages/features/lynx/**`,
   `packages/features/knowledge/**`, or `packages/ai/src/tools/**`.
 - Preview gate before production:
   `pnpm typecheck`, `pnpm architecture:check`, `pnpm lint:lynx-brand`, focused

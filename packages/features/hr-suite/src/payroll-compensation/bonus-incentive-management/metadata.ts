@@ -29,12 +29,12 @@ export {
   toHrBonusPageModelInput,
   type HrBonusListSurfaceKey,
   type HrBonusSearchParams,
-} from "./data/hr.payroll.bonus-search-params.parse.shared";
+} from "./hr.payroll.bonus-search-params.parse.shared";
 
-export { HR_BONUS_LIST_SURFACE_COLUMNS_BY_KEY } from "./surface/hr.payroll.bonus-surface-columns.shared";
-export { hrBonusUiCopy } from "./surface/hr.payroll.bonus-ui.copy.shared";
+export { HR_BONUS_LIST_SURFACE_COLUMNS_BY_KEY } from "./hr.payroll.bonus-surface-columns.shared";
+export { hrBonusUiCopy } from "./hr.payroll.bonus-ui.copy.shared";
 
 export {
   hrBonusRoutePaths,
   type HrBonusRoutePath,
-} from "./contracts/hr.payroll.bonus-route.contract";
+} from "./hr.payroll.bonus-route.contract";

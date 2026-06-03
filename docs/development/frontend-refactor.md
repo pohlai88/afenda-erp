@@ -81,14 +81,15 @@ apps/erp/src/
 
 | Path | MUST BE | Wrong |
 | ---- | ------- | ----- |
-| `app/**/page.tsx` | Thin delegate to `routes/**` or `@/auth/pages/*` | Domain logic, Drizzle, large JSX |
-| `routes/**` | RSC composers: `Promise.all`, Suspense, governed sections | Raw SQL, business rules, `@afenda/db` |
+| `app/**/page.tsx` | Thin delegate to `workspace-routes/**`, `routes/**`, or `@/auth/pages/*` | Domain logic, Drizzle, large JSX |
+| `workspace-routes/**` | Authenticated workspace RSC composers: `Promise.all`, Suspense, governed sections | Raw SQL, business rules, `@afenda/db` |
+| `routes/**` | Auth/onboarding and non-workspace support composers | Workspace module business rules, raw SQL |
 | `apps/erp/src/auth/` | ERP auth ingress, forms, dev panel, webhook bridge | Business rules, tenant provisioning |
 | `packages/auth/src/neon-auth/` | Neon Auth SDK module (`@afenda/auth/neon-auth`) | ERP UI, tenant session |
 | `section-adapters/**` | Thin section ID → feature server entry | Cross-module workflows, domain rules |
 | `app/**` (non-route) | Next.js convention files only | Auth forms, shell panels, upload UI |
 | `lib/` | Shrink toward zero — shared transport helpers only | Module logic, section registries, fat adapters |
-| `workspace-routes/` | **Must not exist** — use `routes/**` | Legacy composer folder |
+| `workspace-routes/` | Required workspace composer boundary per **ARCH-1003** | Business rules, Drizzle, feature internals |
 
 HR-specific nested pages under `[moduleId]/` (e.g. `compensation-planning/`, `lms/`) remain until a separate route consolidation pass; they do not change the required top-level layout above.
 
@@ -117,7 +118,7 @@ Catalog source of truth: `packages/auth/src/contracts/auth.flows.ts` (`@afenda/a
 
 ## Key patterns
 
-- `app/**` contains only Next.js route convention files. Pages delegate to `routes/**` composers or `@/auth/pages/*` for auth.
+- `app/**` contains only Next.js route convention files. Workspace pages delegate to `workspace-routes/**`; auth and onboarding pages delegate to `routes/**` composers or `@/auth/pages/*`.
 - `(auth)/layout.tsx` is an app segment layout (`connection()`, `robots: noindex`, `unstable_instant = false`); auth pages delegate to `@/auth/pages/*`.
 - Server Components are default. Client Components stay at leaf files ending in `.client.tsx` or under `apps/erp/src/auth/`.
 - Server Actions live in dedicated `.server.ts` action files, authenticate/authorize first, parse input, dispatch commands, then use narrow `updateTag`, `revalidateTag(tag, "max")`, or `revalidatePath`.
@@ -132,17 +133,17 @@ Catalog source of truth: `packages/auth/src/contracts/auth.flows.ts` (`@afenda/a
 
 | Item | Status |
 | ---- | ------ |
-| `routes/**` grouped by `onboarding`, `workspace/{shell,dashboard,modules,lynx,knowledge,shared}` | Done |
+| `workspace-routes/**` contains authenticated workspace composers; `routes/**` contains auth/onboarding support composers | Done |
 | Auth in `apps/erp/src/auth/`; `(auth)/**/page.tsx` thin re-exports to `@/auth/pages/*` | Done |
 | Neon Auth: sign-in (passwordless), sign-up, verify-email, forgot-password, account, API proxy, webhooks, sign-out | Done |
 | `(auth)/layout.tsx` with `robots: noindex` | Done |
 | App root: `app-root.config.ts`, typed metadata/viewport, global-error with `globals.css` | Done |
 | `[moduleId]/[...section]/page.tsx` delegates to `routes/workspace/modules/*` | Done |
 | `lib/*-sections` moved to `section-adapters/{hr,system-admin}` | Done |
-| Shrink `apps/erp/src/lib` — module logic to features, transport helpers to `routes/**/shared` or `app-env` | In progress |
+| Shrink `apps/erp/src/lib` — module logic to features, transport helpers to `workspace-routes/**`, `routes/**/shared`, or `app-env` | In progress |
 | Imports: feature public doors only; no deep `src` imports; client files on `./client` exports | Ongoing |
 | New feature deps in both `apps/erp/package.json` and `afendaTranspilePackages` | Ongoing |
-| Sync **ARCH-1003** §2, `AGENTS.md`, `afenda-erp-app` rule: `workspace-routes/` → `routes/**` | Pending |
+| Sync **ARCH-1003** §2, `AGENTS.md`, `afenda-erp-app` rule: workspace pages use `workspace-routes/**` | Done |
 
 ## Validation
 

@@ -30,14 +30,14 @@ import {
   hrDepartments,
   hrEmployees,
   hrPositions,
-} from "./schema/hr";
+} from "./hr";
 import {
   hrExpenseApprovalRoutes,
   hrExpenseApprovals,
   hrExpenseClaims,
   hrExpenseExceptions,
   hrExpensePolicies,
-} from "./schema/hr-expense";
+} from "./hr-expense";
 
 export type DecideHrExpenseClaimInput = {
   organizationId: string;

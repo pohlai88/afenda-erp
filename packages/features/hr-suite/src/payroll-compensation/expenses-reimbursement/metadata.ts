@@ -14,12 +14,12 @@ export {
   toHrExpensePageModelInput,
   type HrExpenseListSurfaceKey,
   type HrExpenseSearchParams,
-} from "./data/hr.payroll.expense-search-params.parse.shared";
+} from "./hr.payroll.expense-search-params.parse.shared";
 
-export { HR_EXPENSE_LIST_SURFACE_COLUMNS_BY_KEY } from "./surface/hr.payroll.expense-surface-columns.shared";
-export { hrExpenseUiCopy } from "./surface/hr.payroll.expense-ui.copy.shared";
+export { HR_EXPENSE_LIST_SURFACE_COLUMNS_BY_KEY } from "./hr.payroll.expense-surface-columns.shared";
+export { hrExpenseUiCopy } from "./hr.payroll.expense-ui.copy.shared";
 
 export {
   hrExpenseRoutePaths,
   type HrExpenseRoutePath,
-} from "./contracts/hr.payroll.expense-route.contract";
+} from "./hr.payroll.expense-route.contract";

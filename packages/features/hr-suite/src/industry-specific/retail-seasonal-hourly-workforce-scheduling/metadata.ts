@@ -22,9 +22,9 @@ export {
   hrIndustryRwsSchedulesSurfaceKey,
   hrIndustryRwsShiftSwapsSurfaceKey,
   type HrIndustryRwsListSurfaceKey,
-} from "./surface/hr.industry.rws-surface-metadata.shared";
+} from "./hr.industry.rws-surface-metadata.shared";
 
-export { hrIndustryRwsUiCopy } from "./surface/hr.industry.rws-ui.copy.shared";
+export { hrIndustryRwsUiCopy } from "./hr.industry.rws-ui.copy.shared";
 
 export {
   hrIndustryRwsReportGroupByParam,
@@ -34,12 +34,12 @@ export {
   type HrIndustryRwsPageModelInput,
   type HrIndustryRwsSearchParams,
   type HrIndustryRwsStatusFilter,
-} from "./data/hr.industry.rws-search-params.parse.shared";
+} from "./hr.industry.rws-search-params.parse.shared";
 
 export {
   hrIndustryRwsRoutePaths,
   type HrIndustryRwsRoutePath,
-} from "./contracts/hr.industry.rws-route.contract";
+} from "./hr.industry.rws-route.contract";
 
 export {
   HR_INDUSTRY_RWS_ACCEPTANCE_CRITERIA_COVERAGE,
@@ -48,4 +48,4 @@ export {
   assertHrIndustryRwsCoverageComplete,
   assertHrIndustryRwsEnterpriseCoverage,
   assertHrIndustryRwsScaffoldOnly,
-} from "./data/hr.industry.rws-coverage.shared";
+} from "./hr.industry.rws-coverage.shared";

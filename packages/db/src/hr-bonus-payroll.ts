@@ -13,8 +13,8 @@ import {
   hrBonusPayrollPayoutReferences,
   hrBonusPayouts,
   hrBonusPlans,
-} from "./schema/hr-bonus";
-import { hrEmployees } from "./schema/hr";
+} from "./hr-bonus";
+import { hrEmployees } from "./hr";
 
 const MAX_PAYROLL_EXPORT = 500;
 

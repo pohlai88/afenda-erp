@@ -4,7 +4,7 @@ import {
   type AppShellPrimaryLeftRailNavIconId,
 } from "@afenda/appshell";
 import { getAccessibleModules } from "@afenda/kernel";
-import { getWorkspaceExecutionContext } from "@/workspace-routes/execution-context.server";
+import { getWorkspaceExecutionContext } from "@/routes/execution-context-route.server";
 import { redirect } from "next/navigation";
 import type { ReactNode } from "react";
 
@@ -21,6 +21,13 @@ const iconByModule: Record<string, AppShellPrimaryLeftRailNavIconId> = {
   "system-admin": "shield-check",
 };
 
+function hasCapability(
+  capabilities: readonly string[],
+  capability: string,
+): boolean {
+  return capabilities.includes(capability);
+}
+
 function buildWorkspaceChrome(
   context: NonNullable<Awaited<ReturnType<typeof getWorkspaceExecutionContext>>>,
 ): AppShellChrome {
@@ -34,20 +41,30 @@ function buildWorkspaceChrome(
     icon: iconByModule[module.id] ?? "layout-grid",
   }));
 
-  const machineItems = [
-    {
-      id: "lynx",
-      label: "Lynx",
-      description: "Truth retrieval, operator runs, and workflow sessions.",
-      href: "/lynx",
-      match: "prefix" as const,
-      icon: "sparkles" as const,
-      items: [
-        { id: "lynx-workflows", label: "Workflows", href: "/lynx/workflows" },
-        { id: "lynx-runs", label: "Runs", href: "/lynx/runs" },
-      ],
-    },
-  ];
+  const canReadLynx = hasCapability(
+    context.capabilities,
+    "system-admin.lynx.read",
+  );
+  const machineItems = canReadLynx
+    ? [
+        {
+          id: "lynx",
+          label: "Lynx",
+          description: "Truth retrieval, operator runs, and workflow sessions.",
+          href: "/lynx",
+          match: "prefix" as const,
+          icon: "sparkles" as const,
+          items: [
+            {
+              id: "lynx-workflows",
+              label: "Workflows",
+              href: "/lynx/workflows",
+            },
+            { id: "lynx-runs", label: "Runs", href: "/lynx/runs" },
+          ],
+        },
+      ]
+    : [];
 
   return {
     rail: {
@@ -89,14 +106,18 @@ function buildWorkspaceChrome(
         },
       ],
       launcherItems: [
-        {
-          id: "lynx",
-          label: "Lynx",
-          description: "Open the machine-layer console.",
-          href: "/lynx",
-          icon: "sparkles",
-          group: "Machine",
-        },
+        ...(canReadLynx
+          ? [
+              {
+                id: "lynx",
+                label: "Lynx",
+                description: "Open the machine-layer console.",
+                href: "/lynx",
+                icon: "sparkles" as const,
+                group: "Machine",
+              },
+            ]
+          : []),
         ...modules.map((module) => ({
           id: module.id,
           label: module.label,
@@ -117,39 +138,41 @@ function buildWorkspaceChrome(
         settings: "/system-admin/organization",
       },
     },
-    commandSections: [
-      {
-        id: "machine",
-        label: "Machine",
-        items: [
+    commandSections: canReadLynx
+      ? [
           {
-            id: "lynx",
-            label: "Lynx",
-            description: "Open the Lynx console.",
-            href: "/lynx",
-            icon: "sparkles",
-            kind: "navigation",
-            keywords: ["machine", "operator"],
+            id: "machine",
+            label: "Machine",
+            items: [
+              {
+                id: "lynx",
+                label: "Lynx",
+                description: "Open the Lynx console.",
+                href: "/lynx",
+                icon: "sparkles" as const,
+                kind: "navigation" as const,
+                keywords: ["machine", "operator"],
+              },
+              {
+                id: "lynx-runs",
+                label: "Lynx runs",
+                href: "/lynx/runs",
+                icon: "activity" as const,
+                kind: "inspect" as const,
+                keywords: ["runs", "ledger"],
+              },
+              {
+                id: "lynx-workflows",
+                label: "Lynx workflows",
+                href: "/lynx/workflows",
+                icon: "clipboard-check" as const,
+                kind: "workflow" as const,
+                keywords: ["sessions", "outcomes"],
+              },
+            ],
           },
-          {
-            id: "lynx-runs",
-            label: "Lynx runs",
-            href: "/lynx/runs",
-            icon: "activity",
-            kind: "inspect",
-            keywords: ["runs", "ledger"],
-          },
-          {
-            id: "lynx-workflows",
-            label: "Lynx workflows",
-            href: "/lynx/workflows",
-            icon: "clipboard-check",
-            kind: "workflow",
-            keywords: ["sessions", "outcomes"],
-          },
-        ],
-      },
-    ],
+        ]
+      : [],
     contextStack: null,
     preferences: {
       railMode: "expanded",

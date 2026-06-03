@@ -18,7 +18,7 @@ import {
   hrBonusPayoutFormulas,
   hrBonusTargetAchievements,
   hrBonusTargets,
-} from "./schema/hr-bonus-incentive";
+} from "./hr-bonus-incentive";
 
 export type RecordHrBonusTargetAchievementInput = {
   organizationId: string;

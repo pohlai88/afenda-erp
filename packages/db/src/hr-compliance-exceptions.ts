@@ -11,7 +11,7 @@ import { buildPaginatedWindow, formatHrEmployeeDisplayName } from "./hr-complian
 import { clampPageSize, loadComplianceExceptionForMutation, assertComplianceOwnerEmployeeInOrg } from "./hr-compliance.internal";
 import { HrComplianceCommandError } from "./hr-compliance.types";
 import type { HrComplianceExceptionWindow } from "./hr-compliance.types";
-import { hrComplianceExceptions, hrEmployees } from "./schema/hr";
+import { hrComplianceExceptions, hrEmployees } from "./hr";
 
 export async function listHrComplianceExceptionsWindow(input: {
   organizationId: string;

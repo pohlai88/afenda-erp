@@ -1,4 +1,4 @@
-import type { hrComplianceEvidenceLinks } from "./schema/hr";
+import type { hrComplianceEvidenceLinks } from "./hr";
 
 export const HR_COMPLIANCE_EVIDENCE_RECORD_KINDS = [
   "filing",

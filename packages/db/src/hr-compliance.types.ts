@@ -8,7 +8,7 @@ import {
   hrComplianceObligations,
   hrComplianceWorkAuthorizationDocuments,
   hrComplianceWorkEligibility,
-} from "./schema/hr";
+} from "./hr";
 
 export type HrComplianceObligationScopeFields = Omit<
   HrComplianceObligationScope,

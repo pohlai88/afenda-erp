@@ -1,6 +1,6 @@
 import { executeDocumentRetentionExpirySweepCommand } from "@afenda/feature-system-admin/server";
 
-import { runCronJob } from "@/app-cron/run";
+import { runCronJob } from "@/kitchen-sinks/cron.run";
 
 export function GET(request: Request) {
   return runCronJob({

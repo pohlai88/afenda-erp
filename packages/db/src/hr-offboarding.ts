@@ -26,7 +26,7 @@ import {
   hrOffboardingClearanceItems,
   hrOffboardingDocumentLinks,
   hrOffboardingSettlementBlockers,
-} from "./schema/hr";
+} from "./hr";
 import { alias } from "drizzle-orm/pg-core";
 
 const managerEmployee = alias(hrEmployees, "manager_employee");

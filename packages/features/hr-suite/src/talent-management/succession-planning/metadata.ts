@@ -7,13 +7,13 @@ export {
   HR_SUCCESSION_LIST_SURFACE_KEYS,
   HR_SUCCESSION_WORKBENCH_READ_ONLY_SURFACE_KEYS,
   type HrSuccessionListSurfaceKey,
-} from "./surface/hr.talent.succession-surface-metadata.shared";
+} from "./hr.talent.succession-surface-metadata.shared";
 
 export {
   hrSuccessionPlanningUiCopy,
   hrSuccessionUiCopy,
   hrTalentSuccessionUiCopy,
-} from "./surface/hr.talent.succession-ui.copy.shared";
+} from "./hr.talent.succession-ui.copy.shared";
 
 export {
   hrSuccessionAuditTrailSearchParam,
@@ -48,7 +48,7 @@ export {
   toHrSuccessionPlanningPageModelInput,
   type HrSuccessionPageModelInput,
   type HrSuccessionSearchParams,
-} from "./data/hr.talent.succession-search-params.parse.shared";
+} from "./hr.talent.succession-search-params.parse.shared";
 
 export {
   hrSuccessionCriticalRoleDetailRoutePath,
@@ -57,11 +57,11 @@ export {
   hrSuccessionSuccessorDetailRoutePath,
   type HrSuccessionPlanningRoutePath,
   type HrSuccessionRoutePath,
-} from "./contracts/hr.talent.succession-route.contract";
+} from "./hr.talent.succession-route.contract";
 
 export {
   SUCCESSION_ACCEPTANCE_CRITERIA_COVERAGE,
   SUCCESSION_REQUIREMENT_COVERAGE,
   assertSuccessionAcceptanceCriteriaComplete,
   assertSuccessionCoverageComplete,
-} from "./data/hr.talent.succession-coverage.shared";
+} from "./hr.talent.succession-coverage.shared";

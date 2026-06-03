@@ -24,21 +24,21 @@ export {
   hrGeoReportGroupByParam,
   hrGeoReportsColumnsId,
   type HrGeoListSurfaceKey,
-} from "./surface/hr.time.geo-surface-metadata.shared";
+} from "./hr.time.geo-surface-metadata.shared";
 
-export { hrGeoUiCopy } from "./surface/hr.time.geo-ui.copy.shared";
+export { hrGeoUiCopy } from "./hr.time.geo-ui.copy.shared";
 
 export {
   parseHrGeoSearchParams,
   toHrGeoPageModelInput,
   type HrGeoSearchParams,
   type HrGeoPageModelInput,
-} from "./data/hr.time.geo-search-params.parse.shared";
+} from "./hr.time.geo-search-params.parse.shared";
 
 export {
   hrGeoRoutePaths,
   type HrGeoRoutePath,
-} from "./contracts/hr.time.geo-route.contract";
+} from "./hr.time.geo-route.contract";
 
 export {
   buildHrGeoGeofencesListSurface,
@@ -52,7 +52,7 @@ export {
   buildHrGeoOvertimeReferenceListSurface,
   buildHrGeoPayrollReferenceListSurface,
   buildHrGeoRawVsApprovedListSurface,
-} from "./surface/hr.time.geo-surface-builders.shared";
+} from "./hr.time.geo-surface-builders.shared";
 
 export {
   assertGeoCoverageComplete,

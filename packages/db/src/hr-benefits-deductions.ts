@@ -8,8 +8,8 @@ import {
   hrBenefitEnrollmentContributions,
   hrBenefitEnrollments,
   hrBenefitPlans,
-} from "./schema/hr-benefits";
-import { hrEmployees } from "./schema/hr";
+} from "./hr-benefits";
+import { hrEmployees } from "./hr";
 import { formatEmployeeLabel } from "./hr-benefits.shared";
 
 const MAX_PAYROLL_EXPORT = 500;

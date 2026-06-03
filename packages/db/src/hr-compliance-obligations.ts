@@ -10,7 +10,7 @@ import {
 } from "./hr-compliance.internal";
 import { HrComplianceCommandError } from "./hr-compliance.types";
 import type { HrComplianceObligationWindow } from "./hr-compliance.types";
-import { hrComplianceObligations, hrDepartments } from "./schema/hr";
+import { hrComplianceObligations, hrDepartments } from "./hr";
 
 export async function listHrComplianceObligationsWindow(input: {
   organizationId: string;

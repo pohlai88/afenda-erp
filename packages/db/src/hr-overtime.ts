@@ -11,7 +11,7 @@ import {
   type ExecuteHrOvertimeApprovalInput,
 } from "./hr-otm-approval.server";
 import { runWithOrganizationContext } from "./client";
-import { hrOvertimeRequests } from "./schema/hr";
+import { hrOvertimeRequests } from "./hr";
 import { and, eq } from "drizzle-orm";
 
 export type { HrOvertimeRequestRow, HrOvertimeRequestWindow };

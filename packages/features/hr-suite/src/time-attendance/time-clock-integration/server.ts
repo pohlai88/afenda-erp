@@ -1,60 +1,55 @@
-import React from "react";
+/**
+ * Server-only public door.
+ */
+import "server-only";
 
-import {
-  buildHrTimeClockPageModel,
-} from "./data/hr.time.clock-integration.page-model.server";
-import { toHrTimeClockPageModelInput } from "./data/hr.time.clock-integration-search-params.parse.shared";
-import { requireHrTimeClockRead } from "./policies/hr.time.clock-integration-access.policy.server";
-
-export * from "./actions/hr.time.clock-integration.actions.server";
-export * from "./actions/hr.time.clock-integration.api-ingest.actions.server";
-export * from "./data/hr.time.clock-integration-devices.shared.server";
-export * from "./data/hr.time.clock-integration.page-model.server";
-export * from "./data/hr.time.clock-integration-search-params.parse.shared";
-export * from "./data/hr.time.clock-integration-list-load.shared";
-export * from "./data/hr.time.clock-integration-lam-export.shared.server";
-export * from "./data/hr.time.clock-integration-overtime-refs.shared.server";
-export * from "./data/hr.time.clock-integration-payroll-refs.shared.server";
-export * from "./data/hr.time.clock-integration-sync-alerts.shared.server";
-export * from "./data/hr.time.clock-integration-sync.shared.server";
-export * from "./data/hr.time.clock-integration-reports.shared";
-export * from "./schemas";
-export * from "./contracts";
-export * from "./events";
-export * from "./policies";
-
-export {
-  HrTimeClockAccessDeniedPanel,
-  HrTimeClockWorkbenchSection,
-} from "./components/hr.time.clock-integration-section.component.server";
-
-import { HrTimeClockAccessDeniedPanel } from "./components/hr.time.clock-integration-section.component.server";
-import { HrTimeClockWorkbenchSection } from "./components/hr.time.clock-integration-section.component.server";
-
-export function HrTimeClockAccessDenied() {
-  return React.createElement(HrTimeClockAccessDeniedPanel);
-}
-
-type HrRawSearchParams = Record<string, string | string[] | undefined> | undefined;
-type HrSearchParamsInput = HrRawSearchParams | Promise<HrRawSearchParams>;
-
-export async function renderHrTimeClockPage(searchParams?: HrSearchParamsInput) {
-  const resolvedSearchParams = searchParams ? await searchParams : undefined;
-
-  try {
-    const guard = await requireHrTimeClockRead();
-    const model = await buildHrTimeClockPageModel(
-      toHrTimeClockPageModelInput({
-        organizationId: guard.organization.id,
-        canWrite: guard.canWrite,
-        canAdmin: guard.canAdmin,
-        canReadAudit: true,
-        searchParams: resolvedSearchParams,
-      }),
-    );
-
-    return React.createElement(HrTimeClockWorkbenchSection, { model });
-  } catch {
-    return React.createElement(HrTimeClockAccessDeniedPanel);
-  }
-}
+export * from "./hr.time.clock-integration-access.policy.server";
+export * from "./hr.time.clock-integration-audit-trail-list.surface";
+export * from "./hr.time.clock-integration-classification.shared.server";
+export * from "./hr.time.clock-integration-correction.actions.server";
+export * from "./hr.time.clock-integration-correction.schema";
+export * from "./hr.time.clock-integration-correction.shared.server";
+export * from "./hr.time.clock-integration-device.actions.server";
+export * from "./hr.time.clock-integration-device.schema";
+export * from "./hr.time.clock-integration-devices-list.surface";
+export * from "./hr.time.clock-integration-devices.shared.server";
+export * from "./hr.time.clock-integration-employee-mappings-list.surface";
+export * from "./hr.time.clock-integration-exception.schema";
+export * from "./hr.time.clock-integration-exceptions.shared.server";
+export * from "./hr.time.clock-integration-ingest.actions.server";
+export * from "./hr.time.clock-integration-ingest.shared.server";
+export * from "./hr.time.clock-integration-lam-export-list.surface";
+export * from "./hr.time.clock-integration-lam-export.shared.server";
+export * from "./hr.time.clock-integration-list-load.shared";
+export * from "./hr.time.clock-integration-list.shared";
+export * from "./hr.time.clock-integration-mapping.schema";
+export * from "./hr.time.clock-integration-mappings.shared.server";
+export * from "./hr.time.clock-integration-overtime-refs-list.surface";
+export * from "./hr.time.clock-integration-overtime-refs.shared.server";
+export * from "./hr.time.clock-integration-overview-stat.surface";
+export * from "./hr.time.clock-integration-payroll-refs-list.surface";
+export * from "./hr.time.clock-integration-payroll-refs.shared.server";
+export * from "./hr.time.clock-integration-promotion.shared.server";
+export * from "./hr.time.clock-integration-punch-exceptions-list.surface";
+export * from "./hr.time.clock-integration-punch.schema";
+export * from "./hr.time.clock-integration-raw-punches-list.surface";
+export * from "./hr.time.clock-integration-reports-list.surface";
+export * from "./hr.time.clock-integration-reports.shared";
+export * from "./hr.time.clock-integration-search-params.parse.shared";
+export * from "./hr.time.clock-integration-section.component.server";
+export * from "./hr.time.clock-integration-shift-match.shared.server";
+export * from "./hr.time.clock-integration-surface-builders.shared";
+export * from "./hr.time.clock-integration-surface-columns.shared";
+export * from "./hr.time.clock-integration-surface-metadata.shared";
+export * from "./hr.time.clock-integration-sync-alerts.shared.server";
+export * from "./hr.time.clock-integration-sync-batches-list.surface";
+export * from "./hr.time.clock-integration-sync.actions.server";
+export * from "./hr.time.clock-integration-sync.schema";
+export * from "./hr.time.clock-integration-sync.shared.server";
+export * from "./hr.time.clock-integration-ui.copy.shared";
+export * from "./hr.time.clock-integration-validation.shared.server";
+export * from "./hr.time.clock-integration.actions.server";
+export * from "./hr.time.clock-integration.api-ingest.actions.server";
+export * from "./hr.time.clock-integration.contract";
+export * from "./hr.time.clock-integration.event";
+export * from "./hr.time.clock-integration.page-model.server";

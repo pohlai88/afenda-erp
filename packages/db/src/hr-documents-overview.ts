@@ -1,7 +1,7 @@
 import { and, count, eq, gte, isNotNull, lte } from "drizzle-orm";
 
 import { runWithOrganizationContext } from "./client";
-import { hrEmployeeDocuments } from "./schema/hr";
+import { hrEmployeeDocuments } from "./hr";
 
 export type HrDocumentsOverviewSnapshot = {
   activeDocumentCount: number;

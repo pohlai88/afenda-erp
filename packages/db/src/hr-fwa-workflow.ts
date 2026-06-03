@@ -16,7 +16,7 @@ import {
   hrFwaArrangements,
   hrFwaPolicyGroups,
   hrFwaRequests,
-} from "./schema/hr";
+} from "./hr";
 
 export type HrFwaRequestDecision =
   | "approve"

@@ -1,4 +1,4 @@
-import type { HrCompensationApprovalRules } from "./schema/hr-compensation-planning";
+import type { HrCompensationApprovalRules } from "./hr-compensation-planning";
 
 export type HrCompensationApprovalRoutingStep =
   HrCompensationApprovalRules["steps"][number];

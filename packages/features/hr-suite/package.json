@@ -3,6 +3,20 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "afenda": {
+    "layout": "tiered-feature",
+    "tiered": {
+      "featureDomains": [
+        "employee-management",
+        "industry-specific",
+        "payroll-compensation",
+        "talent-management",
+        "time-attendance",
+        "hr-suite-integration"
+      ],
+      "flatAtFeatureRoot": ["hr-suite-integration"]
+    }
+  },
   "exports": {
     ".": {
       "types": "./src/index.ts",

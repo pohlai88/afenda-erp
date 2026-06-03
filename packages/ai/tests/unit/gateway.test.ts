@@ -21,7 +21,7 @@ import {
   hasAiGatewayCredentials,
   hasAiGatewayRuntimeCredentials,
   verifyAiGatewayModels,
-} from "../../src/data/ai.gateway.data.server";
+} from "../../src/ai-gateway.repository.server";
 
 function createTestEnv(
   env: Record<string, string | undefined> = {},

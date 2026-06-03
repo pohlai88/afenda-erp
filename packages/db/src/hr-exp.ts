@@ -6,7 +6,7 @@ import {
   hrExpenseAuditEvents,
   hrExpenseClaims,
   hrExpenseExceptions,
-} from "./schema/hr-expense";
+} from "./hr-expense";
 
 export * from "./hr-exp.shared";
 

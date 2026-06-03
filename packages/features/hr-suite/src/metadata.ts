@@ -91,7 +91,7 @@ export {
 export {
   hrComplianceRoutePaths,
   type HrComplianceRoutePath,
-} from "./employee-management/compliance-regulatory-tracking/contracts/hr.workforce.compliance-route.contract";
+} from "./employee-management/compliance-regulatory-tracking/hr.workforce.compliance-route.contract";
 
 export {
   buildHrSuiteListSearchToolbar,
@@ -148,7 +148,7 @@ export {
 export {
   hrDocumentsRoutePaths,
   type HrDocumentsRoutePath,
-} from "./employee-management/documents-management/contracts/hr.workforce.documents-route.contract";
+} from "./employee-management/documents-management/hr.workforce.documents-route.contract";
 
 export {
   getHrOrgListSurfaceKeys,
@@ -183,7 +183,7 @@ export {
 export {
   hrOrgRoutePaths,
   type HrOrgRoutePath,
-} from "./employee-management/organizational-chart-hierarchy/contracts/hr.workforce.org-route.contract";
+} from "./employee-management/organizational-chart-hierarchy/hr.workforce.org-route.contract";
 
 export {
   getHrRecordsListSurfaceKeys,
@@ -224,7 +224,7 @@ export {
   hrRecordsRoutePaths,
   hrEmployeeDetailRoutePath,
   type HrRecordsRoutePath,
-} from "./employee-management/employee-records-management/contracts/hr.workforce.records-route.contract";
+} from "./employee-management/employee-records-management/hr.workforce.records-route.contract";
 
 /** @deprecated Use hrRecordsUiCopy */
 export { hrRecordsUiCopy as hrEmployeesUiCopy } from "./employee-management/employee-records-management/metadata";
@@ -360,7 +360,7 @@ export {
 export {
   hrLifecycleRoutePaths,
   type HrLifecycleRoutePath,
-} from "./employee-management/employee-lifecycle-management/contracts/hr.workforce.lifecycle-route.contract";
+} from "./employee-management/employee-lifecycle-management/hr.workforce.lifecycle-route.contract";
 
 export {
   getHrOffboardingListSurfaceKeys,
@@ -383,7 +383,7 @@ export {
 export {
   hrOffboardingRoutePaths,
   type HrOffboardingRoutePath,
-} from "./employee-management/offboarding-exit-management/contracts/hr.workforce.offboarding-route.contract";
+} from "./employee-management/offboarding-exit-management/hr.workforce.offboarding-route.contract";
 
 export {
   getHrBenefitsListSurfaceKeys,
@@ -414,7 +414,7 @@ export {
 export {
   hrBenefitsRoutePaths,
   type HrBenefitsRoutePath,
-} from "./payroll-compensation/benefits-administration/contracts/hr.payroll.benefits-route.contract";
+} from "./payroll-compensation/benefits-administration/hr.payroll.benefits-route.contract";
 
 export {
   getHrBonusListSurfaceKeys,
@@ -454,7 +454,7 @@ export {
 export {
   hrBonusRoutePaths,
   type HrBonusRoutePath,
-} from "./payroll-compensation/bonus-incentive-management/contracts/hr.payroll.bonus-route.contract";
+} from "./payroll-compensation/bonus-incentive-management/hr.payroll.bonus-route.contract";
 
 export {
   getHrExpenseListSurfaceKeys,
@@ -479,7 +479,7 @@ export {
 export {
   hrExpenseRoutePaths,
   type HrExpenseRoutePath,
-} from "./payroll-compensation/expenses-reimbursement/contracts/hr.payroll.expense-route.contract";
+} from "./payroll-compensation/expenses-reimbursement/hr.payroll.expense-route.contract";
 
 export {
   getHrCpmListSurfaceKeys,

@@ -1,81 +1,44 @@
-import React from "react";
+/**
+ * Server-only public door.
+ */
+import "server-only";
 
-import {
-  buildHrAatPageModel,
-} from "./data/hr.time.aat.page-model.server";
-import { toHrAatPageModelInput } from "./data/hr.time.aat-search-params.parse.shared";
-import { requireHrAatReportRead } from "./policies/hr.time.aat-access.policy.server";
-
-export * from "./actions";
-export * from "./data";
-export * from "./events";
-export * from "./policies";
-export * from "./schemas";
-export * from "./contracts";
-
-export * from "./data/hr.time.aat.page-model.server";
-export * from "./data/hr.time.aat-audit.server";
-export * from "./data/hr.time.aat-snapshots.server";
-export * from "./data/hr.time.aat-notifications.server";
-export * from "./data/hr.time.aat-search-params.parse.shared";
-
-export {
-  HrAatAccessDeniedPanel,
-  HrAatWorkbenchSection,
-} from "./components/hr.time.aat-section.component.server";
-
-export {
-  requireHrAatReportRead as requireHrAatRead,
-  requireHrAatRiskRead,
-} from "./policies/hr.time.aat-access.policy.server";
-
-export {
-  buildHrAatRiskIndicatorsListSurface,
-  hrAatRiskIndicatorsSurfaceKey,
-} from "./surface/hr.time.aat-risk-indicators-list.surface";
-export {
-  buildHrAatSnapshotsListSurface,
-  hrAatSnapshotsSurfaceKey,
-} from "./surface/hr.time.aat-snapshots-list.surface";
-export {
-  buildHrAatNotificationsListSurface,
-  hrAatNotificationsSurfaceKey,
-} from "./surface/hr.time.aat-notifications-list.surface";
-export {
-  buildHrAatAuditTrailListSurface,
-  hrAatAuditTrailSurfaceKey,
-} from "./surface/hr.time.aat-audit-trail-list.surface";
-
-import { HrAatAccessDeniedPanel } from "./components/hr.time.aat-section.component.server";
-import { HrAatWorkbenchSection } from "./components/hr.time.aat-section.component.server";
-
-export function HrAatAccessDenied() {
-  return React.createElement(HrAatAccessDeniedPanel);
-}
-
-type HrRawSearchParams = Record<string, string | string[] | undefined> | undefined;
-type HrSearchParamsInput = HrRawSearchParams | Promise<HrRawSearchParams>;
-
-export async function renderHrAatPage(searchParams?: HrSearchParamsInput) {
-  const resolvedSearchParams = searchParams ? await searchParams : undefined;
-
-  try {
-    const guard = await requireHrAatReportRead();
-    const model = await buildHrAatPageModel(
-      toHrAatPageModelInput({
-        organizationId: guard.organization.id,
-        actorAuthUserId: guard.session.id,
-        canViewRiskIndicators: guard.canViewRiskIndicators,
-        canViewAudit:
-          guard.accessRole === "auditor" ||
-          guard.accessRole === "hr" ||
-          guard.accessRole === "compliance",
-        searchParams: resolvedSearchParams,
-      }),
-    );
-
-    return React.createElement(HrAatWorkbenchSection, { model });
-  } catch {
-    return React.createElement(HrAatAccessDeniedPanel);
-  }
-}
+export * from "./hr.time.aat-acceptance-coverage.shared";
+export * from "./hr.time.aat-access.policy.server";
+export * from "./hr.time.aat-analytics-core.shared";
+export * from "./hr.time.aat-analytics.schema";
+export * from "./hr.time.aat-audit-trail-list.surface";
+export * from "./hr.time.aat-comparison.schema";
+export * from "./hr.time.aat-list.shared";
+export * from "./hr.time.aat-notifications-list.surface";
+export * from "./hr.time.aat-overview-stat.surface";
+export * from "./hr.time.aat-patterns.schema";
+export * from "./hr.time.aat-report.actions.server";
+export * from "./hr.time.aat-report.schema";
+export * from "./hr.time.aat-risk-indicators-list.surface";
+export * from "./hr.time.aat-risk-threshold.policy.server";
+export * from "./hr.time.aat-risk.schema";
+export * from "./hr.time.aat-route.contract";
+export * from "./hr.time.aat-search-params.parse.shared";
+export * from "./hr.time.aat-section.component.server";
+export * from "./hr.time.aat-snapshots-list.surface";
+export * from "./hr.time.aat-surface-metadata.shared";
+export * from "./hr.time.aat-ui.copy.shared";
+export * from "./hr.time.aat.contract";
+export * from "./hr.time.aat.event";
+export * from "./hr.time.aat.page-model.server";
+export * from "./hrs-hr-time-aat-analytics-core-server";
+export * from "./hrs-hr-time-aat-audit-server";
+export * from "./hrs-hr-time-aat-availability-server";
+export * from "./hrs-hr-time-aat-comparison-server";
+export * from "./hrs-hr-time-aat-corrective-ref-server";
+export * from "./hrs-hr-time-aat-exceptions-server";
+export * from "./hrs-hr-time-aat-heatmap-server";
+export * from "./hrs-hr-time-aat-notifications-server";
+export * from "./hrs-hr-time-aat-patterns-server";
+export * from "./hrs-hr-time-aat-payroll-ref-server";
+export * from "./hrs-hr-time-aat-reason-masking-server";
+export * from "./hrs-hr-time-aat-report-server";
+export * from "./hrs-hr-time-aat-risk-server";
+export * from "./hrs-hr-time-aat-snapshots-server";
+export * from "./hrs-hr-time-aat-trend-movement-server";

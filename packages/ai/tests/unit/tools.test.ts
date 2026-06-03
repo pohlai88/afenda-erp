@@ -1,15 +1,15 @@
 import { describe, expect, it } from "vitest";
-import { createErpAssistantTools } from "../../src/tools/ai.erp-tools.tool.server";
+import { createErpAssistantTools } from "../../src/ai-erp-tools.tool.server";
 import {
   assertGovernedToolPolicy,
   assertGovernedToolset,
   createGovernedToolRegistry,
   redactGovernedToolAuditValue,
-} from "../../src/tools/ai.governance.tool.server";
+} from "../../src/ai-governance.tool.server";
 import {
   ERP_ASSISTANT_TOOL_IDS,
   erpAssistantToolMeta,
-} from "../../src/tools/ai.tool-meta";
+} from "../../src/ai-tool.meta";
 
 const baseOrg = {
   id: "org_test",

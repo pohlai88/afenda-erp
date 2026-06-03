@@ -3,7 +3,7 @@ import { runWithOrganizationContext, type AfendaTransaction } from "./client";
 import { createEntityId } from "./ids";
 import { buildPaginatedWindow, clampPageSize } from "./hr-benefits.shared";
 import { HrBonusCommandError } from "./hr-bonus-incentive.shared";
-import { hrBonusCycles, hrBonusPlans } from "./schema/hr-bonus-incentive";
+import { hrBonusCycles, hrBonusPlans } from "./hr-bonus-incentive";
 
 export async function listHrBonusCyclesWindow(input: {
   organizationId: string;

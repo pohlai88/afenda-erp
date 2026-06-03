@@ -8,7 +8,7 @@ import {
   hrPayrollPayments,
   hrPayrollRunLines,
   hrPayrollRuns,
-} from "./schema/hr-payroll-processing";
+} from "./hr-payroll-processing";
 
 function buildBankPaymentCsv(
   lines: Array<{

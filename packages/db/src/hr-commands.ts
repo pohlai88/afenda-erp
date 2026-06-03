@@ -7,7 +7,7 @@ import {
   hrEmployeeAssignments,
   hrEmployees,
   hrPositions,
-} from "./schema/hr";
+} from "./hr";
 
 export type HrEmployeeCommandErrorCode =
   | "employee_not_found"

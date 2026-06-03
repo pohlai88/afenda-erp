@@ -24,7 +24,7 @@ import {
 } from "./client";
 import { createEntityId } from "./ids";
 import { auditLogs } from "./schema";
-import { hrDocumentAuditEvents } from "./schema/hr";
+import { hrDocumentAuditEvents } from "./hr";
 
 export const auditEntityTypes = [
   "organization",

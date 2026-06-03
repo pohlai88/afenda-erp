@@ -6,12 +6,12 @@ import {
   assertEmployeeExists,
 } from "./hr-time-clock-devices";
 import { HrTimeClockCommandError } from "./hr-time-clock.types";
-import { hrEmployees } from "./schema/hr";
+import { hrEmployees } from "./hr";
 import {
   hrTimeClockAuditEvents,
   hrTimeClockDevices,
   hrTimeClockEmployeeMappings,
-} from "./schema/hr-time-clock";
+} from "./hr-time-clock";
 
 export type HrTimeClockEmployeeMappingRow = {
   id: string;

@@ -17,14 +17,14 @@ export {
   hrDocumentsAuditTrailSurfaceKey,
   hrDocumentsAcknowledgmentsSurfaceKey,
   type HrDocumentsListSurfaceKey,
-} from "./surface/hr.workforce.documents-surface-metadata.shared";
+} from "./hr.workforce.documents-surface-metadata.shared";
 
-export { hrDocumentsUiCopy } from "./surface/hr.workforce.documents-ui.copy.shared";
+export { hrDocumentsUiCopy } from "./hr.workforce.documents-ui.copy.shared";
 
 export {
   hrDocumentsOverviewStatSurfaceKey,
   buildHrDocumentsOverviewStatGroups,
-} from "./surface/hr.workforce.documents-overview-stat.surface";
+} from "./hr.workforce.documents-overview-stat.surface";
 
 export {
   HR_WORKFORCE_DOCUMENTS_ACCEPTANCE_CRITERIA_COVERAGE,
@@ -33,7 +33,7 @@ export {
   type HrDocumentsCoverageEntry,
   type HrDocumentsCoverageStatus,
   type HrDocumentsRequirementCode,
-} from "./data/hr.workforce.documents-coverage.shared";
+} from "./hr.workforce.documents-coverage.shared";
 
 export {
   parseHrDocumentsSearchParams,
@@ -46,4 +46,4 @@ export {
   hrDocumentsRetentionSearchParam,
   hrDocumentsAuditTrailSearchParam,
   hrDocumentsAcknowledgmentsSearchParam,
-} from "./data/hr.workforce.documents-search-params.parse.shared";
+} from "./hr.workforce.documents-search-params.parse.shared";

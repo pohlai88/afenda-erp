@@ -28,7 +28,7 @@ import {
   erpWorkItems,
   organizations,
 } from "./schema";
-import { hrEmployeeDocuments } from "./schema/hr";
+import { hrEmployeeDocuments } from "./hr";
 
 import {
   clampPageSize,

@@ -1,7 +1,7 @@
 import { and, count, desc, eq, gte, ilike, isNull, lte, or } from "drizzle-orm";
 import { runWithOrganizationContext } from "./client";
 import { createEntityId } from "./ids";
-import { hrAttendanceRecords, hrEmployees } from "./schema/hr";
+import { hrAttendanceRecords, hrEmployees } from "./hr";
 
 export type HrAttendanceRecordRow = {
   id: string;

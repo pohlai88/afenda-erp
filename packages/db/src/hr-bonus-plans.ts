@@ -7,7 +7,7 @@ import {
   normalizeScopeText,
 } from "./hr-benefits.shared";
 import { HrBonusCommandError } from "./hr-bonus-incentive.shared";
-import { hrBonusPlans } from "./schema/hr-bonus-incentive";
+import { hrBonusPlans } from "./hr-bonus-incentive";
 
 export async function listHrBonusPlansWindow(input: {
   organizationId: string;

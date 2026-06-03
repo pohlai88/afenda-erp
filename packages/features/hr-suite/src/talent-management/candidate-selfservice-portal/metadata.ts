@@ -27,9 +27,9 @@ export {
   hrTalentRssRoleTasksSurfaceKey,
   hrTalentRssScorecardsSurfaceKey,
   type HrTalentRssListSurfaceKey,
-} from "./surface/hr.talent.rss-surface-metadata.shared";
+} from "./hr.talent.rss-surface-metadata.shared";
 
-export { hrTalentRssUiCopy } from "./surface/hr.talent.rss-ui.copy.shared";
+export { hrTalentRssUiCopy } from "./hr.talent.rss-ui.copy.shared";
 
 export {
   hrTalentRssReportGroupByParam,
@@ -38,15 +38,15 @@ export {
   toHrTalentRssPageModelInput,
   type HrTalentRssPageModelInput,
   type HrTalentRssSearchParams,
-} from "./data/hr.talent.rss-search-params.parse.shared";
+} from "./hr.talent.rss-search-params.parse.shared";
 
 export {
   hrTalentRssRoutePaths,
   type HrTalentRssRoutePath,
-} from "./contracts/hr.talent.rss-route.contract";
+} from "./hr.talent.rss-route.contract";
 
 export {
   HR_TALENT_RSS_ACCEPTANCE_CRITERIA_COVERAGE,
   HR_TALENT_RSS_REQUIREMENT_COVERAGE,
   assertHrTalentRssEnterpriseCoverage,
-} from "./data/hr.talent.rss-coverage.shared";
+} from "./hr.talent.rss-coverage.shared";

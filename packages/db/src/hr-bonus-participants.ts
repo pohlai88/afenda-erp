@@ -11,8 +11,8 @@ import { HrBonusCommandError } from "./hr-bonus-incentive.shared";
 import {
   hrBonusPlanParticipants,
   hrBonusPlans,
-} from "./schema/hr-bonus-incentive";
-import { hrEmployees } from "./schema/hr";
+} from "./hr-bonus-incentive";
+import { hrEmployees } from "./hr";
 
 export async function listHrBonusPlanParticipantsWindow(input: {
   organizationId: string;

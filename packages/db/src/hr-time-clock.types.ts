@@ -1,4 +1,4 @@
-import { hrTimeClockRawPunches } from "./schema/hr-time-clock";
+import { hrTimeClockRawPunches } from "./hr-time-clock";
 
 export type HrTimeClockPunchType =
   (typeof hrTimeClockRawPunches.$inferSelect)["punchType"];

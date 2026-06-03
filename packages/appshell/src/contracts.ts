@@ -1,2 +1,2 @@
-export * from "./app-shell/appshell-props.shared";
-export * from "./app-shell/command/command-recents.shared";
+export * from "./app-appshell-props-shared";
+export * from "./app-command-recents-shared";

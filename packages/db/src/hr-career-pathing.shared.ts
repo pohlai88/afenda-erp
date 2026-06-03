@@ -1,11 +1,11 @@
 import { and, eq } from "drizzle-orm";
 import type { AfendaTransaction } from "./client";
-import { hrEmployees } from "./schema/hr";
+import { hrEmployees } from "./hr";
 import {
   hrmCareerPathFrameworks,
   hrmDevelopmentGoals,
   hrmDevelopmentPlans,
-} from "./schema/hr-career-pathing";
+} from "./hr-career-pathing";
 
 export class HrCareerPathingCommandError extends Error {
   readonly code: string;

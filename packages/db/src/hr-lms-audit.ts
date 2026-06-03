@@ -1,6 +1,6 @@
 import type { AfendaTransaction } from "./client";
 import { createEntityId } from "./ids";
-import { hrLmsAuditEvents } from "./schema/hr-lms";
+import { hrLmsAuditEvents } from "./hr-lms";
 
 export type AppendHrLmsAuditEventInput = {
   organizationId: string;

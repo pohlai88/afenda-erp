@@ -1,1 +1,6 @@
-/** Client-safe exports for @afenda/feature-dashboard. */
+/**
+ * Client public door.
+ */
+"use client";
+
+

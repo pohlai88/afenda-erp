@@ -3,13 +3,13 @@ import type { AfendaTransaction } from "./client";
 import { createEntityId } from "./ids";
 import { appendHrPayrollAuditEventInTx } from "./hr-payroll-processing-audit";
 import { buildPaginatedWindow, clampPageSize } from "./hr-benefits.shared";
-import { hrEmployees } from "./schema/hr";
+import { hrEmployees } from "./hr";
 import {
   hrPayrollCycles,
   hrPayrollEmployeeAssignments,
   hrPayrollPayGroups,
   hrPayrollRuns,
-} from "./schema/hr-payroll-processing";
+} from "./hr-payroll-processing";
 
 /** PAY-002 — create payroll pay group. */
 export async function createHrPayrollGroupInTx(

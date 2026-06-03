@@ -10,8 +10,8 @@ import {
   hrBonusPlans,
   hrBonusProrations,
   hrBonusRecoveries,
-} from "./schema/hr-bonus-incentive";
-import { hrDepartments, hrEmployees } from "./schema/hr";
+} from "./hr-bonus-incentive";
+import { hrDepartments, hrEmployees } from "./hr";
 
 type ListWindow<T> = {
   rows: T[];

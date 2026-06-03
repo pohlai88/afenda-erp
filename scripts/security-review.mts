@@ -11,8 +11,12 @@ const root = process.cwd();
 const checks: readonly Check[] = [
   {
     name: "Workspace shell resolves organization context",
-    file: "apps/erp/src/workspace-routes/workspace-route-cache.ts",
-    patterns: ["getOrganizationContext", "organization", "accessibleModules"],
+    file: "apps/erp/src/routes/execution-context-route.server.ts",
+    patterns: [
+      "getWorkspaceExecutionContext",
+      "requireWorkspaceExecutionContext",
+      "resolveExecutionContext",
+    ],
   },
   {
     name: "Uploads validate capability and content policy",

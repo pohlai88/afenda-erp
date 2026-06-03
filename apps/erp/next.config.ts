@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { erpNeonAuthLegacyPathRedirects } from "@afenda/auth/neon-auth";
 import { createAfendaNextConfig } from "@afenda/config/next";
 
 const nextConfig: NextConfig = createAfendaNextConfig({
@@ -18,6 +19,11 @@ const nextConfig: NextConfig = createAfendaNextConfig({
         destination: "/lynx/:path*",
         permanent: true,
       },
+      ...erpNeonAuthLegacyPathRedirects.map(({ source, destination }) => ({
+        source,
+        destination,
+        permanent: false,
+      })),
     ];
   },
 });

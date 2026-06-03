@@ -17,7 +17,7 @@ import {
   hrComplianceWorkAuthorizationDocuments,
   hrComplianceWorkEligibility,
   hrEmployees,
-} from "./schema/hr";
+} from "./hr";
 
 type CalendarEntryDraft = {
   id: string;

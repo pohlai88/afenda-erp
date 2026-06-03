@@ -35,7 +35,7 @@ export {
   type HrCareerPathingListSurfaceKey,
   type HrCareerPathingSearchParams,
   type HrCareerPathSearchParams,
-} from "./data/hr.talent.career-pathing-search-params.parse.shared";
+} from "./hr.talent.career-pathing-search-params.parse.shared";
 
 export {
   buildHrCareerPathFrameworksListSurface,
@@ -43,25 +43,25 @@ export {
   buildHrCareerPathPlansListSurface,
   buildHrCareerPathSkillGapsListSurface,
   buildHrCareerPathTargetRolesListSurface,
-} from "./surface/hr.talent.career-pathing-lists.surface";
+} from "./hr.talent.career-pathing-lists.surface";
 
 export {
   buildHrCareerPathOverviewStatGrid,
-} from "./surface/hr.talent.career-pathing-overview-stat.surface";
+} from "./hr.talent.career-pathing-overview-stat.surface";
 
-export { hrCareerPathOverviewKpiSurfaceKey as hrCareerPathOverviewStatSurfaceKey } from "./data/hr.talent.career-pathing-search-params.parse.shared";
+export { hrCareerPathOverviewKpiSurfaceKey as hrCareerPathOverviewStatSurfaceKey } from "./hr.talent.career-pathing-search-params.parse.shared";
 
 export {
   buildHrCareerPathingReadinessListSurface,
-} from "./surface/hr.talent.career-pathing-readiness-list.surface";
+} from "./hr.talent.career-pathing-readiness-list.surface";
 
 export {
   buildHrCareerPathingReportsListSurface,
-} from "./surface/hr.talent.career-pathing-reports-list.surface";
+} from "./hr.talent.career-pathing-reports-list.surface";
 
 export {
   buildHrCareerPathingAuditTrailListSurface,
-} from "./surface/hr.talent.career-pathing-audit-trail-list.surface";
+} from "./hr.talent.career-pathing-audit-trail-list.surface";
 
 export {
   hrTalentCareerPathingUiCopy,
@@ -72,21 +72,21 @@ export {
   hrCareerPathSkillGapsColumnsId,
   hrCareerPathPlansColumnsId,
   hrCareerPathPlanGoalsColumnsId,
-} from "./surface/hr.talent.career-pathing-ui.copy.shared";
+} from "./hr.talent.career-pathing-ui.copy.shared";
 
 export {
   HR_CAREER_READINESS_LEVELS,
   HR_CAREER_REPORT_GROUP_BY,
   type HrCareerReadinessLevel,
   type HrCareerReportGroupBy,
-} from "./schemas/hr.talent.career-pathing-constants.shared";
+} from "./hr.talent.career-pathing-constants.shared";
 
 export {
   CAREER_PATHING_REQUIREMENT_COVERAGE,
   CAREER_PATHING_ACCEPTANCE_CRITERIA_COVERAGE,
   assertCareerPathingCoverageComplete,
   assertCareerPathingAcceptanceCriteriaComplete,
-} from "./data/hr.talent.career-pathing-acceptance-coverage.shared";
+} from "./hr.talent.career-pathing-acceptance-coverage.shared";
 
 export const HR_CAREER_PATHING_LIST_SURFACE_COLUMNS_BY_KEY = {
   "hrm:career-pathing:overview-kpi": "hr.talent.career-pathing.overview.columns",
@@ -104,4 +104,4 @@ export const HR_CAREER_PATHING_LIST_SURFACE_COLUMNS_BY_KEY = {
 export {
   hrTalentCareerPathRoutePaths,
   type HrTalentCareerPathRoutePath,
-} from "./contracts/hr.talent.career-pathing.contract";
+} from "./hr.talent.career-pathing.contract";

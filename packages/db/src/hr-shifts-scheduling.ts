@@ -17,14 +17,14 @@ import {
   resolveShiftBounds,
   toUtcDayStart,
 } from "./hr-shifts.shared";
-import { hrDepartments, hrEmployees, hrPositions } from "./schema/hr";
+import { hrDepartments, hrEmployees, hrPositions } from "./hr";
 import {
   hrShiftAssignments,
   hrShiftRecurrenceRules,
   hrShiftRotationCycleSteps,
   hrShiftRotationCycles,
   hrShiftTemplates,
-} from "./schema/hr-shift-scheduling";
+} from "./hr-shift-scheduling";
 
 export type HrShiftRosterRow = {
   id: string;

@@ -1,6 +1,6 @@
 import type { AfendaTransaction } from "./client";
 import { createEntityId } from "./ids";
-import { hrBonusAuditEvents } from "./schema/hr-bonus-incentive";
+import { hrBonusAuditEvents } from "./hr-bonus-incentive";
 
 export async function appendHrBonusIncentiveAuditEventInTx(
   db: AfendaTransaction,

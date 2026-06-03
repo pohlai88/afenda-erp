@@ -40,8 +40,8 @@ import {
   type HrMcpExportFormatConfig,
   type HrMcpRuleConfigPayload,
   type HrMcpRuleVersionSnapshotPayload,
-} from "./schema/hr-multi-country-payroll";
-import { hrEmployees } from "./schema/hr";
+} from "./hr-multi-country-payroll";
+import { hrEmployees } from "./hr";
 
 export {
   HrMcpCommandError,

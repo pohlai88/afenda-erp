@@ -1,4 +1,4 @@
-import type { hrOvertimeRequests } from "./schema/hr";
+import type { hrOvertimeRequests } from "./hr";
 
 export type HrOvertimeRequestStatus =
   (typeof hrOvertimeRequests.$inferSelect)["status"];

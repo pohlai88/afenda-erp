@@ -42,6 +42,9 @@ jobs:
       - name: Initialize test artifact directories
         run: pnpm artifacts:init
 
+      - name: GUARD 1 + GUARD 2 — ERP layout
+        run: pnpm guard:erp
+
       - name: Format check
         run: pnpm format
 

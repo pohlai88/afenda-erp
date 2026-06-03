@@ -2,7 +2,7 @@ import { and, eq, gte, lte } from "drizzle-orm";
 
 import { runWithOrganizationContext } from "./client";
 import { appendHrOvertimeAuditEvent } from "./hr-otm";
-import { hrEmployees, hrOvertimeRequests } from "./schema/hr";
+import { hrEmployees, hrOvertimeRequests } from "./hr";
 
 /** HRM-OTM-024 — only this request status may be consumed by payroll export. */
 export const HRM_OTM_PAYROLL_EXPORTABLE_STATUS = "payroll_ready" as const;

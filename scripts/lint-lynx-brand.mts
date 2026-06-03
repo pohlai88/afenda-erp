@@ -7,7 +7,7 @@
  *
  * Flipped surfaces (Phase B):
  *   - apps/erp/src/app/(workspace)/lynx/**
- *   - apps/erp/src/workspace-routes/lynx-console-route.tsx
+ *   - apps/erp/src/routes/lynx-console-route.server.tsx
  *   - packages/kernel/src/shell/navigation-extensions.ts
  *   - packages/kernel/src/shell/route-copy-metadata.ts
  *   - packages/features/lynx/src/prompts/lynx.solution-provider-prompt.server.ts
@@ -26,7 +26,7 @@ const ROOT = join(fileURLToPath(import.meta.url), "../../");
 
 const FLIPPED_PATHS = [
   "apps/erp/src/app/(workspace)/lynx",
-  "apps/erp/src/workspace-routes/lynx-console-route.tsx",
+  "apps/erp/src/routes/lynx-console-route.server.tsx",
   "packages/kernel/src/shell/navigation-extensions.ts",
   "packages/kernel/src/shell/route-copy-metadata.ts",
   "packages/ai/src/prompts/ai.system-prompt.ts",

@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { connection } from "next/server";
 import { NeonAuthUiLayout } from "@afenda/auth/neon-auth/ui";
-import type { ReactNode } from "react";
+import { Suspense, type ReactNode } from "react";
+
+import { AuthRouteFallback } from "@/routes/auth-route-fallback";
 
 export const metadata: Metadata = {
   robots: {
@@ -10,7 +12,19 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function OnboardingLayout({
+export default function OnboardingLayout({
+  children,
+}: Readonly<{
+  children: ReactNode;
+}>) {
+  return (
+    <Suspense fallback={<AuthRouteFallback />}>
+      <OnboardingLayoutInner>{children}</OnboardingLayoutInner>
+    </Suspense>
+  );
+}
+
+async function OnboardingLayoutInner({
   children,
 }: Readonly<{
   children: ReactNode;

@@ -24,7 +24,7 @@ export {
   toHrPayrollAuditPageModelInput,
   type HrPayrollListSurfaceKey,
   type HrPayrollSearchParams,
-} from "./data/hr.payroll.processing-search-params.parse.shared";
+} from "./hr.payroll.processing-search-params.parse.shared";
 
 export {
   hrPayrollCyclesColumnsId,
@@ -34,17 +34,17 @@ export {
   hrPayrollPayslipsColumnsId,
   hrPayrollPaymentsColumnsId,
   hrPayrollAuditColumnsId,
-} from "./surface/hr.payroll.processing-surface-columns.shared";
+} from "./hr.payroll.processing-surface-columns.shared";
 
-export { hrPayrollUiCopy } from "./surface/hr.payroll.processing-ui.copy.shared";
+export { hrPayrollUiCopy } from "./hr.payroll.processing-ui.copy.shared";
 
 export {
   hrPayrollProcessingRoutePaths,
   hrPayrollRunDetailRoutePath,
   type HrPayrollProcessingRoutePath,
-} from "./contracts/hr.payroll.processing-route.contract";
+} from "./hr.payroll.processing-route.contract";
 
 export {
   PAYROLL_REQUIREMENT_COVERAGE,
   PAYROLL_ACCEPTANCE_CRITERIA_COVERAGE,
-} from "./data/hr.payroll.processing-acceptance-coverage.shared";
+} from "./hr.payroll.processing-acceptance-coverage.shared";

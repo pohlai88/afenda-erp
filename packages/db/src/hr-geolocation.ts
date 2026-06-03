@@ -18,7 +18,7 @@ import {
   hrDepartments,
   hrEmployees,
   hrPositions,
-} from "./schema/hr";
+} from "./hr";
 import {
   hrGeoAuditEvents,
   hrGeoCheckinOutcomes,
@@ -30,7 +30,7 @@ import {
   hrGeoRegisteredDevices,
   type HrGeoCheckinPolicyDetails,
   type HrGeoSpoofingSignals,
-} from "./schema/hr-geolocation";
+} from "./hr-geolocation";
 
 export type HrGeoCheckinAction =
   (typeof hrGeoRawCheckins.$inferSelect)["action"];

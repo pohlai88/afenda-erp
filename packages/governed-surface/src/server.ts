@@ -1,110 +1,147 @@
+/**
+ * Server-only public door.
+ */
 import "server-only";
 
-export { resolveGovernedErpPermissionAllowed } from "./data/governed-permission-gate.server";
-
-export type { LogGovernedListSurfaceRenderInput } from "./log-governed-list-surface-render.server";
-
-export {
-  ModulePageHeader,
-  type ModulePageHeaderProps,
-} from "./components/module-page-header";
-export {
-  GovernedSurface,
-  type GovernedSurfaceProps,
-} from "./components/governed-surface";
-export {
-  GovernedSection,
-  type GovernedSectionProps,
-} from "./components/governed-section";
-export {
-  GovernedSurfaceSectionCard,
-  type GovernedSurfaceSectionCardBody,
-  type GovernedSurfaceSectionCardProps,
-} from "./components/governed-surface-section-card";
-export {
-  GovernedPatternCListSection,
-  type GovernedPatternCListSectionLayout,
-  type GovernedPatternCListSectionProps,
-} from "./components/governed-pattern-c-list-section";
-export {
-  GovernedPatternBListSection,
-  type GovernedPatternBListSectionLayout,
-  type GovernedPatternBListSectionProps,
-} from "./components/governed-pattern-b-list-section";
-export {
-  GovernedPatternBStatSection,
-  governedStatSectionTestId,
-  type GovernedPatternBStatGroup,
-  type GovernedPatternBStatSectionLayout,
-  type GovernedPatternBStatSectionProps,
-} from "./components/governed-pattern-b-stat-section";
-export {
-  GovernedPatternBChartSection,
-  governedChartSectionTestId,
-  type GovernedPatternBChartSectionLayout,
-  type GovernedPatternBChartSectionProps,
-} from "./components/governed-pattern-b-chart-section";
-export {
-  GovernedPatternBApprovalTimelineSection,
-  type GovernedPatternBApprovalTimelineSectionLayout,
-  type GovernedPatternBApprovalTimelineSectionProps,
-} from "./components/governed-pattern-b-approval-timeline-section";
-export {
-  GovernedPatternBActionBarSection,
-  type GovernedPatternBActionBarSectionLayout,
-  type GovernedPatternBActionBarSectionProps,
-} from "./components/governed-pattern-b-action-bar-section";
-export {
-  GovernedPatternBMultiStepFormSection,
-  type GovernedPatternBMultiStepFormSectionLayout,
-  type GovernedPatternBMultiStepFormSectionProps,
-} from "./components/governed-pattern-b-multi-step-form-section";
-export {
-  GovernedPatternBScorecardFormSection,
-  type GovernedPatternBScorecardFormSectionLayout,
-  type GovernedPatternBScorecardFormSectionProps,
-} from "./components/governed-pattern-b-scorecard-form-section";
-export {
-  GovernedKanbanFooterSection,
-  type GovernedKanbanFooterSectionLayout,
-  type GovernedKanbanFooterSectionProps,
-} from "./components/governed-kanban-footer-section";
-/** Same RSC shell — pass `GovernedKanbanDragBoard` as children for `drag-reorder`. */
-export {
-  GovernedKanbanFooterSection as GovernedKanbanDragSection,
-  type GovernedKanbanFooterSectionLayout as GovernedKanbanDragSectionLayout,
-  type GovernedKanbanFooterSectionProps as GovernedKanbanDragSectionProps,
-} from "./components/governed-kanban-footer-section";
-export {
-  GovernedKanbanReadOnlyBoard,
-  type GovernedKanbanReadOnlyBoardProps,
-} from "./components/governed-kanban-read-only-board.client";
-export {
-  GovernedKanbanFooterBoard,
-  type GovernedKanbanFooterBoardProps,
-} from "./components/governed-kanban-footer-board.client";
-export {
-  GovernedKanbanDragBoard,
-  type GovernedKanbanDragBoardProps,
-} from "./components/governed-kanban-drag-board.client";
-export {
-  GovernedEmpty,
-  type GovernedEmptyProps,
-} from "./components/governed-empty";
-export {
-  GovernedListSurface,
-  type GovernedListSurfaceProps,
-} from "./components/governed-list-surface";
-export {
-  ActionFormErrors,
-  type ActionFormErrorKind,
-  type ActionFormErrorsProps,
-} from "./components/action-form-errors";
-export {
-  GovernedAuditPanel,
-  type GovernedAuditPanelProps,
-} from "./components/governed-audit-panel";
-export {
-  GovernedDetailTabs,
-  type GovernedDetailTabsProps,
-} from "./components/governed-detail-tabs";
+export * from "./erp-permission-capability.shared";
+export * from "./form-rules.evaluate.shared";
+export * from "./gov-_stability-shared";
+export * from "./gov-action-bar-action-client";
+export * from "./gov-action-bar-renderer";
+export * from "./gov-action-bar-schema";
+export * from "./gov-action-form-errors";
+export * from "./gov-action-result-shared";
+export * from "./gov-action-schema";
+export * from "./gov-approval-timeline-renderer";
+export * from "./gov-approval-timeline-schema";
+export * from "./gov-audit-panel-builders";
+export * from "./gov-audit-panel-renderer";
+export * from "./gov-audit-panel-schema";
+export * from "./gov-build-governed-chart-surface";
+export * from "./gov-build-governed-list-surface";
+export * from "./gov-build-governed-stat-grid";
+export * from "./gov-chart-heatmap-body-client";
+export * from "./gov-chart-renderer";
+export * from "./gov-chart-renderer-body-client";
+export * from "./gov-chart-schema";
+export * from "./gov-component-registry-schema";
+export * from "./gov-component-schema";
+export * from "./gov-detail-section-adapter";
+export * from "./gov-detail-tabs-builders";
+export * from "./gov-detail-tabs-renderer";
+export * from "./gov-detail-tabs-schema";
+export * from "./gov-dev-assert-shared";
+export * from "./gov-display-string-shared";
+export * from "./gov-empty-renderer";
+export * from "./gov-empty-state-builders";
+export * from "./gov-erp-permission-requirement-schema";
+export * from "./gov-erp-permission-shared";
+export * from "./gov-events-shared";
+export * from "./gov-example-usage";
+export * from "./gov-form-rules-schema";
+export * from "./gov-governed-audit-panel";
+export * from "./gov-governed-component-skeleton";
+export * from "./gov-governed-component-state-schema";
+export * from "./gov-governed-component-state-schema.schemas";
+export * from "./gov-governed-component-tree";
+export * from "./gov-governed-data-table-client";
+export * from "./gov-governed-detail-tabs";
+export * from "./gov-governed-diagnostics-shared";
+export * from "./gov-governed-empty";
+export * from "./gov-governed-file-upload-field-client";
+export * from "./gov-governed-heading-shared";
+export * from "./gov-governed-heading.server";
+export * from "./gov-governed-identity-shared";
+export * from "./gov-governed-kanban-drag-board-client";
+export * from "./gov-governed-kanban-footer-board-client";
+export * from "./gov-governed-kanban-footer-section";
+export * from "./gov-governed-kanban-read-only-board-client";
+export * from "./gov-governed-kanban-transition-hint-client";
+export * from "./gov-governed-list-surface";
+export * from "./gov-governed-list-toolbar-shared";
+export * from "./gov-governed-list-trailing-cell-registry-client";
+export * from "./gov-governed-logging-server";
+export * from "./gov-governed-metadata-loading";
+export * from "./gov-governed-metadata-trailing-cell-client";
+export * from "./gov-governed-pattern-b-action-bar-section";
+export * from "./gov-governed-pattern-b-approval-timeline-section";
+export * from "./gov-governed-pattern-b-chart-section";
+export * from "./gov-governed-pattern-b-list-section";
+export * from "./gov-governed-pattern-b-multi-step-form-section";
+export * from "./gov-governed-pattern-b-scorecard-form-section";
+export * from "./gov-governed-pattern-b-stat-section";
+export * from "./gov-governed-pattern-c-list-section";
+export * from "./gov-governed-pattern-c-list-table-host-client";
+export * from "./gov-governed-pattern-section-shell-shared";
+export * from "./gov-governed-permission-gate-server";
+export * from "./gov-governed-presentation-profiles";
+export * from "./gov-governed-profile-types";
+export * from "./gov-governed-registry-shared";
+export * from "./gov-governed-renderer-copy-shared";
+export * from "./gov-governed-renderer-dispatch";
+export * from "./gov-governed-safe-route";
+export * from "./gov-governed-section";
+export * from "./gov-governed-surface-copy";
+export * from "./gov-governed-surface-copy-client";
+export * from "./gov-governed-surface-section-card";
+export * from "./gov-governed-telemetry-shared";
+export * from "./gov-governed-trailing-action-slot-client";
+export * from "./gov-kanban-board-drag-view-client";
+export * from "./gov-kanban-board-presentation";
+export * from "./gov-kanban-board-renderer";
+export * from "./gov-kanban-board-schema";
+export * from "./gov-kanban-board-view";
+export * from "./gov-list-surface-cell-client";
+export * from "./gov-list-surface-chrome-shared";
+export * from "./gov-list-surface-header-shared";
+export * from "./gov-list-surface-renderer";
+export * from "./gov-list-surface-renderer-schema";
+export * from "./gov-list-surface-row-trailing-action-schema";
+export * from "./gov-list-surface-schema";
+export * from "./gov-list-surface-sparkline-client";
+export * from "./gov-list-surface-table";
+export * from "./gov-list-surface-table-client";
+export * from "./gov-list-surface-table-layout-shared";
+export * from "./gov-list-surface-tanstack-shared";
+export * from "./gov-list-surface-toolbar-client";
+export * from "./gov-list-surface-toolbar-schema";
+export * from "./gov-list-surface-trailing-action-server";
+export * from "./gov-list-surface-with-trailing-column";
+export * from "./gov-list-trailing-cell-context-schema";
+export * from "./gov-module-page-header";
+export * from "./gov-multi-step-form-client";
+export * from "./gov-multi-step-form-renderer";
+export * from "./gov-multi-step-form-schema";
+export * from "./gov-page-header-schema";
+export * from "./gov-presentation-profile-schema";
+export * from "./gov-registry";
+export * from "./gov-render-governed-child-tree-shared";
+export * from "./gov-render-governed-component";
+export * from "./gov-resolve-governed-presentation";
+export * from "./gov-schema-version-shared";
+export * from "./gov-scorecard-form-client";
+export * from "./gov-scorecard-form-renderer";
+export * from "./gov-scorecard-form-schema";
+export * from "./gov-section-renderer";
+export * from "./gov-section-schema";
+export * from "./gov-server-actions-shared";
+export * from "./gov-stack-renderer";
+export * from "./gov-stack-schema";
+export * from "./gov-stat-card-body-client";
+export * from "./gov-stat-card-renderer";
+export * from "./gov-stat-card-schema";
+export * from "./gov-surface-chrome-classes";
+export * from "./gov-surface-chrome-schema";
+export * from "./gov-workbench-search-params-shared";
+export * from "./governed-configuration.shared";
+export * from "./governed-pattern-c-trailing-column.shared";
+export * from "./kanban-card-drop.shared";
+export * from "./kanban-card-transition.shared";
+export * from "./kanban-surface-identity.shared";
+export * from "./kanban-workflow.shared";
+export * from "./list-surface-identity.shared";
+export * from "./list-surface-toolbar-url.shared";
+export * from "./list-surface-trailing-action.shared";
+export * from "./log-governed-list-surface-render.server";
+export * from "./migrate-governed-configuration.shared";
+export * from "./stat-card-layout.shared";

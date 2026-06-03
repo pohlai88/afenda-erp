@@ -18,10 +18,13 @@ When working on `apps/erp` (routes, RSC, handlers, caching, or Next.js APIs), ca
 
 ## Route ownership
 
-- Authenticated shell: route group `(workspace)/` (Next.js route groups — omitted from URL). `layout.tsx` renders `ShellFrame` immediately; sidebar/header load in parallel `<Suspense>` boundaries (`workspace-routes/*.server.tsx`).
-- Dynamic module workspace: `(workspace)/[moduleId]/` — thin `page.tsx` only; compose governed surfaces from `@/workspace-routes/*`. Do not add `finance/`, `sales/`, etc. as sibling route folders unless the URL tree is genuinely different.
-- Do not put non-route TSX under `src/app/` — use `src/workspace-routes/` (matches Next.js “store project files outside of app”).
-- Dashboard and Lynx (`/lynx`) are dedicated routes, not `[moduleId]`.
+- **`apps/erp/src/` GUARD 1:** only `app/`, `routes/`, `kitchen-sinks/`, `instrumentation.ts`, `proxy.ts`. **`pnpm guard:erp-src`**
+- **`apps/erp/src/app/` GUARD 2:** only `(auth)/`, `(workspace)/`, `api/`, `onboarding/`, plus root Next.js files (`page.tsx`, `layout.tsx`, `error.tsx`, `not-found.tsx`, `global-error.tsx`, `globals.css`, `favicon.ico`, etc.). Anything else → **FAIL** with `FUCK, READ the RULES!!` — **`pnpm guard:erp-app`**. Doc: `.cursor/hooks/afenda-guard-erp-app.md`
+- **`kitchen-sinks/` GUARD 3:** every file must be `{topic}.{role}.ts` — roles: `run`, `contract`, `redirect`, `metadata`, `helper`. No `app-` prefix. Fail banner: **YOU MOTHER FUCKER AI, READ THE RULES!!!** Doc: `.cursor/hooks/afenda-guard-kitchen-sinks.md` — **`pnpm guard:kitchen-sinks`**
+- **`routes/` GUARD 4:** every filename must include `-route` or start with `route-` (e.g. `lynx-console-route.server.tsx`, `route-state.client.tsx`). Fail banner: **YOU DAMN SON OF BITH AI, READ THE RULES!!!!** Doc: `.cursor/hooks/afenda-guard-routes.md` — **`pnpm guard:routes`**
+- **`routes/`** and **`kitchen-sinks/`** stay **flat** (no subfolders).
+- Authenticated shell: `(workspace)/` — thin `page.tsx` delegates to `@/routes/*.server.tsx`.
+- Do not put composers, helpers, or large JSX under `src/app/` — use `src/routes/` or `src/kitchen-sinks/`.
 - `src/proxy.ts` is the Next.js 16 traffic/session helper — not the sole auth boundary.
 
 ## Server vs client

@@ -18,7 +18,7 @@ import {
   hrLeaveBlackoutPeriods,
   hrLeavePolicies,
   hrLeaveRequests,
-} from "./schema/hr";
+} from "./hr";
 
 const MAX_PAYROLL_EXPORT = 100;
 

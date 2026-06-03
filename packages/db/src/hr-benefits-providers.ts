@@ -3,7 +3,7 @@ import { runWithOrganizationContext, type AfendaTransaction } from "./client";
 import { createEntityId } from "./ids";
 import { buildPaginatedWindow, clampPageSize } from "./hr-benefits.shared";
 import type { HrBenefitProviderWindow } from "./hr-benefits.types";
-import { hrBenefitProviders } from "./schema/hr-benefits";
+import { hrBenefitProviders } from "./hr-benefits";
 
 export async function listHrBenefitProvidersWindow(input: {
   organizationId: string;

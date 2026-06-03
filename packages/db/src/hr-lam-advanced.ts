@@ -15,7 +15,7 @@ import {
   hrEmployees,
   hrLamNotifications,
   hrLeaveRequests,
-} from "./schema/hr";
+} from "./hr";
 
 export const MEDICAL_LEAVE_TYPES = new Set<HrLeaveType>([
   "sick",

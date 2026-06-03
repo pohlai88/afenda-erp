@@ -14,7 +14,7 @@ import {
   hrEmployeeProfiles,
   hrEmployeeRecordEvents,
   hrEmployees,
-} from "./schema/hr";
+} from "./hr";
 
 export { HrEmployeeCommandError };
 

@@ -15,7 +15,7 @@ import {
   hrComplianceFilings,
   hrComplianceObligations,
   hrDepartments,
-} from "./schema/hr";
+} from "./hr";
 
 export async function syncHrComplianceFilingsInTx(
   db: AfendaTransaction,

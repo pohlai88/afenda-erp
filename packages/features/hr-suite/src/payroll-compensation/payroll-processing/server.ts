@@ -1,98 +1,38 @@
-import React from "react";
+/**
+ * Server-only public door.
+ */
+import "server-only";
 
-import {
-  ExecutionAccessDeniedError,
-  ExecutionContextRequiredError,
-} from "@afenda/kernel/execution";
-
-import {
-  HrPayrollAccessDeniedPanel,
-  HrPayrollWorkbenchSection,
-} from "./components";
-import {
-  buildHrPayrollPageModel,
-  toHrPayrollPageModelInput,
-} from "./data";
-import { requireHrPayrollRead } from "./policies/hr.payroll.processing-access.policy.server";
-
-export * from "./actions";
-export * from "./data";
-export * from "./events";
-export * from "./policies";
-export * from "./schemas";
-export * from "./contracts";
-
-export {
-  requireHrPayrollRead,
-  requireHrPayrollWrite,
-  requireHrPayrollApprove,
-  requireHrPayrollAuditRead,
-  requireHrPayrollEssRead,
-  HR_PAYROLL_READ_CAPABILITY,
-  HR_PAYROLL_WRITE_CAPABILITY,
-  HR_PAYROLL_APPROVE_CAPABILITY,
-  HR_PAYROLL_AUDIT_READ_CAPABILITY,
-  HR_PAYROLL_ESS_READ_CAPABILITY,
-} from "./policies/hr.payroll.processing-access.policy.server";
-
-export {
-  PAYROLL_REQUIREMENT_COVERAGE,
-  PAYROLL_ACCEPTANCE_CRITERIA_COVERAGE,
-  assertPayrollCoverageComplete,
-} from "./data/hr.payroll.processing-acceptance-coverage.shared";
-
-export {
-  buildHrPayrollPageModel,
-  buildHrPayrollAuditPageModel,
-  type HrPayrollPageModel,
-  type HrPayrollAuditPageModel,
-} from "./data/hr.payroll.processing.page-model.server";
-
-export {
-  HrPayrollAccessDeniedPanel,
-  HrPayrollWorkbenchSection,
-  HrPayrollAuditSection,
-} from "./components";
-
-function isPayrollAccessFailure(error: unknown) {
-  return (
-    error instanceof ExecutionAccessDeniedError ||
-    error instanceof ExecutionContextRequiredError
-  );
-}
-
-export async function renderHrPayrollPage(
-  searchParams?: Promise<Record<string, string | string[] | undefined>>,
-) {
-  let guard: Awaited<ReturnType<typeof requireHrPayrollRead>>;
-  let resolvedSearchParams: Record<string, string | string[] | undefined> | undefined;
-
-  try {
-    [guard, resolvedSearchParams] = await Promise.all([
-      requireHrPayrollRead(),
-      searchParams ?? Promise.resolve(undefined),
-    ]);
-  } catch (error) {
-    if (isPayrollAccessFailure(error)) {
-      return React.createElement(HrPayrollAccessDeniedPanel);
-    }
-    throw error;
-  }
-
-  const pageModel = await buildHrPayrollPageModel(
-    toHrPayrollPageModelInput({
-      organizationId: guard.organization.id,
-      actorUserId: guard.session.id,
-      canWrite: guard.hasCapability("hr.payroll.write"),
-      searchParams: resolvedSearchParams,
-    }),
-  );
-
-  return React.createElement(HrPayrollWorkbenchSection, { pageModel });
-}
-
-export async function renderHrPayrollProcessingPage(
-  searchParams?: Promise<Record<string, string | string[] | undefined>>,
-) {
-  return renderHrPayrollPage(searchParams);
-}
+export * from "./hr.payroll.processing-acceptance-coverage.shared";
+export * from "./hr.payroll.processing-access.policy.server";
+export * from "./hr.payroll.processing-adjustment.schema";
+export * from "./hr.payroll.processing-calculation.shared";
+export * from "./hr.payroll.processing-constants.shared";
+export * from "./hr.payroll.processing-input-staging.schema";
+export * from "./hr.payroll.processing-list.shared";
+export * from "./hr.payroll.processing-lists.surface";
+export * from "./hr.payroll.processing-mutation.schema";
+export * from "./hr.payroll.processing-proration.schema";
+export * from "./hr.payroll.processing-proration.shared";
+export * from "./hr.payroll.processing-route.contract";
+export * from "./hr.payroll.processing-search-params.parse.shared";
+export * from "./hr.payroll.processing-section.component.server";
+export * from "./hr.payroll.processing-store.shared";
+export * from "./hr.payroll.processing-surface-columns.shared";
+export * from "./hr.payroll.processing-surface-metadata.shared";
+export * from "./hr.payroll.processing-ui.copy.shared";
+export * from "./hr.payroll.processing-validation.schema";
+export * from "./hr.payroll.processing-validation.shared";
+export * from "./hr.payroll.processing-workflow.shared";
+export * from "./hr.payroll.processing.actions.server";
+export * from "./hr.payroll.processing.contract";
+export * from "./hr.payroll.processing.event";
+export * from "./hr.payroll.processing.page-model.server";
+export * from "./hrs-hr-payroll-processing-audit-server";
+export * from "./hrs-hr-payroll-processing-correction-server";
+export * from "./hrs-hr-payroll-processing-input-collection-server";
+export * from "./hrs-hr-payroll-processing-journal-server";
+export * from "./hrs-hr-payroll-processing-payment-server";
+export * from "./hrs-hr-payroll-processing-payslip-server";
+export * from "./hrs-hr-payroll-processing-validation-server";
+export * from "./hrs-hr-payroll-processing-workflow-server";

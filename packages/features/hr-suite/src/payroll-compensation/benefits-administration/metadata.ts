@@ -18,12 +18,12 @@ export {
   hrBenefitsProvidersSearchParam,
   hrBenefitsProvidersSurfaceKey,
   type HrBenefitsListSurfaceKey,
-} from "./surface/hr.payroll.benefits-surface-metadata.shared";
+} from "./hr.payroll.benefits-surface-metadata.shared";
 
-export { hrBenefitsUiCopy } from "./surface/hr.payroll.benefits-ui.copy.shared";
+export { hrBenefitsUiCopy } from "./hr.payroll.benefits-ui.copy.shared";
 
 export {
   parseHrBenefitsSearchParams,
   toHrBenefitsPageModelInput,
   type HrBenefitsSearchParams,
-} from "./data/hr.payroll.benefits-search-params.parse.shared";
+} from "./hr.payroll.benefits-search-params.parse.shared";

@@ -36,7 +36,7 @@ import {
   hrOvertimeRateRules,
   hrOvertimeRequests,
   hrPositions,
-} from "./schema/hr";
+} from "./hr";
 
 export * from "./hr-otm.shared";
 export * from "./hr-otm-calculation.shared";

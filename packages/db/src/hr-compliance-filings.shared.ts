@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
 
-import { hrComplianceObligations } from "./schema/hr";
+import { hrComplianceObligations } from "./hr";
 
 export const HR_COMPLIANCE_FILING_REQUIREMENT_KIND = "filing" as const;
 

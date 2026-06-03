@@ -1,6 +1,6 @@
 import { and, count, desc, eq, ilike, or } from "drizzle-orm";
 import { runWithOrganizationContext } from "./client";
-import { hrEmployees, hrLeaveRequests } from "./schema/hr";
+import { hrEmployees, hrLeaveRequests } from "./hr";
 
 export type HrLeaveRequestRow = {
   id: string;

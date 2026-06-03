@@ -2,18 +2,60 @@
 
 Canonical architecture: **ARCH-1002** §6–§8 · Scaffold: `packages/_scaffold/feature`.
 
-## Public doors
+## Public doors (only root-level exceptions)
 
 - `src/index.ts` — neutral
 - `src/client.ts` — browser-safe
 - `src/server.ts` — server-only (imports `@afenda/kernel/server`)
 - `src/metadata.ts` — governed metadata, no tenant I/O
 
-## Buckets (horizontal)
+## Flat layout (required for new scaffold)
 
-`actions/` · `commands/` · `api/` · `contracts/` · `components/` · `data/` · `domain/` · `events/` · `policies/` · `read-models/` · `schemas/` · `tests/`
+```txt
+src/
+  index.ts · client.ts · server.ts · metadata.ts
+  __CODE__-core.contract.ts
+  __CODE__-example.command.server.ts
+  __CODE__-example.handler.server.ts
+  __CODE__-example.schema.ts
+  __CODE__-example.read-model.server.ts
+  __CODE__-example.component.client.tsx
+```
 
-Vertical slice: `pnpm scaffold:vertical __MODULE_ID__ <capability>` — full bucket set under `src/<capability>/`.
+No bucket folders (`commands/`, `schemas/`, …) in new packages.
+
+### Naming
+
+```txt
+{code}-{topic}.{artifact}.{canonical}.{ext}
+```
+
+- **code** — first 3 alphanumeric chars of module id (`purchasing` → `pur`, `lynx` → `lyn`)
+- **topic** — kebab-case subject (`order-create`, `truth-search`)
+- **artifact** — `command` · `handler` · `contract` · `schema` · `read-model` · `policy` · `repository` · `domain` · `component` · …
+- **canonical** — optional `server` · `client` · `types` · `shared`
+
+Examples:
+
+- `pur-order-create.command.server.ts`
+- `pur-order.schema.ts`
+- `lyn-truth-search.handler.server.ts`
+
+## Vertical slice (group by capability name only)
+
+```bash
+pnpm scaffold:vertical __MODULE_ID__ <capability>
+```
+
+```txt
+src/<capability>/
+  index.ts
+  __CODE__-<capability>-example.command.server.ts
+  __CODE__-<capability>-example.handler.server.ts
+  ...
+```
+
+Still flat inside the slice folder — **no** nested buckets.
 
 ## Constraints
 

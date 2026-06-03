@@ -36,13 +36,44 @@ pnpm validate:feature-entry --feature <module-id> [--slice <capability>]
 pnpm architecture:check
 ```
 
-### Feature buckets (horizontal)
+### Feature layout (flat)
 
-`actions/` · `commands/` · `api/` · `contracts/` · `components/` · `data/` · `domain/` · `events/` · `policies/` · `read-models/` · `schemas/` · `tests/`
+**Single-feature package** — everything flat under `src/`:
+
+```txt
+src/index.ts · client.ts · server.ts · metadata.ts
+src/{code}-{topic}.{artifact}.{canonical}.ts
+```
+
+**Multi-capability package** — group only by capability folder, still flat inside:
+
+```txt
+src/<capability>/index.ts
+src/<capability>/{code}-{topic}.{artifact}.{canonical}.ts
+```
+
+### Flat file naming
+
+```txt
+{code}-{topic}.{artifact}.{canonical}.{ext}
+```
+
+| Part | Rule | Example |
+| ---- | ---- | ------- |
+| `code` | First 3 alphanumeric chars of module id | `purchasing` → `pur` |
+| `topic` | kebab-case subject | `order-create`, `truth-search` |
+| `artifact` | command · handler · contract · schema · read-model · policy · repository · domain · component · … | `.command.server.ts` |
+| `canonical` | optional server · client · types · shared | `.server.ts`, `.client.tsx` |
+
+Examples:
+
+- `pur-order-create.command.server.ts`
+- `pur-order.schema.ts`
+- `lyn-truth-search.handler.server.ts`
 
 Four public doors: `index.ts` · `client.ts` · `server.ts` · `metadata.ts`
 
-Vertical slice: full bucket set under `src/<capability>/`.
+Legacy bucket folders in existing packages are grandfathered. **New** scaffold output is flat only.
 
 ### Platform categories
 
@@ -70,4 +101,4 @@ Then: `pnpm architecture:check`.
 
 ## HR suite
 
-HR uses `pnpm scaffold:hr-slice` (feature-specific) on top of the feature template. See `packages/features/hr-suite/AGENTS.md`.
+HR uses `pnpm scaffold:hr-slice` (feature-specific) on top of legacy bucket layout. See `packages/features/hr-suite/AGENTS.md`.

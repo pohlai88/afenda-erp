@@ -2,11 +2,11 @@
 export {
   hrAatRoutePaths,
   type HrAatRoutePath,
-} from "./contracts/hr.time.aat-route.contract";
+} from "./hr.time.aat-route.contract";
 
 export {
   HR_TIME_AAT_AUDIT_MODULE_KEY,
   hrTimeAatReadPermission,
-} from "./contracts/hr.time.aat.contract";
+} from "./hr.time.aat.contract";
 
-export { hrTimeAatAuditActions } from "./events/hr.time.aat.event";
+export { hrTimeAatAuditActions } from "./hr.time.aat.event";

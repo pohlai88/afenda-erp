@@ -12,7 +12,7 @@ vi.mock("@afenda/kernel/server", () => ({
       name: "Afenda",
       slug: "afenda",
       role: "owner",
-      capabilities: ["system-admin.view", "dashboard.view"],
+      capabilities: ["system-admin.view", "system-admin.lynx.read"],
     },
   })),
 }));

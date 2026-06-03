@@ -11,7 +11,7 @@ import {
   hrBonusCycles,
   hrBonusPayouts,
   hrBonusPlans,
-} from "./schema/hr-bonus";
+} from "./hr-bonus";
 
 /** HRM-BON-025 — block normal edits after final approval lock. */
 export async function assertHrBonusPayoutEditableInTx(

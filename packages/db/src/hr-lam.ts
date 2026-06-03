@@ -20,7 +20,7 @@ import {
   hrLeaveEntitlementRules,
   hrLeaveRequests,
   hrLeaveTypeConfigs,
-} from "./schema/hr";
+} from "./hr";
 
 import type { HrLeaveType } from "./hr-leave-validation";
 

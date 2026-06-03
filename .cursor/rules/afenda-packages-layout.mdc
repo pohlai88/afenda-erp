@@ -1,0 +1,28 @@
+---
+description: packages/ GUARD 5 — single, multi, or tiered (HR 3-layer) layout
+globs: packages/**/*
+alwaysApply: false
+---
+
+# Packages layout (GUARD 5)
+
+## 1. Single-feature — flat `src/`
+
+Doors + `{code}-*` only. Example: `packages/ai`, `packages/features/lynx`.
+
+## 2. Multi-feature — `src/features/<slice>/` flat
+
+Example: `packages/features/system-admin`.
+
+## 3. Tiered-feature — `src/<feature>/<sub-feature>/` flat (HR Suite)
+
+```text
+src/<feature-domain>/<sub-feature-capability>/*   ← layer 3 flat, no buckets
+```
+
+Example: `packages/features/hr-suite`  
+`hr-suite-integration/` flattens at layer 1 (no sub-feature folder).
+
+**Fail banner:** YOUR MOTHER OR FATHER IS A WHORE, FUCK OFF AND CORRECT IT
+
+`pnpm guard:packages` — doc: `.cursor/hooks/afenda-guard-packages-layout.md`

@@ -1,6 +1,6 @@
 import "@afenda/kernel/server";
 
 /**
- * Server door — actions, commands, domain, data, read-models, policies.
+ * Server door — re-export server-safe flat modules from src/.
  */
 export * from "./metadata";

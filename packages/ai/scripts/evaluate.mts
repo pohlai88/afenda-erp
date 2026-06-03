@@ -1,32 +1,40 @@
 import { strict as assert } from "node:assert";
 import {
-  AiBudgetError,
-  actionSandboxSchema,
-  approvalRecommendationSchema,
-  approvalToolOutputSchema,
-  approvalToolInputSchema,
   approveActionSandbox,
-  assembleAiContext,
-  assertAiBudget,
-  assertNoSensitiveCredentialContent,
   createActionSandbox,
+  rejectActionSandbox,
+} from "../src/ai-sandbox.action.server";
+import { assembleAiContext } from "../src/ai-context.repository.server";
+import {
   createGatewayOptions,
-  createErpAssistantTools,
-  documentLookupToolInputSchema,
-  documentExtractionSchema,
-  estimateTokenCount,
   getAiGatewayEnvironment,
   getAiModelForFeature,
-  getAssistantSystemPrompt,
-  reportNarrativeSchema,
   hasAiGatewayRuntimeCredentials,
-  redactGovernedToolAuditValue,
-  scoreAiConfidence,
   verifyAiGatewayModels,
-  workspaceSummarySchema,
+} from "../src/ai-gateway.repository.server";
+import { getAssistantSystemPrompt } from "../src/ai-system.prompt";
+import { scoreAiConfidence } from "../src/ai-confidence.policy";
+import {
+  AiBudgetError,
   AiSensitiveContentError,
-  rejectActionSandbox,
-} from "../src/index";
+  assertAiBudget,
+  assertNoSensitiveCredentialContent,
+  estimateTokenCount,
+} from "../src/ai-guardrails.policy";
+import { redactGovernedToolAuditValue } from "../src/ai-governance.tool.server";
+import { createErpAssistantTools } from "../src/ai-erp-tools.tool.server";
+import { actionSandboxSchema } from "../src/ai-operations.schema";
+import { documentExtractionSchema } from "../src/ai-extraction.schema";
+import {
+  approvalRecommendationSchema,
+  reportNarrativeSchema,
+  workspaceSummarySchema,
+} from "../src/ai-recommendations.schema";
+import {
+  approvalToolInputSchema,
+  approvalToolOutputSchema,
+  documentLookupToolInputSchema,
+} from "../src/ai-tools.schema";
 
 type ExecutableTool<TInput, TOutput> = {
   execute: (input: TInput) => Promise<TOutput>;

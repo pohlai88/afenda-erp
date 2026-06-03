@@ -7,7 +7,7 @@ import {
   hrComplianceExceptions,
   hrComplianceObligations,
   hrEmployees,
-} from "./schema/hr";
+} from "./hr";
 
 type TrackedRequirementStatus =
   (typeof hrComplianceEmployeeRequirements.$inferSelect)["status"];

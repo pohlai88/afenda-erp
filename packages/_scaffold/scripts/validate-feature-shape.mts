@@ -4,10 +4,13 @@ import { spawnSync } from "node:child_process";
 import {
   appRouteAllowedTsxNames,
   bannedBucketNames,
+  featureFlatFileViolation,
   featurePublicDoorFiles,
   featureTemplateBuckets,
   getRepositoryRoot,
   isBannedBucketName,
+  isFeatureFlatFileName,
+  isLegacyFeatureFolder,
   readFeatureTemplateBuckets,
 } from "./lib/scaffold-grammar.mts";
 
@@ -99,12 +102,41 @@ function validateFeaturePath(relativePath: string) {
       leaf as (typeof featurePublicDoorFiles)[number],
     );
     const isAllowedBucket = templateBucketSet.has(leaf);
-    if (!isDoor && !isAllowedBucket && !leaf.endsWith(".md")) {
-      if (leaf.includes(".")) {
-        problems.push(
-          `Unexpected top-level source file in feature package: ${relativePath}`,
-        );
+    if (isDoor || isAllowedBucket || leaf.endsWith(".md")) {
+      return;
+    }
+    if (leaf.includes(".")) {
+      if (isFeatureFlatFileName(leaf)) {
+        return;
       }
+      problems.push(
+        `Unexpected top-level source file in feature package: ${relativePath}`,
+      );
+      return;
+    }
+    if (isLegacyFeatureFolder(leaf)) {
+      return;
+    }
+    return;
+  }
+
+  if (segments.length === 2) {
+    const [top, leaf] = segments;
+    if (top && templateBucketSet.has(top)) {
+      return;
+    }
+    if (top && isLegacyFeatureFolder(top)) {
+      return;
+    }
+    if (leaf?.includes(".")) {
+      if (leaf === "index.ts" || isFeatureFlatFileName(leaf)) {
+        return;
+      }
+      const violation = featureFlatFileViolation(leaf);
+      if (violation) {
+        problems.push(`${relativePath}: ${violation}`);
+      }
+      return;
     }
   }
 

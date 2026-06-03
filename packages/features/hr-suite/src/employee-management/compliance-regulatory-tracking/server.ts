@@ -1,86 +1,72 @@
-import React from "react";
-
-import {
-  ExecutionAccessDeniedError,
-  ExecutionContextRequiredError,
-} from "@afenda/kernel/execution";
-import { SectionPanel } from "@afenda/ui";
-
-import {
-  HrComplianceAccessDeniedPanel,
-  HrComplianceWorkbenchSection,
-} from "./components/hr.workforce.compliance-section.component.server";
-import {
-  buildHrCompliancePageModel,
-  toHrCompliancePageModelInput,
-} from "./data";
-import { requireHrComplianceRead } from "./policies/hr.workforce.compliance-access.policy.server";
-
 /**
- * Server door — employee-management/compliance-regulatory-tracking
+ * Server-only public door.
  */
-export * from "./actions";
-export * from "./data";
-export * from "./events";
-export * from "./policies";
-export * from "./schemas";
-export * from "./contracts";
+import "server-only";
 
-export { HrComplianceAccessDeniedPanel, HrComplianceWorkbenchSection };
-
-export function HrComplianceAccessDenied() {
-  return React.createElement(HrComplianceAccessDeniedPanel);
-}
-
-export function HrComplianceSection({
-  title,
-  description,
-  children,
-}: {
-  title: string;
-  description?: string;
-  children: React.ReactNode;
-}) {
-  return React.createElement(
-    SectionPanel,
-    { headingLevel: 2, title, description },
-    children,
-  );
-}
-
-function isComplianceAccessFailure(error: unknown) {
-  return (
-    error instanceof ExecutionAccessDeniedError ||
-    error instanceof ExecutionContextRequiredError
-  );
-}
-
-export async function renderHrCompliancePage(
-  searchParams?: Promise<Record<string, string | string[] | undefined>>,
-) {
-  let guard: Awaited<ReturnType<typeof requireHrComplianceRead>>;
-  let resolvedSearchParams: Record<string, string | string[] | undefined> | undefined;
-
-  try {
-    [guard, resolvedSearchParams] = await Promise.all([
-      requireHrComplianceRead(),
-      searchParams ?? Promise.resolve(undefined),
-    ]);
-  } catch (error) {
-    if (isComplianceAccessFailure(error)) {
-      return React.createElement(HrComplianceAccessDeniedPanel);
-    }
-    throw error;
-  }
-
-  const model = await buildHrCompliancePageModel(
-    toHrCompliancePageModelInput({
-      organizationId: guard.organization.id,
-      canWrite: guard.hasCapability("hr.compliance.write"),
-      canViewSensitive: guard.canViewSensitive,
-      searchParams: resolvedSearchParams,
-    }),
-  );
-
-  return React.createElement(HrComplianceWorkbenchSection, { model });
-}
+export * from "./hr.workforce.compliance-access.policy.server";
+export * from "./hr.workforce.compliance-action-result.shared";
+export * from "./hr.workforce.compliance-action.shared.server";
+export * from "./hr.workforce.compliance-alerts-list.surface";
+export * from "./hr.workforce.compliance-alerts.shared";
+export * from "./hr.workforce.compliance-audit-trail-list.surface";
+export * from "./hr.workforce.compliance-coverage.shared";
+export * from "./hr.workforce.compliance-enum-guard.shared";
+export * from "./hr.workforce.compliance-evidence-link.schema";
+export * from "./hr.workforce.compliance-evidence-links-list.surface";
+export * from "./hr.workforce.compliance-evidence-links.shared";
+export * from "./hr.workforce.compliance-exception.schema";
+export * from "./hr.workforce.compliance-exceptions-list.surface";
+export * from "./hr.workforce.compliance-filing.schema";
+export * from "./hr.workforce.compliance-filing.shared";
+export * from "./hr.workforce.compliance-filings-list.surface";
+export * from "./hr.workforce.compliance-form.shared";
+export * from "./hr.workforce.compliance-labor-law-requirements-list.surface";
+export * from "./hr.workforce.compliance-labor-law.schema";
+export * from "./hr.workforce.compliance-list-load.shared";
+export * from "./hr.workforce.compliance-list-trailing.config.shared";
+export * from "./hr.workforce.compliance-list.shared";
+export * from "./hr.workforce.compliance-mutation.shared";
+export * from "./hr.workforce.compliance-obligation.schema";
+export * from "./hr.workforce.compliance-obligation.shared";
+export * from "./hr.workforce.compliance-obligations-list.surface";
+export * from "./hr.workforce.compliance-org-scope.shared";
+export * from "./hr.workforce.compliance-overview-breakdown-list.surface";
+export * from "./hr.workforce.compliance-overview-stat.surface";
+export * from "./hr.workforce.compliance-policy-acknowledgement.schema";
+export * from "./hr.workforce.compliance-policy-acknowledgements-list.surface";
+export * from "./hr.workforce.compliance-regulatory-calendar-list.surface";
+export * from "./hr.workforce.compliance-regulatory-calendar.shared";
+export * from "./hr.workforce.compliance-requirement-trailing.schema";
+export * from "./hr.workforce.compliance-review-queue-list.surface";
+export * from "./hr.workforce.compliance-review-queue.schema";
+export * from "./hr.workforce.compliance-review-queue.shared";
+export * from "./hr.workforce.compliance-route.contract";
+export * from "./hr.workforce.compliance-safety-training-requirements-list.surface";
+export * from "./hr.workforce.compliance-safety-training.schema";
+export * from "./hr.workforce.compliance-search-params.parse.shared";
+export * from "./hr.workforce.compliance-section.component.server";
+export * from "./hr.workforce.compliance-sensitive-access.shared";
+export * from "./hr.workforce.compliance-status.shared";
+export * from "./hr.workforce.compliance-statutory-requirements-list.surface";
+export * from "./hr.workforce.compliance-statutory.schema";
+export * from "./hr.workforce.compliance-surface-columns.shared";
+export * from "./hr.workforce.compliance-surface-metadata.shared";
+export * from "./hr.workforce.compliance-ui.copy.shared";
+export * from "./hr.workforce.compliance-work-auth-documents-list.surface";
+export * from "./hr.workforce.compliance-work-auth-documents.schema";
+export * from "./hr.workforce.compliance-work-auth-documents.shared";
+export * from "./hr.workforce.compliance-work-eligibility-list.surface";
+export * from "./hr.workforce.compliance-work-eligibility.schema";
+export * from "./hr.workforce.compliance-work-eligibility.shared";
+export * from "./hr.workforce.compliance-workplace-safety-list.surface";
+export * from "./hr.workforce.compliance-workplace-safety.schema";
+export * from "./hr.workforce.compliance.actions.server";
+export * from "./hr.workforce.compliance.audit-emitted.shared";
+export * from "./hr.workforce.compliance.audit-trail.shared";
+export * from "./hr.workforce.compliance.audit-trail.shared.server";
+export * from "./hr.workforce.compliance.contract";
+export * from "./hr.workforce.compliance.event";
+export * from "./hr.workforce.compliance.mutation.shared.server";
+export * from "./hr.workforce.compliance.page-model.server";
+export * from "./hr.workforce.compliance.reports.shared";
+export * from "./hr.workforce.compliance.reports.shared.server";

@@ -14,7 +14,7 @@ export type {
   ServerLogEvent,
   ServerLogLevel,
   ServerLogMetadata,
-} from "./logger/logger.types";
+} from "./obs-logger-types";
 
 export const telemetry = {
   serviceName: "afenda-erp",

@@ -20,7 +20,7 @@ import {
   hrmDevelopmentStretchAssignments,
   type HrmCareerAgreedAction,
   type HrmCareerDiscussionParticipant,
-} from "./schema/hr-career-pathing";
+} from "./hr-career-pathing";
 
 export async function createHrmDevelopmentLearningActionInTx(
   db: AfendaTransaction,

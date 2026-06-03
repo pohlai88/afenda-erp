@@ -15,36 +15,36 @@ export {
   hrAatSnapshotsSurfaceKey,
   hrAatOverviewStatSurfaceKey,
   type HrAatListSurfaceKey,
-} from "./surface/hr.time.aat-surface-metadata.shared";
+} from "./hr.time.aat-surface-metadata.shared";
 
 export {
   parseHrAatSearchParams,
   toHrAatPageModelInput,
   type HrAatSearchParams,
-} from "./data/hr.time.aat-search-params.parse.shared";
+} from "./hr.time.aat-search-params.parse.shared";
 
-export { hrAatUiCopy } from "./surface/hr.time.aat-ui.copy.shared";
+export { hrAatUiCopy } from "./hr.time.aat-ui.copy.shared";
 
 export {
   hrAatRoutePaths,
   type HrAatRoutePath,
-} from "./contracts/hr.time.aat-route.contract";
+} from "./hr.time.aat-route.contract";
 
 export {
   buildHrAatRiskIndicatorsListSurface,
-} from "./surface/hr.time.aat-risk-indicators-list.surface";
+} from "./hr.time.aat-risk-indicators-list.surface";
 export {
   buildHrAatSnapshotsListSurface,
-} from "./surface/hr.time.aat-snapshots-list.surface";
+} from "./hr.time.aat-snapshots-list.surface";
 export {
   buildHrAatNotificationsListSurface,
-} from "./surface/hr.time.aat-notifications-list.surface";
+} from "./hr.time.aat-notifications-list.surface";
 export {
   buildHrAatAuditTrailListSurface,
-} from "./surface/hr.time.aat-audit-trail-list.surface";
-export { buildHrAatOverviewStatGrid } from "./surface/hr.time.aat-overview-stat.surface";
+} from "./hr.time.aat-audit-trail-list.surface";
+export { buildHrAatOverviewStatGrid } from "./hr.time.aat-overview-stat.surface";
 
 export {
   assertAatIntegrationCoverageComplete,
   AAT_INTEGRATION_REQUIREMENT_COVERAGE,
-} from "./data/hr.time.aat-acceptance-coverage.shared";
+} from "./hr.time.aat-acceptance-coverage.shared";

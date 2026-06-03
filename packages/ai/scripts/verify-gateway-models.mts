@@ -3,7 +3,7 @@ import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { dirname } from "node:path";
 
-import { verifyAiGatewayModels } from "../src/data/ai.gateway.data.server";
+import { verifyAiGatewayModels } from "../src/ai-gateway.repository.server";
 
 const rootDir = resolve(dirname(fileURLToPath(import.meta.url)), "../../..");
 

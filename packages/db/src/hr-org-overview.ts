@@ -1,7 +1,7 @@
 import { and, count, eq, isNull, or, sql } from "drizzle-orm";
 
 import { runWithOrganizationContext } from "./client";
-import { hrDepartments, hrEmployees, hrPositions } from "./schema/hr";
+import { hrDepartments, hrEmployees, hrPositions } from "./hr";
 
 export type HrOrgOverviewSnapshot = {
   orgUnitCount: number;

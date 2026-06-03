@@ -1,17 +1,9 @@
-import "@afenda/kernel/server";
+/**
+ * Server-only public door.
+ */
+import "server-only";
 
-export {
-  createStripeBillingPortalSession,
-  createStripeCheckoutSession,
-  ensureStripeCustomerForOrganization,
-  getStripeConfigurationStatus,
-  processStripeWebhookEvent,
-  type StripeConfigurationStatus,
-} from "./stripe-billing.server";
-export { handleStripeWebhookPost } from "./stripe-webhook.handler.server";
-export {
-  formatStripePlanPrice,
-  listStripeBillingPlans,
-  type StripeBillingPlan,
-  type StripeBillingPlanKey,
-} from "./stripe-plans.shared";
+export * from "./stripe-billing.server";
+export * from "./stripe-config.shared";
+export * from "./stripe-plans.shared";
+export * from "./stripe-webhook.handler.server";

@@ -22,8 +22,8 @@ import type {
 import {
   hrBenefitEligibilityRules,
   hrBenefitPlans,
-} from "./schema/hr-benefits";
-import { hrEmployees } from "./schema/hr";
+} from "./hr-benefits";
+import { hrEmployees } from "./hr";
 
 export function formatBenefitEligibilityScopeLabel(
   rule: HrBenefitEligibilityRuleScope,

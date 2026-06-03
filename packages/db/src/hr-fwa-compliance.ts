@@ -13,7 +13,7 @@ import {
   hrFwaComplianceBreaches,
   hrFwaComplianceBreachKindEnum,
   hrFwaComplianceBreachStatusEnum,
-} from "./schema/hr";
+} from "./hr";
 
 export type HrFwaComplianceBreachKind =
   (typeof hrFwaComplianceBreachKindEnum.enumValues)[number];

@@ -1,4 +1,4 @@
-import type { hrLeaveTypeEnum } from "./schema/hr";
+import type { hrLeaveTypeEnum } from "./hr";
 
 export type HrLeaveType = (typeof hrLeaveTypeEnum.enumValues)[number];
 

@@ -3,8 +3,8 @@ import { runWithOrganizationContext, type AfendaTransaction } from "./client";
 import { createEntityId } from "./ids";
 import { HrBenefitsCommandError } from "./hr-benefits.shared";
 import type { HrBenefitDocumentLinkRow } from "./hr-benefits.types";
-import { hrBenefitDocumentLinks } from "./schema/hr-benefits";
-import { hrEmployeeDocuments } from "./schema/hr";
+import { hrBenefitDocumentLinks } from "./hr-benefits";
+import { hrEmployeeDocuments } from "./hr";
 
 /** HRM-BEN-021 — link supporting documents by reference ID (not storage engine). */
 export async function linkHrBenefitDocumentInTx(

@@ -12,8 +12,8 @@ import {
   hrBenefitEnrollments,
   hrBenefitPlans,
   hrBenefitProviders,
-} from "./schema/hr-benefits";
-import { hrDepartments, hrEmployees } from "./schema/hr";
+} from "./hr-benefits";
+import { hrDepartments, hrEmployees } from "./hr";
 
 function escapeCsvCell(value: string) {
   if (/[",\n]/.test(value)) {

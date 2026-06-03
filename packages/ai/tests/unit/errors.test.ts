@@ -1,6 +1,6 @@
 import { APICallError } from "ai";
 import { describe, expect, it } from "vitest";
-import { getAiRouteError } from "../../src/errors/ai.gateway.error";
+import { getAiRouteError } from "../../src/ai-gateway.error";
 
 function createGatewayError(statusCode: number, retryAfter?: string) {
   return new APICallError({

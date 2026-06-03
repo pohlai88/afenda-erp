@@ -10,7 +10,7 @@ import {
   hrTimeClockEmployeeMappings,
   hrTimeClockRawPunches,
   hrTimeClockSyncBatches,
-} from "./schema/hr-time-clock";
+} from "./hr-time-clock";
 
 export type HrTimeClockPunchIngestSource =
   | "device_sync"

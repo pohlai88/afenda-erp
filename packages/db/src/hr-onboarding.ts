@@ -10,7 +10,7 @@ import {
   hrLifecycleEvents,
   hrOnboardingCases,
   hrOnboardingChecklistItems,
-} from "./schema/hr";
+} from "./hr";
 
 export const DEFAULT_ONBOARDING_CHECKLIST = [
   { code: "identity_docs", title: "Identity documents submitted", sortOrder: 10 },

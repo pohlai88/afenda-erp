@@ -17,12 +17,12 @@ import { parseNumeric } from "./hr-bonus-incentive.shared";
 import {
   hrBonusPayoutApprovalSteps,
   hrBonusPayouts,
-} from "./schema/hr-bonus";
+} from "./hr-bonus";
 import {
   hrBonusPlans,
   type HrBonusApprovalRoutingConfig,
-} from "./schema/hr-bonus-incentive";
-import { hrEmployees } from "./schema/hr";
+} from "./hr-bonus-incentive";
+import { hrEmployees } from "./hr";
 
 export type HrBonusPayoutReviewDecision =
   | "approve"

@@ -11,7 +11,7 @@ import type { HrBenefitPlanWindow } from "./hr-benefits.types";
 import {
   hrBenefitPlans,
   hrBenefitProviders,
-} from "./schema/hr-benefits";
+} from "./hr-benefits";
 
 export async function listHrBenefitPlansWindow(input: {
   organizationId: string;

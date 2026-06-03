@@ -4,11 +4,11 @@ vi.mock("server-only", () => ({}));
 
 import { getRequestId } from "../../src/index";
 import { logServerEvent } from "../../src/server";
-import { createChildLogger } from "../../src/logger/create-child-logger";
-import { hasStructuralLogContract } from "../../src/logger/logger.schema";
-import { redactLogPayload } from "../../src/logger/redact-policy";
-import { serializeError } from "../../src/logger/serializers";
-import { captureConsoleLogs } from "../../src/testing/log-capture";
+import { createChildLogger } from "../../src/obs-create-child-logger";
+import { hasStructuralLogContract } from "../../src/obs-logger-schema";
+import { redactLogPayload } from "../../src/obs-redact-policy";
+import { serializeError } from "../../src/obs-serializers";
+import { captureConsoleLogs } from "../../src/obs-log-capture";
 
 describe("structural logger", () => {
   it("redacts secret-like keys", () => {

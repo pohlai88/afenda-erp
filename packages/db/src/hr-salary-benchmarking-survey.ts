@@ -13,7 +13,7 @@ import {
   hrSbsBenchmarkEntries,
   hrSbsBenchmarkVersions,
   hrSbsCurrencyRefs,
-} from "./schema/hr-salary-benchmarking";
+} from "./hr-salary-benchmarking";
 
 export async function appendHrSbsAuditEventInTx(
   db: AfendaTransaction,

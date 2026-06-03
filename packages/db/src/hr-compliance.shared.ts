@@ -1,8 +1,8 @@
 import { and, asc, desc, eq, gte, inArray, isNotNull, isNull, lt, lte, or, sql } from "drizzle-orm";
 
 export { buildPaginatedWindow } from "./list-window.shared";
-import type { hrComplianceWorkEligibility } from "./schema/hr";
-import { hrComplianceWorkAuthorizationDocuments } from "./schema/hr";
+import type { hrComplianceWorkEligibility } from "./hr";
+import { hrComplianceWorkAuthorizationDocuments } from "./hr";
 
 type HrComplianceWorkEligibilityStatus =
   (typeof hrComplianceWorkEligibility.$inferSelect)["status"];

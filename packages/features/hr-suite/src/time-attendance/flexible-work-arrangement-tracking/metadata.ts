@@ -14,32 +14,32 @@ export {
   hrFwaAuditTrailSurfaceKey,
   hrFwaAuditTrailSearchParam,
   type HrFwaListSurfaceKey,
-} from "./surface/hr.time.fwa-surface-metadata.shared";
+} from "./hr.time.fwa-surface-metadata.shared";
 
-export { hrFwaUiCopy } from "./surface/hr.time.fwa-ui.copy.shared";
+export { hrFwaUiCopy } from "./hr.time.fwa-ui.copy.shared";
 
 export {
   parseHrFwaSearchParams,
   toHrFwaPageModelInput,
   type HrFwaSearchParams,
-} from "./data/hr.time.fwa-search-params.parse.shared";
+} from "./hr.time.fwa-search-params.parse.shared";
 
 export {
   hrFwaRoutePaths,
   type HrFwaRoutePath,
-} from "./contracts/hr.time.fwa-route.contract";
+} from "./hr.time.fwa-route.contract";
 
 export {
   buildHrFwaArrangementsListSurface,
-} from "./surface/hr.time.fwa-arrangements-list.surface";
+} from "./hr.time.fwa-arrangements-list.surface";
 export {
   buildHrFwaRequestsListSurface,
-} from "./surface/hr.time.fwa-requests-list.surface";
+} from "./hr.time.fwa-requests-list.surface";
 export {
   buildHrFwaComplianceListSurface,
-} from "./surface/hr.time.fwa-compliance-list.surface";
+} from "./hr.time.fwa-compliance-list.surface";
 
 export {
   assertFwaCoverageComplete,
   FWA_REQUIREMENT_COVERAGE,
-} from "./data/hr.time.fwa-acceptance-coverage.shared";
+} from "./hr.time.fwa-acceptance-coverage.shared";

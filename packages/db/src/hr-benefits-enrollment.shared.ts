@@ -1,4 +1,4 @@
-import type { hrBenefitEnrollments } from "./schema/hr-benefits";
+import type { hrBenefitEnrollments } from "./hr-benefits";
 
 export const HR_BENEFIT_COVERAGE_LEVELS = [
   "employee_only",

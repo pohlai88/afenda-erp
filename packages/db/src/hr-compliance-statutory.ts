@@ -19,7 +19,7 @@ import {
   hrComplianceEmployeeRequirements,
   hrComplianceObligations,
   hrEmployees,
-} from "./schema/hr";
+} from "./hr";
 
 export async function syncHrEmployeeStatutoryRequirementsInTx(
   db: AfendaTransaction,

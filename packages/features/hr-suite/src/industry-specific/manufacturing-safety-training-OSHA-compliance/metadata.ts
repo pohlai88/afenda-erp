@@ -20,9 +20,9 @@ export {
   hrIndustryMscTrainingAssignmentsSurfaceKey,
   hrIndustryMscWorkRestrictionsSurfaceKey,
   type HrIndustryMscListSurfaceKey,
-} from "./surface/hr.industry.msc-surface-metadata.shared";
+} from "./hr.industry.msc-surface-metadata.shared";
 
-export { hrIndustryMscUiCopy } from "./surface/hr.industry.msc-ui.copy.shared";
+export { hrIndustryMscUiCopy } from "./hr.industry.msc-ui.copy.shared";
 
 export {
   hrIndustryMscReportGroupByParam,
@@ -32,12 +32,12 @@ export {
   type HrIndustryMscPageModelInput,
   type HrIndustryMscSearchParams,
   type HrIndustryMscStatusFilter,
-} from "./data/hr.industry.msc-search-params.parse.shared";
+} from "./hr.industry.msc-search-params.parse.shared";
 
 export {
   hrIndustryMscRoutePaths,
   type HrIndustryMscRoutePath,
-} from "./contracts/hr.industry.msc-route.contract";
+} from "./hr.industry.msc-route.contract";
 
 export {
   HR_INDUSTRY_MSC_ACCEPTANCE_CRITERIA_COVERAGE,
@@ -45,4 +45,4 @@ export {
   assertHrIndustryMscAcceptanceCriteriaComplete,
   assertHrIndustryMscCoverageComplete,
   assertHrIndustryMscEnterpriseCoverage,
-} from "./data/hr.industry.msc-coverage.shared";
+} from "./hr.industry.msc-coverage.shared";

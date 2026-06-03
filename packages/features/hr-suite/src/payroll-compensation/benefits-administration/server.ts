@@ -1,69 +1,40 @@
-import React from "react";
+/**
+ * Server-only public door.
+ */
+import "server-only";
 
-import { SectionPanel } from "@afenda/ui";
-
-import {
-  buildHrBenefitsPageModel,
-} from "./data/hr.payroll.benefits.page-model.server";
-import { toHrBenefitsPageModelInput } from "./data/hr.payroll.benefits-search-params.parse.shared";
-import {
-  HrBenefitsAccessDeniedPanel,
-  HrBenefitsWorkbenchSection,
-} from "./components/hr.payroll.benefits-section.component.server";
-import { requireHrBenefitsRead } from "./policies/hr.payroll.benefits-access.policy.server";
-
-export * from "./actions";
-export * from "./data";
-export * from "./events";
-export * from "./policies";
-export * from "./schemas";
-export * from "./contracts";
-
-export { HrBenefitsAccessDeniedPanel, HrBenefitsWorkbenchSection };
-
-export function HrBenefitsAccessDenied() {
-  return React.createElement(HrBenefitsAccessDeniedPanel);
-}
-
-export function HrBenefitsSection({
-  title,
-  description,
-  children,
-}: {
-  title: string;
-  description?: string;
-  children: React.ReactNode;
-}) {
-  return React.createElement(
-    SectionPanel,
-    { headingLevel: 2, title, description },
-    children,
-  );
-}
-
-type HrRawSearchParams = Record<string, string | string[] | undefined> | undefined;
-type HrSearchParamsInput = HrRawSearchParams | Promise<HrRawSearchParams>;
-
-export async function renderHrBenefitsPage(searchParams?: HrSearchParamsInput) {
-  const resolvedSearchParams = searchParams ? await searchParams : undefined;
-
-  try {
-    const guard = await requireHrBenefitsRead();
-    const canWrite = guard.hasCapability("hr.benefits.write");
-    const pageModel = await buildHrBenefitsPageModel(
-      toHrBenefitsPageModelInput({
-        organizationId: guard.organization.id,
-        canWrite,
-        canViewSensitive: guard.canViewSensitive,
-        searchParams: resolvedSearchParams,
-      }),
-    );
-
-    return React.createElement(HrBenefitsWorkbenchSection, {
-      pageModel,
-      canWrite,
-    });
-  } catch {
-    return React.createElement(HrBenefitsAccessDeniedPanel);
-  }
-}
+export * from "./hr.payroll.benefits-acceptance-coverage.shared";
+export * from "./hr.payroll.benefits-access.policy.server";
+export * from "./hr.payroll.benefits-action-result.shared";
+export * from "./hr.payroll.benefits-audit-trail-list.surface";
+export * from "./hr.payroll.benefits-constants.shared";
+export * from "./hr.payroll.benefits-eligibility-rules-list.surface";
+export * from "./hr.payroll.benefits-eligibility.schema";
+export * from "./hr.payroll.benefits-eligibility.shared";
+export * from "./hr.payroll.benefits-employment-sync.shared.server";
+export * from "./hr.payroll.benefits-enrollment.schema";
+export * from "./hr.payroll.benefits-enrollments-list.surface";
+export * from "./hr.payroll.benefits-form-fields.shared";
+export * from "./hr.payroll.benefits-form.shared";
+export * from "./hr.payroll.benefits-list.shared";
+export * from "./hr.payroll.benefits-mutation.schema";
+export * from "./hr.payroll.benefits-open-enrollment-list.surface";
+export * from "./hr.payroll.benefits-open-enrollment.schema";
+export * from "./hr.payroll.benefits-open-enrollment.shared";
+export * from "./hr.payroll.benefits-org-scope.shared";
+export * from "./hr.payroll.benefits-plan.schema";
+export * from "./hr.payroll.benefits-plans-list.surface";
+export * from "./hr.payroll.benefits-providers-list.surface";
+export * from "./hr.payroll.benefits-reports.shared";
+export * from "./hr.payroll.benefits-route.contract";
+export * from "./hr.payroll.benefits-search-params.parse.shared";
+export * from "./hr.payroll.benefits-section.component.server";
+export * from "./hr.payroll.benefits-sensitive-access.shared";
+export * from "./hr.payroll.benefits-surface-columns.shared";
+export * from "./hr.payroll.benefits-surface-metadata.shared";
+export * from "./hr.payroll.benefits-ui.copy.shared";
+export * from "./hr.payroll.benefits.actions.server";
+export * from "./hr.payroll.benefits.contract";
+export * from "./hr.payroll.benefits.event";
+export * from "./hr.payroll.benefits.mutation.shared.server";
+export * from "./hr.payroll.benefits.page-model.server";

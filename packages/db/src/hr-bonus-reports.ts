@@ -9,8 +9,8 @@ import {
   type HrBonusReportKind,
 } from "./hr-bonus-reports.shared";
 import type { HrBonusReportCsvResult } from "./hr-bonus.types";
-import { hrBonusCycles, hrBonusPayouts, hrBonusPlans } from "./schema/hr-bonus";
-import { hrDepartments, hrEmployees } from "./schema/hr";
+import { hrBonusCycles, hrBonusPayouts, hrBonusPlans } from "./hr-bonus";
+import { hrDepartments, hrEmployees } from "./hr";
 
 function escapeCsvCell(value: string) {
   if (/[",\n]/.test(value)) {

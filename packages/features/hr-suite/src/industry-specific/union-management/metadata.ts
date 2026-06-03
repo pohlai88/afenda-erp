@@ -23,9 +23,9 @@ export {
   hrIndustryUcbSenioritySurfaceKey,
   hrIndustryUcbUnionsSurfaceKey,
   type HrIndustryUcbListSurfaceKey,
-} from "./surface/hr.industry.ucb-surface-metadata.shared";
+} from "./hr.industry.ucb-surface-metadata.shared";
 
-export { hrIndustryUcbUiCopy } from "./surface/hr.industry.ucb-ui.copy.shared";
+export { hrIndustryUcbUiCopy } from "./hr.industry.ucb-ui.copy.shared";
 
 export {
   hrIndustryUcbReportGroupByParam,
@@ -35,12 +35,12 @@ export {
   type HrIndustryUcbPageModelInput,
   type HrIndustryUcbSearchParams,
   type HrIndustryUcbStatusFilter,
-} from "./data/hr.industry.ucb-search-params.parse.shared";
+} from "./hr.industry.ucb-search-params.parse.shared";
 
 export {
   hrIndustryUcbRoutePaths,
   type HrIndustryUcbRoutePath,
-} from "./contracts/hr.industry.ucb-route.contract";
+} from "./hr.industry.ucb-route.contract";
 
 export {
   HR_INDUSTRY_UCB_ACCEPTANCE_CRITERIA_COVERAGE,
@@ -49,4 +49,4 @@ export {
   assertHrIndustryUcbCoverageComplete,
   assertHrIndustryUcbEnterpriseCoverage,
   assertHrIndustryUcbScaffoldOnly,
-} from "./data/hr.industry.ucb-coverage.shared";
+} from "./hr.industry.ucb-coverage.shared";

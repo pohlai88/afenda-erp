@@ -1,9 +1,11 @@
 import fs from "node:fs";
 import path from "node:path";
 import {
+  featureFlatFileViolation,
   featurePublicDoorFiles,
   getRepositoryRoot,
-  readFeatureTemplateBuckets,
+  isFeatureFlatFileName,
+  isLegacyFeatureFolder,
 } from "./lib/scaffold-grammar.mts";
 
 const root = getRepositoryRoot();
@@ -36,55 +38,83 @@ if (!fs.existsSync(sliceDir)) {
 }
 
 const problems: string[] = [];
-const templateBuckets = new Set(readFeatureTemplateBuckets(root));
 
-function requirePath(relativePath: string) {
-  const fullPath = path.join(sliceDir, relativePath);
-  if (!fs.existsSync(fullPath)) {
-    problems.push(`Missing required entry file: ${relativePath}`);
+function validateFlatDirectory(relativeLabel: string, dirPath: string, requireDoors: boolean) {
+  for (const entry of fs.readdirSync(dirPath, { withFileTypes: true })) {
+    const rel = `${relativeLabel}/${entry.name}`;
+
+    if (entry.isDirectory()) {
+      if (isLegacyFeatureFolder(entry.name)) {
+        continue;
+      }
+      problems.push(`Flat layout forbids subdirectory: ${rel}/`);
+      continue;
+    }
+
+    if (entry.name === "index.ts") continue;
+
+    const violation = featureFlatFileViolation(entry.name);
+    if (violation) {
+      problems.push(`${relativeLabel}: ${violation}`);
+    }
+  }
+
+  if (requireDoors) {
+    for (const door of featurePublicDoorFiles) {
+      if (!fs.existsSync(path.join(dirPath, door))) {
+        problems.push(`Missing public door at feature root: ${door}`);
+      }
+    }
+  } else if (!fs.existsSync(path.join(dirPath, "index.ts"))) {
+    problems.push(`Vertical slice missing index.ts: ${relativeLabel}`);
   }
 }
 
 if (slice) {
-  for (const bucket of readFeatureTemplateBuckets(root)) {
-    const bucketPath = path.join(sliceDir, bucket);
-    if (!fs.existsSync(bucketPath)) {
-      problems.push(`Vertical slice "${slice}" is missing bucket "${bucket}".`);
-    }
-  }
-
-  requirePath("index.ts");
-  requirePath(path.join("components", "index.ts"));
-  requirePath(path.join("actions", "index.ts"));
-  requirePath(path.join("commands", "index.ts"));
-  requirePath(path.join("contracts", "index.ts"));
-  requirePath(path.join("data", "index.ts"));
-  requirePath(path.join("schemas", "index.ts"));
-  requirePath(path.join("policies", "index.ts"));
+  validateFlatDirectory(`${feature}/${slice}`, sliceDir, false);
 } else {
-  for (const door of featurePublicDoorFiles) {
-    const doorPath = path.join(featureSrcDir, door);
-    if (!fs.existsSync(doorPath)) {
-      problems.push(`Feature package missing public door: ${door}`);
-    }
-  }
-}
-
-const extraVerticalFolders = new Set(["surface", "surfaces", "tools", "workflows"]);
-
-const unexpectedTopLevel = fs
-  .readdirSync(sliceDir, { withFileTypes: true })
-  .filter((entry) => entry.isDirectory())
-  .map((entry) => entry.name)
-  .filter(
-    (name) =>
-      !templateBuckets.has(name) &&
-      !extraVerticalFolders.has(name) &&
-      !featurePublicDoorFiles.includes(name as (typeof featurePublicDoorFiles)[number]),
+  const topLevel = fs.readdirSync(featureSrcDir, { withFileTypes: true });
+  const hasLegacyBuckets = topLevel.some(
+    (entry) => entry.isDirectory() && isLegacyFeatureFolder(entry.name),
+  );
+  const hasVerticalSlices = topLevel.some(
+    (entry) =>
+      entry.isDirectory() &&
+      !isLegacyFeatureFolder(entry.name) &&
+      !featurePublicDoorFiles.includes(entry.name as (typeof featurePublicDoorFiles)[number]),
   );
 
-for (const name of unexpectedTopLevel) {
-  problems.push(`Unexpected top-level folder in slice "${slice ?? feature}": ${name}`);
+  if (hasLegacyBuckets) {
+    for (const door of featurePublicDoorFiles) {
+      if (!fs.existsSync(path.join(featureSrcDir, door))) {
+        problems.push(`Feature package missing public door: ${door}`);
+      }
+    }
+  } else if (hasVerticalSlices) {
+    for (const door of featurePublicDoorFiles) {
+      if (!fs.existsSync(path.join(featureSrcDir, door))) {
+        problems.push(`Feature package missing public door: ${door}`);
+      }
+    }
+
+    for (const entry of topLevel) {
+      if (!entry.isDirectory() || isLegacyFeatureFolder(entry.name)) continue;
+      validateFlatDirectory(`${feature}/${entry.name}`, path.join(featureSrcDir, entry.name), false);
+    }
+
+    for (const entry of topLevel) {
+      if (!entry.isFile()) continue;
+      if (featurePublicDoorFiles.includes(entry.name as (typeof featurePublicDoorFiles)[number])) {
+        continue;
+      }
+      const violation = featureFlatFileViolation(entry.name);
+      if (violation) {
+        problems.push(`feature root: ${violation}`);
+      }
+    }
+  } else {
+    validateFlatDirectory(feature, featureSrcDir, true);
+  }
 }
 
 if (problems.length > 0) {
@@ -96,5 +126,5 @@ if (problems.length > 0) {
 }
 
 console.log(
-  `[validate-feature-entry] OK: ${slice ? `${feature}/${slice}` : feature} entry points and buckets.`,
+  `[validate-feature-entry] OK: ${slice ? `${feature}/${slice}` : feature} flat entry layout.`,
 );

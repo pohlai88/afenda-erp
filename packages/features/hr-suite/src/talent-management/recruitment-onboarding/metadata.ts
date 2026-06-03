@@ -6,9 +6,9 @@ export {
   HR_RON_LIST_SURFACE_KEYS,
   HR_RON_WORKBENCH_READ_ONLY_SURFACE_KEYS,
   type HrRonListSurfaceKey,
-} from "./surface/hr.talent.ron-surface-metadata.shared";
+} from "./hr.talent.ron-surface-metadata.shared";
 
-export { hrRonUiCopy } from "./surface/hr.talent.ron-ui.copy.shared";
+export { hrRonUiCopy } from "./hr.talent.ron-ui.copy.shared";
 
 export {
   hrRonApplicationsSearchParam,
@@ -33,7 +33,7 @@ export {
   parseHrRonSearchParams,
   toHrRonPageModelInput,
   type HrRonSearchParams,
-} from "./data/hr.talent.ron-search-params.parse.shared";
+} from "./hr.talent.ron-search-params.parse.shared";
 
 export {
   hrRonApplicationDetailRoutePath,
@@ -41,4 +41,4 @@ export {
   hrRonRequisitionDetailRoutePath,
   hrRonRoutePaths,
   type HrRonRoutePath,
-} from "./contracts/hr.talent.ron-route.contract";
+} from "./hr.talent.ron-route.contract";

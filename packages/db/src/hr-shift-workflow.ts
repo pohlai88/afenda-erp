@@ -7,7 +7,7 @@ import {
   hrDepartments,
   hrEmployees,
   hrPositions,
-} from "./schema/hr";
+} from "./hr";
 import {
   hrShiftAssignments,
   hrShiftAuditEvents,
@@ -17,7 +17,7 @@ import {
   hrShiftSwapRequests,
   hrShiftTemplates,
   type HrShiftScheduleChangePayload,
-} from "./schema/hr-shift-scheduling";
+} from "./hr-shift-scheduling";
 
 export class HrShiftWorkflowCommandError extends Error {
   readonly code:

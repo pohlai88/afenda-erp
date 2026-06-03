@@ -21,7 +21,7 @@ import {
   hrComplianceWorkEligibility,
   hrEmployeeDocuments,
   hrEmployees,
-} from "./schema/hr";
+} from "./hr";
 
 type ResolvedComplianceEvidenceRecord = {
   recordLabel: string;

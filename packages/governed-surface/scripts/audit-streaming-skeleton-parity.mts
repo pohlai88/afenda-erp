@@ -276,7 +276,7 @@ function main(): void {
   const canonical = readCanonicalStatGrid();
 
   const scanRoots = [
-    join(repoRoot, "apps", "erp", "src", "workspace-routes"),
+    join(repoRoot, "apps", "erp", "src", "routes"),
     join(packageRoot, "src", "metadata", "renderers", "stat-card.renderer.tsx"),
   ];
 

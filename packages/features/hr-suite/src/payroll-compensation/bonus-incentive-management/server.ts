@@ -1,56 +1,37 @@
-import React from "react";
+/**
+ * Server-only public door.
+ */
+import "server-only";
 
-import {
-  HrBonusAccessDeniedPanel,
-  HrBonusWorkbenchSection,
-} from "./components/hr.payroll.bonus-section.component.server";
-import { buildHrBonusPageModel } from "./data/hr.payroll.bonus.page-model.server";
-import { toHrBonusPageModelInput } from "./data/hr.payroll.bonus-search-params.parse.shared";
-import { requireHrBonusRead } from "./policies/hr.payroll.bonus-access.policy.server";
-
-export * from "./actions";
-export * from "./data";
-export * from "./events";
-export * from "./policies";
-export * from "./schemas";
-export * from "./contracts";
-
-export {
-  buildHrBonusPageModel,
-  type HrBonusPageModel,
-  type HrBonusPageModelInput,
-} from "./data/hr.payroll.bonus.page-model.server";
-
-export {
-  requireHrBonusRead,
-  requireHrBonusWrite,
-  requireHrBonusApprove,
-} from "./policies/hr.payroll.bonus-access.policy.server";
-
-export { toHrBonusPageModelInput } from "./data/hr.payroll.bonus-search-params.parse.shared";
-
-export { HrBonusAccessDeniedPanel, HrBonusWorkbenchSection };
-
-export { HrBonusAccessDeniedPanel as HrBonusAccessDenied };
-
-type HrRawSearchParams = Record<string, string | string[] | undefined> | undefined;
-type HrSearchParamsInput = HrRawSearchParams | Promise<HrRawSearchParams>;
-
-export async function renderHrBonusPage(searchParams?: HrSearchParamsInput) {
-  const resolvedSearchParams = searchParams ? await searchParams : undefined;
-
-  try {
-    const guard = await requireHrBonusRead();
-    const pageModel = await buildHrBonusPageModel(
-      toHrBonusPageModelInput({
-        organizationId: guard.organization.id,
-        canWrite: guard.hasCapability("hr.bonus.write"),
-        searchParams: resolvedSearchParams,
-      }),
-    );
-
-    return React.createElement(HrBonusWorkbenchSection, { pageModel });
-  } catch {
-    return React.createElement(HrBonusAccessDeniedPanel);
-  }
-}
+export * from "./hr.payroll.bonus-acceptance-coverage.shared";
+export * from "./hr.payroll.bonus-access.policy.server";
+export * from "./hr.payroll.bonus-accounting.schema";
+export * from "./hr.payroll.bonus-action-result.shared";
+export * from "./hr.payroll.bonus-calculation.shared";
+export * from "./hr.payroll.bonus-constants.shared";
+export * from "./hr.payroll.bonus-form.shared";
+export * from "./hr.payroll.bonus-foundation-form.shared";
+export * from "./hr.payroll.bonus-foundation-lists.surface";
+export * from "./hr.payroll.bonus-foundation.actions.server";
+export * from "./hr.payroll.bonus-foundation.schema";
+export * from "./hr.payroll.bonus-governed-lists.surface";
+export * from "./hr.payroll.bonus-list.shared";
+export * from "./hr.payroll.bonus-lock.shared";
+export * from "./hr.payroll.bonus-mutation.schema";
+export * from "./hr.payroll.bonus-org-scope.shared";
+export * from "./hr.payroll.bonus-reports.shared";
+export * from "./hr.payroll.bonus-route.contract";
+export * from "./hr.payroll.bonus-search-params.parse.shared";
+export * from "./hr.payroll.bonus-section.component.server";
+export * from "./hr.payroll.bonus-sensitive-access.shared";
+export * from "./hr.payroll.bonus-surface-columns.shared";
+export * from "./hr.payroll.bonus-ui.copy.shared";
+export * from "./hr.payroll.bonus-workflow.actions.server";
+export * from "./hr.payroll.bonus-workflow.schema";
+export * from "./hr.payroll.bonus.actions.server";
+export * from "./hr.payroll.bonus.contract";
+export * from "./hr.payroll.bonus.event";
+export * from "./hr.payroll.bonus.mutation.shared.server";
+export * from "./hr.payroll.bonus.mutation.shared.server.data";
+export * from "./hr.payroll.bonus.page-model.server";
+export * from "./hrs-hr-payroll-bonus-events";

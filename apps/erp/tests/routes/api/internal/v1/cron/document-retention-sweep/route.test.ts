@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { ERP_CRON_HTTP_ROUTES } from "@/contracts/erp-http.contract";
+import { ERP_CRON_HTTP_ROUTES } from "@/kitchen-sinks/erp-http.contract";
 
 const cronHistory = vi.hoisted(() => ({
   createCronRunHistory: vi.fn(async () => "cron_run_retention"),

@@ -24,7 +24,7 @@ import {
   hrComplianceWorkAuthorizationDocuments,
   hrComplianceWorkEligibility,
   hrEmployees,
-} from "./schema/hr";
+} from "./hr";
 
 type AlertCandidateDraft = {
   id: string;

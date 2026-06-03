@@ -1,0 +1,341 @@
+import {
+  appCapabilities,
+  isAppCapability,
+  type AppCapability,
+} from "@afenda/auth";
+import { type ModuleId } from "@afenda/config/module-ids";
+import { moduleById } from "./ker-definitions";
+import {
+  ExecutionCapabilityNotFoundError,
+  ExecutionInvalidStateError,
+} from "../errors/execution-errors";
+
+export type ExecutionCapabilityStatus = "active" | "preview" | "deprecated";
+
+export type ExecutionCapability = {
+  key: string;
+  moduleKey: string;
+  label: string;
+  description?: string;
+  route?: `/${string}`;
+  requiredPermission: AppCapability;
+  auditArea: string;
+  status: ExecutionCapabilityStatus;
+};
+
+const routeByCapability: Partial<Record<AppCapability, `/${string}`>> = {
+  "dashboard.view": "/dashboard",
+  "finance.view": "/finance",
+  "sales.view": "/sales",
+  "purchasing.view": "/purchasing",
+  "inventory.view": "/inventory",
+  "hr.view": "/hr",
+  "hr.compliance.read": "/hr/compliance",
+  "hr.compliance.write": "/hr/compliance",
+  "hr.compliance.sensitive.read": "/hr/compliance",
+  "hr.benefits.read": "/hr/benefits",
+  "hr.benefits.write": "/hr/benefits",
+  "hr.benefits.sensitive.read": "/hr/benefits",
+  "hr.bonus.read": "/hr/bonus",
+  "hr.bonus.write": "/hr/bonus",
+  "hr.bonus.sensitive.read": "/hr/bonus",
+  "hr.bonus.finance.read": "/hr/bonus",
+  "hr.bonus.audit.read": "/hr/bonus",
+  "hr.expense.read": "/hr/expenses",
+  "hr.expense.write": "/hr/expenses",
+  "hr.expense.approve": "/hr/expenses",
+  "hr.expense.finance.read": "/hr/expenses",
+  "hr.expense.audit.read": "/hr/expenses",
+  "hr.expense.sensitive.read": "/hr/expenses",
+  "hr.cpm.read": "/hr/compensation-planning",
+  "hr.cpm.write": "/hr/compensation-planning",
+  "hr.cpm.approve": "/hr/compensation-planning",
+  "hr.csf.read": "/hr/competency-skills",
+  "hr.csf.write": "/hr/competency-skills",
+  "hr.performance.read": "/hr/performance-appraisals",
+  "hr.performance.write": "/hr/performance-appraisals",
+  "hr.performance.approve": "/hr/performance-appraisals",
+  "hr.performance.calibrate": "/hr/performance-appraisals",
+  "hr.performance.compensation.read": "/hr/performance-appraisals",
+  "hr.performance.audit.read": "/hr/performance-appraisals",
+  "hr.recruitment.read": "/hr/recruitment-onboarding",
+  "hr.recruitment.write": "/hr/recruitment-onboarding",
+  "hr.recruitment.approve": "/hr/recruitment-onboarding",
+  "hr.recruitment.interview.write": "/hr/recruitment-onboarding",
+  "hr.recruitment.offer.read": "/hr/recruitment-onboarding",
+  "hr.recruitment.offer.write": "/hr/recruitment-onboarding",
+  "hr.recruitment.offer.approve": "/hr/recruitment-onboarding",
+  "hr.recruitment.onboarding.read": "/hr/recruitment-onboarding",
+  "hr.recruitment.onboarding.write": "/hr/recruitment-onboarding",
+  "hr.recruitment.finance.read": "/hr/recruitment-onboarding",
+  "hr.recruitment.it.read": "/hr/recruitment-onboarding",
+  "hr.recruitment.audit.read": "/hr/recruitment-onboarding",
+  "hr.recruitment.sensitive.read": "/hr/recruitment-onboarding",
+  "hr.recruitment.convert": "/hr/recruitment-onboarding",
+  "hr.succession.read": "/hr/succession-planning",
+  "hr.succession.write": "/hr/succession-planning",
+  "hr.succession.approve": "/hr/succession-planning",
+  "hr.succession.audit.read": "/hr/succession-planning",
+  "hr.succession.restricted.read": "/hr/succession-planning",
+  "hr.succession.lifecycle.expose": "/hr/succession-planning",
+  "hr.training.read": "/hr/training-development",
+  "hr.training.write": "/hr/training-development",
+  "hr.training.approve": "/hr/training-development",
+  "hr.training.audit.read": "/hr/training-development",
+  "hr.training.restricted.read": "/hr/training-development",
+  "hr.training.integration.expose": "/hr/training-development",
+  "hr.frm.read": "/hr/field-worker-remote-workforce-management",
+  "hr.frm.write": "/hr/field-worker-remote-workforce-management",
+  "hr.frm.approve": "/hr/field-worker-remote-workforce-management",
+  "hr.frm.audit.read": "/hr/field-worker-remote-workforce-management",
+  "hr.frm.restricted.read": "/hr/field-worker-remote-workforce-management",
+  "hr.frm.integration.expose": "/hr/field-worker-remote-workforce-management",
+  "hr.fhc.read": "/hr/food-handler-certification-health-compliance",
+  "hr.fhc.write": "/hr/food-handler-certification-health-compliance",
+  "hr.fhc.approve": "/hr/food-handler-certification-health-compliance",
+  "hr.fhc.audit.read": "/hr/food-handler-certification-health-compliance",
+  "hr.fhc.restricted.read": "/hr/food-handler-certification-health-compliance",
+  "hr.fhc.integration.expose":
+    "/hr/food-handler-certification-health-compliance",
+  "hr.gpg.read": "/hr/government-classification-pay-grades",
+  "hr.gpg.write": "/hr/government-classification-pay-grades",
+  "hr.gpg.approve": "/hr/government-classification-pay-grades",
+  "hr.gpg.audit.read": "/hr/government-classification-pay-grades",
+  "hr.gpg.restricted.read": "/hr/government-classification-pay-grades",
+  "hr.gpg.integration.expose": "/hr/government-classification-pay-grades",
+  "hr.msc.read": "/hr/manufacturing-safety-training-osha-compliance",
+  "hr.msc.write": "/hr/manufacturing-safety-training-osha-compliance",
+  "hr.msc.approve": "/hr/manufacturing-safety-training-osha-compliance",
+  "hr.msc.audit.read": "/hr/manufacturing-safety-training-osha-compliance",
+  "hr.msc.restricted.read":
+    "/hr/manufacturing-safety-training-osha-compliance",
+  "hr.msc.integration.expose":
+    "/hr/manufacturing-safety-training-osha-compliance",
+  "hr.rws.read": "/hr/retail-seasonal-hourly-workforce-scheduling",
+  "hr.rws.write": "/hr/retail-seasonal-hourly-workforce-scheduling",
+  "hr.rws.approve": "/hr/retail-seasonal-hourly-workforce-scheduling",
+  "hr.rws.audit.read": "/hr/retail-seasonal-hourly-workforce-scheduling",
+  "hr.rws.restricted.read":
+    "/hr/retail-seasonal-hourly-workforce-scheduling",
+  "hr.rws.labor-cost.read":
+    "/hr/retail-seasonal-hourly-workforce-scheduling",
+  "hr.rws.integration.expose":
+    "/hr/retail-seasonal-hourly-workforce-scheduling",
+  "hr.ucb.read": "/hr/union-management",
+  "hr.ucb.write": "/hr/union-management",
+  "hr.ucb.approve": "/hr/union-management",
+  "hr.ucb.audit.read": "/hr/union-management",
+  "hr.ucb.restricted.read": "/hr/union-management",
+  "hr.ucb.grievance.manage": "/hr/union-management",
+  "hr.ucb.legal-reference.read": "/hr/union-management",
+  "hr.ucb.payroll.expose": "/hr/union-management",
+  "hr.ucb.integration.expose": "/hr/union-management",
+  "hr.ucb.report.export": "/hr/union-management",
+  "hr.payroll.read": "/hr/payroll-processing",
+  "hr.payroll.write": "/hr/payroll-processing",
+  "hr.payroll.approve": "/hr/payroll-processing",
+  "hr.payroll.audit.read": "/hr/payroll-processing/audit",
+  "hr.payroll.ess.read": "/hr/payroll-processing",
+  "hr.sbs.read": "/hr/salary-benchmarking",
+  "hr.sbs.write": "/hr/salary-benchmarking",
+  "hr.sbs.approve": "/hr/salary-benchmarking",
+  "hr.documents.read": "/hr/documents",
+  "hr.documents.write": "/hr/documents",
+  "hr.documents.sensitive.read": "/hr/documents",
+  "crm.view": "/crm",
+  "approvals.view": "/system-admin/approvals",
+  "approvals.decide": "/system-admin/approvals",
+  "approvals.documents.sensitive.read": "/system-admin/approvals",
+  "reports.view": "/reports",
+  "reports.documents.sensitive.read": "/reports",
+  "system-admin.view": "/system-admin",
+  "system-admin.identity.read": "/system-admin/identity",
+  "system-admin.identity.write": "/system-admin/identity",
+  "system-admin.users.read": "/system-admin/users",
+  "system-admin.users.manage": "/system-admin/users",
+  "system-admin.memberships.read": "/system-admin/memberships",
+  "system-admin.memberships.manage": "/system-admin/memberships",
+  "system-admin.roles.read": "/system-admin/roles",
+  "system-admin.roles.manage": "/system-admin/roles",
+  "system-admin.permissions.read": "/system-admin/permissions",
+  "system-admin.permissions.manage": "/system-admin/permissions",
+  "system-admin.modules.read": "/system-admin/modules",
+  "system-admin.modules.manage": "/system-admin/modules",
+  "system-admin.capabilities.read": "/system-admin/capabilities",
+  "system-admin.capabilities.manage": "/system-admin/capabilities",
+  "system-admin.data-management.read": "/system-admin/data-management",
+  "system-admin.data-management.manage": "/system-admin/data-management",
+  "system-admin.data-management.run": "/system-admin/data-management",
+  "system-admin.data-management.cancel": "/system-admin/data-management",
+  "system-admin.data-management.export": "/system-admin/data-management",
+  "system-admin.policies.read": "/system-admin/policies",
+  "system-admin.policies.review": "/system-admin/policies",
+  "system-admin.policies.manage": "/system-admin/policies",
+  "system-admin.approvals.read": "/system-admin/approvals",
+  "system-admin.approvals.review": "/system-admin/approvals",
+  "system-admin.approvals.manage": "/system-admin/approvals",
+  "system-admin.settings.read": "/system-admin/organization",
+  "system-admin.settings.write": "/system-admin/organization",
+  "system-admin.audit.read": "/system-admin/audit",
+  "system-admin.audit.review": "/system-admin/audit",
+  "system-admin.audit.export": "/system-admin/audit",
+  "system-admin.security.read": "/system-admin/security",
+  "system-admin.security.manage": "/system-admin/security",
+  "system-admin.organization.read": "/system-admin/organization",
+  "system-admin.organization.manage": "/system-admin/organization",
+  "system-admin.integrations.read": "/system-admin/integrations",
+  "system-admin.integrations.write": "/system-admin/integrations",
+  "system-admin.lynx.read": "/system-admin/lynx",
+  "system-admin.lynx.approve": "/system-admin/lynx",
+  "system-admin.reliability.read": "/system-admin/reliability",
+  "system-admin.billing.read": "/system-admin/billing",
+  "system-admin.billing.manage": "/system-admin/billing",
+  "system-admin.billing.export": "/system-admin/billing",
+  "system-admin.diagnostics.read": "/system-admin/diagnostics",
+
+  "hr.rss.read": "/hr/candidate-selfservice-portal",
+  "hr.rss.write": "/hr/candidate-selfservice-portal",
+  "hr.rss.approve": "/hr/candidate-selfservice-portal",
+  "hr.rss.audit.read": "/hr/candidate-selfservice-portal",
+  "hr.rss.restricted.read": "/hr/candidate-selfservice-portal",
+  "hr.rss.integration.expose": "/hr/candidate-selfservice-portal",
+
+  "hr.ess.read": "/hr/employee-selfservice-portal",
+  "hr.ess.write": "/hr/employee-selfservice-portal",
+  "hr.ess.approve": "/hr/employee-selfservice-portal",
+  "hr.ess.audit.read": "/hr/employee-selfservice-portal",
+  "hr.ess.restricted.read": "/hr/employee-selfservice-portal",
+  "hr.ess.integration.expose": "/hr/employee-selfservice-portal",
+
+  "hr.eng.read": "/hr/employee-engagement-surveys",
+  "hr.eng.write": "/hr/employee-engagement-surveys",
+  "hr.eng.approve": "/hr/employee-engagement-surveys",
+  "hr.eng.audit.read": "/hr/employee-engagement-surveys",
+  "hr.eng.restricted.read": "/hr/employee-engagement-surveys",
+  "hr.eng.integration.expose": "/hr/employee-engagement-surveys",
+};
+
+function titleCase(value: string) {
+  return value
+    .split(/[\s.-]+/g)
+    .filter(Boolean)
+    .map((segment) => segment[0]?.toUpperCase() + segment.slice(1))
+    .join(" ");
+}
+
+function buildCapabilityLabel(key: AppCapability) {
+  const [moduleKey = key, ...segments] = key.split(".");
+  const moduleDefinition = moduleById.get(moduleKey as ModuleId);
+
+  if (segments.length === 1 && segments[0] === "view" && moduleDefinition) {
+    return moduleDefinition.label;
+  }
+
+  return titleCase([moduleKey, ...segments].join(" "));
+}
+
+function buildCapabilityDescription(key: AppCapability) {
+  const [moduleKey = key, ...segments] = key.split(".");
+  const moduleDefinition = moduleById.get(moduleKey as ModuleId);
+
+  if (segments.length === 1 && segments[0] === "view" && moduleDefinition) {
+    return moduleDefinition.description;
+  }
+
+  return `Allows ${segments.join(" ")} access within ${titleCase(moduleKey)}.`;
+}
+
+function buildBuiltinExecutionCapability(
+  requiredPermission: AppCapability,
+): ExecutionCapability {
+  const [moduleKey = requiredPermission] = requiredPermission.split(".");
+
+  return {
+    key: requiredPermission,
+    moduleKey,
+    label: buildCapabilityLabel(requiredPermission),
+    description: buildCapabilityDescription(requiredPermission),
+    route:
+      routeByCapability[requiredPermission] ??
+      moduleById.get(moduleKey as ModuleId)?.href,
+    requiredPermission,
+    auditArea: moduleKey,
+    status: "active",
+  };
+}
+
+const builtinExecutionCapabilities = appCapabilities.map(
+  buildBuiltinExecutionCapability,
+);
+
+const builtinCapabilityMap = new Map<string, ExecutionCapability>(
+  builtinExecutionCapabilities.map((capability) => [
+    capability.key,
+    capability,
+  ]),
+);
+
+const customExecutionCapabilities = new Map<string, ExecutionCapability>();
+
+export function defineExecutionCapability(
+  capability: ExecutionCapability,
+): ExecutionCapability {
+  if (!isAppCapability(capability.requiredPermission)) {
+    throw new ExecutionInvalidStateError(
+      `Unknown permission in execution capability: ${capability.requiredPermission}`,
+    );
+  }
+
+  if (
+    builtinCapabilityMap.has(capability.key) ||
+    customExecutionCapabilities.has(capability.key)
+  ) {
+    throw new ExecutionInvalidStateError(
+      `Duplicate execution capability key: ${capability.key}`,
+    );
+  }
+
+  customExecutionCapabilities.set(capability.key, capability);
+  return capability;
+}
+
+export function defineExecutionCapabilities(
+  capabilities: readonly ExecutionCapability[],
+) {
+  return capabilities.map(defineExecutionCapability);
+}
+
+export function resetExecutionCapabilityRegistryForTest() {
+  customExecutionCapabilities.clear();
+}
+
+export function getExecutionCapability(key: string) {
+  return (
+    customExecutionCapabilities.get(key) ??
+    builtinCapabilityMap.get(key) ??
+    null
+  );
+}
+
+export function requireExecutionCapability(key: string) {
+  const capability = getExecutionCapability(key);
+
+  if (!capability) {
+    throw new ExecutionCapabilityNotFoundError(key);
+  }
+
+  return capability;
+}
+
+export function listExecutionCapabilities() {
+  return [
+    ...builtinExecutionCapabilities,
+    ...customExecutionCapabilities.values(),
+  ];
+}
+
+export function listExecutionCapabilitiesForModule(moduleKey: string) {
+  return listExecutionCapabilities().filter(
+    (capability) => capability.moduleKey === moduleKey,
+  );
+}
