@@ -29,6 +29,19 @@ export const LYNX_ERP_HTTP_ROUTES = {
 export type LynxErpHttpRoute =
   (typeof LYNX_ERP_HTTP_ROUTES)[keyof typeof LYNX_ERP_HTTP_ROUTES];
 
+export const LYNX_WORKSPACE_ROUTES = {
+  console: "/lynx",
+  workflows: "/lynx/workflows",
+  workflowDetail: (sessionId: string) => `/lynx/workflows/${sessionId}`,
+  runs: "/lynx/runs",
+  runDetail: (runId: string) => `/lynx/runs/${runId}`,
+} as const;
+
+export type LynxWorkspaceStaticRoute =
+  | typeof LYNX_WORKSPACE_ROUTES.console
+  | typeof LYNX_WORKSPACE_ROUTES.workflows
+  | typeof LYNX_WORKSPACE_ROUTES.runs;
+
 /**
  * Truth response mandatory section headers.
  * Every truth response must include exactly these four sections in order.

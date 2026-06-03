@@ -14,7 +14,7 @@ import {
 } from "@afenda/ai/server";
 import { createSolutionProviderSpecialistAgent } from "../agents/lynx.solution-provider-specialist.agent.server";
 import { solutionProviderToolMeta } from "../tools/lynx.solution-provider-tool-meta";
-import { getApiAuthContext } from "@afenda/auth/server";
+import { getApiAuthContext } from "../server";
 import {
   completeLynxRun,
   createAiUsageEvent,
@@ -174,7 +174,7 @@ export async function handleLynxOperatorPost(request: Request): Promise<Response
 
   try {
     const auth = await getApiAuthContext();
-    if (auth instanceof NextResponse) return auth;
+    if (auth instanceof Response) return auth;
 
     const { session, organization } = auth;
 

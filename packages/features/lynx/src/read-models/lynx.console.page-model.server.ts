@@ -16,7 +16,10 @@ import type {
   StatCardConfigurationResolvedInput,
 } from "@afenda/governed-surface";
 import type { Tone } from "@afenda/ui";
-import { LYNX_MODULE_ID } from "../contracts/lynx.core.contract";
+import {
+  LYNX_MODULE_ID,
+  LYNX_WORKSPACE_ROUTES,
+} from "../contracts/lynx.core.contract";
 import {
   getLynxNavigationExtensionHeroCopy,
   lynxConsoleMetrics,
@@ -227,7 +230,7 @@ export async function buildLynxConsolePageModel(input: {
             ? item.metadata.moduleId
             : LYNX_MODULE_ID,
         createdAt: formatRunLedgerTimestamp(item.startedAt),
-        href: `/lynx/runs/${item.id}`,
+        href: LYNX_WORKSPACE_ROUTES.runDetail(item.id),
       })),
     }),
     readiness: lynxReadiness

@@ -19,12 +19,12 @@ export default function GlobalError({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className="min-h-full bg-background font-sans text-foreground antialiased">
-        <main className="flex min-h-full items-center justify-center p-6">
+        <main className="surface-page flex items-center justify-center p-surface-lg">
           <div className="max-w-md space-y-3 text-center">
-            <h1 className="text-lg font-semibold">{copy.title}</h1>
-            <p className="text-sm text-muted-foreground">{description}</p>
+            <h1 className="type-card-title">{copy.title}</h1>
+            <p className="type-muted">{description}</p>
             <button
-              className="text-sm font-medium text-primary underline-offset-4 hover:underline"
+              className="type-control text-primary underline-offset-4 hover:underline"
               onClick={reset}
               type="button"
             >

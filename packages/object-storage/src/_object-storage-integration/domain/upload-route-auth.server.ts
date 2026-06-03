@@ -1,12 +1,11 @@
 import "server-only";
 
 import {
-  getActiveOrganization,
-  getSession,
   hasDocumentReadAccess,
   hasDocumentWriteAccess,
-} from "@afenda/auth/server";
+} from "@afenda/auth";
 import { getErpModuleById, uploadRouteCopy, type ModuleId } from "@afenda/kernel";
+import { getOrganizationContext } from "@afenda/kernel/server";
 import { UploadRouteError } from "../domain/upload-route.error.shared";
 
 export async function requireUploadModuleAccess(
@@ -19,18 +18,14 @@ export async function requireUploadModuleAccess(
     throw new UploadRouteError(400, uploadRouteCopy.invalidRequest);
   }
 
-  const session = await getSession();
-
-  if (!session) {
-    throw new UploadRouteError(401, uploadRouteCopy.authenticationRequired);
-  }
-
-  const organization = getActiveOrganization(session);
-
-  if (!organization) {
+  let context;
+  try {
+    context = await getOrganizationContext();
+  } catch {
     throw new UploadRouteError(409, uploadRouteCopy.organizationRequired);
   }
 
+  const { organization, session } = context;
   const { capabilities } = organization;
 
   const hasModuleAccess = capabilities.includes(

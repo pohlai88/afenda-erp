@@ -1,1 +1,4 @@
-export { assertLynxRunFeedbackAccess } from "./lynx.run-feedback-access.policy.server";
+export {
+  assertLynxReadAccess,
+  assertLynxRunFeedbackAccess,
+} from "./lynx.run-feedback-access.policy.server";

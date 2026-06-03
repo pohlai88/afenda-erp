@@ -2,7 +2,20 @@ import { NextResponse } from "next/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("server-only", () => ({}));
-vi.mock("@afenda/kernel/server", () => ({}));
+vi.mock("@afenda/kernel/server", () => ({
+  getApiAuthContext: vi.fn(async () => ({
+    session: {
+      id: "user_1",
+    },
+    organization: {
+      id: "org_1",
+      name: "Afenda",
+      slug: "afenda",
+      role: "owner",
+      capabilities: ["system-admin.view", "dashboard.view"],
+    },
+  })),
+}));
 vi.mock("@afenda/kernel/execution", () => ({
   writeExecutionAuditEvent: vi.fn(async () => undefined),
 }));
@@ -17,21 +30,6 @@ vi.mock("@afenda/ai/server", () => ({
   getAiModelForFeature: vi.fn(() => "openai/gpt-5.4"),
   hasAiGatewayRuntimeCredentials: vi.fn(() => true),
   resolveLanguageModel: vi.fn(() => "model"),
-}));
-
-vi.mock("@afenda/auth/server", () => ({
-  getApiAuthContext: vi.fn(async () => ({
-    session: {
-      id: "user_1",
-    },
-    organization: {
-      id: "org_1",
-      name: "Afenda",
-      slug: "afenda",
-      role: "owner",
-      capabilities: ["system-admin.view", "dashboard.view"],
-    },
-  })),
 }));
 
 vi.mock("@afenda/db", () => ({

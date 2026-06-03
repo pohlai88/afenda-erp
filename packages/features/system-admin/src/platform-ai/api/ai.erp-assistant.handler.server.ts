@@ -1,4 +1,4 @@
-import { getApiAuthContext } from "@afenda/auth/server";
+import { getApiAuthContext } from "../../server";
 import {
   getErpModuleById,
   getModuleWorkspace,
@@ -71,7 +71,7 @@ export async function handleAiErpAssistantPost(
 
   try {
     const auth = await getApiAuthContext();
-    if (auth instanceof NextResponse) return auth;
+    if (auth instanceof Response) return auth;
 
     const { session: activeSession, organization } = auth;
     const isAssistantEnabled = await isAiFeatureEnabledForOrganization({

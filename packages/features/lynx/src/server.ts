@@ -3,6 +3,11 @@ import "@afenda/kernel/server";
 /**
  * Server-only exports for @afenda/feature-lynx.
  */
+export {
+  getApiAuthContext,
+  requireCapability,
+  type ApiAuthContext,
+} from "@afenda/kernel/server";
 export * from "./agents";
 export * from "./api";
 export * from "./catalogs";

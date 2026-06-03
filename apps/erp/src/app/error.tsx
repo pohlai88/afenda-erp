@@ -15,12 +15,12 @@ export default function RootError({
     : copy.description;
 
   return (
-    <main className="flex min-h-[50vh] w-full items-center justify-center p-6">
+    <main className="surface-page flex w-full items-center justify-center p-surface-lg">
       <div className="max-w-md space-y-3 text-center">
-        <h1 className="text-lg font-semibold">{copy.title}</h1>
-        <p className="text-sm text-muted-foreground">{description}</p>
+        <h1 className="type-card-title">{copy.title}</h1>
+        <p className="type-muted">{description}</p>
         <button
-          className="text-sm font-medium text-primary underline-offset-4 hover:underline"
+          className="type-control text-primary underline-offset-4 hover:underline"
           onClick={reset}
           type="button"
         >

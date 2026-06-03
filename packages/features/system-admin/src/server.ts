@@ -4,6 +4,7 @@
 import "@afenda/kernel/server";
 import "./tenant-execution/policies/register-tenant-execution-policies.server";
 
+export { getApiAuthContext, requireCapability } from "@afenda/kernel/server";
 export * from "./approvals/server";
 export * from "./audit-viewer/server";
 export * from "./billing/server";

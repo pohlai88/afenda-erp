@@ -3,5 +3,6 @@ export * from "./errors.catalog";
 export * from "./flows.catalog";
 export * from "./paths.shared";
 export * from "./server-sdk.catalog";
+export * from "./session.contract";
 export * from "./ui.catalog";
 export * from "./ui-flows.catalog";

@@ -1,4 +1,4 @@
-import { getApiAuthContext, requireCapability } from "@afenda/auth/server";
+import { getApiAuthContext, requireCapability } from "../../server";
 import { getErpModuleById } from "@afenda/kernel";
 import { getRequestId, logServerEvent } from "@afenda/observability/server";
 import { generateText, Output } from "ai";
@@ -66,7 +66,7 @@ export async function handleAiExtractDocumentPost(
 
   try {
     const auth = await getApiAuthContext();
-    if (auth instanceof NextResponse) return auth;
+    if (auth instanceof Response) return auth;
 
     const { session, organization } = auth;
     const isExtractionEnabled = await isAiFeatureEnabledForOrganization({

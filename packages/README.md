@@ -1,12 +1,15 @@
-# AI, Lynx, And Knowledge Package Map
+# Machine Layer And Workflow Package Map
 
-This README is the cross-link for Afenda's machine-layer packages. It explains
-where code belongs before agents create new files or merge packages.
+This README is the cross-link for Afenda's machine-layer and workflow
+infrastructure packages. It explains where code belongs before agents create new
+files or merge packages.
 
 Canonical references:
 
 - [ARCH-1005 Machine Layer Doctrine](../docs/architecture/1005-infrastructure.md)
 - [ARCH-1001 System Architecture](../docs/architecture/1001-afenda-platform-doctrine.md)
+- [ARCH-1002 Backend Doctrine](../docs/architecture/1002-backend.md)
+- [ARCH-1004 API Doctrine](../docs/architecture/1004-api.md)
 - [Package scaffolds](./_scaffold/README.md) — feature vs platform templates
 - Vercel AI Gateway docs: https://vercel.com/docs/ai-gateway
 - Vercel AI SDK docs: https://ai-sdk.dev/docs
@@ -31,11 +34,12 @@ such as Lynx and Knowledge.
 
 ## Package Roles
 
-| Package                            | Role                | Owns                                                                                                                     | Must not own                                               |
-| ---------------------------------- | ------------------- | ------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------- |
-| `@afenda/ai`                       | Agent/runtime layer | Specialist agents, governed tools, AI Gateway options, model policy, guardrails, sandbox primitives, AI schemas          | Lynx UI, Knowledge retrieval tables, product routes        |
-| `@afenda/feature-knowledge`        | Retrieval substrate | source adapters, chunking, embeddings, pgvector retrieval, eval data, knowledge settings                                 | Lynx brand, operator prompts, cross-product agent behavior |
-| `@afenda/feature-lynx`             | Product/brand layer | Lynx contracts, Truth Retrieval, Decision Operator, run/workflow/readiness surfaces, composition of Knowledge + AI tools | generic AI gateway primitives, Knowledge storage ownership |
+| Package                     | Role                    | Owns                                                                                                                     | Must not own                                               |
+| --------------------------- | ----------------------- | ------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------- |
+| `@afenda/ai`                | Agent/runtime layer     | Specialist agents, governed tools, AI Gateway options, model policy, guardrails, sandbox primitives, AI schemas          | Lynx UI, Knowledge retrieval tables, product routes        |
+| `@afenda/feature-knowledge` | Retrieval substrate     | source adapters, chunking, embeddings, pgvector retrieval, eval data, knowledge settings                                 | Lynx brand, operator prompts, cross-product agent behavior |
+| `@afenda/feature-lynx`      | Product/brand layer     | Lynx contracts, Truth Retrieval, Decision Operator, run/workflow/readiness surfaces, composition of Knowledge + AI tools | generic AI gateway primitives, Knowledge storage ownership |
+| `@afenda/workflows`         | Workflow infrastructure | cron authorization, scheduled sweep runners, retry/backoff, cron run history, tenant webhook dispatch                    | feature truth, workspace UI, route business logic          |
 
 ## Import Direction
 
@@ -57,6 +61,16 @@ apps/erp
 @afenda/ai
   -> no @afenda/feature-lynx
   -> no @afenda/feature-knowledge
+
+apps/erp
+  -> @afenda/workflows
+  -> @afenda/feature-* server doors
+
+@afenda/workflows
+  -> @afenda/config
+  -> @afenda/db
+  -> @afenda/kernel
+  -> @afenda/observability
 ```
 
 Use package doors:
@@ -100,6 +114,36 @@ agent filename.
 - Mutating tools require `needsApproval`, governed tool metadata, audit records,
   and sandbox/approval flow before domain mutations.
 
+## Workflow Runtime Contract
+
+`@afenda/workflows` is a platform infrastructure package, not a feature package
+and not a generic workflow builder.
+
+It owns:
+
+- `runCronJob`, the common cron route wrapper for authorization, logging, run
+  history, and HTTP success/failure responses.
+- `runWorkflowWithRetry`, the shared retry/backoff runner used by scheduled
+  work and webhook delivery.
+- scheduled sweep facades such as `runReminderSweep`, `runSyncSweep`, and
+  `runHousekeepingSweep`.
+- `dispatchTenantWebhookEvent`, the tenant webhook dispatcher that signs
+  payloads, retries delivery, and records delivery outcomes.
+- workflow automation and recovery playbook metadata re-exports from
+  `@afenda/kernel`.
+
+It must not own:
+
+- feature package domain decisions, command handlers, kernels, or read-models.
+- `apps/erp` route business logic.
+- workspace page data fetching or governed UI composition.
+- tenant identity derivation beyond inputs passed by compliant server callers.
+
+Cron routes in `apps/erp/src/app/api/internal/v1/cron/*/route.ts` stay thin:
+authenticate through the workflow wrapper, pass a job name and operation, and
+dispatch to a package-owned server function. App routes must not move sweep
+logic or DB mutation logic into `route.ts`.
+
 ## Merge And Retirement Rules
 
 Do not merge:
@@ -107,11 +151,16 @@ Do not merge:
 - `@afenda/feature-knowledge` into `@afenda/ai`
 - `@afenda/feature-lynx` into `@afenda/ai`
 - `@afenda/ai` into `@afenda/feature-lynx`
+- `@afenda/workflows` into `@afenda/ai`, `@afenda/feature-lynx`, or
+  `@afenda/feature-knowledge`
 
 Allowed cleanup:
 
 - Lynx product surfaces, console metadata, and `/lynx` routes live in
   `@afenda/feature-lynx`. Legacy `/solution-console` URLs redirect to `/lynx`.
+- Shared scheduled-work execution, cron history, retry/backoff, and webhook
+  dispatch live in `@afenda/workflows`; individual features keep their own
+  domain workflow truth in their feature package.
 
 ## Next Refactor Audit
 
@@ -122,6 +171,9 @@ Current observations:
   implementation in `src/data/`.
 - `@afenda/feature-lynx` now follows the feature template with contracts,
   metadata surfaces, data queries, tools, and workflows in explicit buckets.
+- `@afenda/workflows` is a small infrastructure package with a public facade,
+  retry runner, webhook dispatcher, and tests for retry/webhook behavior.
+
 ### Knowledge
 
 Current shape is mostly correct: it is a server-heavy substrate with chunking,

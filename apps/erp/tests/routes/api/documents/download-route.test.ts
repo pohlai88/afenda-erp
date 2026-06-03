@@ -5,6 +5,11 @@ const downloadHandler = vi.hoisted(() => ({
     status: 302,
     redirect: "https://signed.example/object",
   })),
+  toObjectStorageResponse: vi.fn((result: { status: number; redirect?: string }) =>
+    result.redirect
+      ? Response.redirect(result.redirect, result.status)
+      : Response.json(null, { status: result.status }),
+  ),
 }));
 
 const governanceDeps = vi.hoisted(() => ({

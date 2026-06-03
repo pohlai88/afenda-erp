@@ -1,9 +1,9 @@
-import { requireCapability } from "@afenda/auth/server";
+import { requireCapability } from "../server";
 
 import { buildLynxRunLedgerExportCsv } from "../read-models/lynx.run-ledger-export.read-model.server";
 
 export async function handleLynxRunsExportGet(request: Request): Promise<Response> {
-  const { organization } = await requireCapability("dashboard.view");
+  const { organization } = await requireCapability("system-admin.lynx.read");
   const url = new URL(request.url);
   const csv = await buildLynxRunLedgerExportCsv({
     organizationId: organization.id,

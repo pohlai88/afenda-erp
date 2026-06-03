@@ -6,7 +6,7 @@ import {
   hasAiGatewayRuntimeCredentials,
   resolveLanguageModel,
 } from "@afenda/ai/server";
-import { getApiAuthContext } from "@afenda/auth/server";
+import { getApiAuthContext } from "../server";
 import {
   completeLynxRun,
   createAiUsageEvent,
@@ -96,7 +96,7 @@ export async function handleLynxTruthSearchPost(request: Request): Promise<Respo
 
   try {
     const auth = await getApiAuthContext();
-    if (auth instanceof NextResponse) return auth;
+    if (auth instanceof Response) return auth;
 
     const { session, organization } = auth;
     assertCapabilityAllowed({

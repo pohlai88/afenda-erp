@@ -1,6 +1,6 @@
 import "server-only";
 
-import { getOrganizationContext } from "@afenda/auth/server";
+import { getOrganizationContext } from "@afenda/kernel/server";
 
 import { resolveErpCapabilityForPermission } from "../erp-permission-capability.shared";
 import type { ErpPermissionRequirement } from "../schemas/erp-permission-requirement.schema";

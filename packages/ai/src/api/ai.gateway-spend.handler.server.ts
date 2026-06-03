@@ -1,4 +1,4 @@
-import { getApiAuthContext } from "@afenda/auth/server";
+import { getApiAuthContext } from "@afenda/kernel/server";
 import { getRequestId, logServerEvent } from "@afenda/observability/server";
 import { NextResponse } from "next/server";
 
@@ -15,7 +15,7 @@ import {
 
 export async function handleAiGatewaySpendGet(
   request: Request,
-): Promise<NextResponse> {
+): Promise<Response> {
   const requestId = getRequestId(request) ?? "";
   const route = AI_ERP_HTTP_ROUTES.gatewaySpend;
 
@@ -28,7 +28,7 @@ export async function handleAiGatewaySpendGet(
 
   try {
     const auth = await getApiAuthContext();
-    if (auth instanceof NextResponse) return auth;
+    if (auth instanceof Response) return auth;
 
     const { organization } = auth;
 

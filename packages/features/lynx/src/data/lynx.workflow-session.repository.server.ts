@@ -6,5 +6,6 @@ export {
   getLynxWorkflowSession,
   listLynxWorkflowSessions,
   updateLynxWorkflowSession,
+  type LynxWorkflowSessionFilters,
   type LynxWorkflowSessionSummary,
 } from "@afenda/db";

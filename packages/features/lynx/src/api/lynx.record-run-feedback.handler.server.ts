@@ -1,5 +1,5 @@
 import { isAiPermissionError } from "@afenda/ai/server";
-import { getApiAuthContext } from "@afenda/auth/server";
+import { getApiAuthContext } from "../server";
 import { getRequestId, logServerEvent } from "@afenda/observability/server";
 import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
@@ -9,6 +9,7 @@ import {
   LYNX_AUDIT_ACTIONS,
   LYNX_ERP_HTTP_ROUTES,
   LYNX_MODULE_ID,
+  LYNX_WORKSPACE_ROUTES,
 } from "../contracts/lynx.core.contract";
 import { lynxLiveRunFeedbackRequestSchema } from "../schemas/lynx.run-feedback.schema";
 
@@ -20,7 +21,7 @@ export async function handleLynxRecordRunFeedbackPost(
 
   try {
     const auth = await getApiAuthContext();
-    if (auth instanceof NextResponse) return auth;
+    if (auth instanceof Response) return auth;
 
     const { session, organization } = auth;
     const body = await request.json().catch(() => ({}));
@@ -48,8 +49,8 @@ export async function handleLynxRecordRunFeedbackPost(
       );
     }
 
-    revalidatePath(`/lynx/runs/${parsed.data.runId}`);
-    revalidatePath("/lynx/runs");
+    revalidatePath(LYNX_WORKSPACE_ROUTES.runDetail(parsed.data.runId));
+    revalidatePath(LYNX_WORKSPACE_ROUTES.runs);
 
     logServerEvent(
       "info",

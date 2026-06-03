@@ -1,6 +1,6 @@
 import { assertCapabilityAllowed } from "@afenda/ai/server";
 import { createSolutionProviderTools } from "./lynx.solution-provider-tools.tool.server";
-import type { ApiAuthContext } from "@afenda/auth/server";
+import type { ApiAuthContext } from "../server";
 import { createAiActionSandbox, registerAiApprovalProposal } from "@afenda/db";
 import {
   getErpModuleById,

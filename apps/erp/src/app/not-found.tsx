@@ -8,14 +8,14 @@ export const metadata: Metadata = {
 
 export default function RootNotFound() {
   return (
-    <main className="flex min-h-[50vh] w-full items-center justify-center p-6">
+    <main className="surface-page flex w-full items-center justify-center p-surface-lg">
       <div className="max-w-md space-y-3 text-center">
-        <h1 className="text-lg font-semibold">{authNotFoundCopy.title}</h1>
-        <p className="text-sm text-muted-foreground">
+        <h1 className="type-card-title">{authNotFoundCopy.title}</h1>
+        <p className="type-muted">
           {authNotFoundCopy.description}
         </p>
         <Link
-          className="text-sm font-medium text-primary underline-offset-4 hover:underline"
+          className="type-control text-primary underline-offset-4 hover:underline"
           href="/sign-in"
         >
           {authNotFoundCopy.actionLabel}
