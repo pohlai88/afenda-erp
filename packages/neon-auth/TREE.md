@@ -1,17 +1,19 @@
 # neon-auth directory tree
 
-Phase 3 production layout under `packages/auth/src/neon-auth/`.
+Phase 5 standalone package layout under `packages/neon-auth/`.
 
 ```
-packages/auth/neon-auth/
+packages/neon-auth/
 ├── README.md
 ├── TREE.md
+├── package.json
 ├── tsconfig.json
 ├── vitest.config.ts
-├── server.ts
-├── client.ts
-├── index.ts
-├── runtime/
+├── src/
+│   ├── server.ts
+│   ├── client.ts
+│   ├── index.ts
+│   ├── runtime/
 │   ├── neon-auth.server.ts
 │   ├── neon-auth.client.ts
 │   ├── neon-session.server.ts

@@ -13,7 +13,7 @@ import { jwtVerify } from "jose";
 import {
   resetNeonAuthJwtVerifyCacheForTests,
   verifyNeonAuthAccessToken,
-} from "../../security/jwt-verify.server";
+} from "../../src/security/jwt-verify.server";
 
 describe("neon-auth jwt verify", () => {
   beforeEach(() => {

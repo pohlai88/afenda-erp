@@ -1,13 +1,13 @@
 import { describe, expect, it, vi } from "vitest";
 
 vi.mock("server-only", () => ({}));
-vi.mock("../../runtime/neon-auth.server", () => ({
+vi.mock("../../src/runtime/neon-auth.server", () => ({
   getNeonAuthServer: vi.fn(),
   isNeonAuthReady: vi.fn(),
 }));
 
-import { getNeonAuthServer, isNeonAuthReady } from "../../runtime/neon-auth.server";
-import { readNeonAuthSessionPayload } from "../../runtime/neon-session.server";
+import { getNeonAuthServer, isNeonAuthReady } from "../../src/runtime/neon-auth.server";
+import { readNeonAuthSessionPayload } from "../../src/runtime/neon-session.server";
 
 describe("neon-auth session", () => {
   it("returns null when Neon Auth is not ready", async () => {

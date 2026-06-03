@@ -1,9 +1,0 @@
-{
-  "extends": "../../../config/tsconfig.library.base.json",
-  "compilerOptions": {
-    "rootDir": ".",
-    "noEmit": true
-  },
-  "include": ["./**/*.ts", "./**/*.tsx"],
-  "exclude": []
-}

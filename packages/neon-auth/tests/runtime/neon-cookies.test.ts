@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   hasNeonAuthSessionToken,
   NEON_AUTH_SESSION_TOKEN_COOKIE,
-} from "../../runtime/neon-cookies.shared";
+} from "../../src/runtime/neon-cookies.shared";
 
 describe("neon-auth cookies", () => {
   it("detects the session token cookie by exact name", () => {

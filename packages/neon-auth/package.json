@@ -1,5 +1,5 @@
 {
-  "name": "@afenda/auth",
+  "name": "@afenda/neon-auth",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -19,43 +19,31 @@
       "development": "./src/server.ts",
       "default": "./dist/server.js"
     },
-    "./neon-auth-server": {
-      "types": "./src/neon-auth-server.ts",
-      "development": "./src/neon-auth-server.ts",
-      "default": "./dist/neon-auth-server.js"
-    },
     "./neon-cookies": {
-      "types": "./src/neon-cookies.ts",
-      "development": "./src/neon-cookies.ts",
-      "default": "./dist/neon-cookies.js"
+      "types": "./src/runtime/neon-cookies.shared.ts",
+      "development": "./src/runtime/neon-cookies.shared.ts",
+      "default": "./dist/runtime/neon-cookies.shared.js"
     },
     "./neon-session": {
-      "types": "./src/neon-session.ts",
-      "development": "./src/neon-session.ts",
-      "default": "./dist/neon-session.js"
+      "types": "./src/runtime/neon-session.server.ts",
+      "development": "./src/runtime/neon-session.server.ts",
+      "default": "./dist/runtime/neon-session.server.js"
     },
-    "./auth-flows": {
-      "types": "./src/contracts/auth.flows.ts",
-      "development": "./src/contracts/auth.flows.ts",
-      "default": "./dist/contracts/auth.flows.js"
+    "./paths": {
+      "types": "./src/contracts/paths.shared.ts",
+      "development": "./src/contracts/paths.shared.ts",
+      "default": "./dist/contracts/paths.shared.js"
     }
   },
   "dependencies": {
     "@afenda/config": "workspace:*",
-    "@afenda/db": "workspace:*",
-    "@afenda/kernel": "workspace:*",
-    "@afenda/neon-auth": "workspace:*",
-    "@afenda/observability": "workspace:*",
-    "@afenda/ui": "workspace:*",
     "@neondatabase/auth": "0.4.1-beta",
-    "@neondatabase/serverless": "^1.1.0",
-    "drizzle-orm": "catalog:",
     "jose": "^6.1.2",
+    "server-only": "^0.0.1",
     "zod": "catalog:"
   },
   "peerDependencies": {
-    "next": "catalog:",
-    "react": "catalog:"
+    "next": "catalog:"
   },
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
@@ -64,7 +52,6 @@
     "test": "vitest run"
   },
   "devDependencies": {
-    "server-only": "^0.0.1",
     "vitest": "catalog:"
   },
   "sideEffects": false

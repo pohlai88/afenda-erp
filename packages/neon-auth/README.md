@@ -1,23 +1,22 @@
-# neon-auth
+# @afenda/neon-auth
 
-Canonical Neon Auth module for `@afenda/auth`.
+Canonical Neon Auth module for Afenda.
 
-**Production:** `packages/auth/src/neon-auth/`
+**Production:** `packages/neon-auth/`
 
 ## Status
 
-- Phase 1: directory scaffold (committed)
-- Phase 2: fresh implementation per [Neon Next.js quickstart](https://neon.com/docs/auth/quick-start/nextjs-api-only.md)
-- Phase 2.5: stabilization (typecheck, tests, catalog parity)
-- Phase 3: promoted to `src/neon-auth/`; package exports wired
+- Phase 5: extracted as standalone workspace package `@afenda/neon-auth`
+- `@afenda/auth` re-exports Neon doors for backward compatibility
 
 ## Public doors
 
-| File | Export |
-| ---- | ------ |
-| `server.ts` | `@afenda/auth/server` (future) |
-| `client.ts` | `@afenda/auth/client` (future) |
-| `index.ts` | catalogs |
+| Export | Module |
+| ------ | ------ |
+| `@afenda/neon-auth/server` | SDK runtime, JWT/webhook verify, session helpers |
+| `@afenda/neon-auth/client` | Browser SDK + plugin clients |
+| `@afenda/neon-auth` | Plugin catalogs + webhook contracts |
+| `@afenda/neon-auth/paths` | Shared HTTP paths (webhook route) |
 
 ## Server surface
 

@@ -1,1 +1,1 @@
-export * from "./neon-auth/client";
+export * from "@afenda/neon-auth/client";

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { isNeonEmailResetAvailable } from "../../plugins/recovery/client";
+import { isNeonEmailResetAvailable } from "../../src/plugins/recovery/client";
 
 describe("neon-auth recovery client", () => {
   it("exports recovery helpers", () => {

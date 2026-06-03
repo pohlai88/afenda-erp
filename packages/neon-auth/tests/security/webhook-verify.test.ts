@@ -6,8 +6,8 @@ vi.mock("@afenda/config/env", () => ({
 }));
 
 import { getNeonAuthEnv } from "@afenda/config/env";
-import { getNeonAuthJwkByKid, resetNeonAuthJwksCacheForTests } from "../../security/jwks.shared.server";
-import { verifyNeonAuthWebhookPayload } from "../../security/webhook-verify.server";
+import { getNeonAuthJwkByKid, resetNeonAuthJwksCacheForTests } from "../../src/security/jwks.shared.server";
+import { verifyNeonAuthWebhookPayload } from "../../src/security/webhook-verify.server";
 
 describe("neon-auth webhook verify", () => {
   beforeEach(() => {

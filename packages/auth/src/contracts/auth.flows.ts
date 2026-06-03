@@ -1,7 +1,7 @@
 import {
   neonAuthHttpProxyPath,
   neonAuthWebhookHttpPath,
-} from "../neon-auth/contracts/paths.shared";
+} from "@afenda/neon-auth/paths";
 
 /**
  * Neon Auth capability catalog for Afenda ERP.

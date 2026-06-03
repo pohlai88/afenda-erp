@@ -46,8 +46,8 @@ import {
 import {
   getNeonAuthServer,
   isNeonAuthReady,
-} from "../neon-auth/runtime/neon-auth.server";
-import { readNeonAuthSessionPayload } from "../neon-auth/runtime/neon-session.server";
+} from "@afenda/neon-auth/server";
+import { readNeonAuthSessionPayload } from "@afenda/neon-auth/server";
 import {
   parseDevSessionCookie,
   serializeDevSessionCookie,

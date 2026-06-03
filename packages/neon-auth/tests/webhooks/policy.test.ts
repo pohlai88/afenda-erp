@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   parseBlockedSignupEmailDomains,
   resolveUserBeforeCreateResponse,
-} from "../../webhooks/policy.server";
+} from "../../src/webhooks/policy.server";
 
 describe("neon-auth webhooks policy", () => {
   it("allows signups when domain is not blocked", () => {

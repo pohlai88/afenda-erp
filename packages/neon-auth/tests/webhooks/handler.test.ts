@@ -5,17 +5,17 @@ vi.mock("@afenda/config/env", () => ({
   getNeonAuthEnv: vi.fn(() => ({ NEON_AUTH_WEBHOOK_BLOCKED_EMAIL_DOMAINS: "blocked.test" })),
   isNeonAuthEnabled: vi.fn(() => true),
 }));
-vi.mock("../../security/webhook-verify.server", () => ({
+vi.mock("../../src/security/webhook-verify.server", () => ({
   verifyNeonAuthWebhookPayload: vi.fn(),
 }));
 
 import { isNeonAuthEnabled } from "@afenda/config/env";
-import { verifyNeonAuthWebhookPayload } from "../../security/webhook-verify.server";
-import { handleNeonAuthWebhookPost } from "../../webhooks/handler.server";
+import { verifyNeonAuthWebhookPayload } from "../../src/security/webhook-verify.server";
+import { handleNeonAuthWebhookPost } from "../../src/webhooks/handler.server";
 import {
   registerNeonAuthWebhookHooks,
   resetNeonAuthWebhookHooksForTests,
-} from "../../webhooks/hooks.server";
+} from "../../src/webhooks/hooks.server";
 
 describe("neon-auth webhook handler", () => {
   beforeEach(() => {

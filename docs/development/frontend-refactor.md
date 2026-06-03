@@ -84,7 +84,7 @@ apps/erp/src/
 | `app/**/page.tsx` | Thin delegate to `routes/**` or `@/auth/pages/*` | Domain logic, Drizzle, large JSX |
 | `routes/**` | RSC composers: `Promise.all`, Suspense, governed sections | Raw SQL, business rules, `@afenda/db` |
 | `apps/erp/src/auth/` | ERP auth ingress, forms, dev panel, webhook bridge | Business rules, tenant provisioning |
-| `packages/auth/neon-auth/` | Neon Auth SDK module (staging → `src/neon-auth/`) | ERP UI, tenant session |
+| `packages/neon-auth/` | Neon Auth SDK module (`@afenda/neon-auth`) | ERP UI, tenant session |
 | `section-adapters/**` | Thin section ID → feature server entry | Cross-module workflows, domain rules |
 | `app/**` (non-route) | Next.js convention files only | Auth forms, shell panels, upload UI |
 | `lib/` | Shrink toward zero — shared transport helpers only | Module logic, section registries, fat adapters |
@@ -113,7 +113,7 @@ Catalog source of truth: `packages/auth/src/contracts/auth.flows.ts` (`@afenda/a
 
 **UI gate:** `isNeonAuthUiReady()` = server `AFENDA_NEON_AUTH_ENABLED` + `NEXT_PUBLIC_AFENDA_NEON_AUTH_ENABLED` (unset public flag follows server).
 
-**`packages/auth` exports:** `.`, `./client`, `./server`, `./neon-auth-server`, `./neon-session`, `./neon-cookies`, `./auth-flows` → `src/neon-auth/*` + session doors. ERP auth UI: `@/auth/*` in `apps/erp`.
+**`packages/auth` exports:** `.`, `./client`, `./server`, `./neon-auth-server`, `./neon-session`, `./neon-cookies`, `./auth-flows` — session + shim re-exports of `@afenda/neon-auth`. ERP auth UI: `@/auth/*` in `apps/erp`.
 
 ## Key patterns
 
