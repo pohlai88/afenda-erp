@@ -14,7 +14,7 @@ import {
   resolveHrEmployeeIdsForAuthUser,
 } from "@afenda/db";
 
-import { resolveHrLeaveApproverContext } from "../../src/time-attendance/leave-attendance-management/data/hr.time.leave-approver-context.shared.server";
+import { resolveHrLeaveApproverContext } from "../../src/time-attendance/leave-attendance-management/hr.time.leave-approver-context.shared.server";
 
 describe("LAM manager approver identity", () => {
   it("derives HR approve flag from write and manager ids from auth email linkage", async () => {

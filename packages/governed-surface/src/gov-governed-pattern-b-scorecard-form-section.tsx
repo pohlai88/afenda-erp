@@ -2,11 +2,8 @@ import "server-only";
 
 import type { ReactNode } from "react";
 
-import { GovernedComponentRenderer } from "./index";
-import { logUnexpectedServerError } from "./governed-logging.server";
-import { getGovernedSurfaceTranslations } from "../i18n/governed-surface-copy";
+import { GovernedComponentRenderer } from "./gov-render-governed-component";
 
-import type { EmptyState } from "./gov-list-surface-schema";
 import {
   parseGovernedScorecardFormConfiguration,
   type GovernedScorecardFormConfigurationInput,
@@ -16,10 +13,11 @@ import {
   type GovernedPatternSectionDensity,
   type GovernedPatternSectionLayout,
   type RenderGovernedPatternSectionShellInput,
-} from "./governed-pattern-section-shell.shared";
-import type { GovernedSurfaceSectionCardBody } from "./governed-surface-section-card";
-
-type GovernedPatternEmptyState = EmptyState & { emptyId?: string };
+} from "./gov-governed-pattern-section-shell-shared";
+import {
+  resolveMetadataSectionBody,
+  type GovernedPatternEmptyState,
+} from "./resolve-metadata-section-body.server";
 
 export type GovernedPatternBScorecardFormSectionLayout =
   GovernedPatternSectionLayout;
@@ -63,7 +61,6 @@ export async function GovernedPatternBScorecardFormSection({
   cardClassName,
   contentClassName,
 }: GovernedPatternBScorecardFormSectionProps) {
-  const t = await getGovernedSurfaceTranslations("Erp");
   const resolvedSectionKey = sectionKey ?? `${surfaceKey}-scorecard-form`;
   const resolvedComponentKey = componentKey ?? resolvedSectionKey;
 
@@ -82,69 +79,40 @@ export async function GovernedPatternBScorecardFormSection({
     contentClassName,
   } satisfies Omit<RenderGovernedPatternSectionShellInput, "body">;
 
-  let body: GovernedSurfaceSectionCardBody;
-
-  if (loadError) {
-    body = {
-      state: "invalid",
-      model: {
-        ...loadError,
-        emptyId: loadError.emptyId ?? "scorecard-form-section-load-error",
-      },
-    };
-  } else if (!parentAccessAllowed) {
-    body = {
-      state: "forbidden",
-      model: {
-        variant: "forbidden",
-        title: forbidden?.title ?? t("GovernedSurface.forbiddenTitle"),
-        description:
-          forbidden?.description ?? t("GovernedSurface.forbiddenDescription"),
-        emptyId: forbidden?.emptyId ?? "scorecard-form-section-forbidden",
-      },
-    };
-  } else {
-    const parsed = parseGovernedScorecardFormConfiguration(formConfiguration);
-
-    if (!parsed.success) {
-      logUnexpectedServerError(
-        "GovernedPatternBScorecardFormSection invalid form configuration",
-        parsed.error,
-        {
-          surfaceKey,
-          sectionKey: resolvedSectionKey,
-          componentKey: resolvedComponentKey,
-        },
-      );
-
-      body = {
-        state: "invalid",
-        model: {
-          variant: "error",
-          title: invalid?.title ?? t("GovernedSurface.invalidConfigTitle"),
-          description:
-            invalid?.description ?? t("GovernedSurface.invalidConfigDescription"),
-          emptyId: invalid?.emptyId ?? "scorecard-form-section-invalid-config",
-        },
-      };
-    } else {
-      body = {
-        state: "ready",
-        children: (
-          <GovernedComponentRenderer
-            surfaceKey={surfaceKey}
-            sectionKey={resolvedSectionKey}
-            componentKey={resolvedComponentKey}
-            component={{
-              type: "governed:scorecard-form",
-              serverType: "governed:scorecard-form",
-              configuration: parsed.data,
-            }}
-          />
-        ),
-      };
-    }
-  }
+  const body = await resolveMetadataSectionBody({
+    loadError,
+    parentAccessAllowed,
+    parse: () => parseGovernedScorecardFormConfiguration(formConfiguration),
+    parseErrorLabel:
+      "GovernedPatternBScorecardFormSection invalid form configuration",
+    parseContext: {
+      surfaceKey,
+      sectionKey: resolvedSectionKey,
+      componentKey: resolvedComponentKey,
+    },
+    emptyStateIds: {
+      loadError: "scorecard-form-section-load-error",
+      invalid: "scorecard-form-section-invalid-config",
+      forbidden: "scorecard-form-section-forbidden",
+    },
+    invalid,
+    forbidden,
+    buildReadyBody: (config) => ({
+      state: "ready",
+      children: (
+        <GovernedComponentRenderer
+          surfaceKey={surfaceKey}
+          sectionKey={resolvedSectionKey}
+          componentKey={resolvedComponentKey}
+          component={{
+            type: "governed:scorecard-form",
+            serverType: "governed:scorecard-form",
+            configuration: config,
+          }}
+        />
+      ),
+    }),
+  });
 
   return renderGovernedPatternSectionShell({
     ...shellInput,

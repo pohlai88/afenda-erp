@@ -21,9 +21,9 @@ import type {
 import {
   SYSTEM_ADMIN_IMPORT_FILENAME_MAX_LENGTH,
   SYSTEM_ADMIN_IMPORT_SOURCE_LABEL_MAX_LENGTH,
-} from "../contracts/system-admin.data-management.limits.shared";
-import type { SystemAdminActionResult } from "../../tenant-execution/contracts/system-admin.action-result.contract";
-import { systemAdminDataManagementUiCopy } from "../surface/system-admin.data-management-ui.copy.shared";
+} from "./sys-data-management.limits.shared";
+import type { SystemAdminActionResult } from "../tenant-execution/sys-action-result.contract";
+import { systemAdminDataManagementUiCopy } from "./sys-data-management-ui.copy.shared";
 
 type CreateImportJobFormAction = (
   state: SystemAdminActionResult<CreateSystemAdminImportJobActionData> | undefined,

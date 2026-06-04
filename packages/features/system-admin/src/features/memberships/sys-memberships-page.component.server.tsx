@@ -2,14 +2,14 @@ import { hasExecutionPermission } from "@afenda/kernel/execution";
 import { Alert, AlertDescription, AlertTitle } from "@afenda/ui/alert";
 import { SectionPanel } from "@afenda/ui";
 import Link from "next/link";
-import { systemAdminRoutePaths } from "../../overview/contracts/system-admin.route-paths.contract";
-import { buildSystemAdminMembershipsPageModel } from "../data";
+import { systemAdminRoutePaths } from "../overview/sys-route-paths.contract";
+import { buildSystemAdminMembershipsPageModel } from "./sys-memberships.page-model.server";
 import { requireSystemAdminMembershipsRead } from "./sys-memberships.policy.server";
-import { systemAdminMembershipsUiCopy } from "../surface/system-admin.memberships-ui.copy.shared";
+import { systemAdminMembershipsUiCopy } from "./sys-memberships-ui.copy.shared";
 import {
   SystemAdminMembershipsAccessDenied,
   SystemAdminMembershipsSection,
-} from "./system-admin.memberships-section.component.server";
+} from "./sys-memberships-section.component.server";
 
 const SYSTEM_ADMIN_MEMBERSHIPS_WINDOW_LIMIT = 100;
 

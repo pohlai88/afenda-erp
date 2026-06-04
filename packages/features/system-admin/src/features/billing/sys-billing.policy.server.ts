@@ -1,6 +1,6 @@
-import { requireSystemAdminCapability } from "../../overview/policies/system-admin.capability.policy.server";
+import { requireSystemAdminCapability } from "../overview/sys-capability.policy.server";
 
-export { requireSystemAdminBillingRead } from "../../overview/policies/system-admin.capability.policy.server";
+export { requireSystemAdminBillingRead } from "../overview/sys-capability.policy.server";
 
 export function requireSystemAdminBillingManage() {
   return requireSystemAdminCapability("system-admin.billing.manage");

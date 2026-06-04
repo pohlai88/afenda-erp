@@ -10,7 +10,7 @@ import {
   hrDocumentsExpiringSurfaceKey,
   hrDocumentsAuditTrailSurfaceKey,
 } from "../../src/metadata";
-import { parseHrDocumentsSearchParams } from "../../src/employee-management/documents-management/data/hr.workforce.documents-search-params.parse.shared";
+import { parseHrDocumentsSearchParams } from "../../src/employee-management/documents-management/hr.workforce.documents-search-params.parse.shared";
 
 describe("hr documents workbench metadata", () => {
   it("marks missing, expiring, and audit trail as read-only Pattern C surfaces", () => {

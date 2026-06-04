@@ -1,4 +1,4 @@
-import type { hrBenefitEnrollments } from "./hr-benefits";
+import type { hrBenefitEnrollments } from "./dbx-hr-benefits";
 
 export const HR_BENEFIT_COVERAGE_LEVELS = [
   "employee_only",
@@ -183,3 +183,4 @@ export function resolveEnrollmentContributionRows(input: {
 
 export type HrBenefitEnrollmentCoverageLevel =
   (typeof hrBenefitEnrollments.$inferSelect)["coverageLevel"];
+

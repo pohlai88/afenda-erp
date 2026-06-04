@@ -4,5 +4,7 @@
  */
 export * from "./metadata";
 export * from "./client";
-export * from "./contracts";
-export * from "./schemas";
+export * from "./sys-module-category.contract";
+export * from "./sys-module-dependencies.contract";
+export * from "./sys-modules.contract";
+export * from "./sys-module-settings.schema";

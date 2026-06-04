@@ -32,8 +32,8 @@ import {
   buildGovernedListToolbarParamHref,
   governedListToolbarOwnedParams,
   governedListToolbarResetParams,
-} from "./client";
-import { ActionFormErrors } from "../../components/action-form-errors";
+} from "./list-surface-toolbar-url.shared";
+import { ActionFormErrors } from "./gov-action-form-errors";
 import {
   actionFailure,
   type ActionResult,

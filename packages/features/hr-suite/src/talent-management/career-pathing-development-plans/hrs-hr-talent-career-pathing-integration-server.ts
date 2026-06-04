@@ -11,7 +11,7 @@ import type {
   HrCareerSuccessionReadinessRef,
 } from "./hr.talent.career-pathing-integration.contract";
 import { hrTalentCareerPathingAuditActions } from "./hr.talent.career-pathing.event";
-import { emitHrCareerPathingAuditEvent } from "./hr.talent.career-pathing-audit.server";
+import { emitHrCareerPathingAuditEvent } from "./hrs-hr-talent-career-pathing-audit-server";
 
 /** HRM-CAR-026 — expose development plan refs to Performance Appraisals. */
 export async function listCareerPathDevelopmentPlanRefsForAppraisal(

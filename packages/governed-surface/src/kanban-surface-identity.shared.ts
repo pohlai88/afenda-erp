@@ -1,12 +1,12 @@
 import {
   diagnosticsDataAttributes,
   type GovernedDiagnosticsDataAttributes,
-} from "./utils/governed-diagnostics.shared";
+} from "./gov-governed-diagnostics-shared";
 import {
   governedIdentityAttributes,
   governedTestId,
   type GovernedIdentityAttributes,
-} from "./utils/governed-identity.shared";
+} from "./gov-governed-identity-shared";
 
 export type GovernedKanbanBoardRenderState = "empty" | "ready" | "invalid";
 

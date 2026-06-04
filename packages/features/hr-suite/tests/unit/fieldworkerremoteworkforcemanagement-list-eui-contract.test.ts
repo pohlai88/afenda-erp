@@ -1,18 +1,18 @@
 import { parseListSurfaceRendererConfiguration } from "@afenda/governed-surface/schemas";
 import { describe, expect, it } from "vitest";
 
-import { hrIndustryFrmReadPermission } from "../../src/industry-specific/field-worker-remote-workforce-management/contracts/hr.industry.frm.contract";
-import { buildHrIndustryFrmPageModel } from "../../src/industry-specific/field-worker-remote-workforce-management/data/hr.industry.frm.page-model.server";
+import { hrIndustryFrmReadPermission } from "../../src/industry-specific/field-worker-remote-workforce-management/hr.industry.frm.contract";
+import { buildHrIndustryFrmPageModel } from "../../src/industry-specific/field-worker-remote-workforce-management/hr.industry.frm.page-model.server";
 import {
   listHrIndustryFrmAttendanceOutcomeRefs,
   resetHrIndustryFrmStore,
-} from "../../src/industry-specific/field-worker-remote-workforce-management/data/hr.industry.frm-store.shared";
-import { buildHrIndustryFrmListSurface } from "../../src/industry-specific/field-worker-remote-workforce-management/surface/hr.industry.frm-lists.surface";
+} from "../../src/industry-specific/field-worker-remote-workforce-management/hr.industry.frm-store.shared";
+import { buildHrIndustryFrmListSurface } from "../../src/industry-specific/field-worker-remote-workforce-management/hr.industry.frm-lists.surface";
 import {
   HR_INDUSTRY_FRM_LIST_SURFACE_KEYS,
   hrIndustryFrmAssignmentsSurfaceKey,
   hrIndustryFrmPayrollExportsSurfaceKey,
-} from "../../src/industry-specific/field-worker-remote-workforce-management/surface/hr.industry.frm-surface-metadata.shared";
+} from "../../src/industry-specific/field-worker-remote-workforce-management/hr.industry.frm-surface-metadata.shared";
 
 describe("field worker remote workforce list EUI contract", () => {
   it("builds governed server-window list configuration", () => {

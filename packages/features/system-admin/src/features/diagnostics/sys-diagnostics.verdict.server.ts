@@ -4,8 +4,8 @@ import type {
   SystemAdminDiagnosticIssue,
   SystemAdminDiagnosticsSummary,
   DiagnosticSeverity,
-} from "../contracts/system-admin.diagnostic-issue.contract";
-import type { SystemAdminDiagnosticsModuleCoverageRow } from "../contracts/system-admin.diagnostics-coverage.contract";
+} from "./sys-diagnostic-issue.contract";
+import type { SystemAdminDiagnosticsModuleCoverageRow } from "./sys-diagnostics-coverage.contract";
 
 const severityRank: Record<DiagnosticSeverity, number> = {
   blocked: 0,

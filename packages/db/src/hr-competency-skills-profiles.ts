@@ -12,7 +12,7 @@ import {
   hrCsfEmployeeSkillProfiles,
   hrCsfProficiencyLevels,
   hrCsfSkills,
-} from "./hr-competency-skills";
+} from "./dbx-hr-competency-skills";
 
 async function assertHrEmployeeExistsInTx(
   db: AfendaTransaction,
@@ -824,3 +824,4 @@ export async function listHrCsfAssessmentEvidence(input: {
       .orderBy(desc(hrCsfAssessmentEvidence.evidenceDate)),
   );
 }
+

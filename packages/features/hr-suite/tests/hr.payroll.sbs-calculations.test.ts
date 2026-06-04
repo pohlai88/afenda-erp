@@ -14,7 +14,7 @@ import {
   marketRatio,
   payEquityAnalysis,
   resolveBenchmarkReferenceAmount,
-} from "./hr.payroll.sbs-calculations.shared";
+} from "../src/payroll-compensation/salary-benchmarking-survey/hr.payroll.sbs-calculations.shared";
 
 const benchmark = {
   currencyCode: "USD",

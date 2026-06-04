@@ -8,7 +8,7 @@ import {
   hrPayrollPayments,
   hrPayrollRunLines,
   hrPayrollRuns,
-} from "./hr-payroll-processing";
+} from "./dbx-hr-payroll-processing";
 
 function buildBankPaymentCsv(
   lines: Array<{
@@ -298,3 +298,4 @@ export async function listHrPayrollPaymentsWindow(
     hasNextPage: false,
   };
 }
+

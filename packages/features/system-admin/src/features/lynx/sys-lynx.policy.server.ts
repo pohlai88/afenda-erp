@@ -1,4 +1,4 @@
-import { requireSystemAdminCapability } from "../../overview/policies/system-admin.capability.policy.server";
+import { requireSystemAdminCapability } from "../overview/sys-capability.policy.server";
 
 export function requireSystemAdminLynxRead() {
   return requireSystemAdminCapability("system-admin.lynx.read");

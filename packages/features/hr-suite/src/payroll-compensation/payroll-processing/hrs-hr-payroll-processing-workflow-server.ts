@@ -10,7 +10,7 @@ import {
 } from "@afenda/db";
 
 import { hrPayrollProcessingAuditActions } from "./hr.payroll.processing.event";
-import { writePayrollProcessingAuditEvent } from "./hr.payroll.processing-audit.server";
+import { writePayrollProcessingAuditEvent } from "./hrs-hr-payroll-processing-audit-server";
 import { PAYROLL_WORKFLOW_TRANSITIONS } from "./hr.payroll.processing-workflow.shared";
 
 export { PAYROLL_WORKFLOW_TRANSITIONS };

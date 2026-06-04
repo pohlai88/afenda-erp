@@ -1,4 +1,4 @@
-import type { SystemAdminCapabilityAvailability } from "../contracts";
+import type { SystemAdminCapabilityAvailability } from "./sys-capabilities.contract";
 
 export const systemAdminCapabilityWebhookEvents = [
   "system-admin.capability-settings.updated",

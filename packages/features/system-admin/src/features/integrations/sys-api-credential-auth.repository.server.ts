@@ -5,7 +5,7 @@ import {
 import {
   isSystemAdminApiScope,
   type SystemAdminApiScope,
-} from "../contracts/system-admin.integrations-catalog.contract";
+} from "./sys-integrations-catalog.contract";
 
 function parseBearerToken(authorizationHeader: string | null | undefined) {
   if (!authorizationHeader) {

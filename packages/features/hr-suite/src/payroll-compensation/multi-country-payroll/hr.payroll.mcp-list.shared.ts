@@ -3,7 +3,7 @@ import type { ListSurfaceRendererConfigurationInput } from "@afenda/governed-sur
 import {
   buildHrSuiteListSearchToolbar,
   buildHrSuiteOperationalListSurface,
-} from "../../employee-management/compliance-regulatory-tracking/metadata";
+} from "../../hr-suite-integration/metadata";
 import { hrPayrollMcpReadPermission } from "./hr.payroll.mcp.contract";
 
 export type McpListWindow = {

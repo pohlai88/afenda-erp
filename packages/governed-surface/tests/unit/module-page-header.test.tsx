@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
 
-import { ModulePageHeader } from "../../src/components/module-page-header";
+import { ModulePageHeader } from "../../src/gov-module-page-header";
 
 describe("ModulePageHeader", () => {
   it("omits eyebrow when not provided", () => {

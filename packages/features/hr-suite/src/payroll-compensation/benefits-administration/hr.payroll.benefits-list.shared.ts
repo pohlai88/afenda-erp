@@ -4,7 +4,7 @@ import {
   buildHrSuiteListSearchToolbar,
   buildHrSuiteOperationalListSurface,
   resolveHrSuiteListTrailingAction,
-} from "../../employee-management/compliance-regulatory-tracking/metadata";
+} from "../../hr-suite-integration/metadata";
 import { hrPayrollBenefitsReadPermission } from "./hr.payroll.benefits.contract";
 
 export type BenefitsListWindow = {

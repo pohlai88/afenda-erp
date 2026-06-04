@@ -35,7 +35,7 @@ import {
   hrCompensationScenarios,
   type HrCompensationApprovalRules,
   type HrCompensationEligibilityRuleConfig,
-} from "./hr-compensation-planning";
+} from "./dbx-hr-compensation-planning";
 import { hrEmployees } from "./hr";
 
 export {
@@ -1799,3 +1799,4 @@ export async function getHrCompensationSalaryBandContext(input: {
     };
   });
 }
+

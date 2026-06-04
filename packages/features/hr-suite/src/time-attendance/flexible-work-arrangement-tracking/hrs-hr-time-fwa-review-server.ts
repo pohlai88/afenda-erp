@@ -6,8 +6,8 @@ import {
   type HrFwaArrangementRow,
 } from "@afenda/db";
 
-import { emitHrFwaAuditTrailEvent } from "./hr.time.fwa-audit-trail.server";
-import { syncHrFwaLifecycleNotifications } from "./hr.time.fwa-notifications.server";
+import { emitHrFwaAuditTrailEvent } from "./hrs-hr-time-fwa-audit-trail-server";
+import { syncHrFwaLifecycleNotifications } from "./hrs-hr-time-fwa-notifications-server";
 
 export type HrFwaLifecycleDueItem = Awaited<
   ReturnType<typeof listHrFwaArrangementsDueForLifecycleAction>

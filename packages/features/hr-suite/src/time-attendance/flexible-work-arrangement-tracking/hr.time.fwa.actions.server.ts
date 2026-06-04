@@ -14,14 +14,14 @@ import {
   renewHrFwaApprovedArrangement,
   suspendHrFwaApprovedArrangement,
   terminateHrFwaApprovedArrangement,
-} from "./hr.time.fwa-approval.server";
-import { createHrFwaArrangementSchedulePattern } from "./hr.time.fwa-schedule.server";
-import { upsertHrFwaApprovedRemoteLocation } from "./hr.time.fwa-location.server";
+} from "./hrs-hr-time-fwa-approval-server";
+import { createHrFwaArrangementSchedulePattern } from "./hrs-hr-time-fwa-schedule-server";
+import { upsertHrFwaApprovedRemoteLocation } from "./hrs-hr-time-fwa-location-server";
 import {
   previewHrTimeFwaRequestEligibility,
   submitHrTimeFwaRequest,
-} from "./hr.time.fwa-request.server";
-import { hrTimeFwaAuditActions } from "../events/hr.time.fwa-workflow.events";
+} from "./hrs-hr-time-fwa-request-server";
+import { hrTimeFwaAuditActions } from "./hrs-hr-time-fwa-workflow-events";
 import { resolveHrFwaApproverContext } from "./hr.time.fwa-approver-context.shared.server";
 import {
   assertHrTimeFwaCanInitiateForEmployee,

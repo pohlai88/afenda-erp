@@ -5,7 +5,7 @@ import {
   getOrganizationObjectStorageProvider,
   getTenantDocument,
 } from "@afenda/db";
-import { isAppCapability, type AppCapability } from "@afenda/auth";
+import { isAppCapability, type AppCapability } from "@afenda/kernel";
 import type { ModuleId } from "@afenda/kernel";
 import {
   hasExecutionPermission,

@@ -1,7 +1,7 @@
 import { summarizeTenantOrganizationMetrics } from "@afenda/db";
-import type { WorkflowAutomationDefinition } from "./module-types";
-import type { ModuleDataMode } from "./workspace-data-mode";
-import { getWorkflowAutomationDefinitions } from "../modules/workflow-metadata";
+import type { WorkflowAutomationDefinition } from "./ker-module-types";
+import type { ModuleDataMode } from "./ker-workspace-data-mode";
+import { getWorkflowAutomationDefinitions } from "./ker-workflow-metadata";
 
 function resolveAutomationStatus(input: {
   definition: WorkflowAutomationDefinition;

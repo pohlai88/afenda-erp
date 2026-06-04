@@ -3,8 +3,8 @@ import { describe, expect, it } from "vitest";
 import {
   deriveEffectiveLaborLawRequirementStatus,
   worstComplianceRequirementStatus,
-} from "../../src/employee-management/compliance-regulatory-tracking/data/hr.workforce.compliance-status.shared";
-import { resolveLaborLawRequirementListBadgeTone } from "../../src/employee-management/compliance-regulatory-tracking/surface/hr.workforce.compliance-list.shared";
+} from "../../src/employee-management/compliance-regulatory-tracking/hr.workforce.compliance-status.shared";
+import { resolveLaborLawRequirementListBadgeTone } from "../../src/employee-management/compliance-regulatory-tracking/hr.workforce.compliance-list.shared";
 
 describe("HRM-CMP-002 labor law requirement status", () => {
   const now = new Date("2026-06-01T12:00:00.000Z");

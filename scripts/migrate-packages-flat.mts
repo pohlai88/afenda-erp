@@ -9,12 +9,10 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import {
   FEATURES_CONTAINER,
-  HR_SUITE_FLAT_FEATURE_ROOTS,
   HR_TIERED_FLAT_FILE,
   LEGACY_BUCKET_DIRS,
   type PackageScanTarget,
   flatFilePatternForCode,
-  isPublicDoor,
   listPackageScanTargets,
   packageSrcCode,
   readTieredLayoutConfig,

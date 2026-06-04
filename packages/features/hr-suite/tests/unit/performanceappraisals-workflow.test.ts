@@ -15,7 +15,7 @@ import {
   resolvePerformanceApprovalWorkflow,
   submitManagerEvaluation,
   submitSelfAssessment,
-} from "../../src/talent-management/performance-appraisals/data/hr.talent.performance-store.shared";
+} from "../../src/talent-management/performance-appraisals/hr.talent.performance-store.shared";
 
 const cycle = createHrPerformanceCycle({
   id: "cycle-1",

@@ -7,7 +7,7 @@ import type {
   TenantPolicyRuleRecord,
 } from "@afenda/kernel/execution-tenant-policy";
 import { cache } from "react";
-import { mapTenantApprovalSettingToKernelRecord } from "../../approvals/data/system-admin.approval-rules.mapper";
+import { mapTenantApprovalSettingToKernelRecord } from "../approvals/sys-approval-rules.mapper";
 import { mapTenantPolicySettingToKernelRecord } from "../policies/system-admin.policy-rules.mapper";
 
 export const loadTenantExecutionRulesForOrganization = cache(

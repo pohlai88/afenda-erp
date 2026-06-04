@@ -10,7 +10,7 @@ import type {
   HrSftApplyRecurrenceRuleInput,
   HrSftCreateRecurrenceRuleInput,
 } from "./hr.time.sft-recurrence.schema";
-import { emitHrSftAuditEvent } from "./hr.time.sft-audit.server";
+import { emitHrSftAuditEvent } from "./hrs-hr-time-sft-audit-server";
 import { hrTimeSftAuditActions } from "./hr.time.sft.event";
 
 export type { HrShiftRecurrenceRuleWindow, HrShiftBulkScheduleResult };

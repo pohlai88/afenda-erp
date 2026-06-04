@@ -1,4 +1,4 @@
-import type { AppCapability } from "@afenda/auth";
+import type { AppCapability } from "@afenda/kernel";
 
 export const HR_TALENT_RSS_READ_CAPABILITY =
   "hr.rss.read" satisfies AppCapability;

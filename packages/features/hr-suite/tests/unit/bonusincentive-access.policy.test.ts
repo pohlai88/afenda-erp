@@ -16,7 +16,7 @@ import {
   HR_BONUS_FINANCE_READ_CAPABILITY,
   HR_BONUS_SENSITIVE_READ_CAPABILITY,
   requireHrBonusRead,
-} from "../../src/payroll-compensation/bonus-incentive-management/policies/hr.payroll.bonus-access.policy.server";
+} from "../../src/payroll-compensation/bonus-incentive-management/hr.payroll.bonus-access.policy.server";
 
 describe("HRM-BON-029 bonus access policy", () => {
   it("requires hr.bonus.read and denies sensitive detail without hr.bonus.sensitive.read", async () => {

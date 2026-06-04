@@ -7,7 +7,7 @@ import {
 } from "@afenda/db";
 import { and, eq, inArray } from "drizzle-orm";
 
-import { emitHrSftAuditEvent } from "./hr.time.sft-audit.server";
+import { emitHrSftAuditEvent } from "./hrs-hr-time-sft-audit-server";
 import { hrTimeSftAuditActions } from "./hr.time.sft.event";
 import {
   buildHrSftNotificationCopy,

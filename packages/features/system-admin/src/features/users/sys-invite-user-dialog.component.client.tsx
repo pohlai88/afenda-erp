@@ -1,19 +1,19 @@
 "use client";
 
 import { ActionFormErrors } from "@afenda/governed-surface/client";
-import { SystemAdminOneTimeSecretPanel } from "../../overview/components/system-admin.one-time-secret.component.client";
+import { SystemAdminOneTimeSecretPanel } from "../overview/sys-one-time-secret.component.client";
 import {
   systemAdminEmailRoleActionFormFooterClass,
   systemAdminEmailRoleActionFormGridClass,
   systemAdminInlineFormMaxWidthClass,
-} from "../../overview/surfaces/system-admin.form-layout.shared";
+} from "../overview/sys-form-layout.shared";
 import { Button, Field, FieldGroup, FieldLabel, Input, NativeSelect } from "@afenda/ui";
 import { SendIcon } from "lucide-react";
 import { useActionState } from "react";
-import type { SystemAdminActionResult } from "../../tenant-execution/contracts/system-admin.action-result.contract";
-import type { SystemAdminInviteUserResult } from "../contracts";
-import { systemAdminSeedRoles } from "../../roles/contracts";
-import { systemAdminUsersUiCopy } from "../surface/system-admin.users-ui.copy.shared";
+import type { SystemAdminActionResult } from "../tenant-execution/sys-action-result.contract";
+import type { SystemAdminInviteUserResult } from "./sys-users.contract";
+import { systemAdminSeedRoles } from "../roles/sys-roles.contract";
+import { systemAdminUsersUiCopy } from "./sys-users-ui.copy.shared";
 
 type InviteAction = (
   state: SystemAdminActionResult<SystemAdminInviteUserResult> | undefined,

@@ -3,19 +3,19 @@
 import { ActionFormErrors } from "@afenda/governed-surface/client";
 import {
   SystemAdminOneTimeSecretPanel,
-} from "../../overview/components/system-admin.one-time-secret.component.client";
+} from "../overview/sys-one-time-secret.component.client";
 import {
   systemAdminEmailRoleActionFormFooterClass,
   systemAdminEmailRoleActionFormGridClass,
-} from "../../overview/surfaces/system-admin.form-layout.shared";
-import { systemAdminRoutePaths } from "../../overview/contracts/system-admin.route-paths.contract";
+} from "../overview/sys-form-layout.shared";
+import { systemAdminRoutePaths } from "../overview/sys-route-paths.contract";
 import { Button, Field, FieldGroup, FieldLabel, Input, NativeSelect } from "@afenda/ui";
 import { SendIcon } from "lucide-react";
 import Link from "next/link";
 import { useActionState } from "react";
-import type { SystemAdminActionResult } from "../../tenant-execution/contracts/system-admin.action-result.contract";
-import { systemAdminSeedRoles } from "../../roles/contracts";
-import type { InviteMemberActionData } from "../contracts/system-admin.memberships-action-dtos.contract";
+import type { SystemAdminActionResult } from "../tenant-execution/sys-action-result.contract";
+import { systemAdminSeedRoles } from "../roles/sys-roles.contract";
+import type { InviteMemberActionData } from "./sys-memberships-action-dtos.contract";
 
 type InviteMemberAction = (
   state: SystemAdminActionResult<InviteMemberActionData> | undefined,

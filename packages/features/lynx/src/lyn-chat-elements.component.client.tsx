@@ -23,34 +23,34 @@ import {
   useState,
 } from "react";
 import { Streamdown, type Components, type ExtraProps } from "streamdown";
-import { LYNX_ERP_HTTP_ROUTES } from "./lyn-core-contract";
+import { LYNX_ERP_HTTP_ROUTES } from "./lyn-core.contract";
 import {
   lynxRunContextDataSchema,
   lynxRunContextMetadataSchema,
   type LynxRunContextData,
   type LynxRunFeedbackCategory,
   type LynxRunFeedbackRating,
-} from "./lyn-run-feedback-schema";
+} from "./lyn-run-feedback.schema";
 import {
   lynxTruthEvidenceDataSchema,
   lynxTruthQualityGateDataSchema,
-} from "./lyn-truth-schema";
+} from "./lyn-truth.schema";
 import {
   getLynxChatStatus,
   getLynxRunStepState,
   isSafeLynxHref,
   linkLynxCitations,
   type LynxRunStepState,
-} from "./lynx.chat-format.shared";
+} from "./lyn-chat-format.shared";
 import {
   LynxEvidenceCard,
   LynxMetricCard,
-} from "./lynx.panel.component.client";
+} from "./lyn-panel.component.client";
 import {
   getLynxToolDisplayName,
   LynxToolCard,
   type LynxToolPart,
-} from "./lynx.tool-output.component.client";
+} from "./lyn-tool-output.component.client";
 
 type TextPart = {
   type: "text";

@@ -5,9 +5,9 @@ import {
   resolveApprovalListRowTone,
   resolveApprovalRuleModeLabel,
   resolveApprovalTargetTypeLabel,
-} from "../../src/approvals/surface/system-admin.approvals-list.shared";
-import { systemAdminApprovalsUiCopy } from "../../src/approvals/surface/system-admin.approvals-ui.copy.shared";
-import { SYSTEM_ADMIN_APPROVALS_MANAGE_CAPABILITY } from "../../src/approvals/schemas/system-admin.approvals-capability.shared";
+} from "../../src/features/approvals/sys-approvals-list.shared";
+import { systemAdminApprovalsUiCopy } from "../../src/features/approvals/sys-approvals-ui.copy.shared";
+import { SYSTEM_ADMIN_APPROVALS_MANAGE_CAPABILITY } from "../../src/features/approvals/sys-approvals-capability.shared";
 
 const baseApproval = {
   id: "approval-gallery-1",

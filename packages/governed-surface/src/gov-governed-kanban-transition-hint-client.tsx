@@ -6,8 +6,8 @@ import { cn } from "@afenda/ui/utils";
 
 import type { KanbanCardTransitionAvailability } from "./gov-kanban-board-schema";
 import { governedKanbanTransitionTestId } from "./kanban-surface-identity.shared";
-import { diagnosticsDataAttributes } from "../utils/governed-diagnostics.shared";
-import { governedIdentityAttributes } from "../utils/governed-identity.shared";
+import { diagnosticsDataAttributes } from "./gov-governed-diagnostics-shared";
+import { governedIdentityAttributes } from "./gov-governed-identity-shared";
 
 export type GovernedKanbanTransitionHintProps = {
   transition: KanbanCardTransitionAvailability & {

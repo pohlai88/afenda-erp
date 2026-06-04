@@ -1,6 +1,6 @@
 import { GovernedPatternCListSection } from "@afenda/governed-surface/server";
 import { Alert, AlertDescription, AlertTitle, SectionPanel } from "@afenda/ui";
-import type { SystemAdminDataManagementPageModel } from "./system-admin.data-management.page-model.server";
+import type { SystemAdminDataManagementPageModel } from "./sys-data-management.page-model.server";
 import {
   buildSystemAdminDataExportsListSurface,
   buildSystemAdminImportFailuresListSurface,
@@ -10,13 +10,13 @@ import {
   systemAdminImportFailuresSurfaceKey,
   systemAdminImportJobsSurfaceKey,
   systemAdminImportTemplatesSurfaceKey,
-} from "../surface/system-admin.import-jobs-list.surface";
-import { systemAdminDataManagementUiCopy } from "../surface/system-admin.data-management-ui.copy.shared";
-import { createSystemAdminImportJobFormAction } from "../actions/system-admin.import-jobs.actions.server";
-import { SystemAdminCreateImportJobForm } from "./system-admin.create-import-job-form.component.client";
-import { SystemAdminDataManagementExportButton } from "./system-admin.data-management-export-button.component.client";
-import { SystemAdminDataManagementSummaryPanel } from "./system-admin.data-management-summary.component.server";
-import { SystemAdminImportJobsTrailingCell } from "./system-admin.import-jobs-trailing-cells.component.client";
+} from "./sys-import-jobs-list.surface";
+import { systemAdminDataManagementUiCopy } from "./sys-data-management-ui.copy.shared";
+import { createSystemAdminImportJobFormAction } from "./sys-import-jobs.actions.server";
+import { SystemAdminCreateImportJobForm } from "./sys-create-import-job-form.component.client";
+import { SystemAdminDataManagementExportButton } from "./sys-data-management-export-button.component.client";
+import { SystemAdminDataManagementSummaryPanel } from "./sys-data-management-summary.component.server";
+import { SystemAdminImportJobsTrailingCell } from "./sys-import-jobs-trailing-cells.component.client";
 
 export function SystemAdminDataManagementSection({
   model,

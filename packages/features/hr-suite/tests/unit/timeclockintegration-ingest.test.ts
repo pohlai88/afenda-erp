@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   buildHrTimeClockIdempotencyKey,
   classifyHrTimeClockPunchType,
-} from "../../src/time-attendance/time-clock-integration/data/hr.time.clock-integration-ingest.shared.server";
+} from "../../src/time-attendance/time-clock-integration/hr.time.clock-integration-ingest.shared.server";
 
 describe("hr timeclockintegration punch ingest", () => {
   it("classifies clock and break punch aliases", () => {

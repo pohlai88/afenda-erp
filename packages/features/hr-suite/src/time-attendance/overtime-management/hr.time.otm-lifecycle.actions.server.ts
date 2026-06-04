@@ -16,9 +16,9 @@ import {
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
-import { emitHrTimeOtmAuditEvent } from "./hr.time.otm-audit.server";
-import { syncHrTimeOtmLifecycleNotifications } from "./hr.time.otm-notification.server";
-import { validateHrTimeOtmEligibilityForSubmit } from "./hr.time.otm-eligibility.server";
+import { emitHrTimeOtmAuditEvent } from "./hrs-hr-time-otm-audit-server";
+import { syncHrTimeOtmLifecycleNotifications } from "./hrs-hr-time-otm-notification-server";
+import { validateHrTimeOtmEligibilityForSubmit } from "./hrs-hr-time-otm-eligibility-server";
 import { HRM_OTM_AUDIT } from "./hr.time.otm.event";
 import {
   HrTimeOtmAccessDeniedError,

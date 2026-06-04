@@ -5,7 +5,7 @@ import type {
   SystemAdminWebhookDeliveryListRow,
   SystemAdminWebhookDeliveryStatus,
   SystemAdminWebhookListRow,
-} from "../contracts/system-admin.integrations-list.contract";
+} from "./sys-integrations-list.contract";
 
 function toApiCredentialStatus(status: string): SystemAdminApiCredentialStatus {
   if (status === "revoked" || status === "expired") {

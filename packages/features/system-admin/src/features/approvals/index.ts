@@ -4,5 +4,7 @@
  */
 export * from "./metadata";
 export * from "./client";
-export * from "./contracts";
-export * from "./schemas";
+export * from "./sys-approval-rule.contract";
+export * from "./sys-approvals-queue.contract";
+export * from "./sys-approval-rule.schema";
+export * from "./sys-approvals-queue-decision.schema";

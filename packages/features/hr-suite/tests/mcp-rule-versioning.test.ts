@@ -9,7 +9,7 @@ import {
   HrMcpRuleVersionError,
   isPublishedHrMcpRuleVersion,
   resolveFinalizedRuleVersionReference,
-} from "./hr.payroll.mcp-rule-versioning.shared";
+} from "../src/payroll-compensation/multi-country-payroll/hr.payroll.mcp-rule-versioning.shared";
 
 describe("HRM-MCP-023 rule versioning", () => {
   it("formats rule version labels", () => {

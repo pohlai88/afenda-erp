@@ -1,11 +1,11 @@
 import { HrComplianceCommandError } from "@afenda/db";
 import { describe, expect, it } from "vitest";
 
-import { toComplianceActionFailure } from "../../src/employee-management/compliance-regulatory-tracking/data/hr.workforce.compliance-action-result.shared";
+import { toComplianceActionFailure } from "../../src/employee-management/compliance-regulatory-tracking/hr.workforce.compliance-action-result.shared";
 import {
   HrComplianceOrganizationScopeError,
   HrComplianceSensitiveAccessError,
-} from "../../src/employee-management/compliance-regulatory-tracking/data/hr.workforce.compliance-org-scope.shared";
+} from "../../src/employee-management/compliance-regulatory-tracking/hr.workforce.compliance-org-scope.shared";
 
 describe("compliance action failure mapping", () => {
   it.each([

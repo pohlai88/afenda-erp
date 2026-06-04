@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import type { EvalRunMetrics } from "../../src/data/knowledge.eval.server";
+import type { EvalRunMetrics } from "../../src/kno-eval.server";
 
 vi.mock("server-only", () => ({}));
 
@@ -13,7 +13,7 @@ vi.mock("../../src/data/knowledge.retrieve-hybrid.server", () => ({
 }));
 
 const { evaluateKnowledgeEvalGate } =
-  await import("../../src/data/knowledge.eval.server");
+  await import("../../src/kno-eval.server");
 
 const passingMetrics: EvalRunMetrics = {
   recallAtK: 0.9,

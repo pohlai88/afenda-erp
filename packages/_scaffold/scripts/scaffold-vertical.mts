@@ -8,7 +8,6 @@ import {
   featurePublicDoorFiles,
   getFeatureTemplateSrcDir,
   getRepositoryRoot,
-  isLegacyFeatureFolder,
   listFeatureFlatTemplateFiles,
   scaffoldRootRelativePath,
 } from "./lib/scaffold-grammar.mts";

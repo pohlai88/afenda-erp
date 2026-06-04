@@ -3,11 +3,23 @@
  */
 import "server-only";
 
+export {
+  LYNX_WORKSPACE_ROUTES,
+  type LynxWorkspaceStaticRoute,
+} from "./lyn-core.contract";
+export * from "./lyn-api-auth.server";
 export * from "./lyn-console.page-model.server";
 export * from "./lyn-console.surface";
 export * from "./lyn-erp-read-tools.tool.server";
 export * from "./lyn-knowledge.tool.server";
-export * from "./lyn-observability.surface";
+export {
+  buildLynxLatencyAnalyticsListSurface,
+  buildLynxObservabilityStatGrid,
+  buildLynxProactiveOutcomeAnalyticsListSurface,
+  buildLynxQualityAnalyticsListSurface,
+  buildLynxRepresentativeEvalFailureListSurface,
+  buildLynxSpendAnalyticsListSurface,
+} from "./lyn-observability.surface";
 export * from "./lyn-operational-skill.catalog.server";
 export * from "./lyn-operator.handler.server";
 export * from "./lyn-outcome-monitor.surface";
@@ -37,4 +49,8 @@ export * from "./lyn-tool-meta";
 export * from "./lyn-truth-search.handler.server";
 export * from "./lyn-workflow-session.command.server";
 export * from "./lyn-workflow-session.repository.server";
-export * from "./lyn-workflow-session.surface";
+export {
+  buildLynxWorkflowLinkedRunListSurface,
+  buildLynxWorkflowSessionDetailStatGrid,
+  buildLynxWorkflowSessionListSurface,
+} from "./lyn-workflow-session.surface";

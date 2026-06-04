@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   buildHrCompensationPlanningReportCsv,
   filterHrCompensationPlanningReportRows,
-} from "../../src/payroll-compensation/compensation-planning-modeling/data/hr.payroll.cpm-reports.shared";
+} from "../../src/payroll-compensation/compensation-planning-modeling/hr.payroll.cpm-reports.shared";
 
 describe("HRM-CPM-029 compensation planning reports", () => {
   const sampleRows = [

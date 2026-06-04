@@ -1,8 +1,8 @@
 import { parseListSurfaceRendererConfiguration } from "@afenda/governed-surface/schemas";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { buildMembersListSurface } from "../../src/memberships/surface/system-admin.memberships-list.surface";
-import { systemAdminMembershipsGalleryRows } from "../../src/memberships/surface/system-admin.memberships-gallery.fixtures.shared";
-import { systemAdminMembershipStatusInputSchema } from "../../src/memberships/schemas/system-admin.memberships.schema";
+import { buildMembersListSurface } from "../../src/features/memberships/sys-memberships-list.surface";
+import { systemAdminMembershipsGalleryRows } from "../../src/features/memberships/sys-memberships-gallery.fixtures.shared";
+import { systemAdminMembershipStatusInputSchema } from "../../src/features/memberships/sys-memberships.schema";
 
 const mockListMemberships = vi.fn();
 const mockRequireMembershipsManage = vi.fn();
@@ -30,7 +30,7 @@ vi.mock("@afenda/db", async (importOriginal) => {
 vi.mock("../../src/overview/policies/system-admin.capability.policy.server", async (importOriginal) => {
   const actual =
     await importOriginal<
-      typeof import("../../src/overview/policies/system-admin.capability.policy.server")
+      typeof import("../../src/features/overview/sys-capability.policy.server")
     >();
   return {
     ...actual,
@@ -93,7 +93,7 @@ describe("system admin memberships actions", () => {
     mockRequireMembershipsRead.mockRejectedValue(new Error("Forbidden"));
 
     const { requireSystemAdminMembershipsRead } = await import(
-      "../../src/memberships/policies/system-admin.memberships.policy.server"
+      "../../src/features/memberships/sys-memberships.policy.server"
     );
 
     await expect(requireSystemAdminMembershipsRead()).rejects.toThrow("Forbidden");
@@ -103,7 +103,7 @@ describe("system admin memberships actions", () => {
     mockRequireMembershipsManage.mockRejectedValue(new Error("Forbidden"));
 
     const { requireSystemAdminMembershipsManage } = await import(
-      "../../src/memberships/policies/system-admin.memberships.policy.server"
+      "../../src/features/memberships/sys-memberships.policy.server"
     );
 
     await expect(requireSystemAdminMembershipsManage()).rejects.toThrow("Forbidden");
@@ -113,7 +113,7 @@ describe("system admin memberships actions", () => {
     mockRequireMembershipsManage.mockRejectedValue(new Error("Forbidden"));
 
     const { suspendSystemAdminMembership } = await import(
-      "../../src/memberships/actions/system-admin.memberships.actions.server"
+      "../../src/features/memberships/sys-memberships.actions.server"
     );
 
     await expect(suspendSystemAdminMembership("member_1")).rejects.toThrow("Forbidden");
@@ -122,7 +122,7 @@ describe("system admin memberships actions", () => {
 
   it("writes audit evidence on membership suspension", async () => {
     const { suspendSystemAdminMembership } = await import(
-      "../../src/memberships/actions/system-admin.memberships.actions.server"
+      "../../src/features/memberships/sys-memberships.actions.server"
     );
 
     const result = await suspendSystemAdminMembership("member_1");
@@ -138,7 +138,7 @@ describe("system admin memberships actions", () => {
 
   it("writes audit evidence on membership reactivation", async () => {
     const { reactivateSystemAdminMembership } = await import(
-      "../../src/memberships/actions/system-admin.memberships.actions.server"
+      "../../src/features/memberships/sys-memberships.actions.server"
     );
 
     const result = await reactivateSystemAdminMembership("member_1");
@@ -152,7 +152,7 @@ describe("system admin memberships actions", () => {
 
   it("writes audit evidence on membership removal", async () => {
     const { removeSystemAdminMembership } = await import(
-      "../../src/memberships/actions/system-admin.memberships.actions.server"
+      "../../src/features/memberships/sys-memberships.actions.server"
     );
 
     const result = await removeSystemAdminMembership("member_1");
@@ -170,7 +170,7 @@ describe("system admin memberships actions", () => {
     );
 
     const { suspendSystemAdminMembership } = await import(
-      "../../src/memberships/actions/system-admin.memberships.actions.server"
+      "../../src/features/memberships/sys-memberships.actions.server"
     );
 
     const result = await suspendSystemAdminMembership("member_1");
@@ -186,7 +186,7 @@ describe("system admin memberships actions", () => {
     );
 
     const { removeSystemAdminMembership } = await import(
-      "../../src/memberships/actions/system-admin.memberships.actions.server"
+      "../../src/features/memberships/sys-memberships.actions.server"
     );
 
     const result = await removeSystemAdminMembership("member_1");
@@ -205,7 +205,7 @@ describe("system admin memberships actions", () => {
     });
 
     const { suspendSystemAdminMembership } = await import(
-      "../../src/memberships/actions/system-admin.memberships.actions.server"
+      "../../src/features/memberships/sys-memberships.actions.server"
     );
 
     const result = await suspendSystemAdminMembership("member_1");
@@ -225,7 +225,7 @@ describe("system admin memberships actions", () => {
     });
 
     const { reactivateSystemAdminMembership } = await import(
-      "../../src/memberships/actions/system-admin.memberships.actions.server"
+      "../../src/features/memberships/sys-memberships.actions.server"
     );
 
     const result = await reactivateSystemAdminMembership("member_1");
@@ -238,7 +238,7 @@ describe("system admin memberships actions", () => {
 
   it("writes audit evidence on role removal from memberships trailing action", async () => {
     const { removeSystemAdminRoleAssignmentForm } = await import(
-      "../../src/roles/actions/system-admin.roles.actions.server"
+      "../../src/features/roles/sys-roles.actions.server"
     );
 
     const formData = new FormData();
@@ -267,7 +267,7 @@ describe("system admin memberships page model", () => {
     mockListMemberships.mockResolvedValue([]);
 
     const { buildSystemAdminMembershipsPageModel } = await import(
-      "../../src/memberships/data/system-admin.memberships.page-model.server"
+      "../../src/features/memberships/sys-memberships.page-model.server"
     );
 
     await buildSystemAdminMembershipsPageModel({
@@ -310,7 +310,7 @@ describe("system admin memberships page model", () => {
     ]);
 
     const { buildSystemAdminMembershipsPageModel } = await import(
-      "../../src/memberships/data/system-admin.memberships.page-model.server"
+      "../../src/features/memberships/sys-memberships.page-model.server"
     );
 
     const model = await buildSystemAdminMembershipsPageModel({
@@ -357,7 +357,7 @@ describe("system admin memberships page model", () => {
     ]);
 
     const { buildSystemAdminMembershipsPageModel } = await import(
-      "../../src/memberships/data/system-admin.memberships.page-model.server"
+      "../../src/features/memberships/sys-memberships.page-model.server"
     );
 
     const model = await buildSystemAdminMembershipsPageModel({

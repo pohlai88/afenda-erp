@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { SYSTEM_ADMIN_AUDIT_DEFAULT_PAGE_SIZE } from "../contracts/system-admin.audit-viewer.limits.shared";
+import { SYSTEM_ADMIN_AUDIT_DEFAULT_PAGE_SIZE } from "./sys-audit-viewer.limits.shared";
 
 const auditEntityTypeSchema = z.enum([
   "organization",

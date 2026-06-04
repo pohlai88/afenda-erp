@@ -4,7 +4,7 @@ import {
   ReportTenantDocumentScanResultError,
   reportTenantDocumentScanResultCommand,
   reportTenantDocumentScanResultInputSchema,
-} from "../commands/report-tenant-document-scan-result.command.server";
+} from "./sys-report-tenant-document-scan-result-command-server";
 
 function authorizeDocumentAvWebhook(request: Request) {
   const webhookSecret = getDocumentAvWebhookSecret();

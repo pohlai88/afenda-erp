@@ -2,16 +2,16 @@ import { hasExecutionPermission } from "@afenda/kernel/execution";
 import { Alert, AlertDescription, AlertTitle } from "@afenda/ui/alert";
 import { SectionPanel } from "@afenda/ui";
 import Link from "next/link";
-import { systemAdminRoutePaths } from "../../overview/contracts/system-admin.route-paths.contract";
-import { inviteSystemAdminUser } from "../actions";
-import { buildSystemAdminUsersPageModel } from "../data";
+import { systemAdminRoutePaths } from "../overview/sys-route-paths.contract";
+import { inviteSystemAdminUser } from "./sys-users.actions.server";
+import { buildSystemAdminUsersPageModel } from "./sys-users.page-model.server";
 import { requireSystemAdminUsersRead } from "./sys-users.policy.server";
-import { systemAdminUsersUiCopy } from "../surface/system-admin.users-ui.copy.shared";
-import { SystemAdminInviteUserDialog } from "./system-admin.invite-user-dialog.component.client";
+import { systemAdminUsersUiCopy } from "./sys-users-ui.copy.shared";
+import { SystemAdminInviteUserDialog } from "./sys-invite-user-dialog.component.client";
 import {
   SystemAdminUsersAccessDenied,
   SystemAdminUsersSection,
-} from "./system-admin.users-section.component.server";
+} from "./sys-users-section.component.server";
 
 const SYSTEM_ADMIN_USERS_WINDOW_LIMIT = 100;
 

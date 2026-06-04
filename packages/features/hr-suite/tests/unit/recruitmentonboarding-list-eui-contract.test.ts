@@ -1,16 +1,16 @@
 import { describe, expect, it } from "vitest";
 
-import { hrTalentRonReadPermission } from "../../src/talent-management/recruitment-onboarding/contracts/hr.talent.ron.contract";
+import { hrTalentRonReadPermission } from "../../src/talent-management/recruitment-onboarding/hr.talent.ron.contract";
 import {
   buildHrRonApplicationsListSurface,
   buildHrRonRequisitionsListSurface,
-} from "../../src/talent-management/recruitment-onboarding/surface/hr.talent.ron-lists.surface";
-import { resetHrRonStoreForTests } from "../../src/talent-management/recruitment-onboarding/data/hr.talent.ron-store.shared";
+} from "../../src/talent-management/recruitment-onboarding/hr.talent.ron-lists.surface";
+import { resetHrRonStoreForTests } from "../../src/talent-management/recruitment-onboarding/hr.talent.ron-store.shared";
 import {
   hrRonApplicationsSurfaceKey,
   hrRonRequisitionsSearchParam,
   hrRonRequisitionsSurfaceKey,
-} from "../../src/talent-management/recruitment-onboarding/data/hr.talent.ron-search-params.parse.shared";
+} from "../../src/talent-management/recruitment-onboarding/hr.talent.ron-search-params.parse.shared";
 
 describe("recruitment onboarding list EUI contract", () => {
   const store = resetHrRonStoreForTests("org-ron-eui");

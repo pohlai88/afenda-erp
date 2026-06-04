@@ -6,7 +6,7 @@ import {
   hrBonusAcceleratorRules,
   hrBonusCommissionTiers,
   hrBonusPayoutFormulas,
-} from "./hr-bonus-incentive";
+} from "./dbx-hr-bonus-incentive";
 
 export type UpsertHrBonusPayoutFormulaInput = {
   organizationId: string;
@@ -204,3 +204,4 @@ export async function upsertHrBonusAcceleratorRuleInTx(
 
   return { ruleId: existing?.id ?? ruleId };
 }
+

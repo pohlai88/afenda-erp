@@ -6,7 +6,7 @@ import {
 
 import type { HrAatAnalyticsSnapshot } from "./hr.time.aat-analytics.schema";
 import type { HrAatAnalyticsPeriodKind } from "./hr.time.aat-analytics.schema";
-import { emitHrAatAuditEvent } from "./hr.time.aat-audit.server";
+import { emitHrAatAuditEvent } from "./hrs-hr-time-aat-audit-server";
 import { hrTimeAatAuditActions } from "./hr.time.aat.event";
 
 export type { HrAatAnalyticsSnapshotRow };

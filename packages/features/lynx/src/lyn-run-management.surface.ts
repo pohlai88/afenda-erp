@@ -2,9 +2,9 @@ export {
   buildLynxRunManagementListSurface,
   buildLynxRunManagementQualityStatGrid,
   buildLynxRunManagementStatGrid,
-} from "./lynx.surface.shared";
+} from "./lyn-surface.shared";
 export type {
   LynxRouteListPagination,
   LynxRunManagementFilters,
   LynxRunManagementRow,
-} from "./lynx.surface.shared";
+} from "./lyn-surface.shared";

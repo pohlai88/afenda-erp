@@ -8,8 +8,8 @@ import {
   zodActionFailure,
 } from "@afenda/governed-surface/schemas";
 
-import { requireHrRead } from "../../employee-management/compliance-regulatory-tracking/server";
-import { linkGapDevelopmentResource } from "./hr.talent.csf-development.server";
+import { requireHrRead } from "../../hr-suite-integration/server";
+import { linkGapDevelopmentResource } from "./hrs-hr-talent-csf-development-server";
 import {
   hrCsfLinkDevelopmentResourceSchema,
   hrCsfListDevelopmentForGapSchema,

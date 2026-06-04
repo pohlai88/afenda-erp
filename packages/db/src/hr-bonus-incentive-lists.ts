@@ -10,7 +10,7 @@ import {
   hrBonusPlans,
   hrBonusProrations,
   hrBonusRecoveries,
-} from "./hr-bonus-incentive";
+} from "./dbx-hr-bonus-incentive";
 import { hrDepartments, hrEmployees } from "./hr";
 
 type ListWindow<T> = {
@@ -559,3 +559,4 @@ export async function listHrBonusRecoveriesWindow(input: {
     );
   });
 }
+

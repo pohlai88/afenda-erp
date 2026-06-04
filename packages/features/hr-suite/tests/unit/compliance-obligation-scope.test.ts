@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   appliesComplianceObligationToEmployee,
   formatComplianceObligationScope,
-} from "../../src/employee-management/compliance-regulatory-tracking/data/hr.workforce.compliance-obligation.shared";
+} from "../../src/employee-management/compliance-regulatory-tracking/hr.workforce.compliance-obligation.shared";
 
 describe("HRM-CMP-001 compliance obligation scope", () => {
   it("matches employee when obligation scope dimensions are unset", () => {

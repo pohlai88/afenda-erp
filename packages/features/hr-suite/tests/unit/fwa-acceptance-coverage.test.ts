@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   FWA_REQUIREMENT_COVERAGE,
-} from "../../src/time-attendance/flexible-work-arrangement-tracking/data/hr.time.fwa-acceptance-coverage.shared";
+} from "../../src/time-attendance/flexible-work-arrangement-tracking/hr.time.fwa-acceptance-coverage.shared";
 
 describe("FWA-009..017 acceptance coverage", () => {
   it("documents shipped requirements HRM-FWA-009 through HRM-FWA-017", () => {

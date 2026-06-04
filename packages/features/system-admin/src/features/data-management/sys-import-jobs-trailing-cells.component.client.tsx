@@ -9,14 +9,14 @@ import {
 import { Button } from "@afenda/ui/button";
 import { PlayIcon, RotateCcwIcon, XCircleIcon } from "lucide-react";
 import { useState, useTransition } from "react";
-import { SystemAdminDestructiveConfirmButton } from "../../overview/components/system-admin.destructive-confirm-button.component.client";
-import { SystemAdminTrailingActionStack } from "../../overview/components/system-admin.trailing-action-stack.component.client";
-import type { SystemAdminActionResult } from "../../tenant-execution/contracts/system-admin.action-result.contract";
+import { SystemAdminDestructiveConfirmButton } from "../overview/sys-destructive-confirm-button.component.client";
+import { SystemAdminTrailingActionStack } from "../overview/sys-trailing-action-stack.component.client";
+import type { SystemAdminActionResult } from "../tenant-execution/sys-action-result.contract";
 import {
   cancelSystemAdminImportJobAction,
   retrySystemAdminImportJobAction,
   runSystemAdminImportJobAction,
-} from "../actions/system-admin.import-jobs.actions.server";
+} from "./sys-import-jobs.actions.server";
 
 export function SystemAdminImportJobsTrailingCell({
   row,

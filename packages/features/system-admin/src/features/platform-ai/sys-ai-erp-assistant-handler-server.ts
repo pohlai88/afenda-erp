@@ -1,4 +1,3 @@
-import { getApiAuthContext } from "../../server";
 import {
   getErpModuleById,
   getModuleWorkspace,
@@ -7,6 +6,7 @@ import {
   resolveWorkspaceDataMode,
   type ModuleId,
 } from "@afenda/kernel";
+import { getApiAuthContext } from "../../server";
 import { getRequestId, logServerEvent } from "@afenda/observability/server";
 import { createAgentUIStreamResponse, type UIMessage } from "ai";
 import { NextResponse } from "next/server";
@@ -42,7 +42,7 @@ import {
   createAiUsageEvent,
   isAiFeatureEnabledForOrganization,
   registerAiApprovalProposal,
-} from "./ai-http-persistence.repository.server";
+} from "./sys-ai-http-persistence-repository-server";
 
 export const AI_ERP_ASSISTANT_MAX_DURATION = 30;
 

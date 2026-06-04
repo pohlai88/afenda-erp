@@ -3,15 +3,15 @@ import type { ReactNode } from "react";
 import { cn } from "@afenda/ui/utils";
 
 import type { GovernedRenderableState } from "./gov-governed-component-state-schema";
-import { diagnosticsDataAttributes } from "../utils/governed-diagnostics.shared";
-import { GovernedHeading } from "../utils/governed-heading.shared";
+import { diagnosticsDataAttributes } from "./gov-governed-diagnostics-shared";
+import { GovernedHeading } from "./gov-governed-heading-shared";
 import {
   governedDescriptionId,
   governedHeadingId,
   governedIdentityAttributes,
   governedTestId,
   toGovernedDomId,
-} from "../utils/governed-identity.shared";
+} from "./gov-governed-identity-shared";
 
 export type GovernedSectionProps = {
   title: ReactNode;

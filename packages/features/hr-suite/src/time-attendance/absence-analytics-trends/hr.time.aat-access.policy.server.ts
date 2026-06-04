@@ -1,4 +1,4 @@
-import type { AppCapability } from "@afenda/auth";
+import type { AppCapability } from "@afenda/kernel";
 import {
   getUserProfile,
   resolveEmployeeIdsVisibleToActor,

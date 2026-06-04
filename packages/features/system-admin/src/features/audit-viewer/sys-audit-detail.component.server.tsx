@@ -1,9 +1,9 @@
 import { Button, Card, CardContent, CardHeader, CardTitle } from "@afenda/ui";
 import Link from "next/link";
-import type { SystemAdminAuditEventDetail } from "../contracts";
-import { systemAdminAuditUiCopy } from "../surface/system-admin.audit-ui.copy.shared";
-import { SystemAdminAuditCorrelationBadges } from "./system-admin.audit-correlation-badges.component.server";
-import { SystemAdminAuditInvestigationPanel } from "./system-admin.audit-investigation-panel.component.server";
+import type { SystemAdminAuditEventDetail } from "./sys-audit-event.contract";
+import { systemAdminAuditUiCopy } from "./sys-audit-ui.copy.shared";
+import { SystemAdminAuditCorrelationBadges } from "./sys-audit-correlation-badges.component.server";
+import { SystemAdminAuditInvestigationPanel } from "./sys-audit-investigation-panel.component.server";
 
 export function SystemAdminAuditDetailPanel({
   detail,

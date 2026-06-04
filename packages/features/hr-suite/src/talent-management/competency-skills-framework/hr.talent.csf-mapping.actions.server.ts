@@ -10,7 +10,7 @@ import {
   getHrCsfProficiencyScaleDetail,
   listHrCsfProficiencyScales,
   updateHrCsfProficiencyScale,
-} from "./hr.talent.csf-proficiency.server";
+} from "./hrs-hr-talent-csf-proficiency-server";
 import {
   deleteHrCsfCompetencyRequirement,
   deleteHrCsfSkillRequirement,
@@ -18,7 +18,7 @@ import {
   listHrCsfSkillRequirements,
   upsertHrCsfCompetencyRequirement,
   upsertHrCsfSkillRequirement,
-} from "./hr.talent.csf-role-mapping.server";
+} from "./hrs-hr-talent-csf-role-mapping-server";
 import {
   HR_CSF_READ_CAPABILITY,
   HR_CSF_WRITE_CAPABILITY,

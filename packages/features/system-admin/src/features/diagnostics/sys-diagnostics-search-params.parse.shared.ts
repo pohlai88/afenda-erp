@@ -1,4 +1,4 @@
-import { systemAdminDiagnosticsSearchParamsSchema } from "../schemas/system-admin.diagnostics-filter.schema";
+import { systemAdminDiagnosticsSearchParamsSchema } from "./sys-diagnostics-filter.schema";
 
 function readSearchParam(
   searchParams: Record<string, string | string[] | undefined> | undefined,

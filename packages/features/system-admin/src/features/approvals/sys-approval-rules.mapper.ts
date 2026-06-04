@@ -1,5 +1,5 @@
 import type { TenantApprovalSettingRow } from "@afenda/db";
-import { organizationRoles } from "@afenda/auth";
+import { organizationRoles } from "@afenda/kernel";
 import type { TenantApprovalRuleRecord } from "@afenda/kernel/execution";
 import type {
   ApprovalEscalationBehavior,
@@ -7,27 +7,27 @@ import type {
   SystemAdminApprovalRule,
   SystemAdminApprovalRuleListRow,
   SystemAdminApprovalRuleStatus,
-} from "../contracts/system-admin.approval-rule.contract";
-import { evaluateApprovalRuleReadiness } from "./system-admin.approval-rules.readiness.server";
+} from "./sys-approval-rule.contract";
+import { evaluateApprovalRuleReadiness } from "./sys-approval-rules.readiness.server";
 import {
   formatApprovalEscalationSummary,
-} from "./system-admin.approval-rules.shared";
+} from "./sys-approval-rules.shared";
 import {
   MINUTES_PER_HOUR,
   readConfigurationNumber,
   readConfigurationOptionalNumber,
   readConfigurationString,
   readExecutionSettingConfiguration,
-} from "../../tenant-execution/contracts/system-admin.execution-settings.shared";
+} from "../tenant-execution/sys-execution-settings.shared";
 import {
   APPROVAL_RULE_DEFAULT_MODULE_KEY,
   APPROVAL_RULE_DEFAULT_TARGET_TYPE,
   APPROVAL_RULE_MIN_ESCALATION_HOURS_FROM_MINUTES,
-} from "../contracts/system-admin.approval-rule.limits.shared";
+} from "./sys-approval-rule.limits.shared";
 import {
   approvalModeSchema,
   escalationBehaviorSchema,
-} from "../schemas/system-admin.approval-rule.schema";
+} from "./sys-approval-rule.schema";
 
 type ApproverRole = NonNullable<TenantApprovalSettingRow["approverRole"]>;
 

@@ -3,11 +3,11 @@ import { z } from "zod";
 import type { SchemaStability } from "./gov-_stability-shared";
 
 import { prepareGovernedConfigurationForParse } from "./migrate-governed-configuration.shared";
-import { resolveGovernedStatPresentation } from "../resolvers/resolve-governed-presentation";
-import { refineStatCardDisplayStrings } from "./display-string.shared";
-import { statPresentationProfileIdSchema } from "./presentation-profile.schema";
+import { resolveGovernedStatPresentation } from "./gov-resolve-governed-presentation";
+import { refineStatCardDisplayStrings } from "./gov-display-string-shared";
+import { statPresentationProfileIdSchema } from "./gov-presentation-profile-schema";
 import { governedMetadataSchemaVersionSchema } from "./gov-schema-version-shared";
-import { governedSurfaceChromeSchema } from "./surface-chrome.schema";
+import { governedSurfaceChromeSchema } from "./gov-surface-chrome-schema";
 
 export const SCHEMA_STABILITY: SchemaStability = "beta";
 

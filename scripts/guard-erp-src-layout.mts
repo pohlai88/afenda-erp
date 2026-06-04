@@ -11,10 +11,6 @@ const ALLOWED_TOP_LEVEL_FILES = new Set(["instrumentation.ts", "proxy.ts"]);
 
 const problems: string[] = [];
 
-function relativeFromRoot(absolutePath: string) {
-  return path.relative(root, absolutePath).replace(/\\/g, "/");
-}
-
 function checkGuard1() {
   if (!fs.existsSync(erpSrcRoot)) {
     problems.push("GUARD 1: apps/erp/src is missing.");

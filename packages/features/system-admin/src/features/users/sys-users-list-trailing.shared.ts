@@ -1,5 +1,5 @@
 import { resolveListSurfaceRowTrailingAction } from "@afenda/governed-surface";
-import type { SystemAdminUserStatus } from "../contracts";
+import type { SystemAdminUserStatus } from "./sys-users.contract";
 
 export const SYSTEM_ADMIN_USERS_MANAGE_DENIED =
   "Requires system-admin.users.manage.";

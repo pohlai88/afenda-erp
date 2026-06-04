@@ -1,7 +1,7 @@
 "use client";
 
 import type { Route } from "next";
-import { useLocale } from "../i18n/governed-surface-copy.client";
+import { useLocale } from "./gov-governed-surface-copy-client";
 import { AlertTriangle } from "lucide-react";
 
 import Link from "next/link";
@@ -17,7 +17,7 @@ import type {
 import type { ListSurfaceRow } from "./gov-list-surface-renderer-schema";
 import { cn } from "@afenda/ui/utils";
 
-import { ListSurfaceSparkline } from "./list-surface-sparkline.client";
+import { ListSurfaceSparkline } from "./gov-list-surface-sparkline-client";
 
 const BADGE_TONE_CLASS: Record<ListCellTone, string> = {
   positive: "bg-success/15 text-success-foreground",

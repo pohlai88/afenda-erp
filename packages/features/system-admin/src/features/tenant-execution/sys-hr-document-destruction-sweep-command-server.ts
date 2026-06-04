@@ -4,7 +4,7 @@ import {
   isOrganizationDocumentLegalHoldActive,
 } from "@afenda/db";
 
-import { destroyHrEmployeeDocumentCommand } from "./destroy-hr-employee-document.command.server";
+import { destroyHrEmployeeDocumentCommand } from "./sys-destroy-hr-employee-document-command-server";
 
 /** Cron-safe sweep — destroys HR employee documents archived past grace period. */
 export async function executeHrDocumentDestructionSweepCommand(input?: {

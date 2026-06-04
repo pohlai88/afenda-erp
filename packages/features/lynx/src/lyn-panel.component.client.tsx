@@ -13,7 +13,7 @@ import {
   EmptyTitle,
 } from "@afenda/ui";
 import type { ReactNode } from "react";
-import { isSafeLynxHref } from "./lynx.chat-format.shared";
+import { isSafeLynxHref } from "./lyn-chat-format.shared";
 
 export function LynxPanel({
   children,

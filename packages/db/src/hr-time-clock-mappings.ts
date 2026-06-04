@@ -11,7 +11,7 @@ import {
   hrTimeClockAuditEvents,
   hrTimeClockDevices,
   hrTimeClockEmployeeMappings,
-} from "./hr-time-clock";
+} from "./dbx-hr-time-clock";
 
 export type HrTimeClockEmployeeMappingRow = {
   id: string;
@@ -424,3 +424,4 @@ export async function resolveHrTimeClockEmployeeMapping(input: {
     return row ?? null;
   });
 }
+

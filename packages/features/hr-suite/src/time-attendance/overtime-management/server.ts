@@ -9,7 +9,10 @@ export * from "./hr.time.otm-approval.actions.server";
 export * from "./hr.time.otm-lifecycle.actions.server";
 export * from "./hr.time.otm-report.actions.server";
 export * from "./hr.time.otm-request.actions.server";
-export * from "./hr.time.otm.actions.server";
+export {
+  saveHrTimeOtmDraftAction,
+  submitHrTimeOtmDraftAction,
+} from "./hr.time.otm.actions.server";
 export * from "./hr.time.otm.event";
 export * from "./hr.time.otm.page-model.server";
 export * from "./hrs-hr-time-otm-approval-commands-server";

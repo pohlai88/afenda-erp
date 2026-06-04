@@ -1,9 +1,9 @@
-import type { KnowledgeSourceKind } from "../contracts/knowledge.core.contract";
-import type { KnowledgeSourceAdapter } from "../contracts/knowledge.source-adapter.contract";
-import type { KnowledgeGitHubRepoSourceConfig } from "../schemas/knowledge.source-github-repo.schema";
-import type { KnowledgeManualSourceConfig } from "../schemas/knowledge.source-manual.schema";
-import { githubRepoSourceAdapter } from "./knowledge.source-github-repo.server";
-import { manualSourceAdapter } from "./knowledge.source-manual.server";
+import type { KnowledgeSourceKind } from "./kno-core.contract";
+import type { KnowledgeSourceAdapter } from "./kno-source-adapter.contract";
+import type { KnowledgeGitHubRepoSourceConfig } from "./kno-source-github-repo.schema";
+import type { KnowledgeManualSourceConfig } from "./kno-source-manual.schema";
+import { githubRepoSourceAdapter } from "./kno-source-github-repo.server";
+import { manualSourceAdapter } from "./kno-source-manual.server";
 
 type RegisteredKnowledgeSourceAdapter =
   | KnowledgeSourceAdapter<KnowledgeManualSourceConfig>

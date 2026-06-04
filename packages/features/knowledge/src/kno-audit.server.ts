@@ -4,7 +4,7 @@ import {
   writeExecutionAuditEventInTransaction,
   type ExecutionAuditEvent,
 } from "@afenda/kernel/execution";
-import { KNOWLEDGE_AUDIT_ACTIONS } from "../contracts/knowledge.core.contract";
+import { KNOWLEDGE_AUDIT_ACTIONS } from "./kno-core.contract";
 
 export type KnowledgeAuditAction =
   (typeof KNOWLEDGE_AUDIT_ACTIONS)[keyof typeof KNOWLEDGE_AUDIT_ACTIONS];

@@ -1,13 +1,10 @@
 import { describe, expect, it } from "vitest";
-import {
-  buildSystemAdminCapabilityCoverageRows,
-  evaluateCapabilityCoverage,
-} from "../../src/capabilities/data";
-import { SYSTEM_ADMIN_PROTECTED_MODULE_KEY } from "../../src/modules/contracts";
-import { buildSystemAdminModuleCatalogRows } from "../../src/modules/data/system-admin.modules.query.server";
-import { buildSystemAdminPermissionCatalogRows } from "../../src/permissions/data/system-admin.permissions.query.server";
-import { systemAdminCapabilitySettingsActionSchema } from "../../src/capabilities/schemas/system-admin.capability-settings.schema";
-import { systemAdminModuleSettingsActionSchema } from "../../src/modules/schemas/system-admin.module-settings.schema";
+import { buildSystemAdminCapabilityCoverageRows, evaluateCapabilityCoverage } from "../../src/features/capabilities/sys-capabilities.coverage.server";
+import { SYSTEM_ADMIN_PROTECTED_MODULE_KEY } from "../../src/features/modules/sys-modules.contract";
+import { buildSystemAdminModuleCatalogRows } from "../../src/features/modules/sys-modules.query.server";
+import { buildSystemAdminPermissionCatalogRows } from "../../src/features/permissions/sys-permissions.query.server";
+import { systemAdminCapabilitySettingsActionSchema } from "../../src/features/capabilities/sys-capability-settings.schema";
+import { systemAdminModuleSettingsActionSchema } from "../../src/features/modules/sys-module-settings.schema";
 import { getErpModuleById } from "@afenda/kernel/module-definitions";
 import {
   applyTenantCapabilityAvailability,
@@ -179,7 +176,7 @@ describe("system admin phase 2 capability navigation", () => {
 describe("system admin phase 2 nav visibility", () => {
   it("filters system admin nav items by effective capabilities", async () => {
     const { resolveSystemAdminNavItems } = await import(
-      "../../src/overview/contracts/system-admin.nav.contract"
+      "../../src/features/overview/sys-nav.contract"
     );
 
     const items = resolveSystemAdminNavItems([

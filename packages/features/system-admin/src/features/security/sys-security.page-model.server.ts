@@ -4,12 +4,12 @@ import {
   getOrganizationObjectStorageProvider,
 } from "@afenda/db";
 import { assertObjectStorageConfigured } from "@afenda/object-storage/server";
-import { loadSystemAdminDocumentQuarantineInboxWindow } from "../../tenant-execution/data/system-admin.document-quarantine-inbox.read-model.server";
-import { loadOrganizationStorageQuotaSnapshot } from "../../tenant-execution/data/system-admin.organization-storage-quota.read-model.server";
-import { getSystemAdminOrganizationSecuritySettings } from "./system-admin.security.query.server";
-import { evaluateSecurityReadiness } from "./system-admin.security.readiness.server";
-import { listSystemAdminSecurityRecentChanges } from "./system-admin.security.recent-changes.server";
-import { systemAdminSecurityAuditActions } from "../events/system-admin.security.event";
+import { loadSystemAdminDocumentQuarantineInboxWindow } from "../tenant-execution/sys-document-quarantine-inbox.read-model.server";
+import { loadOrganizationStorageQuotaSnapshot } from "../tenant-execution/sys-organization-storage-quota.read-model.server";
+import { getSystemAdminOrganizationSecuritySettings } from "./sys-security.query.server";
+import { evaluateSecurityReadiness } from "./sys-security.readiness.server";
+import { listSystemAdminSecurityRecentChanges } from "./sys-security.recent-changes.server";
+import { systemAdminSecurityAuditActions } from "./sys-security.event";
 
 export async function buildSystemAdminSecurityPageModel(input: {
   organizationId: string;

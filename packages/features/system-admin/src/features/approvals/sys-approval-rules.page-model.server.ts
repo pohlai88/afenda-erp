@@ -2,21 +2,21 @@ import { writeExecutionAuditEvent } from "@afenda/kernel/execution";
 import {
   listTenantApprovalSettings,
   listTenantPolicySettings,
-} from "../../tenant-execution/data/system-admin.execution-settings.repository.server";
-import { filterSystemAdminListRows } from "../../overview/contracts/system-admin.list-filter.shared";
+} from "../tenant-execution/sys-execution-settings.repository.server";
+import { filterSystemAdminListRows } from "../overview/sys-list-filter.shared";
 import {
   resolveSystemAdminApprovalDetailKey,
   resolveSystemAdminListSearch,
-} from "../../overview/contracts/system-admin.list-search.shared";
-import { APPROVAL_RULE_LIST_SEARCH_FIELDS } from "../contracts/system-admin.approval-rule.limits.shared";
-import { buildSystemAdminApprovalRuleDetail } from "./system-admin.approval-rules.detail.server";
-import { mapApprovalRuleToEditorDefaults } from "./system-admin.approval-rules.editor-defaults.shared";
+} from "../overview/sys-list-search.shared";
+import { APPROVAL_RULE_LIST_SEARCH_FIELDS } from "./sys-approval-rule.limits.shared";
+import { buildSystemAdminApprovalRuleDetail } from "./sys-approval-rules.detail.server";
+import { mapApprovalRuleToEditorDefaults } from "./sys-approval-rules.editor-defaults.shared";
 import {
   buildSystemAdminApprovalRuleRows,
   buildSystemAdminApproverRoleOptions,
   SYSTEM_ADMIN_APPROVAL_RULES_QUERY_LIMIT,
-} from "./system-admin.approval-rules.query.server";
-import { mapTenantApprovalSettingToRule } from "./system-admin.approval-rules.mapper";
+} from "./sys-approval-rules.query.server";
+import { mapTenantApprovalSettingToRule } from "./sys-approval-rules.mapper";
 
 export async function buildSystemAdminApprovalsPageModel(input: {
   organizationId: string;

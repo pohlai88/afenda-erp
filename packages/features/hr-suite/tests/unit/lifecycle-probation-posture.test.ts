@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { deriveProbationReviewPosture } from "../../src/employee-management/employee-lifecycle-management/data/hr.workforce.lifecycle-probation.shared";
+import { deriveProbationReviewPosture } from "../../src/employee-management/employee-lifecycle-management/hr.workforce.lifecycle-probation.shared";
 
 describe("lifecycle probation review posture", () => {
   const asOf = new Date("2026-05-30T12:00:00.000Z");

@@ -1,9 +1,9 @@
-import type { OrganizationSecuritySettings } from "../contracts/system-admin.security-settings.contract";
+import type { OrganizationSecuritySettings } from "./sys-security-settings.contract";
 import type {
   SecurityReadinessIssue,
   SecurityReadinessReport,
   SecurityReadinessVerdict,
-} from "../contracts/system-admin.security-readiness.contract";
+} from "./sys-security-readiness.contract";
 
 function issue(
   id: string,

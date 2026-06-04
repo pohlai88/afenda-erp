@@ -22,7 +22,7 @@ import {
   requireHrCpmApprove,
   requireHrCpmRead,
   requireHrCpmWrite,
-} from "../../src/payroll-compensation/compensation-planning-modeling/policies/hr.payroll.cpm-access.policy.server";
+} from "../../src/payroll-compensation/compensation-planning-modeling/hr.payroll.cpm-access.policy.server";
 
 function mockContext(capabilities: string[]) {
   vi.mocked(requireExecutionContext).mockResolvedValue({

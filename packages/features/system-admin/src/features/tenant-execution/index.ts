@@ -4,4 +4,4 @@
  */
 export * from "./metadata";
 export * from "./client";
-export * from "./contracts";
+export * from "./sys-action-result.contract";

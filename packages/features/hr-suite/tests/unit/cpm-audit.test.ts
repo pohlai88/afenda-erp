@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { hrPayrollCpmAuditActions } from "../../src/payroll-compensation/compensation-planning-modeling/events/hr.payroll.cpm.event";
+import { hrPayrollCpmAuditActions } from "../../src/payroll-compensation/compensation-planning-modeling/hr.payroll.cpm.event";
 
 describe("HRM-CPM-030 audit verbs", () => {
   it("declares cycle, recommendation, approval, payroll, and report verbs", () => {

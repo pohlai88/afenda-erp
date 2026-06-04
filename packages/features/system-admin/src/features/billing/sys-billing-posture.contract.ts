@@ -1,5 +1,5 @@
-import type { OrganizationSubscription } from "./system-admin.billing-subscription.contract";
-import type { SystemAdminBillingEntitlementRow } from "./system-admin.billing-list.contract";
+import type { OrganizationSubscription } from "./sys-billing-subscription.contract";
+import type { SystemAdminBillingEntitlementRow } from "./sys-billing-list.contract";
 
 export type BillingPostureSnapshot = {
   subscription: OrganizationSubscription;

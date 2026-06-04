@@ -11,7 +11,7 @@ import {
   requireExecutionPermission,
 } from "@afenda/kernel/execution";
 
-import { requireHrLifecycleRead } from "../../src/employee-management/employee-lifecycle-management/policies/hr.workforce.lifecycle-access.policy.server";
+import { requireHrLifecycleRead } from "../../src/employee-management/employee-lifecycle-management/hr.workforce.lifecycle-access.policy.server";
 
 describe("requireHrLifecycleRead", () => {
   it("requires hr.lifecycle.read on the execution context", async () => {

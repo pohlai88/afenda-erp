@@ -4,5 +4,6 @@
  */
 export * from "./metadata";
 export * from "./client";
-export * from "./contracts";
-export * from "./schemas";
+export * from "./sys-lynx-outcome-monitor-catalog.contract";
+export * from "./sys-lynx-outcome-monitor.contract";
+export * from "./sys-lynx-outcome-monitor-action.schema";

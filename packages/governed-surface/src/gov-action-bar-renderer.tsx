@@ -1,22 +1,22 @@
-import { GovernedEmpty } from "./client";
+import { GovernedEmpty } from "./gov-governed-empty";
 import {
   GOVERNED_ACTION_BAR_CONFIGURATION_SCHEMA_ID,
   parseGovernedActionBarConfiguration,
 } from "./gov-action-bar-schema";
-import { governedParseErrorCopy } from "../i18n/governed-renderer-copy.shared";
+import { governedParseErrorCopy } from "./gov-governed-renderer-copy-shared";
 import { densityGapClass } from "./gov-surface-chrome-classes";
-import { diagnosticsDataAttributes } from "../utils/governed-diagnostics.shared";
+import { diagnosticsDataAttributes } from "./gov-governed-diagnostics-shared";
 import {
   governedIdentityAttributes,
   governedTestId,
-} from "../utils/governed-identity.shared";
+} from "./gov-governed-identity-shared";
 import { resolveGovernedServerAction } from "./gov-server-actions-shared";
 import { Badge } from "@afenda/ui/badge";
 import { cn } from "@afenda/ui/utils";
 
-import type { RendererProps } from "../governed-renderer-dispatch";
+import type { RendererProps } from "./gov-governed-renderer-dispatch";
 
-import { ActionBarActionForm } from "./action-bar-action.client";
+import { ActionBarActionForm } from "./gov-action-bar-action-client";
 
 /**
  * governed:action-bar — declarative ERP action descriptors.

@@ -12,7 +12,7 @@ import {
   hrBenefitEnrollments,
   hrBenefitPlans,
   hrBenefitProviders,
-} from "./hr-benefits";
+} from "./dbx-hr-benefits";
 import { hrDepartments, hrEmployees } from "./hr";
 
 function escapeCsvCell(value: string) {
@@ -311,3 +311,4 @@ export async function buildHrBenefitReportCsv(input: {
     }
   });
 }
+

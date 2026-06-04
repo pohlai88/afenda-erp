@@ -2,9 +2,9 @@ import { z } from "zod";
 
 import type { SchemaStability } from "./gov-_stability-shared";
 
-import { erpPermissionRequirementSchema } from "./erp-permission-requirement.schema";
-import { emptyStateSchema } from "./list-surface.schema";
-import { governedSurfaceChromeSchema } from "./surface-chrome.schema";
+import { erpPermissionRequirementSchema } from "./gov-erp-permission-requirement-schema";
+import { emptyStateSchema } from "./gov-list-surface-schema";
+import { governedSurfaceChromeSchema } from "./gov-surface-chrome-schema";
 
 export const GOVERNED_KANBAN_BOARD_SCHEMA_ID =
   "governed.kanban-board.configuration" as const;

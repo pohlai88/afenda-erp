@@ -4,8 +4,8 @@ import {
   getSolutionToolModuleBindings,
   solutionToolModuleBindings,
   solutionWorkflowIds,
-} from "../../src/modules/solution-playbooks";
-import { getRecoveryPlaybookDefinitions } from "../../src/modules/workflow-metadata";
+} from "../../src/ker-solution-playbooks";
+import { getRecoveryPlaybookDefinitions } from "../../src/ker-workflow-metadata";
 
 describe("solution provider metadata", () => {
   it("aligns workflow ids with playbook definitions", () => {

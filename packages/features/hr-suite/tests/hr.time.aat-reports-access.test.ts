@@ -26,12 +26,12 @@ import {
 import {
   AAT_SENSITIVE_REASON_MASK,
   maskHrAatAbsenceReason,
-} from "./hr.time.aat-reason-masking.server";
+} from "../src/time-attendance/absence-analytics-trends/hrs-hr-time-aat-reason-masking-server";
 import {
   HrAatAccessDeniedError,
   requireHrAatReportExport,
   requireHrAatReportRead,
-} from "../policies/hr.time.aat-access.policy.server";
+} from "../src/time-attendance/absence-analytics-trends/hr.time.aat-access.policy.server";
 
 describe("requireHrAatReportRead (HRM-AAT-025)", () => {
   it("denies users without hr.view or base analytics permissions", async () => {

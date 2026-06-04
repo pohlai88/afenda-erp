@@ -296,7 +296,7 @@ export async function calculateBonusPayoutReadAction(
     return actionSuccess(result);
   } catch (error) {
     const { toBonusActionFailure } = await import(
-      "../data/hr.payroll.bonus-action-result.shared"
+      "./hr.payroll.bonus-action-result.shared"
     );
     return toBonusActionFailure<BonusPayoutCalculationResult & { formulaId: string }>(
       error,

@@ -1,5 +1,5 @@
-import { readOptionalFormValue } from "../../tenant-execution/contracts/system-admin.execution-settings.shared";
-import { createSystemAdminImportJobSchema } from "../schemas/system-admin.import-job.schema";
+import { readOptionalFormValue } from "../tenant-execution/sys-execution-settings.shared";
+import { createSystemAdminImportJobSchema } from "./sys-import-job.schema";
 
 export function parseSystemAdminImportJobFormData(formData: FormData) {
   const filename = readOptionalFormValue(formData.get("filename"));

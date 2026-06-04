@@ -2,16 +2,16 @@
 
 import { useMemo } from "react";
 
-import { useTranslations } from "../i18n/governed-surface-copy.client";
+import { useTranslations } from "./gov-governed-surface-copy-client";
 import { KanbanBoardDragView } from "./gov-kanban-board-drag-view-client";
 
 import {
   parseGovernedKanbanBoardConfiguration,
   type GovernedKanbanBoardConfigurationInput,
-  type KanbanCardMovePayload,
-} from "./client";
+} from "./gov-kanban-board-schema";
+import type { KanbanCardMovePayload } from "./kanban-card-drop.shared";
 
-import { GovernedEmpty } from "./governed-empty";
+import { GovernedEmpty } from "./gov-governed-empty";
 
 export type GovernedKanbanDragBoardProps = {
   configuration: GovernedKanbanBoardConfigurationInput;

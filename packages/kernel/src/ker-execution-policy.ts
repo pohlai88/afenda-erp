@@ -1,17 +1,17 @@
-import type { ExecutionContext } from "../context/execution-context";
+import type { ExecutionContext } from "./ker-execution-context";
 import {
   ExecutionPolicyApprovalRequiredError,
   ExecutionPolicyDeniedError,
-} from "../errors/execution-errors";
+} from "./ker-execution-errors";
 import type {
   ExecutionPolicyCheck,
   ExecutionPolicyVerdict,
-} from "./execution-policy-types";
+} from "./ker-execution-policy-types";
 
 type MaybePromise<T> = T | Promise<T>;
 
-export type { ExecutionPolicyCheck, ExecutionPolicyVerdict } from "./execution-policy-types";
-export type { ExecutionPolicyEffect } from "./tenant-execution-rules";
+export type { ExecutionPolicyCheck, ExecutionPolicyVerdict } from "./ker-execution-policy-types";
+export type { ExecutionPolicyEffect } from "./ker-tenant-execution-rules";
 export {
   executionPolicyEffects,
   findMatchingTenantApprovalRule,
@@ -21,7 +21,7 @@ export {
   resolveTenantExecutionPolicyVerdict,
   type TenantApprovalRuleRecord,
   type TenantPolicyRuleRecord,
-} from "./tenant-execution-rules";
+} from "./ker-tenant-execution-rules";
 
 export type ExecutionPolicyEvaluator = (input: {
   context: ExecutionContext;

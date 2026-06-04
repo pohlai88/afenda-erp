@@ -2,9 +2,9 @@ import type {
   BillingReadinessIssue,
   BillingReadinessReport,
   BillingReadinessVerdict,
-} from "../contracts/system-admin.billing-readiness.contract";
-import type { OrganizationSubscription } from "../contracts/system-admin.billing-subscription.contract";
-import type { SystemAdminBillingEntitlementRow } from "../contracts/system-admin.billing-list.contract";
+} from "./sys-billing-readiness.contract";
+import type { OrganizationSubscription } from "./sys-billing-subscription.contract";
+import type { SystemAdminBillingEntitlementRow } from "./sys-billing-list.contract";
 
 function issue(
   id: string,

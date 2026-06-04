@@ -3,7 +3,7 @@ import {
   SYSTEM_ADMIN_IMPORT_FILENAME_MAX_LENGTH,
   SYSTEM_ADMIN_IMPORT_SOURCE_DATA_MAX_BYTES,
   SYSTEM_ADMIN_IMPORT_SOURCE_LABEL_MAX_LENGTH,
-} from "../contracts/system-admin.data-management.limits.shared";
+} from "./sys-data-management.limits.shared";
 
 export const systemAdminDataManagementImportJobStatuses = [
   "uploaded",

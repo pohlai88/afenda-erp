@@ -11,7 +11,7 @@ import {
 import {
   hrCsfDevelopmentLinks,
   hrCsfDevelopmentRecommendations,
-} from "./hr-competency-skills";
+} from "./dbx-hr-competency-skills";
 
 export async function createHrCsfDevelopmentRecommendationsInTx(
   db: AfendaTransaction,
@@ -195,3 +195,4 @@ export async function listHrCsfDevelopmentLinksForRecommendation(input: {
       .orderBy(desc(hrCsfDevelopmentLinks.createdAt)),
   );
 }
+

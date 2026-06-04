@@ -1,4 +1,4 @@
-import type { ExecutionPolicyEffect } from "./tenant-execution-rules";
+import type { ExecutionPolicyEffect } from "./ker-tenant-execution-rules";
 
 export type ExecutionPolicyCheck = {
   action: string;

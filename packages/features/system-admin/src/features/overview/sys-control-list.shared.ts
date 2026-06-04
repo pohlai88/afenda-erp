@@ -11,7 +11,7 @@ import type {
 import {
   buildSystemAdminListToolbar,
   buildSystemAdminStaticPagination,
-} from "./system-admin.list-surface.shared";
+} from "./sys-list-surface.shared";
 type BasicRow = {
   id: string;
   [key: string]: string;

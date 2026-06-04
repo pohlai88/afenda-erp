@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { systemAdminDiagnosticCategorySchema } from "./system-admin.diagnostics.schema";
+import { systemAdminDiagnosticCategorySchema } from "./sys-diagnostics.schema";
 
 export const systemAdminDiagnosticsSearchParamsSchema = z.object({
   diagnosticsCategory: systemAdminDiagnosticCategorySchema.optional(),

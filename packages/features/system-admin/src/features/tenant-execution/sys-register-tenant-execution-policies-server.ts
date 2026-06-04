@@ -1,6 +1,6 @@
 import { registerTenantExecutionPolicyEvaluator } from "@afenda/kernel/execution";
 import { resolveTenantExecutionPolicyVerdict } from "@afenda/kernel/execution-tenant-policy";
-import { loadTenantExecutionRulesForOrganization } from "./system-admin.tenant-execution-rules.loader.server";
+import { loadTenantExecutionRulesForOrganization } from "./sys-tenant-execution-rules.loader.server";
 
 let tenantExecutionPoliciesRegistered = false;
 

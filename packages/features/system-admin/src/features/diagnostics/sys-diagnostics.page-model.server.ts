@@ -1,44 +1,44 @@
-import { listRoleOverridesForOrganization } from "../../users/data/system-admin.identity.repository.server";
+import { listRoleOverridesForOrganization } from "../users/sys-identity.repository.server";
 import {
   listTenantApprovalSettings,
   listTenantCapabilitySettings,
   listTenantModuleSettings,
   listTenantPolicySettings,
-} from "../../tenant-execution/data/system-admin.execution-settings.repository.server";
-import { getSystemAdminOrganizationSecuritySettings } from "../../security/data/system-admin.security.query.server";
+} from "../tenant-execution/sys-execution-settings.repository.server";
+import { getSystemAdminOrganizationSecuritySettings } from "../security/sys-security.query.server";
 import {
   mapApiCredentialToListRow,
   mapSsoConnectionToListRow,
   mapWebhookDeliveryToListRow,
   mapWebhookToListRow,
-} from "../../integrations/data/system-admin.integrations.mapper.server";
-import { evaluateIntegrationsReadiness } from "../../integrations/data/system-admin.integrations.readiness.server";
+} from "../integrations/sys-integrations.mapper.server";
+import { evaluateIntegrationsReadiness } from "../integrations/sys-integrations.readiness.server";
 import {
   listApiCredentials,
   listSsoConnections,
   listWebhookDeliveries,
   listWebhooks,
-} from "../../integrations/data/system-admin.integrations.repository.server";
+} from "../integrations/sys-integrations.repository.server";
 import type {
   SystemAdminDiagnosticCategory,
   SystemAdminDiagnosticIssue,
   SystemAdminDiagnosticsSummary,
-} from "../contracts/system-admin.diagnostic-issue.contract";
+} from "./sys-diagnostic-issue.contract";
 import type {
   SystemAdminDiagnosticsModuleCoverageRow,
   SystemAdminDiagnosticsRecentChangeRow,
-} from "../contracts/system-admin.diagnostics-coverage.contract";
+} from "./sys-diagnostics-coverage.contract";
 import {
   collectIntegrationDiagnosticIssues,
   collectSystemAdminDiagnosticIssues,
-} from "./system-admin.diagnostics.checks.server";
-import { buildDiagnosticsModuleCoverageRows } from "./system-admin.diagnostics.module-coverage.server";
-import { listSystemAdminDiagnosticsRecentChanges } from "./system-admin.diagnostics.recent-changes.server";
+} from "./sys-diagnostics.checks.server";
+import { buildDiagnosticsModuleCoverageRows } from "./sys-diagnostics.module-coverage.server";
+import { listSystemAdminDiagnosticsRecentChanges } from "./sys-diagnostics.recent-changes.server";
 import {
   groupDiagnosticIssuesBySeverity,
   sortDiagnosticIssues,
   summarizeDiagnosticIssues,
-} from "./system-admin.diagnostics.verdict.server";
+} from "./sys-diagnostics.verdict.server";
 
 export type SystemAdminDiagnosticsPageModel = {
   issues: readonly SystemAdminDiagnosticIssue[];

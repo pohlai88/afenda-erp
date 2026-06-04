@@ -1,9 +1,9 @@
-import type { AppCapability } from "@afenda/auth";
+import type { AppCapability } from "@afenda/kernel";
 
 import {
   requireHrCapability,
   type HrModuleExecutionGuard,
-} from "../compliance-regulatory-tracking/server";
+} from "../../hr-suite-integration/server";
 import {
   HR_WORKFORCE_ESS_APPROVE_CAPABILITY,
   HR_WORKFORCE_ESS_AUDIT_READ_CAPABILITY,

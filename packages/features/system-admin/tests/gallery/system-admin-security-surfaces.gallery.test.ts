@@ -1,12 +1,12 @@
 import { parseListSurfaceRendererConfiguration } from "@afenda/governed-surface/schemas";
 import { describe, expect, it } from "vitest";
 
-import { evaluateSecurityReadiness } from "../../src/security/data/system-admin.security.readiness.server";
+import { evaluateSecurityReadiness } from "../../src/features/security/sys-security.readiness.server";
 import {
   buildSystemAdminSecuritySettingsListSurface,
   systemAdminSecurityGalleryEncryptionSettings,
   systemAdminSecurityGalleryProviders,
-} from "../../src/security/metadata";
+} from "../../src/features/security/metadata";
 
 describe("system admin security gallery surfaces", () => {
   it("parses platform encryption posture rows", () => {

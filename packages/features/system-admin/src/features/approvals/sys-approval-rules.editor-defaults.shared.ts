@@ -1,7 +1,7 @@
 import type {
   SystemAdminApprovalRule,
   SystemAdminApprovalRuleEditorDefaults,
-} from "../contracts/system-admin.approval-rule.contract";
+} from "./sys-approval-rule.contract";
 
 export function mapApprovalRuleToEditorDefaults(
   rule: SystemAdminApprovalRule,

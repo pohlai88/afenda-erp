@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
 
-import { GovernedSection } from "../../src/components/governed-section";
+import { GovernedSection } from "../../src/gov-governed-section";
 
 describe("GovernedSection", () => {
   it("emits identity and diagnostics when surfaceKey is provided", () => {

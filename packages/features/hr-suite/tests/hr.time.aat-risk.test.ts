@@ -26,17 +26,17 @@ import {
 import {
   classifyHrAatAbsenceRisk,
   parseHrAatAbsenceRiskThresholds,
-} from "../policies/hr.time.aat-risk-threshold.policy.server";
+} from "../src/time-attendance/absence-analytics-trends/hr.time.aat-risk-threshold.policy.server";
 import {
   requireHrAatPayrollRefRead,
   requireHrAatRiskRead,
   requireHrAatRiskThresholdWrite,
-} from "../policies/hr.time.aat-access.policy.server";
+} from "../src/time-attendance/absence-analytics-trends/hr.time.aat-access.policy.server";
 import {
   DEFAULT_HR_AAT_ABSENCE_RISK_THRESHOLDS,
   HR_AAT_RISK_LEVEL_BADGE_TONE,
   hrAatAbsenceRiskThresholdsSchema,
-} from "../schemas/hr.time.aat-risk.schema";
+} from "../src/time-attendance/absence-analytics-trends/hr.time.aat-risk.schema";
 
 describe("HRM-AAT-018 configurable absence risk thresholds", () => {
   it("accepts monotonic default thresholds", () => {

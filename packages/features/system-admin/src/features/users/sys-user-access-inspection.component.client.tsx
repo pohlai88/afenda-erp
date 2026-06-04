@@ -1,16 +1,16 @@
 "use client";
 
-import { formatSystemAdminListPreview } from "../../overview/components/system-admin.list-preview.shared";
-import { SystemAdminMetadataFieldStack } from "../../overview/components/system-admin.metadata-field-stack.component.client";
+import { formatSystemAdminListPreview } from "../overview/sys-list-preview.shared";
+import { SystemAdminMetadataFieldStack } from "../overview/sys-metadata-field-stack.component.client";
 import { Badge } from "@afenda/ui/badge";
 import { Button } from "@afenda/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@afenda/ui/card";
 import { ScrollArea } from "@afenda/ui/scroll-area";
 import { Separator } from "@afenda/ui/separator";
 import { XIcon } from "lucide-react";
-import type { SystemAdminUserAccessInspection } from "../contracts";
-import { systemAdminUsersUiCopy } from "../surface/system-admin.users-ui.copy.shared";
-import { systemAdminUserStatusBadgeVariant } from "../surface/system-admin.users-status-badge.shared";
+import type { SystemAdminUserAccessInspection } from "./sys-users.contract";
+import { systemAdminUsersUiCopy } from "./sys-users-ui.copy.shared";
+import { systemAdminUserStatusBadgeVariant } from "./sys-users-status-badge.shared";
 
 export function SystemAdminUserAccessInspectionPanel({
   inspection,

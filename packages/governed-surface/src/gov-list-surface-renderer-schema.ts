@@ -3,16 +3,16 @@ import { z } from "zod";
 import type { SchemaStability } from "./gov-_stability-shared";
 
 import { prepareGovernedConfigurationForParse } from "./migrate-governed-configuration.shared";
-import { resolveGovernedListPresentation } from "../resolvers/resolve-governed-presentation";
-import { erpPermissionRequirementSchema } from "./erp-permission-requirement.schema";
-import { listPresentationProfileIdSchema } from "./presentation-profile.schema";
+import { resolveGovernedListPresentation } from "./gov-resolve-governed-presentation";
+import { erpPermissionRequirementSchema } from "./gov-erp-permission-requirement-schema";
+import { listPresentationProfileIdSchema } from "./gov-presentation-profile-schema";
 import {
   listCellKindSchema,
   listColumnSchema,
   listSurfaceSchema,
-} from "./list-surface.schema";
-import { listSurfaceRowTrailingActionSchema } from "./list-surface-row-trailing-action.schema";
-import { listSurfaceToolbarSchema } from "./list-surface-toolbar.schema";
+} from "./gov-list-surface-schema";
+import { listSurfaceRowTrailingActionSchema } from "./gov-list-surface-row-trailing-action-schema";
+import { listSurfaceToolbarSchema } from "./gov-list-surface-toolbar-schema";
 import { governedMetadataSchemaVersionSchema } from "./gov-schema-version-shared";
 
 export const SCHEMA_STABILITY: SchemaStability = "beta";
@@ -139,7 +139,7 @@ export const listSurfaceDecisionLedgerSchema = z
 
 export const listSurfacePresentationSchema = z
   .object({
-    variant: z.enum(["full", "table-only"]).default("full"),
+    variant: z.enum(["table-only"]).default("table-only"),
     tableDensity: z.enum(["compact", "comfortable"]).default("compact"),
     narrowMode: z.enum(["table", "cards", "auto"]).optional(),
     primaryColumnId: z.string().trim().min(1).optional(),

@@ -1,4 +1,4 @@
-import type { AppCapability, OrganizationRole } from "@afenda/auth";
+import type { AppCapability, OrganizationRole } from "@afenda/kernel";
 
 export type SystemAdminUserStatus = "invited" | "active" | "suspended" | "removed";
 

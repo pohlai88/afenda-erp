@@ -1,9 +1,9 @@
 import { moduleById } from "@afenda/kernel";
 import type { ModuleId } from "@afenda/config/module-ids";
 import type { TenantModuleSettingRow } from "@afenda/db";
-import { systemAdminControlLinks } from "../../overview/contracts/system-admin.control-links.contract";
-import type { SystemAdminDiagnosticIssue } from "../contracts/system-admin.diagnostic-issue.contract";
-import type { SystemAdminDiagnosticsModuleCoverageRow } from "../contracts/system-admin.diagnostics-coverage.contract";
+import { systemAdminControlLinks } from "../overview/sys-control-links.contract";
+import type { SystemAdminDiagnosticIssue } from "./sys-diagnostic-issue.contract";
+import type { SystemAdminDiagnosticsModuleCoverageRow } from "./sys-diagnostics-coverage.contract";
 
 function titleCaseModuleKey(moduleKey: string) {
   return moduleKey

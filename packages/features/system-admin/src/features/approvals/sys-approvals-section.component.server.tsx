@@ -1,23 +1,15 @@
 import { GovernedPatternCListSection } from "@afenda/governed-surface/server";
 import { Alert, AlertDescription, AlertTitle, SectionPanel } from "@afenda/ui";
 import type { ModuleWorkspace, ModuleWorkspaceListQuery } from "@afenda/kernel";
-import type { SystemAdminActionResult } from "../../tenant-execution/contracts/system-admin.action-result.contract";
-import type {
-  SystemAdminApprovalRuleDetail,
-  SystemAdminApprovalRuleEditorDefaults,
-  SystemAdminApprovalRuleListRow,
-  SystemAdminApproverRoleOption,
-} from "../contracts";
-import {
-  buildApprovalsListSurface,
-  systemAdminApprovalsSurfaceKey,
-  systemAdminApprovalsUiCopy,
-} from "../surface";
-import { SystemAdminApprovalDetailPanel } from "./system-admin.approval-detail.component.server";
-import { SystemAdminApprovalRuleEditor } from "./system-admin.approval-rule-editor.component.client";
-import { SystemAdminApprovalQueueSection } from "./system-admin.approvals-queue-section.component.server";
-import { SystemAdminApprovalTrailingCell } from "./system-admin.approvals-trailing-cells.component.client";
-import { systemAdminControlLinks } from "../../overview/contracts/system-admin.control-links.contract";
+import type { SystemAdminActionResult } from "../tenant-execution/sys-action-result.contract";
+import type { SystemAdminApprovalRuleDetail, SystemAdminApprovalRuleEditorDefaults, SystemAdminApprovalRuleListRow, SystemAdminApproverRoleOption } from "./sys-approval-rule.contract";
+import { buildApprovalsListSurface, systemAdminApprovalsSurfaceKey } from "./sys-approvals-list.surface";
+import { systemAdminApprovalsUiCopy } from "./sys-approvals-ui.copy.shared";
+import { SystemAdminApprovalDetailPanel } from "./sys-approval-detail.component.server";
+import { SystemAdminApprovalRuleEditor } from "./sys-approval-rule-editor.component.client";
+import { SystemAdminApprovalQueueSection } from "./sys-approvals-queue-section.component.server";
+import { SystemAdminApprovalTrailingCell } from "./sys-approvals-trailing-cells.component.client";
+import { systemAdminControlLinks } from "../overview/sys-control-links.contract";
 
 type UpdateApprovalRuleAction = (
   state: SystemAdminActionResult | undefined,

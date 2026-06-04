@@ -3,16 +3,16 @@ import { describe, expect, it } from "vitest";
 import {
   systemAdminApprovalStatusLabels,
   systemAdminApprovalReadinessLabels,
-} from "../../src/approvals/surface/system-admin.approvals-detail-badges.shared";
+} from "../../src/features/approvals/sys-approvals-detail-badges.shared";
 import {
   systemAdminApprovalsGalleryRows,
   systemAdminApprovalsGalleryScenarioKeys,
   systemAdminApprovalsQueueGalleryRows,
   systemAdminApprovalsQueueGalleryScenarioKeys,
-} from "../../src/approvals/surface/system-admin.approvals-gallery.fixtures.shared";
-import { buildApprovalsListSurface } from "../../src/approvals/surface/system-admin.approvals-list.surface";
-import { buildSystemAdminApprovalQueueListSurface } from "../../src/approvals/surface/system-admin.approvals-queue-list.surface";
-import { SYSTEM_ADMIN_APPROVAL_QUEUE_ROW_TRAILING_ACTION_IDS } from "../../src/approvals/surface/system-admin.approvals-queue-list-trailing.shared";
+} from "../../src/features/approvals/sys-approvals-gallery.fixtures.shared";
+import { buildApprovalsListSurface } from "../../src/features/approvals/sys-approvals-list.surface";
+import { buildSystemAdminApprovalQueueListSurface } from "../../src/features/approvals/sys-approvals-queue-list.surface";
+import { SYSTEM_ADMIN_APPROVAL_QUEUE_ROW_TRAILING_ACTION_IDS } from "../../src/features/approvals/sys-approvals-queue-list-trailing.shared";
 
 describe("system admin approvals list surface gallery", () => {
   it.each([

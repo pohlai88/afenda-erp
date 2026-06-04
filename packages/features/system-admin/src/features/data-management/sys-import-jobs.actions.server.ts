@@ -2,38 +2,38 @@
 
 import { createHash } from "node:crypto";
 import { revalidatePath } from "next/cache";
-import { systemAdminRoutePaths } from "../../overview/contracts/system-admin.route-paths.contract";
+import { systemAdminRoutePaths } from "../overview/sys-route-paths.contract";
 import {
   systemAdminActionFailure,
   systemAdminActionSuccess,
   type SystemAdminActionResult,
   zodActionFailure,
-} from "../../tenant-execution/contracts/system-admin.action-result.contract";
+} from "../tenant-execution/sys-action-result.contract";
 import type {
   CreateSystemAdminImportJobActionData,
   ExportSystemAdminDataManagementActionData,
 } from "./sys-import-job.contract";
-import { SYSTEM_ADMIN_DATA_MANAGEMENT_QUERY_LIMIT } from "../contracts/system-admin.data-management.limits.shared";
+import { SYSTEM_ADMIN_DATA_MANAGEMENT_QUERY_LIMIT } from "./sys-data-management.limits.shared";
 import { systemAdminDataManagementAuditActions } from "./sys-data-management.event";
 import {
   requireSystemAdminDataManagementCancel,
   requireSystemAdminDataManagementExport,
   requireSystemAdminDataManagementManage,
   requireSystemAdminDataManagementRun,
-} from "../policies/system-admin.data-management.policy.server";
+} from "./sys-data-management.policy.server";
 import {
   exportSystemAdminDataManagementSchema,
   systemAdminImportJobCommandSchema,
 } from "./sys-import-job.schema";
-import { parseSystemAdminCsv } from "./system-admin.data-management-csv.parse.shared";
-import { writeSystemAdminDataManagementAudit } from "./system-admin.data-management-audit.shared";
-import { buildSystemAdminDataManagementExportCsv } from "./system-admin.data-management-export.build.server";
-import { findMissingCsvHeaders } from "./system-admin.data-management-headers.shared";
+import { parseSystemAdminCsv } from "./sys-data-management-csv.parse.shared";
+import { writeSystemAdminDataManagementAudit } from "./sys-data-management-audit.shared";
+import { buildSystemAdminDataManagementExportCsv } from "./sys-data-management-export.build.server";
+import { findMissingCsvHeaders } from "./sys-data-management-headers.shared";
 import {
   getSystemAdminImportAdapter,
   getSystemAdminImportTemplate,
-} from "./system-admin.import-adapter.registry.server";
-import { parseSystemAdminImportJobFormData } from "./system-admin.import-job-form.shared";
+} from "./sys-import-adapter.registry.server";
+import { parseSystemAdminImportJobFormData } from "./sys-import-job-form.shared";
 import {
   cancelSystemAdminDataImportJob,
   createSystemAdminDataImportJob,
@@ -41,8 +41,8 @@ import {
   recordSystemAdminDataExportJob,
   retrySystemAdminDataImportJob,
   runSystemAdminDataImportJob,
-} from "./system-admin.import-jobs.query.server";
-import { buildSystemAdminDataManagementPageModel } from "./system-admin.data-management.page-model.server";
+} from "./sys-import-jobs.query.server";
+import { buildSystemAdminDataManagementPageModel } from "./sys-data-management.page-model.server";
 
 function digest(value: string) {
   return createHash("sha256").update(value).digest("hex");

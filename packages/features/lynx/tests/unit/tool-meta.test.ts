@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { LYNX_TOOL_IDS, lynxToolMeta } from "../../src/tools/lynx.tool-meta";
+import { LYNX_TOOL_IDS, lynxToolMeta } from "../../src/lyn-tool-meta";
 
 describe("Lynx governed tool metadata", () => {
   it("declares governed metadata for every Lynx tool id", () => {

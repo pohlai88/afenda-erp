@@ -2,30 +2,30 @@ import { beforeEach, describe, expect, it } from "vitest";
 import {
   requireExecutionPermission,
   resolveExecutionAccessVerdict,
-} from "../../src/execution-kernel/access/execution-access";
-import { resolveExecutionAuditEntityType } from "../../src/execution-kernel/audit/execution-audit";
+} from "../../src/ker-execution-access";
+import { resolveExecutionAuditEntityType } from "../../src/ker-execution-audit";
 import {
   defineExecutionCapability,
   getExecutionCapability,
   listExecutionCapabilitiesForModule,
   resetExecutionCapabilityRegistryForTest,
-} from "../../src/execution-kernel/capabilities/execution-capabilities";
-import type { ExecutionContext } from "../../src/execution-kernel/context/execution-context-types";
-import { toExecutionAuthorityContext } from "../../src/execution-kernel/context/execution-context-types";
+} from "../../src/ker-execution-capabilities";
+import type { ExecutionContext } from "../../src/ker-execution-context-types";
+import { toExecutionAuthorityContext } from "../../src/ker-execution-context-types";
 import {
   ExecutionAccessDeniedError,
   ExecutionInvalidStateError,
   ExecutionPolicyDeniedError,
-} from "../../src/execution-kernel/errors/execution-errors";
+} from "../../src/ker-execution-errors";
 import {
   defineExecutionPolicy,
   resetExecutionPolicyRegistryForTest,
   resolveExecutionPolicyVerdict,
-} from "../../src/execution-kernel/policy/execution-policy";
+} from "../../src/ker-execution-policy";
 import {
   executionStates,
   isExecutionState,
-} from "../../src/execution-kernel/state/execution-state";
+} from "../../src/ker-execution-state";
 
 const context: ExecutionContext = {
   organizationId: "org_123",

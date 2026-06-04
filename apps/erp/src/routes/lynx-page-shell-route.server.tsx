@@ -1,4 +1,7 @@
-import { GovernedComponentRenderer } from "@afenda/governed-surface/metadata";
+import {
+  GovernedComponentRenderer,
+  ListSurfaceRenderer,
+} from "@afenda/governed-surface/server";
 import type {
   ListSurfaceRendererConfigurationResolvedInput,
   StatCardConfigurationResolvedInput,
@@ -88,13 +91,7 @@ export function GovernedListSection({
   return (
     <section aria-label={title ?? "Lynx list"} className="section-stack">
       {title ? <h2 className="type-section-title">{title}</h2> : null}
-      <GovernedComponentRenderer
-        component={{
-          type: "governed:list-surface",
-          serverType: "list-surface",
-          configuration: model,
-        }}
-      />
+      <ListSurfaceRenderer configuration={model} />
     </section>
   );
 }

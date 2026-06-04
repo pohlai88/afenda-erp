@@ -58,7 +58,28 @@ export * from "./app-system-admin-client";
 export * from "./app-upload-panel-client";
 export * from "./app-utility-bar";
 export * from "./app-utility-bar-items-shared";
-export * from "./app-utility-bar-metadata-shared";
+export {
+  APP_SHELL_UTILITY_BAR_METADATA_VERSION,
+  APP_SHELL_UTILITY_BAR_ZONES,
+  APP_SHELL_UTILITY_INTENTS,
+  APP_SHELL_UTILITY_KINDS,
+  appShellUtilityAdapterKeySchema,
+  appShellUtilityBarMetadataSchema,
+  appShellUtilityIntentSchema,
+  appShellUtilityItemMetadataSchema,
+  appShellUtilityKindSchema,
+  appShellUtilityZoneIdSchema,
+  appShellUtilityZoneMetadata,
+  appShellUtilityZoneMetadataSchema,
+  parseAppShellUtilityBarMetadata,
+  type AppShellUtilityBarMetadata,
+  type AppShellUtilityIconKey,
+  type AppShellUtilityIntent,
+  type AppShellUtilityItemMetadata,
+  type AppShellUtilityKind,
+  type AppShellUtilityZoneId,
+  type AppShellUtilityZoneMetadata,
+} from "./app-utility-bar-metadata-shared";
 export * from "./app-utility-bar-store";
 export * from "./app-utility-chrome-shared";
 export * from "./app-utility-config-popover-client";

@@ -1,7 +1,7 @@
 import type {
   HrBonusApprovalRoutingConfig,
   HrBonusApprovalRoutingStep,
-} from "./hr-bonus-incentive";
+} from "./dbx-hr-bonus-incentive";
 
 export type HrBonusApprovalRouteContext = {
   planType: string;
@@ -74,3 +74,4 @@ export function resolveHrBonusApprovalSteps(input: {
     .sort((a, b) => a.order - b.order)
     .filter((step) => matchesRoutingStep(step, input.context));
 }
+

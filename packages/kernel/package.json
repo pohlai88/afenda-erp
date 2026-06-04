@@ -27,47 +27,46 @@
       "default": "./dist/execution.js"
     },
     "./execution-capabilities": {
-      "types": "./src/execution-kernel/capabilities/execution-capabilities.ts",
-      "development": "./src/execution-kernel/capabilities/execution-capabilities.ts",
-      "import": "./src/execution-kernel/capabilities/execution-capabilities.ts",
-      "default": "./dist/execution-kernel/capabilities/execution-capabilities.js"
+      "types": "./src/ker-execution-capabilities.ts",
+      "development": "./src/ker-execution-capabilities.ts",
+      "import": "./src/ker-execution-capabilities.ts",
+      "default": "./dist/ker-execution-capabilities.js"
     },
     "./feature-metadata": {
-      "types": "./src/modules/feature-metadata.ts",
-      "development": "./src/modules/feature-metadata.ts",
-      "import": "./src/modules/feature-metadata.ts",
-      "default": "./dist/modules/feature-metadata.js"
+      "types": "./src/ker-feature-metadata.ts",
+      "development": "./src/ker-feature-metadata.ts",
+      "import": "./src/ker-feature-metadata.ts",
+      "default": "./dist/ker-feature-metadata.js"
     },
     "./execution-tenant-policy": {
-      "types": "./src/execution-kernel/policy/tenant-execution-rules.ts",
-      "development": "./src/execution-kernel/policy/tenant-execution-rules.ts",
-      "import": "./src/execution-kernel/policy/tenant-execution-rules.ts",
-      "default": "./dist/execution-kernel/policy/tenant-execution-rules.js"
+      "types": "./src/ker-tenant-execution-rules.ts",
+      "development": "./src/ker-tenant-execution-rules.ts",
+      "import": "./src/ker-tenant-execution-rules.ts",
+      "default": "./dist/ker-tenant-execution-rules.js"
     },
     "./module-definitions": {
-      "types": "./src/modules/definitions.ts",
-      "development": "./src/modules/definitions.ts",
-      "import": "./src/modules/definitions.ts",
-      "default": "./dist/modules/definitions.js"
+      "types": "./src/ker-definitions.ts",
+      "development": "./src/ker-definitions.ts",
+      "import": "./src/ker-definitions.ts",
+      "default": "./dist/ker-definitions.js"
     },
     "./tenant-availability": {
-      "types": "./src/modules/tenant-availability.ts",
-      "development": "./src/modules/tenant-availability.ts",
-      "import": "./src/modules/tenant-availability.ts",
-      "default": "./dist/modules/tenant-availability.js"
+      "types": "./src/ker-tenant-availability.ts",
+      "development": "./src/ker-tenant-availability.ts",
+      "import": "./src/ker-tenant-availability.ts",
+      "default": "./dist/ker-tenant-availability.js"
     },
     "./tenant-module-availability": {
-      "types": "./src/modules/tenant-module-availability.ts",
-      "development": "./src/modules/tenant-module-availability.ts",
-      "import": "./src/modules/tenant-module-availability.ts",
-      "default": "./dist/modules/tenant-module-availability.js"
+      "types": "./src/ker-tenant-module-availability.ts",
+      "development": "./src/ker-tenant-module-availability.ts",
+      "import": "./src/ker-tenant-module-availability.ts",
+      "default": "./dist/ker-tenant-module-availability.js"
     }
   },
   "dependencies": {
     "@afenda/auth": "workspace:*",
     "@afenda/config": "workspace:*",
     "@afenda/db": "workspace:*",
-    "@afenda/governed-surface": "workspace:*",
     "@afenda/observability": "workspace:*",
     "server-only": "^0.0.1",
     "zod": "catalog:"

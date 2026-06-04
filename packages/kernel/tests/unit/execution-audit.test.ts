@@ -5,7 +5,7 @@ import {
   normalizeExecutionAuditEvent,
   redactExecutionAuditRecord,
   resolveExecutionAuditEntityType,
-} from "../../src/execution-kernel/audit/execution-audit";
+} from "../../src/ker-execution-audit";
 
 describe("execution audit helpers", () => {
   it("normalizes summary, outcome, and redacts sensitive metadata", () => {

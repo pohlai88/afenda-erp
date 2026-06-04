@@ -1,37 +1,26 @@
 import { GovernedPatternCListSection } from "@afenda/governed-surface/server";
 import { SectionPanel } from "@afenda/ui";
-import type { IntegrationReadinessReport } from "../contracts/system-admin.integrations-readiness.contract";
+import type { IntegrationReadinessReport } from "./sys-integrations-readiness.contract";
 import type {
   SystemAdminApiCredentialListRow,
   SystemAdminIntegrationsRecentChangeRow,
   SystemAdminSsoConnectionListRow,
   SystemAdminWebhookDeliveryListRow,
   SystemAdminWebhookListRow,
-} from "../contracts/system-admin.integrations-list.contract";
-import {
-  buildApiCredentialsListSurface,
-  buildIntegrationsGovernanceListSurface,
-  buildSsoConnectionsListSurface,
-  buildSystemAdminIntegrationsRecentChangesListSurface,
-  buildWebhookDeliveriesListSurface,
-  buildWebhooksListSurface,
-  systemAdminApiCredentialsSurfaceKey,
-  systemAdminIntegrationsGovernanceSurfaceKey,
-  systemAdminIntegrationsRecentChangesSurfaceKey,
-  systemAdminIntegrationsUiCopy,
-  systemAdminSsoSurfaceKey,
-  systemAdminWebhookDeliveriesSurfaceKey,
-  systemAdminWebhooksSurfaceKey,
-} from "../surface";
-import { CreateApiCredentialForm } from "./system-admin.create-api-credential-form.component.client";
-import { CreateWebhookForm } from "./system-admin.create-webhook-form.component.client";
+} from "./sys-integrations-list.contract";
+import { buildApiCredentialsListSurface, buildSsoConnectionsListSurface, buildWebhookDeliveriesListSurface, buildWebhooksListSurface, systemAdminApiCredentialsSurfaceKey, systemAdminSsoSurfaceKey, systemAdminWebhookDeliveriesSurfaceKey, systemAdminWebhooksSurfaceKey } from "./sys-integrations-list.surface";
+import { buildIntegrationsGovernanceListSurface, systemAdminIntegrationsGovernanceSurfaceKey } from "./sys-integrations-governance.surface";
+import { buildSystemAdminIntegrationsRecentChangesListSurface, systemAdminIntegrationsRecentChangesSurfaceKey } from "./sys-integrations-recent-changes.surface";
+import { systemAdminIntegrationsUiCopy } from "./sys-integrations-ui.copy.shared";
+import { CreateApiCredentialForm } from "./sys-create-api-credential-form.component.client";
+import { CreateWebhookForm } from "./sys-create-webhook-form.component.client";
 import {
   ApiCredentialTrailingCell,
   WebhookTrailingCell,
-} from "./system-admin.integration-trailing-cells.component.client";
-import { SystemAdminSsoConnectionForm } from "./system-admin.sso-connection-form.component.client";
-import type { SystemAdminActionResult } from "../../tenant-execution/contracts/system-admin.action-result.contract";
-import type { CreateApiCredentialActionData, CreateWebhookActionData } from "../contracts/system-admin.integrations-action-dtos.contract";
+} from "./sys-integration-trailing-cells.component.client";
+import { SystemAdminSsoConnectionForm } from "./sys-sso-connection-form.component.client";
+import type { SystemAdminActionResult } from "../tenant-execution/sys-action-result.contract";
+import type { CreateApiCredentialActionData, CreateWebhookActionData } from "./sys-integrations-action-dtos.contract";
 
 type CreateApiCredentialFormAction = (
   state: SystemAdminActionResult<CreateApiCredentialActionData> | undefined,

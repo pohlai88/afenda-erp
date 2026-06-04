@@ -26,7 +26,7 @@ describe("fingerprintContent", () => {
 import * as React from "react";
 import { Slot } from "radix-ui";
 import { cva } from "class-variance-authority";
-import { cn } from "./utils";
+import { cn } from "../../src/utils";
 
 const buttonVariants = cva("base");
 

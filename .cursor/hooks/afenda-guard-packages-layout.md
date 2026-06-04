@@ -64,6 +64,26 @@ packages/features/hr-suite/src/
 
 ---
 
+## Mode 4 — metadata-ui-runtime (GUARD 6)
+
+Structured runtime package — **not** GUARD 5 flat layout.
+
+```text
+packages/metadata-ui/src/
+  index.ts | client.ts | server.ts
+  contracts/ | schemas/ | registry/ | runtime/ | identity/
+  security/ | server-actions/ | shell/ | renderers/ | presentation/ | logging/ | tests/
+  sections/<kind>/   ← flat per section kind (list, stat, chart, …)
+```
+
+Naming: `{purpose}.{runtime}.ts(x)` — e.g. `list-table.client.tsx`, `list.schema.ts`.  
+**Never** `gov-*`, `governed-*`, `*-surface-*`, `*-helper-*`, `*-utils-*` noise.
+
+`"afenda": { "layout": "metadata-ui-runtime" }`  
+**Run:** `pnpm guard:metadata-ui` · **Law:** `packages/metadata-ui/architecture.md`
+
+---
+
 ## Scan
 
 Every package with `src/` is scanned. Log shows mode:

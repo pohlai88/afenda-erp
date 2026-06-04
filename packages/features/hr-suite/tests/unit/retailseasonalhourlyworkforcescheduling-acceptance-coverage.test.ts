@@ -4,8 +4,8 @@ import {
   HR_INDUSTRY_RWS_ACCEPTANCE_CRITERIA_COVERAGE,
   HR_INDUSTRY_RWS_REQUIREMENT_COVERAGE,
   assertHrIndustryRwsEnterpriseCoverage,
-} from "../../src/industry-specific/retail-seasonal-hourly-workforce-scheduling/data/hr.industry.rws-coverage.shared";
-import { hrIndustryRwsAuditActions } from "../../src/industry-specific/retail-seasonal-hourly-workforce-scheduling/events/hr.industry.rws.event";
+} from "../../src/industry-specific/retail-seasonal-hourly-workforce-scheduling/hr.industry.rws-coverage.shared";
+import { hrIndustryRwsAuditActions } from "../../src/industry-specific/retail-seasonal-hourly-workforce-scheduling/hr.industry.rws.event";
 
 describe("HRM-RWS-001..034 coverage registry", () => {
   it("registers all thirty-four requirements as shipped", () => {

@@ -1,14 +1,14 @@
 import type { ListSurfaceRendererConfigurationResolvedInput } from "@afenda/governed-surface";
-import { systemAdminControlLinks } from "../../overview/contracts/system-admin.control-links.contract";
+import { systemAdminControlLinks } from "../overview/sys-control-links.contract";
 import {
   buildLinkedControlListSurface,
   coverageVerdictBadge,
   linkCell,
   moduleReadinessVerdictBadge,
-} from "../../overview/surfaces/system-admin.control-list.shared";
-import type { SystemAdminCapabilityAvailability } from "../contracts";
-import { systemAdminCapabilitiesUiCopy } from "../surface/system-admin.capabilities-ui.copy.shared";
-import { resolveSystemAdminCapabilityRowTrailingAction } from "../surface/system-admin.capabilities-list-trailing.shared";
+} from "../overview/sys-control-list.shared";
+import type { SystemAdminCapabilityAvailability } from "./sys-capabilities.contract";
+import { systemAdminCapabilitiesUiCopy } from "./sys-capabilities-ui.copy.shared";
+import { resolveSystemAdminCapabilityRowTrailingAction } from "./sys-capabilities-list-trailing.shared";
 
 export const systemAdminCapabilitiesSurfaceKey =
   "system-admin.capabilities.list";

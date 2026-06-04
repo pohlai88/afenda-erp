@@ -8,7 +8,7 @@ import { formatErpDateTime } from "@afenda/kernel";
 import {
   buildSystemAdminListToolbar,
   buildSystemAdminStaticPagination,
-} from "../../overview/surfaces/system-admin.list-surface.shared";
+} from "../overview/sys-list-surface.shared";
 import type {
   SystemAdminExportJobListRow,
   SystemAdminImportJobListRow,
@@ -16,8 +16,8 @@ import type {
   SystemAdminImportRowFailure,
   SystemAdminImportTemplate,
 } from "./sys-import-job.contract";
-import { systemAdminDataManagementUiCopy } from "./system-admin.data-management-ui.copy.shared";
-import { resolveSystemAdminImportJobRowTrailingAction } from "./system-admin.import-jobs-list-trailing.shared";
+import { systemAdminDataManagementUiCopy } from "./sys-data-management-ui.copy.shared";
+import { resolveSystemAdminImportJobRowTrailingAction } from "./sys-import-jobs-list-trailing.shared";
 
 export const systemAdminImportTemplatesSurfaceKey =
   "system-admin.data-management.templates.list";

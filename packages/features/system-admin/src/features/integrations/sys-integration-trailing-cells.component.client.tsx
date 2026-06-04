@@ -10,11 +10,11 @@ import { Button } from "@afenda/ui/button";
 import { BanIcon, PowerIcon } from "lucide-react";
 import { useState, useTransition } from "react";
 
-import type { SystemAdminActionResult } from "../../tenant-execution/contracts/system-admin.action-result.contract";
+import type { SystemAdminActionResult } from "../tenant-execution/sys-action-result.contract";
 import {
   revokeApiCredentialAction,
   setWebhookEnabledAction,
-} from "../actions/system-admin.integrations.actions.server";
+} from "./sys-integrations.actions.server";
 
 export function WebhookTrailingCell({ row }: GovernedListTrailingCellProps) {
   const [result, setResult] = useState<SystemAdminActionResult>();

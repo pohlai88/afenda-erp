@@ -4,6 +4,7 @@
 import "server-only";
 
 export * from "./execution";
+export * from "./ker-app-capabilities";
 export * from "./ker-assistant-prompts";
 export * from "./ker-auth-route-copy";
 export * from "./ker-chart-surfaces";

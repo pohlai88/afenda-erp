@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { buildHrBenefitsPlansListSurface } from "../../src/payroll-compensation/benefits-administration/surface/hr.payroll.benefits-plans-list.surface";
+import { buildHrBenefitsPlansListSurface } from "../../src/payroll-compensation/benefits-administration/hr.payroll.benefits-plans-list.surface";
 
 describe("hr benefits plans list EUI contract", () => {
   it("exposes search toolbar bound to the plans registry param", () => {

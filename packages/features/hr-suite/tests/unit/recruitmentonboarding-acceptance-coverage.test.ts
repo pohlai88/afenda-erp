@@ -4,7 +4,7 @@ import {
   assertRonCoverageComplete,
   RON_ACCEPTANCE_CRITERIA_COVERAGE,
   RON_REQUIREMENT_COVERAGE,
-} from "../../src/talent-management/recruitment-onboarding/data/hr.talent.ron-coverage.shared";
+} from "../../src/talent-management/recruitment-onboarding/hr.talent.ron-coverage.shared";
 
 describe("HRM-RON-001..041 coverage registry", () => {
   it("registers all forty-one requirements as shipped", () => {

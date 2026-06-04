@@ -6,7 +6,7 @@ import {
   governedIdentityAttributes,
   governedTestId,
   toGovernedDomId,
-} from "../../src/utils/governed-identity.shared";
+} from "../../src/gov-governed-identity-shared";
 
 describe("governed identity contract", () => {
   it("emits surface, section, and component keys", () => {

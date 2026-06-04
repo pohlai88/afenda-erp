@@ -2,16 +2,16 @@
 
 import { useMemo, type ReactNode } from "react";
 
-import { useTranslations } from "../i18n/governed-surface-copy.client";
+import { useTranslations } from "./gov-governed-surface-copy-client";
 import { KanbanBoardView } from "./gov-kanban-board-view";
 
 import {
   parseGovernedKanbanBoardConfiguration,
   type GovernedKanbanBoardConfigurationInput,
   type KanbanCard,
-} from "./client";
+} from "./gov-kanban-board-schema";
 
-import { GovernedEmpty } from "./governed-empty";
+import { GovernedEmpty } from "./gov-governed-empty";
 
 export type GovernedKanbanFooterBoardProps = {
   configuration: GovernedKanbanBoardConfigurationInput;

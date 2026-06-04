@@ -7,7 +7,7 @@ import {
   hrPayrollPayslips,
   hrPayrollRunLines,
   hrPayrollRuns,
-} from "./hr-payroll-processing";
+} from "./dbx-hr-payroll-processing";
 
 /** PAY-024 — generate payslips after finalization. */
 export async function generateHrPayrollPayslipsInTx(
@@ -208,3 +208,4 @@ export async function getHrPayrollPayslipForEmployeeInTx(
 
   return row ?? null;
 }
+

@@ -11,7 +11,7 @@ import { HrBonusCommandError } from "./hr-bonus-incentive.shared";
 import {
   hrBonusPlanParticipants,
   hrBonusPlans,
-} from "./hr-bonus-incentive";
+} from "./dbx-hr-bonus-incentive";
 import { hrEmployees } from "./hr";
 
 export async function listHrBonusPlanParticipantsWindow(input: {
@@ -233,3 +233,4 @@ export async function removeHrBonusPlanParticipantInTx(
 
   return { participantId: participant.id };
 }
+

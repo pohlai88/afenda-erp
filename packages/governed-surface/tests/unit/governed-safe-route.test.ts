@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   asGovernedRoute,
   isGovernedRoute,
-} from "../../src/utils/governed-safe-route";
+} from "../../src/gov-governed-safe-route";
 
 describe("governed safe route", () => {
   it("accepts internal app routes", () => {

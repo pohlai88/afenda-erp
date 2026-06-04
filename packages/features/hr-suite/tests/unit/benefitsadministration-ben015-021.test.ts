@@ -3,11 +3,11 @@ import { describe, expect, it } from "vitest";
 import { HrBenefitsCommandError } from "@afenda/db";
 import { buildBenefitDeductionCode } from "../../../../db/src/hr-benefits-deductions";
 
-import { toBenefitsActionFailure } from "../../src/payroll-compensation/benefits-administration/data/hr.payroll.benefits-action-result.shared";
+import { toBenefitsActionFailure } from "../../src/payroll-compensation/benefits-administration/hr.payroll.benefits-action-result.shared";
 import {
   BENEFITS_ACCEPTANCE_COVERAGE,
   BENEFITS_REQUIREMENT_COVERAGE,
-} from "../../src/payroll-compensation/benefits-administration/data/hr.payroll.benefits-acceptance-coverage.shared";
+} from "../../src/payroll-compensation/benefits-administration/hr.payroll.benefits-acceptance-coverage.shared";
 
 describe("HRM-BEN-015 … HRM-BEN-021 coverage matrix", () => {
   it("marks requirement codes as shipped", () => {

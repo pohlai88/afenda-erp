@@ -2,15 +2,15 @@ import { updateTenantSettings } from "@afenda/db";
 import {
   ensureTenantSettings,
   getTenantSettings,
-} from "../../organization/data/system-admin.tenant-settings.repository.server";
-import { listTenantMembers } from "../../users/data/system-admin.identity.repository.server";
-import type { SystemAdminBillingContactRow } from "../contracts/system-admin.billing-list.contract";
-import { formatBillingContactRoleLabel } from "../contracts/system-admin.billing-list.contract";
+} from "../organization/sys-tenant-settings.repository.server";
+import { listTenantMembers } from "../users/sys-identity.repository.server";
+import type { SystemAdminBillingContactRow } from "./sys-billing-list.contract";
+import { formatBillingContactRoleLabel } from "./sys-billing-list.contract";
 import {
   systemAdminBillingContactsStoredSchema,
   type SystemAdminBillingContactsInput,
   type SystemAdminBillingContactsStored,
-} from "../schemas/system-admin.billing-contact.schema";
+} from "./sys-billing-contact.schema";
 
 const BILLING_CONTACTS_BRANDING_KEY = "billingContacts";
 

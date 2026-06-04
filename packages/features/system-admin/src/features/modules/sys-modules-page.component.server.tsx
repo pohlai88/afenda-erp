@@ -2,17 +2,14 @@ import { GovernedPatternCListSection } from "@afenda/governed-surface/server";
 import { hasExecutionPermission } from "@afenda/kernel/execution";
 import { SectionPanel } from "@afenda/ui";
 
-import { updateSystemAdminModuleSettingsAction } from "../actions";
-import { buildSystemAdminModulesPageModel } from "../data";
+import { updateSystemAdminModuleSettingsAction } from "./sys-module-settings.actions.server";
+import { buildSystemAdminModulesPageModel } from "./sys-modules.page-model.server";
 import { requireSystemAdminModulesRead } from "./sys-modules.policy.server";
-import {
-  buildModulesListSurface,
-  systemAdminModulesSurfaceKey,
-  systemAdminModulesUiCopy,
-} from "../surface";
-import { SystemAdminModuleSettingsDialog } from "./system-admin.module-settings-dialog.component.client";
-import { SystemAdminModulesAccessDenied } from "./system-admin.modules-access.component.server";
-import { SystemAdminModuleTrailingCell } from "./system-admin.modules-trailing-cells.component.client";
+import { buildModulesListSurface, systemAdminModulesSurfaceKey } from "./sys-modules-list.surface";
+import { systemAdminModulesUiCopy } from "./sys-modules-ui.copy.shared";
+import { SystemAdminModuleSettingsDialog } from "./sys-module-settings-dialog.component.client";
+import { SystemAdminModulesAccessDenied } from "./sys-modules-access.component.server";
+import { SystemAdminModuleTrailingCell } from "./sys-modules-trailing-cells.component.client";
 
 type SystemAdminModulesPageProps = {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;

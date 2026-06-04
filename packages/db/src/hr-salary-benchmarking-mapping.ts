@@ -10,7 +10,7 @@ import {
   hrSbsBenchmarkVersions,
   hrSbsCpmRecommendationRefs,
   hrSbsMappingApprovals,
-} from "./hr-salary-benchmarking";
+} from "./dbx-hr-salary-benchmarking";
 
 export type CreateHrSbsBenchmarkMappingInput = {
   organizationId: string;
@@ -446,3 +446,4 @@ export async function listHrSbsCpmRecommendationRefsWindow(input: {
     });
   });
 }
+

@@ -1,17 +1,17 @@
 import { parseListSurfaceRendererConfiguration } from "@afenda/governed-surface/schemas";
 import { describe, expect, it } from "vitest";
 
-import { hrTalentRssReadPermission } from "../../src/talent-management/candidate-selfservice-portal/contracts/hr.talent.rss.contract";
-import { buildHrTalentRssPageModel } from "../../src/talent-management/candidate-selfservice-portal/data/hr.talent.rss.page-model.server";
-import { resetHrTalentRssStore } from "../../src/talent-management/candidate-selfservice-portal/data/hr.talent.rss-store.shared";
-import { buildHrTalentRssListSurface } from "../../src/talent-management/candidate-selfservice-portal/surface/hr.talent.rss-lists.surface";
+import { hrTalentRssReadPermission } from "../../src/talent-management/candidate-selfservice-portal/hr.talent.rss.contract";
+import { buildHrTalentRssPageModel } from "../../src/talent-management/candidate-selfservice-portal/hr.talent.rss.page-model.server";
+import { resetHrTalentRssStore } from "../../src/talent-management/candidate-selfservice-portal/hr.talent.rss-store.shared";
+import { buildHrTalentRssListSurface } from "../../src/talent-management/candidate-selfservice-portal/hr.talent.rss-lists.surface";
 import {
   HR_TALENT_RSS_LIST_SURFACE_KEYS,
   hrTalentRssApplicationsSurfaceKey,
   hrTalentRssAuditTrailSurfaceKey,
   hrTalentRssCandidateProfilesSurfaceKey,
   hrTalentRssPrivacyRecordsSurfaceKey,
-} from "../../src/talent-management/candidate-selfservice-portal/surface/hr.talent.rss-surface-metadata.shared";
+} from "../../src/talent-management/candidate-selfservice-portal/hr.talent.rss-surface-metadata.shared";
 
 describe("Candidate Self-Service Portal list EUI contract", () => {
   it("builds governed Pattern C server-window list configuration", () => {

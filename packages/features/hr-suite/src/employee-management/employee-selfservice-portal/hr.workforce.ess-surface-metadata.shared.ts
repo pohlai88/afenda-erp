@@ -6,7 +6,7 @@ import {
   buildHrSuiteSearchParamsBySurfaceKey,
   defineHrSuiteListSurfaceRegistry,
   type HrSuiteListSurfaceProfile,
-} from "../compliance-regulatory-tracking/metadata";
+} from "../../hr-suite-integration/metadata";
 
 export const hrWorkforceEssOverviewKpiSurfaceKey =
   "hr.workforce.ess.overview.kpi" as const;

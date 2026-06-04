@@ -1,7 +1,7 @@
 import {
   buildGovernedChartSurface,
   type GovernedChartConfigurationInput,
-} from "@afenda/governed-surface";
+} from "./ker-governed-surface-contract";
 
 // ─── Dashboard hardening trend ────────────────────────────────────────────────
 

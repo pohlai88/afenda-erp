@@ -1,8 +1,8 @@
 import { Button } from "@afenda/ui";
 import Link from "next/link";
-import type { SystemAdminAuditEventDetail } from "../contracts";
-import { buildSystemAdminAuditInvestigationLinks } from "../surface/system-admin.audit-investigation.shared";
-import { systemAdminAuditUiCopy } from "../surface/system-admin.audit-ui.copy.shared";
+import type { SystemAdminAuditEventDetail } from "./sys-audit-event.contract";
+import { buildSystemAdminAuditInvestigationLinks } from "./sys-audit-investigation.shared";
+import { systemAdminAuditUiCopy } from "./sys-audit-ui.copy.shared";
 
 export function SystemAdminAuditInvestigationPanel({
   detail,

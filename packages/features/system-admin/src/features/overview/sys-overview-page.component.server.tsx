@@ -1,15 +1,15 @@
 import {
   buildSystemAdminOverviewStatGroups,
   systemAdminOverviewStatSurfaceKey,
-} from "../surfaces";
-import type { SystemAdminOverviewSnapshot } from "../contracts";
+} from "./sys-overview-stat.surface";
+import type { SystemAdminOverviewSnapshot } from "./sys-overview.contract";
 import { GovernedPatternBStatSection } from "@afenda/governed-surface/server";
 import { SectionPanel } from "@afenda/ui";
 import { ui } from "@afenda/ui/design-system";
 import { cn } from "@afenda/ui/utils";
 import Link from "next/link";
 import { formatErpDateTime } from "@afenda/kernel";
-import { systemAdminRoutePaths } from "../contracts/system-admin.route-paths.contract";
+import { systemAdminRoutePaths } from "./sys-route-paths.contract";
 
 const overviewLinks = [
   {

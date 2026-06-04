@@ -11,22 +11,22 @@ import {
 } from "@afenda/ui/table";
 import { cn } from "@afenda/ui/utils";
 
-import { governedRendererCopy } from "../i18n/governed-renderer-copy.shared";
+import { governedRendererCopy } from "./gov-governed-renderer-copy-shared";
 import {
   auditPanelSchema,
   type AuditPanelModel,
 } from "./gov-audit-panel-schema";
-import { diagnosticsDataAttributes } from "../utils/governed-diagnostics.shared";
-import { GovernedHeading } from "../utils/governed-heading.shared";
+import { diagnosticsDataAttributes } from "./gov-governed-diagnostics-shared";
+import { GovernedHeading } from "./gov-governed-heading-shared";
 import {
   governedDescriptionId,
   governedHeadingId,
   governedIdentityAttributes,
   governedTestId,
   toGovernedDomId,
-} from "../utils/governed-identity.shared";
-import { asGovernedRoute } from "../utils/governed-safe-route";
-import { GovernedEmpty } from "./governed-empty";
+} from "./gov-governed-identity-shared";
+import { asGovernedRoute } from "./gov-governed-safe-route";
+import { GovernedEmpty } from "./gov-governed-empty";
 
 export type GovernedAuditPanelProps = {
   model: AuditPanelModel;

@@ -1,6 +1,34 @@
-export {
-  diagnosticsDataAttributes,
-  type GovernedDiagnostics,
-  type GovernedDiagnosticsDataAttributes,
-  type GovernedRenderableState,
-} from "../utils/governed-diagnostics.shared";
+import type { GovernedRenderableState } from "./gov-governed-component-state-schema";
+
+export type { GovernedRenderableState } from "./gov-governed-component-state-schema";
+
+export type GovernedDiagnosticState = GovernedRenderableState | "disabled";
+
+export type GovernedDiagnostics = {
+  state?: GovernedDiagnosticState;
+  testId?: string;
+  componentType?: string;
+};
+
+export type GovernedDiagnosticsDataAttributes = {
+  "data-render-state"?: GovernedDiagnosticState;
+  "data-testid"?: string;
+  "data-component-type"?: string;
+};
+
+export function diagnosticsDataAttributes(
+  diagnostics?: GovernedDiagnostics,
+): GovernedDiagnosticsDataAttributes {
+  if (!diagnostics) {
+    return {};
+  }
+
+  const attrs: GovernedDiagnosticsDataAttributes = {};
+  if (diagnostics.state) attrs["data-render-state"] = diagnostics.state;
+  if (diagnostics.testId) attrs["data-testid"] = diagnostics.testId;
+  if (diagnostics.componentType) {
+    attrs["data-component-type"] = diagnostics.componentType;
+  }
+
+  return attrs;
+}

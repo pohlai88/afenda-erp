@@ -7,17 +7,17 @@ import { formatErpDateTime } from "@afenda/kernel";
 import type {
   SystemAdminAuditEventDetail,
   SystemAdminAuditEventRow,
-} from "../contracts/system-admin.audit-event.contract";
+} from "./sys-audit-event.contract";
 import {
   SYSTEM_ADMIN_AUDIT_DEFAULT_PAGE_SIZE,
   SYSTEM_ADMIN_AUDIT_TARGET_TIMELINE_DEFAULT_LIMIT,
-} from "../contracts/system-admin.audit-viewer.limits.shared";
-import { redactAuditMetadata } from "./system-admin.audit-metadata.redact.shared";
-import { extractAuditCorrelationRefs } from "./system-admin.audit-correlation.shared";
-import { buildSystemAdminAuditSearchFilters } from "./system-admin.audit-search-filters.shared";
-import type { SystemAdminAuditSearchParams } from "../schemas/system-admin.audit-filter.schema";
+} from "./sys-audit-viewer.limits.shared";
+import { redactAuditMetadata } from "./sys-audit-metadata.redact.shared";
+import { extractAuditCorrelationRefs } from "./sys-audit-correlation.shared";
+import { buildSystemAdminAuditSearchFilters } from "./sys-audit-search-filters.shared";
+import type { SystemAdminAuditSearchParams } from "./sys-audit-filter.schema";
 
-export { parseAuditFilterDate, buildSystemAdminAuditSearchFilters } from "./system-admin.audit-search-filters.shared";
+export { parseAuditFilterDate, buildSystemAdminAuditSearchFilters } from "./sys-audit-search-filters.shared";
 
 export function resolveAuditModuleKey(action: string) {
   const [moduleKey] = action.split(".");

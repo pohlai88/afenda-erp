@@ -9,8 +9,8 @@ import {
   assignExpenseClaimAccountingAllocation,
   recordPaymentReference,
   sendToPayrollOrAP,
-} from "./hr.payroll.expense-integration.server";
-import { generateExpenseReport } from "./hr.payroll.expense-reports.server";
+} from "./hrs-hr-payroll-expense-integration-server";
+import { generateExpenseReport } from "./hrs-hr-payroll-expense-reports-server";
 import { toExpenseActionFailure } from "./hr.payroll.expense-action-result.shared";
 import {
   requireHrExpenseFinanceAccess,

@@ -6,8 +6,8 @@ import { useState, useTransition } from "react";
 import {
   systemAdminActionFailure,
   type SystemAdminActionResult,
-} from "../../tenant-execution/contracts/system-admin.action-result.contract";
-import { systemAdminBillingUiCopy } from "../surface/system-admin.billing-ui.copy.shared";
+} from "../tenant-execution/sys-action-result.contract";
+import { systemAdminBillingUiCopy } from "./sys-billing-ui.copy.shared";
 
 export type ExportSystemAdminBillingSummaryAction = () => Promise<
   SystemAdminActionResult<{ csv: string; rowCount: number }>

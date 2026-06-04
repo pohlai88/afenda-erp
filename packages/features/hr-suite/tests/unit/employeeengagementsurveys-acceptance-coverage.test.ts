@@ -4,7 +4,7 @@ import {
   HR_TALENT_ENG_ACCEPTANCE_CRITERIA_COVERAGE,
   HR_TALENT_ENG_REQUIREMENT_COVERAGE,
   assertHrTalentEngEnterpriseCoverage,
-} from "../../src/talent-management/employee-engagement-surveys/data/hr.talent.eng-coverage.shared";
+} from "../../src/talent-management/employee-engagement-surveys/hr.talent.eng-coverage.shared";
 
 describe("Employee Engagement Surveys enterprise coverage", () => {
   it("ships HRM-ENG-001 through HRM-ENG-034 and all acceptance criteria", () => {

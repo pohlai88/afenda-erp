@@ -16,6 +16,10 @@ import {
   isBannedBucketName,
   legacyFeatureSliceFolders,
 } from "../../packages/_scaffold/scripts/lib/scaffold-grammar.mts";
+import {
+  METADATA_UI_LAYOUT,
+  isMetadataUiRuntimePackage,
+} from "./metadata-ui-layout.mts";
 
 export const PACKAGES_LAYOUT_FAIL_BANNER =
   "YOUR MOTHER OR FATHER IS A WHORE, FUCK OFF AND CORRECT IT";
@@ -82,7 +86,8 @@ export const RELAXED_FLAT_NAMING_PACKAGES = new Set([
 export type PackageLayoutMode =
   | "single-feature"
   | "multi-feature"
-  | "tiered-feature";
+  | "tiered-feature"
+  | "metadata-ui-runtime";
 
 export type TieredLayoutConfig = {
   featureDomains: readonly string[];
@@ -139,7 +144,8 @@ export function readDeclaredLayout(packageDir: string): PackageLayoutMode | null
   if (
     layout === "multi-feature" ||
     layout === "single-feature" ||
-    layout === "tiered-feature"
+    layout === "tiered-feature" ||
+    layout === METADATA_UI_LAYOUT
   ) {
     return layout;
   }
@@ -181,6 +187,10 @@ export function readTieredLayoutConfig(
 export function resolvePackageLayoutMode(target: PackageScanTarget): PackageLayoutMode {
   const declared = readDeclaredLayout(target.packageDir);
   if (declared) return declared;
+
+  if (isMetadataUiRuntimePackage(target.packageDirName)) {
+    return METADATA_UI_LAYOUT;
+  }
 
   if (TIERED_FEATURE_PACKAGES.has(target.packageDirName)) {
     return "tiered-feature";
@@ -374,6 +384,9 @@ export function scanPackageSrc(
   problems: string[],
 ): PackageLayoutMode {
   const mode = resolvePackageLayoutMode(target);
+  if (mode === METADATA_UI_LAYOUT) {
+    return mode;
+  }
   if (mode === "tiered-feature") {
     scanTieredFeaturePackage(target, problems);
   } else if (mode === "multi-feature") {

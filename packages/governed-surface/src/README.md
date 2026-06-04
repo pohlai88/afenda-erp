@@ -62,5 +62,5 @@ const auditModel = buildGovernedAuditPanel({ ... });
 ## Architecture rule
 
 Do not add builders named `buildGovernedSurface`, `buildGovernedSection`,
-`buildGovernedPatternBListSection`, or `buildGovernedPatternCListSection` unless
+or `buildGovernedPatternCListSection` unless
 they create serializable metadata/config rather than JSX or component props.

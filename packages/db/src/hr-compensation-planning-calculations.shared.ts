@@ -1,4 +1,4 @@
-import type { HrCompensationEligibilityRuleConfig } from "./hr-compensation-planning";
+import type { HrCompensationEligibilityRuleConfig } from "./dbx-hr-compensation-planning";
 
 export class HrCompensationCalculationError extends Error {
   constructor(message: string) {
@@ -481,3 +481,4 @@ export function computeBudgetImpact(
   assertFiniteNonNegative(proposedSalary, "proposed salary");
   return Math.max(0, proposedSalary - currentSalary);
 }
+

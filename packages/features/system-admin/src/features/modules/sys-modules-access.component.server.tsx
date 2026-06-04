@@ -1,5 +1,5 @@
 import { SectionPanel } from "@afenda/ui";
-import { systemAdminModulesUiCopy } from "../surface/system-admin.modules-ui.copy.shared";
+import { systemAdminModulesUiCopy } from "./sys-modules-ui.copy.shared";
 
 export function SystemAdminModulesAccessDenied() {
   const copy = systemAdminModulesUiCopy;

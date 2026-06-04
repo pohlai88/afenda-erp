@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { parseHrLifecycleSearchParams } from "../../src/employee-management/employee-lifecycle-management/data/hr.workforce.lifecycle-search-params.parse.shared";
+import { parseHrLifecycleSearchParams } from "../../src/employee-management/employee-lifecycle-management/hr.workforce.lifecycle-search-params.parse.shared";
 
 describe("hr lifecycle search params", () => {
   it("returns empty object when search params are undefined", () => {

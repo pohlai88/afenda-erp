@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import {
   systemAdminDeprecateRoleInputSchema,
   systemAdminUpdateRoleInputSchema,
-} from "../../src/roles/schemas/system-admin.roles.schema";
+} from "../../src/features/roles/sys-roles.schema";
 
 const mockUpsertTenantRoleCatalogEntry = vi.fn();
 const mockRequireRolesManage = vi.fn();
@@ -63,7 +63,7 @@ describe("system admin role catalog mutations", () => {
     mockUpsertTenantRoleCatalogEntry.mockResolvedValue(undefined);
 
     const { updateSystemAdminRoleForm } = await import(
-      "../../src/roles/actions/system-admin.roles.actions.server"
+      "../../src/features/roles/sys-roles.actions.server"
     );
 
     const formData = new FormData();

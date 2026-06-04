@@ -13,7 +13,7 @@ import {
 } from "@afenda/kernel/execution";
 import { logServerEvent } from "@afenda/observability/server";
 import { revalidatePath } from "next/cache";
-import { systemAdminRoutePaths } from "../../overview/contracts/system-admin.route-paths.contract";
+import { systemAdminRoutePaths } from "../overview/sys-route-paths.contract";
 import {
   assertSystemAdminFormActionResult,
   systemAdminActionFailure,
@@ -21,28 +21,28 @@ import {
   toSystemAdminVoidFormAction,
   type SystemAdminActionResult,
   zodActionFailure,
-} from "../../tenant-execution/contracts/system-admin.action-result.contract";
+} from "../tenant-execution/sys-action-result.contract";
 import type {
   CreateApiCredentialActionData,
   CreateWebhookActionData,
-} from "../contracts/system-admin.integrations-action-dtos.contract";
+} from "./sys-integrations-action-dtos.contract";
 import {
   isSystemAdminApiScope,
   isSystemAdminWebhookEvent,
   type SystemAdminApiScope,
   type SystemAdminWebhookEvent,
-} from "../contracts/system-admin.integrations-catalog.contract";
-import { requireSystemAdminIntegrationsWrite } from "../policies/system-admin.integrations.policy.server";
+} from "./sys-integrations-catalog.contract";
+import { requireSystemAdminIntegrationsWrite } from "./sys-integrations.policy.server";
 import {
   systemAdminApiCredentialActionSchema,
   systemAdminSsoConnectionActionSchema,
   systemAdminWebhookActionSchema,
-} from "../schemas/system-admin.integrations-action.schema";
+} from "./sys-integrations-action.schema";
 import {
   systemAdminIntegrationsAuditActions,
   systemAdminIntegrationsWebhookEvents,
-} from "../events/system-admin.integrations.event";
-import { dispatchSystemAdminWebhook } from "../events/system-admin.webhook-dispatch.event";
+} from "./sys-integrations.event";
+import { dispatchSystemAdminWebhook } from "./sys-webhook-dispatch.event";
 
 const [
   apiCredentialCreatedWebhookEvent,

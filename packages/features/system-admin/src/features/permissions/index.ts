@@ -4,5 +4,7 @@
  */
 export * from "./metadata";
 export * from "./client";
-export * from "./contracts";
-export * from "./schemas";
+export * from "./sys-permission-catalog.contract";
+export * from "./sys-permissions.contract";
+export * from "./sys-permission-key.schema";
+export * from "./sys-role-override.schema";

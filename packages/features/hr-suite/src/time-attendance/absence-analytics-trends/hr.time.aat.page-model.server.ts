@@ -1,17 +1,17 @@
 import type { EmptyState } from "@afenda/governed-surface/schemas";
 
-import { queryHrAatAbsenceAnalytics } from "./hr.time.aat-analytics-core.server";
-import { listHrAatAuditTrailWindow } from "./hr.time.aat-audit.server";
+import { queryHrAatAbsenceAnalytics } from "./hrs-hr-time-aat-analytics-core-server";
+import { listHrAatAuditTrailWindow } from "./hrs-hr-time-aat-audit-server";
 import {
   listHrAatRiskNotifications,
   syncHrAatRiskThresholdNotifications,
-} from "./hr.time.aat-notifications.server";
+} from "./hrs-hr-time-aat-notifications-server";
 import {
   listHrAatAnalyticsSnapshots,
   persistHrAatAnalyticsSnapshotFromResult,
   recordHrAatAnalyticsGeneration,
-} from "./hr.time.aat-snapshots.server";
-import { listHrAatAbsenceRiskIndicators } from "./hr.time.aat-risk.server";
+} from "./hrs-hr-time-aat-snapshots-server";
+import { listHrAatAbsenceRiskIndicators } from "./hrs-hr-time-aat-risk-server";
 import type { HrAatPageModelInput } from "./hr.time.aat-search-params.parse.shared";
 import { defaultPeriodRange } from "./hr.time.aat-search-params.parse.shared";
 import { buildHrAatAuditTrailListSurface } from "./hr.time.aat-audit-trail-list.surface";

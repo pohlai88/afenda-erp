@@ -3,7 +3,7 @@ import { runWithOrganizationContext, type AfendaTransaction } from "./client";
 import { createEntityId } from "./ids";
 import { clampPageSize } from "./hr-benefits.shared";
 import type { HrBonusAuditTrailWindow } from "./hr-bonus.types";
-import { hrBonusPayoutAuditEvents } from "./hr-bonus";
+import { hrBonusPayoutAuditEvents } from "./dbx-hr-bonus";
 
 export async function appendHrBonusPayoutAuditEventInTx(
   db: AfendaTransaction,
@@ -90,3 +90,4 @@ export async function listHrBonusPayoutAuditTrailWindow(input: {
     };
   });
 }
+

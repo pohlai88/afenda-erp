@@ -2,16 +2,16 @@ import type { ListSurfaceRendererConfigurationResolvedInput } from "@afenda/gove
 import {
   buildLinkedControlListSurface,
   linkCell,
-} from "../../overview/surfaces/system-admin.control-list.shared";
+} from "../overview/sys-control-list.shared";
 import type {
   SystemAdminReliabilityIssue,
   SystemAdminReliabilityOperationalLinkRow,
-} from "../contracts/system-admin.reliability-issue.contract";
+} from "./sys-reliability-issue.contract";
 import {
   formatReliabilityCategoryLabel,
   formatReliabilitySeverityLabel,
-} from "./system-admin.reliability.verdict.server";
-import { systemAdminReliabilityUiCopy } from "./system-admin.reliability-ui.copy.shared";
+} from "./sys-reliability.verdict.server";
+import { systemAdminReliabilityUiCopy } from "./sys-reliability-ui.copy.shared";
 
 export const systemAdminReliabilitySurfaceKey = "system-admin.reliability.list";
 

@@ -1,16 +1,16 @@
 import { describe, expect, it } from "vitest";
 
-import { hrPayrollSbsAuditActions } from "../events/hr.payroll.sbs-audit.event";
-import { hrPayrollSbsMappingEvents } from "../events/hr.payroll.sbs-mapping.event";
+import { hrPayrollSbsAuditActions } from "../src/payroll-compensation/salary-benchmarking-survey/hr.payroll.sbs-audit.event";
+import { hrPayrollSbsMappingEvents } from "../src/payroll-compensation/salary-benchmarking-survey/hr.payroll.sbs-mapping.event";
 import {
   HR_SBS_APPROVE_CAPABILITY,
   HR_SBS_READ_CAPABILITY,
   HR_SBS_WRITE_CAPABILITY,
-} from "../schemas/hr.payroll.sbs-constants.shared";
+} from "../src/payroll-compensation/salary-benchmarking-survey/hr.payroll.sbs-constants.shared";
 import {
   hrSbsCreateMappingSchema,
   hrSbsReviewMappingSchema,
-} from "../schemas/hr.payroll.sbs-mapping.schema";
+} from "../src/payroll-compensation/salary-benchmarking-survey/hr.payroll.sbs-mapping.schema";
 
 describe("hr.payroll.sbs mapping schemas", () => {
   it("validates mapping create payload", () => {

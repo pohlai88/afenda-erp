@@ -1,4 +1,4 @@
-import type { AppCapability } from "@afenda/auth";
+import type { AppCapability } from "@afenda/kernel";
 
 export const HR_GPG_READ_CAPABILITY = "hr.gpg.read" satisfies AppCapability;
 export const HR_GPG_WRITE_CAPABILITY = "hr.gpg.write" satisfies AppCapability;

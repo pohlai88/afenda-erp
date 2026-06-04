@@ -1,12 +1,12 @@
 import { resolveListSurfaceRowTrailingAction } from "@afenda/governed-surface";
 import type { ActionDescriptor } from "@afenda/governed-surface/schemas";
 
-import type { SystemAdminApprovalRuleStatus } from "../contracts/system-admin.approval-rule.contract";
-import { systemAdminApprovalsUiCopy } from "./system-admin.approvals-ui.copy.shared";
+import type { SystemAdminApprovalRuleStatus } from "./sys-approval-rule.contract";
+import { systemAdminApprovalsUiCopy } from "./sys-approvals-ui.copy.shared";
 
 export {
   SYSTEM_ADMIN_APPROVALS_MANAGE_CAPABILITY,
-} from "../schemas/system-admin.approvals-capability.shared";
+} from "./sys-approvals-capability.shared";
 
 export const SYSTEM_ADMIN_APPROVALS_MANAGE_DENIED =
   systemAdminApprovalsUiCopy.permissions.requiresManage;

@@ -10,7 +10,7 @@ import {
 import {
   DEFAULT_EMBEDDING_MODEL,
   KNOWLEDGE_EMBEDDING_DIMENSIONS,
-} from "../contracts/knowledge.core.contract";
+} from "./kno-core.contract";
 
 type EmbedManyProviderOptions = NonNullable<
   Parameters<typeof embedMany>[0]["providerOptions"]

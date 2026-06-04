@@ -9,13 +9,13 @@ import {
   createExchangeRateProvider,
   getExchangeRate,
   roundCurrencyAmount,
-} from "./hr.payroll.expense-calculation.shared";
+} from "../src/payroll-compensation/expenses-reimbursement/hr.payroll.expense-calculation.shared";
 import {
   hrExpenseClaimCalculationInputSchema,
   hrExpenseForeignCurrencyLineItemSchema,
   hrExpenseMileageLineItemSchema,
   hrExpenseTravelLineItemSchema,
-} from "../schemas/hr.payroll.expense-line-item.schema";
+} from "../src/payroll-compensation/expenses-reimbursement/hr.payroll.expense-line-item.schema";
 
 describe("HRM-EXP-012 mileage calculation (AC 10)", () => {
   it("calculates amount from distance and approved rate", () => {

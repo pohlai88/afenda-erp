@@ -5,7 +5,7 @@ export {
   requireHrRead,
   type HrModuleCapabilityRequirementMode,
   type HrModuleExecutionGuard,
-} from "./policies/hr-suite-access.policy.server";
+} from "./hrs-hr-suite-access-policy-server";
 export {
   hrSuiteActionFailure,
   toHrSuiteActionFailure,
@@ -14,4 +14,4 @@ export {
   type HrSuiteActionFailureMapper,
   type HrSuiteActionFailureOptions,
   type HrSuiteActionStateHandler,
-} from "./actions/hr-suite-action-result.shared";
+} from "./hrs-hr-suite-action-result-shared";

@@ -7,8 +7,8 @@ import {
 import type { ListSurfaceRendererConfigurationResolvedInput } from "@afenda/governed-surface";
 import type { EmptyState } from "@afenda/governed-surface/schemas";
 
-import { listHrFwaAuditTrailWindow } from "./hr.time.fwa-audit-trail.server";
-import { buildHrFwaReportRows } from "./hr.time.fwa-report.server";
+import { listHrFwaAuditTrailWindow } from "./hrs-hr-time-fwa-audit-trail-server";
+import { buildHrFwaReportRows } from "./hrs-hr-time-fwa-report-server";
 import { settleHrFwaListLoad } from "./hr.time.fwa-list-load.shared";
 import { buildHrFwaArrangementsListSurface } from "./hr.time.fwa-arrangements-list.surface";
 import { buildHrFwaComplianceListSurface } from "./hr.time.fwa-compliance-list.surface";

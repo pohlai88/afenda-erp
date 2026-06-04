@@ -22,7 +22,7 @@ import {
   organizationIdColumn,
   timestampColumns,
 } from "./dbx-common";
-import { erpDocuments, erpWorkItems } from "./erp";
+import { erpDocuments, erpWorkItems } from "./dbx-erp";
 import { organizations } from "./dbx-organizations";
 
 const organizationReference = () =>

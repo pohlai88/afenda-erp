@@ -1,7 +1,7 @@
 "use server";
 
 import { TenantDocumentMutationError } from "@afenda/db";
-import { hasDocumentWriteAccess } from "@afenda/auth";
+import { hasDocumentWriteAccess } from "@afenda/kernel";
 import type { ModuleId } from "@afenda/kernel";
 import { requireExecutionContext } from "@afenda/kernel/execution";
 import {
@@ -14,11 +14,11 @@ import { z } from "zod";
 
 import {
   systemAdminActionSuccess,
-} from "../contracts/system-admin.action-result.contract";
-import { applyLegalHoldToTenantDocumentCommand } from "../commands/apply-legal-hold-to-tenant-document.command.server";
-import { deleteTenantDocumentCommand } from "../commands/delete-tenant-document.command.server";
-import { releaseLegalHoldToTenantDocumentCommand } from "../commands/release-legal-hold-to-tenant-document.command.server";
-import { releaseTenantDocumentScanQuarantineCommand } from "../commands/release-tenant-document-scan-quarantine.command.server";
+} from "./sys-action-result.contract";
+import { applyLegalHoldToTenantDocumentCommand } from "./sys-apply-legal-hold-to-tenant-document-command-server";
+import { deleteTenantDocumentCommand } from "./sys-delete-tenant-document-command-server";
+import { releaseLegalHoldToTenantDocumentCommand } from "./sys-release-legal-hold-to-tenant-document-command-server";
+import { releaseTenantDocumentScanQuarantineCommand } from "./sys-release-tenant-document-scan-quarantine-command-server";
 
 const tenantDocumentLifecycleFormSchema = z.object({
   documentId: z.string().trim().min(1),

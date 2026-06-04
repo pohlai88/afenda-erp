@@ -25,14 +25,14 @@ import {
   type ChartConfig,
 } from "@afenda/ui/chart";
 import { Skeleton } from "@afenda/ui/skeleton";
-import { GovernedEmpty } from "./client";
+import { GovernedEmpty } from "./gov-governed-empty";
 import type {
   ChartAnnotation,
   GovernedChartConfiguration,
 } from "./gov-chart-schema";
 import { cn } from "@afenda/ui/utils";
 
-import { ChartHeatmapBody } from "./chart-heatmap-body.client";
+import { ChartHeatmapBody } from "./gov-chart-heatmap-body-client";
 
 type ChartRendererBodyProps = {
   configuration: GovernedChartConfiguration;

@@ -1,5 +1,5 @@
 import { SectionPanel } from "@afenda/ui";
-import { systemAdminCapabilitiesUiCopy } from "../surface/system-admin.capabilities-ui.copy.shared";
+import { systemAdminCapabilitiesUiCopy } from "./sys-capabilities-ui.copy.shared";
 
 export function SystemAdminCapabilitiesAccessDenied() {
   const copy = systemAdminCapabilitiesUiCopy;

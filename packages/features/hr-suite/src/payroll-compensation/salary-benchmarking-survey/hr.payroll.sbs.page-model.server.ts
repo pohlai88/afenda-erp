@@ -15,9 +15,9 @@ import {
   hrSbsPayEquityReportSurfaceKey,
   hrSbsVersionsSurfaceKey,
 } from "./hr.payroll.sbs-search-params.parse.shared";
-import { listHrSbsAuditEvents } from "./hr.payroll.sbs-audit.server";
-import { listHrSbsCompensationAnalyses } from "./hr.payroll.sbs-analysis.server";
-import { listHrSbsBenchmarkMappings } from "./hr.payroll.sbs-mapping.server";
+import { listHrSbsAuditEvents } from "./hrs-hr-payroll-sbs-audit-server";
+import { listHrSbsCompensationAnalyses } from "./hrs-hr-payroll-sbs-analysis-server";
+import { listHrSbsBenchmarkMappings } from "./hrs-hr-payroll-sbs-mapping-server";
 import {
   buildHrSbsBenchmarkReportRows,
   filterHrSbsPayEquityReportRows,

@@ -1,8 +1,8 @@
 import { registerGovernedPolicyBulkServerAction } from "@afenda/governed-surface/schemas";
 
-import { bulkSuspendSystemAdminUsers } from "./system-admin.users.actions.server";
-import { SYSTEM_ADMIN_USERS_BULK_SUSPEND_ACTION_ID } from "../contracts/system-admin.users-actions.contract";
-import { systemAdminUsersSurfaceKey } from "../surface/system-admin.users-list.surface";
+import { bulkSuspendSystemAdminUsers } from "./sys-users.actions.server";
+import { SYSTEM_ADMIN_USERS_BULK_SUSPEND_ACTION_ID } from "./sys-users-actions.contract";
+import { systemAdminUsersSurfaceKey } from "./sys-users-list.surface";
 
 let systemAdminUsersGovernedActionsRegistered = false;
 

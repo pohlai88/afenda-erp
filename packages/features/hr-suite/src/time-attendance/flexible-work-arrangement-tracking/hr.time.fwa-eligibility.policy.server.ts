@@ -2,8 +2,8 @@ import type { HrFwaEligibilityResultInput } from "./hr.time.fwa-eligibility.sche
 import {
   assertHrTimeFwaExceptionPath,
   canSubmitHrTimeFwaWithException,
-} from "./hr.time.fwa-exception.server";
-import type { HrTimeFwaEligibilityGateInput } from "./hr.time.fwa-request.server";
+} from "./hrs-hr-time-fwa-exception-server";
+import type { HrTimeFwaEligibilityGateInput } from "./hrs-hr-time-fwa-request-server";
 
 export type { HrTimeFwaEligibilityGateInput };
 

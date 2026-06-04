@@ -7,7 +7,7 @@ import {
   defineHrSuiteListSurfaceRegistry,
   type HrSuiteListColumn,
   type HrSuiteListSurfaceProfile,
-} from "../../employee-management/compliance-regulatory-tracking/metadata";
+} from "../../hr-suite-integration/metadata";
 
 export const hrTalentEngOverviewKpiSurfaceKey =
   "hr.talent.eng.overview.kpi" as const;

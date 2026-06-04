@@ -1,7 +1,7 @@
 import {
   SYSTEM_ADMIN_AUDIT_METADATA_REDACT_MAX_DEPTH,
   SYSTEM_ADMIN_AUDIT_METADATA_REDACT_MAX_STRING_LENGTH,
-} from "../contracts/system-admin.audit-viewer.limits.shared";
+} from "./sys-audit-viewer.limits.shared";
 
 const SECRET_KEY_PATTERN =
   /(password|secret|token|hash|ciphertext|signing|api[_-]?key|private|credential)/i;

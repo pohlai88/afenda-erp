@@ -6,10 +6,10 @@ import {
   HR_RECORDS_LIST_SURFACE_KEYS,
   HR_RECORDS_WORKBENCH_READ_ONLY_SURFACE_KEYS,
 } from "../../src/metadata";
-import { hrRecordsAssignmentsSurfaceKey } from "../../src/employee-management/employee-records-management/surface/hr.workforce.records-assignments-list.surface";
-import { hrRecordsAuditTrailSurfaceKey } from "../../src/employee-management/employee-records-management/surface/hr.workforce.records-audit-trail-list.surface";
-import { hrRecordsDocumentReferencesSurfaceKey } from "../../src/employee-management/employee-records-management/surface/hr.workforce.records-document-references-list.surface";
-import { hrRecordsStatusHistorySurfaceKey } from "../../src/employee-management/employee-records-management/surface/hr.workforce.records-status-history-list.surface";
+import { hrRecordsAssignmentsSurfaceKey } from "../../src/employee-management/employee-records-management/hr.workforce.records-assignments-list.surface";
+import { hrRecordsAuditTrailSurfaceKey } from "../../src/employee-management/employee-records-management/hr.workforce.records-audit-trail-list.surface";
+import { hrRecordsDocumentReferencesSurfaceKey } from "../../src/employee-management/employee-records-management/hr.workforce.records-document-references-list.surface";
+import { hrRecordsStatusHistorySurfaceKey } from "../../src/employee-management/employee-records-management/hr.workforce.records-status-history-list.surface";
 
 describe("hr records workbench metadata", () => {
   it("registers historical and reference lists as read-only workbench surfaces", () => {

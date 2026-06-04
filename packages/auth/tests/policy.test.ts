@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   parseBlockedSignupEmailDomains,
   resolveUserBeforeCreateResponse,
-} from "../../webhooks/policy.server";
+} from "../src/aut-policy-server";
 
 describe("webhook signup policy", () => {
   it("parses blocked domains", () => {

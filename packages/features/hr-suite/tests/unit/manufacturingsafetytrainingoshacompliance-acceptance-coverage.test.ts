@@ -4,8 +4,8 @@ import {
   HR_INDUSTRY_MSC_ACCEPTANCE_CRITERIA_COVERAGE,
   HR_INDUSTRY_MSC_REQUIREMENT_COVERAGE,
   assertHrIndustryMscEnterpriseCoverage,
-} from "../../src/industry-specific/manufacturing-safety-training-osha-compliance/data/hr.industry.msc-coverage.shared";
-import { hrIndustryMscAuditActions } from "../../src/industry-specific/manufacturing-safety-training-osha-compliance/events/hr.industry.msc.event";
+} from "../../src/industry-specific/manufacturing-safety-training-osha-compliance/hr.industry.msc-coverage.shared";
+import { hrIndustryMscAuditActions } from "../../src/industry-specific/manufacturing-safety-training-osha-compliance/hr.industry.msc.event";
 
 describe("HRM-MSC-001..031 coverage registry", () => {
   it("registers all thirty-one requirements as shipped", () => {

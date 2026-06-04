@@ -2,25 +2,24 @@ import "server-only";
 
 import type { ReactNode } from "react";
 
-import { GovernedComponentRenderer } from "./index";
-import { logUnexpectedServerError } from "./governed-logging.server";
-import { resolveGovernedErpPermissionAllowed } from "./governed-permission-gate.server";
-import { getGovernedSurfaceTranslations } from "../i18n/governed-surface-copy";
+import { GovernedComponentRenderer } from "./gov-render-governed-component";
+import { resolveGovernedErpPermissionAllowed } from "./gov-governed-permission-gate-server";
 
 import {
   parseGovernedActionBarConfiguration,
+  type GovernedActionBarConfiguration,
   type GovernedActionBarConfigurationInput,
 } from "./gov-action-bar-schema";
-import type { EmptyState } from "./gov-list-surface-schema";
 import {
   renderGovernedPatternSectionShell,
   type GovernedPatternSectionDensity,
   type GovernedPatternSectionLayout,
   type RenderGovernedPatternSectionShellInput,
-} from "./governed-pattern-section-shell.shared";
-import type { GovernedSurfaceSectionCardBody } from "./governed-surface-section-card";
-
-type GovernedPatternEmptyState = EmptyState & { emptyId?: string };
+} from "./gov-governed-pattern-section-shell-shared";
+import {
+  resolveMetadataSectionBody,
+  type GovernedPatternEmptyState,
+} from "./resolve-metadata-section-body.server";
 
 export type GovernedPatternBActionBarSectionLayout =
   GovernedPatternSectionLayout;
@@ -66,7 +65,6 @@ export async function GovernedPatternBActionBarSection({
   cardClassName,
   contentClassName,
 }: GovernedPatternBActionBarSectionProps) {
-  const t = await getGovernedSurfaceTranslations("Erp");
   const resolvedSectionKey = sectionKey ?? `${surfaceKey}-actions`;
   const resolvedComponentKey = componentKey ?? resolvedSectionKey;
 
@@ -85,79 +83,47 @@ export async function GovernedPatternBActionBarSection({
     contentClassName,
   } satisfies Omit<RenderGovernedPatternSectionShellInput, "body">;
 
-  let body: GovernedSurfaceSectionCardBody;
-
-  if (loadError) {
-    body = {
-      state: "invalid",
-      model: {
-        ...loadError,
-        emptyId: loadError.emptyId ?? "action-bar-section-load-error",
-      },
-    };
-  } else {
-    const parsed = parseGovernedActionBarConfiguration(actionBarConfiguration);
-
-    if (!parsed.success) {
-      logUnexpectedServerError(
-        "GovernedPatternBActionBarSection invalid action-bar configuration",
-        parsed.error,
-        {
-          surfaceKey,
-          sectionKey: resolvedSectionKey,
-          componentKey: resolvedComponentKey,
-        },
-      );
-
-      body = {
-        state: "invalid",
-        model: {
-          variant: "error",
-          title: invalid?.title ?? t("GovernedSurface.invalidConfigTitle"),
-          description:
-            invalid?.description ?? t("GovernedSurface.invalidConfigDescription"),
-          emptyId: invalid?.emptyId ?? "action-bar-section-invalid-config",
-        },
-      };
-    } else {
+  const body = await resolveMetadataSectionBody<GovernedActionBarConfiguration>({
+    loadError,
+    parse: () => parseGovernedActionBarConfiguration(actionBarConfiguration),
+    parseErrorLabel:
+      "GovernedPatternBActionBarSection invalid action-bar configuration",
+    parseContext: {
+      surfaceKey,
+      sectionKey: resolvedSectionKey,
+      componentKey: resolvedComponentKey,
+    },
+    emptyStateIds: {
+      loadError: "action-bar-section-load-error",
+      invalid: "action-bar-section-invalid-config",
+      forbidden: "action-bar-section-forbidden",
+    },
+    invalid,
+    forbidden,
+    resolvePermission: async (config) => {
       const allowedFromConfig = resolveConfiguredPermission
         ? await resolveGovernedErpPermissionAllowed(
-            parsed.data.requiresErpPermission,
+            config.requiresErpPermission,
           )
         : true;
-      const allowed = parentAccessAllowed && allowedFromConfig;
-
-      if (!allowed) {
-        body = {
-          state: "forbidden",
-          model: {
-            variant: "forbidden",
-            title: forbidden?.title ?? t("GovernedSurface.forbiddenTitle"),
-            description:
-              forbidden?.description ??
-              t("GovernedSurface.forbiddenDescription"),
-            emptyId: forbidden?.emptyId ?? "action-bar-section-forbidden",
-          },
-        };
-      } else {
-        body = {
-          state: "ready",
-          children: (
-            <GovernedComponentRenderer
-              surfaceKey={surfaceKey}
-              sectionKey={resolvedSectionKey}
-              componentKey={resolvedComponentKey}
-              component={{
-                type: "governed:action-bar",
-                serverType: "governed:action-bar",
-                configuration: parsed.data,
-              }}
-            />
-          ),
-        };
-      }
-    }
-  }
+      return parentAccessAllowed && allowedFromConfig;
+    },
+    buildReadyBody: (config) => ({
+      state: "ready",
+      children: (
+        <GovernedComponentRenderer
+          surfaceKey={surfaceKey}
+          sectionKey={resolvedSectionKey}
+          componentKey={resolvedComponentKey}
+          component={{
+            type: "governed:action-bar",
+            serverType: "governed:action-bar",
+            configuration: config,
+          }}
+        />
+      ),
+    }),
+  });
 
   return renderGovernedPatternSectionShell({
     ...shellInput,

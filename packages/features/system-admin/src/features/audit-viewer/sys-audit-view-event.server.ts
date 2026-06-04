@@ -1,7 +1,7 @@
 import { writeExecutionAuditEvent } from "@afenda/kernel/execution";
-import { systemAdminAuditActions } from "../contracts/system-admin.audit-actions.contract";
-import type { SystemAdminAuditEventDetail } from "../contracts/system-admin.audit-event.contract";
-import type { SystemAdminAuditSearchParams } from "../schemas/system-admin.audit-filter.schema";
+import { systemAdminAuditActions } from "./sys-audit-actions.contract";
+import type { SystemAdminAuditEventDetail } from "./sys-audit-event.contract";
+import type { SystemAdminAuditSearchParams } from "./sys-audit-filter.schema";
 
 export function shouldRecordSystemAdminAuditListView(
   params: SystemAdminAuditSearchParams,

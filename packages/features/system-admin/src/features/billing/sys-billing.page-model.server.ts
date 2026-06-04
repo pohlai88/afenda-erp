@@ -1,24 +1,24 @@
 import { writeExecutionAuditEvent } from "@afenda/kernel/execution";
-import { getSystemAdminBillingContacts } from "./system-admin.billing-contacts.repository.server";
-import type { BillingPostureSnapshot } from "../contracts/system-admin.billing-posture.contract";
+import { getSystemAdminBillingContacts } from "./sys-billing-contacts.repository.server";
+import type { BillingPostureSnapshot } from "./sys-billing-posture.contract";
 import {
   buildBillingPaymentRows,
   getBillingPostureSnapshot,
   loadBillingInvoiceRows,
-} from "./system-admin.billing-posture.query.server";
-import { evaluateBillingReadiness } from "./system-admin.billing.readiness.server";
-import type { BillingReadinessReport } from "../contracts/system-admin.billing-readiness.contract";
-import type { OrganizationSubscription } from "../contracts/system-admin.billing-subscription.contract";
+} from "./sys-billing-posture.query.server";
+import { evaluateBillingReadiness } from "./sys-billing.readiness.server";
+import type { BillingReadinessReport } from "./sys-billing-readiness.contract";
+import type { OrganizationSubscription } from "./sys-billing-subscription.contract";
 import type {
   SystemAdminBillingContactRow,
   SystemAdminBillingEntitlementRow,
   SystemAdminBillingInvoiceRow,
   SystemAdminBillingPaymentRow,
-} from "../contracts/system-admin.billing-list.contract";
-import type { SystemAdminBillingPlanRow } from "../contracts/system-admin.billing-plans.contract";
-import { mapStripeBillingPlansToRows } from "./system-admin.billing-plans.mapper.server";
-import { resolveSystemAdminBillingDefaultPlanKey } from "./system-admin.billing-default-plan.shared";
-import { systemAdminBillingAuditActions } from "../events/system-admin.billing.event";
+} from "./sys-billing-list.contract";
+import type { SystemAdminBillingPlanRow } from "./sys-billing-plans.contract";
+import { mapStripeBillingPlansToRows } from "./sys-billing-plans.mapper.server";
+import { resolveSystemAdminBillingDefaultPlanKey } from "./sys-billing-default-plan.shared";
+import { systemAdminBillingAuditActions } from "./sys-billing.event";
 
 export type SystemAdminBillingPageModel = {
   posture: BillingPostureSnapshot;

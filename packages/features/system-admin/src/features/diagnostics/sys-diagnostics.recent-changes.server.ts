@@ -1,8 +1,8 @@
 import { searchTenantAuditLogs } from "@afenda/db";
 import { formatErpDateTime } from "@afenda/kernel";
-import { systemAdminWebhookEvents } from "../../integrations/contracts/system-admin.integrations-catalog.contract";
-import type { SystemAdminDiagnosticsRecentChangeRow } from "../contracts/system-admin.diagnostics-coverage.contract";
-import { buildSystemAdminAuditEventDetailHref } from "../../audit-viewer/surface/system-admin.audit-pagination.shared";
+import { systemAdminWebhookEvents } from "../integrations/sys-integrations-catalog.contract";
+import type { SystemAdminDiagnosticsRecentChangeRow } from "./sys-diagnostics-coverage.contract";
+import { buildSystemAdminAuditEventDetailHref } from "../audit-viewer/sys-audit-pagination.shared";
 
 const CONFIGURATION_AUDIT_ACTION_EXCLUDED = new Set([
   "system-admin.audit.view",

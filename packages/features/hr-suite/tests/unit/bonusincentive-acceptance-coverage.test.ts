@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   BONUS_ACCEPTANCE_CRITERIA_COVERAGE,
   BONUS_REQUIREMENT_COVERAGE,
-} from "../../src/payroll-compensation/bonus-incentive-management/data/hr.payroll.bonus-acceptance-coverage.shared";
+} from "../../src/payroll-compensation/bonus-incentive-management/hr.payroll.bonus-acceptance-coverage.shared";
 
 describe("HRM-BON-025..030 acceptance coverage", () => {
   it("marks BON-025 through BON-030 as shipped with evidence", () => {

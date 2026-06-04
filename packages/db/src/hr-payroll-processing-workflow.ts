@@ -25,7 +25,7 @@ import {
   hrPayrollRunLines,
   hrPayrollRuns,
   hrPayrollValidations,
-} from "./hr-payroll-processing";
+} from "./dbx-hr-payroll-processing";
 import { hrEmployees } from "./hr";
 
 const DEFAULT_BASIC_SALARY = 5000;
@@ -566,3 +566,4 @@ export async function listHrPayrollRunValidationsWindow(
     hasNextPage: false,
   };
 }
+

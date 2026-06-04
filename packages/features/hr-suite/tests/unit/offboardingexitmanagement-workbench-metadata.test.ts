@@ -6,9 +6,9 @@ import {
   HR_OFFBOARDING_LIST_SURFACE_KEYS,
   HR_OFFBOARDING_WORKBENCH_READ_ONLY_SURFACE_KEYS,
 } from "../../src/metadata";
-import { hrOffboardingAuditTrailSurfaceKey } from "../../src/employee-management/offboarding-exit-management/surface/hr.workforce.offboarding-audit-trail-list.surface";
-import { hrOffboardingOverdueSurfaceKey } from "../../src/employee-management/offboarding-exit-management/surface/hr.workforce.offboarding-overdue-list.surface";
-import { hrOffboardingSettlementSurfaceKey } from "../../src/employee-management/offboarding-exit-management/surface/hr.workforce.offboarding-settlement-list.surface";
+import { hrOffboardingAuditTrailSurfaceKey } from "../../src/employee-management/offboarding-exit-management/hr.workforce.offboarding-audit-trail-list.surface";
+import { hrOffboardingOverdueSurfaceKey } from "../../src/employee-management/offboarding-exit-management/hr.workforce.offboarding-overdue-list.surface";
+import { hrOffboardingSettlementSurfaceKey } from "../../src/employee-management/offboarding-exit-management/hr.workforce.offboarding-settlement-list.surface";
 
 describe("hr offboarding workbench metadata", () => {
   it("registers settlement, overdue, and audit as read-only lists", () => {

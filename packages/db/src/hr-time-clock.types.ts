@@ -1,4 +1,4 @@
-import { hrTimeClockRawPunches } from "./hr-time-clock";
+import { hrTimeClockRawPunches } from "./dbx-hr-time-clock";
 
 export type HrTimeClockPunchType =
   (typeof hrTimeClockRawPunches.$inferSelect)["punchType"];
@@ -21,3 +21,4 @@ export class HrTimeClockCommandError extends Error {
     this.code = code;
   }
 }
+

@@ -1,7 +1,7 @@
 import {
   systemAdminAuditSearchParamsSchema,
   type SystemAdminAuditSearchParams,
-} from "../schemas/system-admin.audit-filter.schema";
+} from "./sys-audit-filter.schema";
 
 function readSearchParam(
   searchParams: Record<string, string | string[] | undefined> | undefined,

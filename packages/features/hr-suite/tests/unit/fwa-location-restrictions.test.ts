@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { assertHrFwaLocationRestrictions } from "../../src/time-attendance/flexible-work-arrangement-tracking/data/hr.time.fwa-location.server";
+import { assertHrFwaLocationRestrictions } from "../../src/time-attendance/flexible-work-arrangement-tracking/hrs-hr-time-fwa-location-server";
 
 describe("FWA-017 location restrictions", () => {
   it("blocks disallowed location kinds", () => {

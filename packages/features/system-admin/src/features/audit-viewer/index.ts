@@ -4,5 +4,11 @@
  */
 export * from "./metadata";
 export * from "./client";
-export * from "./contracts";
-export * from "./schemas";
+export * from "./sys-audit-actions.contract";
+export * from "./sys-audit-coverage.contract";
+export * from "./sys-audit-event.contract";
+export * from "./sys-audit-export.contract";
+export * from "./sys-retention-policy.contract";
+export * from "./sys-audit-export.schema";
+export * from "./sys-audit-filter.schema";
+export * from "./sys-retention-action.schema";

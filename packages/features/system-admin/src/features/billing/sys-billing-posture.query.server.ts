@@ -8,19 +8,19 @@ import {
 } from "@afenda/billing/server";
 import { formatErpDateTime } from "@afenda/kernel";
 import { listLynxEvalRuns } from "@afenda/feature-knowledge/server";
-import { listTenantMembers } from "../../users/data/system-admin.identity.repository.server";
-import { listAiUsageEvents } from "../../lynx/data/system-admin.lynx.repository.server";
-import type { BillingPostureSnapshot } from "../contracts/system-admin.billing-posture.contract";
-import type { OrganizationSubscription } from "../contracts/system-admin.billing-subscription.contract";
+import { listTenantMembers } from "../users/sys-identity.repository.server";
+import { listAiUsageEvents } from "../lynx/sys-lynx.repository.server";
+import type { BillingPostureSnapshot } from "./sys-billing-posture.contract";
+import type { OrganizationSubscription } from "./sys-billing-subscription.contract";
 import type {
   SystemAdminBillingEntitlementRow,
   SystemAdminBillingInvoiceRow,
   SystemAdminBillingPaymentRow,
-} from "../contracts/system-admin.billing-list.contract";
+} from "./sys-billing-list.contract";
 import {
   getOrganizationBillingByOrganizationId,
   listOrganizationBillingInvoices,
-} from "./system-admin.billing-stripe.repository.server";
+} from "./sys-billing-stripe.repository.server";
 
 export async function getBillingPostureSnapshot(input: {
   organizationId: string;

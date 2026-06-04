@@ -1,10 +1,10 @@
+import { LYNX_WORKSPACE_ROUTES } from "./lyn-core.contract";
 import {
-  LYNX_WORKSPACE_ROUTES,
   lynxClaimValidationResultSchema,
   lynxQualityGateResultSchema,
   type LynxQualityGateResult,
   type LynxQualityGateStatus,
-} from "../contracts";
+} from "./lyn-evidence-trust.schema";
 import {
   getLynxRunAnalytics,
   getLynxRunDetail,
@@ -14,13 +14,13 @@ import {
   type LynxRunLedgerFilters,
   type LynxRunLedgerSummary,
   type LynxWorkflowSessionStatus,
-} from "./lynx.run-ledger.repository.server";
+} from "./lyn-run-ledger.repository.server";
 import {
   getLynxWorkflowSession,
   listLynxWorkflowSessions,
   type LynxWorkflowSessionFilters,
   type LynxWorkflowSessionSummary,
-} from "./lynx.workflow-session.repository.server";
+} from "./lyn-workflow-session.repository.server";
 import {
   buildLynxClaimValidationListSurface,
   buildLynxRunDetailStatGrid,
@@ -40,7 +40,7 @@ import {
   type LynxRunManagementRow,
   type LynxWorkflowSessionFilters as LynxWorkflowSessionSurfaceFilters,
   type LynxWorkflowSessionRow,
-} from "../surface";
+} from "./lyn-surface.shared";
 
 type SearchParamValue = string | string[] | undefined;
 

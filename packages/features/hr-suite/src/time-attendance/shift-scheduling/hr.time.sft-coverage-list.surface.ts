@@ -1,4 +1,4 @@
-import type { HrSftCoverageCompareWindow } from "./hr.time.sft-coverage.server";
+import type { HrSftCoverageCompareWindow } from "./hrs-hr-time-sft-coverage-server";
 import { formatCoverageStaffingStatusLabel } from "./hr.time.sft-coverage.shared";
 import {
   buildSftListSearchToolbar,

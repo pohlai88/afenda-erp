@@ -10,7 +10,7 @@ import { and, eq } from "drizzle-orm";
 
 import type { HrAatAbsenceRiskIndicator } from "./hr.time.aat-risk.schema";
 import { formatHrAatAbsenceRiskLevelLabel } from "./hr.time.aat-risk.schema";
-import { emitHrAatAuditEvent } from "./hr.time.aat-audit.server";
+import { emitHrAatAuditEvent } from "./hrs-hr-time-aat-audit-server";
 import { hrTimeAatAuditActions } from "./hr.time.aat.event";
 
 export type HrAatNotificationWindow = Awaited<

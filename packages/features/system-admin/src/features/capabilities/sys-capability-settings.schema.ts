@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { SYSTEM_ADMIN_CAPABILITY_KEY_MAX_LENGTH } from "../contracts/system-admin.capabilities.limits.shared";
+import { SYSTEM_ADMIN_CAPABILITY_KEY_MAX_LENGTH } from "./sys-capabilities.limits.shared";
 
 export const systemAdminCapabilityAvailabilitySchema = z.enum([
   "enabled",

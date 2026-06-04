@@ -4,11 +4,11 @@ import { cacheLife, cacheTag } from "next/cache";
 import {
   listTenantCapabilitySettings,
   listTenantModuleSettings,
-} from "./system-admin.execution-settings.repository.server";
+} from "./sys-execution-settings.repository.server";
 import {
   WORKSPACE_NAVIGATION_SETTINGS_CACHE_SCOPE,
   workspaceNavigationSettingsCacheTag,
-} from "../contracts/system-admin.workspace-navigation-cache.shared";
+} from "./sys-workspace-navigation-cache.shared";
 
 const MODULE_SETTINGS_LIMIT = 100;
 const CAPABILITY_SETTINGS_LIMIT = 500;

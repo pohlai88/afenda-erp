@@ -7,7 +7,7 @@ import {
   HR_BENEFITS_WORKBENCH_READ_ONLY_SURFACE_KEYS,
   hrBenefitsAuditTrailSurfaceKey,
 } from "../../src/metadata";
-import { parseHrBenefitsSearchParams } from "../../src/payroll-compensation/benefits-administration/data/hr.payroll.benefits-search-params.parse.shared";
+import { parseHrBenefitsSearchParams } from "../../src/payroll-compensation/benefits-administration/hr.payroll.benefits-search-params.parse.shared";
 
 describe("hr benefits workbench metadata", () => {
   it("marks audit trail as read-only Pattern C surface", () => {

@@ -6,8 +6,8 @@ import {
   readConfigurationString,
   readExecutionSettingConfiguration,
   readOptionalFormValue,
-} from "../../src/tenant-execution/contracts/system-admin.execution-settings.shared";
-import { resolveExecutionCapabilityForAction } from "../../src/tenant-execution/policies/system-admin.execution-capability.shared.server";
+} from "../../src/features/tenant-execution/sys-execution-settings.shared";
+import { resolveExecutionCapabilityForAction } from "../../src/features/tenant-execution/sys-execution-capability.shared.server";
 
 describe("tenant-execution shared helpers", () => {
   it("reads execution setting configuration safely", () => {

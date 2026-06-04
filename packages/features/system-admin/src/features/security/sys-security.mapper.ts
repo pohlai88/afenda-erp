@@ -1,5 +1,5 @@
 import type { TenantSecuritySettingsSnapshot } from "@afenda/db";
-import type { OrganizationSecuritySettings } from "../contracts/system-admin.security-settings.contract";
+import type { OrganizationSecuritySettings } from "./sys-security-settings.contract";
 
 function readSessionPolicyNumber(
   sessionPolicy: Record<string, unknown>,

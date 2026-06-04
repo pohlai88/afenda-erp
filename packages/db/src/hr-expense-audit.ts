@@ -5,7 +5,7 @@ import { clampPageSize } from "./hr-benefits.shared";
 import {
   hrExpenseAuditActionEnum,
   hrExpenseAuditEvents,
-} from "./hr-expense";
+} from "./dbx-hr-expense";
 
 export type HrExpenseAuditTrailWindow = {
   rows: readonly {
@@ -132,3 +132,4 @@ export async function listHrExpenseAuditTrailWindow(input: {
     };
   });
 }
+

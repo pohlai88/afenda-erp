@@ -9,7 +9,7 @@ import {
   moveHrRonCandidateStage,
   parseHrRonResumeReference,
   submitHrRonApplication,
-} from "../../src/talent-management/recruitment-onboarding/data/hr.talent.ron-store.shared";
+} from "../../src/talent-management/recruitment-onboarding/hr.talent.ron-store.shared";
 
 const requisition = createHrRonRequisition({
   id: "req-1",

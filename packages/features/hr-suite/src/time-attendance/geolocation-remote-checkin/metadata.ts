@@ -57,6 +57,6 @@ export {
 export {
   assertGeoCoverageComplete,
   GEO_REQUIREMENT_COVERAGE,
-} from "./data/geolocation-acceptance-coverage.shared";
+} from "./hrs-geolocation-acceptance-coverage-shared";
 
-export { GEO_SPEC_MAP, GEO_REQUIREMENT_CODES } from "./data/geolocation-spec-map.shared";
+export { GEO_SPEC_MAP, GEO_REQUIREMENT_CODES } from "./hrs-geolocation-spec-map-shared";

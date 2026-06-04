@@ -7,7 +7,7 @@ import {
   normalizeScopeText,
 } from "./hr-benefits.shared";
 import { HrBonusCommandError } from "./hr-bonus-incentive.shared";
-import { hrBonusPlans } from "./hr-bonus-incentive";
+import { hrBonusPlans } from "./dbx-hr-bonus-incentive";
 
 export async function listHrBonusPlansWindow(input: {
   organizationId: string;
@@ -157,3 +157,4 @@ export async function archiveHrBonusPlanInTx(
 
   return { planId: plan.id };
 }
+

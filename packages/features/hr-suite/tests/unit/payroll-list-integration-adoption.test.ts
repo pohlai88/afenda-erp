@@ -1,41 +1,41 @@
 import type { ListSurfaceRendererConfigurationResolvedInput } from "@afenda/governed-surface";
 import { describe, expect, it } from "vitest";
 
-import { hrPayrollBenefitsReadPermission } from "../../src/payroll-compensation/benefits-administration/contracts/hr.payroll.benefits.contract";
+import { hrPayrollBenefitsReadPermission } from "../../src/payroll-compensation/benefits-administration/hr.payroll.benefits.contract";
 import {
   buildBenefitsListSearchToolbar,
   buildBenefitsOperationalListSurface,
-} from "../../src/payroll-compensation/benefits-administration/surface/hr.payroll.benefits-list.shared";
-import { hrPayrollBonusReadPermission } from "../../src/payroll-compensation/bonus-incentive-management/contracts/hr.payroll.bonus.contract";
+} from "../../src/payroll-compensation/benefits-administration/hr.payroll.benefits-list.shared";
+import { hrPayrollBonusReadPermission } from "../../src/payroll-compensation/bonus-incentive-management/hr.payroll.bonus.contract";
 import {
   buildBonusListSearchToolbar,
   buildBonusOperationalListSurface,
-} from "../../src/payroll-compensation/bonus-incentive-management/surface/hr.payroll.bonus-list.shared";
-import { hrPayrollCpmReadPermission } from "../../src/payroll-compensation/compensation-planning-modeling/contracts/hr.payroll.cpm.contract";
+} from "../../src/payroll-compensation/bonus-incentive-management/hr.payroll.bonus-list.shared";
+import { hrPayrollCpmReadPermission } from "../../src/payroll-compensation/compensation-planning-modeling/hr.payroll.cpm.contract";
 import {
   buildCpmListSearchToolbar,
   buildCpmOperationalListSurface,
-} from "../../src/payroll-compensation/compensation-planning-modeling/surface/hr.payroll.cpm-list.shared";
-import { hrPayrollExpenseReadPermission } from "../../src/payroll-compensation/expenses-reimbursement/contracts/hr.payroll.expense.contract";
+} from "../../src/payroll-compensation/compensation-planning-modeling/hr.payroll.cpm-list.shared";
+import { hrPayrollExpenseReadPermission } from "../../src/payroll-compensation/expenses-reimbursement/hr.payroll.expense.contract";
 import {
   buildExpenseListSearchToolbar,
   buildExpenseOperationalListSurface,
-} from "../../src/payroll-compensation/expenses-reimbursement/surface/hr.payroll.expense-list.shared";
-import { hrPayrollMcpReadPermission } from "../../src/payroll-compensation/multi-country-payroll/contracts/hr.payroll.mcp.contract";
+} from "../../src/payroll-compensation/expenses-reimbursement/hr.payroll.expense-list.shared";
+import { hrPayrollMcpReadPermission } from "../../src/payroll-compensation/multi-country-payroll/hr.payroll.mcp.contract";
 import {
   buildMcpListSearchToolbar,
   buildMcpOperationalListSurface,
-} from "../../src/payroll-compensation/multi-country-payroll/surface/hr.payroll.mcp-list.shared";
-import { hrPayrollProcessingReadPermission } from "../../src/payroll-compensation/payroll-processing/contracts/hr.payroll.processing.contract";
+} from "../../src/payroll-compensation/multi-country-payroll/hr.payroll.mcp-list.shared";
+import { hrPayrollProcessingReadPermission } from "../../src/payroll-compensation/payroll-processing/hr.payroll.processing.contract";
 import {
   buildPayrollListSearchToolbar,
   buildPayrollOperationalListSurface,
-} from "../../src/payroll-compensation/payroll-processing/surface/hr.payroll.processing-list.shared";
-import { hrPayrollSbsReadPermission } from "../../src/payroll-compensation/salary-benchmarking-survey/contracts/hr.payroll.sbs.contract";
+} from "../../src/payroll-compensation/payroll-processing/hr.payroll.processing-list.shared";
+import { hrPayrollSbsReadPermission } from "../../src/payroll-compensation/salary-benchmarking-survey/hr.payroll.sbs.contract";
 import {
   buildSbsListSearchToolbar,
   buildSbsOperationalListSurface,
-} from "../../src/payroll-compensation/salary-benchmarking-survey/surface/hr.payroll.sbs-list.shared";
+} from "../../src/payroll-compensation/salary-benchmarking-survey/hr.payroll.sbs-list.shared";
 
 type PayrollPermission = {
   readonly module: "hr";

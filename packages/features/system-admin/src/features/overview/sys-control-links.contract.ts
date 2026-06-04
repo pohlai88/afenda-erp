@@ -1,4 +1,4 @@
-import { systemAdminRoutePaths } from "./system-admin.route-paths.contract";
+import { systemAdminRoutePaths } from "./sys-route-paths.contract";
 
 export function systemAdminListHref(
   path: string,

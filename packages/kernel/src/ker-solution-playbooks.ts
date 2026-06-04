@@ -1,5 +1,5 @@
 import type { ModuleId } from "@afenda/config/module-ids";
-import type { BusinessProblemType, SolutionWorkflowId } from "../shared/module-types";
+import type { BusinessProblemType, SolutionWorkflowId } from "./ker-module-types";
 
 export const businessProblemTypes = [
   "negative_pnl",

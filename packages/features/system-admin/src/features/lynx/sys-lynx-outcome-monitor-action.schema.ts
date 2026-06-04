@@ -1,4 +1,4 @@
-import { getSystemAdminLynxOutcomeMonitorThresholdCatalog } from "../contracts/system-admin.lynx-outcome-monitor-catalog.contract";
+import { getSystemAdminLynxOutcomeMonitorThresholdCatalog } from "./sys-lynx-outcome-monitor-catalog.contract";
 
 export const systemAdminLynxOutcomeMonitorSeverityModes = [
   "standard",

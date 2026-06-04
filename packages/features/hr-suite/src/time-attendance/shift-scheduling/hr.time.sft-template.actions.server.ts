@@ -13,7 +13,7 @@ import {
   archiveHrTimeSftShiftTemplate,
   createHrTimeSftShiftTemplate,
   updateHrTimeSftShiftTemplate,
-} from "./hr.time.sft-template.server";
+} from "./hrs-hr-time-sft-template-server";
 import { hrTimeSftRoutePaths } from "./hr.time.sft-route.contract";
 import { requireHrTimeSftManage } from "./hr.time.sft-access.policy.server";
 import {

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { hrPayrollBenefitsAuditActions } from "../../src/payroll-compensation/benefits-administration/events/hr.payroll.benefits.event";
+import { hrPayrollBenefitsAuditActions } from "../../src/payroll-compensation/benefits-administration/hr.payroll.benefits.event";
 
 describe("HRM-BEN-028 enrollment audit", () => {
   it("declares enrollment create audit action for enrollment mutations", () => {

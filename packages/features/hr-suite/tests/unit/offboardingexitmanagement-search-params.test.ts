@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { parseHrOffboardingSearchParams } from "../../src/employee-management/offboarding-exit-management/data/hr.workforce.offboarding-search-params.parse.shared";
+import { parseHrOffboardingSearchParams } from "../../src/employee-management/offboarding-exit-management/hr.workforce.offboarding-search-params.parse.shared";
 
 describe("hr offboarding search params", () => {
   it("returns empty object when search params are undefined", () => {

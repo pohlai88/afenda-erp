@@ -17,8 +17,8 @@ import {
 } from "@afenda/ui";
 import { GitPullRequestIcon } from "lucide-react";
 import { useActionState, useId, useMemo } from "react";
-import type { SystemAdminActionResult } from "../../tenant-execution/contracts/system-admin.action-result.contract";
-import { systemAdminInlineFormMaxWidthClass } from "../../overview/surfaces/system-admin.form-layout.shared";
+import type { SystemAdminActionResult } from "../tenant-execution/sys-action-result.contract";
+import { systemAdminInlineFormMaxWidthClass } from "../overview/sys-form-layout.shared";
 import {
   APPROVAL_RULE_DEFAULT_MODULE_KEY,
   APPROVAL_RULE_DEFAULT_TARGET_TYPE,
@@ -28,12 +28,9 @@ import {
   APPROVAL_RULE_ESCALATION_HOURS_MIN,
   APPROVAL_RULE_MIN_APPROVALS_MAX,
   APPROVAL_RULE_MIN_APPROVALS_MIN,
-} from "../contracts/system-admin.approval-rule.limits.shared";
-import type {
-  SystemAdminApprovalRuleEditorDefaults,
-  SystemAdminApproverRoleOption,
-} from "../contracts";
-import { systemAdminApprovalsUiCopy } from "../surface/system-admin.approvals-ui.copy.shared";
+} from "./sys-approval-rule.limits.shared";
+import type { SystemAdminApprovalRuleEditorDefaults, SystemAdminApproverRoleOption } from "./sys-approval-rule.contract";
+import { systemAdminApprovalsUiCopy } from "./sys-approvals-ui.copy.shared";
 
 type ApprovalRuleAction = (
   state: SystemAdminActionResult | undefined,

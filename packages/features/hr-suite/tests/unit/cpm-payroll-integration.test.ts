@@ -34,7 +34,7 @@ vi.mock("@afenda/db", async (importOriginal) => {
 });
 
 import { finalizeHrCompensationApprovalInTx } from "../../../../db/src/hr-compensation-planning";
-import { hrPayrollCpmAuditActions } from "../../src/payroll-compensation/compensation-planning-modeling/events/hr.payroll.cpm.event";
+import { hrPayrollCpmAuditActions } from "../../src/payroll-compensation/compensation-planning-modeling/hr.payroll.cpm.event";
 import {
   acknowledgeCompensationPayrollSync,
   listApprovedCompensationPayrollRefs,

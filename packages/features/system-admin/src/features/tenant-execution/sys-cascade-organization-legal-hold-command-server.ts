@@ -1,7 +1,7 @@
 import { cascadeOrganizationLegalHoldToDocuments } from "@afenda/db";
 import type { ModuleId } from "@afenda/kernel";
 
-import { recordTenantDocumentEvidenceEvent } from "../api/system-admin.object-storage-governance.server";
+import { recordTenantDocumentEvidenceEvent } from "./sys-object-storage-governance.server";
 
 /** Propagates org policy legal hold to ERP and HR registry rows. */
 export async function cascadeOrganizationLegalHoldCommand(input: {

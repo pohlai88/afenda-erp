@@ -13,13 +13,13 @@ import {
 import { RadioTowerIcon } from "lucide-react";
 import { useActionState, useMemo, useState } from "react";
 
-import type { SystemAdminActionResult } from "../../tenant-execution/contracts/system-admin.action-result.contract";
-import type { CreateWebhookActionData } from "../contracts/system-admin.integrations-action-dtos.contract";
+import type { SystemAdminActionResult } from "../tenant-execution/sys-action-result.contract";
+import type { CreateWebhookActionData } from "./sys-integrations-action-dtos.contract";
 import {
   systemAdminDefaultWebhookEventPresets,
   systemAdminWebhookEvents,
-} from "../contracts/system-admin.integrations-catalog.contract";
-import { SystemAdminOneTimeSecretPanel } from "../../overview/components/system-admin.one-time-secret.component.client";
+} from "./sys-integrations-catalog.contract";
+import { SystemAdminOneTimeSecretPanel } from "../overview/sys-one-time-secret.component.client";
 
 type CreateWebhookFormAction = (
   state: SystemAdminActionResult<CreateWebhookActionData> | undefined,

@@ -1,8 +1,8 @@
 import type { TenantApprovalSettingRow } from "@afenda/db";
-import { organizationRoles } from "@afenda/auth";
-import { listTenantApprovalSettings } from "../../tenant-execution/data/system-admin.execution-settings.repository.server";
-import { listDeprecatedOrganizationRoles } from "../policies/system-admin.approval-rules.roles.server";
-import { mapTenantApprovalSettingToListRow } from "./system-admin.approval-rules.mapper";
+import { organizationRoles } from "@afenda/kernel";
+import { listTenantApprovalSettings } from "../tenant-execution/sys-execution-settings.repository.server";
+import { listDeprecatedOrganizationRoles } from "./sys-approval-rules.roles.server";
+import { mapTenantApprovalSettingToListRow } from "./sys-approval-rules.mapper";
 
 export const SYSTEM_ADMIN_APPROVAL_RULES_QUERY_LIMIT = 200;
 

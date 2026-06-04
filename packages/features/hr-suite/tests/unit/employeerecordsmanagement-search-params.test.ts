@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { parseHrRecordsSearchParams } from "../../src/employee-management/employee-records-management/data/hr.workforce.records-search-params.parse.shared";
+import { parseHrRecordsSearchParams } from "../../src/employee-management/employee-records-management/hr.workforce.records-search-params.parse.shared";
 
 describe("hr records search params", () => {
   it("returns empty object when search params are undefined", () => {

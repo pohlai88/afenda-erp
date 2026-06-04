@@ -1,6 +1,6 @@
 import type {
   SystemAdminImportTemplate,
-} from "../contracts/system-admin.import-job.contract";
+} from "./sys-import-job.contract";
 
 export type SystemAdminImportRowParseResult =
   | {

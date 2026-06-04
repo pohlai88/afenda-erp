@@ -1,15 +1,15 @@
-import type { AppCapability } from "@afenda/auth";
+import type { AppCapability } from "./ker-app-capabilities";
 import {
   requireExecutionContext,
   type ExecutionContext,
-} from "../context/execution-context";
-import { requireExecutionPermission } from "../access/execution-access";
+} from "./ker-execution-context";
+import { requireExecutionPermission } from "./ker-execution-access";
 import {
   assertExecutionPolicy,
   type ExecutionPolicyCheck,
-} from "../policy/execution-policy";
-import { writeExecutionAuditEvent } from "../audit/execution-audit";
-import type { ExecutionActorType } from "../actor/execution-actor";
+} from "./ker-execution-policy";
+import { writeExecutionAuditEvent } from "./ker-execution-audit";
+import type { ExecutionActorType } from "./ker-execution-actor";
 
 type MaybePromise<T> = T | Promise<T>;
 

@@ -1,6 +1,6 @@
 import { dispatchTenantWebhookEvent } from "@afenda/workflows";
 import { logServerEvent } from "@afenda/observability/server";
-import type { SystemAdminWebhookEvent } from "../contracts/system-admin.integrations-catalog.contract";
+import type { SystemAdminWebhookEvent } from "./sys-integrations-catalog.contract";
 
 export async function dispatchSystemAdminWebhook(input: {
   organizationId: string;

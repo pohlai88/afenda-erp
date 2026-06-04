@@ -1,5 +1,5 @@
 import { Card, CardContent } from "@afenda/ui/card";
-import { GovernedEmpty } from "./client";
+import { GovernedEmpty } from "./gov-governed-empty";
 import {
   parseStatCardConfiguration,
   type StatCardDensity,
@@ -8,13 +8,13 @@ import {
 import {
   governedParseErrorCopy,
   governedRendererCopy,
-} from "../i18n/governed-renderer-copy.shared";
+} from "./gov-governed-renderer-copy-shared";
 import { GOVERNED_STAT_GRID_CLASS } from "./stat-card-layout.shared";
-import { diagnosticsDataAttributes } from "../utils/governed-diagnostics.shared";
+import { diagnosticsDataAttributes } from "./gov-governed-diagnostics-shared";
 import {
   governedIdentityAttributes,
   governedTestId,
-} from "../utils/governed-identity.shared";
+} from "./gov-governed-identity-shared";
 
 import type { GovernedComponentRendererDiagnostics } from "./gov-registry";
 import { StatCardBody } from "./gov-stat-card-body-client";

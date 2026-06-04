@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 
-import { buildSystemAdminAuditSearchFilters } from "../../src/audit-viewer/data/system-admin.audit-search-filters.shared";
-import { parseSystemAdminAuditExportFormData } from "../../src/audit-viewer/data/system-admin.audit-export-form.shared";
-import { extractAuditCorrelationRefs } from "../../src/audit-viewer/data/system-admin.audit-correlation.shared";
+import { buildSystemAdminAuditSearchFilters } from "../../src/features/audit-viewer/sys-audit-search-filters.shared";
+import { parseSystemAdminAuditExportFormData } from "../../src/features/audit-viewer/sys-audit-export-form.shared";
+import { extractAuditCorrelationRefs } from "../../src/features/audit-viewer/sys-audit-correlation.shared";
 
 describe("audit viewer shared helpers", () => {
   it("builds tenant audit search filters from parsed params", () => {

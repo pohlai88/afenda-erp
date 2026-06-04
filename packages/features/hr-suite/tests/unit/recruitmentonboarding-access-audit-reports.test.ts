@@ -6,8 +6,8 @@ import {
   filterHrRonRecordsForAccess,
   listHrRonHistoryByCandidateOrEmployee,
   resetHrRonStoreForTests,
-} from "../../src/talent-management/recruitment-onboarding/data/hr.talent.ron-store.shared";
-import { hrTalentRonAuditActions } from "../../src/talent-management/recruitment-onboarding/events/hr.talent.ron.event";
+} from "../../src/talent-management/recruitment-onboarding/hr.talent.ron-store.shared";
+import { hrTalentRonAuditActions } from "../../src/talent-management/recruitment-onboarding/hr.talent.ron.event";
 
 describe("HRM-RON access, reporting, and audit", () => {
   it("builds reports by configured grouping", () => {

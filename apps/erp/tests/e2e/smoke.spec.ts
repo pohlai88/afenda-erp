@@ -14,7 +14,7 @@ test.describe("Afenda ERP public smoke", () => {
   test("renders the public home landing page @public", async ({
     page,
   }) => {
-    await gotoApp(page, "/");
+    await gotoApp(page, "/?intro=0");
     await expect(page).toHaveURL(/\/$/);
     await expect(
       page.getByRole("heading", { level: 1, name: "Afenda project" }),

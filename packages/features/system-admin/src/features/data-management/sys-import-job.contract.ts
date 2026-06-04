@@ -3,7 +3,7 @@ import type {
   SystemAdminDataImportJobStatus,
   SystemAdminDataImportRowStatus,
 } from "@afenda/db";
-import type { AppCapability } from "@afenda/auth";
+import type { AppCapability } from "@afenda/kernel";
 
 export type SystemAdminImportJobStatus = SystemAdminDataImportJobStatus;
 export type SystemAdminImportRowStatus = SystemAdminDataImportRowStatus;

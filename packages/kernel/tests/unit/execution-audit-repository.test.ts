@@ -11,7 +11,7 @@ vi.mock("@afenda/db", () => ({
 }));
 
 const { writeExecutionAuditEvent, writeExecutionAuditEventInTransaction } =
-  await import("../../src/execution-kernel/audit/execution-audit");
+  await import("../../src/ker-execution-audit");
 
 describe("execution audit repository", () => {
   beforeEach(() => {

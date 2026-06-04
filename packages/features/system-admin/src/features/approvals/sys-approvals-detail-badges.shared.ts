@@ -6,12 +6,12 @@ import type { Badge } from "@afenda/ui/badge";
 import {
   catalogStatusBadge,
   moduleReadinessVerdictBadge,
-} from "../../overview/surfaces/system-admin.control-list.shared";
+} from "../overview/sys-control-list.shared";
 import type {
   ApprovalReadinessVerdict,
   SystemAdminApprovalRuleStatus,
-} from "../contracts/system-admin.approval-rule.contract";
-import { systemAdminApprovalsUiCopy } from "./system-admin.approvals-ui.copy.shared";
+} from "./sys-approval-rule.contract";
+import { systemAdminApprovalsUiCopy } from "./sys-approvals-ui.copy.shared";
 
 type ApprovalBadgeCellKind = NonNullable<ListSurfaceRow["cellKinds"]>[string];
 type ListCellTone = "default" | "positive" | "attention" | "critical";

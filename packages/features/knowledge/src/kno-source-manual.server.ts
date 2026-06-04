@@ -1,8 +1,8 @@
-import type { KnowledgeSourceAdapter } from "../contracts/knowledge.source-adapter.contract";
+import type { KnowledgeSourceAdapter } from "./kno-source-adapter.contract";
 import {
   knowledgeManualSourceConfigSchema,
   type KnowledgeManualSourceConfig,
-} from "../schemas/knowledge.source-manual.schema";
+} from "./kno-source-manual.schema";
 
 /**
  * Manual ingest adapter — config stores the content directly.

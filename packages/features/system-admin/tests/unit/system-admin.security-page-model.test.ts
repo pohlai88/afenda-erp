@@ -69,9 +69,9 @@ vi.mock("../../src/security/data/system-admin.security.recent-changes.server", (
   listSystemAdminSecurityRecentChanges: vi.fn(async () => []),
 }));
 
-import { buildSystemAdminSecurityPageModel } from "../../src/security/data/system-admin.security.page-model.server";
-import { loadSystemAdminDocumentQuarantineInboxWindow } from "../../src/tenant-execution/data/system-admin.document-quarantine-inbox.read-model.server";
-import { loadOrganizationStorageQuotaSnapshot } from "../../src/tenant-execution/data/system-admin.organization-storage-quota.read-model.server";
+import { buildSystemAdminSecurityPageModel } from "../../src/features/security/sys-security.page-model.server";
+import { loadSystemAdminDocumentQuarantineInboxWindow } from "../../src/features/tenant-execution/sys-document-quarantine-inbox.read-model.server";
+import { loadOrganizationStorageQuotaSnapshot } from "../../src/features/tenant-execution/sys-organization-storage-quota.read-model.server";
 
 describe("system admin security page model", () => {
   beforeEach(() => {

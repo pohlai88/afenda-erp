@@ -2,7 +2,7 @@ import { z } from "zod";
 
 import type { SchemaStability } from "./gov-_stability-shared";
 
-import { governedSurfaceChromeSchema } from "./surface-chrome.schema";
+import { governedSurfaceChromeSchema } from "./gov-surface-chrome-schema";
 
 export const GOVERNED_APPROVAL_TIMELINE_SCHEMA_ID =
   "governed.approval-timeline.configuration" as const;

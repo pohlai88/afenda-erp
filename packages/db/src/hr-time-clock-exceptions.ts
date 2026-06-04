@@ -7,7 +7,7 @@ import {
   hrTimeClockDevices,
   hrTimeClockPunchExceptions,
   hrTimeClockRawPunches,
-} from "./hr-time-clock";
+} from "./dbx-hr-time-clock";
 
 export type HrTimeClockPunchExceptionRow = {
   id: string;
@@ -141,3 +141,4 @@ export async function listHrTimeClockPunchExceptionsWindow(input: {
     });
   });
 }
+

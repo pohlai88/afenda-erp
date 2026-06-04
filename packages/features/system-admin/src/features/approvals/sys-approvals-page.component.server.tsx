@@ -1,23 +1,14 @@
 import { resolveWorkspaceDataMode } from "@afenda/kernel";
 import { hasExecutionPermission } from "@afenda/kernel/execution";
 
-import {
-  reactivateDeprecatedSystemAdminApprovalRuleAction,
-  updateSystemAdminApprovalRuleAction,
-} from "../actions";
-import {
-  buildSystemAdminApprovalsPageModel,
-  buildSystemAdminApprovalsQueuePageModel,
-} from "../data";
-import {
-  hasSystemAdminApprovalsQueueView,
-  hasSystemAdminApprovalsRulesRead,
-  requireSystemAdminApprovalsPageAccess,
-} from "../policies";
+import { reactivateDeprecatedSystemAdminApprovalRuleAction, updateSystemAdminApprovalRuleAction } from "./sys-approval-rules.actions.server";
+import { buildSystemAdminApprovalsPageModel } from "./sys-approval-rules.page-model.server";
+import { buildSystemAdminApprovalsQueuePageModel } from "./sys-approvals-queue.page-model.server";
+import { hasSystemAdminApprovalsQueueView, hasSystemAdminApprovalsRulesRead, requireSystemAdminApprovalsPageAccess } from "./sys-approvals-queue.policy.server";
 import {
   SystemAdminApprovalsAccessDenied,
   SystemAdminApprovalsSection,
-} from "./system-admin.approvals-section.component.server";
+} from "./sys-approvals-section.component.server";
 
 type SystemAdminApprovalsPageProps = {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;

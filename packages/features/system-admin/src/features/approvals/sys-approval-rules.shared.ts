@@ -1,16 +1,16 @@
 import type {
   SystemAdminApprovalRule,
   SystemAdminApprovalRuleStatus,
-} from "../contracts/system-admin.approval-rule.contract";
+} from "./sys-approval-rule.contract";
 import {
   MINUTES_PER_HOUR,
   readOptionalFormValue,
-} from "../../tenant-execution/contracts/system-admin.execution-settings.shared";
+} from "../tenant-execution/sys-execution-settings.shared";
 import {
   approvalRuleStatusSchema,
   systemAdminApprovalRuleActionSchema,
   type SystemAdminApprovalRuleActionInput,
-} from "../schemas/system-admin.approval-rule.schema";
+} from "./sys-approval-rule.schema";
 
 export const APPROVAL_ACTIVITY_DEFAULT_LIMIT = 10;
 

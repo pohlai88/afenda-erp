@@ -3,13 +3,13 @@ import type {
   ListSurfaceRow,
 } from "@afenda/governed-surface/schemas";
 import type { ExecutionPolicyEffect } from "@afenda/kernel/execution-tenant-policy";
-import { systemAdminControlLinks } from "../../overview/contracts/system-admin.control-links.contract";
+import { systemAdminControlLinks } from "../overview/sys-control-links.contract";
 import {
   buildLinkedControlListSurface,
   catalogStatusBadge,
   linkCell,
   moduleReadinessVerdictBadge,
-} from "../../overview/surfaces/system-admin.control-list.shared";
+} from "../overview/sys-control-list.shared";
 import type { SystemAdminPolicyRuleListRow } from "./system-admin.policy-rule.contract";
 import { systemAdminPoliciesUiCopy } from "./system-admin.policies-ui.copy.shared";
 import { resolveSystemAdminPolicyRowTrailingAction } from "./system-admin.policy-rules-list-trailing.shared";

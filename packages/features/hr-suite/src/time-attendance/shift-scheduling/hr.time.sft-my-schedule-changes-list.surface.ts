@@ -1,4 +1,4 @@
-import type { HrShiftScheduleChangeRequestWindow } from "./hr.time.sft-schedule-change.server";
+import type { HrShiftScheduleChangeRequestWindow } from "./hrs-hr-time-sft-schedule-change-server";
 import { hrTimeSftMyScheduleChangesSurfaceKey } from "./hr.time.sft.contract";
 import {
   buildSftListSearchToolbar,

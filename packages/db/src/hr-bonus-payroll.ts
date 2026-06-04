@@ -9,11 +9,13 @@ import {
 } from "./hr-bonus.shared";
 import type { HrBonusPayrollPayoutRefRow } from "./hr-bonus.types";
 import {
-  hrBonusCycles,
   hrBonusPayrollPayoutReferences,
   hrBonusPayouts,
+} from "./dbx-hr-bonus";
+import {
+  hrBonusCycles,
   hrBonusPlans,
-} from "./hr-bonus";
+} from "./dbx-hr-bonus-incentive";
 import { hrEmployees } from "./hr";
 
 const MAX_PAYROLL_EXPORT = 500;
@@ -245,3 +247,4 @@ export async function markHrBonusPayrollPayoutRefsSyncedInTx(
 
   return { syncedCount: updated.length };
 }
+

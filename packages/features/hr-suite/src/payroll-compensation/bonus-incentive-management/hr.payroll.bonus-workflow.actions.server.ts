@@ -196,7 +196,7 @@ export async function reviewBonusPayoutJsonAction(
     return actionSuccess(reviewed);
   } catch (error) {
     const { toBonusActionFailure } = await import(
-      "../data/hr.payroll.bonus-action-result.shared"
+      "./hr.payroll.bonus-action-result.shared"
     );
     return toBonusActionFailure(error) as ActionResult<{
       payoutStatus: string;

@@ -2,13 +2,13 @@ import { GovernedPatternCListSection } from "@afenda/governed-surface/server";
 import { Alert, AlertDescription, SectionPanel } from "@afenda/ui";
 import type { ModuleWorkspace, ModuleWorkspaceListQuery } from "@afenda/kernel";
 
-import { mapWorkspaceItemsToSystemAdminApprovalQueueRows } from "./system-admin.approvals-queue.mapper";
+import { mapWorkspaceItemsToSystemAdminApprovalQueueRows } from "./sys-approvals-queue.mapper";
 import {
   buildSystemAdminApprovalQueueListSurface,
   systemAdminApprovalsQueueSurfaceKey,
-} from "../surface/system-admin.approvals-queue-list.surface";
-import { systemAdminApprovalsUiCopy } from "../surface/system-admin.approvals-ui.copy.shared";
-import { SystemAdminApprovalQueueTrailingCell } from "./system-admin.approvals-queue-trailing-cell.component.client";
+} from "./sys-approvals-queue-list.surface";
+import { systemAdminApprovalsUiCopy } from "./sys-approvals-ui.copy.shared";
+import { SystemAdminApprovalQueueTrailingCell } from "./sys-approvals-queue-trailing-cell.component.client";
 
 export function SystemAdminApprovalQueueSection({
   workspace,

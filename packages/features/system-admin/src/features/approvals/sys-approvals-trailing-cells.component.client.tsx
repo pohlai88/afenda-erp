@@ -11,11 +11,11 @@ import { ArrowUpRightIcon, BanIcon, PowerIcon } from "lucide-react";
 import Link from "next/link";
 import { useState, useTransition } from "react";
 
-import { SystemAdminDestructiveConfirmButton } from "../../overview/components/system-admin.destructive-confirm-button.component.client";
-import { SystemAdminTrailingActionStack } from "../../overview/components/system-admin.trailing-action-stack.component.client";
-import type { SystemAdminActionResult } from "../../tenant-execution/contracts/system-admin.action-result.contract";
-import { setSystemAdminApprovalRuleEnabledAction } from "../actions/system-admin.approval-rules.actions.server";
-import { systemAdminApprovalsUiCopy } from "../surface/system-admin.approvals-ui.copy.shared";
+import { SystemAdminDestructiveConfirmButton } from "../overview/sys-destructive-confirm-button.component.client";
+import { SystemAdminTrailingActionStack } from "../overview/sys-trailing-action-stack.component.client";
+import type { SystemAdminActionResult } from "../tenant-execution/sys-action-result.contract";
+import { setSystemAdminApprovalRuleEnabledAction } from "./sys-approval-rules.actions.server";
+import { systemAdminApprovalsUiCopy } from "./sys-approvals-ui.copy.shared";
 
 export function SystemAdminApprovalTrailingCell({
   row,

@@ -2,19 +2,19 @@ import type { TenantModuleSettingRow, TenantPolicySettingRow } from "@afenda/db"
 import { getErpModuleById } from "@afenda/kernel";
 import { moduleIds } from "@afenda/config/module-ids";
 import {
-  capabilitiesForRole,
+  getCapabilitiesForOrganizationRole,
   organizationRoles,
   type AppCapability,
   type OrganizationRole,
-} from "@afenda/auth";
+} from "@afenda/kernel";
 import { listExecutionCapabilitiesForModule } from "@afenda/kernel/execution-capabilities";
 import { mapTenantPolicySettingToRule } from "../policies/system-admin.policy-rules.mapper";
-import type { SystemAdminModuleCatalogRow, SystemAdminModuleStatus } from "../contracts";
-import { resolveSystemAdminModuleCategory } from "../contracts/system-admin.module-category.contract";
+import type { SystemAdminModuleCatalogRow, SystemAdminModuleStatus } from "./sys-modules.contract";
+import { resolveSystemAdminModuleCategory } from "./sys-module-category.contract";
 import {
   resolveSystemAdminModuleAvailability,
   resolveSystemAdminModuleReadinessVerdict,
-} from "../contracts/system-admin.modules-readiness.shared";
+} from "./sys-modules-readiness.shared";
 
 function formatModuleLifecycleStatus(
   setting: TenantModuleSettingRow | undefined,
@@ -38,7 +38,7 @@ function countRolesWithModuleAccess(moduleRequiredCapability: AppCapability) {
   const roles: OrganizationRole[] = [];
 
   for (const role of organizationRoles) {
-    if (capabilitiesForRole(role).includes(moduleRequiredCapability)) {
+    if (getCapabilitiesForOrganizationRole(role).includes(moduleRequiredCapability)) {
       roles.push(role);
     }
   }

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
-import { GovernedComponentRenderer } from "../../src/metadata/render-governed-component";
-import { resolveGovernedDetailSectionContent } from "../../src/metadata/detail-section.adapter";
+import { GovernedComponentRenderer } from "../../src/gov-render-governed-component";
+import { resolveGovernedDetailSectionContent } from "../../src/gov-detail-section-adapter";
 
 describe("resolveGovernedDetailSectionContent", () => {
   it("returns a GovernedComponentRenderer element for a valid section", () => {

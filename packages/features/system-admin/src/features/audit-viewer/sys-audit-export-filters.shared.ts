@@ -1,4 +1,4 @@
-import type { SystemAdminAuditSearchParams } from "../schemas/system-admin.audit-filter.schema";
+import type { SystemAdminAuditSearchParams } from "./sys-audit-filter.schema";
 
 export function buildSystemAdminAuditExportFilterFields(
   params: SystemAdminAuditSearchParams,

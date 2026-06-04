@@ -12,7 +12,7 @@ vi.mock(
   async (importOriginal) => {
     const actual =
       await importOriginal<
-        typeof import("../../src/approvals/policies/system-admin.approval-rules.policy.server")
+        typeof import("../../src/features/approvals/sys-approval-rules.policy.server")
       >();
     return {
       ...actual,
@@ -73,11 +73,11 @@ const guardContext = {
 };
 
 describe("system admin approvals", () => {
-  let updateSystemAdminApprovalRuleAction: typeof import("../../src/approvals/actions/system-admin.approval-rules.actions.server").updateSystemAdminApprovalRuleAction;
+  let updateSystemAdminApprovalRuleAction: typeof import("../../src/features/approvals/sys-approval-rules.actions.server").updateSystemAdminApprovalRuleAction;
 
   beforeAll(async () => {
     ({ updateSystemAdminApprovalRuleAction } = await import(
-      "../../src/approvals/actions/system-admin.approval-rules.actions.server"
+      "../../src/features/approvals/sys-approval-rules.actions.server"
     ));
   });
 
@@ -93,7 +93,7 @@ describe("system admin approvals", () => {
     mockRequireApprovalsRead.mockRejectedValue(new Error("Forbidden"));
 
     const { requireSystemAdminApprovalsRead } = await import(
-      "../../src/approvals/policies/system-admin.approval-rules.policy.server"
+      "../../src/features/approvals/sys-approval-rules.policy.server"
     );
 
     await expect(requireSystemAdminApprovalsRead()).rejects.toThrow("Forbidden");
@@ -143,7 +143,7 @@ describe("system admin approvals", () => {
 
   it("rejects duplicate approval keys on create", async () => {
     const { listTenantApprovalSettings } = await import(
-      "../../src/tenant-execution/data/system-admin.execution-settings.repository.server"
+      "../../src/features/tenant-execution/sys-execution-settings.repository.server"
     );
     vi.mocked(listTenantApprovalSettings).mockResolvedValueOnce([
       {
@@ -207,7 +207,7 @@ describe("system admin approvals", () => {
 
   it("toggles approval rule enabled state", async () => {
     const { listTenantApprovalSettings } = await import(
-      "../../src/tenant-execution/data/system-admin.execution-settings.repository.server"
+      "../../src/features/tenant-execution/sys-execution-settings.repository.server"
     );
     vi.mocked(listTenantApprovalSettings).mockResolvedValueOnce([
       {
@@ -231,7 +231,7 @@ describe("system admin approvals", () => {
     ]);
 
     const { setSystemAdminApprovalRuleEnabledAction } = await import(
-      "../../src/approvals/actions/system-admin.approval-rules.actions.server"
+      "../../src/features/approvals/sys-approval-rules.actions.server"
     );
 
     const result = await setSystemAdminApprovalRuleEnabledAction({
@@ -279,7 +279,7 @@ describe("system admin approvals", () => {
 
   it("maps disabled approval rules out of kernel resolution", async () => {
     const { mapTenantApprovalSettingToKernelRecord } = await import(
-      "../../src/approvals/data/system-admin.approval-rules.mapper"
+      "../../src/features/approvals/sys-approval-rules.mapper"
     );
 
     expect(
@@ -306,10 +306,10 @@ describe("system admin approvals", () => {
 
   it("evaluates readiness for active approval rules", async () => {
     const { evaluateApprovalRuleReadiness } = await import(
-      "../../src/approvals/data/system-admin.approval-rules.readiness.server"
+      "../../src/features/approvals/sys-approval-rules.readiness.server"
     );
     const { mapTenantApprovalSettingToRule } = await import(
-      "../../src/approvals/data/system-admin.approval-rules.mapper"
+      "../../src/features/approvals/sys-approval-rules.mapper"
     );
 
     const rule = mapTenantApprovalSettingToRule({
@@ -336,7 +336,7 @@ describe("system admin approvals", () => {
 
   it("validates escalation timing bounds", async () => {
     const { updateApprovalRuleInputSchema } = await import(
-      "../../src/approvals/schemas/system-admin.approval-rule.schema"
+      "../../src/features/approvals/sys-approval-rule.schema"
     );
 
     expect(
@@ -360,7 +360,7 @@ describe("system admin approvals", () => {
     mockRequireApprovalsReview.mockRejectedValue(new Error("Forbidden"));
 
     const { reactivateDeprecatedSystemAdminApprovalRuleAction } = await import(
-      "../../src/approvals/actions/system-admin.approval-rules.actions.server"
+      "../../src/features/approvals/sys-approval-rules.actions.server"
     );
 
     await expect(
@@ -373,7 +373,7 @@ describe("system admin approvals", () => {
 
   it("reactivates deprecated approval rules after review", async () => {
     const { listTenantApprovalSettings } = await import(
-      "../../src/tenant-execution/data/system-admin.execution-settings.repository.server"
+      "../../src/features/tenant-execution/sys-execution-settings.repository.server"
     );
     vi.mocked(listTenantApprovalSettings).mockResolvedValueOnce([
       {
@@ -397,7 +397,7 @@ describe("system admin approvals", () => {
     ]);
 
     const { reactivateDeprecatedSystemAdminApprovalRuleAction } = await import(
-      "../../src/approvals/actions/system-admin.approval-rules.actions.server"
+      "../../src/features/approvals/sys-approval-rules.actions.server"
     );
 
     const result = await reactivateDeprecatedSystemAdminApprovalRuleAction({

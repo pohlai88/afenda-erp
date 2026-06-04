@@ -12,8 +12,8 @@ vi.mock("../../security/jwks.shared.server", () => ({
 }));
 
 import { getNeonAuthEnv } from "@afenda/config/env";
-import { getNeonAuthJwkByKid } from "../../security/jwks.shared.server";
-import { verifyNeonAuthWebhookPayload } from "../../security/webhook-verify.server";
+import { getNeonAuthJwkByKid } from "../src/aut-jwks-shared-server";
+import { verifyNeonAuthWebhookPayload } from "../src/aut-webhook-verify-server";
 
 const baseUrl =
   "https://ep-snowy-hat-aof9n5iw.neonauth.c-2.ap-southeast-1.aws.neon.tech/neondb/auth";

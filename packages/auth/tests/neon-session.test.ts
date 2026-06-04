@@ -6,8 +6,8 @@ vi.mock("../../runtime/neon-auth.server", () => ({
   isNeonAuthReady: vi.fn(),
 }));
 
-import { getNeonAuthServer, isNeonAuthReady } from "../../runtime/neon-auth.server";
-import { readNeonAuthSessionPayload } from "../../runtime/neon-session.server";
+import { getNeonAuthServer, isNeonAuthReady } from "../src/aut-neon-auth-server";
+import { readNeonAuthSessionPayload } from "../src/aut-neon-session-server";
 
 describe("readNeonAuthSessionPayload", () => {
   it("returns null when Neon Auth is not ready", async () => {

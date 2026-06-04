@@ -2,8 +2,8 @@ import type {
   AppCapability,
   OrganizationRole,
   UserSession,
-} from "@afenda/auth";
-import type { ExecutionActorType } from "../actor/execution-actor";
+} from "./ker-app-capabilities";
+import type { ExecutionActorType } from "./ker-execution-actor";
 
 /**
  * Minimum authority contract (ARCH-1002 §5.2). Use when passing context across

@@ -3,7 +3,7 @@ import {
   buildHrSuiteListSearchToolbarFromRegistryEntry,
   buildHrSuiteOperationalListSurface,
   type HrSuiteListRow,
-} from "../../employee-management/compliance-regulatory-tracking/metadata";
+} from "../../hr-suite-integration/metadata";
 import {
   hrIndustryGpgReadPermission,
   type HrIndustryGpgListCellValue,

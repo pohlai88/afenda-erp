@@ -12,7 +12,7 @@ import {
   hrGeoCheckinOutcomes,
   hrGeoExceptions,
   hrGeoRawCheckins,
-} from "./hr-geolocation";
+} from "./dbx-hr-geolocation";
 
 export class HrGeoWorkflowError extends Error {
   readonly code:
@@ -296,3 +296,4 @@ export async function listHrGeoPendingExceptionsWindow(input: {
     };
   });
 }
+

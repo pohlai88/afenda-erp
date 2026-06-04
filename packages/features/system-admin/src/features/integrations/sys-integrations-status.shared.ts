@@ -3,7 +3,7 @@ import type {
   SystemAdminApiCredentialListRow,
   SystemAdminWebhookDeliveryListRow,
   SystemAdminWebhookListRow,
-} from "../contracts/system-admin.integrations-list.contract";
+} from "./sys-integrations-list.contract";
 
 type BadgeKind = NonNullable<ListSurfaceRow["cellKinds"]>[string];
 

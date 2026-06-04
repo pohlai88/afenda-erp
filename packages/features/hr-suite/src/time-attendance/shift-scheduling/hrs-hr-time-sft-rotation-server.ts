@@ -12,7 +12,7 @@ import type {
   HrSftApplyRotationCycleInput,
   HrSftCreateRotationCycleInput,
 } from "./hr.time.sft-rotation.schema";
-import { emitHrSftAuditEvent } from "./hr.time.sft-audit.server";
+import { emitHrSftAuditEvent } from "./hrs-hr-time-sft-audit-server";
 import { hrTimeSftAuditActions } from "./hr.time.sft.event";
 
 export type { HrShiftRotationCycleWindow, HrShiftBulkScheduleResult };

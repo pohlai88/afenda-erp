@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
-import { hrSftDecideScheduleChangeSchema } from "../schemas/hr.time.sft-schedule-change.schema";
-import { hrSftDecideSwapRequestSchema } from "../schemas/hr.time.sft-swap.schema";
+import { hrSftDecideScheduleChangeSchema } from "../src/time-attendance/shift-scheduling/hr.time.sft-schedule-change.schema";
+import { hrSftDecideSwapRequestSchema } from "../src/time-attendance/shift-scheduling/hr.time.sft-swap.schema";
 
 describe("SFT reason validation (HRM-SFT-023)", () => {
   it("requires rejection reason on swap reject", () => {

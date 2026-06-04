@@ -2,18 +2,18 @@ import type { ListSurfaceRendererConfigurationResolvedInput } from "@afenda/gove
 import {
   buildLinkedControlListSurface,
   linkCell,
-} from "../../overview/surfaces/system-admin.control-list.shared";
-import type { SystemAdminDiagnosticIssue } from "../contracts/system-admin.diagnostic-issue.contract";
+} from "../overview/sys-control-list.shared";
+import type { SystemAdminDiagnosticIssue } from "./sys-diagnostic-issue.contract";
 import type {
   SystemAdminDiagnosticsModuleCoverageRow,
   SystemAdminDiagnosticsRecentChangeRow,
-} from "../contracts/system-admin.diagnostics-coverage.contract";
+} from "./sys-diagnostics-coverage.contract";
 import {
   formatDiagnosticCategoryLabel,
   formatDiagnosticSeverityLabel,
   formatModuleCoverageStatusLabel,
-} from "./system-admin.diagnostics.verdict.server";
-import { systemAdminDiagnosticsUiCopy } from "./system-admin.diagnostics-ui.copy.shared";
+} from "./sys-diagnostics.verdict.server";
+import { systemAdminDiagnosticsUiCopy } from "./sys-diagnostics-ui.copy.shared";
 
 export const systemAdminDiagnosticsSurfaceKey =
   "system-admin.diagnostics.list";

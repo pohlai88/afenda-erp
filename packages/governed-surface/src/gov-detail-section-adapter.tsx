@@ -1,11 +1,11 @@
 import type { ReactNode } from "react";
 
-import { GovernedEmpty } from "./client";
-import { governedSurfaceParseErrorCopy } from "../i18n/governed-renderer-copy.shared";
+import { GovernedEmpty } from "./gov-governed-empty";
+import { governedSurfaceParseErrorCopy } from "./gov-governed-renderer-copy-shared";
 import { toGovernedComponentEnvelopeFromDetailSection } from "./governed-configuration.shared";
 import type { GovernedDetailSection } from "./gov-detail-tabs-schema";
 
-import { GovernedComponentRenderer } from "./render-governed-component";
+import { GovernedComponentRenderer } from "./gov-render-governed-component";
 
 /**
  * Resolves `rendererKey` to presentation for a governed detail section.

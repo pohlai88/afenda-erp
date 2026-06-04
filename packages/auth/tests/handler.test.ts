@@ -12,12 +12,12 @@ vi.mock("../../security/webhook-verify.server", () => ({
 }));
 
 import { getNeonAuthEnv, isNeonAuthEnabled } from "@afenda/config/env";
-import { verifyNeonAuthWebhookPayload } from "../../security/webhook-verify.server";
-import { handleNeonAuthWebhookPost } from "../../webhooks/handler.server";
+import { verifyNeonAuthWebhookPayload } from "../src/aut-webhook-verify-server";
+import { handleNeonAuthWebhookPost } from "../src/aut-handler-server";
 import {
   registerNeonAuthWebhookHooks,
   resetNeonAuthWebhookHooksForTests,
-} from "../../webhooks/hooks.server";
+} from "../src/aut-hooks-server";
 
 function post(body: unknown, init?: RequestInit) {
   return new Request("https://example.com/api/internal/v1/webhooks/neon-auth", {

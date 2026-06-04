@@ -2,7 +2,7 @@ import {
   appCapabilities,
   isAppCapability,
   type AppCapability,
-} from "@afenda/auth";
+} from "@afenda/kernel";
 
 export type SystemAdminCatalogOption<TValue extends string = string> = {
   value: TValue;

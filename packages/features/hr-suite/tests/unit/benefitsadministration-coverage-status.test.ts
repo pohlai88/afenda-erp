@@ -6,7 +6,7 @@ import {
   HR_BENEFIT_COVERAGE_STATUSES,
   resolveBenefitCoverageStatusForEmploymentChange,
 } from "@afenda/db";
-import { maskBenefitsSensitiveDisplayText } from "../../src/payroll-compensation/benefits-administration/data/hr.payroll.benefits-sensitive-access.shared";
+import { maskBenefitsSensitiveDisplayText } from "../../src/payroll-compensation/benefits-administration/hr.payroll.benefits-sensitive-access.shared";
 
 describe("HRM-BEN-022 coverage status", () => {
   it("declares all governed coverage statuses", () => {

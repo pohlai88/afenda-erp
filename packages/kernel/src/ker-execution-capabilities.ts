@@ -2,13 +2,13 @@ import {
   appCapabilities,
   isAppCapability,
   type AppCapability,
-} from "@afenda/auth";
+} from "./ker-app-capabilities";
 import { type ModuleId } from "@afenda/config/module-ids";
 import { moduleById } from "./ker-definitions";
 import {
   ExecutionCapabilityNotFoundError,
   ExecutionInvalidStateError,
-} from "../errors/execution-errors";
+} from "./ker-execution-errors";
 
 export type ExecutionCapabilityStatus = "active" | "preview" | "deprecated";
 

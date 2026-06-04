@@ -1,5 +1,5 @@
-import type { OrganizationRole } from "@afenda/auth";
-import { organizationRoles } from "@afenda/auth";
+import type { OrganizationRole } from "@afenda/kernel";
+import { organizationRoles } from "@afenda/kernel";
 
 export function parseSystemAdminCapabilityMatrixRole(
   matrixRoleRaw: string | string[] | undefined,

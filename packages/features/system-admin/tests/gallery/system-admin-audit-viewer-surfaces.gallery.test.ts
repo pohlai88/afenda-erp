@@ -1,13 +1,13 @@
 import { describe, expect, it } from "vitest";
 
-import { buildSystemAdminAuditViewerListSurface } from "../../src/audit-viewer/surface/system-admin.audit-list.surface";
-import { buildSystemAdminRetentionPoliciesListSurface } from "../../src/audit-viewer/surface/system-admin.retention-list.surface";
-import { systemAdminAuditUiCopy } from "../../src/audit-viewer/surface/system-admin.audit-ui.copy.shared";
+import { buildSystemAdminAuditViewerListSurface } from "../../src/features/audit-viewer/sys-audit-list.surface";
+import { buildSystemAdminRetentionPoliciesListSurface } from "../../src/features/audit-viewer/sys-retention-list.surface";
+import { systemAdminAuditUiCopy } from "../../src/features/audit-viewer/sys-audit-ui.copy.shared";
 import {
   systemAdminAuditCoverageGalleryGaps,
   systemAdminAuditDetailGalleryFixture,
   systemAdminAuditViewerGalleryRows,
-} from "../../src/audit-viewer/surface/system-admin.audit-viewer-gallery.fixtures.shared";
+} from "../../src/features/audit-viewer/sys-audit-viewer-gallery.fixtures.shared";
 
 describe("system admin audit viewer gallery surfaces", () => {
   it("renders audit list fixture rows with governed columns", () => {

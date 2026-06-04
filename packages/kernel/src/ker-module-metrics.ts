@@ -1,5 +1,5 @@
 import type { TenantModuleMetricSummary } from "@afenda/db";
-import { formatErpMoneyFromMinorUnits } from "./erp-formatting";
+import { formatErpMoneyFromMinorUnits } from "./ker-erp-formatting";
 
 type ModuleTone = "neutral" | "positive" | "warning";
 

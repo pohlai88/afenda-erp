@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   parseHrDocumentsSearchParams,
   toHrDocumentsPageModelInput,
-} from "../../src/employee-management/documents-management/data/hr.workforce.documents-search-params.parse.shared";
+} from "../../src/employee-management/documents-management/hr.workforce.documents-search-params.parse.shared";
 
 describe("hr documents search params", () => {
   it("returns empty object when search params are undefined", () => {

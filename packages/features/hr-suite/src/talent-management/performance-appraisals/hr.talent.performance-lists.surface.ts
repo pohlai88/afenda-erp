@@ -4,7 +4,7 @@ import {
   buildHrSuiteListSearchToolbar,
   buildHrSuiteOperationalListSurface,
   type HrSuiteListSurfaceProfile,
-} from "../../employee-management/compliance-regulatory-tracking/metadata";
+} from "../../hr-suite-integration/metadata";
 import { hrTalentPerformanceReadPermission } from "./hr.talent.performance.contract";
 import type {
   HrPerformanceAuditEvent,

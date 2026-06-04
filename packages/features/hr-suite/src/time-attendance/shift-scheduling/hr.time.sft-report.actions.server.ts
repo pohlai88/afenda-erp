@@ -15,8 +15,8 @@ import {
   toHrSftReportActionFailure,
   type HrSftReportCsvResult,
   type HrSftReportResult,
-} from "./hr.time.sft-report.server";
-import { emitHrSftAuditEvent } from "./hr.time.sft-audit.server";
+} from "./hrs-hr-time-sft-report-server";
+import { emitHrSftAuditEvent } from "./hrs-hr-time-sft-audit-server";
 import {
   HrSftAccessDeniedError,
   requireHrSftManage,
@@ -265,7 +265,7 @@ export async function publishHrSftRosterAction(
 
   try {
     const { publishHrSftRoster } = await import(
-      "../data/hr.time.sft-publication.server"
+      "./hrs-hr-time-sft-publication-server"
     );
 
     const result = await publishHrSftRoster({

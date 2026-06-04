@@ -34,12 +34,12 @@ import {
   TableHeader,
   TableRow,
 } from "@afenda/ui/table";
-import { GovernedEmpty } from "./client";
+import { GovernedEmpty } from "./gov-governed-empty";
 import {
   buildGovernedListSurfaceDataAttributes,
   governedListRowTestId,
   governedListSurfaceTestId,
-} from "./client";
+} from "./list-surface-identity.shared";
 import type { EmptyState, ListColumn } from "./gov-list-surface-schema";
 import type {
   ListSurfaceRendererDataNature,
@@ -58,10 +58,10 @@ import {
   resolveListSurfaceColumnVisualClass,
   resolveListSurfaceColumnVisualStyle,
   resolveListSurfaceTableMinWidthPx,
-} from "./list-surface-table-layout.shared";
-import { buildListSurfaceColumnDefs } from "./list-surface-tanstack.shared";
-import { ListSurfaceCell } from "./list-surface-cell.client";
-import { ListSurfaceToolbarClient } from "./list-surface-toolbar.client";
+} from "./gov-list-surface-table-layout-shared";
+import { buildListSurfaceColumnDefs } from "./gov-list-surface-tanstack-shared";
+import { ListSurfaceCell } from "./gov-list-surface-cell-client";
+import { ListSurfaceToolbarClient } from "./gov-list-surface-toolbar-client";
 import {
   LIST_SURFACE_CARD_CHROME_CLASS,
   LIST_SURFACE_CHROME_GROUP_CLASS,
@@ -69,7 +69,7 @@ import {
   LIST_SURFACE_TABLE_VIEWPORT_CLASS,
   LIST_SURFACE_TOOLBAR_ROW_CLASS,
   listSurfaceChromeXClass,
-} from "./list-surface-chrome.shared";
+} from "./gov-list-surface-chrome-shared";
 
 const ROW_TONE_CLASS: Record<ListSurfaceRowTone, string> = {
   default: "",
@@ -484,12 +484,7 @@ export function ListSurfaceTableClient({
 
   const shell = (
     <div
-      className={cn(
-        LIST_SURFACE_CHROME_GROUP_CLASS,
-        presentationVariant === "table-only"
-          ? LIST_SURFACE_CARD_CHROME_CLASS
-          : undefined,
-      )}
+      className={cn(LIST_SURFACE_CHROME_GROUP_CLASS, LIST_SURFACE_CARD_CHROME_CLASS)}
       data-density={density}
     >
       {toolbar || tableLabel ? (
@@ -986,10 +981,7 @@ export function ListSurfaceTableClient({
 
   return (
     <div
-      className={cn(
-        "@container min-w-0",
-        presentationVariant !== "table-only" && "af-material-opaque rounded-section",
-      )}
+      className="@container min-w-0"
       data-testid={listTestId}
       {...governedDataAttrs}
     >

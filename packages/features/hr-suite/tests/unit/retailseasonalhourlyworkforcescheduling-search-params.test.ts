@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   parseHrIndustryRwsSearchParams,
   toHrIndustryRwsPageModelInput,
-} from "../../src/industry-specific/retail-seasonal-hourly-workforce-scheduling/data/hr.industry.rws-search-params.parse.shared";
+} from "../../src/industry-specific/retail-seasonal-hourly-workforce-scheduling/hr.industry.rws-search-params.parse.shared";
 
 describe("retail seasonal hourly workforce scheduling search params", () => {
   it("parses list searches, status filters, and report grouping", () => {

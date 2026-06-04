@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { hrPayrollSbsAuditActions } from "../events/hr.payroll.sbs-audit.event";
+import { hrPayrollSbsAuditActions } from "../src/payroll-compensation/salary-benchmarking-survey/hr.payroll.sbs-audit.event";
 
 describe("hr.payroll.sbs audit events", () => {
   it("covers survey upload, mapping, analysis, recommendation, and report export", () => {

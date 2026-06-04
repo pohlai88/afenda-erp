@@ -5,7 +5,7 @@ import { describe, expect, it } from "vitest";
 import {
   assertGeoCoverageComplete,
   GEO_REQUIREMENT_COVERAGE,
-} from "../../src/time-attendance/geolocation-remote-checkin/data/geolocation-acceptance-coverage.shared";
+} from "../../src/time-attendance/geolocation-remote-checkin/hrs-geolocation-acceptance-coverage-shared";
 
 const repoRoot = resolve(import.meta.dirname, "../../../../../");
 

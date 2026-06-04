@@ -1,7 +1,7 @@
 import type { ListSurfaceRendererConfigurationResolvedInput } from "@afenda/governed-surface/schemas";
-import { buildLinkedControlListSurface, linkCell } from "../../overview/surfaces/system-admin.control-list.shared";
-import type { SystemAdminDiagnosticsRecentChangeRow } from "../../diagnostics/contracts/system-admin.diagnostics-coverage.contract";
-import { systemAdminSecurityUiCopy } from "./system-admin.security-ui.copy.shared";
+import { buildLinkedControlListSurface, linkCell } from "../overview/sys-control-list.shared";
+import type { SystemAdminDiagnosticsRecentChangeRow } from "../diagnostics/sys-diagnostics-coverage.contract";
+import { systemAdminSecurityUiCopy } from "./sys-security-ui.copy.shared";
 
 export const systemAdminSecurityRecentChangesSurfaceKey =
   "system-admin.security.recent-changes";

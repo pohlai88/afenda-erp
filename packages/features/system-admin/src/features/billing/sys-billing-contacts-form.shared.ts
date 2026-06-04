@@ -1,5 +1,5 @@
-import { readOptionalFormValue } from "../../tenant-execution/contracts/system-admin.execution-settings.shared";
-import { systemAdminBillingContactsSchema } from "../schemas/system-admin.billing-contact.schema";
+import { readOptionalFormValue } from "../tenant-execution/sys-execution-settings.shared";
+import { systemAdminBillingContactsSchema } from "./sys-billing-contact.schema";
 
 function readOptionalContactPair(
   formData: FormData,

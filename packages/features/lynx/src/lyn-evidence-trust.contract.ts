@@ -5,7 +5,7 @@ import type {
   LynxClaimValidationStatus,
   LynxQualityGateResult,
   LynxQualityGateStatus,
-} from "./lyn-evidence-trust-schema";
+} from "./lyn-evidence-trust.schema";
 export {
   lynxClaimEvidenceLinkSchema,
   lynxClaimSchema,
@@ -13,7 +13,7 @@ export {
   lynxClaimValidationStatusSchema,
   lynxQualityGateResultSchema,
   lynxQualityGateStatusSchema,
-} from "./lyn-evidence-trust-schema";
+} from "./lyn-evidence-trust.schema";
 export type {
   LynxClaim,
   LynxClaimEvidenceLink,
@@ -21,7 +21,7 @@ export type {
   LynxClaimValidationStatus,
   LynxQualityGateResult,
   LynxQualityGateStatus,
-} from "./lyn-evidence-trust-schema";
+} from "./lyn-evidence-trust.schema";
 
 export type LynxClaimValidationEvidence = {
   id: string;

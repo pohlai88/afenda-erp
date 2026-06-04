@@ -1,10 +1,10 @@
 import type { ListSurfaceRendererConfigurationResolvedInput } from "@afenda/governed-surface/schemas";
-import { buildLinkedControlListSurface } from "../../overview/surfaces/system-admin.control-list.shared";
+import { buildLinkedControlListSurface } from "../overview/sys-control-list.shared";
 import {
   formatOrganizationSubscriptionStatusLabel,
   type OrganizationSubscription,
-} from "../contracts/system-admin.billing-subscription.contract";
-import { systemAdminBillingUiCopy } from "./system-admin.billing-ui.copy.shared";
+} from "./sys-billing-subscription.contract";
+import { systemAdminBillingUiCopy } from "./sys-billing-ui.copy.shared";
 
 export const systemAdminBillingSubscriptionSurfaceKey =
   "system-admin.billing.subscription";

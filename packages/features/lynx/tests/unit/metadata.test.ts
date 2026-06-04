@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { LYNX_ERP_HTTP_ROUTES } from "../../src/contracts/lynx.core.contract";
+import { LYNX_ERP_HTTP_ROUTES } from "../../src/lyn-core.contract";
 import {
   buildLynxActivityLedgerListSurface,
   buildLynxClaimValidationListSurface,
@@ -25,7 +25,7 @@ import {
   buildLynxReadinessStatGrid,
   buildLynxToolAvailabilityListSurface,
 } from "../../src/metadata";
-import type { LynxReadinessSnapshot } from "../../src/contracts/lynx.readiness.contract";
+import type { LynxReadinessSnapshot } from "../../src/lyn-readiness.contract";
 
 const snapshot: LynxReadinessSnapshot = {
   organizationId: "org_1",

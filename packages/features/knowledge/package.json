@@ -29,10 +29,11 @@
     "@afenda/ai": "workspace:*",
     "@afenda/config": "workspace:*",
     "@afenda/db": "workspace:*",
-    "@afenda/kernel": "workspace:*",
     "@afenda/governed-surface": "workspace:*",
+    "@afenda/kernel": "workspace:*",
     "ai": "^6.0.191",
     "drizzle-orm": "catalog:",
+    "server-only": "^0.0.1",
     "zod": "catalog:"
   },
   "scripts": {

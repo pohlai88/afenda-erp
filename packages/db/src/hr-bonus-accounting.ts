@@ -3,7 +3,7 @@ import type { AfendaTransaction } from "./client";
 import { appendHrBonusPayoutAuditEventInTx } from "./hr-bonus-audit";
 import { assertHrBonusPayoutEditableInTx } from "./hr-bonus-lock";
 import { HrBonusPayoutCommandError } from "./hr-bonus.shared";
-import { hrBonusPayouts } from "./hr-bonus";
+import { hrBonusPayouts } from "./dbx-hr-bonus";
 
 export type HrBonusAccountingAllocationInput = {
   legalEntityCode?: string | null;
@@ -106,3 +106,4 @@ export async function updateHrBonusPayoutAccountingAllocationInTx(
 
   return { payoutId: updated.id };
 }
+

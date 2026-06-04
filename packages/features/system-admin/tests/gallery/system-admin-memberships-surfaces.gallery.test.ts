@@ -1,7 +1,7 @@
 import { parseListSurfaceRendererConfiguration } from "@afenda/governed-surface/schemas";
 import { describe, expect, it } from "vitest";
-import { buildMembersListSurface } from "../../src/memberships/surface/system-admin.memberships-list.surface";
-import { systemAdminMembershipsGalleryRows } from "../../src/memberships/surface/system-admin.memberships-gallery.fixtures.shared";
+import { buildMembersListSurface } from "../../src/features/memberships/sys-memberships-list.surface";
+import { systemAdminMembershipsGalleryRows } from "../../src/features/memberships/sys-memberships-gallery.fixtures.shared";
 
 describe("system admin memberships list surface gallery", () => {
   it.each([

@@ -1,5 +1,5 @@
 import { SectionPanel } from "@afenda/ui";
-import { systemAdminLynxUiCopy } from "../surface/system-admin.lynx-ui.copy.shared";
+import { systemAdminLynxUiCopy } from "./sys-lynx-ui.copy.shared";
 
 export function SystemAdminLynxAccessDenied() {
   const copy = systemAdminLynxUiCopy;

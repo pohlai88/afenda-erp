@@ -1,4 +1,4 @@
-import type { GovernedComponentRegistry } from "./component-registry.schema";
+import type { GovernedComponentRegistry } from "./gov-component-registry-schema";
 
 /**
  * Merges module-scoped registry slices into a single lookup table.

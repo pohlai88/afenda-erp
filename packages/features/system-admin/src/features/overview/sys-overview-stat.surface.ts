@@ -4,7 +4,7 @@ import {
 } from "@afenda/governed-surface";
 import type { StatCardConfigurationResolvedInput } from "@afenda/governed-surface/schemas";
 
-import type { SystemAdminOverviewSnapshot } from "../contracts";
+import type { SystemAdminOverviewSnapshot } from "./sys-overview.contract";
 
 export const systemAdminOverviewStatSurfaceKey = "system-admin-overview-stats";
 
@@ -47,4 +47,15 @@ export function buildSystemAdminOverviewStatGrid(input: {
       },
     ],
   });
+}
+
+export function buildSystemAdminOverviewStatGroups(input: {
+  snapshot: SystemAdminOverviewSnapshot;
+}) {
+  return [
+    {
+      groupKey: "system-admin-overview",
+      configuration: buildSystemAdminOverviewStatGrid(input),
+    },
+  ] as const;
 }

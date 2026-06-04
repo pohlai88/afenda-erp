@@ -5,8 +5,8 @@ import {
   SYSTEM_ADMIN_APPROVAL_ROW_TRAILING_ACTION_IDS,
   SYSTEM_ADMIN_APPROVALS_MANAGE_CAPABILITY,
   SYSTEM_ADMIN_APPROVALS_MANAGE_DENIED,
-} from "../../src/approvals/surface/system-admin.approvals-list-trailing.shared";
-import { systemAdminApprovalsUiCopy } from "../../src/approvals/surface/system-admin.approvals-ui.copy.shared";
+} from "../../src/features/approvals/sys-approvals-list-trailing.shared";
+import { systemAdminApprovalsUiCopy } from "../../src/features/approvals/sys-approvals-ui.copy.shared";
 
 describe("resolveSystemAdminApprovalRowTrailingAction", () => {
   it("returns ready disable metadata with confirm for active enabled rules", () => {

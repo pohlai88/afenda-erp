@@ -3,14 +3,14 @@ import {
   GOVERNED_METADATA_SCHEMA_VERSION,
   type ListSurfaceRendererConfigurationResolvedInput,
 } from "@afenda/governed-surface";
-import { buildSystemAdminListToolbar } from "../../overview/surfaces/system-admin.list-surface.shared";
-import type { SystemAdminAuditEventRow } from "../contracts/system-admin.audit-event.contract";
-import type { SystemAdminAuditSearchParams } from "../schemas/system-admin.audit-filter.schema";
-import { systemAdminAuditUiCopy } from "./system-admin.audit-ui.copy.shared";
+import { buildSystemAdminListToolbar } from "../overview/sys-list-surface.shared";
+import type { SystemAdminAuditEventRow } from "./sys-audit-event.contract";
+import type { SystemAdminAuditSearchParams } from "./sys-audit-filter.schema";
+import { systemAdminAuditUiCopy } from "./sys-audit-ui.copy.shared";
 import {
   buildSystemAdminAuditEventDetailHref,
   buildSystemAdminAuditPageHref,
-} from "./system-admin.audit-pagination.shared";
+} from "./sys-audit-pagination.shared";
 
 export const systemAdminAuditViewerSurfaceKey = "system-admin.audit-viewer.list";
 

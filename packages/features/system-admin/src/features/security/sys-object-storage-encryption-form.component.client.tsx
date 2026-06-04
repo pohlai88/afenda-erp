@@ -3,8 +3,8 @@
 import { ActionFormErrors } from "@afenda/governed-surface/client";
 import { Button, Field, FieldGroup, FieldLabel, Input, NativeSelect, NativeSelectOption } from "@afenda/ui";
 import { useActionState } from "react";
-import type { SystemAdminActionResult } from "../../tenant-execution/contracts/system-admin.action-result.contract";
-import { systemAdminSecurityUiCopy } from "../surface/system-admin.security-ui.copy.shared";
+import type { SystemAdminActionResult } from "../tenant-execution/sys-action-result.contract";
+import { systemAdminSecurityUiCopy } from "./sys-security-ui.copy.shared";
 
 type UpdateEncryptionSettingsAction = (
   state: SystemAdminActionResult | undefined,

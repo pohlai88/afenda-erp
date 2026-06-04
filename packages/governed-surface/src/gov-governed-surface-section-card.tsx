@@ -13,14 +13,14 @@ import { cn } from "@afenda/ui/utils";
 import type { GovernedRenderableState } from "./gov-governed-component-state-schema";
 import type { EmptyState } from "./gov-list-surface-schema";
 import { densityGapClass } from "./gov-surface-chrome-classes";
-import { diagnosticsDataAttributes } from "../utils/governed-diagnostics.shared";
+import { diagnosticsDataAttributes } from "./gov-governed-diagnostics-shared";
 import {
   governedIdentityAttributes,
   governedTestId,
   toGovernedDomId,
-} from "../utils/governed-identity.shared";
-import { GovernedEmpty } from "./governed-empty";
-import type { GovernedPatternSectionDensity } from "./governed-pattern-section-shell.shared";
+} from "./gov-governed-identity-shared";
+import { GovernedEmpty } from "./gov-governed-empty";
+import type { GovernedPatternSectionDensity } from "./gov-governed-pattern-section-shell-shared";
 
 export type GovernedSectionEmptyModel = EmptyState & {
   emptyId?: string;

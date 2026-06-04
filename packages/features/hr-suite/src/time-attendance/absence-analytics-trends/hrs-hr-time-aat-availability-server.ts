@@ -8,7 +8,7 @@ import {
 import {
   loadHrAatActiveHeadcount,
   loadHrAatUnavailableCounts,
-} from "./hr.time.aat-comparison.server";
+} from "./hrs-hr-time-aat-comparison-server";
 
 /** HRM-AAT-014 — workforce availability indicators for the selected scope. */
 export async function loadHrAatWorkforceAvailabilityIndicators(

@@ -41,7 +41,7 @@ async function loadGeoRemoteCheckinDays(input: {
 }> {
   try {
     const importGeoBoundary = new Function(
-      "return import('../../geolocation-remote-checkin/data/hr.time.geo-lam-integration.server')",
+      "return import('../geolocation-remote-checkin/hrs-hr-time-geo-lam-integration-server')",
     ) as () => Promise<GeoRemoteCheckinBoundary>;
     const geoModule = await importGeoBoundary();
 

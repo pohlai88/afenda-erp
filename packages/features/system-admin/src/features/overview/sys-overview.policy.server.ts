@@ -1,3 +1,3 @@
-import { requireSystemAdminRead } from "./system-admin.capability.policy.server";
+import { requireSystemAdminRead } from "./sys-capability.policy.server";
 
 export { requireSystemAdminRead as requireSystemAdminOverviewRead };

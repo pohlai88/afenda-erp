@@ -1,4 +1,4 @@
-import type { AppCapability } from "@afenda/auth";
+import type { AppCapability } from "@afenda/kernel";
 import {
   getTenantMembershipById,
   listTenantCapabilitySettings,
@@ -7,12 +7,12 @@ import {
 import {
   listRoleOverridesForOrganization,
   listTenantMembers,
-} from "./system-admin.identity.repository.server";
+} from "./sys-identity.repository.server";
 import { getErpModuleById } from "@afenda/kernel";
 import { moduleIds } from "@afenda/config/module-ids";
 import { listExecutionCapabilities } from "@afenda/kernel/execution-capabilities";
-import { resolveEffectivePermissionsForRole } from "../../permissions/data/system-admin.permissions.query.server";
-import type { SystemAdminUserAccessInspection, SystemAdminUserStatus } from "../contracts";
+import { resolveEffectivePermissionsForRole } from "../permissions/sys-permissions.query.server";
+import type { SystemAdminUserAccessInspection, SystemAdminUserStatus } from "./sys-users.contract";
 
 function membershipStatusToUserStatus(
   status: "active" | "suspended" | "removed",

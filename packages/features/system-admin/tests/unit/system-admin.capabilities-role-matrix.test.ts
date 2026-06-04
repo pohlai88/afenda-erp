@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { listExecutionCapabilities } from "@afenda/kernel/execution-capabilities";
-import { buildSystemAdminCapabilityRoleMatrix } from "../../src/capabilities/data/system-admin.capabilities-role-matrix.server";
+import { buildSystemAdminCapabilityRoleMatrix } from "../../src/features/capabilities/sys-capabilities-role-matrix.server";
 
 vi.mock(
   "../../src/users/data/system-admin.identity.repository.server",

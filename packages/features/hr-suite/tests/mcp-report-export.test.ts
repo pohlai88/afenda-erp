@@ -1,20 +1,20 @@
 import { describe, expect, it } from "vitest";
 
-import { buildBankPaymentExport } from "./hr.payroll.mcp-bank-export.shared";
+import { buildBankPaymentExport } from "../src/payroll-compensation/multi-country-payroll/hr.payroll.mcp-bank-export.shared";
 import {
   generateMcpContributionReport,
   generateMcpReportByKind,
-} from "./hr.payroll.mcp-contribution-reports.shared";
+} from "../src/payroll-compensation/multi-country-payroll/hr.payroll.mcp-contribution-reports.shared";
 import {
   assertPayslipFieldsComplete,
   resolveDefaultPayslipManifest,
   resolvePayslipFields,
-} from "./hr.payroll.mcp-payslip-fields.shared";
-import { generateMcpStatutoryReport } from "./hr.payroll.mcp-statutory-reports.shared";
-import { generateMcpTaxReport } from "./hr.payroll.mcp-tax-reports.shared";
-import { HrMcpValidationError } from "./hr.payroll.mcp-statutory-readiness.shared";
-import { buildVendorExport } from "./hr.payroll.mcp-vendor-export.shared";
-import type { HrMcpReportLineItem } from "../schemas/hr.payroll.mcp-report.schema";
+} from "../src/payroll-compensation/multi-country-payroll/hr.payroll.mcp-payslip-fields.shared";
+import { generateMcpStatutoryReport } from "../src/payroll-compensation/multi-country-payroll/hr.payroll.mcp-statutory-reports.shared";
+import { generateMcpTaxReport } from "../src/payroll-compensation/multi-country-payroll/hr.payroll.mcp-tax-reports.shared";
+import { HrMcpValidationError } from "../src/payroll-compensation/multi-country-payroll/hr.payroll.mcp-statutory-readiness.shared";
+import { buildVendorExport } from "../src/payroll-compensation/multi-country-payroll/hr.payroll.mcp-vendor-export.shared";
+import type { HrMcpReportLineItem } from "../src/payroll-compensation/multi-country-payroll/hr.payroll.mcp-report.schema";
 
 const sampleLineItems: HrMcpReportLineItem[] = [
   {

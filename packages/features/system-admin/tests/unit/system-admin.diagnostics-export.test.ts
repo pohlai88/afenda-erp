@@ -45,7 +45,7 @@ describe("system admin diagnostics export", () => {
     });
 
     const { exportSystemAdminDiagnosticsAction } = await import(
-      "../../src/diagnostics/actions/system-admin.diagnostics.actions.server"
+      "../../src/features/diagnostics/sys-diagnostics.actions.server"
     );
 
     const result = await exportSystemAdminDiagnosticsAction();

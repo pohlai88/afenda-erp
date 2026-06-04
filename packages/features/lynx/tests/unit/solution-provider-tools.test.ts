@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
 import { assertGovernedToolset } from "@afenda/ai/server";
-import { createSolutionProviderTools } from "../../src/tools/lynx.solution-provider-tools.tool.server";
+import { createSolutionProviderTools } from "../../src/lyn-solution-provider-tools.tool.server";
 import {
   SOLUTION_PROVIDER_TOOL_IDS,
   solutionProviderToolMeta,
-} from "../../src/tools/lynx.solution-provider-tool-meta";
+} from "../../src/lyn-solution-provider-tool-meta";
 
 const baseOrg = {
   id: "org_test",

@@ -1,9 +1,9 @@
 import {
   ensureTenantSecuritySettings,
   getTenantSecuritySettings,
-} from "./system-admin.tenant-security.repository.server";
-import { mapTenantSecurityToOrganizationSettings } from "./system-admin.security.mapper";
-import type { OrganizationSecuritySettings } from "../contracts/system-admin.security-settings.contract";
+} from "./sys-tenant-security.repository.server";
+import { mapTenantSecurityToOrganizationSettings } from "./sys-security.mapper";
+import type { OrganizationSecuritySettings } from "./sys-security-settings.contract";
 
 export async function getSystemAdminOrganizationSecuritySettings(input: {
   organizationId: string;

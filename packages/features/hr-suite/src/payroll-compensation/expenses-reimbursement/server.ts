@@ -5,7 +5,6 @@ import "server-only";
 
 export * from "./hr.payroll.exp-access.policy.server";
 export * from "./hr.payroll.exp-approval.actions.server";
-export * from "./hr.payroll.exp.event";
 export * from "./hr.payroll.expense-access.policy.server";
 export * from "./hr.payroll.expense-audit-trail-list.surface";
 export * from "./hr.payroll.expense-claims-list.surface";

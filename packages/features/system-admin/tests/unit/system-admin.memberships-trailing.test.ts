@@ -3,7 +3,7 @@ import {
   resolveSystemAdminMembershipRowTrailingAction,
   SYSTEM_ADMIN_MEMBERSHIPS_MANAGE_DENIED,
   SYSTEM_ADMIN_MEMBERSHIPS_ROLES_MANAGE_DENIED,
-} from "../../src/memberships/surface/system-admin.memberships-list-trailing.shared";
+} from "../../src/features/memberships/sys-memberships-list-trailing.shared";
 
 describe("system admin memberships list trailing metadata", () => {
   it("hides trailing actions when no membership or role capabilities apply", () => {

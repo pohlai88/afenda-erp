@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { isHrCompensationRecommendationLocked } from "../../../../db/src/hr-compensation-planning.shared";
 
-import { isHrCpmRecommendationLocked } from "../../src/payroll-compensation/compensation-planning-modeling/data/hr.payroll.cpm-lock.shared";
+import { isHrCpmRecommendationLocked } from "../../src/payroll-compensation/compensation-planning-modeling/hr.payroll.cpm-lock.shared";
 
 describe("HRM-CPM-025 recommendation lock", () => {
   it("locks when status is approved", () => {

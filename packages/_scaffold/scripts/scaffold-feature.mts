@@ -13,7 +13,6 @@ import {
   scaffoldRootRelativePath,
 } from "./lib/scaffold-grammar.mts";
 import {
-  copyTreeIfMissing,
   ensureDir,
   writeFileAlways,
   writeIfMissing,

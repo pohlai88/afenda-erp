@@ -11,7 +11,7 @@ import {
   resolveHrRonOfferApprovalWorkflow,
   scheduleHrRonInterview,
   submitHrRonInterviewScorecard,
-} from "../../src/talent-management/recruitment-onboarding/data/hr.talent.ron-store.shared";
+} from "../../src/talent-management/recruitment-onboarding/hr.talent.ron-store.shared";
 
 describe("HRM-RON interviews, assessments, offers, and checks", () => {
   it("schedules interviews, sends invitations, and aggregates scorecards", () => {

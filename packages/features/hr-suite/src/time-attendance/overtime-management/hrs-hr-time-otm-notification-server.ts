@@ -7,7 +7,7 @@ import {
 } from "@afenda/db";
 import { and, eq } from "drizzle-orm";
 
-import { deliverHrTimeOtmOrgNotification } from "./hr.time.otm-notification-delivery.server";
+import { deliverHrTimeOtmOrgNotification } from "./hrs-hr-time-otm-notification-delivery-server";
 import {
   buildHrTimeOtmModulePath,
   buildHrTimeOtmNotificationCopy,

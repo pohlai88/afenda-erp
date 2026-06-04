@@ -1,13 +1,13 @@
 import { describe, expect, it } from "vitest";
 
-import { parseHrLifecycleProbationOutcomeForm } from "../../src/employee-management/employee-lifecycle-management/schemas/hr.workforce.lifecycle-probation.schema";
-import { parseHrLifecycleContractRenewalForm } from "../../src/employee-management/employee-lifecycle-management/schemas/hr.workforce.lifecycle-contract.schema";
-import { parseHrLifecycleMovementForm } from "../../src/employee-management/employee-lifecycle-management/schemas/hr.workforce.lifecycle-movement.schema";
-import { parseHrLifecycleNoticePeriodForm } from "../../src/employee-management/employee-lifecycle-management/schemas/hr.workforce.lifecycle-exit.schema";
+import { parseHrLifecycleProbationOutcomeForm } from "../../src/employee-management/employee-lifecycle-management/hr.workforce.lifecycle-probation.schema";
+import { parseHrLifecycleContractRenewalForm } from "../../src/employee-management/employee-lifecycle-management/hr.workforce.lifecycle-contract.schema";
+import { parseHrLifecycleMovementForm } from "../../src/employee-management/employee-lifecycle-management/hr.workforce.lifecycle-movement.schema";
+import { parseHrLifecycleNoticePeriodForm } from "../../src/employee-management/employee-lifecycle-management/hr.workforce.lifecycle-exit.schema";
 import {
   parseHrLifecycleCancelTransitionForm,
   parseHrLifecycleScheduleStatusChangeForm,
-} from "../../src/employee-management/employee-lifecycle-management/schemas/hr.workforce.lifecycle-transition.schema";
+} from "../../src/employee-management/employee-lifecycle-management/hr.workforce.lifecycle-transition.schema";
 
 describe("lifecycle mutation schemas", () => {
   it("parses schedule status change with stored enum only", () => {

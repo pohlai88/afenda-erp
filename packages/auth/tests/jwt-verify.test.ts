@@ -10,11 +10,11 @@ import { getNeonAuthEnv } from "@afenda/config/env";
 import {
   resetNeonAuthJwtVerifyCacheForTests,
   verifyNeonAuthAccessToken,
-} from "../../security/jwt-verify.server";
+} from "../src/aut-jwt-verify-server";
 import {
   neonAuthJwksUrl,
   resetNeonAuthJwksCacheForTests,
-} from "../../security/jwks.shared.server";
+} from "../src/aut-jwks-shared-server";
 
 describe("neonAuthJwksUrl", () => {
   it("appends .well-known/jwks.json to the auth base URL", () => {

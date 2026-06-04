@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   HRM_OTM_MINUTES_PER_LEAVE_DAY,
   otmPayableMinutesToCompensatoryLeaveDays,
-} from "../../src/time-attendance/overtime-management/data/hr.time.otm-compensatory-leave.shared";
+} from "../../src/time-attendance/overtime-management/hr.time.otm-compensatory-leave.shared";
 
 describe("OTM compensatory leave conversion (HRM-OTM-022)", () => {
   it("converts 480 payable minutes to one leave day", () => {

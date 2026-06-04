@@ -1,18 +1,18 @@
-import type { LynxReadinessStatus } from "./lyn-readiness-schema";
+import type { LynxReadinessStatus } from "./lyn-readiness.schema";
 export {
   lynxModuleReadinessSchema,
   lynxReadinessSignalSchema,
   lynxReadinessSnapshotSchema,
   lynxReadinessStatusSchema,
   lynxToolAvailabilitySchema,
-} from "./lyn-readiness-schema";
+} from "./lyn-readiness.schema";
 export type {
   LynxModuleReadiness,
   LynxReadinessSignal,
   LynxReadinessSnapshot,
   LynxReadinessStatus,
   LynxToolAvailability,
-} from "./lyn-readiness-schema";
+} from "./lyn-readiness.schema";
 
 export const LYNX_EVAL_QUALITY_THRESHOLDS = {
   recallAtK: 0.8,

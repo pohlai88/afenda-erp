@@ -5,21 +5,17 @@ import {
   type ListSurfaceRow,
 } from "@afenda/governed-surface";
 import { formatErpDateTime } from "@afenda/kernel";
-import { organizationRoles } from "@afenda/auth";
-import { systemAdminControlLinks } from "../../overview/contracts/system-admin.control-links.contract";
-import { linkCell } from "../../overview/surfaces/system-admin.control-list.shared";
-import { systemAdminSeedRoles } from "../../roles/contracts";
+import { organizationRoles } from "@afenda/kernel";
+import { systemAdminControlLinks } from "../overview/sys-control-links.contract";
+import { linkCell } from "../overview/sys-control-list.shared";
+import { systemAdminSeedRoles } from "../roles/sys-roles.contract";
 import {
   buildSystemAdminListToolbar,
   buildSystemAdminStaticPagination,
-} from "../../overview/surfaces/system-admin.list-surface.shared";
-import {
-  systemAdminMembershipStatuses,
-  type SystemAdminMembershipRow,
-  type SystemAdminMembershipStatus,
-} from "../contracts";
-import { resolveSystemAdminMembershipRowTrailingAction } from "./system-admin.memberships-list-trailing.shared";
-import { systemAdminMembershipsUiCopy } from "./system-admin.memberships-ui.copy.shared";
+} from "../overview/sys-list-surface.shared";
+import { systemAdminMembershipStatuses, type SystemAdminMembershipRow, type SystemAdminMembershipStatus } from "./sys-memberships.contract";
+import { resolveSystemAdminMembershipRowTrailingAction } from "./sys-memberships-list-trailing.shared";
+import { systemAdminMembershipsUiCopy } from "./sys-memberships-ui.copy.shared";
 
 const MEMBERSHIP_STATUS_BADGE: Record<
   SystemAdminMembershipStatus,

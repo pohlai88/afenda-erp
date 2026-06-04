@@ -3,14 +3,16 @@ import { trace } from "@opentelemetry/api";
 
 import {
   GovernedEmpty,
+} from "./gov-governed-empty";
+import {
   parseGovernedComponentData,
   type GovernedComponent,
-} from "./client";
+} from "./gov-component-schema";
 
-import { governedDispatchErrorCopy } from "../i18n/governed-renderer-copy.shared";
+import { governedDispatchErrorCopy } from "./gov-governed-renderer-copy-shared";
 import { extractGovernedConfigurationDataNature } from "./governed-configuration.shared";
-import { emitGovernedTelemetry } from "./governed-telemetry.shared";
-import { renderGovernedRendererById } from "./governed-renderer-dispatch";
+import { emitGovernedTelemetry } from "./gov-governed-telemetry-shared";
+import { renderGovernedRendererById } from "./gov-governed-renderer-dispatch";
 import {
   AFENDA_GOVERNED_COMPONENT_REGISTRY,
   AFENDA_GOVERNED_RENDERER_CONTRACTS,

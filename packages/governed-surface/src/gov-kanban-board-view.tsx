@@ -5,12 +5,12 @@ import type {
   KanbanCard,
   KanbanCardTransitionAvailability,
 } from "./gov-kanban-board-schema";
+import { GovernedKanbanTransitionHint } from "./gov-governed-kanban-transition-hint-client";
 import {
-  GovernedKanbanTransitionHint,
+  buildKanbanBoardDataAttributes,
   governedKanbanCardTestId,
-  isKanbanCardTransitionRenderable,
-} from "./client";
-import { buildKanbanBoardDataAttributes } from "./kanban-surface-identity.shared";
+} from "./kanban-surface-identity.shared";
+import { isKanbanCardTransitionRenderable } from "./kanban-card-transition.shared";
 
 import {
   groupCardsByColumn,
@@ -19,16 +19,16 @@ import {
   KanbanCardTile,
   KanbanColumnPanel,
   resolveKanbanColumns,
-} from "./kanban-board-presentation";
-import { GovernedEmpty } from "./client";
-import { governedRendererCopy } from "../i18n/governed-renderer-copy.shared";
+} from "./gov-kanban-board-presentation";
+import { GovernedEmpty } from "./gov-governed-empty";
+import { governedRendererCopy } from "./gov-governed-renderer-copy-shared";
 
 export {
   groupCardsByColumn,
   KANBAN_DATA_NATURE_CLASS,
   kanbanGridClass,
   resolveKanbanColumns,
-} from "./kanban-board-presentation";
+} from "./gov-kanban-board-presentation";
 
 export type KanbanBoardViewProps = {
   board: GovernedKanbanBoardConfiguration;

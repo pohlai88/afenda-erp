@@ -2,13 +2,13 @@ import type {
   IntegrationReadinessIssue,
   IntegrationReadinessReport,
   IntegrationReadinessVerdict,
-} from "../contracts/system-admin.integrations-readiness.contract";
+} from "./sys-integrations-readiness.contract";
 import type {
   SystemAdminApiCredentialListRow,
   SystemAdminSsoConnectionListRow,
   SystemAdminWebhookDeliveryListRow,
   SystemAdminWebhookListRow,
-} from "../contracts/system-admin.integrations-list.contract";
+} from "./sys-integrations-list.contract";
 
 function issue(
   id: string,

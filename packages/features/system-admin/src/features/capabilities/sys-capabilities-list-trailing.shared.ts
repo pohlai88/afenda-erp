@@ -1,10 +1,10 @@
 import { resolveListSurfaceRowTrailingAction } from "@afenda/governed-surface";
 import { getExecutionCapability } from "@afenda/kernel/execution-capabilities";
-import type { SystemAdminCapabilityAvailability } from "../contracts";
+import type { SystemAdminCapabilityAvailability } from "./sys-capabilities.contract";
 import {
   isCriticalExecutionCapability,
   SYSTEM_ADMIN_PROTECTED_CAPABILITY_PERMISSION,
-} from "../contracts/system-admin.capability-safety.contract";
+} from "./sys-capability-safety.contract";
 
 export const SYSTEM_ADMIN_CAPABILITIES_MANAGE_DENIED =
   "Requires system-admin.capabilities.manage.";

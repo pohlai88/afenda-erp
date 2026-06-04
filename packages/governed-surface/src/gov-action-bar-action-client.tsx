@@ -6,7 +6,7 @@ import { Badge } from "@afenda/ui/badge";
 import { Button } from "@afenda/ui/button";
 import { Checkbox } from "@afenda/ui/checkbox";
 
-import { ActionFormErrors } from "../../components/action-form-errors";
+import { ActionFormErrors } from "./gov-action-form-errors";
 import {
   actionFailure,
   type ActionResult,

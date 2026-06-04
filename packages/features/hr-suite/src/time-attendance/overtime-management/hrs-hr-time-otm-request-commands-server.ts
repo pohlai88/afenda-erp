@@ -1,6 +1,6 @@
 import { submitHrOvertimeRequest, type HrOvertimeType } from "@afenda/db";
 
-import { createHrTimeOtmApprovalOnSubmit } from "./hr.time.otm-approval-commands.server";
+import { createHrTimeOtmApprovalOnSubmit } from "./hrs-hr-time-otm-approval-commands-server";
 
 export type SubmitHrTimeOtmRequestInput = {
   organizationId: string;

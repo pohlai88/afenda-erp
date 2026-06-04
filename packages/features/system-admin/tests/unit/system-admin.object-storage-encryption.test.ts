@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   mapEncryptionSettingsToColumns,
   updateOrganizationEncryptionSettingsInputSchema,
-} from "../../src/security/schemas/system-admin.object-storage-encryption.schema";
+} from "../../src/features/security/sys-object-storage-encryption.schema";
 
 describe("organization encryption settings schema", () => {
   it("accepts platform mode without adapter", () => {

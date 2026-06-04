@@ -1,4 +1,4 @@
-import type { AppCapability } from "@afenda/auth";
+import type { AppCapability } from "@afenda/kernel";
 
 export const HR_FRM_READ_CAPABILITY = "hr.frm.read" satisfies AppCapability;
 export const HR_FRM_WRITE_CAPABILITY = "hr.frm.write" satisfies AppCapability;

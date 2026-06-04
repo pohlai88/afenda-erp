@@ -13,12 +13,12 @@ import {
   AUDIT_VIEWER_REQUIREMENT_COVERAGE,
   assertAuditViewerAcceptanceCriteriaComplete,
   assertAuditViewerCoverageComplete,
-} from "../../src/audit-viewer/data/system-admin.audit-viewer.coverage.shared";
-import { extractAuditCorrelationRefs } from "../../src/audit-viewer/data/system-admin.audit-correlation.shared";
-import { mapTenantAuditLogToDetail } from "../../src/audit-viewer/data/system-admin.audit.query.server";
-import { buildSystemAdminAuditInvestigationLinks } from "../../src/audit-viewer/surface/system-admin.audit-investigation.shared";
-import { buildSystemAdminAuditViewerListSurface } from "../../src/audit-viewer/surface/system-admin.audit-list.surface";
-import { systemAdminAuditViewerGalleryRows } from "../../src/audit-viewer/surface/system-admin.audit-viewer-gallery.fixtures.shared";
+} from "../../src/features/audit-viewer/sys-audit-viewer.coverage.shared";
+import { extractAuditCorrelationRefs } from "../../src/features/audit-viewer/sys-audit-correlation.shared";
+import { mapTenantAuditLogToDetail } from "../../src/features/audit-viewer/sys-audit.query.server";
+import { buildSystemAdminAuditInvestigationLinks } from "../../src/features/audit-viewer/sys-audit-investigation.shared";
+import { buildSystemAdminAuditViewerListSurface } from "../../src/features/audit-viewer/sys-audit-list.surface";
+import { systemAdminAuditViewerGalleryRows } from "../../src/features/audit-viewer/sys-audit-viewer-gallery.fixtures.shared";
 
 describe("SUC-001..030 coverage registry", () => {
   it("registers all thirty functional requirements", () => {

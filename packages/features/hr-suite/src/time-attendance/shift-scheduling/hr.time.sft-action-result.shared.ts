@@ -1,7 +1,7 @@
 import { HrShiftCommandError } from "@afenda/db";
 import { actionFailure, type ActionResult } from "@afenda/governed-surface/schemas";
 
-import { HrSftConflictValidationError } from "./hr.time.sft-conflict.server";
+import { HrSftConflictValidationError } from "./hrs-hr-time-sft-conflict-server";
 
 export class HrTimeSftAccessDeniedError extends Error {
   readonly code: string;

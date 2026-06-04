@@ -16,8 +16,8 @@ import {
   TableRow,
 } from "@afenda/ui/table";
 
-import { diagnosticsDataAttributes } from "../utils/governed-diagnostics.shared";
-import { governedIdentityAttributes } from "../utils/governed-identity.shared";
+import { diagnosticsDataAttributes } from "./gov-governed-diagnostics-shared";
+import { governedIdentityAttributes } from "./gov-governed-identity-shared";
 
 export type GovernedDataTableDensity = "compact" | "comfortable";
 

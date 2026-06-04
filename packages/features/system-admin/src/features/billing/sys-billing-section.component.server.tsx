@@ -1,30 +1,20 @@
 import { GovernedPatternCListSection } from "@afenda/governed-surface/server";
 import { SectionPanel } from "@afenda/ui";
-import type { SystemAdminBillingPageModel } from "./system-admin.billing.page-model.server";
-import {
-  buildBillingContactsListSurface,
-  buildBillingEntitlementsListSurface,
-  buildBillingGovernanceListSurface,
-  buildBillingInvoicesListSurface,
-  buildBillingPaymentsListSurface,
-  buildBillingPlansListSurface,
-  buildBillingSubscriptionListSurface,
-  buildBillingUsageListSurface,
-  systemAdminBillingContactsSurfaceKey,
-  systemAdminBillingEntitlementsSurfaceKey,
-  systemAdminBillingGovernanceSurfaceKey,
-  systemAdminBillingInvoicesSurfaceKey,
-  systemAdminBillingPaymentsSurfaceKey,
-  systemAdminBillingPlansSurfaceKey,
-  systemAdminBillingSubscriptionSurfaceKey,
-  systemAdminBillingUiCopy,
-  systemAdminBillingUsageSurfaceKey,
-} from "../surface";
-import { SystemAdminBillingContactsForm } from "./system-admin.billing-contacts-form.component.client";
-import { SystemAdminBillingExportButton } from "./system-admin.billing-export-button.component.client";
-import { SystemAdminBillingCheckoutBanner } from "./system-admin.billing-checkout-banner.component.client";
-import { SystemAdminBillingPlanCheckout } from "./system-admin.billing-plan-checkout.component.client";
-import type { SystemAdminActionResult } from "../../tenant-execution/contracts/system-admin.action-result.contract";
+import type { SystemAdminBillingPageModel } from "./sys-billing.page-model.server";
+import { buildBillingContactsListSurface, systemAdminBillingContactsSurfaceKey } from "./sys-billing-contacts.surface";
+import { buildBillingEntitlementsListSurface, systemAdminBillingEntitlementsSurfaceKey } from "./sys-billing-entitlements.surface";
+import { buildBillingGovernanceListSurface, systemAdminBillingGovernanceSurfaceKey } from "./sys-billing-governance.surface";
+import { buildBillingInvoicesListSurface, systemAdminBillingInvoicesSurfaceKey } from "./sys-billing-invoices.surface";
+import { buildBillingPaymentsListSurface, systemAdminBillingPaymentsSurfaceKey } from "./sys-billing-payments.surface";
+import { buildBillingPlansListSurface, systemAdminBillingPlansSurfaceKey } from "./sys-billing-plans.surface";
+import { buildBillingSubscriptionListSurface, systemAdminBillingSubscriptionSurfaceKey } from "./sys-billing-subscription.surface";
+import { buildBillingUsageListSurface, systemAdminBillingUsageSurfaceKey } from "./sys-billing-usage.surface";
+import { systemAdminBillingUiCopy } from "./sys-billing-ui.copy.shared";
+import { SystemAdminBillingContactsForm } from "./sys-billing-contacts-form.component.client";
+import { SystemAdminBillingExportButton } from "./sys-billing-export-button.component.client";
+import { SystemAdminBillingCheckoutBanner } from "./sys-billing-checkout-banner.component.client";
+import { SystemAdminBillingPlanCheckout } from "./sys-billing-plan-checkout.component.client";
+import type { SystemAdminActionResult } from "../tenant-execution/sys-action-result.contract";
 
 type UpdateBillingContactsAction = (
   state: SystemAdminActionResult | undefined,

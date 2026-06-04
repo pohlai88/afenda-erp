@@ -2,7 +2,7 @@ import {
   actionFailure,
   actionSuccess,
   type ActionResult,
-} from "./action-result.shared";
+} from "./gov-action-result-shared";
 
 /**
  * Maps governed form `actionId` strings to their Server Action handlers.

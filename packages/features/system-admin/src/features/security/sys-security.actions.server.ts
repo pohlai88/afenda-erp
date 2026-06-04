@@ -11,25 +11,25 @@ import {
   systemAdminActionSuccess,
   type SystemAdminActionResult,
   zodActionFailure,
-} from "../../tenant-execution/contracts/system-admin.action-result.contract";
-import { systemAdminRoutePaths } from "../../overview/contracts/system-admin.route-paths.contract";
-import { dispatchSystemAdminWebhook } from "../../integrations/events/system-admin.webhook-dispatch.event";
-import { requireSystemAdminSecurityManage } from "../policies/system-admin.security.policy.server";
+} from "../tenant-execution/sys-action-result.contract";
+import { systemAdminRoutePaths } from "../overview/sys-route-paths.contract";
+import { dispatchSystemAdminWebhook } from "../integrations/sys-webhook-dispatch.event";
+import { requireSystemAdminSecurityManage } from "./sys-security.policy.server";
 import {
   assertSecuritySettingsDowngradeGuard,
   updateSecuritySettingsInputSchema,
-} from "../schemas/system-admin.security.schema";
+} from "./sys-security.schema";
 import {
   diffSecurityDomainChanges,
   getSystemAdminOrganizationSecuritySettings,
   mapParsedSecurityInputToOrganizationSettings,
-} from "./system-admin.security.query.server";
-import { mapOrganizationSecurityToTenantPatch } from "./system-admin.security.mapper";
-import { redactAuditMetadata } from "../../audit-viewer/data/system-admin.audit-metadata.redact.shared";
+} from "./sys-security.query.server";
+import { mapOrganizationSecurityToTenantPatch } from "./sys-security.mapper";
+import { redactAuditMetadata } from "../audit-viewer/sys-audit-metadata.redact.shared";
 import {
   systemAdminSecurityAuditActions,
   systemAdminSecurityWebhookEvents,
-} from "../events/system-admin.security.event";
+} from "./sys-security.event";
 
 async function writeSecurityAudit(input: {
   organizationId: string;

@@ -2,8 +2,8 @@ import type { ModuleId } from "@afenda/config/module-ids";
 import {
   buildGovernedStatGrid,
   GOVERNED_METADATA_SCHEMA_VERSION,
-} from "@afenda/governed-surface";
-import type { StatCardConfigurationResolvedInput } from "@afenda/governed-surface/schemas";
+  type StatCardConfigurationResolvedInput,
+} from "./ker-governed-surface-contract";
 
 // Internal metric tone mapping (domain → stat-card token).
 type ModuleTone = "neutral" | "positive" | "warning";

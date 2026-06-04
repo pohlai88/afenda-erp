@@ -1,6 +1,6 @@
 import type { ModuleId } from "@afenda/config/module-ids";
 import type { TenantModuleSettingRow } from "@afenda/db";
-import { listDisabledModuleDependencyKeys } from "./system-admin.module-dependencies.contract";
+import { listDisabledModuleDependencyKeys } from "./sys-module-dependencies.contract";
 
 export type SystemAdminModuleReadinessVerdict = "ready" | "warning" | "blocked";
 

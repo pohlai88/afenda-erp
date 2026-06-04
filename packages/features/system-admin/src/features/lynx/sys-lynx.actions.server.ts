@@ -1,6 +1,6 @@
 "use server";
 
-import { executeApprovedSandbox } from "./ai-sandbox-executors.data.server";
+import { executeApprovedSandbox } from "./sys-ai-sandbox-executors-data-server";
 import {
   transitionAiActionSandbox,
   upsertAiFeatureEntitlement,
@@ -9,8 +9,8 @@ import {
 import { writeExecutionAuditEvent } from "@afenda/kernel/execution";
 import { logServerEvent } from "@afenda/observability/server";
 import { revalidatePath } from "next/cache";
-import { requireSystemAdminLynxApprove } from "../policies/system-admin.lynx.policy.server";
-import { dispatchSystemAdminWebhook } from "../../integrations/events/system-admin.webhook-dispatch.event";
+import { requireSystemAdminLynxApprove } from "./sys-lynx.policy.server";
+import { dispatchSystemAdminWebhook } from "../integrations/sys-webhook-dispatch.event";
 
 async function resolveLynxApprover() {
   return requireSystemAdminLynxApprove();

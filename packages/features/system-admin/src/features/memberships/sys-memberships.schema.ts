@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { systemAdminMembershipStatuses } from "../contracts/system-admin.memberships.contract";
+import { systemAdminMembershipStatuses } from "./sys-memberships.contract";
 
 export const systemAdminMembershipStatusFilterSchema = z.enum(
   systemAdminMembershipStatuses,

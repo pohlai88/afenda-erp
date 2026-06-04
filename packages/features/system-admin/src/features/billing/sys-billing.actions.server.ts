@@ -6,21 +6,21 @@ import {
   systemAdminActionSuccess,
   type SystemAdminActionResult,
   zodActionFailure,
-} from "../../tenant-execution/contracts/system-admin.action-result.contract";
-import { systemAdminRoutePaths } from "../../overview/contracts/system-admin.route-paths.contract";
-import { upsertSystemAdminBillingContacts } from "./system-admin.billing-contacts.repository.server";
-import { parseSystemAdminBillingContactsFormData } from "./system-admin.billing-contacts-form.shared";
-import { buildSystemAdminBillingSummaryCsv } from "./system-admin.billing-export.build.server";
+} from "../tenant-execution/sys-action-result.contract";
+import { systemAdminRoutePaths } from "../overview/sys-route-paths.contract";
+import { upsertSystemAdminBillingContacts } from "./sys-billing-contacts.repository.server";
+import { parseSystemAdminBillingContactsFormData } from "./sys-billing-contacts-form.shared";
+import { buildSystemAdminBillingSummaryCsv } from "./sys-billing-export.build.server";
 import {
   createStripeBillingPortalSession,
   createStripeCheckoutSession,
   getBillingPostureSnapshot,
-} from "./system-admin.billing-posture.query.server";
-import { systemAdminBillingAuditActions } from "../events/system-admin.billing.event";
+} from "./sys-billing-posture.query.server";
+import { systemAdminBillingAuditActions } from "./sys-billing.event";
 import {
   requireSystemAdminBillingExport,
   requireSystemAdminBillingManage,
-} from "../policies/system-admin.billing.policy.server";
+} from "./sys-billing.policy.server";
 
 export async function updateSystemAdminBillingContactsAction(
   _state: SystemAdminActionResult | undefined,

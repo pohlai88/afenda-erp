@@ -3,8 +3,8 @@ import {
   requireSystemAdminMembershipsManage,
   requireSystemAdminMembershipsRead,
   requireSystemAdminRolesManage,
-} from "../../overview/policies/system-admin.capability.policy.server";
-import type { SystemAdminMembershipStatus } from "../contracts";
+} from "../overview/sys-capability.policy.server";
+import type { SystemAdminMembershipStatus } from "./sys-memberships.contract";
 
 export {
   requireSystemAdminMembershipsManage,

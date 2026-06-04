@@ -7,9 +7,9 @@ import { useState, useTransition } from "react";
 import {
   systemAdminActionFailure,
   type SystemAdminActionResult,
-} from "../../tenant-execution/contracts/system-admin.action-result.contract";
+} from "../tenant-execution/sys-action-result.contract";
 import type { ExportSystemAdminDataManagementActionData } from "./sys-import-job.contract";
-import { systemAdminDataManagementUiCopy } from "../surface/system-admin.data-management-ui.copy.shared";
+import { systemAdminDataManagementUiCopy } from "./sys-data-management-ui.copy.shared";
 
 export type ExportSystemAdminDataManagementAction = (input?: {
   scope?: "jobs" | "failures" | "exports";

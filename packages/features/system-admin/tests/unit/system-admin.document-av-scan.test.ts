@@ -83,10 +83,10 @@ vi.mock("@afenda/kernel/execution", () => ({
 }));
 
 import { writeExecutionAuditEvent } from "@afenda/kernel/execution";
-import { executeDocumentScanSweepCommand } from "../../src/tenant-execution/commands/document-scan-sweep.command.server";
-import { processTenantDocumentScanCommand } from "../../src/tenant-execution/commands/process-tenant-document-scan.command.server";
-import { reportTenantDocumentScanResultCommand } from "../../src/tenant-execution/commands/report-tenant-document-scan-result.command.server";
-import { handleDocumentScanWebhookPost } from "../../src/tenant-execution/api/handle-document-scan-webhook.server";
+import { executeDocumentScanSweepCommand } from "../../src/features/tenant-execution/sys-document-scan-sweep-command-server";
+import { processTenantDocumentScanCommand } from "../../src/features/tenant-execution/sys-process-tenant-document-scan-command-server";
+import { reportTenantDocumentScanResultCommand } from "../../src/features/tenant-execution/sys-report-tenant-document-scan-result-command-server";
+import { handleDocumentScanWebhookPost } from "../../src/features/tenant-execution/sys-handle-document-scan-webhook-server";
 
 describe("document AV scan pipeline", () => {
   beforeEach(async () => {

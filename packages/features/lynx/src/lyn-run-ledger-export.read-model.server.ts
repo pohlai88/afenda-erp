@@ -1,8 +1,8 @@
 import {
   getLynxRunDetail,
   listLynxRunLedger,
-} from "./lynx.run-ledger.repository.server";
-import { parseLynxRunFilters } from "./lyn-run-filters-schema";
+} from "./lyn-run-ledger.repository.server";
+import { parseLynxRunFilters } from "./lyn-run-filters.schema";
 
 function csvCell(value: unknown) {
   const text =

@@ -6,7 +6,7 @@ import {
 } from "@afenda/db";
 
 import { hrPayrollProcessingAuditActions } from "./hr.payroll.processing.event";
-import { writePayrollProcessingAuditEvent } from "./hr.payroll.processing-audit.server";
+import { writePayrollProcessingAuditEvent } from "./hrs-hr-payroll-processing-audit-server";
 
 /** PAY-024 — generate payslips after payroll finalization. */
 export async function generatePayrollPayslips(input: {

@@ -2,7 +2,7 @@ import type {
   SystemAdminExportJobListRow,
   SystemAdminImportJobListRow,
   SystemAdminImportRowFailure,
-} from "../contracts/system-admin.import-job.contract";
+} from "./sys-import-job.contract";
 
 function escapeCsvCell(value: string | number | null | undefined) {
   const normalized = String(value ?? "");

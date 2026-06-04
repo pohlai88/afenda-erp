@@ -1,5 +1,5 @@
-import type { SystemAdminAuditSearchParams } from "../schemas/system-admin.audit-filter.schema";
-import { SYSTEM_ADMIN_AUDIT_DEFAULT_PAGE_SIZE } from "../contracts/system-admin.audit-viewer.limits.shared";
+import type { SystemAdminAuditSearchParams } from "./sys-audit-filter.schema";
+import { SYSTEM_ADMIN_AUDIT_DEFAULT_PAGE_SIZE } from "./sys-audit-viewer.limits.shared";
 
 export const SYSTEM_ADMIN_AUDIT_PATH = "/system-admin/audit";
 

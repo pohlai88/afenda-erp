@@ -8,8 +8,8 @@ import type {
   HrSftAssignShiftInput,
   HrSftBulkAssignShiftInput,
 } from "./hr.time.sft-assignment.schema";
-import { emitHrSftAuditEvent } from "./hr.time.sft-audit.server";
-import { assertShiftAssignmentConflictsClear } from "./hr.time.sft-conflict.server";
+import { emitHrSftAuditEvent } from "./hrs-hr-time-sft-audit-server";
+import { assertShiftAssignmentConflictsClear } from "./hrs-hr-time-sft-conflict-server";
 import { hrTimeSftAuditActions } from "./hr.time.sft.event";
 
 export type { HrShiftBulkScheduleResult };

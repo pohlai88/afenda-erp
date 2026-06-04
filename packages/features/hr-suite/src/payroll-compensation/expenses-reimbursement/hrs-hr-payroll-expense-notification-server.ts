@@ -6,7 +6,7 @@ import {
   buildHrExpenseNotificationCopy,
   hrExpenseNotificationSubjectTypes,
 } from "./hr.payroll.expense-notification-templates.shared";
-import { emitHrExpenseAuditEvent } from "./hr.payroll.expense-audit.server";
+import { emitHrExpenseAuditEvent } from "./hrs-hr-payroll-expense-audit-server";
 
 /** HRM-EXP-027 — notify employees and approvers of claim workflow events. */
 export async function notifyHrExpenseClaimWorkflowEvent(input: {

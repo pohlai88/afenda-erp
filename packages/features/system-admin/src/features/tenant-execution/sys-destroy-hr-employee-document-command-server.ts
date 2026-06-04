@@ -6,8 +6,8 @@ import {
   isOrganizationDocumentLegalHoldActive,
 } from "@afenda/db";
 
-import { recordTenantDocumentEvidenceEvent } from "../api/system-admin.object-storage-governance.server";
-import { purgeTenantDocumentObjectCommand } from "./purge-tenant-document-object.command.server";
+import { recordTenantDocumentEvidenceEvent } from "./sys-object-storage-governance.server";
+import { purgeTenantDocumentObjectCommand } from "./sys-purge-tenant-document-object-command-server";
 
 export { HrDocumentCommandError };
 

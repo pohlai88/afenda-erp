@@ -4,8 +4,8 @@ import {
   type HrShiftRosterPublicationWindow,
 } from "@afenda/db";
 
-import { emitHrSftAuditEvent } from "./hr.time.sft-audit.server";
-import { notifyHrSftRosterPublication } from "./hr.time.sft-notification.server";
+import { emitHrSftAuditEvent } from "./hrs-hr-time-sft-audit-server";
+import { notifyHrSftRosterPublication } from "./hrs-hr-time-sft-notification-server";
 import { hrTimeSftAuditActions } from "./hr.time.sft.event";
 
 export type { HrShiftRosterPublicationWindow };

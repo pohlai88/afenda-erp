@@ -1,4 +1,4 @@
-import { GovernedComponentSkeleton } from "./governed-component-skeleton";
+import { GovernedComponentSkeleton } from "./gov-governed-component-skeleton";
 import type { AfendaGovernedRendererId } from "./gov-registry";
 
 export type GovernedMetadataLoadingProps = {

@@ -1,6 +1,6 @@
 "use server";
 
-import { hrSuiteActionFailure } from "../../employee-management/compliance-regulatory-tracking/server";
+import { hrSuiteActionFailure } from "../../hr-suite-integration/server";
 import {
   emitHrIndustryFrmAuditEvent,
   getHrIndustryFrmStore,

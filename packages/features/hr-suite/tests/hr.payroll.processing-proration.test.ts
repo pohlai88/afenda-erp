@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { calculateHrPayrollProration } from "./hr.payroll.processing-proration.shared";
+import { calculateHrPayrollProration } from "../src/payroll-compensation/payroll-processing/hr.payroll.processing-proration.shared";
 
 const periodStart = new Date("2026-05-01T00:00:00.000Z");
 const periodEnd = new Date("2026-05-31T00:00:00.000Z");

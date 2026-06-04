@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   resolveSystemAdminUserRowTrailingAction,
   SYSTEM_ADMIN_USERS_MANAGE_DENIED,
-} from "../../src/users/surface/system-admin.users-list-trailing.shared";
+} from "../../src/features/users/sys-users-list-trailing.shared";
 
 describe("system admin users list trailing metadata", () => {
   it("hides trailing actions for removed memberships", () => {

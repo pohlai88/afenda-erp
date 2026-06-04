@@ -15,7 +15,7 @@ vi.mock("../../src/data/lynx.workflow-session.repository.server", () => ({
   listLynxWorkflowSessions: vi.fn(),
 }));
 
-import { buildLynxRunManagementPageModel } from "../../src/read-models/lynx.route-page-models.server";
+import { buildLynxRunManagementPageModel } from "../../src/lyn-route-page-models.server";
 
 describe("Lynx route page models", () => {
   beforeEach(() => {

@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   HR_TIME_SFT_ARCHITECTURE_SURFACE_KEYS,
   HR_TIME_SFT_AUDIT_MODULE_KEY,
-} from "../contracts/hr.time.sft.contract";
+} from "../src/time-attendance/shift-scheduling/hr.time.sft.contract";
 import {
   assertSftConflictPolicyCoverageComplete,
   assertSftFoundationCoverageComplete,
@@ -11,16 +11,16 @@ import {
   assertSftRequirementCoverageComplete,
   assertSftWorkflowCoverageComplete,
   SFT_REQUIREMENT_COVERAGE,
-} from "./hr.time.sft-acceptance-coverage.shared";
+} from "../src/time-attendance/shift-scheduling/hr.time.sft-acceptance-coverage.shared";
 import {
   hrTimeSftAuditActions,
   HR_SFT_EMITTED_AUDIT_ACTIONS,
-} from "../events/hr.time.sft.event";
-import { getHrSftArchitectureSurfaceKeys } from "../surface/hr.time.sft-surface-metadata.shared";
+} from "../src/time-attendance/shift-scheduling/hr.time.sft.event";
+import { getHrSftArchitectureSurfaceKeys } from "../src/time-attendance/shift-scheduling/hr.time.sft-surface-metadata.shared";
 import {
   buildHrSftNotificationCopy,
   hrSftNotificationSubjectTypes,
-} from "../surface/hr.time.sft-notification-templates.shared";
+} from "../src/time-attendance/shift-scheduling/hr.time.sft-notification-templates.shared";
 
 describe("HRM-SFT architecture surface keys", () => {
   it("registers all 11 architecture surface keys", () => {

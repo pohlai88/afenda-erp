@@ -2,12 +2,12 @@ import type { ListSurfaceRendererConfigurationResolvedInput } from "@afenda/gove
 import {
   buildLinkedControlListSurface,
   moduleReadinessVerdictBadge,
-} from "../../overview/surfaces/system-admin.control-list.shared";
+} from "../overview/sys-control-list.shared";
 import {
   formatIntegrationReadinessVerdictLabel,
   type IntegrationReadinessReport,
-} from "../contracts/system-admin.integrations-readiness.contract";
-import { systemAdminIntegrationsUiCopy } from "./system-admin.integrations-ui.copy.shared";
+} from "./sys-integrations-readiness.contract";
+import { systemAdminIntegrationsUiCopy } from "./sys-integrations-ui.copy.shared";
 
 export const systemAdminIntegrationsGovernanceSurfaceKey =
   "system-admin.integrations.governance";

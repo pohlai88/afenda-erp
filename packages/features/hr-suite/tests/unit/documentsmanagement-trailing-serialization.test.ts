@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { buildHrDocumentsRepositoryListSurface } from "../../src/employee-management/documents-management/surface/hr.workforce.documents-repository-list.surface";
+import { buildHrDocumentsRepositoryListSurface } from "../../src/employee-management/documents-management/hr.workforce.documents-repository-list.surface";
 
 describe("documents Pattern C trailing cell serialization", () => {
   it("serializes verification and replace prefill cells without leaking blob URLs", () => {

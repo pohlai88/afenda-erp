@@ -22,7 +22,7 @@ import type {
 import {
   hrBenefitEligibilityRules,
   hrBenefitPlans,
-} from "./hr-benefits";
+} from "./dbx-hr-benefits";
 import { hrEmployees } from "./hr";
 
 export function formatBenefitEligibilityScopeLabel(
@@ -320,3 +320,4 @@ export async function determineHrBenefitEligibility(input: {
     };
   });
 }
+

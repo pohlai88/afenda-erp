@@ -19,7 +19,7 @@ import {
   hrBenefitEnrollmentDependents,
   hrBenefitEnrollments,
   hrBenefitPlans,
-} from "./hr-benefits";
+} from "./dbx-hr-benefits";
 import { hrEmployees } from "./hr";
 
 export async function listHrBenefitEnrollmentsWindow(input: {
@@ -525,3 +525,4 @@ export async function applyHrBenefitEnrollmentChangeInTx(
 
   return { enrollmentId: enrollment.id, changeId };
 }
+

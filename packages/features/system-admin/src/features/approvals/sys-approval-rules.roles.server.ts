@@ -1,4 +1,4 @@
-import type { OrganizationRole } from "@afenda/auth";
+import type { OrganizationRole } from "@afenda/kernel";
 import { listTenantRoleCatalog } from "@afenda/db";
 
 export async function listDeprecatedOrganizationRoles(input: {

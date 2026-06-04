@@ -12,7 +12,7 @@ vi.mock(
   async (importOriginal) => {
     const actual =
       await importOriginal<
-        typeof import("../../src/permissions/policies/system-admin.permissions.policy.server")
+        typeof import("../../src/features/permissions/sys-permissions.policy.server")
       >();
     return {
       ...actual,
@@ -68,11 +68,11 @@ const guardContext = {
 };
 
 describe("system admin permissions", () => {
-  let setRoleOverride: typeof import("../../src/permissions/actions/system-admin.permission-bundle.actions.server").setRoleOverride;
+  let setRoleOverride: typeof import("../../src/features/permissions/sys-permission-bundle.actions.server").setRoleOverride;
 
   beforeAll(async () => {
     ({ setRoleOverride } = await import(
-      "../../src/permissions/actions/system-admin.permission-bundle.actions.server"
+      "../../src/features/permissions/sys-permission-bundle.actions.server"
     ));
   });
 
@@ -99,7 +99,7 @@ describe("system admin permissions", () => {
     mockRequirePermissionsRead.mockRejectedValue(new Error("Forbidden"));
 
     const { requireSystemAdminPermissionsRead } = await import(
-      "../../src/permissions/policies/system-admin.permissions.policy.server"
+      "../../src/features/permissions/sys-permissions.policy.server"
     );
 
     await expect(requireSystemAdminPermissionsRead()).rejects.toThrow(
@@ -111,7 +111,7 @@ describe("system admin permissions", () => {
     mockRequirePermissionsManage.mockRejectedValue(new Error("Forbidden"));
 
     const { requireSystemAdminPermissionsManage } = await import(
-      "../../src/permissions/policies/system-admin.permissions.policy.server"
+      "../../src/features/permissions/sys-permissions.policy.server"
     );
 
     await expect(requireSystemAdminPermissionsManage()).rejects.toThrow(
@@ -160,7 +160,7 @@ describe("system admin permissions", () => {
 
   it("flags orphan permissions without execution capabilities", async () => {
     const { buildSystemAdminPermissionCatalogRows } = await import(
-      "../../src/permissions/data/system-admin.permissions.query.server"
+      "../../src/features/permissions/sys-permissions.query.server"
     );
 
     const rows = buildSystemAdminPermissionCatalogRows();
@@ -174,7 +174,7 @@ describe("system admin permissions", () => {
 
   it("validates permission key schema", async () => {
     const { systemAdminPermissionKeySchema } = await import(
-      "../../src/permissions/schemas/system-admin.permission-key.schema"
+      "../../src/features/permissions/sys-permission-key.schema"
     );
 
     expect(
@@ -231,7 +231,7 @@ describe("system admin permissions", () => {
 
   it("includes missing capability rows when execution references unknown keys", async () => {
     const { buildSystemAdminPermissionCatalogRows, listMissingCatalogPermissions } =
-      await import("../../src/permissions/data/system-admin.permissions.query.server");
+      await import("../../src/features/permissions/sys-permissions.query.server");
 
     const missingKeys = listMissingCatalogPermissions();
     const rows = buildSystemAdminPermissionCatalogRows();
@@ -245,7 +245,7 @@ describe("system admin permissions", () => {
 
   it("lists execution capabilities that reference missing catalog permissions", async () => {
     const { listMissingCatalogPermissions } = await import(
-      "../../src/permissions/data/system-admin.permissions.query.server"
+      "../../src/features/permissions/sys-permissions.query.server"
     );
 
     expect(Array.isArray(listMissingCatalogPermissions())).toBe(true);

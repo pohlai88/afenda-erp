@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   parseHrComplianceSearchParams,
   toHrCompliancePageModelInput,
-} from "../../src/employee-management/compliance-regulatory-tracking/data/hr.workforce.compliance-search-params.parse.shared";
+} from "../../src/employee-management/compliance-regulatory-tracking/hr.workforce.compliance-search-params.parse.shared";
 
 describe("parseHrComplianceSearchParams", () => {
   it("returns empty values when search params are missing", () => {

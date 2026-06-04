@@ -1,5 +1,5 @@
-import { getApiAuthContext, requireCapability } from "../../server";
 import { getErpModuleById } from "@afenda/kernel";
+import { getApiAuthContext, requireCapability } from "../../server";
 import { getRequestId, logServerEvent } from "@afenda/observability/server";
 import { generateText, Output } from "ai";
 import { NextResponse } from "next/server";
@@ -30,7 +30,7 @@ import {
   createAiUsageEvent,
   isAiFeatureEnabledForOrganization,
   registerAiDocumentExtraction,
-} from "./ai-http-persistence.repository.server";
+} from "./sys-ai-http-persistence-repository-server";
 
 export const AI_EXTRACT_MAX_DURATION = 30;
 

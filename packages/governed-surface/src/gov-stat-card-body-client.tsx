@@ -22,7 +22,7 @@ import type {
 } from "./gov-stat-card-schema";
 import { cn } from "@afenda/ui/utils";
 
-import { ListSurfaceSparkline } from "./list-surface-sparkline.client";
+import { ListSurfaceSparkline } from "./gov-list-surface-sparkline-client";
 
 const ICON_MAP: Record<StatCardIcon, LucideIcon> = {
   clock: Clock,

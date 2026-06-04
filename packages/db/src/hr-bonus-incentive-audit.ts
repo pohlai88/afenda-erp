@@ -1,6 +1,6 @@
 import type { AfendaTransaction } from "./client";
 import { createEntityId } from "./ids";
-import { hrBonusAuditEvents } from "./hr-bonus-incentive";
+import { hrBonusAuditEvents } from "./dbx-hr-bonus-incentive";
 
 export async function appendHrBonusIncentiveAuditEventInTx(
   db: AfendaTransaction,
@@ -35,3 +35,4 @@ export async function appendHrBonusIncentiveAuditEventInTx(
 
   return { auditEventId };
 }
+

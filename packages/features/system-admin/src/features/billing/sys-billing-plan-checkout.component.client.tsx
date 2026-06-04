@@ -6,15 +6,15 @@ import { useState, useTransition } from "react";
 import {
   systemAdminActionFailure,
   type SystemAdminActionResult,
-} from "../../tenant-execution/contracts/system-admin.action-result.contract";
-import type { SystemAdminBillingPlanRow } from "../contracts/system-admin.billing-plans.contract";
-import { systemAdminBillingUiCopy } from "../surface/system-admin.billing-ui.copy.shared";
+} from "../tenant-execution/sys-action-result.contract";
+import type { SystemAdminBillingPlanRow } from "./sys-billing-plans.contract";
+import { systemAdminBillingUiCopy } from "./sys-billing-ui.copy.shared";
 
 export type StartStripeCheckoutWithPlanAction = (input: {
   planKey: string;
 }) => Promise<SystemAdminActionResult<{ url: string }>>;
 
-export type StartStripeBillingPortalAction = () => Promise<
+type StartStripeBillingPortalAction = () => Promise<
   SystemAdminActionResult<{ url: string }>
 >;
 

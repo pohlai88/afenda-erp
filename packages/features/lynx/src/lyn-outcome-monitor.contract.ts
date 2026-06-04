@@ -5,7 +5,7 @@ export {
   lynxOutcomeMonitorSeveritySchema,
   lynxOutcomeMonitorSignalSchema,
   lynxOutcomeMonitorStatusSchema,
-} from "./lyn-outcome-monitor-schema";
+} from "./lyn-outcome-monitor.schema";
 export type {
   LynxOutcomeEvidenceReference,
   LynxOutcomeMonitorId,
@@ -13,4 +13,4 @@ export type {
   LynxOutcomeMonitorSeverity,
   LynxOutcomeMonitorSignal,
   LynxOutcomeMonitorStatus,
-} from "./lyn-outcome-monitor-schema";
+} from "./lyn-outcome-monitor.schema";

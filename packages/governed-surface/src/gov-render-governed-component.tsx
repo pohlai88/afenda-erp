@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-import { GovernedComponentTree } from "./governed-component-tree";
+import { GovernedComponentTree } from "./gov-governed-component-tree";
 import type {
   AfendaGovernedComponentRegistry,
   GovernedComponentRendererDiagnostics,

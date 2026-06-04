@@ -6,35 +6,41 @@ import {
   hasAiGatewayRuntimeCredentials,
   resolveLanguageModel,
 } from "@afenda/ai/server";
-import { getApiAuthContext } from "./server";
+import { getApiAuthContext } from "./lyn-api-auth.server";
 import {
   isAiFeatureEnabledForOrganization,
-} from "./lynx.run-lifecycle.repository.server";
+} from "./lyn-run-lifecycle.repository.server";
 import {
   executeLynxCompleteRunCommand,
   executeLynxCreateAiUsageEventCommand,
   executeLynxCreateRunCommand,
   executeLynxRecordRunEventCommand,
-} from "../commands";
+} from "./lyn-run-lifecycle.command.server";
 import {
   getKnowledgeOrgSetting,
   retrieveKnowledgeChunksWithDiagnostics,
 } from "@afenda/feature-knowledge/server";
+import { buildLynxTruthSystemPrompt } from "./lyn-truth-prompt.contract";
+import { validateLynxTruthResponse } from "./lyn-truth.contract";
 import {
-  buildLynxTruthSystemPrompt,
   LYNX_AUDIT_ACTIONS,
   LYNX_ERP_HTTP_ROUTES,
   LYNX_GATEWAY_FEATURES,
   LYNX_MODULE_ID,
-  type LynxRunContextData,
-  type LynxRunContextMetadata,
+} from "./lyn-core.contract";
+import {
   summarizeLynxQualityGate,
   validateLynxClaims,
-  type LynxTruthEvidenceData,
-  type LynxTruthQualityGateData,
-  type LynxTruthRetrievalStateData,
-  validateLynxTruthResponse,
-} from "../contracts";
+} from "./lyn-evidence-trust.contract";
+import type {
+  LynxRunContextData,
+  LynxRunContextMetadata,
+} from "./lyn-run-feedback.schema";
+import type {
+  LynxTruthEvidenceData,
+  LynxTruthQualityGateData,
+  LynxTruthRetrievalStateData,
+} from "./lyn-truth.schema";
 import { getRequestId, logServerEvent } from "@afenda/observability/server";
 import {
   createUIMessageStream,
@@ -44,12 +50,12 @@ import {
 } from "ai";
 import { NextResponse } from "next/server";
 
-import { withAiSpan } from "./lynx.ai-span.shared.server";
+import { withAiSpan } from "./lyn-ai-span.shared.server";
 import {
   extractLatestQueryFromLynxTruthUiMessages,
   lynxTruthSearchRequestSchema,
   lynxTruthSearchUiRequestSchema,
-} from "./lyn-truth-search-schema";
+} from "./lyn-truth-search.schema";
 
 type LynxTruthDataParts = {
   "lynx-run-context": LynxRunContextData;

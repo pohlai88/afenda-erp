@@ -1,5 +1,5 @@
 import { SectionPanel } from "@afenda/ui";
-import { systemAdminUsersUiCopy } from "../surface/system-admin.users-ui.copy.shared";
+import { systemAdminUsersUiCopy } from "./sys-users-ui.copy.shared";
 
 export function SystemAdminIdentityAccessDenied() {
   const copy = systemAdminUsersUiCopy.identity;

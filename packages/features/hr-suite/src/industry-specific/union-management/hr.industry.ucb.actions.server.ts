@@ -2,7 +2,7 @@
 
 import { z } from "zod";
 
-import { hrSuiteActionFailure } from "../../employee-management/compliance-regulatory-tracking/server";
+import { hrSuiteActionFailure } from "../../hr-suite-integration/server";
 import {
   buildHrIndustryUcbReportRows,
   emitHrIndustryUcbAuditEvent,

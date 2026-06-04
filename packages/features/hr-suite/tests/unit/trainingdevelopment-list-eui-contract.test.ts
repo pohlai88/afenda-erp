@@ -1,19 +1,19 @@
 import { parseListSurfaceRendererConfiguration } from "@afenda/governed-surface/schemas";
 import { describe, expect, it } from "vitest";
 
-import { hrTalentTrainingReadPermission } from "../../src/talent-management/training-development/contracts/hr.talent.training.contract";
-import { buildHrTrainingPageModel } from "../../src/talent-management/training-development/data/hr.talent.training.page-model.server";
+import { hrTalentTrainingReadPermission } from "../../src/talent-management/training-development/hr.talent.training.contract";
+import { buildHrTrainingPageModel } from "../../src/talent-management/training-development/hr.talent.training.page-model.server";
 import {
   getHrTrainingStore,
   listHrTrainingComplianceCompletionRefs,
   resetHrTrainingStore,
-} from "../../src/talent-management/training-development/data/hr.talent.training-store.shared";
-import { buildHrTrainingListSurface } from "../../src/talent-management/training-development/surface/hr.talent.training-lists.surface";
+} from "../../src/talent-management/training-development/hr.talent.training-store.shared";
+import { buildHrTrainingListSurface } from "../../src/talent-management/training-development/hr.talent.training-lists.surface";
 import {
   hrTrainingCoursesSurfaceKey,
   hrTrainingReportsSurfaceKey,
   HR_TRAINING_LIST_SURFACE_KEYS,
-} from "../../src/talent-management/training-development/surface/hr.talent.training-surface-metadata.shared";
+} from "../../src/talent-management/training-development/hr.talent.training-surface-metadata.shared";
 
 describe("training development list EUI contract", () => {
   it("builds governed server-window list configuration", () => {

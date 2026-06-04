@@ -1,12 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
-import {
-  collectCronReliabilityIssues,
-  collectIntegrationReliabilityIssues,
-  collectMigrationReliabilityIssues,
-  collectRepositoryReliabilityIssues,
-  collectWorkflowReliabilityIssues,
-  summarizeReliabilityIssues,
-} from "../../src/reliability/data";
+import { collectCronReliabilityIssues, collectIntegrationReliabilityIssues, collectMigrationReliabilityIssues, collectRepositoryReliabilityIssues, collectWorkflowReliabilityIssues } from "../../src/features/reliability/sys-reliability.checks.server";
+import { summarizeReliabilityIssues } from "../../src/features/reliability/sys-reliability.verdict.server";
 
 vi.mock("@afenda/db", () => ({
   listLynxWorkflowSessions: vi.fn(async (input: { status?: string }) => {

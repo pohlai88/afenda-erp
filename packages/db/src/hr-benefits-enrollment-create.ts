@@ -27,7 +27,7 @@ import {
   hrBenefitEnrollments,
   hrBenefitLifeEvents,
   hrBenefitPlans,
-} from "./hr-benefits";
+} from "./dbx-hr-benefits";
 import { hrEmployees } from "./hr";
 
 function mapEnrollmentValidationError(error: unknown): never {
@@ -486,3 +486,4 @@ export async function recordHrBenefitLifeEvent(
     recordHrBenefitLifeEventInTx(db, input),
   );
 }
+

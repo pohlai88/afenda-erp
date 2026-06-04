@@ -8,23 +8,23 @@ import {
   systemAdminActionSuccess,
   type SystemAdminActionResult,
   zodActionFailure,
-} from "../../tenant-execution/contracts/system-admin.action-result.contract";
-import { dispatchSystemAdminWebhook } from "../../integrations/events/system-admin.webhook-dispatch.event";
+} from "../tenant-execution/sys-action-result.contract";
+import { dispatchSystemAdminWebhook } from "../integrations/sys-webhook-dispatch.event";
 import {
   requireSystemAdminAuditExport,
   requireSystemAdminAuditReview,
-} from "../policies/system-admin.audit-viewer.policy.server";
-import { systemAdminRetentionPolicyActionSchema } from "../schemas/system-admin.retention-action.schema";
+} from "./sys-audit-viewer.policy.server";
+import { systemAdminRetentionPolicyActionSchema } from "./sys-retention-action.schema";
 import {
   systemAdminAuditViewerAuditActions,
   systemAdminAuditViewerRetentionUpdatedWebhookEvent,
-} from "../events/system-admin.audit-viewer.event";
-import { buildSystemAdminAuditSearchFilters } from "./system-admin.audit-search-filters.shared";
-import { parseSystemAdminAuditExportFormData } from "./system-admin.audit-export-form.shared";
-import { buildAuditExportBody } from "./system-admin.audit-export.build.server";
-import type { SystemAdminAuditExportPayload } from "../contracts/system-admin.audit-export.contract";
-import { SYSTEM_ADMIN_AUDIT_EXPORT_ROW_LIMIT } from "../contracts/system-admin.audit-viewer.limits.shared";
-import { SYSTEM_ADMIN_AUDIT_PATH } from "../surface/system-admin.audit-pagination.shared";
+} from "./sys-audit-viewer.event";
+import { buildSystemAdminAuditSearchFilters } from "./sys-audit-search-filters.shared";
+import { parseSystemAdminAuditExportFormData } from "./sys-audit-export-form.shared";
+import { buildAuditExportBody } from "./sys-audit-export.build.server";
+import type { SystemAdminAuditExportPayload } from "./sys-audit-export.contract";
+import { SYSTEM_ADMIN_AUDIT_EXPORT_ROW_LIMIT } from "./sys-audit-viewer.limits.shared";
+import { SYSTEM_ADMIN_AUDIT_PATH } from "./sys-audit-pagination.shared";
 
 export async function exportSystemAdminAuditLogsAction(
   formData: FormData,
@@ -137,7 +137,7 @@ export async function upsertSystemAdminRetentionPolicyAction(
 
   if (orgHoldActivated) {
     const { cascadeOrganizationLegalHoldCommand } = await import(
-      "../../tenant-execution/commands/cascade-organization-legal-hold.command.server"
+      "../tenant-execution/sys-cascade-organization-legal-hold-command-server"
     );
 
     await cascadeOrganizationLegalHoldCommand({

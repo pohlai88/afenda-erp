@@ -15,14 +15,14 @@ import {
   systemAdminActionSuccess,
   type SystemAdminActionResult,
   zodActionFailure,
-} from "../../tenant-execution/contracts/system-admin.action-result.contract";
-import { systemAdminRoutePaths } from "../../overview/contracts/system-admin.route-paths.contract";
-import { requireSystemAdminSecurityManage } from "../policies/system-admin.security.policy.server";
+} from "../tenant-execution/sys-action-result.contract";
+import { systemAdminRoutePaths } from "../overview/sys-route-paths.contract";
+import { requireSystemAdminSecurityManage } from "./sys-security.policy.server";
 import {
   mapEncryptionSettingsToColumns,
   updateOrganizationEncryptionSettingsInputSchema,
-} from "../schemas/system-admin.object-storage-encryption.schema";
-import { systemAdminSecurityAuditActions } from "../events/system-admin.security.event";
+} from "./sys-object-storage-encryption.schema";
+import { systemAdminSecurityAuditActions } from "./sys-security.event";
 
 export async function updateOrganizationEncryptionSettingsAction(
   _previous: SystemAdminActionResult | undefined,

@@ -2,7 +2,7 @@ import {
   GOVERNED_CHART_PRESENTATION_PROFILES,
   GOVERNED_LIST_PRESENTATION_PROFILES,
   GOVERNED_STAT_PRESENTATION_PROFILES,
-} from "../profiles/governed-presentation-profiles";
+} from "./gov-governed-presentation-profiles";
 import type { ListSurfacePresentation } from "./gov-list-surface-renderer-schema";
 import type { StatCardDensity } from "./gov-stat-card-schema";
 import type { ChartDataNature, GovernedChartKind } from "./gov-chart-schema";

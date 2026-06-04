@@ -4,21 +4,21 @@ import {
   type ListSurfaceRendererConfigurationResolvedInput,
 } from "@afenda/governed-surface";
 import { formatErpDateTime } from "@afenda/kernel";
-import { systemAdminControlLinks } from "../../overview/contracts/system-admin.control-links.contract";
-import { systemAdminRoutePaths } from "../../overview/contracts/system-admin.route-paths.contract";
-import { linkCell } from "../../overview/surfaces/system-admin.control-list.shared";
+import { systemAdminControlLinks } from "../overview/sys-control-links.contract";
+import { systemAdminRoutePaths } from "../overview/sys-route-paths.contract";
+import { linkCell } from "../overview/sys-control-list.shared";
 import {
   buildSystemAdminListToolbar,
   buildSystemAdminStaticPagination,
-} from "../../overview/surfaces/system-admin.list-surface.shared";
+} from "../overview/sys-list-surface.shared";
 import type { ListSurfaceRow } from "@afenda/governed-surface";
-import type { SystemAdminUserRow, SystemAdminUserStatus } from "../contracts";
+import type { SystemAdminUserRow, SystemAdminUserStatus } from "./sys-users.contract";
 import {
   SYSTEM_ADMIN_USERS_BULK_SUSPEND_ACTION_ID,
   systemAdminUsersBulkSuspendConfirm,
-} from "../contracts/system-admin.users-actions.contract";
-import { systemAdminUsersUiCopy } from "./system-admin.users-ui.copy.shared";
-import { resolveSystemAdminUserRowTrailingAction } from "./system-admin.users-list-trailing.shared";
+} from "./sys-users-actions.contract";
+import { systemAdminUsersUiCopy } from "./sys-users-ui.copy.shared";
+import { resolveSystemAdminUserRowTrailingAction } from "./sys-users-list-trailing.shared";
 
 const USER_STATUS_BADGE: Record<
   SystemAdminUserStatus,

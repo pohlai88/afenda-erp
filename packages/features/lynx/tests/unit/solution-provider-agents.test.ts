@@ -19,7 +19,7 @@ vi.mock("ai", async (importOriginal) => {
   };
 });
 
-import { createSolutionProviderSpecialistAgent } from "../../src/agents/lynx.solution-provider-specialist.agent.server";
+import { createSolutionProviderSpecialistAgent } from "../../src/lyn-solution-provider-specialist.agent.server";
 
 function lastAgentSettings() {
   return aiMocks.ToolLoopAgent.mock.calls.at(-1)?.[0] as

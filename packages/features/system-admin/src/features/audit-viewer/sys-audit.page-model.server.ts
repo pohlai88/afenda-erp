@@ -1,13 +1,13 @@
-import type { SystemAdminRetentionPolicyListRow } from "../contracts";
-import { parseSystemAdminAuditSearchParams } from "./system-admin.audit-search-params.parse.shared";
-import { listRetentionPolicies } from "./system-admin.audit.repository.server";
-import { SYSTEM_ADMIN_AUDIT_RETENTION_LIST_LIMIT } from "../contracts/system-admin.audit-viewer.limits.shared";
-import { listSystemAdminAuditCoverageGaps } from "./system-admin.audit-coverage.query.server";
-import { recordSystemAdminAuditViewerViewEvent } from "./system-admin.audit-view-event.server";
+import type { SystemAdminRetentionPolicyListRow } from "./sys-retention-policy.contract";
+import { parseSystemAdminAuditSearchParams } from "./sys-audit-search-params.parse.shared";
+import { listRetentionPolicies } from "./sys-audit.repository.server";
+import { SYSTEM_ADMIN_AUDIT_RETENTION_LIST_LIMIT } from "./sys-audit-viewer.limits.shared";
+import { listSystemAdminAuditCoverageGaps } from "./sys-audit-coverage.query.server";
+import { recordSystemAdminAuditViewerViewEvent } from "./sys-audit-view-event.server";
 import {
   getSystemAdminAuditEventDetail,
   searchSystemAdminAuditEvents,
-} from "./system-admin.audit.query.server";
+} from "./sys-audit.query.server";
 
 function mapRetentionPolicyRow(
   policy: Awaited<ReturnType<typeof listRetentionPolicies>>[number],

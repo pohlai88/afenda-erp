@@ -1,14 +1,15 @@
 import {
+  appCapabilities,
   documentReadCapability,
   documentWriteCapability,
   isAppCapability,
   type AppCapability,
-} from "@afenda/auth";
+} from "@afenda/kernel";
 
 import type { ErpPermissionTuple } from "./gov-erp-permission-shared";
 
 /**
- * Maps governed `requiresErpPermission` tuples to `@afenda/auth` capabilities.
+ * Maps governed `requiresErpPermission` tuples to kernel capabilities.
  * Returns `null` when no known capability applies (caller must deny).
  */
 export function resolveErpCapabilityForPermission(
@@ -52,8 +53,8 @@ export function resolveErpCapabilityForPermission(
     }
     case "predict": {
       const lynxRead = `${module}.lynx.read`;
-      if (isAppCapability(lynxRead)) {
-        return lynxRead;
+      if ((appCapabilities as readonly string[]).includes(lynxRead)) {
+        return lynxRead as AppCapability;
       }
       return null;
     }

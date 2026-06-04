@@ -2,7 +2,7 @@ import type {
   GovernedChartPresentationProfiles,
   GovernedListPresentationProfiles,
   GovernedStatPresentationProfiles,
-} from "./governed-profile-types";
+} from "./gov-governed-profile-types";
 
 const ERP_TABLE_BASE = {
   variant: "table-only" as const,

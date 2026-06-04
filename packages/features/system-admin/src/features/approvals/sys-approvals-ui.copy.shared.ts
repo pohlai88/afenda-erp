@@ -4,7 +4,7 @@ import {
   SYSTEM_ADMIN_APPROVALS_READ_CAPABILITY,
   SYSTEM_ADMIN_APPROVALS_REVIEW_CAPABILITY,
   SYSTEM_ADMIN_APPROVALS_VIEW_CAPABILITY,
-} from "../schemas/system-admin.approvals-capability.shared";
+} from "./sys-approvals-capability.shared";
 
 const queueReadOnlyWithoutDecide = `You can view the queue but cannot record decisions without ${SYSTEM_ADMIN_APPROVALS_DECIDE_CAPABILITY}.`;
 

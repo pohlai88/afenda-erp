@@ -1,4 +1,4 @@
-import type { AppCapability } from "@afenda/auth";
+import type { AppCapability } from "@afenda/kernel";
 
 export const HR_TRAINING_READ_CAPABILITY =
   "hr.training.read" satisfies AppCapability;

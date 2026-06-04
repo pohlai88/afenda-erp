@@ -1,5 +1,5 @@
 import { readdir, readFile } from "node:fs/promises";
-import { resolveRepoRootFile } from "./system-admin.repo-root-file.repository.server";
+import { resolveRepoRootFile } from "./sys-repo-root-file.repository.server";
 
 export type SystemAdminMigrationHealthSnapshot = {
   journalEntryCount: number;

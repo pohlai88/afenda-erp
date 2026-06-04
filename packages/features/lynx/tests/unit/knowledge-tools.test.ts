@@ -39,7 +39,7 @@ vi.mock("@afenda/ai/server", () => ({
 }));
 
 const { createLynxKnowledgeTools } = await import(
-  "../../src/tools/lynx.knowledge.tool.server"
+  "../../src/lyn-knowledge.tool.server"
 );
 
 async function executeTool<TInput>(

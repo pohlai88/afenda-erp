@@ -26,11 +26,11 @@ import type {
   HrCareerPathSessionLogInput,
   HrCareerPathStretchAssignmentCreateInput,
 } from "./hr.talent.career-pathing-development-actions.schema";
-import { emitHrCareerPathingAuditEvent } from "./hr.talent.career-pathing-audit.server";
+import { emitHrCareerPathingAuditEvent } from "./hrs-hr-talent-career-pathing-audit-server";
 import {
   loadHrmDevelopmentCoachAssignmentForPlan,
   loadHrmDevelopmentMentorAssignmentForPlan,
-} from "./hr.talent.career-pathing-queries.server";
+} from "./hrs-hr-talent-career-pathing-queries-server";
 
 /** HRM-CAR-013 — recommend and persist learning actions from skill/competency gaps. */
 export async function recommendHrCareerPathLearningActions(input: {

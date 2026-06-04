@@ -5,15 +5,15 @@ import {
   buildDashboardWorkflowListSurface,
   buildModuleRecordListSurface,
   buildModuleWorkItemListSurface,
-} from "../../src/modules/list-surfaces";
-import { resolveModuleWorkspaceListQuery } from "../../src/shared/module-workspace-query";
+} from "../../src/ker-list-surfaces";
+import { resolveModuleWorkspaceListQuery } from "../../src/ker-module-workspace-query";
 import { buildAuditPanelModel } from "../../src/index";
 import {
   getRecordTypeDefinition,
   parseRecordTypeExtension,
   resolveModuleRecordListDefinition,
   resolveRecordTypeRowHref,
-} from "../../src/modules/record-types";
+} from "../../src/ker-record-types";
 
 const baseRecord = {
   id: "record-1",

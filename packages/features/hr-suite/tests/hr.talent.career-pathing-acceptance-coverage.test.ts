@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   assertCareerPathingCoverageComplete,
   CAREER_PATHING_REQUIREMENT_COVERAGE,
-} from "./hr.talent.career-pathing-acceptance-coverage.shared";
+} from "../src/talent-management/career-pathing-development-plans/hr.talent.career-pathing-acceptance-coverage.shared";
 
 describe("Career pathing acceptance coverage matrix", () => {
   it("lists HRM-CAR-001 through HRM-CAR-012 foundation requirements", () => {

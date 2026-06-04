@@ -7,13 +7,8 @@ import {
   resolveGovernedBulkServerAction,
   type ActionResult,
 } from "@afenda/governed-surface/schemas";
-import {
-  systemAdminInspectUserAccessInputSchema,
-  systemAdminInviteUserInputSchema,
-  systemAdminResendInvitationInputSchema,
-  systemAdminUserStatusInputSchema,
-} from "../../src/users/schemas";
-import { SYSTEM_ADMIN_USERS_BULK_SUSPEND_ACTION_ID } from "../../src/users/contracts/system-admin.users-actions.contract";
+import { systemAdminInspectUserAccessInputSchema, systemAdminInviteUserInputSchema, systemAdminResendInvitationInputSchema, systemAdminUserStatusInputSchema } from "../../src/features/users/sys-users.schema";
+import { SYSTEM_ADMIN_USERS_BULK_SUSPEND_ACTION_ID } from "../../src/features/users/sys-users-actions.contract";
 
 const mockRequireUsersManage = vi.fn();
 const mockRequireUsersRead = vi.fn();
@@ -31,7 +26,7 @@ vi.mock(
   async (importOriginal) => {
     const actual =
       await importOriginal<
-        typeof import("../../src/overview/policies/system-admin.capability.policy.server")
+        typeof import("../../src/features/overview/sys-capability.policy.server")
       >();
     return {
       ...actual,
@@ -50,7 +45,7 @@ vi.mock(
   async (importOriginal) => {
     const actual =
       await importOriginal<
-        typeof import("../../src/memberships/data/system-admin.memberships.query.server")
+        typeof import("../../src/features/memberships/sys-memberships.query.server")
       >();
     return {
       ...actual,
@@ -77,7 +72,7 @@ vi.mock(
   async (importOriginal) => {
     const actual =
       await importOriginal<
-        typeof import("../../src/users/data/system-admin.users.query.server")
+        typeof import("../../src/features/users/sys-users.query.server")
       >();
     return {
       ...actual,
@@ -94,7 +89,7 @@ vi.mock(
   async (importOriginal) => {
     const actual =
       await importOriginal<
-        typeof import("../../src/users/data/system-admin.users-access.query.server")
+        typeof import("../../src/features/users/sys-users-access.query.server")
       >();
     return {
       ...actual,
@@ -182,7 +177,7 @@ describe("system admin users actions", () => {
     mockRequireUsersRead.mockRejectedValue(new Error("Forbidden"));
 
     const { requireSystemAdminUsersRead } = await import(
-      "../../src/overview/policies/system-admin.capability.policy.server"
+      "../../src/features/overview/sys-capability.policy.server"
     );
 
     await expect(requireSystemAdminUsersRead()).rejects.toThrow("Forbidden");
@@ -192,7 +187,7 @@ describe("system admin users actions", () => {
     mockRequireUsersManage.mockRejectedValue(new Error("Forbidden"));
 
     const { requireSystemAdminUsersManage } = await import(
-      "../../src/overview/policies/system-admin.capability.policy.server"
+      "../../src/features/overview/sys-capability.policy.server"
     );
 
     await expect(requireSystemAdminUsersManage()).rejects.toThrow("Forbidden");
@@ -206,7 +201,7 @@ describe("system admin users actions", () => {
       );
 
       const { inviteSystemAdminUser } = await import(
-        "../../src/users/actions/system-admin.users.actions.server"
+        "../../src/features/users/sys-users.actions.server"
       );
       const formData = new FormData();
       formData.set("email", "dup@example.com");
@@ -222,7 +217,7 @@ describe("system admin users actions", () => {
 
   it("writes audit evidence on invite", async () => {
     const { inviteSystemAdminUser } = await import(
-      "../../src/users/actions/system-admin.users.actions.server"
+      "../../src/features/users/sys-users.actions.server"
     );
     const formData = new FormData();
     formData.set("email", "new@example.com");
@@ -244,7 +239,7 @@ describe("system admin users actions", () => {
     );
 
     const { resendSystemAdminInvitation } = await import(
-      "../../src/users/actions/system-admin.users.actions.server"
+      "../../src/features/users/sys-users.actions.server"
     );
 
     const result = await resendSystemAdminInvitation("invite_1");
@@ -256,7 +251,7 @@ describe("system admin users actions", () => {
       suspendSystemAdminUser,
       reactivateSystemAdminUser,
       removeSystemAdminUser,
-    } = await import("../../src/users/actions/system-admin.users.actions.server");
+    } = await import("../../src/features/users/sys-users.actions.server");
 
     await suspendSystemAdminUser("member_1");
     await reactivateSystemAdminUser("member_1");
@@ -275,7 +270,7 @@ describe("system admin users actions", () => {
 
   it("registered bulk suspend rejects no selected rows before auth", async () => {
     const { registerSystemAdminUsersGovernedActions } = await import(
-      "../../src/users/actions/system-admin.users-governed-actions.server"
+      "../../src/features/users/sys-users-governed-actions.server"
     );
     registerSystemAdminUsersGovernedActions();
     const action = resolveGovernedBulkServerAction(
@@ -301,7 +296,7 @@ describe("system admin users actions", () => {
   it("bulk suspend rejects tampered selected membership ids", async () => {
     mockGetMembership.mockResolvedValueOnce(null);
     const { bulkSuspendSystemAdminUsers } = await import(
-      "../../src/users/actions/system-admin.users.actions.server"
+      "../../src/features/users/sys-users.actions.server"
     );
     const formData = new FormData();
     formData.append(GOVERNED_SELECTED_ROW_ID_FIELD, "member_missing");
@@ -323,7 +318,7 @@ describe("system admin users actions", () => {
       status: "active",
     });
     const { bulkSuspendSystemAdminUsers } = await import(
-      "../../src/users/actions/system-admin.users.actions.server"
+      "../../src/features/users/sys-users.actions.server"
     );
     const formData = new FormData();
     formData.append(GOVERNED_SELECTED_ROW_ID_FIELD, "member_1");
@@ -356,7 +351,7 @@ describe("system admin users actions", () => {
       .mockResolvedValueOnce(memberOne)
       .mockResolvedValueOnce(memberTwo);
     const { bulkSuspendSystemAdminUsers } = await import(
-      "../../src/users/actions/system-admin.users.actions.server"
+      "../../src/features/users/sys-users.actions.server"
     );
     const { revalidatePath } = await import("next/cache");
     const formData = new FormData();
@@ -398,7 +393,7 @@ describe("system admin users actions", () => {
     });
 
     const { suspendSystemAdminUser } = await import(
-      "../../src/users/actions/system-admin.users.actions.server"
+      "../../src/features/users/sys-users.actions.server"
     );
 
     const result = await suspendSystemAdminUser("member_1");
@@ -415,7 +410,7 @@ describe("system admin users actions", () => {
     );
 
     const { suspendSystemAdminUser } = await import(
-      "../../src/users/actions/system-admin.users.actions.server"
+      "../../src/features/users/sys-users.actions.server"
     );
 
     const result = await suspendSystemAdminUser("member_1");
@@ -427,7 +422,7 @@ describe("system admin users actions", () => {
 
   it("inspect access returns roles and effective permissions", async () => {
     const { inspectSystemAdminUserAccessAction } = await import(
-      "../../src/users/actions/system-admin.users.actions.server"
+      "../../src/features/users/sys-users.actions.server"
     );
 
     const result = await inspectSystemAdminUserAccessAction("member_1");
@@ -442,7 +437,7 @@ describe("system admin users actions", () => {
 describe("system admin users query", () => {
   it("passes list limit to tenant identity reads", async () => {
     const identityRepository = await import(
-      "../../src/users/data/system-admin.identity.repository.server"
+      "../../src/features/users/sys-identity.repository.server"
     );
     const listMembers = vi
       .spyOn(identityRepository, "listTenantMembers")
@@ -455,7 +450,7 @@ describe("system admin users query", () => {
     vi.spyOn(db, "listActorLastActivityAt").mockResolvedValueOnce(new Map());
 
     const { listSystemAdminUsers } = await import(
-      "../../src/users/data/system-admin.users.query.server"
+      "../../src/features/users/sys-users.query.server"
     );
 
     await listSystemAdminUsers({ organizationId: "org_1", limit: 25 });
@@ -474,12 +469,12 @@ describe("system admin users query", () => {
 describe("system admin users page model", () => {
   it("writes audit evidence when the user directory is viewed", async () => {
     const usersQuery = await import(
-      "../../src/users/data/system-admin.users.query.server"
+      "../../src/features/users/sys-users.query.server"
     );
     vi.spyOn(usersQuery, "listSystemAdminUsers").mockResolvedValueOnce([]);
 
     const { buildSystemAdminUsersPageModel } = await import(
-      "../../src/users/data/system-admin.users.page-model.server"
+      "../../src/features/users/sys-users.page-model.server"
     );
 
     await buildSystemAdminUsersPageModel({
@@ -497,7 +492,7 @@ describe("system admin users page model", () => {
 
   it("filters users by search and status", async () => {
     const usersQuery = await import(
-      "../../src/users/data/system-admin.users.query.server"
+      "../../src/features/users/sys-users.query.server"
     );
     vi.spyOn(usersQuery, "listSystemAdminUsers").mockResolvedValueOnce([
       {
@@ -533,7 +528,7 @@ describe("system admin users page model", () => {
     ]);
 
     const { buildSystemAdminUsersPageModel } = await import(
-      "../../src/users/data/system-admin.users.page-model.server"
+      "../../src/features/users/sys-users.page-model.server"
     );
 
     const model = await buildSystemAdminUsersPageModel({
@@ -551,7 +546,7 @@ describe("system admin users page model", () => {
 describe("system admin users list surface", () => {
   it("serializes governed list configuration for users", async () => {
     const { buildUsersListSurface } = await import(
-      "../../src/users/surface/system-admin.users-list.surface"
+      "../../src/features/users/sys-users-list.surface"
     );
 
     const surface = buildUsersListSurface({

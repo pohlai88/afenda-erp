@@ -9,30 +9,27 @@ import {
   writeExecutionAuditEvent,
 } from "@afenda/kernel/execution";
 import { revalidatePath, revalidateTag } from "next/cache";
-import { workspaceNavigationSettingsCacheTag } from "../../tenant-execution/contracts/system-admin.workspace-navigation-cache.shared";
+import { workspaceNavigationSettingsCacheTag } from "../tenant-execution/sys-workspace-navigation-cache.shared";
 import { z } from "zod";
 import {
   systemAdminActionFailure,
   systemAdminActionSuccess,
   type SystemAdminActionResult,
   zodActionFailure,
-} from "../../tenant-execution/contracts/system-admin.action-result.contract";
-import { systemAdminRoutePaths } from "../../overview/contracts/system-admin.route-paths.contract";
-import { dispatchSystemAdminWebhook } from "../../integrations/events/system-admin.webhook-dispatch.event";
-import type { SystemAdminCapabilityAvailability } from "../contracts";
-import {
-  SYSTEM_ADMIN_CAPABILITY_KEY_MAX_LENGTH,
-  SYSTEM_ADMIN_CAPABILITY_SETTINGS_QUERY_LIMIT,
-  SYSTEM_ADMIN_PROTECTED_CAPABILITY_PERMISSION,
-} from "../contracts";
-import { isCriticalExecutionCapability } from "../contracts/system-admin.capability-safety.contract";
-import { requireSystemAdminCapabilitiesManage } from "../policies/system-admin.capabilities.policy.server";
-import { parseSystemAdminCapabilitySettingsFormData } from "./system-admin.capability-settings-form.shared";
+} from "../tenant-execution/sys-action-result.contract";
+import { systemAdminRoutePaths } from "../overview/sys-route-paths.contract";
+import { dispatchSystemAdminWebhook } from "../integrations/sys-webhook-dispatch.event";
+import type { SystemAdminCapabilityAvailability } from "./sys-capabilities.contract";
+import { SYSTEM_ADMIN_CAPABILITY_KEY_MAX_LENGTH, SYSTEM_ADMIN_CAPABILITY_SETTINGS_QUERY_LIMIT } from "./sys-capabilities.limits.shared";
+import { SYSTEM_ADMIN_PROTECTED_CAPABILITY_PERMISSION } from "./sys-capability-safety.contract";
+import { isCriticalExecutionCapability } from "./sys-capability-safety.contract";
+import { requireSystemAdminCapabilitiesManage } from "./sys-capabilities.policy.server";
+import { parseSystemAdminCapabilitySettingsFormData } from "./sys-capability-settings-form.shared";
 import {
   resolveSystemAdminCapabilityAuditAction,
   SYSTEM_ADMIN_CAPABILITY_SETTINGS_WEBHOOK_EVENT,
-} from "../events/system-admin.capabilities.event";
-import { systemAdminCapabilitySettingsActionSchema } from "../schemas/system-admin.capability-settings.schema";
+} from "./sys-capabilities.event";
+import { systemAdminCapabilitySettingsActionSchema } from "./sys-capability-settings.schema";
 
 function resolvePreviousCapabilityAvailability(input: {
   capabilityKey: string;

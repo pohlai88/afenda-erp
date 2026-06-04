@@ -1,20 +1,13 @@
 import { hasExecutionPermission } from "@afenda/kernel/execution";
 
-import {
-  exportSystemAdminBillingSummaryAction,
-  startStripeBillingPortalAction,
-  startStripeCheckoutWithPlanAction,
-  updateSystemAdminBillingContactsAction,
-} from "../actions";
-import {
-  buildSystemAdminBillingPageModel,
-  parseSystemAdminBillingCheckoutStatus,
-} from "../data";
-import { requireSystemAdminBillingRead } from "../policies/system-admin.billing.policy.server";
+import { exportSystemAdminBillingSummaryAction, startStripeBillingPortalAction, startStripeCheckoutWithPlanAction, updateSystemAdminBillingContactsAction } from "./sys-billing.actions.server";
+import { buildSystemAdminBillingPageModel } from "./sys-billing.page-model.server";
+import { parseSystemAdminBillingCheckoutStatus } from "./sys-billing-checkout-status.shared";
+import { requireSystemAdminBillingRead } from "./sys-billing.policy.server";
 import {
   SystemAdminBillingAccessDenied,
   SystemAdminBillingSection,
-} from "./system-admin.billing-section.component.server";
+} from "./sys-billing-section.component.server";
 
 type SystemAdminBillingPageProps = {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;

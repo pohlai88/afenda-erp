@@ -9,15 +9,15 @@ import {
   digestKnowledgeDocument,
 } from "@afenda/db";
 
-import { KNOWLEDGE_AUDIT_ACTIONS } from "../contracts/knowledge.core.contract";
-import type { RawKnowledgeDocument } from "../contracts/knowledge.retrieval.contract";
+import { KNOWLEDGE_AUDIT_ACTIONS } from "./kno-core.contract";
+import type { RawKnowledgeDocument } from "./kno-retrieval.contract";
 import {
   emitKnowledgeAuditEvent,
   emitKnowledgeAuditEventInTransaction,
-} from "./knowledge.audit.server";
-import { embedKnowledgeBatch } from "./knowledge.embeddings.server";
-import type { KnowledgeChunk } from "./knowledge.chunker.server";
-import { chunkKnowledgeDocument } from "./knowledge.chunker.server";
+} from "./kno-audit.server";
+import { embedKnowledgeBatch } from "./kno-embeddings.server";
+import type { KnowledgeChunk } from "./kno-chunker.server";
+import { chunkKnowledgeDocument } from "./kno-chunker.server";
 
 export type CommitDocumentResult = {
   documentId: string;

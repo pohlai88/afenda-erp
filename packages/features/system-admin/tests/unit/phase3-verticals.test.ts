@@ -3,13 +3,13 @@ import { resolveTenantExecutionPolicyVerdict } from "@afenda/kernel/execution-te
 import {
   mapTenantPolicySettingToRule,
   mapTenantPolicySettingToKernelRecord,
-} from "../../src/policies/data/system-admin.policy-rules.mapper";
+} from "../../src/features/policies/system-admin.policy-rules.mapper";
 import {
   mapTenantApprovalSettingToKernelRecord,
   mapTenantApprovalSettingToRule,
-} from "../../src/approvals/data/system-admin.approval-rules.mapper";
-import { updatePolicyRuleInputSchema } from "../../src/policies/schemas/system-admin.policy-rule.schema";
-import { updateApprovalRuleInputSchema } from "../../src/approvals/schemas/system-admin.approval-rule.schema";
+} from "../../src/features/approvals/sys-approval-rules.mapper";
+import { updatePolicyRuleInputSchema } from "../../src/features/policies/system-admin.policy-rule.schema";
+import { updateApprovalRuleInputSchema } from "../../src/features/approvals/sys-approval-rule.schema";
 
 describe("system admin phase 3 policy schemas", () => {
   it("rejects malformed policy condition JSON", () => {

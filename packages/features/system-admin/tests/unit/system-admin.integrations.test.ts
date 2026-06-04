@@ -12,7 +12,7 @@ vi.mock(
   async (importOriginal) => {
     const actual =
       await importOriginal<
-        typeof import("../../src/integrations/policies/system-admin.integrations.policy.server")
+        typeof import("../../src/features/integrations/sys-integrations.policy.server")
       >();
     return {
       ...actual,
@@ -66,23 +66,23 @@ const guardContext = {
 import {
   assertCredentialValueNotExposed,
   formatMaskedCredentialPrefix,
-} from "../../src/integrations/contracts/system-admin.credential-visibility.shared";
-import { formatIntegrationReadinessVerdictLabel } from "../../src/integrations/contracts/system-admin.integrations-readiness.contract";
-import { evaluateIntegrationsReadiness } from "../../src/integrations/data/system-admin.integrations.readiness.server";
-import { systemAdminIntegrationsAuditActions } from "../../src/integrations/events/system-admin.integrations.event";
-import { buildApiCredentialsListSurface } from "../../src/integrations/surface/system-admin.integrations-list.surface";
-import { buildIntegrationsGovernanceListSurface } from "../../src/integrations/surface/system-admin.integrations-governance.surface";
+} from "../../src/features/integrations/sys-credential-visibility.shared";
+import { formatIntegrationReadinessVerdictLabel } from "../../src/features/integrations/sys-integrations-readiness.contract";
+import { evaluateIntegrationsReadiness } from "../../src/features/integrations/sys-integrations.readiness.server";
+import { systemAdminIntegrationsAuditActions } from "../../src/features/integrations/sys-integrations.event";
+import { buildApiCredentialsListSurface } from "../../src/features/integrations/sys-integrations-list.surface";
+import { buildIntegrationsGovernanceListSurface } from "../../src/features/integrations/sys-integrations-governance.surface";
 import {
   resolveSystemAdminApiCredentialRowTrailingAction,
   resolveSystemAdminWebhookRowTrailingAction,
-} from "../../src/integrations/surface/system-admin.integrations-list-trailing.shared";
+} from "../../src/features/integrations/sys-integrations-list-trailing.shared";
 
 describe("system admin integrations", () => {
-  let revokeApiCredentialAction: typeof import("../../src/integrations/actions/system-admin.integrations.actions.server").revokeApiCredentialAction;
+  let revokeApiCredentialAction: typeof import("../../src/features/integrations/sys-integrations.actions.server").revokeApiCredentialAction;
 
   beforeAll(async () => {
     ({ revokeApiCredentialAction } = await import(
-      "../../src/integrations/actions/system-admin.integrations.actions.server"
+      "../../src/features/integrations/sys-integrations.actions.server"
     ));
   });
 
@@ -97,7 +97,7 @@ describe("system admin integrations", () => {
     mockRequireIntegrationsRead.mockRejectedValue(new Error("Forbidden"));
 
     const { requireSystemAdminIntegrationsRead } = await import(
-      "../../src/integrations/policies/system-admin.integrations.policy.server"
+      "../../src/features/integrations/sys-integrations.policy.server"
     );
 
     await expect(requireSystemAdminIntegrationsRead()).rejects.toThrow(

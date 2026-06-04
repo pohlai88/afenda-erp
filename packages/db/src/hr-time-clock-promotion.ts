@@ -4,7 +4,7 @@ import { runWithOrganizationContext } from "./client";
 import { recordHrAttendancePunch } from "./hr-attendance";
 import { appendHrTimeClockAuditEvent } from "./hr-time-clock-devices";
 import { HrTimeClockCommandError } from "./hr-time-clock.types";
-import { hrTimeClockRawPunches } from "./hr-time-clock";
+import { hrTimeClockRawPunches } from "./dbx-hr-time-clock";
 import type { HrTimeClockPunchType } from "./hr-time-clock.types";
 
 const PROMOTABLE_PUNCH_TYPES = new Set<HrTimeClockPunchType>([
@@ -108,3 +108,4 @@ export async function promoteValidatedHrTimeClockPunchToLam(input: {
     created: result.created,
   };
 }
+

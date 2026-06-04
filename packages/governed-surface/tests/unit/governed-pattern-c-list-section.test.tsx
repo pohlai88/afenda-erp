@@ -2,12 +2,12 @@ import { describe, expect, it, vi } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
 
 vi.mock("server-only", () => ({}));
-vi.mock("../../src/data/governed-permission-gate.server", () => ({
+vi.mock("../../src/gov-governed-permission-gate-server", () => ({
   resolveGovernedErpPermissionAllowed: async () => true,
 }));
 
-import { GovernedPatternCListSection } from "../../src/components/governed-pattern-c-list-section";
-import { resolvePatternCTableTrailingColumn } from "../../src/components/governed-pattern-c-list-table-host.client";
+import { GovernedPatternCListSection } from "../../src/gov-governed-pattern-c-list-section";
+import { resolvePatternCTableTrailingColumn } from "../../src/gov-governed-pattern-c-list-table-host-client";
 import {
   type ListSurfaceRendererConfigurationInput,
 } from "../../src/gov-list-surface-renderer-schema";

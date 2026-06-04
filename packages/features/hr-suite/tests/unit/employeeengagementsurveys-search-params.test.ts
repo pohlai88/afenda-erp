@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   parseHrTalentEngSearchParams,
   toHrTalentEngPageModelInput,
-} from "../../src/talent-management/employee-engagement-surveys/data/hr.talent.eng-search-params.parse.shared";
+} from "../../src/talent-management/employee-engagement-surveys/hr.talent.eng-search-params.parse.shared";
 
 describe("Employee Engagement Surveys search params", () => {
   it("parses and trims survey, restricted, audit, grouping, status, and segment params", () => {

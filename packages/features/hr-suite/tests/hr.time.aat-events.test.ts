@@ -4,8 +4,8 @@ import {
   HR_AAT_EMITTED_AUDIT_ACTIONS,
   hrTimeAatAuditActions,
   isHrAatAuditAction,
-} from "../events/hr.time.aat.event";
-import { HR_TIME_AAT_AUDIT_MODULE_KEY } from "../contracts/hr.time.aat.contract";
+} from "../src/time-attendance/absence-analytics-trends/hr.time.aat.event";
+import { HR_TIME_AAT_AUDIT_MODULE_KEY } from "../src/time-attendance/absence-analytics-trends/hr.time.aat.contract";
 
 describe("hr.time.aat.event", () => {
   it("uses hr.aat.* audit prefix for moduleKey search", () => {

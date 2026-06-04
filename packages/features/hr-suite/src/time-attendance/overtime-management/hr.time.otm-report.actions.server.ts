@@ -10,8 +10,8 @@ import { revalidatePath } from "next/cache";
 import {
   buildHrTimeOtmReportCsvExport,
   type HrTimeOtmReportCsvResult,
-} from "./hr.time.otm-report.server";
-import { emitHrTimeOtmAuditEvent } from "./hr.time.otm-audit.server";
+} from "./hrs-hr-time-otm-report-server";
+import { emitHrTimeOtmAuditEvent } from "./hrs-hr-time-otm-audit-server";
 import {
   HrTimeOtmAccessDeniedError,
   requireHrTimeOtmReportExport,

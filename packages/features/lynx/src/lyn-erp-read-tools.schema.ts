@@ -1,6 +1,6 @@
 import { moduleIds } from "@afenda/config/module-ids";
 import { z } from "zod";
-import { lynxReadinessStatusSchema } from "./lynx.readiness.schema";
+import { lynxReadinessStatusSchema } from "./lyn-readiness.schema";
 
 export const LYNX_ERP_READ_TOOL_IDS = [
   "inspectFinanceSignals",

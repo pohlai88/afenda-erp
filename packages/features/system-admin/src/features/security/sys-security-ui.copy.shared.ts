@@ -1,4 +1,4 @@
-import { systemAdminRoutePaths } from "../../overview/contracts/system-admin.route-paths.contract";
+import { systemAdminRoutePaths } from "../overview/sys-route-paths.contract";
 
 export const systemAdminSecurityUiCopy = {
   page: {

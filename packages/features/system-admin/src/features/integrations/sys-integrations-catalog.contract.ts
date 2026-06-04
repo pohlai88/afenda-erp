@@ -1,4 +1,4 @@
-import type { SystemAdminCatalogOption } from "../../permissions/contracts/system-admin.permission-catalog.contract";
+import type { SystemAdminCatalogOption } from "../permissions/sys-permission-catalog.contract";
 
 export const systemAdminApiScopes = [
   {

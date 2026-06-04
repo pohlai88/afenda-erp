@@ -17,7 +17,7 @@ import {
   hrShiftSwapRequests,
   hrShiftTemplates,
   type HrShiftScheduleChangePayload,
-} from "./hr-shift-scheduling";
+} from "./dbx-hr-shift-scheduling";
 
 export class HrShiftWorkflowCommandError extends Error {
   readonly code:
@@ -1130,3 +1130,4 @@ export async function listHrShiftScheduleChangeRequestsWindow(input: {
     };
   });
 }
+

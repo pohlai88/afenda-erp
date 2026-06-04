@@ -5,24 +5,24 @@ import {
   type AppCapability,
   type OrganizationSummary,
   type UserSession,
-} from "@afenda/auth";
+} from "./ker-app-capabilities";
 import { readNeonAuthSessionPayload } from "@afenda/auth/server";
 import { getUserProfile, listOrganizationsForUser } from "@afenda/db";
 import {
   ExecutionContextRequiredError,
   ExecutionInvalidStateError,
-} from "../errors/execution-errors";
+} from "./ker-execution-errors";
 import {
   resolveExecutionActor,
   type ExecutionActorType,
-} from "../actor/execution-actor";
+} from "./ker-execution-actor";
 
 export type {
   ExecutionAuthorityContext,
   ExecutionContext,
-} from "./execution-context-types";
-export { toExecutionAuthorityContext } from "./execution-context-types";
-import type { ExecutionContext } from "./execution-context-types";
+} from "./ker-execution-context-types";
+export { toExecutionAuthorityContext } from "./ker-execution-context-types";
+import type { ExecutionContext } from "./ker-execution-context-types";
 
 function buildExecutionContext(input: {
   session: UserSession;

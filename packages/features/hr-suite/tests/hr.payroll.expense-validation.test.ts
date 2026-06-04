@@ -8,7 +8,7 @@ import {
   validateClaimPolicy,
   type HrExpenseEligibilityRuleRow,
   type HrExpensePolicyHeaderRow,
-} from "./hr.payroll.expense-validation.shared";
+} from "../src/payroll-compensation/expenses-reimbursement/hr.payroll.expense-validation.shared";
 
 const basePolicy = (
   overrides: Partial<HrExpensePolicyHeaderRow> = {},

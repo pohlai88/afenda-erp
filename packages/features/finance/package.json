@@ -26,8 +26,9 @@
     }
   },
   "dependencies": {
+    "@afenda/governed-surface": "workspace:*",
     "@afenda/kernel": "workspace:*",
-    "@afenda/governed-surface": "workspace:*"
+    "server-only": "^0.0.1"
   },
   "scripts": {
     "build": "tsc -p tsconfig.build.json",

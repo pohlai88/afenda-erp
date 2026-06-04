@@ -5,23 +5,23 @@ import {
   hrComplianceFormDateTimeInput,
   readComplianceFormTextField,
   readOptionalComplianceFormField,
-} from "../../src/employee-management/compliance-regulatory-tracking/schemas/hr.workforce.compliance-form.shared";
-import { parseUpdateHrWorkAuthorizationDocumentForm } from "../../src/employee-management/compliance-regulatory-tracking/schemas/hr.workforce.compliance-work-auth-documents.schema";
-import { parseUpdateHrWorkEligibilityForm } from "../../src/employee-management/compliance-regulatory-tracking/schemas/hr.workforce.compliance-work-eligibility.schema";
+} from "../../src/employee-management/compliance-regulatory-tracking/hr.workforce.compliance-form.shared";
+import { parseUpdateHrWorkAuthorizationDocumentForm } from "../../src/employee-management/compliance-regulatory-tracking/hr.workforce.compliance-work-auth-documents.schema";
+import { parseUpdateHrWorkEligibilityForm } from "../../src/employee-management/compliance-regulatory-tracking/hr.workforce.compliance-work-eligibility.schema";
 import {
   parseUpdateHrEmployeeWorkplaceSafetyRequirementForm,
   updateHrEmployeeWorkplaceSafetyRequirementFormSchema,
-} from "../../src/employee-management/compliance-regulatory-tracking/schemas/hr.workforce.compliance-workplace-safety.schema";
+} from "../../src/employee-management/compliance-regulatory-tracking/hr.workforce.compliance-workplace-safety.schema";
 import {
   parseUpdateHrEmployeeSafetyTrainingRequirementForm,
   updateHrEmployeeSafetyTrainingRequirementFormSchema,
-} from "../../src/employee-management/compliance-regulatory-tracking/schemas/hr.workforce.compliance-safety-training.schema";
-import { parseUpdateHrEmployeePolicyAcknowledgementForm } from "../../src/employee-management/compliance-regulatory-tracking/schemas/hr.workforce.compliance-policy-acknowledgement.schema";
+} from "../../src/employee-management/compliance-regulatory-tracking/hr.workforce.compliance-safety-training.schema";
+import { parseUpdateHrEmployeePolicyAcknowledgementForm } from "../../src/employee-management/compliance-regulatory-tracking/hr.workforce.compliance-policy-acknowledgement.schema";
 import {
   assignHrComplianceCorrectiveActionFormSchema,
   createHrComplianceExceptionFormSchema,
   updateHrComplianceCorrectiveActionProgressFormSchema,
-} from "../../src/employee-management/compliance-regulatory-tracking/schemas/hr.workforce.compliance-exception.schema";
+} from "../../src/employee-management/compliance-regulatory-tracking/hr.workforce.compliance-exception.schema";
 
 describe("hrComplianceFormDateTimeInput", () => {
   it("accepts ISO datetime strings", () => {

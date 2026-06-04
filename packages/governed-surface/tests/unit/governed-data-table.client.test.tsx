@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
 import { type ColumnDef } from "@tanstack/react-table";
 
-import { GovernedDataTableClient } from "../../src/components/governed-data-table.client";
+import { GovernedDataTableClient } from "../../src/gov-governed-data-table-client";
 
 type Row = { id: string; name: string };
 

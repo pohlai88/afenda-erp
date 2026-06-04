@@ -11,10 +11,10 @@ import {
   systemAdminActionSuccess,
   type SystemAdminActionResult,
   zodActionFailure,
-} from "../../tenant-execution/contracts/system-admin.action-result.contract";
-import { systemAdminRoutePaths } from "../../overview/contracts/system-admin.route-paths.contract";
+} from "../tenant-execution/sys-action-result.contract";
+import { systemAdminRoutePaths } from "../overview/sys-route-paths.contract";
 import { requireSystemAdminPoliciesManage } from "../policies/system-admin.policy-rules.policy.server";
-import { dispatchSystemAdminWebhook } from "../../integrations/events/system-admin.webhook-dispatch.event";
+import { dispatchSystemAdminWebhook } from "../integrations/sys-webhook-dispatch.event";
 import {
   systemAdminPolicyRuleAuditActionsByMode,
   systemAdminPolicyRuleWebhookEvents,

@@ -3,8 +3,8 @@ import {
   listTenantRoleCatalog,
   removeTenantMembershipRole,
 } from "@afenda/db";
-import { listTenantMembers } from "../../users/data/system-admin.identity.repository.server";
-import type { OrganizationRole } from "@afenda/auth";
+import { listTenantMembers } from "../users/sys-identity.repository.server";
+import type { OrganizationRole } from "@afenda/kernel";
 import {
   systemAdminSeedRoles,
   type SystemAdminRoleRow,

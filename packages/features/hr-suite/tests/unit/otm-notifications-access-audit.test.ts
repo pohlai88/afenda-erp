@@ -1,11 +1,11 @@
 import { describe, expect, it } from "vitest";
 
-import { HRM_OTM_AUDIT } from "../../src/time-attendance/overtime-management/events/hr.time.otm.event";
+import { HRM_OTM_AUDIT } from "../../src/time-attendance/overtime-management/hr.time.otm.event";
 import {
   buildHrTimeOtmModulePath,
   buildHrTimeOtmNotificationCopy,
-} from "../../src/time-attendance/overtime-management/surface/hr.time.otm-notification-templates.shared";
-import { HR_OTM_REPORT_GROUP_BY_OPTIONS } from "../../src/time-attendance/overtime-management/schemas/hr.time.otm.schema";
+} from "../../src/time-attendance/overtime-management/hr.time.otm-notification-templates.shared";
+import { HR_OTM_REPORT_GROUP_BY_OPTIONS } from "../../src/time-attendance/overtime-management/hr.time.otm.schema";
 
 describe("HRM-OTM-026 notification copy", () => {
   it("builds submitted and approved lifecycle titles", () => {

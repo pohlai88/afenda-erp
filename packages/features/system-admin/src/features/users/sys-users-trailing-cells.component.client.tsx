@@ -6,9 +6,9 @@ import {
   isListSurfaceTrailingActionRenderable,
   type GovernedListTrailingCellProps,
 } from "@afenda/governed-surface/client";
-import { SystemAdminOneTimeSecretPanel } from "../../overview/components/system-admin.one-time-secret.component.client";
-import { SystemAdminTrailingActionStack } from "../../overview/components/system-admin.trailing-action-stack.component.client";
-import { systemAdminRoutePaths } from "../../overview/contracts/system-admin.route-paths.contract";
+import { SystemAdminOneTimeSecretPanel } from "../overview/sys-one-time-secret.component.client";
+import { SystemAdminTrailingActionStack } from "../overview/sys-trailing-action-stack.component.client";
+import { systemAdminRoutePaths } from "../overview/sys-route-paths.contract";
 import { Button } from "@afenda/ui/button";
 import Link from "next/link";
 import {
@@ -20,8 +20,8 @@ import {
   UserMinusIcon,
 } from "lucide-react";
 import { useState, useTransition } from "react";
-import { SystemAdminDestructiveConfirmButton } from "../../overview/components/system-admin.destructive-confirm-button.component.client";
-import type { SystemAdminActionResult } from "../../tenant-execution/contracts/system-admin.action-result.contract";
+import { SystemAdminDestructiveConfirmButton } from "../overview/sys-destructive-confirm-button.component.client";
+import type { SystemAdminActionResult } from "../tenant-execution/sys-action-result.contract";
 import {
   cancelSystemAdminInvitation,
   inspectSystemAdminUserAccessAction,
@@ -29,11 +29,11 @@ import {
   removeSystemAdminUser,
   resendSystemAdminInvitation,
   suspendSystemAdminUser,
-} from "../actions/system-admin.users.actions.server";
-import type { SystemAdminUserAccessInspection } from "../contracts";
-import { systemAdminUserTrailingConfirms } from "../surface/system-admin.users-trailing-confirm.client.shared";
-import { systemAdminUsersUiCopy } from "../surface/system-admin.users-ui.copy.shared";
-import { SystemAdminUserAccessInspectionPanel } from "./system-admin.user-access-inspection.component.client";
+} from "./sys-users.actions.server";
+import type { SystemAdminUserAccessInspection } from "./sys-users.contract";
+import { systemAdminUserTrailingConfirms } from "./sys-users-trailing-confirm.client.shared";
+import { systemAdminUsersUiCopy } from "./sys-users-ui.copy.shared";
+import { SystemAdminUserAccessInspectionPanel } from "./sys-user-access-inspection.component.client";
 
 export function SystemAdminUserTrailingCell({ row }: GovernedListTrailingCellProps) {
   const trailingAction = row.trailingAction;

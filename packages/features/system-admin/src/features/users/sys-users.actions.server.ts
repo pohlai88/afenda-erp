@@ -11,18 +11,18 @@ import {
 } from "@afenda/db";
 import { writeExecutionAuditEvent } from "@afenda/kernel/execution";
 import { revalidatePath } from "next/cache";
-import { updateMembershipStatus } from "../../memberships/data/system-admin.memberships.query.server";
+import { updateMembershipStatus } from "../memberships/sys-memberships.query.server";
 import {
   systemAdminActionFailure,
   systemAdminActionSuccess,
   type SystemAdminActionResult,
   zodActionFailure,
-} from "../../tenant-execution/contracts/system-admin.action-result.contract";
+} from "../tenant-execution/sys-action-result.contract";
 import {
   assertSystemAdminUserCanBeInvited,
   createSystemAdminUserInvitation,
-} from "./system-admin.users.query.server";
-import { inspectSystemAdminUserAccess } from "./system-admin.users-access.query.server";
+} from "./sys-users.query.server";
+import { inspectSystemAdminUserAccess } from "./sys-users-access.query.server";
 import { requireSystemAdminUsersManage, requireSystemAdminUsersRead } from "./sys-users.policy.server";
 import {
   systemAdminCancelInvitationInputSchema,
@@ -31,11 +31,7 @@ import {
   systemAdminResendInvitationInputSchema,
   systemAdminUserStatusInputSchema,
 } from "./sys-users.schema";
-import type {
-  SystemAdminInviteUserResult,
-  SystemAdminResendInvitationResult,
-  SystemAdminUserAccessInspection,
-} from "../contracts";
+import type { SystemAdminInviteUserResult, SystemAdminResendInvitationResult, SystemAdminUserAccessInspection } from "./sys-users.contract";
 
 function revalidateSystemAdminUsers() {
   revalidatePath("/system-admin");

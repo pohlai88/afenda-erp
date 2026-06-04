@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { hrPayrollExpenseAuditActions } from "../../src/payroll-compensation/expenses-reimbursement/events/hr.payroll.expense.event";
+import { hrPayrollExpenseAuditActions } from "../../src/payroll-compensation/expenses-reimbursement/hr.payroll.expense.event";
 import { resolveHrExpenseAuditAction } from "@afenda/db";
 
 describe("HRM-EXP-028 expense audit actions", () => {

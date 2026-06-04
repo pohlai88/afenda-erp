@@ -1,15 +1,15 @@
 import type { TenantApprovalSettingRow, TenantPolicySettingRow } from "@afenda/db";
-import { systemAdminControlLinks } from "../../overview/contracts/system-admin.control-links.contract";
-import type { SystemAdminApprovalRuleDetail } from "../contracts/system-admin.approval-rule.contract";
+import { systemAdminControlLinks } from "../overview/sys-control-links.contract";
+import type { SystemAdminApprovalRuleDetail } from "./sys-approval-rule.contract";
 import { mapTenantPolicySettingToRule } from "../policies/system-admin.policy-rules.mapper";
-import { listSystemAdminApprovalRuleActivity } from "./system-admin.approval-rules.activity.server";
-import { mapTenantApprovalSettingToRule } from "./system-admin.approval-rules.mapper";
-import { evaluateApprovalRuleReadiness } from "./system-admin.approval-rules.readiness.server";
-import { resolveExecutionCapabilityForAction } from "../../tenant-execution/policies/system-admin.execution-capability.shared.server";
+import { listSystemAdminApprovalRuleActivity } from "./sys-approval-rules.activity.server";
+import { mapTenantApprovalSettingToRule } from "./sys-approval-rules.mapper";
+import { evaluateApprovalRuleReadiness } from "./sys-approval-rules.readiness.server";
+import { resolveExecutionCapabilityForAction } from "../tenant-execution/sys-execution-capability.shared.server";
 import {
   readConfigurationString,
   readExecutionSettingConfiguration,
-} from "../../tenant-execution/contracts/system-admin.execution-settings.shared";
+} from "../tenant-execution/sys-execution-settings.shared";
 
 function isRelatedPolicyForApprovalRule(input: {
   policy: TenantPolicySettingRow;

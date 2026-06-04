@@ -1,32 +1,32 @@
 import { describe, expect, it } from "vitest";
 import { parseListSurfaceRendererConfiguration } from "@afenda/governed-surface/schemas";
-import { buildMembersListSurface } from "../../src/memberships/surface/system-admin.memberships-list.surface";
+import { buildMembersListSurface } from "../../src/features/memberships/sys-memberships-list.surface";
 import {
   buildApiCredentialsListSurface,
   buildWebhooksListSurface,
-} from "../../src/integrations/surface/system-admin.integrations-list.surface";
-import { buildCapabilitiesListSurface } from "../../src/capabilities/data/system-admin.capabilities-list.surface";
-import { buildModulesListSurface } from "../../src/modules/data/system-admin.modules-list.surface";
-import { buildOrganizationDefaultsListSurface } from "../../src/organization/data/system-admin.organization-list.surface";
-import { buildPermissionsListSurface } from "../../src/permissions/surface/system-admin.permissions-list.surface";
-import { buildRolesListSurface } from "../../src/roles/data/system-admin.roles-list.surface";
-import { buildSystemAdminDiagnosticsIssuesListSurface } from "../../src/diagnostics/surface";
-import { buildSystemAdminAuditViewerListSurface } from "../../src/audit-viewer/surface/system-admin.audit-list.surface";
-import { buildSystemAdminSecuritySettingsListSurface } from "../../src/security/surface/system-admin.security-list.surface";
-import { evaluateSecurityReadiness } from "../../src/security/data/system-admin.security.readiness.server";
-import { buildApprovalsListSurface } from "../../src/approvals/surface/system-admin.approvals-list.surface";
-import { buildPoliciesListSurface } from "../../src/policies/data/system-admin.policy-rules.surface";
+} from "../../src/features/integrations/sys-integrations-list.surface";
+import { buildCapabilitiesListSurface } from "../../src/features/capabilities/sys-capabilities-list.surface";
+import { buildModulesListSurface } from "../../src/features/modules/sys-modules-list.surface";
+import { buildOrganizationDefaultsListSurface } from "../../src/features/organization/sys-organization-list.surface";
+import { buildPermissionsListSurface } from "../../src/features/permissions/sys-permissions-list.surface";
+import { buildRolesListSurface } from "../../src/features/roles/sys-roles-list.surface";
+import { buildSystemAdminDiagnosticsIssuesListSurface } from "../../src/features/diagnostics/sys-diagnostics-list.surface";
+import { buildSystemAdminAuditViewerListSurface } from "../../src/features/audit-viewer/sys-audit-list.surface";
+import { buildSystemAdminSecuritySettingsListSurface } from "../../src/features/security/sys-security-list.surface";
+import { evaluateSecurityReadiness } from "../../src/features/security/sys-security.readiness.server";
+import { buildApprovalsListSurface } from "../../src/features/approvals/sys-approvals-list.surface";
+import { buildPoliciesListSurface } from "../../src/features/policies/system-admin.policy-rules.surface";
 import {
   buildSystemAdminAiSandboxesListSurface,
   buildSystemAdminAiUsageListSurface,
-} from "../../src/lynx/data/system-admin.lynx.surface";
+} from "../../src/features/lynx/sys-lynx.surface";
 import {
   buildSystemAdminImportJobsListSurface,
   buildSystemAdminImportTemplatesListSurface,
-} from "../../src/data-management/surface/system-admin.import-jobs-list.surface";
-import { listSystemAdminImportTemplates } from "../../src/data-management/data/system-admin.import-adapter.registry.server";
-import { buildUsersListSurface } from "../../src/users/surface/system-admin.users-list.surface";
-import { systemAdminUsersGalleryRows } from "../../src/users/surface/system-admin.users-gallery.fixtures.shared";
+} from "../../src/features/data-management/sys-import-jobs-list.surface";
+import { listSystemAdminImportTemplates } from "../../src/features/data-management/sys-import-adapter.registry.server";
+import { buildUsersListSurface } from "../../src/features/users/sys-users-list.surface";
+import { systemAdminUsersGalleryRows } from "../../src/features/users/sys-users-gallery.fixtures.shared";
 
 const defaultEncryptionSettings = {
   mode: "platform" as const,

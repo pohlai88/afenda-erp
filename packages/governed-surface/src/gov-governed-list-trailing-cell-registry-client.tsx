@@ -11,7 +11,7 @@ import {
   type GovernedListTrailingCellContext,
 } from "./gov-list-trailing-cell-context-schema";
 
-import { GovernedMetadataTrailingCell } from "./governed-metadata-trailing-cell.client";
+import { GovernedMetadataTrailingCell } from "./gov-governed-metadata-trailing-cell-client";
 
 export type {
   GovernedListTrailingCellProps,

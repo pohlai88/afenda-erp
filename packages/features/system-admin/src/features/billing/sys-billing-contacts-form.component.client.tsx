@@ -3,9 +3,9 @@
 import { ActionFormErrors } from "@afenda/governed-surface/client";
 import { Button, Field, FieldGroup, FieldLabel, Input } from "@afenda/ui";
 import { useActionState } from "react";
-import type { SystemAdminActionResult } from "../../tenant-execution/contracts/system-admin.action-result.contract";
-import type { SystemAdminBillingContactRow } from "../contracts/system-admin.billing-list.contract";
-import { systemAdminBillingUiCopy } from "../surface/system-admin.billing-ui.copy.shared";
+import type { SystemAdminActionResult } from "../tenant-execution/sys-action-result.contract";
+import type { SystemAdminBillingContactRow } from "./sys-billing-list.contract";
+import { systemAdminBillingUiCopy } from "./sys-billing-ui.copy.shared";
 
 type UpdateBillingContactsAction = (
   state: SystemAdminActionResult | undefined,

@@ -2,30 +2,29 @@ import "server-only";
 
 import type { ReactNode } from "react";
 
-import { GovernedComponentRenderer } from "./index";
-import { logUnexpectedServerError } from "./governed-logging.server";
-import { governedRendererCopy } from "../i18n/governed-renderer-copy.shared";
-import { getGovernedSurfaceTranslations } from "../i18n/governed-surface-copy";
-import { diagnosticsDataAttributes } from "../utils/governed-diagnostics.shared";
+import { GovernedComponentRenderer } from "./gov-render-governed-component";
+import { governedRendererCopy } from "./gov-governed-renderer-copy-shared";
+import { diagnosticsDataAttributes } from "./gov-governed-diagnostics-shared";
 import {
   governedIdentityAttributes,
   governedTestId,
-} from "../utils/governed-identity.shared";
+} from "./gov-governed-identity-shared";
 
-import type { EmptyState } from "./gov-list-surface-schema";
 import {
   parseStatCardConfiguration,
+  type StatCardConfiguration,
   type StatCardConfigurationInput,
 } from "./gov-stat-card-schema";
-import type { GovernedSurfaceSectionCardBody } from "./governed-surface-section-card";
 import {
   renderGovernedPatternSectionShell,
   type GovernedPatternSectionDensity,
   type GovernedPatternSectionLayout,
   type RenderGovernedPatternSectionShellInput,
-} from "./governed-pattern-section-shell.shared";
-
-type GovernedPatternEmptyState = EmptyState & { emptyId?: string };
+} from "./gov-governed-pattern-section-shell-shared";
+import {
+  resolveMetadataSectionBody,
+  type GovernedPatternEmptyState,
+} from "./resolve-metadata-section-body.server";
 
 export type GovernedPatternBStatSectionLayout = GovernedPatternSectionLayout;
 
@@ -56,6 +55,16 @@ export type GovernedPatternBStatSectionProps = {
   contentClassName?: string;
 };
 
+type ParsedStatSectionData =
+  | { kind: "empty" }
+  | {
+      kind: "groups";
+      groups: ReadonlyArray<{
+        group: GovernedPatternBStatGroup;
+        configuration: StatCardConfiguration;
+      }>;
+    };
+
 export function governedStatSectionTestId(surfaceKey: string): string {
   return governedTestId("stat-section", surfaceKey);
 }
@@ -78,7 +87,6 @@ export async function GovernedPatternBStatSection({
   cardClassName,
   contentClassName,
 }: GovernedPatternBStatSectionProps) {
-  const t = await getGovernedSurfaceTranslations("Erp");
   const resolvedSectionKey = sectionKey ?? `${surfaceKey}-stats`;
   const resolvedComponentKey = componentKey ?? resolvedSectionKey;
 
@@ -97,77 +105,70 @@ export async function GovernedPatternBStatSection({
     contentClassName,
   } satisfies Omit<RenderGovernedPatternSectionShellInput, "body">;
 
-  const fallbackInvalidModel: GovernedPatternEmptyState = {
-    variant: "error",
-    title: invalid?.title ?? t("GovernedSurface.invalidConfigTitle"),
-    description:
-      invalid?.description ?? t("GovernedSurface.invalidConfigDescription"),
-    emptyId: invalid?.emptyId ?? "stat-section-invalid-config",
-  };
+  const body = await resolveMetadataSectionBody<ParsedStatSectionData>({
+    loadError,
+    forbiddenPreset: forbidden,
+    parse: () => {
+      if (statGroups.length === 0) {
+        return { success: true, data: { kind: "empty" } };
+      }
 
-  let body: GovernedSurfaceSectionCardBody;
-
-  if (loadError) {
-    body = {
-      state: "invalid",
-      model: {
-        ...loadError,
-        emptyId: loadError.emptyId ?? "stat-section-load-error",
-      },
-    };
-  } else if (forbidden) {
-    body = {
-      state: "forbidden",
-      model: {
-        ...forbidden,
-        emptyId: forbidden.emptyId ?? "stat-section-forbidden",
-      },
-    };
-  } else if (statGroups.length === 0) {
-    body = {
-      state: "empty",
-      model: {
-        variant: "muted",
-        title: governedRendererCopy.empty.statCard.title,
-        description: governedRendererCopy.empty.statCard.description,
-        emptyId: `${resolvedComponentKey}-empty-groups`,
-      },
-    };
-  } else {
-    const parsedGroups = statGroups.map((group) => ({
-      group,
-      parsed: parseStatCardConfiguration(group.configuration),
-    }));
-
-    const firstInvalid = parsedGroups.find((entry) => !entry.parsed.success);
-
-    if (firstInvalid) {
-      logUnexpectedServerError(
-        "GovernedPatternBStatSection invalid stat configuration",
-        firstInvalid.parsed.error,
-        {
-          surfaceKey,
-          sectionKey: resolvedSectionKey,
-          componentKey: resolvedComponentKey,
-          groupKey: firstInvalid.group.groupKey,
-        },
-      );
-
-      body = {
-        state: "invalid",
-        model: fallbackInvalidModel,
-      };
-    } else {
-      const validGroups = parsedGroups.map(({ group, parsed }) => ({
+      const parsedGroups = statGroups.map((group) => ({
         group,
-        configuration: parsed.data,
+        parsed: parseStatCardConfiguration(group.configuration),
       }));
+      const firstInvalid = parsedGroups.find((entry) => !entry.parsed.success);
 
-      body = {
+      if (firstInvalid) {
+        return {
+          success: false,
+          error: firstInvalid.parsed.error,
+        };
+      }
+
+      return {
+        success: true,
+        data: {
+          kind: "groups",
+          groups: parsedGroups.flatMap(({ group, parsed }) =>
+            parsed.success
+              ? [{ group, configuration: parsed.data }]
+              : [],
+          ),
+        },
+      };
+    },
+    parseErrorLabel: "GovernedPatternBStatSection invalid stat configuration",
+    parseContext: {
+      surfaceKey,
+      sectionKey: resolvedSectionKey,
+      componentKey: resolvedComponentKey,
+    },
+    emptyStateIds: {
+      loadError: "stat-section-load-error",
+      invalid: "stat-section-invalid-config",
+      forbidden: "stat-section-forbidden",
+    },
+    invalid,
+    forbidden,
+    buildReadyBody: (data) => {
+      if (data.kind === "empty") {
+        return {
+          state: "empty",
+          model: {
+            variant: "muted",
+            title: governedRendererCopy.empty.statCard.title,
+            description: governedRendererCopy.empty.statCard.description,
+            emptyId: `${resolvedComponentKey}-empty-groups`,
+          },
+        };
+      }
+
+      return {
         state: "ready",
         children: (
           <div className="flex flex-col gap-surface-lg">
-            {validGroups.map(({ group, configuration }) => {
+            {data.groups.map(({ group, configuration }) => {
               const groupComponentKey = `${resolvedComponentKey}-${group.groupKey}`;
 
               return (
@@ -205,8 +206,8 @@ export async function GovernedPatternBStatSection({
           </div>
         ),
       };
-    }
-  }
+    },
+  });
 
   return renderGovernedPatternSectionShell({
     ...shellInput,

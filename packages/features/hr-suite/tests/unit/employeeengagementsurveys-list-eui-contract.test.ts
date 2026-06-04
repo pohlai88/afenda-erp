@@ -1,17 +1,17 @@
 import { parseListSurfaceRendererConfiguration } from "@afenda/governed-surface/schemas";
 import { describe, expect, it } from "vitest";
 
-import { hrTalentEngReadPermission } from "../../src/talent-management/employee-engagement-surveys/contracts/hr.talent.eng.contract";
-import { buildHrTalentEngPageModel } from "../../src/talent-management/employee-engagement-surveys/data/hr.talent.eng.page-model.server";
-import { resetHrTalentEngStore } from "../../src/talent-management/employee-engagement-surveys/data/hr.talent.eng-store.shared";
-import { buildHrTalentEngListSurface } from "../../src/talent-management/employee-engagement-surveys/surface/hr.talent.eng-lists.surface";
+import { hrTalentEngReadPermission } from "../../src/talent-management/employee-engagement-surveys/hr.talent.eng.contract";
+import { buildHrTalentEngPageModel } from "../../src/talent-management/employee-engagement-surveys/hr.talent.eng.page-model.server";
+import { resetHrTalentEngStore } from "../../src/talent-management/employee-engagement-surveys/hr.talent.eng-store.shared";
+import { buildHrTalentEngListSurface } from "../../src/talent-management/employee-engagement-surveys/hr.talent.eng-lists.surface";
 import {
   HR_TALENT_ENG_LIST_SURFACE_KEYS,
   hrTalentEngAuditTrailSurfaceKey,
   hrTalentEngOpenTextCommentsSurfaceKey,
   hrTalentEngSegmentScoresSurfaceKey,
   hrTalentEngSurveysSurfaceKey,
-} from "../../src/talent-management/employee-engagement-surveys/surface/hr.talent.eng-surface-metadata.shared";
+} from "../../src/talent-management/employee-engagement-surveys/hr.talent.eng-surface-metadata.shared";
 
 describe("Employee Engagement Surveys list EUI contract", () => {
   it("builds a governed Pattern C server-window list configuration", () => {

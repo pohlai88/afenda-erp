@@ -11,7 +11,7 @@ import {
   compareCareerPathSkillRequirements,
   summarizeCareerPathReadiness,
 } from "./hr.talent.csf-career-path.shared";
-import { emitHrCsfAuditTrailEvent } from "./hr.talent.csf-audit.server";
+import { emitHrCsfAuditTrailEvent } from "./hrs-hr-talent-csf-audit-server";
 import {
   listHrCsfEmployeeProficienciesFromStore,
   listHrCsfGapsFromStore,

@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   parseHrTrainingSearchParams,
   toHrTrainingPageModelInput,
-} from "../../src/talent-management/training-development/data/hr.talent.training-search-params.parse.shared";
+} from "../../src/talent-management/training-development/hr.talent.training-search-params.parse.shared";
 
 describe("training development search params", () => {
   it("parses list searches and report grouping", () => {

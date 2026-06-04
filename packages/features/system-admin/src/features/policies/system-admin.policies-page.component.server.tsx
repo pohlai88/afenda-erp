@@ -2,17 +2,13 @@ import { GovernedPatternCListSection } from "@afenda/governed-surface/server";
 import { hasExecutionPermission } from "@afenda/kernel/execution";
 import { SectionPanel } from "@afenda/ui";
 
-import { systemAdminControlLinks } from "../../overview/contracts/system-admin.control-links.contract";
-import { updateSystemAdminPolicyRuleAction } from "../actions";
-import {
-  buildPoliciesListSurface,
-  buildSystemAdminPoliciesPageModel,
-} from "../data";
+import { systemAdminControlLinks } from "../overview/sys-control-links.contract";
+import { updateSystemAdminPolicyRuleAction } from "./system-admin.policy-rules.actions.server";
+import { buildPoliciesListSurface } from "./system-admin.policy-rules.surface";
+import { buildSystemAdminPoliciesPageModel } from "./system-admin.policy-rules.query.server";
 import { requireSystemAdminPoliciesRead } from "./system-admin.policy-rules.policy.server";
-import {
-  systemAdminPoliciesSurfaceKey,
-  systemAdminPoliciesUiCopy,
-} from "../surface";
+import { systemAdminPoliciesSurfaceKey } from "./system-admin.policy-rules.surface";
+import { systemAdminPoliciesUiCopy } from "./system-admin.policies-ui.copy.shared";
 import { SystemAdminPoliciesAccessDenied } from "./system-admin.policies-access.component.server";
 import { SystemAdminPolicyDetailPanel } from "./system-admin.policy-detail.component.server";
 import { SystemAdminPolicyRuleEditor } from "./system-admin.policy-rule-editor.component.client";

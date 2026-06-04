@@ -50,12 +50,12 @@ describe("commitKnowledgeDocument", () => {
   });
 
   it("is importable without throwing", async () => {
-    const mod = await import("../../src/data/knowledge.pipeline-commit.server");
+    const mod = await import("../../src/kno-pipeline-commit.server");
     expect(typeof mod.commitKnowledgeDocument).toBe("function");
   }, 15_000);
 
   it("exports CommitDocumentResult type shape", async () => {
-    const mod = await import("../../src/data/knowledge.pipeline-commit.server");
+    const mod = await import("../../src/kno-pipeline-commit.server");
     expect(mod.commitKnowledgeDocument).toBeDefined();
   });
 });

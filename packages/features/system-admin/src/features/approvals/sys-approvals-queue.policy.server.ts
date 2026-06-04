@@ -9,11 +9,11 @@ import {
   hasSystemAdminAnyCapability,
   toSystemAdminExecutionGuard,
   type SystemAdminExecutionGuard,
-} from "../../overview/policies/system-admin.capability.policy.server";
+} from "../overview/sys-capability.policy.server";
 import {
   SYSTEM_ADMIN_APPROVALS_DECIDE_CAPABILITY,
   SYSTEM_ADMIN_APPROVALS_VIEW_CAPABILITY,
-} from "../schemas/system-admin.approvals-queue-capability.shared";
+} from "./sys-approvals-queue-capability.shared";
 
 export function hasSystemAdminApprovalsRulesRead(context: ExecutionContext) {
   return hasSystemAdminAnyCapability(context, [

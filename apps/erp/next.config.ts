@@ -1,5 +1,5 @@
 import type { NextConfig } from "next";
-import { erpNeonAuthLegacyPathRedirects } from "@afenda/auth/neon-auth";
+import { erpNeonAuthLegacyPathRedirects } from "@afenda/auth/neon-auth/paths";
 import { createAfendaNextConfig } from "@afenda/config/next";
 
 const nextConfig: NextConfig = createAfendaNextConfig({

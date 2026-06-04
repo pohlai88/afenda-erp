@@ -1,7 +1,7 @@
 import type { ModuleId } from "@afenda/config/module-ids";
 import type { TenantModuleSettingRow } from "@afenda/db";
 import { getErpModuleById } from "@afenda/kernel";
-import { resolveSystemAdminModuleAvailability } from "./system-admin.modules-readiness.shared";
+import { resolveSystemAdminModuleAvailability } from "./sys-modules-readiness.shared";
 
 export const systemAdminModuleDependencies = {
   purchasing: ["inventory"],

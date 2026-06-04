@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   GEO_REQUIREMENT_CODES,
   GEO_SPEC_MAP,
-} from "../../src/time-attendance/geolocation-remote-checkin/data/geolocation-spec-map.shared";
+} from "../../src/time-attendance/geolocation-remote-checkin/hrs-geolocation-spec-map-shared";
 
 describe("HRM-GEO spec map", () => {
   it("maps GEO-001..032 to stable area slugs", () => {

@@ -1,19 +1,19 @@
 import type { EmptyState } from "@afenda/governed-surface/schemas";
 
-import { loadHrTimeSftAvailabilityWindow } from "./hr.time.sft-availability.server";
-import { listHrSftAttendanceReconcile } from "./hr.time.sft-attendance-reconcile.server";
-import { listHrSftAuditTrailWindow } from "./hr.time.sft-audit.server";
-import { loadHrTimeSftCoverageCompareWindow } from "./hr.time.sft-coverage.server";
-import { listHrSftPayrollReferencesForPeriod } from "./hr.time.sft-payroll-ref.server";
-import { listHrSftScheduleNotifications } from "./hr.time.sft-notification.server";
-import { listHrSftRosterPublications } from "./hr.time.sft-publication.server";
-import { listHrTimeSftRecurrenceRules } from "./hr.time.sft-recurrence.server";
-import { listHrSftReportDefinitions } from "./hr.time.sft-report.server";
-import { listHrTimeSftShiftRoster } from "./hr.time.sft-roster.server";
+import { loadHrTimeSftAvailabilityWindow } from "./hrs-hr-time-sft-availability-server";
+import { listHrSftAttendanceReconcile } from "./hrs-hr-time-sft-attendance-reconcile-server";
+import { listHrSftAuditTrailWindow } from "./hrs-hr-time-sft-audit-server";
+import { loadHrTimeSftCoverageCompareWindow } from "./hrs-hr-time-sft-coverage-server";
+import { listHrSftPayrollReferencesForPeriod } from "./hrs-hr-time-sft-payroll-ref-server";
+import { listHrSftScheduleNotifications } from "./hrs-hr-time-sft-notification-server";
+import { listHrSftRosterPublications } from "./hrs-hr-time-sft-publication-server";
+import { listHrTimeSftRecurrenceRules } from "./hrs-hr-time-sft-recurrence-server";
+import { listHrSftReportDefinitions } from "./hrs-hr-time-sft-report-server";
+import { listHrTimeSftShiftRoster } from "./hrs-hr-time-sft-roster-server";
 import {
   loadHrTimeSftMyScheduleChangesWindow,
   loadHrTimeSftScheduleChangePendingWindow,
-} from "./hr.time.sft-schedule-change.server";
+} from "./hrs-hr-time-sft-schedule-change-server";
 import type {
   HrSftPageModelInput,
   HrSftSelfServicePageModelInput,
@@ -24,8 +24,8 @@ import {
 import {
   loadHrTimeSftMySwapsWindow,
   loadHrTimeSftSwapPendingWindow,
-} from "./hr.time.sft-swap.server";
-import { listHrTimeSftShiftTemplates } from "./hr.time.sft-template.server";
+} from "./hrs-hr-time-sft-swap-server";
+import { listHrTimeSftShiftTemplates } from "./hrs-hr-time-sft-template-server";
 import { buildHrTimeSftAvailabilityListSurface } from "./hr.time.sft-availability-list.surface";
 import { buildHrSftAttendanceReconcileListSurface } from "./hr.time.sft-attendance-reconcile-list.surface";
 import { buildHrSftAuditTrailListSurface } from "./hr.time.sft-audit-trail-list.surface";

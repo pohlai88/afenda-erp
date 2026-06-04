@@ -5,7 +5,7 @@ import { buildPaginatedWindow, clampPageSize } from "./list-window.shared";
 import {
   hrTimeClockDevices,
   hrTimeClockSyncBatches,
-} from "./hr-time-clock";
+} from "./dbx-hr-time-clock";
 
 export type HrTimeClockSyncBatchRow = {
   id: string;
@@ -154,3 +154,4 @@ export async function listHrTimeClockFailedSyncAlerts(input: {
     return rows;
   });
 }
+

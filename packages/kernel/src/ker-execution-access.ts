@@ -1,6 +1,6 @@
-import type { AppCapability } from "@afenda/auth";
-import type { ExecutionContext } from "../context/execution-context";
-import { ExecutionAccessDeniedError } from "../errors/execution-errors";
+import type { AppCapability } from "./ker-app-capabilities";
+import type { ExecutionContext } from "./ker-execution-context";
+import { ExecutionAccessDeniedError } from "./ker-execution-errors";
 
 export type ExecutionAccessVerdict = {
   allowed: boolean;

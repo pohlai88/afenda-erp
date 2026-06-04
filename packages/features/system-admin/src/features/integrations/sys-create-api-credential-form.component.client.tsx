@@ -13,10 +13,10 @@ import {
 import { KeyRoundIcon } from "lucide-react";
 import { useActionState, useMemo, useState } from "react";
 
-import type { SystemAdminActionResult } from "../../tenant-execution/contracts/system-admin.action-result.contract";
-import type { CreateApiCredentialActionData } from "../contracts/system-admin.integrations-action-dtos.contract";
-import { systemAdminApiScopes } from "../contracts/system-admin.integrations-catalog.contract";
-import { SystemAdminOneTimeSecretPanel } from "../../overview/components/system-admin.one-time-secret.component.client";
+import type { SystemAdminActionResult } from "../tenant-execution/sys-action-result.contract";
+import type { CreateApiCredentialActionData } from "./sys-integrations-action-dtos.contract";
+import { systemAdminApiScopes } from "./sys-integrations-catalog.contract";
+import { SystemAdminOneTimeSecretPanel } from "../overview/sys-one-time-secret.component.client";
 
 type CreateApiCredentialFormAction = (
   state: SystemAdminActionResult<CreateApiCredentialActionData> | undefined,

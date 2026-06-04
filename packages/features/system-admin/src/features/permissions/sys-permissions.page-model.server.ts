@@ -1,16 +1,12 @@
 import { writeExecutionAuditEvent } from "@afenda/kernel/execution";
-import { filterSystemAdminListRows } from "../../overview/contracts/system-admin.list-filter.shared";
+import { filterSystemAdminListRows } from "../overview/sys-list-filter.shared";
 import {
   resolveSystemAdminListSearch,
   resolveSystemAdminListStatusFilter,
-} from "../../overview/contracts/system-admin.list-search.shared";
-import { listRoleOverridesForOrganization } from "../../users/data/system-admin.identity.repository.server";
-import type {
-  SystemAdminPermissionCatalogRow,
-  SystemAdminPermissionListRow,
-  SystemAdminRoleOverrideListRow,
-} from "../contracts";
-import { buildSystemAdminPermissionCatalogRows } from "./system-admin.permissions.query.server";
+} from "../overview/sys-list-search.shared";
+import { listRoleOverridesForOrganization } from "../users/sys-identity.repository.server";
+import type { SystemAdminPermissionCatalogRow, SystemAdminPermissionListRow, SystemAdminRoleOverrideListRow } from "./sys-permissions.contract";
+import { buildSystemAdminPermissionCatalogRows } from "./sys-permissions.query.server";
 
 function mapPermissionCatalogRow(
   permission: SystemAdminPermissionCatalogRow,

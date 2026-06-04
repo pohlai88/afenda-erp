@@ -1,4 +1,4 @@
-import { formatApprovalEscalationSummary } from "./system-admin.approval-rules.shared";
+import { formatApprovalEscalationSummary } from "./sys-approval-rules.shared";
 import type {
   ApprovalEscalationBehavior,
   SystemAdminApprovalMode,
@@ -6,9 +6,9 @@ import type {
   SystemAdminApprovalRuleListRow,
   SystemAdminApprovalRuleStatus,
   ApprovalReadinessVerdict,
-} from "../contracts/system-admin.approval-rule.contract";
-import type { SystemAdminApprovalQueueListRow } from "../contracts/system-admin.approvals-queue.contract";
-import { systemAdminApprovalsUiCopy } from "./system-admin.approvals-ui.copy.shared";
+} from "./sys-approval-rule.contract";
+import type { SystemAdminApprovalQueueListRow } from "./sys-approvals-queue.contract";
+import { systemAdminApprovalsUiCopy } from "./sys-approvals-ui.copy.shared";
 
 /** Stable approval keys referenced by gallery tests and the metadata renderer page. */
 export const systemAdminApprovalsGalleryScenarioKeys = {

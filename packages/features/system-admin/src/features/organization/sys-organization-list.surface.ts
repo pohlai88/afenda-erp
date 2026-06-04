@@ -1,7 +1,7 @@
 import type { ListSurfaceRendererConfigurationResolvedInput } from "@afenda/governed-surface";
 import type { TenantSettingsSnapshot } from "@afenda/db";
-import { buildControlListSurface } from "../../overview/surfaces/system-admin.control-list.shared";
-import { systemAdminOrganizationUiCopy } from "../surface/system-admin.organization-ui.copy.shared";
+import { buildControlListSurface } from "../overview/sys-control-list.shared";
+import { systemAdminOrganizationUiCopy } from "./sys-organization-ui.copy.shared";
 
 export const systemAdminOrganizationSurfaceKey =
   "system-admin.organization.list";

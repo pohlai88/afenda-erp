@@ -1,12 +1,12 @@
 import { hasExecutionPermission } from "@afenda/kernel/execution";
 
-import { setRoleOverrideAction } from "../actions";
-import { buildSystemAdminPermissionsPageModel } from "../data";
-import { requireSystemAdminPermissionsRead } from "../policies";
+import { setRoleOverrideAction } from "./sys-permission-bundle.actions.server";
+import { buildSystemAdminPermissionsPageModel } from "./sys-permissions.page-model.server";
+import { requireSystemAdminPermissionsRead } from "./sys-permissions.policy.server";
 import {
   SystemAdminPermissionsAccessDenied,
   SystemAdminPermissionsSection,
-} from "./system-admin.permissions-section.component.server";
+} from "./sys-permissions-section.component.server";
 
 type SystemAdminPermissionsPageProps = {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;

@@ -27,14 +27,14 @@ import {
   hrmEmployeeTargetRoles,
   type HrmCareerCompetencyRequirement,
   type HrmCareerSkillRequirement,
-} from "./hr-career-pathing";
+} from "./dbx-hr-career-pathing";
 import {
   hrCsfCompetencies,
   hrCsfEmployeeCompetencyProfiles,
   hrCsfEmployeeSkillProfiles,
   hrCsfProficiencyLevels,
   hrCsfSkills,
-} from "./hr-competency-skills";
+} from "./dbx-hr-competency-skills";
 
 export type HrCareerSkillGapRow = {
   skillCode: string;
@@ -2073,3 +2073,4 @@ export async function listHrmCareerPathingDueForNotification(
 
   return items.slice(0, limit);
 }
+

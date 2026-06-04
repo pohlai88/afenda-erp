@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   erpAuthRouteToNeonUiAuthView,
   neonAuthUiAuthViews,
-} from "../../pages/neon-auth-ui.routes.shared";
+} from "../src/aut-neon-auth-ui-routes-shared";
 
 describe("neon-auth-ui routes", () => {
   it("maps ERP auth ingress routes to Neon Auth UI view slugs", () => {

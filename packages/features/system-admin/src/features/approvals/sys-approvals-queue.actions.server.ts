@@ -13,9 +13,9 @@ import {
 import { writeExecutionAuditEvent } from "@afenda/kernel/execution";
 import { revalidatePath } from "next/cache";
 
-import { systemAdminApprovalQueueAuditActions } from "../events/system-admin.approvals-queue.event";
-import { requireSystemAdminApprovalsQueueDecide } from "../policies/system-admin.approvals-queue.policy.server";
-import { systemAdminApprovalWorkItemDecisionInputSchema } from "../schemas/system-admin.approvals-queue-decision.schema";
+import { systemAdminApprovalQueueAuditActions } from "./sys-approvals-queue.event";
+import { requireSystemAdminApprovalsQueueDecide } from "./sys-approvals-queue.policy.server";
+import { systemAdminApprovalWorkItemDecisionInputSchema } from "./sys-approvals-queue-decision.schema";
 
 function mapApprovalCommandError(
   error: ApprovalWorkItemCommandError,

@@ -5,7 +5,7 @@ import {
   buildHrSuiteListSearchToolbar,
   buildHrSuiteOperationalListSurface,
   resolveHrSuiteListTrailingAction,
-} from "../../employee-management/compliance-regulatory-tracking/metadata";
+} from "../../hr-suite-integration/metadata";
 import { hrPayrollExpenseReadPermission } from "./hr.payroll.expense.contract";
 import type { HrExpenseClaimStatus } from "./hr.payroll.expense-constants.shared";
 import { formatExpenseEnumLabel } from "./hr.payroll.expense-form.shared";

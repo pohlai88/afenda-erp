@@ -1,7 +1,7 @@
 import type { ModuleId } from "@afenda/kernel";
 
-import { recordTenantDocumentEvidenceEvent } from "../api/system-admin.object-storage-governance.server";
-import { deleteTenantDocumentCommand } from "./delete-tenant-document.command.server";
+import { recordTenantDocumentEvidenceEvent } from "./sys-object-storage-governance.server";
+import { deleteTenantDocumentCommand } from "./sys-delete-tenant-document-command-server";
 
 /** Records retention expiry evidence, then purges bytes and deletes the registry row. */
 export async function expireTenantDocumentCommand(input: {

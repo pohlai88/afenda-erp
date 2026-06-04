@@ -9,20 +9,14 @@ import {
   defineExecutionCapability,
   resetExecutionCapabilityRegistryForTest,
 } from "@afenda/kernel/execution-capabilities";
-import { evaluateCapabilityCoverage } from "../../src/capabilities/data/system-admin.capabilities.coverage.server";
-import { collectSystemAdminDiagnosticIssues } from "../../src/diagnostics/data/system-admin.diagnostics.checks.server";
-import { buildDiagnosticsModuleCoverageRows } from "../../src/diagnostics/data/system-admin.diagnostics.module-coverage.server";
-import { isConfigurationAuditAction } from "../../src/diagnostics/data/system-admin.diagnostics.recent-changes.server";
-import {
-  buildSystemAdminDiagnosticsIssuesListSurface,
-  buildSystemAdminDiagnosticsModuleCoverageListSurface,
-  buildSystemAdminDiagnosticsRecentChangesListSurface,
-} from "../../src/diagnostics/surface";
-import {
-  collectIntegrationDiagnosticIssues,
-  summarizeDiagnosticIssues,
-} from "../../src/diagnostics/data";
-import type { OrganizationSecuritySettings } from "../../src/security/contracts/system-admin.security-settings.contract";
+import { evaluateCapabilityCoverage } from "../../src/features/capabilities/sys-capabilities.coverage.server";
+import { collectSystemAdminDiagnosticIssues } from "../../src/features/diagnostics/sys-diagnostics.checks.server";
+import { buildDiagnosticsModuleCoverageRows } from "../../src/features/diagnostics/sys-diagnostics.module-coverage.server";
+import { isConfigurationAuditAction } from "../../src/features/diagnostics/sys-diagnostics.recent-changes.server";
+import { buildSystemAdminDiagnosticsIssuesListSurface, buildSystemAdminDiagnosticsModuleCoverageListSurface, buildSystemAdminDiagnosticsRecentChangesListSurface } from "../../src/features/diagnostics/sys-diagnostics-list.surface";
+import { collectIntegrationDiagnosticIssues } from "../../src/features/diagnostics/sys-diagnostics.checks.server";
+import { summarizeDiagnosticIssues } from "../../src/features/diagnostics/sys-diagnostics.verdict.server";
+import type { OrganizationSecuritySettings } from "../../src/features/security/sys-security-settings.contract";
 import { parseListSurfaceRendererConfiguration } from "@afenda/governed-surface/schemas";
 
 const organizationId = "org_phase5";
@@ -251,7 +245,7 @@ describe("system admin phase 5 diagnostic checks", () => {
 
   it("builds audit coverage diagnostics deep link", async () => {
     const { systemAdminAuditCoverageDiagnosticsHref } = await import(
-      "../../src/diagnostics/contracts/system-admin.diagnostics-links.shared"
+      "../../src/features/diagnostics/sys-diagnostics-links.shared"
     );
 
     expect(systemAdminAuditCoverageDiagnosticsHref).toBe(
@@ -261,7 +255,7 @@ describe("system admin phase 5 diagnostic checks", () => {
 
   it("parses diagnostics category search params", async () => {
     const { parseSystemAdminDiagnosticsSearchParams } = await import(
-      "../../src/diagnostics/data/system-admin.diagnostics-search-params.parse.shared"
+      "../../src/features/diagnostics/sys-diagnostics-search-params.parse.shared"
     );
 
     expect(

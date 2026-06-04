@@ -58,7 +58,7 @@ vi.mock("ai", () => ({
 const {
   retrieveKnowledgeChunks,
   retrieveKnowledgeChunksWithDiagnostics,
-} = await import("../../src/data/knowledge.retrieve-hybrid.server");
+} = await import("../../src/kno-retrieve-hybrid.server");
 
 const semanticRow = {
   id: "chunk_1",

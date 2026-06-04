@@ -1,4 +1,4 @@
-import type { AppCapability } from "@afenda/auth";
+import type { AppCapability } from "@afenda/kernel";
 
 export const HR_WORKFORCE_ESS_READ_CAPABILITY =
   "hr.ess.read" satisfies AppCapability;

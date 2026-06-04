@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import type { ModuleId } from "@afenda/config/module-ids";
-import { createSolutionProviderTools } from "../../src/tools/lynx.solution-provider-tools.tool.server";
+import { createSolutionProviderTools } from "../../src/lyn-solution-provider-tools.tool.server";
 
 function createWorkspace() {
   return {

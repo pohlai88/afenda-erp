@@ -6,9 +6,9 @@ import {
 import {
   buildSystemAdminListToolbar,
   buildSystemAdminStaticPagination,
-} from "../../overview/surfaces/system-admin.list-surface.shared";
-import type { CronHealthSurfaceRow } from "../contracts/system-admin.cron-health.contract";
-import { systemAdminReliabilityUiCopy } from "./system-admin.reliability-ui.copy.shared";
+} from "../overview/sys-list-surface.shared";
+import type { CronHealthSurfaceRow } from "./sys-cron-health.contract";
+import { systemAdminReliabilityUiCopy } from "./sys-reliability-ui.copy.shared";
 
 export const systemAdminCronSurfaceKey = "system-admin.cron-health.list";
 

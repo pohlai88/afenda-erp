@@ -8,8 +8,8 @@ import {
 import {
   buildSystemAdminListToolbar,
   buildSystemAdminStaticPagination,
-} from "../../overview/surfaces/system-admin.list-surface.shared";
-import { systemAdminLynxUiCopy } from "../surface/system-admin.lynx-ui.copy.shared";
+} from "../overview/sys-list-surface.shared";
+import { systemAdminLynxUiCopy } from "./sys-lynx-ui.copy.shared";
 
 const MACHINE_LAYER_APPROVE_REQUIRED_REASON =
   "Requires system-admin.lynx.approve.";

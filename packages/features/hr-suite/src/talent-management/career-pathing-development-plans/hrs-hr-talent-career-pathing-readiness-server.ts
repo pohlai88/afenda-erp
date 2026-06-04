@@ -11,7 +11,7 @@ import {
 import { writeExecutionAuditEvent } from "@afenda/kernel/execution";
 
 import { hrTalentCareerPathingAuditActions } from "./hr.talent.career-pathing.event";
-import { emitHrCareerPathingAuditEvent } from "./hr.talent.career-pathing-audit.server";
+import { emitHrCareerPathingAuditEvent } from "./hrs-hr-talent-career-pathing-audit-server";
 import {
   computeCareerPathReadiness,
   type HrCareerReadinessComputeResult,

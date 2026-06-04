@@ -9,7 +9,8 @@ import {
   type HrBonusReportKind,
 } from "./hr-bonus-reports.shared";
 import type { HrBonusReportCsvResult } from "./hr-bonus.types";
-import { hrBonusCycles, hrBonusPayouts, hrBonusPlans } from "./hr-bonus";
+import { hrBonusPayouts } from "./dbx-hr-bonus";
+import { hrBonusCycles, hrBonusPlans } from "./dbx-hr-bonus-incentive";
 import { hrDepartments, hrEmployees } from "./hr";
 
 function escapeCsvCell(value: string) {
@@ -270,3 +271,4 @@ export async function buildHrBonusReportCsv(input: {
     }
   });
 }
+

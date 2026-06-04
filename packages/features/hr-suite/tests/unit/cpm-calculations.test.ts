@@ -11,7 +11,7 @@ import {
   evaluateCompensationEligibility,
   requiresJustification,
   validateBandPosition,
-} from "../../src/payroll-compensation/compensation-planning-modeling/data/hr.payroll.cpm-calculations.shared";
+} from "../../src/payroll-compensation/compensation-planning-modeling/hr.payroll.cpm-calculations.shared";
 
 const band = { minimum: 80_000, midpoint: 100_000, maximum: 120_000 };
 

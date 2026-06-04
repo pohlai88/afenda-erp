@@ -4,24 +4,24 @@ import {
   mapSsoConnectionToListRow,
   mapWebhookDeliveryToListRow,
   mapWebhookToListRow,
-} from "./system-admin.integrations.mapper.server";
-import { evaluateIntegrationsReadiness } from "./system-admin.integrations.readiness.server";
-import { listSystemAdminIntegrationsRecentChanges } from "./system-admin.integrations.recent-changes.server";
+} from "./sys-integrations.mapper.server";
+import { evaluateIntegrationsReadiness } from "./sys-integrations.readiness.server";
+import { listSystemAdminIntegrationsRecentChanges } from "./sys-integrations.recent-changes.server";
 import {
   listApiCredentials,
   listSsoConnections,
   listWebhookDeliveries,
   listWebhooks,
-} from "./system-admin.integrations.repository.server";
-import type { IntegrationReadinessReport } from "../contracts/system-admin.integrations-readiness.contract";
+} from "./sys-integrations.repository.server";
+import type { IntegrationReadinessReport } from "./sys-integrations-readiness.contract";
 import type {
   SystemAdminApiCredentialListRow,
   SystemAdminIntegrationsRecentChangeRow,
   SystemAdminSsoConnectionListRow,
   SystemAdminWebhookDeliveryListRow,
   SystemAdminWebhookListRow,
-} from "../contracts/system-admin.integrations-list.contract";
-import { systemAdminIntegrationsAuditActions } from "../events/system-admin.integrations.event";
+} from "./sys-integrations-list.contract";
+import { systemAdminIntegrationsAuditActions } from "./sys-integrations.event";
 
 export type SystemAdminIntegrationsPageModel = {
   credentials: readonly SystemAdminApiCredentialListRow[];

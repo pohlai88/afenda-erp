@@ -3,7 +3,7 @@ import {
   combineLynxQualityGates,
   summarizeLynxQualityGate,
   validateLynxClaims,
-} from "../../src/contracts/lynx.evidence-trust.contract";
+} from "../../src/lyn-evidence-trust.contract";
 
 describe("Lynx evidence trust contract", () => {
   it("validates claims from canonical markdown truth responses", () => {

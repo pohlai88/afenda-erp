@@ -8,7 +8,7 @@ import { revalidatePath } from "next/cache";
 
 import { hrFwaRoutePaths } from "./hr.time.fwa-route.contract";
 import { toHrTimeFwaActionFailure } from "./hr.time.fwa-action-result.shared";
-import type { HrTimeFwaAuditAction } from "../events/hr.time.fwa-workflow.events";
+import type { HrTimeFwaAuditAction } from "./hrs-hr-time-fwa-workflow-events";
 
 const FWA_REVALIDATE_PATH = hrFwaRoutePaths.hub;
 

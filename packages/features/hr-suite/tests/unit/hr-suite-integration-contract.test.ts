@@ -31,7 +31,7 @@ import {
   toHrSuiteActionFailure,
   toHrSuiteNativeFormAction,
   toHrSuiteResultFormAction,
-} from "../../src/hr-suite-integration/actions/hr-suite-action-result.shared";
+} from "../../src/hr-suite-integration/hrs-hr-suite-action-result-shared";
 
 const testDir = path.dirname(fileURLToPath(import.meta.url));
 const packageRoot = path.resolve(testDir, "../..");

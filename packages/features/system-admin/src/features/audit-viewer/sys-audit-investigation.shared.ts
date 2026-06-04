@@ -1,5 +1,5 @@
-import type { SystemAdminAuditSearchParams } from "../schemas/system-admin.audit-filter.schema";
-import { buildSystemAdminAuditPageHref } from "./system-admin.audit-pagination.shared";
+import type { SystemAdminAuditSearchParams } from "./sys-audit-filter.schema";
+import { buildSystemAdminAuditPageHref } from "./sys-audit-pagination.shared";
 
 export type SystemAdminAuditInvestigationKind =
   | "actor"

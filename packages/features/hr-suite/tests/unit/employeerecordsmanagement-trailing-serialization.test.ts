@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
-import { buildHrRecordsDirectoryListSurface } from "../../src/employee-management/employee-records-management/surface/hr.workforce.records-directory-list.surface";
-import { buildHrRecordsSeparatedListSurface } from "../../src/employee-management/employee-records-management/surface/hr.workforce.records-separated-list.surface";
+import { buildHrRecordsDirectoryListSurface } from "../../src/employee-management/employee-records-management/hr.workforce.records-directory-list.surface";
+import { buildHrRecordsSeparatedListSurface } from "../../src/employee-management/employee-records-management/hr.workforce.records-separated-list.surface";
 
 describe("records Pattern C trailing cell serialization", () => {
   it("serializes directory and separated prefill cells for trailing mutations", () => {

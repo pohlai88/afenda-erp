@@ -4,7 +4,7 @@ import {
   getAggregateLynxReadinessStatus,
   getWorstLynxReadinessStatus,
   lynxReadinessSnapshotSchema,
-} from "../../src/contracts/lynx.readiness.contract";
+} from "../../src/lyn-readiness.contract";
 
 describe("Lynx readiness contract", () => {
   it("marks missing evals unavailable", () => {

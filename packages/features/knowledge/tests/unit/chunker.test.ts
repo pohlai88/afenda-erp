@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { chunkKnowledgeDocument } from "../../src/data/knowledge.chunker.server";
+import { chunkKnowledgeDocument } from "../../src/kno-chunker.server";
 
 describe("chunkKnowledgeDocument", () => {
   it("returns single chunk for empty body", () => {

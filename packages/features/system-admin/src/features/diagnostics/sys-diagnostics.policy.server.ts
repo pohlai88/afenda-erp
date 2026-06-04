@@ -1,3 +1,3 @@
-import { requireSystemAdminDiagnosticsRead } from "../../overview/policies/system-admin.capability.policy.server";
+import { requireSystemAdminDiagnosticsRead } from "../overview/sys-capability.policy.server";
 
 export { requireSystemAdminDiagnosticsRead };

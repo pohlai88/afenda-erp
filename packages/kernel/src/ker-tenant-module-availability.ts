@@ -1,4 +1,4 @@
-import type { ErpModuleDefinition } from "../shared/module-types";
+import type { ErpModuleDefinition } from "./ker-module-types";
 
 export type TenantModuleAvailabilitySetting = {
   moduleKey: string;

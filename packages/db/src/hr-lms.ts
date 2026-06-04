@@ -14,7 +14,7 @@ import {
   hrLmsProgress,
   hrLmsReminders,
   hrLmsAuditEvents,
-} from "./hr-lms";
+} from "./dbx-hr-lms";
 
 export {
   HrLmsCommandError,
@@ -491,3 +491,4 @@ export async function listHrLmsRemindersForEmployee(input: {
       .orderBy(desc(hrLmsReminders.createdAt)),
   );
 }
+

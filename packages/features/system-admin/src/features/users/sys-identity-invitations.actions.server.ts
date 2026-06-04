@@ -10,16 +10,13 @@ import {
   systemAdminActionSuccess,
   type SystemAdminActionResult,
   zodActionFailure,
-} from "../../tenant-execution/contracts/system-admin.action-result.contract";
-import type { InviteMemberActionData } from "../../memberships/contracts/system-admin.memberships-action-dtos.contract";
-import { requireSystemAdminIdentityWrite } from "../../overview/policies/system-admin.capability.policy.server";
-import { dispatchSystemAdminWebhook } from "../../integrations/events/system-admin.webhook-dispatch.event";
-import { systemAdminIdentityInvitationWebhookEvents } from "../events/system-admin.identity-invitations.event";
-import { systemAdminInviteMemberActionSchema } from "../../memberships/schemas/system-admin.memberships-action.schema";
-import {
-  assertSystemAdminUserCanBeInvited,
-  createSystemAdminUserInvitation,
-} from "../data";
+} from "../tenant-execution/sys-action-result.contract";
+import type { InviteMemberActionData } from "../memberships/sys-memberships-action-dtos.contract";
+import { requireSystemAdminIdentityWrite } from "../overview/sys-capability.policy.server";
+import { dispatchSystemAdminWebhook } from "../integrations/sys-webhook-dispatch.event";
+import { systemAdminIdentityInvitationWebhookEvents } from "./sys-identity-invitations.event";
+import { systemAdminInviteMemberActionSchema } from "../memberships/sys-memberships-action.schema";
+import { assertSystemAdminUserCanBeInvited, createSystemAdminUserInvitation } from "./sys-users.query.server";
 
 function revalidateSystemAdminIdentitySurfaces() {
   revalidatePath("/system-admin");

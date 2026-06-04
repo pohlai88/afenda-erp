@@ -1,4 +1,4 @@
-import type { SystemAdminAuditExportFormat } from "../schemas/system-admin.audit-export.schema";
+import type { SystemAdminAuditExportFormat } from "./sys-audit-export.schema";
 
 export type SystemAdminAuditExportPayload = {
   format: SystemAdminAuditExportFormat;

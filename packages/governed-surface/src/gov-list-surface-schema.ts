@@ -2,7 +2,7 @@ import { z } from "zod";
 
 import type { SchemaStability } from "./gov-_stability-shared";
 
-import { pageHeaderSchema } from "./page-header.schema";
+import { pageHeaderSchema } from "./gov-page-header-schema";
 
 export const SCHEMA_STABILITY: SchemaStability = "beta";
 

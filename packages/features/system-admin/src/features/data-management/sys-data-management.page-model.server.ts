@@ -3,26 +3,26 @@ import type {
   SystemAdminDataImportJobRow,
   SystemAdminDataImportRowEvidence,
 } from "@afenda/db";
-import { filterSystemAdminListRows } from "../../overview/contracts/system-admin.list-filter.shared";
-import { resolveSystemAdminListSearch } from "../../overview/contracts/system-admin.list-search.shared";
-import { SYSTEM_ADMIN_DATA_MANAGEMENT_QUERY_LIMIT } from "../contracts/system-admin.data-management.limits.shared";
+import { filterSystemAdminListRows } from "../overview/sys-list-filter.shared";
+import { resolveSystemAdminListSearch } from "../overview/sys-list-search.shared";
+import { SYSTEM_ADMIN_DATA_MANAGEMENT_QUERY_LIMIT } from "./sys-data-management.limits.shared";
 import type {
   SystemAdminDataManagementSummary,
   SystemAdminExportJobListRow,
   SystemAdminImportJobListRow,
   SystemAdminImportRowFailure,
-} from "../contracts/system-admin.import-job.contract";
+} from "./sys-import-job.contract";
 import {
   formatSystemAdminExportJobStatusLabel,
   formatSystemAdminImportJobStatusLabel,
   formatSystemAdminImportRowStatusLabel,
-} from "./system-admin.data-management.format.shared";
-import { listSystemAdminImportTemplates } from "./system-admin.import-adapter.registry.server";
+} from "./sys-data-management.format.shared";
+import { listSystemAdminImportTemplates } from "./sys-import-adapter.registry.server";
 import {
   listSystemAdminDataExportJobs,
   listSystemAdminDataImportJobs,
   listSystemAdminDataImportRows,
-} from "./system-admin.import-jobs.query.server";
+} from "./sys-import-jobs.query.server";
 
 export type SystemAdminDataManagementPageModel = {
   templates: ReturnType<typeof listSystemAdminImportTemplates>;

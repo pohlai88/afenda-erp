@@ -4,7 +4,7 @@ import {
 } from "@afenda/db";
 import type { ModuleId } from "@afenda/kernel";
 
-import { recordTenantDocumentEvidenceEvent } from "../api/system-admin.object-storage-governance.server";
+import { recordTenantDocumentEvidenceEvent } from "./sys-object-storage-governance.server";
 
 export { TenantDocumentMutationError };
 

@@ -6,7 +6,7 @@ import {
   systemAdminDocumentRegistryGalleryModuleId,
   systemAdminDocumentRegistryGalleryRows,
   systemAdminDocumentRegistrySensitiveGalleryModuleId,
-} from "../../src/tenant-execution/metadata";
+} from "../../src/features/tenant-execution/metadata";
 
 describe("system admin document registry gallery surfaces", () => {
   it("parses registry fixture rows including pending scan and sensitive cases", () => {

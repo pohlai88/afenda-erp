@@ -5,12 +5,12 @@ import {
   SUCCESSION_REQUIREMENT_COVERAGE,
   assertSuccessionAcceptanceCriteriaComplete,
   assertSuccessionCoverageComplete,
-} from "./hr.talent.succession-coverage.shared";
-import { buildHrSuccessionPageModel } from "./hr.talent.succession.page-model.server";
+} from "../src/talent-management/succession-planning/hr.talent.succession-coverage.shared";
+import { buildHrSuccessionPageModel } from "../src/talent-management/succession-planning/hr.talent.succession.page-model.server";
 import {
   parseHrSuccessionSearchParams,
   toHrSuccessionPageModelInput,
-} from "./hr.talent.succession-search-params.parse.shared";
+} from "../src/talent-management/succession-planning/hr.talent.succession-search-params.parse.shared";
 import {
   buildHrSuccessionBenchStrengthRows,
   buildHrSuccessionNotifications,
@@ -22,8 +22,8 @@ import {
   listApprovedSuccessionRecommendationsForLifecycle,
   nominateHrSuccessionSuccessor,
   resetHrSuccessionStoreForTests,
-} from "./hr.talent.succession-store.shared";
-import { hrTalentSuccessionAuditActions } from "../events/hr.talent.succession.event";
+} from "../src/talent-management/succession-planning/hr.talent.succession-store.shared";
+import { hrTalentSuccessionAuditActions } from "../src/talent-management/succession-planning/hr.talent.succession.event";
 
 const ORG = "org_succession_test";
 

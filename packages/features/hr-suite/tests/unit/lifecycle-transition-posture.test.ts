@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { derivePendingTransitionDuePosture } from "../../src/employee-management/employee-lifecycle-management/data/hr.workforce.lifecycle-transition.shared";
+import { derivePendingTransitionDuePosture } from "../../src/employee-management/employee-lifecycle-management/hr.workforce.lifecycle-transition.shared";
 
 describe("derivePendingTransitionDuePosture", () => {
   it("marks transitions at or before asOf as due", () => {

@@ -11,10 +11,10 @@ import type {
   KanbanCard,
   KanbanColumn,
 } from "./gov-kanban-board-schema";
-import type { KanbanCardDropState } from "./index";
-import { GovernedEmpty } from "./client";
+import type { KanbanCardDropState } from "./kanban-card-drop.shared";
+import { GovernedEmpty } from "./gov-governed-empty";
 import { cn } from "@afenda/ui/utils";
-import { asGovernedRoute } from "../utils/governed-safe-route";
+import { asGovernedRoute } from "./gov-governed-safe-route";
 
 export const KANBAN_DATA_NATURE_CLASS: Record<KanbanBoardDataNature, string> = {
   kanban: "@container flex flex-col gap-3",

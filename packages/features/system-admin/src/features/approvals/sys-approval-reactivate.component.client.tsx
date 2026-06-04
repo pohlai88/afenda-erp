@@ -4,9 +4,9 @@ import { ActionFormErrors } from "@afenda/governed-surface/client";
 import { Alert, AlertDescription } from "@afenda/ui";
 import { GitPullRequestIcon } from "lucide-react";
 import { useState, useTransition } from "react";
-import { SystemAdminDestructiveConfirmButton } from "../../overview/components/system-admin.destructive-confirm-button.component.client";
-import type { SystemAdminActionResult } from "../../tenant-execution/contracts/system-admin.action-result.contract";
-import { systemAdminApprovalsUiCopy } from "../surface/system-admin.approvals-ui.copy.shared";
+import { SystemAdminDestructiveConfirmButton } from "../overview/sys-destructive-confirm-button.component.client";
+import type { SystemAdminActionResult } from "../tenant-execution/sys-action-result.contract";
+import { systemAdminApprovalsUiCopy } from "./sys-approvals-ui.copy.shared";
 
 type ReactivateAction = (input: {
   approvalKey: string;

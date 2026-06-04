@@ -6,7 +6,7 @@ import { hrEmployees } from "./hr";
 import {
   hrTimeClockDevices,
   hrTimeClockRawPunches,
-} from "./hr-time-clock";
+} from "./dbx-hr-time-clock";
 
 export type HrTimeClockRawPunchRow = {
   id: string;
@@ -272,3 +272,4 @@ export async function listHrTimeClockValidatedPunchesForLamWindow(input: {
     });
   });
 }
+

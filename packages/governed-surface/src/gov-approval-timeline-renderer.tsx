@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Badge } from "@afenda/ui/badge";
 import { Check, Circle, Clock, X } from "lucide-react";
 import { Progress } from "@afenda/ui/progress";
-import { GovernedEmpty } from "./client";
+import { GovernedEmpty } from "./gov-governed-empty";
 import {
   parseGovernedApprovalTimelineConfiguration,
   type ApprovalTimelineDataNature,
@@ -14,15 +14,15 @@ import {
 import {
   governedParseErrorCopy,
   governedRendererCopy,
-} from "../i18n/governed-renderer-copy.shared";
-import { diagnosticsDataAttributes } from "../utils/governed-diagnostics.shared";
+} from "./gov-governed-renderer-copy-shared";
+import { diagnosticsDataAttributes } from "./gov-governed-diagnostics-shared";
 import {
   governedIdentityAttributes,
   governedTestId,
-} from "../utils/governed-identity.shared";
+} from "./gov-governed-identity-shared";
 import { cn } from "@afenda/ui/utils";
 
-import type { RendererProps } from "../governed-renderer-dispatch";
+import type { RendererProps } from "./gov-governed-renderer-dispatch";
 
 const DATA_NATURE_CLASS: Record<ApprovalTimelineDataNature, string> = {
   "approval-flow": "@container flex flex-col gap-3",

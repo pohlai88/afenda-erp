@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-import { GovernedEmpty } from "./client";
+import { GovernedEmpty } from "./gov-governed-empty";
 import { governedDispatchErrorCopy } from "./gov-governed-renderer-copy-shared";
 
 import type {

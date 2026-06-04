@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
-import { HR_TIME_AAT_AUDIT_MODULE_KEY } from "../contracts/hr.time.aat.contract";
-import { hrTimeAatAuditActions } from "../events/hr.time.aat.event";
+import { HR_TIME_AAT_AUDIT_MODULE_KEY } from "../src/time-attendance/absence-analytics-trends/hr.time.aat.contract";
+import { hrTimeAatAuditActions } from "../src/time-attendance/absence-analytics-trends/hr.time.aat.event";
 
 describe("HRM-AAT-029 audit trail contract", () => {
   it("filters audit logs by hr.aat module key", () => {

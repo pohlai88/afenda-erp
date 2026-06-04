@@ -6,7 +6,7 @@ import { HrExpenseCommandError } from "./hr-expense.shared";
 import {
   hrExpenseClaims,
   hrExpensePaymentReferences,
-} from "./hr-expense";
+} from "./dbx-hr-expense";
 
 export type HrExpensePaymentChannel = "payroll" | "accounts_payable";
 
@@ -356,3 +356,4 @@ export async function updateHrExpenseClaimAccountingAllocation(input: {
     updateHrExpenseClaimAccountingAllocationInTx(db, input),
   );
 }
+

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
 
-import { GovernedDetailTabs } from "../../src/components/governed-detail-tabs";
+import { GovernedDetailTabs } from "../../src/gov-governed-detail-tabs";
 
 describe("GovernedDetailTabs", () => {
   it("emits invalid diagnostics when model fails validation", () => {

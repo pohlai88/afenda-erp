@@ -30,7 +30,7 @@ import {
   hrGeoRegisteredDevices,
   type HrGeoCheckinPolicyDetails,
   type HrGeoSpoofingSignals,
-} from "./hr-geolocation";
+} from "./dbx-hr-geolocation";
 
 export type HrGeoCheckinAction =
   (typeof hrGeoRawCheckins.$inferSelect)["action"];
@@ -2047,3 +2047,4 @@ export async function updateHrGeoDeviceStatus(input: {
     return { deviceId: existing.id };
   });
 }
+

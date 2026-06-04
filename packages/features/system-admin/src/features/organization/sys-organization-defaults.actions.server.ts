@@ -7,15 +7,15 @@ import {
   systemAdminActionSuccess,
   type SystemAdminActionResult,
   zodActionFailure,
-} from "../../tenant-execution/contracts/system-admin.action-result.contract";
-import { systemAdminRoutePaths } from "../../overview/contracts/system-admin.route-paths.contract";
-import { dispatchSystemAdminWebhook } from "../../integrations/events/system-admin.webhook-dispatch.event";
-import { requireSystemAdminOrganizationManage } from "../policies/system-admin.organization.policy.server";
+} from "../tenant-execution/sys-action-result.contract";
+import { systemAdminRoutePaths } from "../overview/sys-route-paths.contract";
+import { dispatchSystemAdminWebhook } from "../integrations/sys-webhook-dispatch.event";
+import { requireSystemAdminOrganizationManage } from "./sys-organization.policy.server";
 import {
   systemAdminOrganizationAuditActions,
   systemAdminOrganizationWebhookEvents,
-} from "../events/system-admin.organization.event";
-import { systemAdminOrganizationDefaultsActionSchema } from "../schemas/system-admin.organization.schema";
+} from "./sys-organization.event";
+import { systemAdminOrganizationDefaultsActionSchema } from "./sys-organization.schema";
 
 function revalidateSystemAdminPaths(...paths: readonly string[]) {
   revalidatePath(systemAdminRoutePaths.hub);

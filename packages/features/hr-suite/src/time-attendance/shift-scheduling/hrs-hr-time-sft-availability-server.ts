@@ -23,7 +23,7 @@ import {
   type HrSftListAvailabilityQuery,
   type HrSftUpdateAvailabilityInput,
 } from "./hr.time.sft-availability.schema";
-import { assertShiftAssignmentConflictsClear } from "./hr.time.sft-conflict.server";
+import { assertShiftAssignmentConflictsClear } from "./hrs-hr-time-sft-conflict-server";
 
 export class HrSftAvailabilityError extends Error {
   readonly code:

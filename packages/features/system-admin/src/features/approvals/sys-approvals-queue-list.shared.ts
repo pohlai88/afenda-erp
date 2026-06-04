@@ -6,11 +6,11 @@ import type {
 } from "@afenda/governed-surface/schemas";
 import type { ModuleWorkspaceListQuery } from "@afenda/kernel";
 
-import { linkCell } from "../../overview/surfaces/system-admin.control-list.shared";
-import { systemAdminRoutePaths } from "../../overview/contracts/system-admin.route-paths.contract";
-import type { SystemAdminApprovalQueueListRow } from "../contracts/system-admin.approvals-queue.contract";
-import { resolveSystemAdminApprovalQueueRowTrailingAction } from "./system-admin.approvals-queue-list-trailing.shared";
-import { systemAdminApprovalsUiCopy } from "./system-admin.approvals-ui.copy.shared";
+import { linkCell } from "../overview/sys-control-list.shared";
+import { systemAdminRoutePaths } from "../overview/sys-route-paths.contract";
+import type { SystemAdminApprovalQueueListRow } from "./sys-approvals-queue.contract";
+import { resolveSystemAdminApprovalQueueRowTrailingAction } from "./sys-approvals-queue-list-trailing.shared";
+import { systemAdminApprovalsUiCopy } from "./sys-approvals-ui.copy.shared";
 
 export type SystemAdminApprovalQueueWindow = {
   pageSize: number;

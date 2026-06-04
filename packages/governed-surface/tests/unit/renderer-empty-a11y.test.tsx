@@ -8,7 +8,7 @@ import {
   GOVERNED_METADATA_SCHEMA_VERSION,
   buildGovernedStatGrid,
 } from "@afenda/governed-surface";
-import { governedRendererCopy } from "../../src/i18n/governed-renderer-copy.shared";
+import { governedRendererCopy } from "../../src/gov-governed-renderer-copy-shared";
 import { StatCardRenderer } from "../../src/gov-stat-card-renderer";
 import { ApprovalTimelineRenderer } from "../../src/gov-approval-timeline-renderer";
 import { ActionBarRenderer } from "../../src/gov-action-bar-renderer";
@@ -23,7 +23,7 @@ import {
   clearGovernedServerActionRegistryForTest,
   registerGovernedBulkServerAction,
   registerGovernedPolicyServerAction,
-} from "../../src/schemas";
+} from "../../src/gov-schemas-barrel";
 
 vi.mock("next/navigation", () => ({
   useRouter: () => ({
@@ -79,7 +79,7 @@ describe("list-surface-table sort control composition", () => {
     const source = readFileSync(
       join(
         repoRoot,
-        "src/metadata/renderers/list-surface-table.client.tsx",
+        "src/gov-list-surface-table-client.tsx",
       ),
       "utf8",
     );

@@ -6,7 +6,7 @@ import {
 import type { ModuleId } from "@afenda/kernel";
 import { z } from "zod";
 
-import { recordTenantDocumentEvidenceEvent } from "../api/system-admin.object-storage-governance.server";
+import { recordTenantDocumentEvidenceEvent } from "./sys-object-storage-governance.server";
 
 export class ReportTenantDocumentScanResultError extends Error {
   readonly code:

@@ -7,8 +7,8 @@ import {
   isStatutoryRuleAuditAction,
   mapHrMcpAuditTrailDisplayRows,
   summarizeHrMcpAuditTrail,
-} from "./hr.payroll.mcp-audit.shared";
-import { hrPayrollMcpAuditActions } from "../events/hr.payroll.mcp.event";
+} from "../src/payroll-compensation/multi-country-payroll/hr.payroll.mcp-audit.shared";
+import { hrPayrollMcpAuditActions } from "../src/payroll-compensation/multi-country-payroll/hr.payroll.mcp.event";
 
 const sampleRows = [
   {

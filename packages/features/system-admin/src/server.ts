@@ -1,7 +1,9 @@
 /**
  * Server-only public door.
  */
-import "server-only";
+import "@afenda/kernel/server";
+
+export { getApiAuthContext, requireCapability } from "@afenda/kernel/server";
 
 export * from "./features/approvals/sys-approval-detail.component.server";
 export * from "./features/approvals/sys-approval-rules.actions.server";

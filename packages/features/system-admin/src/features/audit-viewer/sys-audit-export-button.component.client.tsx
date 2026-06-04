@@ -6,10 +6,10 @@ import { useState, useTransition } from "react";
 import {
   systemAdminActionFailure,
   type SystemAdminActionResult,
-} from "../../tenant-execution/contracts/system-admin.action-result.contract";
-import type { SystemAdminAuditExportPayload } from "../contracts/system-admin.audit-export.contract";
-import type { SystemAdminAuditExportFormat } from "../schemas/system-admin.audit-export.schema";
-import { systemAdminAuditUiCopy } from "../surface/system-admin.audit-ui.copy.shared";
+} from "../tenant-execution/sys-action-result.contract";
+import type { SystemAdminAuditExportPayload } from "./sys-audit-export.contract";
+import type { SystemAdminAuditExportFormat } from "./sys-audit-export.schema";
+import { systemAdminAuditUiCopy } from "./sys-audit-ui.copy.shared";
 
 export type { SystemAdminAuditExportPayload };
 

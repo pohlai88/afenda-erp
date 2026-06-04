@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   computeCoverageCompareRow,
   resolveCoverageStaffingStatus,
-} from "./hr.time.sft-coverage.shared";
+} from "../src/time-attendance/shift-scheduling/hr.time.sft-coverage.shared";
 
 describe("SFT coverage compare (HRM-SFT-016/017)", () => {
   const requirement = {

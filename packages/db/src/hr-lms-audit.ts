@@ -1,6 +1,6 @@
 import type { AfendaTransaction } from "./client";
 import { createEntityId } from "./ids";
-import { hrLmsAuditEvents } from "./hr-lms";
+import { hrLmsAuditEvents } from "./dbx-hr-lms";
 
 export type AppendHrLmsAuditEventInput = {
   organizationId: string;
@@ -43,3 +43,4 @@ export const HR_LMS_AUDIT_ACTIONS = [
   "reminder",
   "report_export",
 ] as const satisfies readonly AppendHrLmsAuditEventInput["action"][];
+

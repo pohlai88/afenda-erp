@@ -7,7 +7,7 @@ import {
   moduleScreenSections,
   routeErrorCopy,
   workspaceSkeletonNavItemIds,
-} from "../../src/shell/route-copy-metadata";
+} from "../../src/ker-route-copy-metadata";
 
 describe("route copy metadata", () => {
   it("exposes workspace skeleton nav ids", () => {

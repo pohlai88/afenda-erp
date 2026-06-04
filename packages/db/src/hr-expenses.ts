@@ -26,7 +26,7 @@ import {
   hrExpenseEligibilityRules,
   hrExpensePolicies,
   hrExpensePolicyCategoryRules,
-} from "./hr-expense";
+} from "./dbx-hr-expense";
 import { hrEmployees } from "./hr";
 
 export {
@@ -682,3 +682,4 @@ export async function upsertHrExpensePolicyCategoryRule(input: {
     return { ruleId };
   });
 }
+

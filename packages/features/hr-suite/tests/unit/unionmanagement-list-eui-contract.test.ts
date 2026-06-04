@@ -1,16 +1,16 @@
 import { parseListSurfaceRendererConfiguration } from "@afenda/governed-surface/schemas";
 import { describe, expect, it } from "vitest";
 
-import { hrIndustryUcbReadPermission } from "../../src/industry-specific/union-management/contracts/hr.industry.ucb.contract";
-import { buildHrIndustryUcbPageModel } from "../../src/industry-specific/union-management/data/hr.industry.ucb.page-model.server";
+import { hrIndustryUcbReadPermission } from "../../src/industry-specific/union-management/hr.industry.ucb.contract";
+import { buildHrIndustryUcbPageModel } from "../../src/industry-specific/union-management/hr.industry.ucb.page-model.server";
 import {
   listHrIndustryUcbIntegrationExposureRefs,
   listHrIndustryUcbPayrollDeductionRefs,
   listHrIndustryUcbRuleReferenceExports,
   listHrIndustryUcbSeniorityDecisionRefs,
   resetHrIndustryUcbStore,
-} from "../../src/industry-specific/union-management/data/hr.industry.ucb-store.shared";
-import { buildHrIndustryUcbListSurface } from "../../src/industry-specific/union-management/surface/hr.industry.ucb-lists.surface";
+} from "../../src/industry-specific/union-management/hr.industry.ucb-store.shared";
+import { buildHrIndustryUcbListSurface } from "../../src/industry-specific/union-management/hr.industry.ucb-lists.surface";
 import {
   HR_INDUSTRY_UCB_LIST_SURFACE_KEYS,
   hrIndustryUcbAuditTrailSurfaceKey,
@@ -19,7 +19,7 @@ import {
   hrIndustryUcbIntegrationExposuresSurfaceKey,
   hrIndustryUcbMembershipsSurfaceKey,
   hrIndustryUcbRuleConflictsSurfaceKey,
-} from "../../src/industry-specific/union-management/surface/hr.industry.ucb-surface-metadata.shared";
+} from "../../src/industry-specific/union-management/hr.industry.ucb-surface-metadata.shared";
 
 describe("union management EUI contract", () => {
   it("builds governed server-window list configuration", () => {

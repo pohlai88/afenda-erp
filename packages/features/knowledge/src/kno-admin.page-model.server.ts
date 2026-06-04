@@ -1,11 +1,11 @@
-import { listLynxEvalRuns } from "./knowledge.eval.server";
+import { listLynxEvalRuns } from "./kno-eval.server";
 import {
   countKnowledgeChunks,
   countKnowledgeDocuments,
   getKnowledgeOrgSetting,
   listKnowledgeSources,
   listRecentKnowledgeChunks,
-} from "./knowledge.queries.server";
+} from "./kno-queries.server";
 
 export type KnowledgeAdminPageModel = {
   sources: Awaited<ReturnType<typeof listKnowledgeSources>>;

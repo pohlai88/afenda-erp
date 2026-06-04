@@ -13,7 +13,7 @@ import {
   hrSbsBenchmarkEntries,
   hrSbsBenchmarkVersions,
   hrSbsCurrencyRefs,
-} from "./hr-salary-benchmarking";
+} from "./dbx-hr-salary-benchmarking";
 
 export async function appendHrSbsAuditEventInTx(
   db: AfendaTransaction,
@@ -802,3 +802,4 @@ export async function listHrSalaryBenchmarkCurrencyRefsWindow(input: {
     });
   });
 }
+

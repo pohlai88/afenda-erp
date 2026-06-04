@@ -1,4 +1,4 @@
-import type { SystemAdminUserRow } from "../contracts";
+import type { SystemAdminUserRow } from "./sys-users.contract";
 
 export const systemAdminUsersGalleryRows: readonly SystemAdminUserRow[] = [
   {

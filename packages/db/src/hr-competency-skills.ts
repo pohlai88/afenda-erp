@@ -19,7 +19,7 @@ import {
   hrCsfProficiencyScales,
   hrCsfSkillRequirements,
   hrCsfSkills,
-} from "./hr-competency-skills";
+} from "./dbx-hr-competency-skills";
 
 export {
   HrCsfCommandError,
@@ -1257,3 +1257,4 @@ export async function deleteHrCsfSkillRequirementInTx(
     summary: "Removed skill requirement mapping",
   });
 }
+

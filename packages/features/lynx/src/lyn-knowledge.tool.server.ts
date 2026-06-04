@@ -7,12 +7,12 @@ import {
   listRecentKnowledgeChunks,
   retrieveKnowledgeChunksWithDiagnostics,
 } from "@afenda/feature-knowledge/server";
-import { tool } from "ai";
+import { tool, type ToolSet } from "ai";
 import {
   recentKnowledgeChunksInputSchema,
   searchKnowledgeInputSchema,
-} from "./lyn-knowledge-tools-schema";
-import { lynxKnowledgeToolMeta } from "./lynx.tool-meta";
+} from "./lyn-knowledge-tools.schema";
+import { lynxKnowledgeToolMeta } from "./lyn-tool-meta";
 
 export type LynxKnowledgeToolsContext = {
   organizationId: string;
@@ -24,7 +24,9 @@ export type LynxKnowledgeToolsContext = {
  * Lynx operator knowledge tools — substrate via @afenda/feature-knowledge only.
  * Meta: packages/features/lynx/src/tools/lynx.tool-meta.ts
  */
-export function createLynxKnowledgeTools(context: LynxKnowledgeToolsContext) {
+export function createLynxKnowledgeTools(
+  context: LynxKnowledgeToolsContext,
+): ToolSet {
   return {
     searchKnowledge: tool({
       description:

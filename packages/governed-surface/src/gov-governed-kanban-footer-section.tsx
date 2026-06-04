@@ -9,13 +9,13 @@ import {
   buildKanbanSectionDataAttributes,
   governedKanbanSectionTestId,
 } from "./kanban-surface-identity.shared";
-import { GovernedHeading } from "../utils/governed-heading.shared";
+import { GovernedHeading } from "./gov-governed-heading-shared";
 import {
   governedDescriptionId,
   governedHeadingId,
-} from "../utils/governed-identity.shared";
+} from "./gov-governed-identity-shared";
 
-import { GovernedEmpty } from "./governed-empty";
+import { GovernedEmpty } from "./gov-governed-empty";
 
 export type GovernedKanbanFooterSectionLayout = "embedded" | "titled";
 

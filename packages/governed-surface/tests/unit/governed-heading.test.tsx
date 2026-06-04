@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
 
-import { GovernedHeading } from "../../src/utils/governed-heading.shared";
+import { GovernedHeading } from "../../src/gov-governed-heading-shared";
 
 describe("GovernedHeading", () => {
   it("renders the mapped semantic heading tag for each level", () => {

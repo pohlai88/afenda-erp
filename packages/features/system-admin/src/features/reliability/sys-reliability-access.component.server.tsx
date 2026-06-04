@@ -1,5 +1,5 @@
 import { SectionPanel } from "@afenda/ui";
-import { systemAdminReliabilityUiCopy } from "../surface/system-admin.reliability-ui.copy.shared";
+import { systemAdminReliabilityUiCopy } from "./sys-reliability-ui.copy.shared";
 
 export function SystemAdminReliabilityAccessDenied() {
   const copy = systemAdminReliabilityUiCopy;

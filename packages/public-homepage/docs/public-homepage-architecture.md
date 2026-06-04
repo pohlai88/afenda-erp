@@ -28,10 +28,13 @@ packages/public-homepage/
     server.ts
     components/
       homepage-shell.server.tsx
+      homepage-shell.client.tsx
       homepage-hero.server.tsx
-      homepage-hero.client.tsx
+      machine-intro-scene.client.tsx
+      machine-intro-lazy.client.tsx
+      machine-intro-resolver.ts
+      machine-intro-config.ts
       site-header.server.tsx
-      site-header-controls.client.tsx
     content/
       homepage.content.ts
     schemas/
@@ -40,6 +43,7 @@ packages/public-homepage/
       homepage-seo.ts
     styles/
       public-homepage.module.css
+      machine-intro.module.css
 ```
 
 ## Package Boundary
@@ -86,7 +90,7 @@ Default to Server Components. Client components are allowed only at interaction 
 | Component type | Allowed responsibilities |
 | -------------- | ------------------------ |
 | Server | Layout, content composition, metadata, static links |
-| Client | Header menu state, theme toggle, small local UI interactions |
+| Client | Header menu state, theme toggle, machine intro cinematic (WebGL + canvas), skip/replay policy |
 
 Client islands receive small serializable props. They do not fetch homepage data, read session
 state, call Server Actions, or import server-only modules.

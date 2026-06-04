@@ -6,9 +6,9 @@ import {
 import {
   buildSystemAdminListToolbar,
   buildSystemAdminStaticPagination,
-} from "../../overview/surfaces/system-admin.list-surface.shared";
-import type { SystemAdminRoleOverrideListRow } from "../contracts";
-import { systemAdminUsersUiCopy } from "../../users/surface/system-admin.users-ui.copy.shared";
+} from "../overview/sys-list-surface.shared";
+import type { SystemAdminRoleOverrideListRow } from "./sys-permissions.contract";
+import { systemAdminUsersUiCopy } from "../users/sys-users-ui.copy.shared";
 
 export const systemAdminRoleOverridesSurfaceKey =
   "system-admin.role-overrides.list";

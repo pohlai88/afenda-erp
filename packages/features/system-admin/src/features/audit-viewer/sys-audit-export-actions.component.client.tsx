@@ -3,11 +3,11 @@
 import { ActionFormErrors } from "@afenda/governed-surface/client";
 import { Button } from "@afenda/ui";
 import { useState, useTransition } from "react";
-import type { SystemAdminActionResult } from "../../tenant-execution/contracts/system-admin.action-result.contract";
-import type { SystemAdminAuditExportPayload } from "../contracts/system-admin.audit-export.contract";
-import type { SystemAdminAuditExportFormat } from "../schemas/system-admin.audit-export.schema";
-import { systemAdminAuditUiCopy } from "../surface/system-admin.audit-ui.copy.shared";
-import type { ExportSystemAdminAuditLogsAction } from "./system-admin.audit-export-button.component.client";
+import type { SystemAdminActionResult } from "../tenant-execution/sys-action-result.contract";
+import type { SystemAdminAuditExportPayload } from "./sys-audit-export.contract";
+import type { SystemAdminAuditExportFormat } from "./sys-audit-export.schema";
+import { systemAdminAuditUiCopy } from "./sys-audit-ui.copy.shared";
+import type { ExportSystemAdminAuditLogsAction } from "./sys-audit-export-button.component.client";
 
 const EXPORT_FORMATS = ["csv", "json", "xlsx", "pdf"] as const;
 

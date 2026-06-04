@@ -5,5 +5,5 @@ export {
   buildLynxReadinessStatGrid,
   buildLynxToolAvailabilityListSurface,
   getLynxReadinessSurfaceKeys,
-} from "./lynx.surface.shared";
-export type { LynxActivityLedgerRow } from "./lynx.surface.shared";
+} from "./lyn-surface.shared";
+export type { LynxActivityLedgerRow } from "./lyn-surface.shared";

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
-import { erpNeonAuthLegacyPathRedirects, erpNeonAuthUiBasePath } from "../../contracts/paths.shared";
-import { resolveNeonAuthUiProviderOptions } from "../../ui/neon-auth-ui.config.shared";
+import { erpNeonAuthLegacyPathRedirects, erpNeonAuthUiBasePath } from "../src/aut-paths-shared";
+import { resolveNeonAuthUiProviderOptions } from "../src/aut-neon-auth-ui-config-shared";
 
 describe("neon-auth-ui provider config", () => {
   it("uses flat ERP auth routes instead of Neon quickstart /auth prefix", () => {

@@ -1,7 +1,7 @@
 import { Alert, AlertDescription, AlertTitle } from "@afenda/ui/alert";
 
 import type { ActionResult } from "./gov-action-result-shared";
-import { governedTestId } from "../utils/governed-identity.shared";
+import { governedTestId } from "./gov-governed-identity-shared";
 
 export type ActionFormErrorKind =
   | "validation"

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { hrPayrollBonusAuditActions } from "../../src/payroll-compensation/bonus-incentive-management/events/hr.payroll.bonus.event";
+import { hrPayrollBonusAuditActions } from "../../src/payroll-compensation/bonus-incentive-management/hr.payroll.bonus.event";
 
 describe("HRM-BON-030 bonus audit verbs", () => {
   it("declares lifecycle, payroll, accounting, and correction verbs", () => {

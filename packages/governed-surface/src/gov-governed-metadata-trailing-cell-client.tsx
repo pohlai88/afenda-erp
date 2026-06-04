@@ -6,10 +6,10 @@ import { Button } from "@afenda/ui/button";
 
 import {
   GovernedTrailingActionSlot,
-  isListSurfaceTrailingActionRenderable,
-} from "./client";
+} from "./gov-governed-trailing-action-slot-client";
+import { isListSurfaceTrailingActionRenderable } from "./list-surface-trailing-action.shared";
 import type { GovernedListTrailingCellProps } from "./governed-pattern-c-trailing-column.shared";
-import { asGovernedRoute } from "../utils/governed-safe-route";
+import { asGovernedRoute } from "./gov-governed-safe-route";
 
 export function GovernedMetadataTrailingCell({
   row,
@@ -21,8 +21,9 @@ export function GovernedMetadataTrailingCell({
     return null;
   }
 
-  const disabled = trailingAction.state === "disabled";
-  const label = trailingAction.descriptor?.label ?? "Action";
+  const renderableTrailingAction = trailingAction;
+  const disabled = renderableTrailingAction.state === "disabled";
+  const label = renderableTrailingAction.descriptor?.label ?? "Action";
   const surfaceKey = context?.surfaceKey ?? "governed-metadata";
   const sectionKey = context?.sectionKey ?? surfaceKey;
   const componentKey = context?.componentKey
@@ -31,7 +32,7 @@ export function GovernedMetadataTrailingCell({
 
   return (
     <GovernedTrailingActionSlot
-      trailingAction={trailingAction}
+      trailingAction={renderableTrailingAction}
       surfaceKey={surfaceKey}
       sectionKey={sectionKey}
       componentKey={componentKey}

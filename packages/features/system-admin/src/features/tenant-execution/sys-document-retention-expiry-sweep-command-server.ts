@@ -5,8 +5,8 @@ import {
   isOrganizationDocumentLegalHoldActive,
 } from "@afenda/db";
 
-import { executeHrDocumentDestructionSweepCommand } from "./hr-document-destruction-sweep.command.server";
-import { expireTenantDocumentCommand } from "./expire-tenant-document.command.server";
+import { executeHrDocumentDestructionSweepCommand } from "./sys-hr-document-destruction-sweep-command-server";
+import { expireTenantDocumentCommand } from "./sys-expire-tenant-document-command-server";
 
 /** Cron-safe sweep — expires short-term ERP registry documents past retention. */
 export async function executeDocumentRetentionExpirySweepCommand(input?: {

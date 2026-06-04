@@ -7,13 +7,13 @@ import {
   runWithOrganizationContext,
 } from "@afenda/db";
 
-import { loadHrSftApprovedLeaveForEmployeeDate } from "./hr.time.sft-lam-boundary.server";
+import { loadHrSftApprovedLeaveForEmployeeDate } from "./hrs-hr-time-sft-lam-boundary-server";
 import {
   analyzeHrSftAssignmentConflicts,
   endOfUtcWeek,
   startOfUtcWeek,
 } from "./hr.time.sft-conflict.shared";
-import { getHrSftSchedulingPolicy } from "./hr.time.sft-policy.server";
+import { getHrSftSchedulingPolicy } from "./hrs-hr-time-sft-policy-server";
 import type { HrSftAssignmentKind } from "./hr.time.sft-availability.schema";
 import type {
   HrSftAvailabilitySlice,

@@ -18,7 +18,7 @@ import {
   hrBonusPayoutFormulas,
   hrBonusTargetAchievements,
   hrBonusTargets,
-} from "./hr-bonus-incentive";
+} from "./dbx-hr-bonus-incentive";
 
 export type RecordHrBonusTargetAchievementInput = {
   organizationId: string;
@@ -260,3 +260,4 @@ export type {
   BonusPayoutBounds,
   BonusPayoutFormulaKind,
 } from "./hr-bonus-incentive-payout.shared";
+

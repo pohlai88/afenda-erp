@@ -10,7 +10,7 @@ import type { HrBenefitOpenEnrollmentWindowList } from "./hr-benefits.types";
 import {
   hrBenefitOpenEnrollmentPlans,
   hrBenefitOpenEnrollmentWindows,
-} from "./hr-benefits";
+} from "./dbx-hr-benefits";
 
 export function isOpenEnrollmentWindowActive(input: {
   status: (typeof hrBenefitOpenEnrollmentWindows.$inferSelect)["status"];
@@ -319,3 +319,4 @@ export async function findActiveOpenEnrollmentWindowForPlanInTx(
 
   return { windowId: match.windowId };
 }
+

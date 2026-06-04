@@ -1,6 +1,6 @@
-import { LynxOutcomeMonitorSettingForm } from "./system-admin.lynx-outcome-monitor-setting-form.component.client";
-import type { SystemAdminActionResult } from "../contracts";
-import type { LynxOutcomeMonitorSetting } from "../contracts";
+import { LynxOutcomeMonitorSettingForm } from "./sys-lynx-outcome-monitor-setting-form.component.client";
+import type { SystemAdminActionResult } from "../tenant-execution/sys-action-result.contract";
+import type { LynxOutcomeMonitorSetting } from "./sys-lynx-outcome-monitor.contract";
 
 type UpdateLynxOutcomeMonitorSettingAction = (
   state: SystemAdminActionResult | undefined,

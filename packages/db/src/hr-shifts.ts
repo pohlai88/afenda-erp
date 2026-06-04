@@ -13,7 +13,7 @@ import { hrEmployees } from "./hr";
 import {
   hrShiftAssignments,
   hrShiftTemplates,
-} from "./hr-shift-scheduling";
+} from "./dbx-hr-shift-scheduling";
 
 export {
   HrShiftCommandError,
@@ -657,3 +657,4 @@ export async function cancelHrShiftAssignment(input: {
     return { assignmentId: input.assignmentId };
   });
 }
+

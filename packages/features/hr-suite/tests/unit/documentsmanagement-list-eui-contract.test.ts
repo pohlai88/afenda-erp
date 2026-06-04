@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { buildHrDocumentsRepositoryListSurface } from "../../src/employee-management/documents-management/surface/hr.workforce.documents-repository-list.surface";
+import { buildHrDocumentsRepositoryListSurface } from "../../src/employee-management/documents-management/hr.workforce.documents-repository-list.surface";
 import { hrDocumentsRepositorySurfaceKey } from "../../src/metadata";
 
 describe("documents list EUI contract", () => {

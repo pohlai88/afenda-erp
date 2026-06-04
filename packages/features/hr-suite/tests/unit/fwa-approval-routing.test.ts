@@ -4,7 +4,7 @@ import {
   computeHrFwaDurationDays,
   requiresHrFwaApprovalStage,
   resolveHrFwaApprovalRouteFromChain,
-} from "../../src/time-attendance/flexible-work-arrangement-tracking/policies/hr.time.fwa-routing.policy.server";
+} from "../../src/time-attendance/flexible-work-arrangement-tracking/hr.time.fwa-routing.policy.server";
 
 describe("FWA-010 approval routing", () => {
   it("routes long duration to HR stage", () => {

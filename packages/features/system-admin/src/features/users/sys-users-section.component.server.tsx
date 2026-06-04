@@ -1,13 +1,13 @@
 import { GovernedPatternCListSection } from "@afenda/governed-surface/server";
 import { SectionPanel } from "@afenda/ui";
-import type { SystemAdminUserRow } from "../contracts";
-import { registerSystemAdminUsersGovernedActions } from "../actions/system-admin.users-governed-actions.server";
+import type { SystemAdminUserRow } from "./sys-users.contract";
+import { registerSystemAdminUsersGovernedActions } from "./sys-users-governed-actions.server";
 import {
   buildUsersListSurface,
   systemAdminUsersSurfaceKey,
-} from "../surface/system-admin.users-list.surface";
-import { systemAdminUsersUiCopy } from "../surface/system-admin.users-ui.copy.shared";
-import { SystemAdminUserTrailingCell } from "./system-admin.users-trailing-cells.component.client";
+} from "./sys-users-list.surface";
+import { systemAdminUsersUiCopy } from "./sys-users-ui.copy.shared";
+import { SystemAdminUserTrailingCell } from "./sys-users-trailing-cells.component.client";
 
 export function SystemAdminUsersSection({
   users,

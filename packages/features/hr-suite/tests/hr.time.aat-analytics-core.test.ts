@@ -10,11 +10,11 @@ import {
   computeAatTotalLostWorkdays,
   HrAatAnalyticsInvariantError,
   resolveAatDimensionGroup,
-} from "./hr.time.aat-analytics-core.shared";
+} from "../src/time-attendance/absence-analytics-trends/hr.time.aat-analytics-core.shared";
 import {
   hrAatAnalyticsQuerySchema,
   hrAatAnalyticsSnapshotSchema,
-} from "../schemas/hr.time.aat-analytics.schema";
+} from "../src/time-attendance/absence-analytics-trends/hr.time.aat-analytics.schema";
 
 const periodStart = new Date("2026-05-01T00:00:00.000Z");
 const periodEnd = new Date("2026-05-31T23:59:59.999Z");

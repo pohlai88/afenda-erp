@@ -11,7 +11,7 @@ import type { HrBenefitPlanWindow } from "./hr-benefits.types";
 import {
   hrBenefitPlans,
   hrBenefitProviders,
-} from "./hr-benefits";
+} from "./dbx-hr-benefits";
 
 export async function listHrBenefitPlansWindow(input: {
   organizationId: string;
@@ -202,3 +202,4 @@ export async function archiveHrBenefitPlanInTx(
 
   return { planId: plan.id };
 }
+

@@ -23,7 +23,7 @@ import {
   listHrCareerPathingReadinessWindow,
   writeCareerPathReadinessExportAudit,
   type HrCareerReadinessComputeResult,
-} from "./hr.talent.career-pathing-readiness.server";
+} from "./hrs-hr-talent-career-pathing-readiness-server";
 import { hrTalentCareerPathAuditActions } from "./hr.talent.career-pathing.event";
 import {
   requireHrCareerPathingRead,
@@ -138,7 +138,7 @@ export async function syncCareerPathingDueNotificationsAction(input?: {
 }): Promise<ActionResult<{ enqueuedCount: number }>> {
   const guard = await requireHrCareerPathingWrite();
   const { syncHrCareerPathingDueNotifications } = await import(
-    "../data/hr.talent.career-pathing-notification.server"
+    "./hrs-hr-talent-career-pathing-notification-server"
   );
 
   const result = await syncHrCareerPathingDueNotifications({

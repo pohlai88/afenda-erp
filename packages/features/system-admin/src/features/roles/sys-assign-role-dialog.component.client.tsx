@@ -4,11 +4,11 @@ import { ActionFormErrors } from "@afenda/governed-surface/client";
 import {
   systemAdminEmailRoleActionFormFooterClass,
   systemAdminEmailRoleActionFormGridClass,
-} from "../../overview/surfaces/system-admin.form-layout.shared";
+} from "../overview/sys-form-layout.shared";
 import { Button, Field, FieldGroup, FieldLabel, Input, NativeSelect } from "@afenda/ui";
 import { UserCogIcon } from "lucide-react";
 import { useActionState } from "react";
-import type { SystemAdminActionResult } from "../../tenant-execution/contracts/system-admin.action-result.contract";
+import type { SystemAdminActionResult } from "../tenant-execution/sys-action-result.contract";
 import { systemAdminSeedRoles } from "./sys-roles.contract";
 
 type RoleAction = (

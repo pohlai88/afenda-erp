@@ -4,8 +4,8 @@ import {
   HR_WORKFORCE_ESS_ACCEPTANCE_CRITERIA_COVERAGE,
   HR_WORKFORCE_ESS_REQUIREMENT_COVERAGE,
   assertHrWorkforceEssEnterpriseCoverage,
-} from "../../src/employee-management/employee-selfservice-portal/data/hr.workforce.ess-coverage.shared";
-import { hrWorkforceEssAuditActions } from "../../src/employee-management/employee-selfservice-portal/events/hr.workforce.ess.event";
+} from "../../src/employee-management/employee-selfservice-portal/hr.workforce.ess-coverage.shared";
+import { hrWorkforceEssAuditActions } from "../../src/employee-management/employee-selfservice-portal/hr.workforce.ess.event";
 
 const expectedRequirementCodes = Array.from(
   { length: 25 },

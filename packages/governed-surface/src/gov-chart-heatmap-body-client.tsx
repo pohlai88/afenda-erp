@@ -3,7 +3,7 @@
 import { useMemo } from "react";
 
 import { Tooltip, TooltipContent, TooltipTrigger } from "@afenda/ui/tooltip";
-import { GovernedEmpty } from "./client";
+import { GovernedEmpty } from "./gov-governed-empty";
 import type { GovernedChartConfiguration } from "./gov-chart-schema";
 import { cn } from "@afenda/ui/utils";
 

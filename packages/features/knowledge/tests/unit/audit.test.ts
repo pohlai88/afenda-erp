@@ -17,7 +17,7 @@ import {
   createKnowledgeAuditEvent,
   createKnowledgeExecutionAuditEvent,
   emitKnowledgeAuditEvent,
-} from "../../src/data/knowledge.audit.server";
+} from "../../src/kno-audit.server";
 
 describe("knowledge audit events", () => {
   beforeEach(() => {

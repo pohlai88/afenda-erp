@@ -2,7 +2,7 @@ import type {
   TenantCapabilitySettingRow,
   TenantModuleSettingRow,
 } from "@afenda/db";
-import type { SystemAdminCapabilityAvailability } from "../contracts";
+import type { SystemAdminCapabilityAvailability } from "./sys-capabilities.contract";
 
 export function resolveSystemAdminCapabilityOrgAvailability(
   capabilityKey: string,

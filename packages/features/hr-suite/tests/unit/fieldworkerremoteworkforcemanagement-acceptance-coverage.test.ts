@@ -4,7 +4,7 @@ import {
   HR_INDUSTRY_FRM_ACCEPTANCE_CRITERIA_COVERAGE,
   HR_INDUSTRY_FRM_REQUIREMENT_COVERAGE,
   assertHrIndustryFrmEnterpriseCoverage,
-} from "../../src/industry-specific/field-worker-remote-workforce-management/data/hr.industry.frm-coverage.shared";
+} from "../../src/industry-specific/field-worker-remote-workforce-management/hr.industry.frm-coverage.shared";
 
 describe("HRM-FRM-001..031 coverage registry", () => {
   it("registers all thirty-one requirements as shipped", () => {

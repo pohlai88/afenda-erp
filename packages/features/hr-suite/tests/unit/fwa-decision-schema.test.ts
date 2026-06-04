@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { decideHrFwaRequestFormSchema } from "../../src/time-attendance/flexible-work-arrangement-tracking/schemas/hr.time.fwa-workflow.schema";
+import { decideHrFwaRequestFormSchema } from "../../src/time-attendance/flexible-work-arrangement-tracking/hr.time.fwa-workflow.schema";
 
 describe("FWA-012 decision reason schema", () => {
   it("requires rejection reason on reject decision", () => {

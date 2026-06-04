@@ -9,8 +9,8 @@ import {
   emitPerformanceAuditEvent,
   filterPerformanceReviewsForAccess,
   listPerformanceHistoryByEmployee,
-} from "../../src/talent-management/performance-appraisals/data/hr.talent.performance-store.shared";
-import { hrTalentPerformanceAuditActions } from "../../src/talent-management/performance-appraisals/events/hr.talent.performance.event";
+} from "../../src/talent-management/performance-appraisals/hr.talent.performance-store.shared";
+import { hrTalentPerformanceAuditActions } from "../../src/talent-management/performance-appraisals/hr.talent.performance.event";
 
 describe("HRM-PER reports, notifications, integration refs, and audit", () => {
   const store = createSeedHrPerformanceStore("org-1");

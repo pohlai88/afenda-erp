@@ -3,7 +3,7 @@ import { z } from "zod";
 import {
   readHrSuiteSearchParam,
   type HrSuiteSearchParamSource,
-} from "../compliance-regulatory-tracking/metadata";
+} from "../../hr-suite-integration/metadata";
 import {
   HR_WORKFORCE_ESS_REPORT_GROUP_BY,
   HR_WORKFORCE_ESS_STATUS_FILTERS,

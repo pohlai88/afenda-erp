@@ -3,7 +3,7 @@ import {
   runWithOrganizationContext,
 } from "@afenda/db";
 
-import { executeKnowledgeSyncOrgCommand } from "./knowledge.sync-org.command.server";
+import { executeKnowledgeSyncOrgCommand } from "./kno-sync-org.command.server";
 
 /** Command: cron-safe multi-org knowledge sync sweep. */
 export async function executeKnowledgeScheduledSyncSweepCommand(input?: {

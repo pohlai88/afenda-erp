@@ -7,7 +7,7 @@ import { HrSbsCommandError, parseNumeric } from "./hr-salary-benchmarking.shared
 import {
   hrCompensationCycleParticipants,
   hrCompensationSalaryBands,
-} from "./hr-compensation-planning";
+} from "./dbx-hr-compensation-planning";
 import { hrEmployees } from "./hr";
 import {
   hrSbsBenchmarkEntries,
@@ -16,7 +16,7 @@ import {
   hrSbsCompensationAnalyses,
   type HrSbsAnalysisSnapshotPayload,
   type HrSbsThresholdConfigPayload,
-} from "./hr-salary-benchmarking";
+} from "./dbx-hr-salary-benchmarking";
 
 export {
   HrSbsCommandError,
@@ -476,3 +476,4 @@ export async function listHrSbsCompensationAnalysesWindow(input: {
     listHrSbsCompensationAnalysesInTx(db, input),
   );
 }
+

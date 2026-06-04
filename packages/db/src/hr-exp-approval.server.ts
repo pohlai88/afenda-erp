@@ -37,7 +37,7 @@ import {
   hrExpenseClaims,
   hrExpenseExceptions,
   hrExpensePolicies,
-} from "./hr-expense";
+} from "./dbx-hr-expense";
 
 export type DecideHrExpenseClaimInput = {
   organizationId: string;
@@ -781,3 +781,4 @@ export {
   resolveExpInitialApprovalStage,
   resolveExpSubmissionApprovers,
 } from "./hr-exp-approval.shared";
+

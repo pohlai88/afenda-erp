@@ -1,4 +1,4 @@
-import { isAppCapability, organizationRoles } from "@afenda/auth";
+import { isAppCapability, organizationRoles } from "@afenda/kernel";
 import type {
   RoleOverrideRow,
   TenantApprovalSettingRow,
@@ -10,15 +10,15 @@ import {
   listExecutionCapabilities,
   listExecutionCapabilitiesForModule,
 } from "@afenda/kernel/execution-capabilities";
-import { resolveExecutionCapabilityForAction } from "../../tenant-execution/policies/system-admin.execution-capability.shared.server";
-import { evaluateCapabilityCoverage } from "../../capabilities/data/system-admin.capabilities.coverage.server";
-import type { OrganizationSecuritySettings } from "../../security/contracts/system-admin.security-settings.contract";
-import { mapTenantApprovalSettingToRule } from "../../approvals/data/system-admin.approval-rules.mapper";
+import { resolveExecutionCapabilityForAction } from "../tenant-execution/sys-execution-capability.shared.server";
+import { evaluateCapabilityCoverage } from "../capabilities/sys-capabilities.coverage.server";
+import type { OrganizationSecuritySettings } from "../security/sys-security-settings.contract";
+import { mapTenantApprovalSettingToRule } from "../approvals/sys-approval-rules.mapper";
 import { mapTenantPolicySettingToRule } from "../policies/system-admin.policy-rules.mapper";
-import type { IntegrationReadinessReport } from "../../integrations/contracts/system-admin.integrations-readiness.contract";
-import { resolveSystemAdminDiagnosticTargetHref } from "../contracts/system-admin.diagnostics-links.shared";
-import type { SystemAdminDiagnosticIssue } from "../contracts/system-admin.diagnostic-issue.contract";
-import { sortDiagnosticIssues } from "./system-admin.diagnostics.verdict.server";
+import type { IntegrationReadinessReport } from "../integrations/sys-integrations-readiness.contract";
+import { resolveSystemAdminDiagnosticTargetHref } from "./sys-diagnostics-links.shared";
+import type { SystemAdminDiagnosticIssue } from "./sys-diagnostic-issue.contract";
+import { sortDiagnosticIssues } from "./sys-diagnostics.verdict.server";
 
 function issueId(parts: string[]) {
   return parts.join(":");

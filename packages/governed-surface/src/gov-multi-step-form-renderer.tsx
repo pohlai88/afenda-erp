@@ -1,19 +1,19 @@
-import { GovernedEmpty } from "./client";
+import { GovernedEmpty } from "./gov-governed-empty";
 import {
   GOVERNED_MULTI_STEP_FORM_SCHEMA_ID,
   parseGovernedMultiStepFormConfiguration,
 } from "./gov-multi-step-form-schema";
 import { resolveGovernedServerAction } from "./gov-server-actions-shared";
-import { governedParseErrorCopy } from "../i18n/governed-renderer-copy.shared";
-import { diagnosticsDataAttributes } from "../utils/governed-diagnostics.shared";
+import { governedParseErrorCopy } from "./gov-governed-renderer-copy-shared";
+import { diagnosticsDataAttributes } from "./gov-governed-diagnostics-shared";
 import {
   governedIdentityAttributes,
   governedTestId,
-} from "../utils/governed-identity.shared";
+} from "./gov-governed-identity-shared";
 
-import type { RendererProps } from "../governed-renderer-dispatch";
+import type { RendererProps } from "./gov-governed-renderer-dispatch";
 
-import { MultiStepFormSurface } from "./multi-step-form.client";
+import { MultiStepFormSurface } from "./gov-multi-step-form-client";
 
 export function MultiStepFormRenderer({
   configuration,

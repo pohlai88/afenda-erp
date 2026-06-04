@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { formatComplianceEmployeeListCell } from "../../src/employee-management/compliance-regulatory-tracking/surface/hr.workforce.compliance-list.shared";
+import { formatComplianceEmployeeListCell } from "../../src/employee-management/compliance-regulatory-tracking/hr.workforce.compliance-list.shared";
 
 describe("formatComplianceEmployeeListCell", () => {
   it("returns em dash when display name is missing", () => {

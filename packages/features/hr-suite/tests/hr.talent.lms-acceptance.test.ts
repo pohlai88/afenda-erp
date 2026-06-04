@@ -5,19 +5,19 @@ import {
   LMS_REQUIREMENT_COVERAGE,
   assertLmsAcceptanceCriteriaComplete,
   assertLmsCoverageComplete,
-} from "./hr.talent.lms-acceptance-coverage.shared";
+} from "../src/talent-management/learning-management-system-lms/hr.talent.lms-acceptance-coverage.shared";
 import {
   getLmsComplianceCompletionSnapshot,
   getLmsOnboardingCompletionSnapshot,
   getLmsTrainingDevelopmentRefs,
-} from "./hr.talent.lms-integration.server";
-import { buildHrLmsReportRows, listHrLmsLearningHistory } from "./hr.talent.lms-reports.server";
-import { emitHrLmsAuditTrailEvent, listHrLmsAuditTrail } from "./hr.talent.lms-audit.server";
+} from "../src/talent-management/learning-management-system-lms/hrs-hr-talent-lms-integration-server";
+import { buildHrLmsReportRows, listHrLmsLearningHistory } from "../src/talent-management/learning-management-system-lms/hrs-hr-talent-lms-reports-server";
+import { emitHrLmsAuditTrailEvent, listHrLmsAuditTrail } from "../src/talent-management/learning-management-system-lms/hrs-hr-talent-lms-audit-server";
 import {
   createHrLmsCourseInStore,
   resetHrLmsStoreForTests,
   submitHrLmsAssessmentAttemptInStore,
-} from "./hr.talent.lms-store.shared";
+} from "../src/talent-management/learning-management-system-lms/hr.talent.lms-store.shared";
 
 const ORG = "org_lms_test";
 
@@ -116,7 +116,7 @@ describe("HRM-LMS domain behavior", () => {
 describe("HRM-LMS-028 permissions", () => {
   it("declares LMS capability constants", async () => {
     const { HR_LMS_READ_CAPABILITY, HR_LMS_WRITE_CAPABILITY } = await import(
-      "../schemas/hr.talent.lms-constants.shared"
+      "../src/talent-management/learning-management-system-lms/hr.talent.lms-constants.shared"
     );
     expect(HR_LMS_READ_CAPABILITY).toBe("hr.lms.read");
     expect(HR_LMS_WRITE_CAPABILITY).toBe("hr.lms.write");

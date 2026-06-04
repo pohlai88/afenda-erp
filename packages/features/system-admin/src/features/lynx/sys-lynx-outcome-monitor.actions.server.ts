@@ -7,8 +7,8 @@ import {
   systemAdminActionFailure,
   systemAdminActionSuccess,
   type SystemAdminActionResult,
-} from "../../tenant-execution/contracts/system-admin.action-result.contract";
-import { requireSystemAdminLynxApprove } from "../policies/system-admin.lynx.policy.server";
+} from "../tenant-execution/sys-action-result.contract";
+import { requireSystemAdminLynxApprove } from "./sys-lynx.policy.server";
 import {
   isSystemAdminLynxOutcomeMonitorSeverityMode,
   parseSystemAdminLynxOutcomeMonitorThresholds,

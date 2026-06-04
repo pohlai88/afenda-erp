@@ -4,7 +4,7 @@ import type {
   SystemAdminReliabilityCategory,
   SystemAdminReliabilityIssue,
   SystemAdminReliabilitySummary,
-} from "../contracts/system-admin.reliability-issue.contract";
+} from "./sys-reliability-issue.contract";
 
 const severityRank: Record<ReliabilitySeverity, number> = {
   blocked: 0,

@@ -4,7 +4,7 @@ import { createAuditLog } from "./audit";
 import { runWithOrganizationContext } from "./client";
 import { erpDocuments } from "./schema";
 import { hrEmployeeDocuments } from "./hr";
-import { retentionPolicies } from "./system-admin";
+import { retentionPolicies } from "./schema";
 
 const DOCUMENT_LEGAL_HOLD_ENTITY_TYPES = [
   "document",

@@ -7,13 +7,13 @@ import {
   systemAdminActionSuccess,
   type SystemAdminActionResult,
   zodActionFailure,
-} from "../../tenant-execution/contracts/system-admin.action-result.contract";
-import { updateMembershipStatus } from "./system-admin.memberships.query.server";
+} from "../tenant-execution/sys-action-result.contract";
+import { updateMembershipStatus } from "./sys-memberships.query.server";
 import {
   assertSystemAdminMembershipStatusChangeAllowed,
   requireSystemAdminMembershipsManage,
-} from "../policies/system-admin.memberships.policy.server";
-import { systemAdminMembershipStatusInputSchema } from "../schemas/system-admin.memberships.schema";
+} from "./sys-memberships.policy.server";
+import { systemAdminMembershipStatusInputSchema } from "./sys-memberships.schema";
 
 function revalidateSystemAdminMemberships() {
   revalidatePath("/system-admin/memberships");

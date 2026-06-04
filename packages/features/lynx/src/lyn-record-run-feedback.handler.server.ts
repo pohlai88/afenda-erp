@@ -1,17 +1,17 @@
 import { isAiPermissionError } from "@afenda/ai/server";
-import { getApiAuthContext } from "./server";
+import { getApiAuthContext } from "./lyn-api-auth.server";
 import { getRequestId, logServerEvent } from "@afenda/observability/server";
 import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 
-import { executeLynxRecordRunFeedbackCommand } from "../commands/lynx.record-run-feedback.command.server";
+import { executeLynxRecordRunFeedbackCommand } from "./lyn-record-run-feedback.command.server";
 import {
   LYNX_AUDIT_ACTIONS,
   LYNX_ERP_HTTP_ROUTES,
   LYNX_MODULE_ID,
   LYNX_WORKSPACE_ROUTES,
-} from "./lyn-core-contract";
-import { lynxLiveRunFeedbackRequestSchema } from "./lyn-run-feedback-schema";
+} from "./lyn-core.contract";
+import { lynxLiveRunFeedbackRequestSchema } from "./lyn-run-feedback.schema";
 
 export async function handleLynxRecordRunFeedbackPost(
   request: Request,

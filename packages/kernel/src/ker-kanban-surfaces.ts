@@ -1,5 +1,5 @@
 import type { ModuleId } from "@afenda/config/module-ids";
-import type { GovernedKanbanBoardConfigurationInput } from "@afenda/governed-surface/client";
+import type { GovernedKanbanBoardConfigurationInput } from "./ker-governed-surface-contract";
 
 // ─── Work-item kanban board ───────────────────────────────────────────────────
 

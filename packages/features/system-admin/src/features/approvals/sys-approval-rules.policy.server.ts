@@ -1,10 +1,10 @@
-import type { SystemAdminApprovalRuleStatus } from "../contracts/system-admin.approval-rule.contract";
+import type { SystemAdminApprovalRuleStatus } from "./sys-approval-rule.contract";
 
 export {
   requireSystemAdminApprovalsManage,
   requireSystemAdminApprovalsRead,
   requireSystemAdminApprovalsReview,
-} from "../../overview/policies/system-admin.capability.policy.server";
+} from "../overview/sys-capability.policy.server";
 
 export function assertApprovalRuleChangeAllowed(input: {
   mode: "create" | "update";

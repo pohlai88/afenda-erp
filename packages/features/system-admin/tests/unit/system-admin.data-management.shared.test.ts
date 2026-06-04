@@ -3,11 +3,11 @@ import { describe, expect, it } from "vitest";
 import {
   SYSTEM_ADMIN_DATA_MANAGEMENT_AUDIT_TARGET_TYPE,
   SYSTEM_ADMIN_DATA_MANAGEMENT_QUERY_LIMIT,
-} from "../../src/data-management/contracts/system-admin.data-management.limits.shared";
-import { buildSystemAdminDataManagementExportCsv } from "../../src/data-management/data/system-admin.data-management-export.build.server";
-import { findMissingCsvHeaders } from "../../src/data-management/data/system-admin.data-management-headers.shared";
-import { parseSystemAdminImportJobFormData } from "../../src/data-management/data/system-admin.import-job-form.shared";
-import { systemAdminDataManagementAuditActions } from "../../src/data-management/events/system-admin.data-management.event";
+} from "../../src/features/data-management/sys-data-management.limits.shared";
+import { buildSystemAdminDataManagementExportCsv } from "../../src/features/data-management/sys-data-management-export.build.server";
+import { findMissingCsvHeaders } from "../../src/features/data-management/sys-data-management-headers.shared";
+import { parseSystemAdminImportJobFormData } from "../../src/features/data-management/sys-import-job-form.shared";
+import { systemAdminDataManagementAuditActions } from "../../src/features/data-management/sys-data-management.event";
 
 describe("data-management shared helpers", () => {
   it("uses hyphenated audit action keys", () => {

@@ -1,5 +1,5 @@
 import { GOVERNED_METADATA_SCHEMA_VERSION } from "./gov-schema-version-shared";
-import { resolveGovernedChartPresentation } from "../resolvers/resolve-governed-presentation";
+import { resolveGovernedChartPresentation } from "./gov-resolve-governed-presentation";
 import type {
   ChartDataNature,
   GovernedChartConfigurationInput,

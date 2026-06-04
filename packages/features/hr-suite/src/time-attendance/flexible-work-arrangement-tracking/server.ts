@@ -18,7 +18,6 @@ export * from "./hrs-hr-time-fwa-audit-trail-server";
 export * from "./hrs-hr-time-fwa-compliance-events";
 export * from "./hrs-hr-time-fwa-compliance-server";
 export * from "./hrs-hr-time-fwa-eligibility-server";
-export * from "./hrs-hr-time-fwa-events";
 export * from "./hrs-hr-time-fwa-exception-server";
 export * from "./hrs-hr-time-fwa-leave-validate-server";
 export * from "./hrs-hr-time-fwa-location-server";

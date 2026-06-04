@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   parseHrTalentRssSearchParams,
   toHrTalentRssPageModelInput,
-} from "../../src/talent-management/candidate-selfservice-portal/data/hr.talent.rss-search-params.parse.shared";
+} from "../../src/talent-management/candidate-selfservice-portal/hr.talent.rss-search-params.parse.shared";
 
 describe("Candidate Self-Service Portal search params", () => {
   it("parses and trims RSS list, grouping, and status params", () => {

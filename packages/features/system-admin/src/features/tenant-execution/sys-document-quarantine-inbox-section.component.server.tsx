@@ -3,16 +3,13 @@ import {
   hasDocumentWriteAccess,
   isAppCapability,
   type AppCapability,
-} from "@afenda/auth";
+} from "@afenda/kernel";
 import { GovernedPatternCListSection } from "@afenda/governed-surface/server";
 import { SectionPanel } from "@afenda/ui";
 
-import type { SystemAdminDocumentQuarantineInboxWindow } from "./system-admin.document-quarantine-inbox.read-model.server";
-import {
-  buildSystemAdminDocumentQuarantineInboxListSurface,
-  systemAdminDocumentQuarantineInboxSurfaceKey,
-} from "../surface";
-import { SystemAdminDocumentQuarantineTrailingCell } from "./system-admin.document-quarantine-trailing-cell.component.client";
+import type { SystemAdminDocumentQuarantineInboxWindow } from "./sys-document-quarantine-inbox.read-model.server";
+import { buildSystemAdminDocumentQuarantineInboxListSurface, systemAdminDocumentQuarantineInboxSurfaceKey } from "./sys-document-quarantine-inbox.surface";
+import { SystemAdminDocumentQuarantineTrailingCell } from "./sys-document-quarantine-trailing-cell.component.client";
 
 export function SystemAdminDocumentQuarantineInboxSection({
   quarantineWindow,

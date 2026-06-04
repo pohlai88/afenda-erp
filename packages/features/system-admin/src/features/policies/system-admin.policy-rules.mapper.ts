@@ -14,7 +14,7 @@ import {
   readConfigurationNumber,
   readConfigurationString,
   readExecutionSettingConfiguration,
-} from "../../tenant-execution/contracts/system-admin.execution-settings.shared";
+} from "../tenant-execution/sys-execution-settings.shared";
 
 function derivePolicyStatus(
   row: TenantPolicySettingRow,

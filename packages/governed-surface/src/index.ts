@@ -1,3 +1,7 @@
+/**
+ * Neutral shared API — schemas, builders, server actions, identity helpers.
+ * Safe from server or client; no React client boundary.
+ */
 export {
   GOVERNED_METADATA_SCHEMA_VERSION,
   governedMetadataSchemaVersionSchema,
@@ -148,7 +152,7 @@ export {
   GOVERNED_CHART_PRESENTATION_PROFILES,
   GOVERNED_LIST_PRESENTATION_PROFILES,
   GOVERNED_STAT_PRESENTATION_PROFILES,
-} from "./profiles/governed-presentation-profiles";
+} from "./gov-governed-presentation-profiles";
 
 export {
   GOVERNED_STAT_GRID_CLASS,
@@ -163,12 +167,12 @@ export {
   type ResolveGovernedChartPresentationInput,
   type ResolveGovernedListPresentationInput,
   type ResolveGovernedStatPresentationInput,
-} from "./resolvers/resolve-governed-presentation";
+} from "./gov-resolve-governed-presentation";
 
 export {
   buildGovernedListSurface,
   type BuildGovernedListSurfaceInput,
-} from "./builders/build-governed-list-surface";
+} from "./gov-build-governed-list-surface";
 
 export {
   buildGovernedListExportToolbarPresentation,
@@ -177,19 +181,19 @@ export {
   matchesGovernedWorkbenchFocus,
   mergeGovernedListToolbarPresentation,
   type GovernedWorkbenchFocusSearchInput,
-} from "./builders/governed-list-toolbar.shared";
+} from "./gov-governed-list-toolbar-shared";
 
-export { listSurfaceHeader } from "./builders/list-surface-header.shared";
+export { listSurfaceHeader } from "./gov-list-surface-header-shared";
 
 export {
   buildGovernedStatGrid,
   type BuildGovernedStatGridInput,
-} from "./builders/build-governed-stat-grid";
+} from "./gov-build-governed-stat-grid";
 
 export {
   buildGovernedChartSurface,
   type BuildGovernedChartSurfaceInput,
-} from "./builders/build-governed-chart-surface";
+} from "./gov-build-governed-chart-surface";
 
 export {
   parseGovernedChartConfiguration,
@@ -340,7 +344,7 @@ export {
   type GovernedDiagnostics,
   type GovernedDiagnosticsDataAttributes,
   type GovernedRenderableState,
-} from "./utils/governed-diagnostics.shared";
+} from "./gov-governed-diagnostics-shared";
 
 export {
   governedDescriptionId,
@@ -350,16 +354,16 @@ export {
   toGovernedDomId,
   type GovernedIdentity,
   type GovernedIdentityAttributes,
-} from "./utils/governed-identity.shared";
+} from "./gov-governed-identity-shared";
 
 export {
   GovernedHeading,
   type GovernedHeadingLevel,
   type GovernedHeadingProps,
   type GovernedHeadingVariant,
-} from "./utils/governed-heading.shared";
+} from "./gov-governed-heading-shared";
 
-export { asGovernedRoute, isGovernedRoute } from "./utils/governed-safe-route";
+export { asGovernedRoute, isGovernedRoute } from "./gov-governed-safe-route";
 
 export {
   DEFAULT_GOVERNED_LIST_TOOLBAR_RESET_PARAMS,

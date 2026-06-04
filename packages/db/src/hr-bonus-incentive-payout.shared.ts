@@ -1,6 +1,6 @@
 import type {
   hrBonusPayoutFormulaKindEnum,
-} from "./hr-bonus-incentive";
+} from "./dbx-hr-bonus-incentive";
 
 export type BonusPayoutFormulaKind =
   (typeof hrBonusPayoutFormulaKindEnum.enumValues)[number];
@@ -212,3 +212,4 @@ export function calculateBonusPayout(
     floored: bounded.floored,
   };
 }
+

@@ -12,60 +12,60 @@ import {
   getUsageMetrics,
   hasAiGatewayRuntimeCredentials,
 } from "@afenda/ai/server";
-import { createSolutionProviderSpecialistAgent } from "../agents/lynx.solution-provider-specialist.agent.server";
-import { solutionProviderToolMeta } from "../tools/lynx.solution-provider-tool-meta";
-import { getApiAuthContext } from "./server";
+import { createSolutionProviderSpecialistAgent } from "./lyn-solution-provider-specialist.agent.server";
+import { solutionProviderToolMeta } from "./lyn-solution-provider-tool-meta";
+import { getApiAuthContext } from "./lyn-api-auth.server";
 import {
   isAiFeatureEnabledForOrganization,
-} from "./lynx.run-lifecycle.repository.server";
+} from "./lyn-run-lifecycle.repository.server";
 import {
   getLynxWorkflowSession,
   type LynxWorkflowSessionSummary,
-} from "./lynx.workflow-session.repository.server";
+} from "./lyn-workflow-session.repository.server";
 import {
   executeLynxCompleteRunCommand,
   executeLynxCreateAiUsageEventCommand,
   executeLynxCreateRunCommand,
-  executeLynxCreateWorkflowSessionCommand,
   executeLynxRecordRunEventCommand,
+} from "./lyn-run-lifecycle.command.server";
+import {
+  executeLynxCreateWorkflowSessionCommand,
   executeLynxUpdateWorkflowSessionCommand,
-} from "../commands";
+} from "./lyn-workflow-session.command.server";
 import {
   combineLynxQualityGates,
   summarizeLynxQualityGate,
   validateLynxClaims,
   type LynxQualityGateResult,
-} from "./lyn-evidence-trust-contract";
-import { createLynxOperatorCheckpoint } from "./lyn-operator-checkpoint-contract";
+} from "./lyn-evidence-trust.contract";
+import { createLynxOperatorCheckpoint } from "./lyn-operator-checkpoint.contract";
 import {
   LYNX_AUDIT_ACTIONS,
   LYNX_ERP_HTTP_ROUTES,
   LYNX_GATEWAY_FEATURES,
   LYNX_MODULE_ID,
   LYNX_OPERATOR_MAX_STEPS,
-} from "./lyn-core-contract";
+} from "./lyn-core.contract";
 import type {
   LynxRunContextData,
   LynxRunContextMetadata,
-} from "./lyn-run-feedback-schema";
-import { getLynxReadinessSnapshot } from "./lynx.readiness.query.server";
-import {
-  createLynxErpReadTools,
-  createLynxKnowledgeTools,
-  createLynxReadinessTools,
-  lynxToolMeta,
-} from "../tools";
+} from "./lyn-run-feedback.schema";
+import { getLynxReadinessSnapshot } from "./lyn-readiness.query.server";
+import { createLynxErpReadTools } from "./lyn-erp-read-tools.tool.server";
+import { createLynxKnowledgeTools } from "./lyn-knowledge.tool.server";
+import { createLynxReadinessTools } from "./lyn-readiness.tool.server";
+import { lynxToolMeta } from "./lyn-tool-meta";
 import { getRequestId, logServerEvent } from "@afenda/observability/server";
 import { solutionWorkflowIds, type SolutionWorkflowId } from "@afenda/kernel";
 import { createAgentUIStreamResponse, type UIMessage } from "ai";
 import { NextResponse } from "next/server";
-import { lynxOperatorRequestSchema } from "./lyn-operator-schema";
+import { lynxOperatorRequestSchema } from "./lyn-operator.schema";
 import {
   createRouteAgentStepLogger,
   createRouteAiTelemetrySettings,
-} from "./lynx.route-observability.shared.server";
-import { createLynxSolutionProviderTools } from "../tools/lynx.solution-provider-bindings.tool.server";
-import { withAiSpan } from "./lynx.ai-span.shared.server";
+} from "./lyn-route-observability.shared.server";
+import { createLynxSolutionProviderTools } from "./lyn-solution-provider-bindings.tool.server";
+import { withAiSpan } from "./lyn-ai-span.shared.server";
 
 function getGatewayUnavailableResponse() {
   return NextResponse.json(

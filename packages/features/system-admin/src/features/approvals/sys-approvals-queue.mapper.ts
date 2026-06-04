@@ -1,6 +1,6 @@
 import type { ModuleWorkspaceItem } from "@afenda/kernel";
 
-import type { SystemAdminApprovalQueueListRow } from "../contracts/system-admin.approvals-queue.contract";
+import type { SystemAdminApprovalQueueListRow } from "./sys-approvals-queue.contract";
 
 function readApprovalRoute(metadata: Record<string, unknown>) {
   const route = metadata.route ?? metadata.approvalRoute;

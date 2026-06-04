@@ -1,15 +1,12 @@
 import { hasExecutionPermission } from "@afenda/kernel/execution";
 
-import {
-  exportSystemAdminAuditLogsAction,
-  upsertSystemAdminRetentionPolicyAction,
-} from "../actions";
-import { buildSystemAdminAuditPageModel } from "../data";
+import { exportSystemAdminAuditLogsAction, upsertSystemAdminRetentionPolicyAction } from "./sys-audit.actions.server";
+import { buildSystemAdminAuditPageModel } from "./sys-audit.page-model.server";
 import { requireSystemAdminAuditRead } from "./sys-audit-viewer.policy.server";
 import {
   SystemAdminAuditAccessDenied,
   SystemAdminAuditSection,
-} from "./system-admin.audit-section.component.server";
+} from "./sys-audit-section.component.server";
 
 export async function SystemAdminAuditPage({
   searchParams,

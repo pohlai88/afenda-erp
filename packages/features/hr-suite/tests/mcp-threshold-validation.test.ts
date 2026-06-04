@@ -5,9 +5,9 @@ import {
   evaluatePayrollThresholdViolations,
   resolveDefaultThresholdRules,
   validatePayrollThresholds,
-} from "./hr.payroll.mcp-threshold-validation.shared";
-import { HrMcpValidationError } from "./hr.payroll.mcp-statutory-readiness.shared";
-import type { HrMcpThresholdValidationInput } from "../schemas/hr.payroll.mcp-validation.schema";
+} from "../src/payroll-compensation/multi-country-payroll/hr.payroll.mcp-threshold-validation.shared";
+import { HrMcpValidationError } from "../src/payroll-compensation/multi-country-payroll/hr.payroll.mcp-statutory-readiness.shared";
+import type { HrMcpThresholdValidationInput } from "../src/payroll-compensation/multi-country-payroll/hr.payroll.mcp-validation.schema";
 
 const baseInput: HrMcpThresholdValidationInput = {
   employeeId: "hr_emp_001",

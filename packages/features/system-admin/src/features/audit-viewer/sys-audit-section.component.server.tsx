@@ -1,27 +1,20 @@
 import { GovernedPatternCListSection } from "@afenda/governed-surface/server";
 import { SectionPanel } from "@afenda/ui";
-import type { SystemAdminAuditSearchParams } from "../schemas/system-admin.audit-filter.schema";
-import type {
-  SystemAdminAuditEventDetail,
-  SystemAdminAuditEventRow,
-  SystemAdminRetentionPolicyListRow,
-} from "../contracts";
-import {
-  buildSystemAdminAuditListHref,
-  buildSystemAdminAuditViewerListSurface,
-  buildSystemAdminRetentionPoliciesListSurface,
-  systemAdminAuditUiCopy,
-  systemAdminAuditViewerSurfaceKey,
-  systemAdminRetentionSurfaceKey,
-} from "../surface";
-import { SystemAdminAuditDetailPanel } from "./system-admin.audit-detail.component.server";
-import { SystemAdminAuditExportActions } from "./system-admin.audit-export-actions.component.client";
-import { RetentionPolicyForm } from "./system-admin.retention-policy-form.component.client";
-import { buildSystemAdminAuditExportFilterFields } from "./system-admin.audit-export-filters.shared";
-import { SystemAdminAuditCoveragePanel } from "./system-admin.audit-coverage-panel.component.server";
-import type { SystemAdminAuditCoverageGapRow } from "../contracts/system-admin.audit-coverage.contract";
-import type { SystemAdminActionResult } from "../../tenant-execution/contracts/system-admin.action-result.contract";
-import type { ExportSystemAdminAuditLogsAction } from "./system-admin.audit-export-button.component.client";
+import type { SystemAdminAuditSearchParams } from "./sys-audit-filter.schema";
+import type { SystemAdminAuditEventDetail, SystemAdminAuditEventRow } from "./sys-audit-event.contract";
+import type { SystemAdminRetentionPolicyListRow } from "./sys-retention-policy.contract";
+import { buildSystemAdminAuditListHref } from "./sys-audit-pagination.shared";
+import { buildSystemAdminAuditViewerListSurface, systemAdminAuditViewerSurfaceKey } from "./sys-audit-list.surface";
+import { buildSystemAdminRetentionPoliciesListSurface, systemAdminRetentionSurfaceKey } from "./sys-retention-list.surface";
+import { systemAdminAuditUiCopy } from "./sys-audit-ui.copy.shared";
+import { SystemAdminAuditDetailPanel } from "./sys-audit-detail.component.server";
+import { SystemAdminAuditExportActions } from "./sys-audit-export-actions.component.client";
+import { RetentionPolicyForm } from "./sys-retention-policy-form.component.client";
+import { buildSystemAdminAuditExportFilterFields } from "./sys-audit-export-filters.shared";
+import { SystemAdminAuditCoveragePanel } from "./sys-audit-coverage-panel.component.server";
+import type { SystemAdminAuditCoverageGapRow } from "./sys-audit-coverage.contract";
+import type { SystemAdminActionResult } from "../tenant-execution/sys-action-result.contract";
+import type { ExportSystemAdminAuditLogsAction } from "./sys-audit-export-button.component.client";
 
 type UpsertRetentionPolicyAction = (
   state: SystemAdminActionResult | undefined,

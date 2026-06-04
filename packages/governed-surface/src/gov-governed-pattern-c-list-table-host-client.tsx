@@ -1,20 +1,15 @@
 "use client";
 
-import {
-  GovernedListSurfaceWithTrailingColumn,
-  type ListSurfaceTableTrailingColumn,
-} from "./index";
+import { ListSurfaceTable } from "./gov-list-surface-table";
+import type { ListSurfaceTableTrailingColumn } from "./gov-list-surface-table-client";
+import { buildListSurfaceTableProps } from "./build-list-surface-table-props.shared";
 
-import type { EmptyState, ListColumn } from "./gov-list-surface-schema";
-import type {
-  ListSurfaceRendererConfiguration,
-  ListSurfaceRow,
-} from "./gov-list-surface-renderer-schema";
+import type { ListSurfaceRendererConfiguration } from "./gov-list-surface-renderer-schema";
 
 import {
   resolveGovernedTrailingColumn,
   type GovernedPatternCTrailingColumnSpec,
-} from "./governed-list-trailing-cell-registry.client";
+} from "./gov-governed-list-trailing-cell-registry-client";
 
 export type GovernedPatternCListTableHostProps = {
   surfaceKey: string;
@@ -55,8 +50,6 @@ export function GovernedPatternCListTableHost({
   config,
   trailingColumn,
 }: GovernedPatternCListTableHostProps) {
-  const tableDensity = config.presentation?.tableDensity ?? "compact";
-  const presentationVariant = config.presentation?.variant ?? "table-only";
   const tableTrailing = resolvePatternCTableTrailingColumn(
     trailingColumn,
     surfaceKey,
@@ -64,24 +57,14 @@ export function GovernedPatternCListTableHost({
     componentKey,
   );
 
-  return (
-    <GovernedListSurfaceWithTrailingColumn
-      surfaceKey={surfaceKey}
-      sectionKey={sectionKey}
-      componentKey={componentKey}
-      columnsId={config.surface.columnsId}
-      dataNature={config.dataNature}
-      presentationVariant={presentationVariant}
-      columns={config.columns as readonly ListColumn[]}
-      rows={config.rows as readonly ListSurfaceRow[]}
-      tableLabel={config.surface.header.title}
-      empty={config.surface.empty as EmptyState | undefined}
-      trailingColumn={tableTrailing}
-      density={tableDensity}
-      stickyHeader={config.presentation?.stickyHeader}
-      virtualizeRowThreshold={config.presentation?.virtualizeRowThreshold}
-      toolbar={config.presentation?.toolbar}
-      pagination={config.pagination}
-    />
-  );
+  const tableProps = buildListSurfaceTableProps(config, {
+    surfaceKey,
+    sectionKey,
+    componentKey,
+    presentationVariant:
+      config.presentation?.variant ?? "table-only",
+    trailingColumn: tableTrailing,
+  });
+
+  return <ListSurfaceTable {...tableProps} />;
 }

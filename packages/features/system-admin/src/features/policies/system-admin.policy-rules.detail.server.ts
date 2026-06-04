@@ -1,10 +1,10 @@
-import { resolveExecutionCapabilityForAction } from "../../tenant-execution/policies/system-admin.execution-capability.shared.server";
+import { resolveExecutionCapabilityForAction } from "../tenant-execution/sys-execution-capability.shared.server";
 import {
   readConfigurationString,
   readExecutionSettingConfiguration,
-} from "../../tenant-execution/contracts/system-admin.execution-settings.shared";
+} from "../tenant-execution/sys-execution-settings.shared";
 import type { TenantPolicySettingRow } from "@afenda/db";
-import { systemAdminControlLinks } from "../../overview/contracts/system-admin.control-links.contract";
+import { systemAdminControlLinks } from "../overview/sys-control-links.contract";
 import type { SystemAdminPolicyRuleDetail } from "./system-admin.policy-rule.contract";
 import {
   mapTenantPolicySettingToRule,

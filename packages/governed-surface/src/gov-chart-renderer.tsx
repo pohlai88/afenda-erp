@@ -11,23 +11,23 @@ import {
   CardHeader,
   CardTitle,
 } from "@afenda/ui/card";
-import { GovernedEmpty } from "./client";
+import { GovernedEmpty } from "./gov-governed-empty";
 import { resolveGovernedServerAction } from "./gov-server-actions-shared";
 import {
   parseGovernedChartConfiguration,
   type ChartAction,
   type ChartDataNature,
 } from "./gov-chart-schema";
-import { governedParseErrorCopy } from "../i18n/governed-renderer-copy.shared";
-import { diagnosticsDataAttributes } from "../utils/governed-diagnostics.shared";
+import { governedParseErrorCopy } from "./gov-governed-renderer-copy-shared";
+import { diagnosticsDataAttributes } from "./gov-governed-diagnostics-shared";
 import {
   governedIdentityAttributes,
   governedTestId,
-} from "../utils/governed-identity.shared";
+} from "./gov-governed-identity-shared";
 
 import type { GovernedComponentRendererDiagnostics } from "./gov-registry";
-import { ActionBarActionForm } from "./action-bar-action.client";
-import { ChartRendererBody } from "./chart-renderer-body.client";
+import { ActionBarActionForm } from "./gov-action-bar-action-client";
+import { ChartRendererBody } from "./gov-chart-renderer-body-client";
 
 const DATA_NATURE_CLASS: Record<ChartDataNature, string> = {
   "time-series": "@container min-h-[14rem]", // audit-ds: ignore no-arbitrary-value — chart minimum height contract

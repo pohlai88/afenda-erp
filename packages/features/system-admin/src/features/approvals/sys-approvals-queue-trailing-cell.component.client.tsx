@@ -21,9 +21,9 @@ import { ArrowUpRightIcon, CheckIcon, XIcon } from "lucide-react";
 import Link from "next/link";
 import { useActionState, useState, useTransition } from "react";
 
-import { SystemAdminTrailingActionStack } from "../../overview/components/system-admin.trailing-action-stack.component.client";
-import { decideSystemAdminApprovalWorkItemAction } from "../actions/system-admin.approvals-queue.actions.server";
-import { systemAdminApprovalsUiCopy } from "../surface/system-admin.approvals-ui.copy.shared";
+import { SystemAdminTrailingActionStack } from "../overview/sys-trailing-action-stack.component.client";
+import { decideSystemAdminApprovalWorkItemAction } from "./sys-approvals-queue.actions.server";
+import { systemAdminApprovalsUiCopy } from "./sys-approvals-ui.copy.shared";
 
 export function SystemAdminApprovalQueueTrailingCell({
   row,

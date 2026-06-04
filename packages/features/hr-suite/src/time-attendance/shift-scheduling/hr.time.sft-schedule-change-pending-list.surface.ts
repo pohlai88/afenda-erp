@@ -1,6 +1,6 @@
 import { resolveListSurfaceRowTrailingAction } from "@afenda/governed-surface";
 
-import type { HrShiftScheduleChangeRequestWindow } from "./hr.time.sft-schedule-change.server";
+import type { HrShiftScheduleChangeRequestWindow } from "./hrs-hr-time-sft-schedule-change-server";
 import {
   buildSftListSearchToolbar,
   buildSftOperationalListSurface,

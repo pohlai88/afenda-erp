@@ -7,7 +7,7 @@ import {
   hrPayrollJournalRefs,
   hrPayrollRunLines,
   hrPayrollRuns,
-} from "./hr-payroll-processing";
+} from "./dbx-hr-payroll-processing";
 
 /** PAY-028 — generate payroll journal / finance posting reference. */
 export async function generateHrPayrollJournalRefInTx(
@@ -119,3 +119,4 @@ export async function getHrPayrollJournalRefInTx(
 
   return row ?? null;
 }
+

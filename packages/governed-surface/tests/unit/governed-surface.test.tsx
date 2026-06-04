@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
 
-import { GovernedSurface } from "../../src/components/governed-surface";
-import { governedHeadingId } from "../../src/utils/governed-identity.shared";
+import { GovernedSurface } from "../../src/gov-governed-heading.server";
+import { governedHeadingId } from "../../src/gov-governed-identity-shared";
 
 describe("GovernedSurface", () => {
   it("labels the surface by the module page header heading", () => {

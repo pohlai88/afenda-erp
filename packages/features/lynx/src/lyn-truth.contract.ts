@@ -1,17 +1,17 @@
-import { LYNX_TRUTH_RESPONSE_SECTIONS } from "./lynx.core.contract";
+import { LYNX_TRUTH_RESPONSE_SECTIONS } from "./lyn-core.contract";
 export {
   lynxTruthEvidenceDataSchema,
   lynxTruthEvidencePassageSchema,
   lynxTruthQualityGateDataSchema,
   lynxTruthRetrievalStateDataSchema,
-} from "./lyn-truth-schema";
+} from "./lyn-truth.schema";
 export type {
   LynxTruthEvidenceData,
   LynxTruthEvidencePassage,
   LynxTruthQualityGateData,
   LynxTruthRetrievalStateData,
   LynxTruthRetrievalStatus,
-} from "./lyn-truth-schema";
+} from "./lyn-truth.schema";
 
 export type LynxTruthValidation = {
   hasRequiredSections: boolean;

@@ -1,11 +1,11 @@
 import { writeExecutionAuditEvent } from "@afenda/kernel/execution";
-import { filterSystemAdminListRows } from "../../overview/contracts/system-admin.list-filter.shared";
+import { filterSystemAdminListRows } from "../overview/sys-list-filter.shared";
 import {
   resolveSystemAdminListSearch,
   resolveSystemAdminListStatusFilter,
-} from "../../overview/contracts/system-admin.list-search.shared";
-import type { SystemAdminUserRow, SystemAdminUserStatus } from "../contracts";
-import { listSystemAdminUsers } from "./system-admin.users.query.server";
+} from "../overview/sys-list-search.shared";
+import type { SystemAdminUserRow, SystemAdminUserStatus } from "./sys-users.contract";
+import { listSystemAdminUsers } from "./sys-users.query.server";
 
 const USER_LIST_SEARCH_FIELDS = ["name", "email"] as const;
 

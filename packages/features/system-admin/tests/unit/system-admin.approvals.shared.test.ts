@@ -3,7 +3,7 @@ import {
   readConfiguredApprovalRuleStatus,
   resolveApprovalRuleKey,
   toEscalationMinutes,
-} from "../../src/approvals/data/system-admin.approval-rules.shared";
+} from "../../src/features/approvals/sys-approval-rules.shared";
 
 describe("approval rule shared helpers", () => {
   it("resolves approval keys from create and update action input", () => {

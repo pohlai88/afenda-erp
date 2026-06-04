@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import {
   buildSystemAdminDocumentQuarantineInboxListSurface,
   systemAdminDocumentQuarantineInboxGalleryRows,
-} from "../../src/tenant-execution/metadata";
+} from "../../src/features/tenant-execution/metadata";
 
 describe("system admin document quarantine inbox gallery surfaces", () => {
   it("parses quarantine inbox fixture rows", () => {

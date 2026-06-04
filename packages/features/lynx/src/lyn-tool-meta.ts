@@ -1,5 +1,5 @@
 import type { GovernedToolMeta } from "@afenda/ai/client";
-import { LYNX_ERP_READ_TOOL_IDS } from "./lyn-erp-read-tools-schema";
+import { LYNX_ERP_READ_TOOL_IDS } from "./lyn-erp-read-tools.schema";
 
 export const LYNX_KNOWLEDGE_TOOL_IDS = [
   "searchKnowledge",

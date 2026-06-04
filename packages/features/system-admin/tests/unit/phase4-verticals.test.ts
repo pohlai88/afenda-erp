@@ -1,17 +1,17 @@
 import { describe, expect, it } from "vitest";
-import { systemAdminAuditViewerAuditActions } from "../../src/audit-viewer/events/system-admin.audit-viewer.event";
+import { systemAdminAuditViewerAuditActions } from "../../src/features/audit-viewer/sys-audit-viewer.event";
 import {
   systemAdminIntegrationsWebhookEvents,
-} from "../../src/integrations/events/system-admin.integrations.event";
-import { buildSystemAdminAuditPageHref } from "../../src/audit-viewer/surface/system-admin.audit-pagination.shared";
-import { systemAdminPolicyRuleWebhookEvents } from "../../src/policies/events/system-admin.policy-rules.event";
-import { systemAdminSecurityAuditActions } from "../../src/security/events/system-admin.security.event";
+} from "../../src/features/integrations/sys-integrations.event";
+import { buildSystemAdminAuditPageHref } from "../../src/features/audit-viewer/sys-audit-pagination.shared";
+import { systemAdminPolicyRuleWebhookEvents } from "../../src/features/policies/system-admin.policy-rules.event";
+import { systemAdminSecurityAuditActions } from "../../src/features/security/sys-security.event";
 import {
   assertSecuritySettingsDowngradeGuard,
   updateSecuritySettingsInputSchema,
-} from "../../src/security/schemas/system-admin.security.schema";
-import type { OrganizationSecuritySettings } from "../../src/security/contracts/system-admin.security-settings.contract";
-import { evaluateSecurityReadiness } from "../../src/security/data/system-admin.security.readiness.server";
+} from "../../src/features/security/sys-security.schema";
+import type { OrganizationSecuritySettings } from "../../src/features/security/sys-security-settings.contract";
+import { evaluateSecurityReadiness } from "../../src/features/security/sys-security.readiness.server";
 
 const baseSecurity: OrganizationSecuritySettings = {
   organizationId: "org_phase4",

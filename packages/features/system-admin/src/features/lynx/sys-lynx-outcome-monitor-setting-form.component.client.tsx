@@ -11,13 +11,9 @@ import {
 } from "@afenda/ui";
 import { useActionState } from "react";
 
-import type { SystemAdminActionResult } from "../contracts";
-import { systemAdminLynxOutcomeMonitorThresholdCatalog } from "../contracts";
-import {
-  readMonitorSeverityMode,
-  readMonitorThresholdNumber,
-  type LynxOutcomeMonitorSetting,
-} from "../contracts";
+import type { SystemAdminActionResult } from "../tenant-execution/sys-action-result.contract";
+import { systemAdminLynxOutcomeMonitorThresholdCatalog } from "./sys-lynx-outcome-monitor-catalog.contract";
+import { readMonitorSeverityMode, readMonitorThresholdNumber, type LynxOutcomeMonitorSetting } from "./sys-lynx-outcome-monitor.contract";
 
 type UpdateLynxOutcomeMonitorSettingAction = (
   state: SystemAdminActionResult | undefined,

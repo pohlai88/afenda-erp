@@ -8,14 +8,10 @@ import {
 import {
   listOrganizationInvitations,
   listTenantMembers,
-} from "./system-admin.identity.repository.server";
-import { formatSystemAdminUserLastActive } from "./system-admin.users-last-active.shared";
-import type { OrganizationRole } from "@afenda/auth";
-import type {
-  SystemAdminInviteUserResult,
-  SystemAdminUserRow,
-  SystemAdminUserStatus,
-} from "../contracts";
+} from "./sys-identity.repository.server";
+import { formatSystemAdminUserLastActive } from "./sys-users-last-active.shared";
+import type { OrganizationRole } from "@afenda/kernel";
+import type { SystemAdminInviteUserResult, SystemAdminUserRow, SystemAdminUserStatus } from "./sys-users.contract";
 
 function mapMembershipStatusToUserStatus(
   status: TenantMemberSummary["status"],

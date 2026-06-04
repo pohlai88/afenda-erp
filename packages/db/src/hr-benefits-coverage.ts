@@ -11,7 +11,7 @@ import { HrBenefitsCommandError } from "./hr-benefits.shared";
 import {
   hrBenefitDeductionReferences,
   hrBenefitEnrollments,
-} from "./hr-benefits";
+} from "./dbx-hr-benefits";
 
 /** HRM-BEN-022 — transition coverage status with validation. */
 export async function updateHrBenefitCoverageStatusInTx(
@@ -164,3 +164,4 @@ export async function adjustHrBenefitCoverageForEmploymentStatusInTx(
 
   return { adjustedCount };
 }
+

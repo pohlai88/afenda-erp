@@ -1,10 +1,10 @@
-import type { OrganizationRole } from "@afenda/auth";
+import type { OrganizationRole } from "@afenda/kernel";
 import {
   isSystemAdminDeprecatedPermissionKey,
   isSystemAdminProtectedAdminPermission,
   requiresElevatedPermissionConfirmation,
   requiresHighRiskPermissionConfirmation,
-} from "../contracts/system-admin.permission-risk.shared";
+} from "./sys-permission-risk.shared";
 
 export function assertRolePermissionBundleChangeAllowed(input: {
   role: OrganizationRole;

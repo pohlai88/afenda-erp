@@ -1,4 +1,4 @@
-import type { HrGeoIntegrationFindingWindow } from "./hr.time.geo-integration-windows.server";
+import type { HrGeoIntegrationFindingWindow } from "./hrs-hr-time-geo-integration-windows-server";
 import {
   hrGeoLamExposureColumnsId,
   hrGeoLamExposureSearchParam,

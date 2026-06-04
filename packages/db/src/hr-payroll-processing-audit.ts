@@ -2,7 +2,7 @@ import { and, count, desc, eq, ilike, or } from "drizzle-orm";
 import { runWithOrganizationContext, type AfendaTransaction } from "./client";
 import { createEntityId } from "./ids";
 import { buildPaginatedWindow, clampPageSize } from "./hr-benefits.shared";
-import { hrPayrollAuditEvents } from "./hr-payroll-processing";
+import { hrPayrollAuditEvents } from "./dbx-hr-payroll-processing";
 
 export async function appendHrPayrollAuditEventInTx(
   db: AfendaTransaction,
@@ -106,3 +106,4 @@ export async function listHrPayrollAuditTrailWindow(input: {
     });
   });
 }
+

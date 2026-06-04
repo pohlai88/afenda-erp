@@ -1,10 +1,10 @@
 import { searchTenantAuditLogs } from "@afenda/db";
 import { formatErpDateTime } from "@afenda/kernel";
-import type { SystemAdminApprovalActivityRow } from "../contracts/system-admin.approval-rule.contract";
+import type { SystemAdminApprovalActivityRow } from "./sys-approval-rule.contract";
 import {
   APPROVAL_ACTIVITY_DEFAULT_LIMIT,
   SYSTEM_ADMIN_APPROVAL_AUDIT_ACTION_PREFIX,
-} from "./system-admin.approval-rules.shared";
+} from "./sys-approval-rules.shared";
 
 export async function listSystemAdminApprovalRuleActivity(input: {
   organizationId: string;

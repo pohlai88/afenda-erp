@@ -4,13 +4,13 @@ import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
 import { Search } from "lucide-react";
 import { useState } from "react";
-import { LYNX_ERP_HTTP_ROUTES } from "./lyn-core-contract";
+import { LYNX_ERP_HTTP_ROUTES } from "./lyn-core.contract";
 import {
   LynxConversation,
   LynxMessage,
   LynxPromptInput,
-} from "./lynx.chat-elements.component.client";
-import { LynxEmptyState, LynxPanel } from "./lynx.panel.component.client";
+} from "./lyn-chat-elements.component.client";
+import { LynxEmptyState, LynxPanel } from "./lyn-panel.component.client";
 
 export function LynxTruthPanel() {
   const [input, setInput] = useState("");

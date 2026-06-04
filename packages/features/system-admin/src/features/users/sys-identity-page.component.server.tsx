@@ -1,10 +1,10 @@
 import { hasExecutionPermission } from "@afenda/kernel/execution";
-import { listRoleOverridesForOrganization } from "../data";
+import { listRoleOverridesForOrganization } from "./sys-identity.repository.server";
 import { requireSystemAdminUsersRead } from "./sys-users.policy.server";
 import {
   SystemAdminIdentityAccessDenied,
-} from "./system-admin.identity-access.component.server";
-import { SystemAdminIdentityHub } from "./system-admin.identity-hub.component.server";
+} from "./sys-identity-access.component.server";
+import { SystemAdminIdentityHub } from "./sys-identity-hub.component.server";
 
 const SYSTEM_ADMIN_IDENTITY_OVERRIDES_WINDOW_LIMIT = 200;
 

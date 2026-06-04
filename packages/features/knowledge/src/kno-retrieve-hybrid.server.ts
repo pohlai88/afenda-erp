@@ -5,16 +5,16 @@ import { getDb, knowledgeChunks } from "@afenda/db";
 import {
   KNOWLEDGE_AUDIT_ACTIONS,
   KNOWLEDGE_DEFAULT_TOP_K,
-} from "../contracts/knowledge.core.contract";
+} from "./kno-core.contract";
 import type {
   HybridRetrievalRow,
   KnowledgeRetrievalDiagnostics,
   KnowledgeRetrievalResult,
   SimilarChunkRow,
-} from "../contracts/knowledge.retrieval.contract";
-import { emitKnowledgeAuditEvent } from "./knowledge.audit.server";
-import type { KnowledgeEmbeddingTelemetry } from "./knowledge.embeddings.server";
-import { embedKnowledgeText } from "./knowledge.embeddings.server";
+} from "./kno-retrieval.contract";
+import { emitKnowledgeAuditEvent } from "./kno-audit.server";
+import type { KnowledgeEmbeddingTelemetry } from "./kno-embeddings.server";
+import { embedKnowledgeText } from "./kno-embeddings.server";
 
 export type RetrievalOptions = {
   topK?: number;

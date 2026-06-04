@@ -7,7 +7,7 @@ import {
   HR_CPM_MANAGER_ADJUSTMENT_TYPES,
   isHrCpmManagerAdjustmentType,
   resolveCpmAdjustmentIncreaseMode,
-} from "../../src/payroll-compensation/compensation-planning-modeling/data/hr.payroll.cpm-participant-display.shared";
+} from "../../src/payroll-compensation/compensation-planning-modeling/hr.payroll.cpm-participant-display.shared";
 import {
   hrCpmEquityRecommendationSchema,
   hrCpmMarketRecommendationSchema,
@@ -16,9 +16,9 @@ import {
   hrCpmRetentionRecommendationSchema,
   mapHrCpmCreateRecommendationFormToMutation,
   parseHrCpmRecommendationInput,
-} from "../../src/payroll-compensation/compensation-planning-modeling/schemas/hr.payroll.cpm-mutation.schema";
-import { buildHrCpmRecommendationsListSurface } from "../../src/payroll-compensation/compensation-planning-modeling/surface/hr.payroll.cpm-lists.surface";
-import { buildHrCpmParticipantContextStatGroups } from "../../src/payroll-compensation/compensation-planning-modeling/surface/hr.payroll.cpm-participant-context-stat.surface";
+} from "../../src/payroll-compensation/compensation-planning-modeling/hr.payroll.cpm-mutation.schema";
+import { buildHrCpmRecommendationsListSurface } from "../../src/payroll-compensation/compensation-planning-modeling/hr.payroll.cpm-lists.surface";
+import { buildHrCpmParticipantContextStatGroups } from "../../src/payroll-compensation/compensation-planning-modeling/hr.payroll.cpm-participant-context-stat.surface";
 
 describe("HRM-CPM-006 participant display", () => {
   it("formats current compensation snapshot fields", () => {

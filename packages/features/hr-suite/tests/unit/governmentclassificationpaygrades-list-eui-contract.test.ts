@@ -1,9 +1,9 @@
 import { parseListSurfaceRendererConfiguration } from "@afenda/governed-surface/schemas";
 import { describe, expect, it } from "vitest";
 
-import { hrIndustryGpgReadPermission } from "../../src/industry-specific/government-classification-pay-grades/contracts/hr.industry.gpg.contract";
-import { buildHrIndustryGpgPageModel } from "../../src/industry-specific/government-classification-pay-grades/data/hr.industry.gpg.page-model.server";
-import { buildHrIndustryGpgListSurface } from "../../src/industry-specific/government-classification-pay-grades/surface/hr.industry.gpg-lists.surface";
+import { hrIndustryGpgReadPermission } from "../../src/industry-specific/government-classification-pay-grades/hr.industry.gpg.contract";
+import { buildHrIndustryGpgPageModel } from "../../src/industry-specific/government-classification-pay-grades/hr.industry.gpg.page-model.server";
+import { buildHrIndustryGpgListSurface } from "../../src/industry-specific/government-classification-pay-grades/hr.industry.gpg-lists.surface";
 import {
   HR_INDUSTRY_GPG_LIST_SURFACE_KEYS,
   HR_INDUSTRY_GPG_READ_ONLY_LIST_SURFACE_KEYS,

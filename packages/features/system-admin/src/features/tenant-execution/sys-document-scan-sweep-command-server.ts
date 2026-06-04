@@ -4,7 +4,7 @@ import {
 } from "@afenda/db";
 import { getDocumentAvEnv } from "@afenda/config/env";
 
-import { processTenantDocumentScanCommand } from "./process-tenant-document-scan.command.server";
+import { processTenantDocumentScanCommand } from "./sys-process-tenant-document-scan-command-server";
 
 function resolveStaleScanningBefore() {
   const avEnv = getDocumentAvEnv();

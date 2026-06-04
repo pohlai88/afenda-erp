@@ -5,10 +5,10 @@ export {
   buildLynxRunEventTimelineListSurface,
   buildLynxRunFeedbackListSurface,
   summarizeLynxQualityGateCell,
-} from "./lynx.surface.shared";
+} from "./lyn-surface.shared";
 export type {
   LynxClaimValidationRow,
   LynxFailedEvalCaseRow,
   LynxRunEventTimelineRow,
   LynxRunFeedbackRow,
-} from "./lynx.surface.shared";
+} from "./lyn-surface.shared";

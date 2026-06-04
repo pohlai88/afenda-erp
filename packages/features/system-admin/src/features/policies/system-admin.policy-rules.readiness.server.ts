@@ -1,7 +1,7 @@
 import {
   listExecutionCapabilitiesForModule,
 } from "@afenda/kernel/execution-capabilities";
-import { resolveExecutionCapabilityForAction } from "../../tenant-execution/policies/system-admin.execution-capability.shared.server";
+import { resolveExecutionCapabilityForAction } from "../tenant-execution/sys-execution-capability.shared.server";
 import type {
   PolicyReadinessVerdict,
   SystemAdminPolicyRule,

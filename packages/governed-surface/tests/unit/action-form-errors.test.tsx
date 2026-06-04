@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
 
-import { ActionFormErrors } from "../../src/components/action-form-errors";
+import { ActionFormErrors } from "../../src/gov-action-form-errors";
 
 describe("ActionFormErrors", () => {
   it("returns null for success or missing result", () => {

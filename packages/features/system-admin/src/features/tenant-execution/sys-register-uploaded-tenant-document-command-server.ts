@@ -5,7 +5,7 @@ import {
 } from "@afenda/object-storage";
 import { logServerEvent } from "@afenda/observability/server";
 
-import { processTenantDocumentScanCommand } from "./process-tenant-document-scan.command.server";
+import { processTenantDocumentScanCommand } from "./sys-process-tenant-document-scan-command-server";
 
 function enqueueTenantDocumentScan(input: {
   organizationId: string;

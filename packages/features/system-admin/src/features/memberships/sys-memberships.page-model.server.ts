@@ -1,14 +1,14 @@
-import { organizationRoles, type OrganizationRole } from "@afenda/auth";
+import { organizationRoles, type OrganizationRole } from "@afenda/kernel";
 import { writeExecutionAuditEvent } from "@afenda/kernel/execution";
 import { z } from "zod";
-import { filterSystemAdminListRows } from "../../overview/contracts/system-admin.list-filter.shared";
+import { filterSystemAdminListRows } from "../overview/sys-list-filter.shared";
 import {
   resolveSystemAdminListSearch,
   resolveSystemAdminListStatusFilter,
-} from "../../overview/contracts/system-admin.list-search.shared";
-import type { SystemAdminMembershipRow } from "../contracts";
-import { systemAdminMembershipStatusFilterSchema } from "../schemas/system-admin.memberships.schema";
-import { listSystemAdminMemberships } from "./system-admin.memberships.query.server";
+} from "../overview/sys-list-search.shared";
+import type { SystemAdminMembershipRow } from "./sys-memberships.contract";
+import { systemAdminMembershipStatusFilterSchema } from "./sys-memberships.schema";
+import { listSystemAdminMemberships } from "./sys-memberships.query.server";
 
 const MEMBERSHIP_LIST_SEARCH_FIELDS = ["name", "email"] as const;
 

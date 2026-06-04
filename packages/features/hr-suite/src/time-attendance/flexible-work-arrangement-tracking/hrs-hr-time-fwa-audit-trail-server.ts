@@ -4,8 +4,6 @@ import {
   type HrFwaAuditTrailWindow,
 } from "@afenda/db";
 
-import { hrTimeFwaAuditActions } from "./hrs-hr-time-fwa-events";
-
 export type { HrFwaAuditTrailWindow };
 
 /** HRM-FWA-032 — paginated FWA audit events from dedicated store. */
@@ -33,5 +31,3 @@ export async function emitHrFwaAuditTrailEvent(input: {
 }): Promise<{ auditEventId: string }> {
   return appendHrFwaAuditEvent(input);
 }
-
-export { hrTimeFwaAuditActions };

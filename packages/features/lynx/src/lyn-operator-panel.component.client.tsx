@@ -8,7 +8,7 @@ import {
 import {
   getLynxConsoleUxCards,
   lynxConsoleAgentCopy,
-} from "../surface/lynx.console-ui.copy.shared";
+} from "./lyn-console-ui.copy.shared";
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
 import {
@@ -25,13 +25,13 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { useState } from "react";
-import { LYNX_ERP_HTTP_ROUTES } from "./lyn-core-contract";
+import { LYNX_ERP_HTTP_ROUTES } from "./lyn-core.contract";
 import {
   LynxConversation,
   LynxMessage,
   LynxPromptInput,
-} from "./lynx.chat-elements.component.client";
-import { LynxEmptyState, LynxPanel } from "./lynx.panel.component.client";
+} from "./lyn-chat-elements.component.client";
+import { LynxEmptyState, LynxPanel } from "./lyn-panel.component.client";
 
 const recoveryPlaybooks = getRecoveryPlaybookDefinitions();
 const lynxConsoleUxCards = getLynxConsoleUxCards();

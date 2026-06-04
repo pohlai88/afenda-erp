@@ -1,23 +1,18 @@
 import {
   appCapabilities,
-  capabilitiesForRole,
+  getCapabilitiesForOrganizationRole,
   organizationRoles,
   type AppCapability,
   type OrganizationRole,
-} from "@afenda/auth";
+} from "@afenda/kernel";
 import type { RoleOverrideRow } from "@afenda/db";
 import { listExecutionCapabilities } from "@afenda/kernel/execution-capabilities";
-import { systemAdminPermissionCatalog } from "../contracts/system-admin.permission-catalog.contract";
+import { systemAdminPermissionCatalog } from "./sys-permission-catalog.contract";
 import {
   isSystemAdminDeprecatedPermissionKey,
   resolveSystemAdminPermissionRiskLevel,
-} from "../contracts/system-admin.permission-risk.shared";
-import type {
-  SystemAdminPermissionCatalogRow,
-  SystemAdminPermissionCatalogStatus,
-  SystemAdminPermissionCoverageVerdict,
-  SystemAdminPermissionRiskLevel,
-} from "../contracts";
+} from "./sys-permission-risk.shared";
+import type { SystemAdminPermissionCatalogRow, SystemAdminPermissionCatalogStatus, SystemAdminPermissionCoverageVerdict, SystemAdminPermissionRiskLevel } from "./sys-permissions.contract";
 
 function permissionModuleDomain(permission: string) {
   return permission.split(".")[0] ?? permission;
@@ -123,7 +118,7 @@ export function buildRolePermissionSets(overrides: readonly RoleOverrideRow[]) {
   const sets = new Map<OrganizationRole, Set<AppCapability>>();
 
   for (const role of organizationRoles) {
-    sets.set(role, new Set(capabilitiesForRole(role)));
+    sets.set(role, new Set(getCapabilitiesForOrganizationRole(role)));
   }
 
   for (const override of overrides) {

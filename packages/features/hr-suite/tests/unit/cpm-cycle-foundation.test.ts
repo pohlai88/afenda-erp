@@ -8,7 +8,7 @@ import {
   evaluateCompensationEligibility,
 } from "@afenda/db";
 
-import { hrCpmBudgetPoolSchema } from "../../src/payroll-compensation/compensation-planning-modeling/schemas/hr.payroll.cpm-mutation.schema";
+import { hrCpmBudgetPoolSchema } from "../../src/payroll-compensation/compensation-planning-modeling/hr.payroll.cpm-mutation.schema";
 
 const baseEmployee = {
   employmentType: "full_time",

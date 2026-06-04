@@ -6,7 +6,7 @@ import {
   hrTimeClockPunchExceptions,
   hrTimeClockRawPunches,
   hrTimeClockSyncBatches,
-} from "./hr-time-clock";
+} from "./dbx-hr-time-clock";
 
 export type HrTimeClockOverviewSnapshot = {
   deviceCount: number;
@@ -237,3 +237,4 @@ export async function summarizeHrTimeClockReport(input: {
     }
   });
 }
+

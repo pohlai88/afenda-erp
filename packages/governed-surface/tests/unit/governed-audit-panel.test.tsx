@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
 
-import { GovernedAuditPanel } from "../../src/components/governed-audit-panel";
+import { GovernedAuditPanel } from "../../src/gov-governed-audit-panel";
 
 const validRow = {
   id: "evt-1",

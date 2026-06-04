@@ -17,11 +17,11 @@ import { parseNumeric } from "./hr-bonus-incentive.shared";
 import {
   hrBonusPayoutApprovalSteps,
   hrBonusPayouts,
-} from "./hr-bonus";
+} from "./dbx-hr-bonus";
 import {
   hrBonusPlans,
   type HrBonusApprovalRoutingConfig,
-} from "./hr-bonus-incentive";
+} from "./dbx-hr-bonus-incentive";
 import { hrEmployees } from "./hr";
 
 export type HrBonusPayoutReviewDecision =
@@ -432,3 +432,4 @@ export async function listHrBonusPayoutsPendingApprovalWindow(input: {
     });
   });
 }
+

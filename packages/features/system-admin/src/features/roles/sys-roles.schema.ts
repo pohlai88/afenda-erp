@@ -1,4 +1,4 @@
-import { organizationRoles } from "@afenda/auth";
+import { organizationRoles } from "@afenda/kernel";
 import { z } from "zod";
 
 export const systemAdminAssignRoleInputSchema = z.object({

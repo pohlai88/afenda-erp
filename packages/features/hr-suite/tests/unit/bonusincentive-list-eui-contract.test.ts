@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { buildHrBonusGuaranteedRulesListSurface } from "../../src/payroll-compensation/bonus-incentive-management/surface/hr.payroll.bonus-governed-lists.surface";
+import { buildHrBonusGuaranteedRulesListSurface } from "../../src/payroll-compensation/bonus-incentive-management/hr.payroll.bonus-governed-lists.surface";
 
 describe("hr bonus guaranteed rules list EUI contract", () => {
   it("exposes search toolbar bound to the guaranteed rules registry param", () => {

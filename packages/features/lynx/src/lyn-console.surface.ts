@@ -1,5 +1,5 @@
-import { LYNX_MODULE_ID } from "./lyn-core-contract";
-import { lynxConsoleSections } from "./lynx.console-ui.copy.shared";
+import { LYNX_MODULE_ID } from "./lyn-core.contract";
+import { lynxConsoleSections } from "./lyn-console-ui.copy.shared";
 import {
   buildGovernedListSurface,
   buildGovernedStatGrid,

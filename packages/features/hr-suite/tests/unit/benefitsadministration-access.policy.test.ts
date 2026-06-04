@@ -12,8 +12,8 @@ import {
   requireExecutionPermission,
 } from "@afenda/kernel/execution";
 
-import { HR_BENEFITS_SENSITIVE_READ_CAPABILITY } from "../../src/payroll-compensation/benefits-administration/data/hr.payroll.benefits-sensitive-access.shared";
-import { requireHrBenefitsRead } from "../../src/payroll-compensation/benefits-administration/policies/hr.payroll.benefits-access.policy.server";
+import { HR_BENEFITS_SENSITIVE_READ_CAPABILITY } from "../../src/payroll-compensation/benefits-administration/hr.payroll.benefits-sensitive-access.shared";
+import { requireHrBenefitsRead } from "../../src/payroll-compensation/benefits-administration/hr.payroll.benefits-access.policy.server";
 
 describe("requireHrBenefitsRead (HRM-BEN-027)", () => {
   it("requires hr.benefits.read and denies sensitive detail without hr.benefits.sensitive.read", async () => {

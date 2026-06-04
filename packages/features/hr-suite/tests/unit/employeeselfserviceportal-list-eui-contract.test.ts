@@ -1,10 +1,10 @@
 import { parseListSurfaceRendererConfiguration } from "@afenda/governed-surface/schemas";
 import { describe, expect, it } from "vitest";
 
-import { hrWorkforceEssReadPermission } from "../../src/employee-management/employee-selfservice-portal/contracts/hr.workforce.ess.contract";
-import { buildHrWorkforceEssPageModel } from "../../src/employee-management/employee-selfservice-portal/data/hr.workforce.ess.page-model.server";
-import { resetHrWorkforceEssStore } from "../../src/employee-management/employee-selfservice-portal/data/hr.workforce.ess-store.shared";
-import { buildHrWorkforceEssListSurface } from "../../src/employee-management/employee-selfservice-portal/surface/hr.workforce.ess-lists.surface";
+import { hrWorkforceEssReadPermission } from "../../src/employee-management/employee-selfservice-portal/hr.workforce.ess.contract";
+import { buildHrWorkforceEssPageModel } from "../../src/employee-management/employee-selfservice-portal/hr.workforce.ess.page-model.server";
+import { resetHrWorkforceEssStore } from "../../src/employee-management/employee-selfservice-portal/hr.workforce.ess-store.shared";
+import { buildHrWorkforceEssListSurface } from "../../src/employee-management/employee-selfservice-portal/hr.workforce.ess-lists.surface";
 import {
   HR_WORKFORCE_ESS_LIST_SURFACE_KEYS,
   hrWorkforceEssAccessLogSurfaceKey,
@@ -14,7 +14,7 @@ import {
   hrWorkforceEssPayDocumentsSurfaceKey,
   hrWorkforceEssProfileSummarySurfaceKey,
   hrWorkforceEssRequestTrackerSurfaceKey,
-} from "../../src/employee-management/employee-selfservice-portal/surface/hr.workforce.ess-surface-metadata.shared";
+} from "../../src/employee-management/employee-selfservice-portal/hr.workforce.ess-surface-metadata.shared";
 
 describe("Employee Self-Service Portal list EUI contract", () => {
   it("builds a governed Pattern C server-window list configuration", () => {

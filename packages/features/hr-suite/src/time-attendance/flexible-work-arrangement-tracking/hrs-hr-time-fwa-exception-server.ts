@@ -1,6 +1,6 @@
 import type { HrFwaEligibilityResultInput } from "./hr.time.fwa-eligibility.schema";
 import { HrTimeFwaEligibilityBlockedError } from "./hr.time.fwa-action-result.shared";
-import { summarizeHrTimeFwaEligibility } from "./hr.time.fwa-eligibility.server";
+import { summarizeHrTimeFwaEligibility } from "./hrs-hr-time-fwa-eligibility-server";
 
 /**
  * HRM-FWA-008 — block ineligible employees unless an authorized exception

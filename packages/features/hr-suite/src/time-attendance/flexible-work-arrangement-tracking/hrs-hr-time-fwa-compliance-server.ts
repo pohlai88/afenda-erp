@@ -13,11 +13,11 @@ import {
 import {
   compareHrFwaScheduleWithAttendance,
   countHrFwaObservedLocationDays,
-} from "./hr.time.fwa-attendance-compare.server";
+} from "./hrs-hr-time-fwa-attendance-compare-server";
 import {
   compareHrFwaRemoteScheduleWithCheckins,
   hasHrFwaUnapprovedRemoteLocation,
-} from "./hr.time.fwa-remote-checkin-compare.server";
+} from "./hrs-hr-time-fwa-remote-checkin-compare-server";
 import {
   eachUtcDayInRange,
   estimateHrFwaDailyHours,

@@ -14,7 +14,7 @@ import {
   loadHrCareerPathRoleCompare,
   loadHrCareerPathSkillGapCompare,
   loadHrCareerPathTargetRolesWindow,
-} from "./hr.talent.career-pathing-queries.server";
+} from "./hrs-hr-talent-career-pathing-queries-server";
 import type { HrCareerPathPageModelInput } from "./hr.talent.career-pathing-search-params.parse.shared";
 
 export type HrCareerPathFoundationPageModel = {

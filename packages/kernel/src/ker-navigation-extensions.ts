@@ -1,5 +1,5 @@
-import type { AppCapability } from "@afenda/auth";
-import type { NavigationExtension } from "../shared/module-types";
+import type { AppCapability } from "./ker-app-capabilities";
+import type { NavigationExtension } from "./ker-module-types";
 
 export const navigationExtensions = [
   {

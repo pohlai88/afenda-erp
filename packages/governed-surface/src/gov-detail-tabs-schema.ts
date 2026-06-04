@@ -2,7 +2,7 @@ import { z } from "zod";
 
 import type { SchemaStability } from "./gov-_stability-shared";
 
-import { auditPanelRowSchema } from "./audit-panel.schema";
+import { auditPanelRowSchema } from "./gov-audit-panel-schema";
 
 export const SCHEMA_STABILITY: SchemaStability = "experimental";
 

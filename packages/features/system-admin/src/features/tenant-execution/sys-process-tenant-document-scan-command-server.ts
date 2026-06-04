@@ -7,8 +7,8 @@ import {
 import { getDocumentAvEnv } from "@afenda/config/env";
 import type { ModuleId } from "@afenda/kernel";
 
-import { recordTenantDocumentEvidenceEvent } from "../api/system-admin.object-storage-governance.server";
-import { runTenantDocumentAvScan } from "../domain/document-av-scanner.server";
+import { recordTenantDocumentEvidenceEvent } from "./sys-object-storage-governance.server";
+import { runTenantDocumentAvScan } from "./sys-document-av-scanner-server";
 import { incrementObjectStorageMetric } from "@afenda/object-storage/server";
 
 export type TenantDocumentScanCommandResult =

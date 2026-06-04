@@ -1,7 +1,7 @@
 import { parseListSurfaceRendererConfiguration } from "@afenda/governed-surface/schemas";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { buildModulesListSurface } from "../../src/modules/data/system-admin.modules-list.surface";
-import { SYSTEM_ADMIN_PROTECTED_MODULE_KEY } from "../../src/modules/contracts";
+import { buildModulesListSurface } from "../../src/features/modules/sys-modules-list.surface";
+import { SYSTEM_ADMIN_PROTECTED_MODULE_KEY } from "../../src/features/modules/sys-modules.contract";
 
 const mockRequireModulesManage = vi.fn();
 const mockRequireModulesRead = vi.fn();
@@ -16,7 +16,7 @@ vi.mock(
   async (importOriginal) => {
     const actual =
       await importOriginal<
-        typeof import("../../src/overview/policies/system-admin.capability.policy.server")
+        typeof import("../../src/features/overview/sys-capability.policy.server")
       >();
     return {
       ...actual,
@@ -81,7 +81,7 @@ describe("system admin modules", () => {
     mockRequireModulesRead.mockRejectedValue(new Error("Forbidden"));
 
     const { requireSystemAdminModulesRead } = await import(
-      "../../src/modules/policies/system-admin.modules.policy.server"
+      "../../src/features/modules/sys-modules.policy.server"
     );
 
     await expect(requireSystemAdminModulesRead()).rejects.toThrow("Forbidden");
@@ -89,7 +89,7 @@ describe("system admin modules", () => {
 
   it("writes audit when module catalog is viewed", async () => {
     const { buildSystemAdminModulesPageModel } = await import(
-      "../../src/modules/data/system-admin.modules.page-model.server"
+      "../../src/features/modules/sys-modules.page-model.server"
     );
 
     await buildSystemAdminModulesPageModel({
@@ -108,7 +108,7 @@ describe("system admin modules", () => {
 
   it("blocks disabling the protected system-admin module", async () => {
     const { setSystemAdminModuleEnabledAction } = await import(
-      "../../src/modules/actions/system-admin.module-settings.actions.server"
+      "../../src/features/modules/sys-module-settings.actions.server"
     );
 
     const result = await setSystemAdminModuleEnabledAction({
@@ -136,7 +136,7 @@ describe("system admin modules", () => {
     ]);
 
     const { setSystemAdminModuleEnabledAction } = await import(
-      "../../src/modules/actions/system-admin.module-settings.actions.server"
+      "../../src/features/modules/sys-module-settings.actions.server"
     );
 
     const result = await setSystemAdminModuleEnabledAction({

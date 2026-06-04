@@ -1,7 +1,7 @@
 import { Alert, Badge, Card, CardContent, CardHeader, CardTitle } from "@afenda/ui";
-import type { SystemAdminReliabilitySummary } from "../contracts/system-admin.reliability-issue.contract";
-import { formatReliabilityVerdictLabel } from "./system-admin.reliability.verdict.server";
-import { systemAdminReliabilityUiCopy } from "../surface/system-admin.reliability-ui.copy.shared";
+import type { SystemAdminReliabilitySummary } from "./sys-reliability-issue.contract";
+import { formatReliabilityVerdictLabel } from "./sys-reliability.verdict.server";
+import { systemAdminReliabilityUiCopy } from "./sys-reliability-ui.copy.shared";
 
 function verdictBadgeVariant(
   verdict: SystemAdminReliabilitySummary["verdict"],

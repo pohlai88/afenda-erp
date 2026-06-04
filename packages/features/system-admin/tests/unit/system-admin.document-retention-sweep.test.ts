@@ -84,7 +84,7 @@ vi.mock("@afenda/kernel/execution", () => ({
 }));
 
 import { writeExecutionAuditEvent } from "@afenda/kernel/execution";
-import { executeDocumentRetentionExpirySweepCommand } from "../../src/tenant-execution/commands/document-retention-expiry-sweep.command.server";
+import { executeDocumentRetentionExpirySweepCommand } from "../../src/features/tenant-execution/sys-document-retention-expiry-sweep-command-server";
 
 describe("document retention expiry sweep", () => {
   beforeEach(() => {

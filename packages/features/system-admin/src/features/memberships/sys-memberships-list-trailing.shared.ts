@@ -1,5 +1,5 @@
 import { resolveListSurfaceRowTrailingAction } from "@afenda/governed-surface";
-import type { SystemAdminMembershipStatus } from "../contracts";
+import type { SystemAdminMembershipStatus } from "./sys-memberships.contract";
 
 export const SYSTEM_ADMIN_MEMBERSHIPS_MANAGE_DENIED =
   "Requires system-admin.memberships.manage.";

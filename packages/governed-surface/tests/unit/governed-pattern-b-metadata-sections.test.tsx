@@ -2,35 +2,14 @@ import { describe, expect, it, vi } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
 
 vi.mock("server-only", () => ({}));
-vi.mock("../../src/data/governed-permission-gate.server", () => ({
+vi.mock("../../src/gov-governed-permission-gate-server", () => ({
   resolveGovernedErpPermissionAllowed: async () => true,
 }));
-vi.mock("../../src/metadata/index", () => ({
-  GovernedComponentRenderer: ({
-    component,
-    surfaceKey,
-    sectionKey,
-    componentKey,
-  }: {
-    component: { type: string };
-    surfaceKey?: string;
-    sectionKey?: string;
-    componentKey?: string;
-  }) => (
-    <div
-      data-testid="renderer-stub"
-      data-renderer-type={component.type}
-      data-surface-key={surfaceKey}
-      data-section-key={sectionKey}
-      data-component-key={componentKey}
-    />
-  ),
-}));
 
-import { GovernedPatternBActionBarSection } from "../../src/components/governed-pattern-b-action-bar-section";
-import { GovernedPatternBApprovalTimelineSection } from "../../src/components/governed-pattern-b-approval-timeline-section";
-import { GovernedPatternBMultiStepFormSection } from "../../src/components/governed-pattern-b-multi-step-form-section";
-import { GovernedPatternBScorecardFormSection } from "../../src/components/governed-pattern-b-scorecard-form-section";
+import { GovernedPatternBActionBarSection } from "../../src/gov-governed-pattern-b-action-bar-section";
+import { GovernedPatternBApprovalTimelineSection } from "../../src/gov-governed-pattern-b-approval-timeline-section";
+import { GovernedPatternBMultiStepFormSection } from "../../src/gov-governed-pattern-b-multi-step-form-section";
+import { GovernedPatternBScorecardFormSection } from "../../src/gov-governed-pattern-b-scorecard-form-section";
 
 describe("Pattern B metadata sections", () => {
   it("wraps approval timeline metadata with governed identity", async () => {
@@ -48,7 +27,8 @@ describe("Pattern B metadata sections", () => {
 
     const html = renderToStaticMarkup(element);
 
-    expect(html).toContain('data-renderer-type="governed:approval-timeline"');
+    expect(html).toContain('data-component-type="governed:approval-timeline"');
+    expect(html).toContain('data-testid="governed:approval-timeline:approval-flow"');
     expect(html).toContain('data-surface-key="procurement"');
     expect(html).toContain('data-section-key="purchase-approval"');
     expect(html).toContain('data-component-key="approval-flow"');
@@ -70,7 +50,7 @@ describe("Pattern B metadata sections", () => {
 
     expect(html).toContain('data-render-state="empty"');
     expect(html).toContain("approval-flow-empty");
-    expect(html).not.toContain('data-testid="renderer-stub"');
+    expect(html).not.toContain('data-component-type="governed:approval-timeline"');
   });
 
   it("wraps action bar metadata and resolves renderer identity", async () => {
@@ -87,7 +67,8 @@ describe("Pattern B metadata sections", () => {
 
     const html = renderToStaticMarkup(element);
 
-    expect(html).toContain('data-renderer-type="governed:action-bar"');
+    expect(html).toContain('data-component-type="governed:action-bar"');
+    expect(html).toContain('data-testid="governed:action-bar:contact-bulk-actions"');
     expect(html).toContain('data-section-key="contact-actions"');
     expect(html).toContain('data-component-key="contact-bulk-actions"');
   });
@@ -121,7 +102,8 @@ describe("Pattern B metadata sections", () => {
 
     const html = renderToStaticMarkup(element);
 
-    expect(html).toContain('data-renderer-type="governed:multi-step-form"');
+    expect(html).toContain('data-component-type="governed:multi-step-form"');
+    expect(html).toContain('data-testid="governed:multi-step-form:onboarding-form"');
     expect(html).toContain('data-component-key="onboarding-form"');
   });
 
@@ -142,7 +124,8 @@ describe("Pattern B metadata sections", () => {
 
     const html = renderToStaticMarkup(element);
 
-    expect(html).toContain('data-renderer-type="governed:scorecard-form"');
+    expect(html).toContain('data-component-type="governed:scorecard-form"');
+    expect(html).toContain('data-testid="governed:scorecard-form:supplier-scorecard"');
     expect(html).toContain('data-section-key="supplier-review"');
     expect(html).toContain('data-component-key="supplier-scorecard"');
   });

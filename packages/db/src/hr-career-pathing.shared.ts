@@ -5,7 +5,7 @@ import {
   hrmCareerPathFrameworks,
   hrmDevelopmentGoals,
   hrmDevelopmentPlans,
-} from "./hr-career-pathing";
+} from "./dbx-hr-career-pathing";
 
 export class HrCareerPathingCommandError extends Error {
   readonly code: string;
@@ -106,3 +106,4 @@ export async function assertGoalInOrg(
     throw new HrCareerPathingCommandError("goal_not_found", "Development goal not found.");
   }
 }
+

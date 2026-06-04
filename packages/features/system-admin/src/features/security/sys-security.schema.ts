@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type { OrganizationSecuritySettings } from "../contracts/system-admin.security-settings.contract";
+import type { OrganizationSecuritySettings } from "./sys-security-settings.contract";
 
 const emailDomainSchema = z
   .string()

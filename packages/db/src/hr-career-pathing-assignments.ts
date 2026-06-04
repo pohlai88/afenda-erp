@@ -20,7 +20,7 @@ import {
   hrmDevelopmentStretchAssignments,
   type HrmCareerAgreedAction,
   type HrmCareerDiscussionParticipant,
-} from "./hr-career-pathing";
+} from "./dbx-hr-career-pathing";
 
 export async function createHrmDevelopmentLearningActionInTx(
   db: AfendaTransaction,
@@ -395,3 +395,4 @@ export async function updateHrmCareerDiscussionInTx(
 
   return { discussionId: input.discussionId };
 }
+

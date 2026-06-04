@@ -10,7 +10,7 @@ import type {
   ModuleWorkspaceRecord,
 } from "@afenda/kernel";
 import { moduleIds } from "@afenda/config/module-ids";
-import { combineLynxQualityGates } from "./lyn-evidence-trust-contract";
+import { combineLynxQualityGates } from "./lyn-evidence-trust.contract";
 import {
   LYNX_OUTCOME_MONITOR_IDS,
   lynxOutcomeMonitorResultSchema,
@@ -19,9 +19,9 @@ import {
   type LynxOutcomeMonitorResult,
   type LynxOutcomeMonitorSeverity,
   type LynxOutcomeMonitorStatus,
-} from "./lyn-outcome-monitor-schema";
-import type { LynxQualityGateResult } from "./lyn-evidence-trust-schema";
-import type { LynxReadinessSnapshot } from "./lyn-readiness-schema";
+} from "./lyn-outcome-monitor.schema";
+import type { LynxQualityGateResult } from "./lyn-evidence-trust.schema";
+import type { LynxReadinessSnapshot } from "./lyn-readiness.schema";
 
 const LYNX_OUTCOME_SWEEP_ORIGIN = "proactive-outcome-sweep";
 const LYNX_OUTCOME_SWEEP_ROUTE = "/api/internal/v1/cron/lynx-outcomes";
@@ -698,7 +698,7 @@ async function runLynxOutcomeSweepForTarget(input: {
       sandboxes,
       monitorSettings,
     ] = await Promise.all([
-      import("../data/lynx.readiness.query.server"),
+      import("./lyn-readiness.query.server"),
       loadOutcomeWorkspaceSet({ organizationId: input.organizationId }),
       listAiApprovalProposals({
         organizationId: input.organizationId,

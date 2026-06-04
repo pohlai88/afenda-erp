@@ -6,7 +6,6 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import {
   FEATURES_CONTAINER,
-  LEGACY_BUCKET_DIRS,
   listPackageScanTargets,
   readTieredLayoutConfig,
   resolvePackageLayoutMode,
@@ -19,10 +18,6 @@ const DOORS = new Set<string>(featurePublicDoorFiles);
 
 function rel(p: string) {
   return path.relative(root, p).split(path.sep).join("/");
-}
-
-function isBarrelIndex(filePath: string) {
-  return path.basename(filePath) === "index.ts";
 }
 
 function deleteIfBarrelOrEmpty(dir: string) {

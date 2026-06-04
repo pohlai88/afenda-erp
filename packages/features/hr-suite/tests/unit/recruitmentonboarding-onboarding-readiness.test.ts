@@ -8,7 +8,7 @@ import {
   getHrRonOnboardingCompletionBlockers,
   recordHrRonOnboardingDocument,
   recordHrRonPolicyAcknowledgment,
-} from "../../src/talent-management/recruitment-onboarding/data/hr.talent.ron-store.shared";
+} from "../../src/talent-management/recruitment-onboarding/hr.talent.ron-store.shared";
 
 describe("HRM-RON conversion, onboarding tasks, and readiness", () => {
   const candidate = {

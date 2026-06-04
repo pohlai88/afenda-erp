@@ -1,8 +1,8 @@
 import { readFile } from "node:fs/promises";
 import { listCronRunHistory } from "@afenda/db";
 import { formatErpDateTime } from "@afenda/kernel";
-import type { CronHealthSurfaceRow } from "../contracts/system-admin.cron-health.contract";
-import { resolveRepoRootFile } from "./system-admin.repo-root-file.repository.server";
+import type { CronHealthSurfaceRow } from "./sys-cron-health.contract";
+import { resolveRepoRootFile } from "./sys-repo-root-file.repository.server";
 
 type VercelCron = {
   path: string;

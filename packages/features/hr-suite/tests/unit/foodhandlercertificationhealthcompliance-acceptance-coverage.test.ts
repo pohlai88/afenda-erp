@@ -4,8 +4,8 @@ import {
   HR_INDUSTRY_FHC_ACCEPTANCE_CRITERIA_COVERAGE,
   HR_INDUSTRY_FHC_REQUIREMENT_COVERAGE,
   assertHrIndustryFhcEnterpriseCoverage,
-} from "../../src/industry-specific/food-handler-certification-health-compliance/data/hr.industry.fhc-coverage.shared";
-import { hrIndustryFhcAuditActions } from "../../src/industry-specific/food-handler-certification-health-compliance/events/hr.industry.fhc.event";
+} from "../../src/industry-specific/food-handler-certification-health-compliance/hr.industry.fhc-coverage.shared";
+import { hrIndustryFhcAuditActions } from "../../src/industry-specific/food-handler-certification-health-compliance/hr.industry.fhc.event";
 
 describe("HRM-FHC-001..025 coverage registry", () => {
   it("registers all twenty-five requirements as shipped", () => {

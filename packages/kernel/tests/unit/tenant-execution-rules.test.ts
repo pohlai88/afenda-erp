@@ -1,17 +1,17 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import type { ExecutionContext } from "../../src/execution-kernel/context/execution-context";
+import type { ExecutionContext } from "../../src/ker-execution-context";
 import {
   ExecutionPolicyApprovalRequiredError,
   ExecutionPolicyDeniedError,
-} from "../../src/execution-kernel/errors/execution-errors";
+} from "../../src/ker-execution-errors";
 import {
   assertExecutionPolicy,
   defineExecutionPolicy,
   registerTenantExecutionPolicyEvaluator,
   resetExecutionPolicyRegistryForTest,
   resolveExecutionPolicyVerdict,
-} from "../../src/execution-kernel/policy/execution-policy";
-import { resolveTenantExecutionPolicyVerdict } from "../../src/execution-kernel/policy/tenant-execution-rules";
+} from "../../src/ker-execution-policy";
+import { resolveTenantExecutionPolicyVerdict } from "../../src/ker-tenant-execution-rules";
 
 const context: ExecutionContext = {
   organizationId: "org_kernel_policy",

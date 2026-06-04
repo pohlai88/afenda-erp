@@ -1,0 +1,235 @@
+"use client";
+
+import { useMemo, useState } from "react";
+import { motion, useReducedMotion } from "motion/react";
+import { Badge, Button, ScrollArea } from "@afenda/ui";
+import { cn } from "@afenda/ui/utils";
+
+import type {
+  MetadataUiKanbanClientModel,
+  MetadataUiKanbanMoveIntent,
+} from "../../runtime/kanban-state.shared";
+
+export type MetadataUiKanbanDragBoardProps = Readonly<{
+  model: MetadataUiKanbanClientModel;
+}>;
+
+type MetadataUiKanbanCardState = Readonly<{
+  cardKey: string;
+  columnKey: string;
+}>;
+
+function createInitialKanbanCardState(
+  model: MetadataUiKanbanClientModel,
+): readonly MetadataUiKanbanCardState[] {
+  return model.columns.flatMap((column) =>
+    column.cards.map((card) => ({
+      cardKey: card.key,
+      columnKey: column.key,
+    })),
+  );
+}
+
+function getKanbanRecordText(
+  record: Readonly<Record<string, string | number | boolean | null>>,
+  field: string | undefined,
+): string | undefined {
+  if (!field) {
+    return undefined;
+  }
+
+  const value = record[field];
+  return value == null ? undefined : String(value);
+}
+
+function resolveKanbanTransition(
+  transitions: readonly MetadataUiKanbanMoveIntent[],
+  cardKey: string,
+  toColumnKey: string,
+): MetadataUiKanbanMoveIntent | undefined {
+  return transitions.find(
+    (transition) =>
+      transition.cardKey === cardKey && transition.toColumnKey === toColumnKey,
+  );
+}
+
+export function MetadataUiKanbanDragBoard({
+  model,
+}: MetadataUiKanbanDragBoardProps) {
+  const prefersReducedMotion = useReducedMotion();
+  const [cardState, setCardState] = useState(() =>
+    createInitialKanbanCardState(model),
+  );
+  const staticMotion =
+    model.reducedMotion === "always-static" ||
+    (model.reducedMotion === "respect-user" && prefersReducedMotion);
+  const columnKeyByCard = useMemo(
+    () => new Map(cardState.map((state) => [state.cardKey, state.columnKey])),
+    [cardState],
+  );
+
+  function moveCard(intent: MetadataUiKanbanMoveIntent) {
+    if (!intent.available) {
+      return;
+    }
+
+    setCardState((current) =>
+      current.map((state) =>
+        state.cardKey === intent.cardKey
+          ? {
+              ...state,
+              columnKey: intent.toColumnKey,
+            }
+          : state,
+      ),
+    );
+  }
+
+  return (
+    <div
+      className="metadata-ui-kanban-board grid gap-3 md:grid-cols-3"
+      data-metadata-ui-kanban={model.key}
+      data-metadata-ui-kanban-mode={model.mode}
+      data-metadata-ui-movement-enabled={model.movementEnabled}
+    >
+      {model.columns.map((column) => {
+        const cards = model.columns
+          .flatMap((sourceColumn) => sourceColumn.cards)
+          .filter(
+            (card) => columnKeyByCard.get(card.key) === column.key,
+          );
+
+        return (
+          <section
+            key={column.key}
+            className="min-w-0 rounded-md border border-zinc-200 bg-zinc-50 p-3"
+            data-metadata-ui-kanban-column={column.key}
+            aria-describedby={
+              column.disabledReason ? `${column.key}-drop-reason` : undefined
+            }
+          >
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <h3 className="text-sm font-semibold text-zinc-900">
+                  {column.label}
+                </h3>
+                {column.description ? (
+                  <p className="mt-1 text-xs text-zinc-500">
+                    {column.description}
+                  </p>
+                ) : null}
+              </div>
+              <Badge variant={column.dropEnabled ? "secondary" : "outline"}>
+                {cards.length}
+              </Badge>
+            </div>
+            {column.disabledReason ? (
+              <p id={`${column.key}-drop-reason`} className="mt-2 text-xs text-zinc-500">
+                {column.disabledReason}
+              </p>
+            ) : null}
+            <ScrollArea className="mt-3 max-h-96 pr-2">
+              <div className="space-y-2">
+                {cards.length === 0 ? (
+                  <div className="rounded border border-dashed border-zinc-300 bg-white p-3 text-sm text-zinc-500">
+                    No cards
+                  </div>
+                ) : null}
+                {cards.map((card) => {
+                  const title =
+                    getKanbanRecordText(
+                      card.record,
+                      model.cardTemplate.titleField,
+                    ) ?? card.key;
+                  const description = getKanbanRecordText(
+                    card.record,
+                    model.cardTemplate.descriptionField,
+                  );
+                  const availableTargets = model.columns.filter(
+                    (targetColumn) => targetColumn.key !== column.key,
+                  );
+
+                  return (
+                    <motion.article
+                      key={card.key}
+                      layout={!staticMotion}
+                      draggable={model.movementEnabled && !card.disabledReason}
+                      className={cn(
+                        "rounded-md border border-zinc-200 bg-white p-3 shadow-sm",
+                        card.disabledReason && "opacity-70",
+                      )}
+                      data-metadata-ui-kanban-card={card.key}
+                      data-metadata-ui-move-payload={JSON.stringify({
+                        cardKey: card.key,
+                        columnKey: column.key,
+                      })}
+                    >
+                      <div className="space-y-1">
+                        <h4 className="text-sm font-medium text-zinc-900">
+                          {title}
+                        </h4>
+                        {description ? (
+                          <p className="text-xs text-zinc-500">{description}</p>
+                        ) : null}
+                        {card.disabledReason ? (
+                          <p className="text-xs text-zinc-500">
+                            {card.disabledReason}
+                          </p>
+                        ) : null}
+                      </div>
+                      {model.cardTemplate.metadataFields.length > 0 ? (
+                        <dl className="mt-3 grid gap-1 text-xs text-zinc-500">
+                          {model.cardTemplate.metadataFields.map((field) => (
+                            <div key={field} className="flex justify-between gap-3">
+                              <dt>{field}</dt>
+                              <dd>{getKanbanRecordText(card.record, field)}</dd>
+                            </div>
+                          ))}
+                        </dl>
+                      ) : null}
+                      {model.movementEnabled && availableTargets.length > 0 ? (
+                        <div className="mt-3 flex flex-wrap gap-1.5">
+                          {availableTargets.map((targetColumn) => {
+                            const intent = resolveKanbanTransition(
+                              column.transitions,
+                              card.key,
+                              targetColumn.key,
+                            );
+                            const disabledReason =
+                              intent?.disabledReason ??
+                              "Move unavailable.";
+
+                            return (
+                              <Button
+                                key={targetColumn.key}
+                                type="button"
+                                size="sm"
+                                variant="outline"
+                                disabled={!intent?.available}
+                                title={!intent?.available ? disabledReason : undefined}
+                                data-metadata-ui-move-intent={JSON.stringify(
+                                  intent?.payload ?? {},
+                                )}
+                                onClick={() => {
+                                  if (intent) {
+                                    moveCard(intent);
+                                  }
+                                }}
+                              >
+                                {targetColumn.label}
+                              </Button>
+                            );
+                          })}
+                        </div>
+                      ) : null}
+                    </motion.article>
+                  );
+                })}
+              </div>
+            </ScrollArea>
+          </section>
+        );
+      })}
+    </div>
+  );
+}

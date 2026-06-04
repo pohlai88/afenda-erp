@@ -1,7 +1,7 @@
 import { moduleIds } from "@afenda/config/module-ids";
 import { solutionWorkflowIds } from "@afenda/kernel";
 import { z } from "zod";
-import { lynxQualityGateResultSchema } from "./lynx.evidence-trust.schema";
+import { lynxQualityGateResultSchema } from "./lyn-evidence-trust.schema";
 
 export const LYNX_OUTCOME_MONITOR_IDS = [
   "finance-control-watch",

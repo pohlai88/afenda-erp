@@ -1,15 +1,15 @@
 import type { ListSurfaceRendererConfigurationResolvedInput } from "@afenda/governed-surface";
 import type { ModuleId } from "@afenda/config/module-ids";
-import { systemAdminControlLinks } from "../../overview/contracts/system-admin.control-links.contract";
+import { systemAdminControlLinks } from "../overview/sys-control-links.contract";
 import {
   buildLinkedControlListSurface,
   catalogStatusBadge,
   linkCell,
   moduleReadinessVerdictBadge,
-} from "../../overview/surfaces/system-admin.control-list.shared";
-import type { SystemAdminModuleAvailability } from "../contracts";
-import { systemAdminModulesUiCopy } from "../surface/system-admin.modules-ui.copy.shared";
-import { resolveSystemAdminModuleRowTrailingAction } from "../surface/system-admin.modules-list-trailing.shared";
+} from "../overview/sys-control-list.shared";
+import type { SystemAdminModuleAvailability } from "./sys-modules.contract";
+import { systemAdminModulesUiCopy } from "./sys-modules-ui.copy.shared";
+import { resolveSystemAdminModuleRowTrailingAction } from "./sys-modules-list-trailing.shared";
 
 export const systemAdminModulesSurfaceKey = "system-admin.modules.list";
 

@@ -6,7 +6,7 @@ import { appendHrTimeClockAuditEvent } from "./hr-time-clock-devices";
 import { resolveHrTimeClockEmployeeMapping } from "./hr-time-clock-mappings";
 import { HrTimeClockCommandError } from "./hr-time-clock.types";
 import { hrAttendancePolicies, hrEmployees } from "./hr";
-import { hrShiftAssignments } from "./hr-shift-scheduling";
+import { hrShiftAssignments } from "./dbx-hr-shift-scheduling";
 import type { HrTimeClockPunchType } from "./hr-time-clock.types";
 import {
   hrTimeClockDevices,
@@ -15,7 +15,7 @@ import {
   hrTimeClockRawPunches,
   type hrTimeClockPunchExceptionCodeEnum,
   type hrTimeClockPunchValidationStatusEnum,
-} from "./hr-time-clock";
+} from "./dbx-hr-time-clock";
 
 export type HrTimeClockPunchExceptionCode =
   (typeof hrTimeClockPunchExceptionCodeEnum.enumValues)[number];
@@ -630,3 +630,4 @@ export async function runHrTimeClockPunchValidationPipeline(input: {
     };
   });
 }
+

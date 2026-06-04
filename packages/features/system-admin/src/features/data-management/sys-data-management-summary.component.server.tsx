@@ -1,6 +1,6 @@
 import { Alert, Badge, Card, CardContent, CardHeader, CardTitle } from "@afenda/ui";
 import type { SystemAdminDataManagementSummary } from "./sys-import-job.contract";
-import { systemAdminDataManagementUiCopy } from "../surface/system-admin.data-management-ui.copy.shared";
+import { systemAdminDataManagementUiCopy } from "./sys-data-management-ui.copy.shared";
 
 export function SystemAdminDataManagementSummaryPanel({
   summary,

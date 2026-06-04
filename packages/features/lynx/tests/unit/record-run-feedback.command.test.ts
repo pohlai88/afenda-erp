@@ -38,7 +38,7 @@ vi.mock("@afenda/kernel/execution", () => ({
 }));
 
 const { executeLynxRecordRunFeedbackCommand } = await import(
-  "../../src/commands/lynx.record-run-feedback.command.server"
+  "../../src/lyn-record-run-feedback.command.server"
 );
 
 describe("executeLynxRecordRunFeedbackCommand", () => {

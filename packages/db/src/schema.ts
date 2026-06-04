@@ -1,4 +1,4 @@
-/** Drizzle schema barrel — flat dbx-* modules merged for ./schema imports. */
+/** Flat Drizzle schema barrel. */
 export * from "./dbx-ai";
 export * from "./dbx-audit";
 export * from "./dbx-billing";
@@ -10,3 +10,17 @@ export * from "./dbx-knowledge";
 export * from "./dbx-organizations";
 export * from "./dbx-permissions";
 export * from "./dbx-system-admin";
+export * from "./dbx-hr-career-pathing";
+export * from "./dbx-hr-compensation-planning";
+export * from "./dbx-hr-competency-skills";
+export * from "./dbx-hr-benefits";
+export * from "./dbx-hr-bonus-incentive";
+export * from "./dbx-hr-bonus";
+export * from "./dbx-hr-expense";
+export * from "./dbx-hr-geolocation";
+export * from "./dbx-hr-lms";
+export * from "./dbx-hr-multi-country-payroll";
+export * from "./dbx-hr-payroll-processing";
+export * from "./dbx-hr-salary-benchmarking";
+export * from "./dbx-hr-shift-scheduling";
+export * from "./dbx-hr-time-clock";

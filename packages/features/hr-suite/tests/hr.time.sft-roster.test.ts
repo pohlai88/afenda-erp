@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { listHrTimeSftShiftRoster } from "./hr.time.sft-roster.server";
-import { hrSftRosterQuerySchema } from "../schemas/hr.time.sft-roster.schema";
+import { listHrTimeSftShiftRoster } from "../src/time-attendance/shift-scheduling/hrs-hr-time-sft-roster-server";
+import { hrSftRosterQuerySchema } from "../src/time-attendance/shift-scheduling/hr.time.sft-roster.schema";
 
 vi.mock("@afenda/db", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@afenda/db")>();

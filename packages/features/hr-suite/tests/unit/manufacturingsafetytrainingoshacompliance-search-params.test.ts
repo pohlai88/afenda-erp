@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   parseHrIndustryMscSearchParams,
   toHrIndustryMscPageModelInput,
-} from "../../src/industry-specific/manufacturing-safety-training-osha-compliance/data/hr.industry.msc-search-params.parse.shared";
+} from "../../src/industry-specific/manufacturing-safety-training-osha-compliance/hr.industry.msc-search-params.parse.shared";
 
 describe("manufacturing safety training OSHA compliance search params", () => {
   it("parses list searches, status filters, and report grouping", () => {

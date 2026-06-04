@@ -1,13 +1,15 @@
 import { hasExecutionPermission } from "@afenda/kernel/execution";
 import { isOrganizationDocumentLegalHoldActive } from "@afenda/db";
 
-import { updateSystemAdminSecuritySettingsAction, updateOrganizationObjectStorageProviderAction, updateOrganizationEncryptionSettingsAction } from "../actions";
-import { buildSystemAdminSecurityPageModel } from "../data";
+import { updateSystemAdminSecuritySettingsAction } from "./sys-security.actions.server";
+import { updateOrganizationObjectStorageProviderAction } from "./sys-object-storage-provider.actions.server";
+import { updateOrganizationEncryptionSettingsAction } from "./sys-object-storage-encryption.actions.server";
+import { buildSystemAdminSecurityPageModel } from "./sys-security.page-model.server";
 import { requireSystemAdminSecurityRead } from "./sys-security.policy.server";
 import {
   SystemAdminSecurityAccessDenied,
   SystemAdminSecuritySection,
-} from "./system-admin.security-section.component.server";
+} from "./sys-security-section.component.server";
 
 export async function SystemAdminSecurityPage() {
   let guard: Awaited<ReturnType<typeof requireSystemAdminSecurityRead>>;

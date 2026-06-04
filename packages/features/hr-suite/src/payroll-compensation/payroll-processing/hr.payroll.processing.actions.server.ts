@@ -17,15 +17,15 @@ import {
   type HrPayrollRunCalculationResult,
 } from "@afenda/db";
 
-import { importHrPayrollInputsForRun } from "./hr.payroll.processing-input-collection.server";
+import { importHrPayrollInputsForRun } from "./hrs-hr-payroll-processing-input-collection-server";
 import {
   approvePayrollRun,
   finalizePayrollRun,
   generatePayrollPreview,
   lockPayrollRun,
   submitPayrollForApproval,
-} from "./hr.payroll.processing-workflow.server";
-import { runHrPayrollProcessingValidation } from "./hr.payroll.processing-validation.server";
+} from "./hrs-hr-payroll-processing-workflow-server";
+import { runHrPayrollProcessingValidation } from "./hrs-hr-payroll-processing-validation-server";
 import {
   runHrPayrollValidationFormSchema,
 } from "./hr.payroll.processing-validation.schema";
@@ -210,7 +210,7 @@ export async function createPayrollAdjustmentAction(input: unknown) {
   const guard = await requireHrPayrollWrite();
   const parsed = payrollAdjustmentSchema.parse(input);
   const { insertHrPayrollAdjustmentRecord } = await import(
-    "../data/hr.payroll.processing-store.shared"
+    "./hr.payroll.processing-store.shared"
   );
 
   return insertHrPayrollAdjustmentRecord({

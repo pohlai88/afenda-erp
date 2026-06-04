@@ -1,16 +1,16 @@
 import type { HrCsfReportGroupBy, HrCsfMatchTargetKind } from "./hr.talent.csf-constants.shared";
-import { listHrCsfAuditTrailWindow } from "./hr.talent.csf-audit.server";
+import { listHrCsfAuditTrailWindow } from "./hrs-hr-talent-csf-audit-server";
 import {
   buildHrCsfReportRows,
   filterHrCsfReportRows,
-} from "./hr.talent.csf-reports.server";
-import { findEmployeesMatchingRequiredSkills } from "./hr.talent.csf-matching.server";
+} from "./hrs-hr-talent-csf-reports-server";
+import { findEmployeesMatchingRequiredSkills } from "./hrs-hr-talent-csf-matching-server";
 import {
   listHrCsfTrainingDevelopmentGapExposure,
   listHrCsfLmsLearningRecommendations,
   listHrCsfPerformanceAppraisalCompetencyRefs,
   listHrCsfSuccessionReadinessIndicators,
-} from "./hr.talent.csf-integration.server";
+} from "./hrs-hr-talent-csf-integration-server";
 import {
   listHrCsfCompetenciesFromStore,
   listHrCsfGapsFromStore,

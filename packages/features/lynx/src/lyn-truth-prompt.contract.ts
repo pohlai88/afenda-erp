@@ -1,4 +1,4 @@
-import { LYNX_TRUTH_RESPONSE_SECTIONS } from "./lynx.core.contract";
+import { LYNX_TRUTH_RESPONSE_SECTIONS } from "./lyn-core.contract";
 
 export type TruthPromptContext = {
   organizationId: string;

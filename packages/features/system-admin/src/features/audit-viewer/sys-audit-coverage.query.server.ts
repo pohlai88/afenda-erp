@@ -1,13 +1,13 @@
 import {
   listTenantCapabilitySettings,
   listTenantModuleSettings,
-} from "../../tenant-execution/data/system-admin.execution-settings.repository.server";
-import { buildSystemAdminCapabilityCoverageRows } from "../../capabilities/data/system-admin.capabilities.coverage.server";
-import type { SystemAdminAuditCoverageGapRow } from "../contracts/system-admin.audit-coverage.contract";
+} from "../tenant-execution/sys-execution-settings.repository.server";
+import { buildSystemAdminCapabilityCoverageRows } from "../capabilities/sys-capabilities.coverage.server";
+import type { SystemAdminAuditCoverageGapRow } from "./sys-audit-coverage.contract";
 import {
   SYSTEM_ADMIN_AUDIT_COVERAGE_CAPABILITY_LIMIT,
   SYSTEM_ADMIN_AUDIT_COVERAGE_MODULE_LIMIT,
-} from "../contracts/system-admin.audit-viewer.limits.shared";
+} from "./sys-audit-viewer.limits.shared";
 
 export async function listSystemAdminAuditCoverageGaps(input: {
   organizationId: string;

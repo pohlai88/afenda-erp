@@ -18,14 +18,24 @@ import {
   hrMcpCrossCountryReportFilterSchema,
   hrMcpPersistFinalizedSnapshotSchema,
   hrMcpPublishRuleVersionSchema,
+} from "./hr.payroll.mcp-mutation.schema";
+import {
   hrMcpUpsertCountryConfigSchema,
+} from "./hr.payroll.mcp-country-config.schema";
+import {
   hrMcpUpsertEmployeeClassificationSchema,
-  hrMcpUpsertEmployerContributionRuleSchema,
+} from "./hr.payroll.mcp-employee-classification.schema";
+import {
   hrMcpUpsertLegalEntitySetupSchema,
+} from "./hr.payroll.mcp-legal-entity.schema";
+import {
   hrMcpUpsertPayComponentTreatmentSchema,
+} from "./hr.payroll.mcp-pay-component.schema";
+import {
+  hrMcpUpsertEmployerContributionRuleSchema,
   hrMcpUpsertStatutoryContributionRuleSchema,
   hrMcpUpsertTaxRuleSchema,
-} from "../schemas";
+} from "./hr.payroll.mcp-tax-statutory.schema";
 import { finalizeHrMcpMutation } from "./hr.payroll.mcp.mutation.shared.server";
 
 export async function createCountryConfigAction(input: unknown) {

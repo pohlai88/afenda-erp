@@ -1,4 +1,4 @@
-import type { AppCapability } from "@afenda/auth";
+import type { AppCapability } from "./ker-app-capabilities";
 import type { ModuleId } from "@afenda/config/module-ids";
 
 export type ModuleTone = "neutral" | "positive" | "warning";

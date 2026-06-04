@@ -1,5 +1,5 @@
 import { formatErpDateTime } from "@afenda/kernel";
-import type { SystemAdminUserStatus } from "../contracts";
+import type { SystemAdminUserStatus } from "./sys-users.contract";
 
 export function formatSystemAdminUserLastActive(input: {
   status: SystemAdminUserStatus;

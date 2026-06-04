@@ -1,21 +1,21 @@
 import type { ListColumn, ListSurfaceRow } from "@afenda/governed-surface/schemas";
 
-import { systemAdminControlLinks } from "../../overview/contracts/system-admin.control-links.contract";
+import { systemAdminControlLinks } from "../overview/sys-control-links.contract";
 import {
   catalogStatusBadge,
   linkCell,
   moduleReadinessVerdictBadge,
-} from "../../overview/surfaces/system-admin.control-list.shared";
+} from "../overview/sys-control-list.shared";
 import type {
   SystemAdminApprovalMode,
   SystemAdminApprovalRuleListRow,
-} from "../contracts/system-admin.approval-rule.contract";
+} from "./sys-approval-rule.contract";
 import {
   systemAdminApprovalReadinessLabels,
   systemAdminApprovalStatusLabels,
-} from "./system-admin.approvals-detail-badges.shared";
-import { resolveSystemAdminApprovalRowTrailingAction } from "./system-admin.approvals-list-trailing.shared";
-import { systemAdminApprovalsUiCopy } from "./system-admin.approvals-ui.copy.shared";
+} from "./sys-approvals-detail-badges.shared";
+import { resolveSystemAdminApprovalRowTrailingAction } from "./sys-approvals-list-trailing.shared";
+import { systemAdminApprovalsUiCopy } from "./sys-approvals-ui.copy.shared";
 
 export const systemAdminApprovalModeLabels = {
   sequential: systemAdminApprovalsUiCopy.editor.modes.sequential,

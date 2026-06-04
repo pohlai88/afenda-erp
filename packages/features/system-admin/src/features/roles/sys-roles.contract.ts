@@ -1,4 +1,4 @@
-import type { OrganizationRole } from "@afenda/auth";
+import type { OrganizationRole } from "@afenda/kernel";
 
 export type SystemAdminRoleStatus = "active" | "deprecated";
 

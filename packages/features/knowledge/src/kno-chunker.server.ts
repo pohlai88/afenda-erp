@@ -1,7 +1,7 @@
 import {
   KNOWLEDGE_CHUNK_OVERLAP_TOKENS,
   KNOWLEDGE_CHUNK_TARGET_TOKENS,
-} from "../contracts/knowledge.core.contract";
+} from "./kno-core.contract";
 
 export type KnowledgeChunk = {
   index: number;

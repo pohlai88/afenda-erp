@@ -1,10 +1,7 @@
 import { resolveListSurfaceRowTrailingAction } from "@afenda/governed-surface";
 import type { ModuleId } from "@afenda/config/module-ids";
-import {
-  SYSTEM_ADMIN_PROTECTED_MODULE_KEY,
-  type SystemAdminModuleAvailability,
-} from "../contracts";
-import { systemAdminCriticalModuleKeys } from "../contracts/system-admin.module-dependencies.contract";
+import { SYSTEM_ADMIN_PROTECTED_MODULE_KEY, type SystemAdminModuleAvailability } from "./sys-modules.contract";
+import { systemAdminCriticalModuleKeys } from "./sys-module-dependencies.contract";
 
 export const SYSTEM_ADMIN_MODULES_MANAGE_DENIED =
   "Requires system-admin.modules.manage.";

@@ -13,7 +13,7 @@ import {
   type HrOvertimeEligibilityRuleRow,
 } from "@afenda/db";
 
-import { listHrTimeOtmVisibleStatusOptions as featureStatusOptions } from "../../src/time-attendance/overtime-management/data/hr.time.otm-lifecycle.shared";
+import { listHrTimeOtmVisibleStatusOptions as featureStatusOptions } from "../../src/time-attendance/overtime-management/hr.time.otm-lifecycle.shared";
 
 const baseRule = (
   overrides: Partial<HrOvertimeEligibilityRuleRow> = {},

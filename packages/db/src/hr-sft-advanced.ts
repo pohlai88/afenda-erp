@@ -11,7 +11,7 @@ import {
   hrShiftRosterReportDefinitions,
   hrShiftTemplates,
   type HrShiftRosterReportFilterPayload,
-} from "./hr-shift-scheduling";
+} from "./dbx-hr-shift-scheduling";
 
 const DEFAULT_PAGE_SIZE = 25;
 const MAX_PAGE_SIZE = 100;
@@ -1024,3 +1024,4 @@ export async function queryHrShiftScheduleReportRows(input: {
       .sort((a, b) => a.groupLabel.localeCompare(b.groupLabel));
   });
 }
+

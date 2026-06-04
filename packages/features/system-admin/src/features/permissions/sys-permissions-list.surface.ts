@@ -1,14 +1,14 @@
 import type { ListSurfaceRendererConfigurationResolvedInput } from "@afenda/governed-surface";
-import { systemAdminControlLinks } from "../../overview/contracts/system-admin.control-links.contract";
+import { systemAdminControlLinks } from "../overview/sys-control-links.contract";
 import {
   buildLinkedControlListSurface,
   catalogStatusBadge,
   linkCell,
   permissionCoverageVerdictBadge,
   riskLevelBadge,
-} from "../../overview/surfaces/system-admin.control-list.shared";
-import type { SystemAdminPermissionListRow } from "../contracts";
-import { systemAdminPermissionsUiCopy } from "./system-admin.permissions-ui.copy.shared";
+} from "../overview/sys-control-list.shared";
+import type { SystemAdminPermissionListRow } from "./sys-permissions.contract";
+import { systemAdminPermissionsUiCopy } from "./sys-permissions-ui.copy.shared";
 
 export const systemAdminPermissionsSurfaceKey =
   "system-admin.permissions.list";

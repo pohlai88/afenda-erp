@@ -25,7 +25,7 @@ import {
   authorizeTenantDocumentDownload,
   createTenantObjectStorageDownloadDeps,
   recordTenantDocumentEvidenceEvent,
-} from "../../src/tenant-execution/api/system-admin.object-storage-governance.server";
+} from "../../src/features/tenant-execution/sys-object-storage-governance.server";
 
 describe("tenant object-storage governance", () => {
   it("writes document evidence events to the execution audit ledger", async () => {

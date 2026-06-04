@@ -4,7 +4,7 @@ import {
   priorPeriodRange,
   type HrAatTrendMovementResult,
 } from "./hr.time.aat-comparison.schema";
-import { loadHrAatDimensionAbsenceRates } from "./hr.time.aat-comparison.server";
+import { loadHrAatDimensionAbsenceRates } from "./hrs-hr-time-aat-comparison-server";
 
 /** HRM-AAT-017 — trend movement indicators (improving / worsening / stable). */
 export async function loadHrAatTrendMovementIndicators(

@@ -5,11 +5,11 @@ import { getDb, knowledgeSources } from "@afenda/db";
 import {
   KNOWLEDGE_AUDIT_ACTIONS,
   type KnowledgeSourceKind,
-} from "../contracts/knowledge.core.contract";
-import type { RawKnowledgeDocument } from "../contracts/knowledge.retrieval.contract";
-import { emitKnowledgeAuditEvent } from "./knowledge.audit.server";
-import { commitKnowledgeDocument } from "./knowledge.pipeline-commit.server";
-import { getKnowledgeSourceAdapter } from "./knowledge.source-adapter-registry.server";
+} from "./kno-core.contract";
+import type { RawKnowledgeDocument } from "./kno-retrieval.contract";
+import { emitKnowledgeAuditEvent } from "./kno-audit.server";
+import { commitKnowledgeDocument } from "./kno-pipeline-commit.server";
+import { getKnowledgeSourceAdapter } from "./kno-source-adapter-registry.server";
 
 export type SyncSourceResult = {
   sourceId: string;

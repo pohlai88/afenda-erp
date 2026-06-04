@@ -1,4 +1,4 @@
 export {
   requireSystemAdminCapabilitiesManage,
   requireSystemAdminCapabilitiesRead,
-} from "../../overview/policies/system-admin.capability.policy.server";
+} from "../overview/sys-capability.policy.server";

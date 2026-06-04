@@ -9,7 +9,7 @@ import {
   hrOrgHeadcountSurfaceKey,
   hrOrgAuditTrailSurfaceKey,
 } from "../../src/metadata";
-import { parseHrOrgSearchParams } from "../../src/employee-management/organizational-chart-hierarchy/data/hr.workforce.org-search-params.parse.shared";
+import { parseHrOrgSearchParams } from "../../src/employee-management/organizational-chart-hierarchy/hr.workforce.org-search-params.parse.shared";
 
 describe("hr org workbench metadata", () => {
   it("marks vacancies, headcount, and audit trail as read-only Pattern C surfaces", () => {

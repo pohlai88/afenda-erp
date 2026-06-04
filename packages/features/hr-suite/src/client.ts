@@ -32,7 +32,6 @@ export * from "./hr-suite-integration/hrs-hr-suite-permission-contract";
 export * from "./payroll-compensation/benefits-administration/hr.payroll.benefits-enrollment-forms.component.client";
 export * from "./payroll-compensation/benefits-administration/hr.payroll.benefits-enrollments-trailing.component.client";
 export * from "./payroll-compensation/benefits-administration/hr.payroll.benefits-reports.component.client";
-export * from "./payroll-compensation/bonus-incentive-management/hrs-hr-payroll-bonus-events";
 export * from "./payroll-compensation/compensation-planning-modeling/hr.payroll.cpm-recommendation-form.component.client";
 export * from "./payroll-compensation/compensation-planning-modeling/hr.payroll.cpm-workflow-forms.component.client";
 export * from "./payroll-compensation/compensation-planning-modeling/hr.payroll.cpm-workflow-trailing.component.client";
@@ -101,7 +100,6 @@ export * from "./time-attendance/flexible-work-arrangement-tracking/hrs-hr-time-
 export * from "./time-attendance/flexible-work-arrangement-tracking/hrs-hr-time-fwa-compliance-events";
 export * from "./time-attendance/flexible-work-arrangement-tracking/hrs-hr-time-fwa-compliance-server";
 export * from "./time-attendance/flexible-work-arrangement-tracking/hrs-hr-time-fwa-eligibility-server";
-export * from "./time-attendance/flexible-work-arrangement-tracking/hrs-hr-time-fwa-events";
 export * from "./time-attendance/flexible-work-arrangement-tracking/hrs-hr-time-fwa-exception-server";
 export * from "./time-attendance/flexible-work-arrangement-tracking/hrs-hr-time-fwa-leave-validate-server";
 export * from "./time-attendance/flexible-work-arrangement-tracking/hrs-hr-time-fwa-location-server";

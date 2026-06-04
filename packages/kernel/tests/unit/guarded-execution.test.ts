@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { ExecutionContext } from "../../src/execution-kernel/context/execution-context";
+import type { ExecutionContext } from "../../src/ker-execution-context";
 
 const context: ExecutionContext = {
   organizationId: "org_123",
@@ -20,22 +20,20 @@ const mocks = vi.hoisted(() => ({
   writeExecutionAuditEvent: vi.fn(async () => undefined),
 }));
 
-vi.mock("../../src/execution-kernel/context/execution-context", () => ({
+vi.mock("../../src/ker-execution-context", () => ({
   requireExecutionContext: mocks.requireExecutionContext,
 }));
-vi.mock("../../src/execution-kernel/access/execution-access", () => ({
+vi.mock("../../src/ker-execution-access", () => ({
   requireExecutionPermission: mocks.requireExecutionPermission,
 }));
-vi.mock("../../src/execution-kernel/policy/execution-policy", () => ({
+vi.mock("../../src/ker-execution-policy", () => ({
   assertExecutionPolicy: mocks.assertExecutionPolicy,
 }));
-vi.mock("../../src/execution-kernel/audit/execution-audit", () => ({
+vi.mock("../../src/ker-execution-audit", () => ({
   writeExecutionAuditEvent: mocks.writeExecutionAuditEvent,
 }));
 
-const { runGuardedExecution } = await import(
-  "../../src/execution-kernel/execution/guarded-execution"
-);
+const { runGuardedExecution } = await import("../../src/ker-guarded-execution");
 
 describe("runGuardedExecution", () => {
   beforeEach(() => {
@@ -50,8 +48,8 @@ describe("runGuardedExecution", () => {
       action: "hr.employee.update",
       permission: "hr.view",
       input: { employeeId: "emp_1", name: "Ada" },
-      parse: async (input) => input,
-      resolveTarget: (input) => ({
+      parse: async (input: { employeeId: string; name: string }) => input,
+      resolveTarget: (input: { employeeId: string; name: string }) => ({
         targetType: "hr-employee",
         targetId: input.employeeId,
       }),
@@ -91,7 +89,7 @@ describe("runGuardedExecution", () => {
       action: "hr.employee.preview",
       permission: "hr.view",
       input: {},
-      parse: async (input) => input,
+      parse: async (input: Record<string, never>) => input,
       resolveTarget: () => ({ targetType: "hr-employee" }),
       execute: async () => null,
       audit: { skip: true },

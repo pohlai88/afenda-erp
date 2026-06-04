@@ -4,7 +4,7 @@ import {
   HR_TALENT_TRAINING_ACCEPTANCE_CRITERIA_COVERAGE,
   HR_TALENT_TRAINING_REQUIREMENT_COVERAGE,
   assertHrTrainingEnterpriseCoverage,
-} from "../../src/talent-management/training-development/data/hr.talent.training-coverage.shared";
+} from "../../src/talent-management/training-development/hr.talent.training-coverage.shared";
 
 describe("HRM-TRN-001..030 coverage registry", () => {
   it("registers all thirty requirements as shipped", () => {

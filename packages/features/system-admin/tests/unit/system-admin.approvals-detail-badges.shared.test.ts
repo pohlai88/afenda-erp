@@ -12,7 +12,7 @@ import {
   systemAdminApprovalStatusLabels,
   systemAdminApprovalEnabledBadgeAriaLabel,
   systemAdminApprovalStatusBadgeAriaLabel,
-} from "../../src/approvals/surface/system-admin.approvals-detail-badges.shared";
+} from "../../src/features/approvals/sys-approvals-detail-badges.shared";
 
 describe("system-admin approval detail badges", () => {
   it("maps list cell tones to badge variants", () => {

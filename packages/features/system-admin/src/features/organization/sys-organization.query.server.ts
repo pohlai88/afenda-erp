@@ -2,11 +2,11 @@ import {
   ensureTenantSettings,
   getOrganizationProfile,
   getTenantSettings,
-} from "./system-admin.tenant-settings.repository.server";
+} from "./sys-tenant-settings.repository.server";
 import type {
   SystemAdminOrganizationDefaults,
   SystemAdminOrganizationPageModel,
-} from "../contracts/system-admin.organization.contract";
+} from "./sys-organization.contract";
 
 function toOrganizationDefaults(
   settings: Awaited<ReturnType<typeof getTenantSettings>>,

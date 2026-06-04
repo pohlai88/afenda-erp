@@ -3,8 +3,8 @@ import { renderToStaticMarkup } from "react-dom/server";
 
 import {
   renderGovernedPatternSectionShell,
-} from "../../src/components/governed-pattern-section-shell.shared";
-import type { GovernedSurfaceSectionCardBody } from "../../src/components/governed-surface-section-card";
+} from "../../src/gov-governed-pattern-section-shell-shared";
+import type { GovernedSurfaceSectionCardBody } from "../../src/gov-governed-surface-section-card";
 
 describe("renderGovernedPatternSectionShell", () => {
   const readyBody: GovernedSurfaceSectionCardBody = {

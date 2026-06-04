@@ -1,9 +1,9 @@
-import type { OrganizationRole } from "@afenda/auth";
+import type { OrganizationRole } from "@afenda/kernel";
 import { writeExecutionAuditEvent } from "@afenda/kernel/execution";
-import { resolveSystemAdminListSearch } from "../../overview/contracts/system-admin.list-search.shared";
-import { listRoleOverridesForOrganization } from "../../users/data/system-admin.identity.repository.server";
-import { resolveEffectivePermissionsForRole } from "../../permissions/data/system-admin.permissions.query.server";
-import { listSystemAdminRoles } from "./system-admin.roles.query.server";
+import { resolveSystemAdminListSearch } from "../overview/sys-list-search.shared";
+import { listRoleOverridesForOrganization } from "../users/sys-identity.repository.server";
+import { resolveEffectivePermissionsForRole } from "../permissions/sys-permissions.query.server";
+import { listSystemAdminRoles } from "./sys-roles.query.server";
 
 function matchesRoleSearch(
   query: string,

@@ -1,4 +1,4 @@
-import type { AppCapability } from "@afenda/auth";
+import type { AppCapability } from "@afenda/kernel";
 import {
   hasExecutionPermission,
   requireExecutionContext,
@@ -303,7 +303,7 @@ export function requireSystemAdminIntegrationsWrite() {
 export {
   requireSystemAdminLynxApprove,
   requireSystemAdminLynxRead,
-} from "../../lynx/policies/system-admin.lynx.policy.server";
+} from "../lynx/sys-lynx.policy.server";
 
 export function requireSystemAdminIntegrationsRead() {
   return requireSystemAdminAnyCapability([

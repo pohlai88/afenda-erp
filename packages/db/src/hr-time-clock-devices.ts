@@ -8,7 +8,7 @@ import {
   hrTimeClockAuditEvents,
   hrTimeClockDevices,
   type HrTimeClockSyncConfig,
-} from "./hr-time-clock";
+} from "./dbx-hr-time-clock";
 
 export type HrTimeClockDeviceRow = {
   id: string;
@@ -405,3 +405,4 @@ export async function updateHrTimeClockDevice(input: {
 }
 
 export { assertEmployeeExists };
+

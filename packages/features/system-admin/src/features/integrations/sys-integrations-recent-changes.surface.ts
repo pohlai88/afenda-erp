@@ -2,9 +2,9 @@ import type { ListSurfaceRendererConfigurationResolvedInput } from "@afenda/gove
 import {
   buildLinkedControlListSurface,
   linkCell,
-} from "../../overview/surfaces/system-admin.control-list.shared";
-import type { SystemAdminIntegrationsRecentChangeRow } from "../contracts/system-admin.integrations-list.contract";
-import { systemAdminIntegrationsUiCopy } from "./system-admin.integrations-ui.copy.shared";
+} from "../overview/sys-control-list.shared";
+import type { SystemAdminIntegrationsRecentChangeRow } from "./sys-integrations-list.contract";
+import { systemAdminIntegrationsUiCopy } from "./sys-integrations-ui.copy.shared";
 
 export const systemAdminIntegrationsRecentChangesSurfaceKey =
   "system-admin.integrations.recent-changes";

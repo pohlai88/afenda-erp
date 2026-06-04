@@ -1,7 +1,9 @@
 import type { ModuleId } from "@afenda/config/module-ids";
-import type { GovernedMultiStepFormConfigurationInput } from "@afenda/governed-surface/schemas";
-import { GOVERNED_METADATA_SCHEMA_VERSION } from "@afenda/governed-surface";
-import { documentWorkflowCopy } from "../shell/route-copy-metadata";
+import {
+  GOVERNED_METADATA_SCHEMA_VERSION,
+  type GovernedMultiStepFormConfigurationInput,
+} from "./ker-governed-surface-contract";
+import { documentWorkflowCopy } from "./ker-route-copy-metadata";
 
 // ─── Document extraction form metadata ───────────────────────────────────────
 

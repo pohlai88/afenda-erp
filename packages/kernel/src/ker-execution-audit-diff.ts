@@ -1,4 +1,4 @@
-import type { AuditDiff } from "./execution-audit.types";
+import type { AuditDiff } from "./ker-execution-audit-types";
 
 function isPlainObject(value: unknown): value is Record<string, unknown> {
   return (

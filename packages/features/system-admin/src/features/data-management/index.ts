@@ -4,5 +4,5 @@
  */
 export * from "./metadata";
 export * from "./client";
-export * from "./contracts";
-export * from "./schemas";
+export * from "./sys-import-job.contract";
+export * from "./sys-import-job.schema";

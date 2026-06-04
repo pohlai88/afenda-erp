@@ -5,7 +5,7 @@ import {
   assertPerformanceCoverageComplete,
   PERFORMANCE_ACCEPTANCE_CRITERIA_COVERAGE,
   PERFORMANCE_REQUIREMENT_COVERAGE,
-} from "../../src/talent-management/performance-appraisals/data/hr.talent.performance-coverage.shared";
+} from "../../src/talent-management/performance-appraisals/hr.talent.performance-coverage.shared";
 
 describe("HRM-PER-001..031 coverage registry", () => {
   it("registers all thirty-one requirements as shipped", () => {

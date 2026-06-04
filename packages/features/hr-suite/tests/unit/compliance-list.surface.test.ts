@@ -4,49 +4,49 @@ import {
   buildHrComplianceWorkAuthDocumentsListSurface,
   hrComplianceWorkAuthDocumentSearchParam,
   hrComplianceWorkAuthDocumentsSurfaceKey,
-} from "../../src/employee-management/compliance-regulatory-tracking/surface/hr.workforce.compliance-work-auth-documents-list.surface";
+} from "../../src/employee-management/compliance-regulatory-tracking/hr.workforce.compliance-work-auth-documents-list.surface";
 import {
   buildHrComplianceWorkEligibilityListSurface,
   hrComplianceWorkEligibilitySearchParam,
   hrComplianceWorkEligibilitySurfaceKey,
-} from "../../src/employee-management/compliance-regulatory-tracking/surface/hr.workforce.compliance-work-eligibility-list.surface";
+} from "../../src/employee-management/compliance-regulatory-tracking/hr.workforce.compliance-work-eligibility-list.surface";
 import {
   buildHrComplianceSafetyTrainingRequirementsListSurface,
   hrComplianceSafetyTrainingRequirementsSurfaceKey,
   hrComplianceSafetyTrainingSearchParam,
-} from "../../src/employee-management/compliance-regulatory-tracking/surface/hr.workforce.compliance-safety-training-requirements-list.surface";
+} from "../../src/employee-management/compliance-regulatory-tracking/hr.workforce.compliance-safety-training-requirements-list.surface";
 import {
   buildHrComplianceWorkplaceSafetyRequirementsListSurface,
   hrComplianceWorkplaceSafetyRequirementsSurfaceKey,
   hrComplianceWorkplaceSafetySearchParam,
-} from "../../src/employee-management/compliance-regulatory-tracking/surface/hr.workforce.compliance-workplace-safety-list.surface";
-import { hrWorkforceComplianceReadPermission } from "../../src/employee-management/compliance-regulatory-tracking/contracts/hr.workforce.compliance.contract";
-import { formatComplianceDateTimeLocalInput } from "../../src/employee-management/compliance-regulatory-tracking/schemas/hr.workforce.compliance-form.shared";
+} from "../../src/employee-management/compliance-regulatory-tracking/hr.workforce.compliance-workplace-safety-list.surface";
+import { hrWorkforceComplianceReadPermission } from "../../src/employee-management/compliance-regulatory-tracking/hr.workforce.compliance.contract";
+import { formatComplianceDateTimeLocalInput } from "../../src/employee-management/compliance-regulatory-tracking/hr.workforce.compliance-form.shared";
 import {
   buildHrComplianceLaborLawRequirementsListSurface,
   hrComplianceLaborLawRequirementsSurfaceKey,
   hrComplianceLaborLawSearchParam,
-} from "../../src/employee-management/compliance-regulatory-tracking/surface/hr.workforce.compliance-labor-law-requirements-list.surface";
+} from "../../src/employee-management/compliance-regulatory-tracking/hr.workforce.compliance-labor-law-requirements-list.surface";
 import {
   buildHrComplianceFilingsListSurface,
   hrComplianceFilingSearchParam,
   hrComplianceFilingsSurfaceKey,
-} from "../../src/employee-management/compliance-regulatory-tracking/surface/hr.workforce.compliance-filings-list.surface";
+} from "../../src/employee-management/compliance-regulatory-tracking/hr.workforce.compliance-filings-list.surface";
 import {
   buildHrCompliancePolicyAcknowledgementsListSurface,
   hrCompliancePolicyAcknowledgementsSurfaceKey,
   hrCompliancePolicyAcknowledgementSearchParam,
-} from "../../src/employee-management/compliance-regulatory-tracking/surface/hr.workforce.compliance-policy-acknowledgements-list.surface";
+} from "../../src/employee-management/compliance-regulatory-tracking/hr.workforce.compliance-policy-acknowledgements-list.surface";
 import {
   buildHrComplianceExceptionsListSurface,
   hrComplianceExceptionSearchParam,
   hrComplianceExceptionsSurfaceKey,
-} from "../../src/employee-management/compliance-regulatory-tracking/surface/hr.workforce.compliance-exceptions-list.surface";
+} from "../../src/employee-management/compliance-regulatory-tracking/hr.workforce.compliance-exceptions-list.surface";
 import {
   buildHrComplianceObligationsListSurface,
   hrComplianceObligationSearchParam,
   hrComplianceObligationsSurfaceKey,
-} from "../../src/employee-management/compliance-regulatory-tracking/surface/hr.workforce.compliance-obligations-list.surface";
+} from "../../src/employee-management/compliance-regulatory-tracking/hr.workforce.compliance-obligations-list.surface";
 
 describe("hr workforce compliance list surfaces", () => {
   it("builds obligations list with toolbar, labels, and trailing metadata", () => {

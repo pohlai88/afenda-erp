@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { decideHrLeaveApplicationFormSchema } from "../../src/time-attendance/leave-attendance-management/schemas/hr.time.leave-decision.schema";
+import { decideHrLeaveApplicationFormSchema } from "../../src/time-attendance/leave-attendance-management/hr.time.leave-decision.schema";
 
 describe("LAM-015 rejection reason schema", () => {
   it("requires rejection reason on reject decision", () => {

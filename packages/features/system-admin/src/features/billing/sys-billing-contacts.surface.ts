@@ -1,7 +1,7 @@
 import type { ListSurfaceRendererConfigurationResolvedInput } from "@afenda/governed-surface/schemas";
-import { buildLinkedControlListSurface } from "../../overview/surfaces/system-admin.control-list.shared";
-import type { SystemAdminBillingContactRow } from "../contracts/system-admin.billing-list.contract";
-import { systemAdminBillingUiCopy } from "./system-admin.billing-ui.copy.shared";
+import { buildLinkedControlListSurface } from "../overview/sys-control-list.shared";
+import type { SystemAdminBillingContactRow } from "./sys-billing-list.contract";
+import { systemAdminBillingUiCopy } from "./sys-billing-ui.copy.shared";
 
 export const systemAdminBillingContactsSurfaceKey =
   "system-admin.billing.contacts";

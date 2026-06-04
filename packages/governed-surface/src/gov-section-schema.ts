@@ -2,8 +2,8 @@ import { z } from "zod";
 
 import type { SchemaStability } from "./gov-_stability-shared";
 
-import { pageHeaderSchema } from "./page-header.schema";
-import { governedSurfaceChromeSchema } from "./surface-chrome.schema";
+import { pageHeaderSchema } from "./gov-page-header-schema";
+import { governedSurfaceChromeSchema } from "./gov-surface-chrome-schema";
 
 export const GOVERNED_SECTION_CONFIGURATION_SCHEMA_ID =
   "governed.section.configuration" as const;

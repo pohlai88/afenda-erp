@@ -1,14 +1,14 @@
 import { describe, expect, it } from "vitest";
 
-import type { LynxReadinessSnapshot } from "../../src/contracts/lynx.readiness.contract";
+import type { LynxReadinessSnapshot } from "../../src/lyn-readiness.contract";
 import {
   moduleById,
   type ModuleWorkspace,
 } from "@afenda/kernel";
-import type { EvaluateLynxOutcomeMonitorsInput } from "../../src/workflows/lynx.outcome-monitor.workflow.server";
+import type { EvaluateLynxOutcomeMonitorsInput } from "../../src/lyn-outcome-monitor.workflow.server";
 
 const { evaluateLynxOutcomeMonitors } =
-  await import("../../src/workflows/lynx.outcome-monitor.workflow.server");
+  await import("../../src/lyn-outcome-monitor.workflow.server");
 
 function workspace(input: {
   moduleId: "finance" | "approvals" | "reports" | "system-admin";

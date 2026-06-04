@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { HRM_EXP_AUDIT } from "../../src/payroll-compensation/expenses-reimbursement/events/hr.payroll.exp.event";
+import { HRM_EXP_AUDIT } from "../../src/payroll-compensation/expenses-reimbursement/hr.payroll.exp.event";
 
 describe("HRM-EXP-028 expense audit events", () => {
   it("maps lifecycle mutations to erp.hrm.expense audit strings", () => {

@@ -1,20 +1,20 @@
 import { describe, expect, it } from "vitest";
 
-import { SYSTEM_ADMIN_PROTECTED_CAPABILITY_PERMISSION } from "../../src/capabilities/contracts/system-admin.capability-safety.contract";
-import { parseSystemAdminCapabilityMatrixRole } from "../../src/capabilities/data/system-admin.capabilities-matrix-role.shared";
+import { SYSTEM_ADMIN_PROTECTED_CAPABILITY_PERMISSION } from "../../src/features/capabilities/sys-capability-safety.contract";
+import { parseSystemAdminCapabilityMatrixRole } from "../../src/features/capabilities/sys-capabilities-matrix-role.shared";
 import {
   countDuplicateExecutionCapabilityKeys,
   listUniqueExecutionCapabilities,
-} from "../../src/capabilities/data/system-admin.capabilities-catalog.shared";
-import { parseSystemAdminCapabilitySettingsFormData } from "../../src/capabilities/data/system-admin.capability-settings-form.shared";
+} from "../../src/features/capabilities/sys-capabilities-catalog.shared";
+import { parseSystemAdminCapabilitySettingsFormData } from "../../src/features/capabilities/sys-capability-settings-form.shared";
 import {
   isSystemAdminModuleDisabledForOrg,
   resolveSystemAdminCapabilityOrgAvailability,
-} from "../../src/capabilities/data/system-admin.capabilities-org-settings.shared";
+} from "../../src/features/capabilities/sys-capabilities-org-settings.shared";
 import {
   resolveSystemAdminCapabilityAuditAction,
   systemAdminCapabilityAuditActions,
-} from "../../src/capabilities/events/system-admin.capabilities.event";
+} from "../../src/features/capabilities/sys-capabilities.event";
 
 describe("capabilities shared helpers", () => {
   it("uses hyphenated audit action keys", () => {

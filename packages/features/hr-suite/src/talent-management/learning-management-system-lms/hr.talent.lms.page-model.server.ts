@@ -1,12 +1,12 @@
 import type { HrLmsReportGroupBy } from "./hr.talent.lms-constants.shared";
-import { listHrLmsAuditTrail } from "./hr.talent.lms-audit.server";
+import { listHrLmsAuditTrail } from "./hrs-hr-talent-lms-audit-server";
 import type { HrLmsHubPageModelInput } from "./hr.talent.lms-search-params.parse.shared";
 import {
   listHrLmsAssignmentsFromStore,
   listHrLmsCoursesFromStore,
   listHrLmsProgressFromStore,
 } from "./hr.talent.lms-store.shared";
-import { buildHrLmsReportRows } from "./hr.talent.lms-reports.server";
+import { buildHrLmsReportRows } from "./hrs-hr-talent-lms-reports-server";
 import {
   buildHrLmsAdminOverviewListSurface,
   buildHrLmsAuditListSurface,

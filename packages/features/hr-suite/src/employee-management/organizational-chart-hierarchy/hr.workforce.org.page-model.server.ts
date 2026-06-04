@@ -14,14 +14,6 @@ import {
 import type { EmptyState } from "@afenda/governed-surface/schemas";
 
 import { settleOrgListLoad } from "./hr.workforce.org-list-load.shared";
-import {
-  hrOrgUnitsSurfaceKey,
-  hrOrgPositionsSurfaceKey,
-  hrOrgReportingLinesSurfaceKey,
-  hrOrgVacanciesSurfaceKey,
-  hrOrgHeadcountSurfaceKey,
-  hrOrgAuditTrailSurfaceKey,
-} from "./hr.workforce.org-search-params.parse.shared";
 import { buildHrOrgOverviewStatGroups } from "./hr.workforce.org-overview-stat.surface";
 import { buildHrOrgUnitsListSurface } from "./hr.workforce.org-units-list.surface";
 import { buildHrOrgPositionsListSurface } from "./hr.workforce.org-positions-list.surface";
@@ -291,12 +283,3 @@ export async function buildHrOrgPageModel(
     orgUnitPickerOptions,
   };
 }
-
-export {
-  hrOrgUnitsSurfaceKey,
-  hrOrgPositionsSurfaceKey,
-  hrOrgReportingLinesSurfaceKey,
-  hrOrgVacanciesSurfaceKey,
-  hrOrgHeadcountSurfaceKey,
-  hrOrgAuditTrailSurfaceKey,
-};

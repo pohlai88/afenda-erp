@@ -1,10 +1,10 @@
 import { listAuditLogsForOrganization } from "@afenda/db";
-import { listOrganizationInvitations } from "../../users/data/system-admin.identity.repository.server";
-import { loadTenantExecutionRulesForOrganization } from "../../tenant-execution/policies/system-admin.tenant-execution-rules.loader.server";
-import { listSystemAdminMemberships } from "../../memberships/data";
-import { listSystemAdminRoles } from "../../roles/data";
-import { listSystemAdminUsers } from "../../users/data";
-import type { SystemAdminOverviewSnapshot } from "../contracts";
+import { listOrganizationInvitations } from "../users/sys-identity.repository.server";
+import { loadTenantExecutionRulesForOrganization } from "../tenant-execution/sys-tenant-execution-rules.loader.server";
+import { listSystemAdminMemberships } from "../memberships/sys-memberships.query.server";
+import { listSystemAdminRoles } from "../roles/sys-roles.query.server";
+import { listSystemAdminUsers } from "../users/sys-users.query.server";
+import type { SystemAdminOverviewSnapshot } from "./sys-overview.contract";
 
 function isSystemAdminAuditAction(action: string) {
   return action.startsWith("system-admin.") || action.startsWith("tenant.");

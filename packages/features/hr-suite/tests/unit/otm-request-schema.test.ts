@@ -10,8 +10,8 @@ import {
   applyOtmOnBehalfFormSchema,
   requestOwnOtmFormSchema,
   resolveOtmSubmitHours,
-} from "../../src/time-attendance/overtime-management/schemas/hr.time.otm-request.schema";
-import { HR_OTM_DAY_CATEGORY_LABELS } from "../../src/time-attendance/overtime-management/data/hr.time.otm-catalog.shared";
+} from "../../src/time-attendance/overtime-management/hr.time.otm-request.schema";
+import { HR_OTM_DAY_CATEGORY_LABELS } from "../../src/time-attendance/overtime-management/hr.time.otm-catalog.shared";
 
 describe("OTM catalog (HRM-OTM-003, HRM-OTM-006)", () => {
   it("exposes planned and actual timing kinds", () => {

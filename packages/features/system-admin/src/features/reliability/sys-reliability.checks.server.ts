@@ -1,12 +1,12 @@
-import type { IntegrationReadinessReport } from "../../integrations/contracts/system-admin.integrations-readiness.contract";
-import { resolveSystemAdminReliabilityTargetHref } from "../contracts/system-admin.reliability-links.shared";
+import type { IntegrationReadinessReport } from "../integrations/sys-integrations-readiness.contract";
+import { resolveSystemAdminReliabilityTargetHref } from "./sys-reliability-links.shared";
 import type {
   SystemAdminReliabilityIssue,
   SystemAdminReliabilityOperationalLinkRow,
-} from "../contracts/system-admin.reliability-issue.contract";
-import type { CronHealthSurfaceRow } from "../contracts/system-admin.cron-health.contract";
-import type { SystemAdminMigrationHealthSnapshot } from "./system-admin.reliability.migration-health.server";
-import type { SystemAdminRepositoryHealthSnapshot } from "./system-admin.reliability.repository-health.server";
+} from "./sys-reliability-issue.contract";
+import type { CronHealthSurfaceRow } from "./sys-cron-health.contract";
+import type { SystemAdminMigrationHealthSnapshot } from "./sys-reliability.migration-health.server";
+import type { SystemAdminRepositoryHealthSnapshot } from "./sys-reliability.repository-health.server";
 
 function issueId(parts: readonly string[]) {
   return parts.join(":");

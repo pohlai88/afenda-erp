@@ -9,8 +9,8 @@ import {
 import { Button } from "@afenda/ui/button";
 import { BanIcon, PowerIcon } from "lucide-react";
 import { useState, useTransition } from "react";
-import type { SystemAdminActionResult } from "../../tenant-execution/contracts/system-admin.action-result.contract";
-import { setSystemAdminCapabilityAvailabilityAction } from "../actions/system-admin.capability-settings.actions.server";
+import type { SystemAdminActionResult } from "../tenant-execution/sys-action-result.contract";
+import { setSystemAdminCapabilityAvailabilityAction } from "./sys-capability-settings.actions.server";
 
 export function SystemAdminCapabilityTrailingCell({
   row,

@@ -3,17 +3,17 @@ import { SectionPanel } from "@afenda/ui";
 import { ui } from "@afenda/ui/design-system";
 import { cn } from "@afenda/ui/utils";
 import Link from "next/link";
-import { setRoleOverrideAction } from "../../permissions/actions/system-admin.permission-bundle.actions.server";
-import { RoleOverrideForm } from "../../permissions/components/system-admin.role-override-form.component.client";
+import { setRoleOverrideAction } from "../permissions/sys-permission-bundle.actions.server";
+import { RoleOverrideForm } from "../permissions/sys-role-override-form.component.client";
 import {
   buildRoleOverridesListSurface,
   systemAdminRoleOverridesSurfaceKey,
-} from "../../permissions/surface/system-admin.role-overrides-list.surface";
+} from "../permissions/sys-role-overrides-list.surface";
 import { InviteMemberForm } from "../../client";
 import type { RoleOverrideRow } from "@afenda/db";
-import { systemAdminRoutePaths } from "../../overview/contracts/system-admin.route-paths.contract";
-import { systemAdminUsersUiCopy } from "../surface/system-admin.users-ui.copy.shared";
-import { inviteMemberAction } from "../actions/system-admin.identity-invitations.actions.server";
+import { systemAdminRoutePaths } from "../overview/sys-route-paths.contract";
+import { systemAdminUsersUiCopy } from "./sys-users-ui.copy.shared";
+import { inviteMemberAction } from "./sys-identity-invitations.actions.server";
 
 const identityDomainLinkHrefs = [
   systemAdminRoutePaths.users,

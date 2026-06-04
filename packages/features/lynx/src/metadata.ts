@@ -9,9 +9,9 @@ export const lynxAiFeatureFlags = [
 
 export type LynxAiFeatureFlag = (typeof lynxAiFeatureFlags)[number];
 
-export * from "./surface";
-export { LYNX_MODULE_ID } from "./contracts/lynx.core.contract";
-export { lynxConsoleStatSurfaceKey } from "./surface/lynx.console.surface";
+export * from "./lyn-surface.shared";
+export { LYNX_MODULE_ID } from "./lyn-core.contract";
+export { lynxConsoleStatSurfaceKey } from "./lyn-console.surface";
 export {
   getLynxConsoleSection,
   getLynxConsoleUxCards,
@@ -22,4 +22,4 @@ export {
   lynxConsolePageMetadata,
   lynxConsoleSections,
   lynxConsoleUxCards,
-} from "./surface/lynx.console-ui.copy.shared";
+} from "./lyn-console-ui.copy.shared";

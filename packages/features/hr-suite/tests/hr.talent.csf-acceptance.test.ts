@@ -3,18 +3,18 @@ import { describe, expect, it } from "vitest";
 import {
   CSF_ACCEPTANCE_CRITERIA_COVERAGE,
   CSF_REQUIREMENT_COVERAGE,
-} from "./hr.talent.csf-acceptance-coverage.shared";
+} from "../src/talent-management/competency-skills-framework/hr.talent.csf-acceptance-coverage.shared";
 import {
   listHrCsfLmsLearningRecommendations,
   listHrCsfPerformanceAppraisalCompetencyRefs,
   listHrCsfSuccessionReadinessIndicators,
   listHrCsfTrainingDevelopmentGapExposure,
-} from "./hr.talent.csf-integration.server";
-import { compareCareerPathSkillRequirements } from "./hr.talent.csf-career-path.shared";
-import { findEmployeesMatchingRequiredSkills } from "./hr.talent.csf-matching.server";
-import { buildHrCsfReportRows } from "./hr.talent.csf-reports.server";
-import { emitHrCsfAuditTrailEvent, listHrCsfAuditTrailWindow } from "./hr.talent.csf-audit.server";
-import { hrTalentCsfAuditActions } from "../events/hr.talent.csf-audit.event";
+} from "../src/talent-management/competency-skills-framework/hrs-hr-talent-csf-integration-server";
+import { compareCareerPathSkillRequirements } from "../src/talent-management/competency-skills-framework/hr.talent.csf-career-path.shared";
+import { findEmployeesMatchingRequiredSkills } from "../src/talent-management/competency-skills-framework/hrs-hr-talent-csf-matching-server";
+import { buildHrCsfReportRows } from "../src/talent-management/competency-skills-framework/hrs-hr-talent-csf-reports-server";
+import { emitHrCsfAuditTrailEvent, listHrCsfAuditTrailWindow } from "../src/talent-management/competency-skills-framework/hrs-hr-talent-csf-audit-server";
+import { hrTalentCsfAuditActions } from "../src/talent-management/competency-skills-framework/hr.talent.csf-audit.event";
 
 const ORG = "org_csf_test";
 

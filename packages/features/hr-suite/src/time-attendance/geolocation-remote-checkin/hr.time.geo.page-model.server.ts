@@ -18,7 +18,7 @@ import {
   listHrGeoOvertimeReferenceWindow,
   listHrGeoPayrollReferenceWindow,
   listHrGeoRawVsApprovedWindow,
-} from "./hr.time.geo-integration-windows.server";
+} from "./hrs-hr-time-geo-integration-windows-server";
 import type { HrGeoPageModelInput } from "./hr.time.geo-search-params.parse.shared";
 import { buildHrGeoAuditTrailListSurface } from "./hr.time.geo-audit-trail-list.surface";
 import { buildHrGeoDevicesListSurface } from "./hr.time.geo-devices-list.surface";

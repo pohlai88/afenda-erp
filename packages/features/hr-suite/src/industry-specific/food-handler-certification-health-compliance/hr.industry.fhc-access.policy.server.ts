@@ -1,10 +1,10 @@
-import type { AppCapability } from "@afenda/auth";
+import type { AppCapability } from "@afenda/kernel";
 import { resolveEmployeeIdsVisibleToActor } from "@afenda/db";
 
 import {
   requireHrCapability,
   type HrModuleExecutionGuard,
-} from "../../employee-management/compliance-regulatory-tracking/server";
+} from "../../hr-suite-integration/server";
 import {
   HR_FHC_APPROVE_CAPABILITY,
   HR_FHC_AUDIT_READ_CAPABILITY,

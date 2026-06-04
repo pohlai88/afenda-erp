@@ -8,5 +8,7 @@
  *
  * Doctrine: docs/architecture/1005-infrastructure.md (ARCH-1005)
  */
-export * from "./contracts";
-export * from "./schemas/knowledge.eval-dataset.schema";
+export * from "./kno-core.contract";
+export * from "./kno-eval-dataset.schema";
+export * from "./kno-retrieval.contract";
+export * from "./kno-source-adapter.contract";

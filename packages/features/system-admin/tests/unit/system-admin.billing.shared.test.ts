@@ -1,11 +1,11 @@
 import { describe, expect, it } from "vitest";
 
-import type { BillingPostureSnapshot } from "../../src/billing/contracts/system-admin.billing-posture.contract";
-import { buildSystemAdminBillingSummaryCsv } from "../../src/billing/data/system-admin.billing-export.build.server";
-import { parseSystemAdminBillingContactsFormData } from "../../src/billing/data/system-admin.billing-contacts-form.shared";
-import { resolveSystemAdminBillingDefaultPlanKey } from "../../src/billing/data/system-admin.billing-default-plan.shared";
-import { parseSystemAdminBillingCheckoutStatus } from "../../src/billing/data/system-admin.billing-checkout-status.shared";
-import { systemAdminBillingAuditActions } from "../../src/billing/events/system-admin.billing.event";
+import type { BillingPostureSnapshot } from "../../src/features/billing/sys-billing-posture.contract";
+import { buildSystemAdminBillingSummaryCsv } from "../../src/features/billing/sys-billing-export.build.server";
+import { parseSystemAdminBillingContactsFormData } from "../../src/features/billing/sys-billing-contacts-form.shared";
+import { resolveSystemAdminBillingDefaultPlanKey } from "../../src/features/billing/sys-billing-default-plan.shared";
+import { parseSystemAdminBillingCheckoutStatus } from "../../src/features/billing/sys-billing-checkout-status.shared";
+import { systemAdminBillingAuditActions } from "../../src/features/billing/sys-billing.event";
 
 const snapshotFixture: BillingPostureSnapshot = {
   subscription: {

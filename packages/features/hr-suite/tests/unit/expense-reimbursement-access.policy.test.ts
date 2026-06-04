@@ -16,7 +16,7 @@ import {
   HR_EXPENSE_FINANCE_READ_CAPABILITY,
   HR_EXPENSE_SENSITIVE_READ_CAPABILITY,
   requireHrExpenseRead,
-} from "../../src/payroll-compensation/expenses-reimbursement/policies/hr.payroll.expense-access.policy.server";
+} from "../../src/payroll-compensation/expenses-reimbursement/hr.payroll.expense-access.policy.server";
 
 describe("HRM-EXP-026 expense access policy", () => {
   it("requires hr.expense.read and denies finance without hr.expense.finance.read", async () => {

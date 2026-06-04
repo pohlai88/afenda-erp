@@ -1,12 +1,12 @@
 import { hasExecutionPermission } from "@afenda/kernel/execution";
 
-import { exportSystemAdminDataManagementAction } from "../actions";
-import { buildSystemAdminDataManagementPageModel } from "../data";
+import { exportSystemAdminDataManagementAction } from "./sys-import-jobs.actions.server";
+import { buildSystemAdminDataManagementPageModel } from "./sys-data-management.page-model.server";
 import { requireSystemAdminDataManagementRead } from "./sys-data-management.policy.server";
 import {
   SystemAdminDataManagementAccessDenied,
   SystemAdminDataManagementSection,
-} from "./system-admin.data-management-section.component.server";
+} from "./sys-data-management-section.component.server";
 
 type SystemAdminDataManagementPageProps = {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;

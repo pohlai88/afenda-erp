@@ -1,5 +1,5 @@
-import { getOperationalSkills } from "../catalogs/lynx.operational-skill.catalog.server";
-import { listLynxRunLedger } from "./lynx.run-ledger.repository.server";
+import { getOperationalSkills } from "./lyn-operational-skill.catalog.server";
+import { listLynxRunLedger } from "./lyn-run-ledger.repository.server";
 import {
   describeWorkspaceDataSource,
   getAccessibleModules,
@@ -19,11 +19,11 @@ import type { Tone } from "@afenda/ui";
 import {
   LYNX_MODULE_ID,
   LYNX_WORKSPACE_ROUTES,
-} from "./lyn-core-contract";
+} from "./lyn-core.contract";
 import {
   getLynxNavigationExtensionHeroCopy,
   lynxConsoleMetrics,
-} from "../surface/lynx.console-ui.copy.shared";
+} from "./lyn-console-ui.copy.shared";
 import {
   buildLynxConsoleAiUsageListSurface,
   buildLynxConsoleEvidenceListSurface,
@@ -32,7 +32,7 @@ import {
   buildLynxRecoveryPlaybookListSurface,
   getLynxConsoleListSurfaceKeys,
   type LynxConsoleResolvedMetric,
-} from "../surface/lynx.console.surface";
+} from "./lyn-console.surface";
 import {
   buildLynxActivityLedgerListSurface,
   buildLynxEnterpriseControlsListSurface,
@@ -40,8 +40,8 @@ import {
   buildLynxReadinessStatGrid,
   buildLynxToolAvailabilityListSurface,
   getLynxReadinessSurfaceKeys,
-} from "../surface/lynx.readiness.surface";
-import { getLynxReadinessSnapshot } from "./lynx.readiness.query.server";
+} from "./lyn-readiness.surface";
+import { getLynxReadinessSnapshot } from "./lyn-readiness.query.server";
 
 type SessionSource = "dev" | "neon";
 

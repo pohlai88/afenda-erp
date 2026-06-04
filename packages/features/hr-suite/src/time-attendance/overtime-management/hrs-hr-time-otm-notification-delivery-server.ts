@@ -1,4 +1,4 @@
-import { sendHrTimeOtmNotificationEmail } from "./hr.time.otm-notification-email.server";
+import { sendHrTimeOtmNotificationEmail } from "./hrs-hr-time-otm-notification-email-server";
 
 /** Best-effort Ably shell refresh when ABLY_API_KEY is configured (HRM-OTM-026). */
 export async function publishHrTimeOtmAblyShellRefresh(input: {

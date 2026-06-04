@@ -1,16 +1,16 @@
 import { parseListSurfaceRendererConfiguration } from "@afenda/governed-surface/schemas";
 import { describe, expect, it } from "vitest";
 
-import { hrIndustryMscReadPermission } from "../../src/industry-specific/manufacturing-safety-training-osha-compliance/contracts/hr.industry.msc.contract";
-import { buildHrIndustryMscPageModel } from "../../src/industry-specific/manufacturing-safety-training-osha-compliance/data/hr.industry.msc.page-model.server";
+import { hrIndustryMscReadPermission } from "../../src/industry-specific/manufacturing-safety-training-osha-compliance/hr.industry.msc.contract";
+import { buildHrIndustryMscPageModel } from "../../src/industry-specific/manufacturing-safety-training-osha-compliance/hr.industry.msc.page-model.server";
 import {
   listHrIndustryMscComplianceTrainingRefs,
   listHrIndustryMscLearningRequirementRefs,
   listHrIndustryMscShiftSchedulingEligibilityRefs,
   resetHrIndustryMscStore,
   resolveHrIndustryMscSafetyEligibility,
-} from "../../src/industry-specific/manufacturing-safety-training-osha-compliance/data/hr.industry.msc-store.shared";
-import { buildHrIndustryMscListSurface } from "../../src/industry-specific/manufacturing-safety-training-osha-compliance/surface/hr.industry.msc-lists.surface";
+} from "../../src/industry-specific/manufacturing-safety-training-osha-compliance/hr.industry.msc-store.shared";
+import { buildHrIndustryMscListSurface } from "../../src/industry-specific/manufacturing-safety-training-osha-compliance/hr.industry.msc-lists.surface";
 import {
   HR_INDUSTRY_MSC_LIST_SURFACE_KEYS,
   hrIndustryMscCertificationsSurfaceKey,
@@ -18,7 +18,7 @@ import {
   hrIndustryMscEvidenceLinksSurfaceKey,
   hrIndustryMscIncidentsSurfaceKey,
   hrIndustryMscIntegrationExposuresSurfaceKey,
-} from "../../src/industry-specific/manufacturing-safety-training-osha-compliance/surface/hr.industry.msc-surface-metadata.shared";
+} from "../../src/industry-specific/manufacturing-safety-training-osha-compliance/hr.industry.msc-surface-metadata.shared";
 
 describe("manufacturing safety training OSHA compliance EUI contract", () => {
   it("builds governed server-window list configuration", () => {

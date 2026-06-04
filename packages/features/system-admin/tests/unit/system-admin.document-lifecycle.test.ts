@@ -161,13 +161,13 @@ import {
 } from "@afenda/db";
 import { createObjectStore } from "@afenda/object-storage/server";
 import { writeExecutionAuditEvent } from "@afenda/kernel/execution";
-import { deleteTenantDocumentCommand } from "../../src/tenant-execution/commands/delete-tenant-document.command.server";
-import { destroyHrEmployeeDocumentCommand } from "../../src/tenant-execution/commands/destroy-hr-employee-document.command.server";
-import { processTenantDocumentScanCommand } from "../../src/tenant-execution/commands/process-tenant-document-scan.command.server";
-import { releaseLegalHoldToTenantDocumentCommand } from "../../src/tenant-execution/commands/release-legal-hold-to-tenant-document.command.server";
-import { releaseTenantDocumentScanQuarantineCommand } from "../../src/tenant-execution/commands/release-tenant-document-scan-quarantine.command.server";
-import { applyLegalHoldToTenantDocumentCommand } from "../../src/tenant-execution/commands/apply-legal-hold-to-tenant-document.command.server";
-import { cascadeOrganizationLegalHoldCommand } from "../../src/tenant-execution/commands/cascade-organization-legal-hold.command.server";
+import { deleteTenantDocumentCommand } from "../../src/features/tenant-execution/sys-delete-tenant-document-command-server";
+import { destroyHrEmployeeDocumentCommand } from "../../src/features/tenant-execution/sys-destroy-hr-employee-document-command-server";
+import { processTenantDocumentScanCommand } from "../../src/features/tenant-execution/sys-process-tenant-document-scan-command-server";
+import { releaseLegalHoldToTenantDocumentCommand } from "../../src/features/tenant-execution/sys-release-legal-hold-to-tenant-document-command-server";
+import { releaseTenantDocumentScanQuarantineCommand } from "../../src/features/tenant-execution/sys-release-tenant-document-scan-quarantine-command-server";
+import { applyLegalHoldToTenantDocumentCommand } from "../../src/features/tenant-execution/sys-apply-legal-hold-to-tenant-document-command-server";
+import { cascadeOrganizationLegalHoldCommand } from "../../src/features/tenant-execution/sys-cascade-organization-legal-hold-command-server";
 
 describe("tenant document lifecycle commands", () => {
   it("purges object bytes before deleting the registry row", async () => {
@@ -239,7 +239,7 @@ describe("tenant document lifecycle commands", () => {
     });
 
     const { expireTenantDocumentCommand } = await import(
-      "../../src/tenant-execution/commands/expire-tenant-document.command.server"
+      "../../src/features/tenant-execution/sys-expire-tenant-document-command-server"
     );
 
     await expireTenantDocumentCommand({

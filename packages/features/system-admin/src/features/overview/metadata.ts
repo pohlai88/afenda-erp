@@ -2,7 +2,7 @@
  * Governed metadata door — system-admin/overview
  * List surfaces, surface keys, and metadata-only copy. No tenant I/O.
  */
-export * from "./surfaces";
+export * from "./sys-overview-stat.surface";
 export {
   getSystemAdminSurfaceKeys,
   systemAdminAiApprovalsSurfaceKey,
@@ -32,4 +32,4 @@ export {
   systemAdminSsoSurfaceKey,
   systemAdminWebhookDeliveriesSurfaceKey,
   systemAdminWebhooksSurfaceKey,
-} from "./surfaces/system-admin.surface-keys.shared";
+} from "./sys-surface-keys.shared";

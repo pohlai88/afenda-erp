@@ -1,23 +1,18 @@
-import { appCapabilities, isAppCapability } from "@afenda/auth";
+import { appCapabilities, isAppCapability } from "@afenda/kernel";
 import type {
   TenantCapabilitySettingRow,
   TenantModuleSettingRow,
 } from "@afenda/db";
 import type { ExecutionCapability } from "@afenda/kernel/execution-capabilities";
-import { listUniqueExecutionCapabilities } from "./system-admin.capabilities-catalog.shared";
-import type {
-  CapabilityCoverageVerdict,
-  SystemAdminCapabilityAvailability,
-  SystemAdminCapabilityCoverageRow,
-  SystemAdminCapabilityReadinessVerdict,
-} from "../contracts";
-import { isCriticalExecutionCapability } from "../contracts/system-admin.capability-safety.contract";
+import { listUniqueExecutionCapabilities } from "./sys-capabilities-catalog.shared";
+import type { CapabilityCoverageVerdict, SystemAdminCapabilityAvailability, SystemAdminCapabilityCoverageRow, SystemAdminCapabilityReadinessVerdict } from "./sys-capabilities.contract";
+import { isCriticalExecutionCapability } from "./sys-capability-safety.contract";
 import {
   buildSystemAdminCapabilitySettingsMap,
   buildSystemAdminModuleSettingsMap,
   isSystemAdminModuleDisabledForOrg,
   resolveSystemAdminCapabilityOrgAvailability,
-} from "./system-admin.capabilities-org-settings.shared";
+} from "./sys-capabilities-org-settings.shared";
 
 function isSensitiveCapability(capability: ExecutionCapability) {
   return isCriticalExecutionCapability(capability);

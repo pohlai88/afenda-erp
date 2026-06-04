@@ -6,9 +6,9 @@ import {
   HR_LIFECYCLE_LIST_SURFACE_KEYS,
   HR_LIFECYCLE_WORKBENCH_READ_ONLY_SURFACE_KEYS,
 } from "../../src/metadata";
-import { hrLifecycleAuditTrailSurfaceKey } from "../../src/employee-management/employee-lifecycle-management/surface/hr.workforce.lifecycle-audit-trail-list.surface";
-import { hrLifecycleOnboardingCasesSurfaceKey } from "../../src/employee-management/employee-lifecycle-management/surface/hr.workforce.lifecycle-onboarding-cases-list.surface";
-import { hrLifecycleOffboardingCasesSurfaceKey } from "../../src/employee-management/employee-lifecycle-management/surface/hr.workforce.lifecycle-offboarding-cases-list.surface";
+import { hrLifecycleAuditTrailSurfaceKey } from "../../src/employee-management/employee-lifecycle-management/hr.workforce.lifecycle-audit-trail-list.surface";
+import { hrLifecycleOnboardingCasesSurfaceKey } from "../../src/employee-management/employee-lifecycle-management/hr.workforce.lifecycle-onboarding-cases-list.surface";
+import { hrLifecycleOffboardingCasesSurfaceKey } from "../../src/employee-management/employee-lifecycle-management/hr.workforce.lifecycle-offboarding-cases-list.surface";
 
 describe("hr lifecycle workbench metadata", () => {
   it("registers case queues and audit trail as read-only lists", () => {

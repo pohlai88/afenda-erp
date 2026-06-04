@@ -11,15 +11,15 @@ import {
 import { Braces, Check, Copy, X } from "lucide-react";
 import type { ComponentProps } from "react";
 import { useEffect, useState } from "react";
-import { lynxErpReadToolOutputSchema } from "./lyn-erp-read-tools-schema";
+import { lynxErpReadToolOutputSchema } from "./lyn-erp-read-tools.schema";
 import {
   LynxEvidenceCard,
   LynxMetricCard,
-} from "./lynx.panel.component.client";
+} from "./lyn-panel.component.client";
 import {
   getLynxToolStateLabel,
   getLynxToolStateTone,
-} from "./lynx.tool-state.shared";
+} from "./lyn-tool-state.shared";
 
 export type LynxToolPart = {
   type: string;

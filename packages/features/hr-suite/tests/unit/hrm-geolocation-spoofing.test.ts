@@ -4,7 +4,7 @@ import {
   collectHrGeoClientSpoofingSignals,
   hasHrGeoSpoofingRisk,
   mergeHrGeoSpoofingSignals,
-} from "../../src/time-attendance/geolocation-remote-checkin/data/hr.time.geo-spoofing.shared";
+} from "../../src/time-attendance/geolocation-remote-checkin/hr.time.geo-spoofing.shared";
 import { collectHrGeoServerSpoofingSignals } from "@afenda/db";
 
 describe("HRM-GEO spoofing detection", () => {

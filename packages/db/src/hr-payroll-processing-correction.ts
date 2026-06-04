@@ -7,7 +7,7 @@ import { getHrPayrollRunSummaryInTx } from "./hr-payroll-processing-workflow";
 import {
   hrPayrollCorrections,
   hrPayrollRuns,
-} from "./hr-payroll-processing";
+} from "./dbx-hr-payroll-processing";
 
 /** PAY-029 — authorized payroll correction or reversal. */
 export async function authorizeHrPayrollCorrectionInTx(
@@ -122,3 +122,4 @@ export async function listHrPayrollCorrectionsWindow(
     hasNextPage: false,
   };
 }
+

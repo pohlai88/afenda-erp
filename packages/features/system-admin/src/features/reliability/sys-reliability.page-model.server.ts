@@ -3,21 +3,21 @@ import {
   mapSsoConnectionToListRow,
   mapWebhookDeliveryToListRow,
   mapWebhookToListRow,
-} from "../../integrations/data/system-admin.integrations.mapper.server";
-import { evaluateIntegrationsReadiness } from "../../integrations/data/system-admin.integrations.readiness.server";
+} from "../integrations/sys-integrations.mapper.server";
+import { evaluateIntegrationsReadiness } from "../integrations/sys-integrations.readiness.server";
 import {
   listApiCredentials,
   listSsoConnections,
   listWebhookDeliveries,
   listWebhooks,
-} from "../../integrations/data/system-admin.integrations.repository.server";
+} from "../integrations/sys-integrations.repository.server";
 import type {
   SystemAdminReliabilityIssue,
   SystemAdminReliabilityOperationalLinkRow,
   SystemAdminReliabilitySummary,
-} from "../contracts/system-admin.reliability-issue.contract";
-import { getCronHealthSurfaceRows } from "./system-admin.cron-health.query.server";
-import type { CronHealthSurfaceRow } from "../contracts/system-admin.cron-health.contract";
+} from "./sys-reliability-issue.contract";
+import { getCronHealthSurfaceRows } from "./sys-cron-health.query.server";
+import type { CronHealthSurfaceRow } from "./sys-cron-health.contract";
 import {
   buildReliabilityOperationalLinkRows,
   collectCronReliabilityIssues,
@@ -26,14 +26,14 @@ import {
   collectPlatformInstrumentationIssues,
   collectRepositoryReliabilityIssues,
   collectWorkflowReliabilityIssues,
-} from "./system-admin.reliability.checks.server";
-import { evaluateMigrationHealth } from "./system-admin.reliability.migration-health.server";
-import { evaluateRepositoryHealth } from "./system-admin.reliability.repository-health.server";
+} from "./sys-reliability.checks.server";
+import { evaluateMigrationHealth } from "./sys-reliability.migration-health.server";
+import { evaluateRepositoryHealth } from "./sys-reliability.repository-health.server";
 import {
   groupReliabilityIssuesBySeverity,
   sortReliabilityIssues,
   summarizeReliabilityIssues,
-} from "./system-admin.reliability.verdict.server";
+} from "./sys-reliability.verdict.server";
 
 export type SystemAdminReliabilityPageModel = {
   cronRows: readonly CronHealthSurfaceRow[];

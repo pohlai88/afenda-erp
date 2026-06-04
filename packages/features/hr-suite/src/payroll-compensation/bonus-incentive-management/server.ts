@@ -13,4 +13,3 @@ export * from "./hr.payroll.bonus.actions.server";
 export * from "./hr.payroll.bonus.event";
 export * from "./hr.payroll.bonus.mutation.shared.server.data";
 export * from "./hr.payroll.bonus.page-model.server";
-export * from "./hrs-hr-payroll-bonus-events";

@@ -1,16 +1,16 @@
 import { parseListSurfaceRendererConfiguration } from "@afenda/governed-surface/schemas";
 import { describe, expect, it } from "vitest";
 
-import { hrIndustryRwsReadPermission } from "../../src/industry-specific/retail-seasonal-hourly-workforce-scheduling/contracts/hr.industry.rws.contract";
-import { buildHrIndustryRwsPageModel } from "../../src/industry-specific/retail-seasonal-hourly-workforce-scheduling/data/hr.industry.rws.page-model.server";
+import { hrIndustryRwsReadPermission } from "../../src/industry-specific/retail-seasonal-hourly-workforce-scheduling/hr.industry.rws.contract";
+import { buildHrIndustryRwsPageModel } from "../../src/industry-specific/retail-seasonal-hourly-workforce-scheduling/hr.industry.rws.page-model.server";
 import {
   listHrIndustryRwsCoverageGapRefs,
   listHrIndustryRwsIntegrationExposureRefs,
   listHrIndustryRwsOpenShiftEligibilityRefs,
   listHrIndustryRwsPayrollScheduleRefs,
   resetHrIndustryRwsStore,
-} from "../../src/industry-specific/retail-seasonal-hourly-workforce-scheduling/data/hr.industry.rws-store.shared";
-import { buildHrIndustryRwsListSurface } from "../../src/industry-specific/retail-seasonal-hourly-workforce-scheduling/surface/hr.industry.rws-lists.surface";
+} from "../../src/industry-specific/retail-seasonal-hourly-workforce-scheduling/hr.industry.rws-store.shared";
+import { buildHrIndustryRwsListSurface } from "../../src/industry-specific/retail-seasonal-hourly-workforce-scheduling/hr.industry.rws-lists.surface";
 import {
   HR_INDUSTRY_RWS_LIST_SURFACE_KEYS,
   hrIndustryRwsAssignmentsSurfaceKey,
@@ -19,7 +19,7 @@ import {
   hrIndustryRwsIntegrationExposuresSurfaceKey,
   hrIndustryRwsLaborBudgetsSurfaceKey,
   hrIndustryRwsSchedulesSurfaceKey,
-} from "../../src/industry-specific/retail-seasonal-hourly-workforce-scheduling/surface/hr.industry.rws-surface-metadata.shared";
+} from "../../src/industry-specific/retail-seasonal-hourly-workforce-scheduling/hr.industry.rws-surface-metadata.shared";
 
 describe("retail seasonal hourly workforce scheduling EUI contract", () => {
   it("builds governed server-window list configuration", () => {

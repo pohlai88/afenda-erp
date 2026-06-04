@@ -17,7 +17,7 @@ import {
   requireHrWorkforceEssApprove,
   requireHrWorkforceEssRead,
   requireHrWorkforceEssWrite,
-} from "../../src/employee-management/employee-selfservice-portal/policies/hr.workforce.ess-access.policy.server";
+} from "../../src/employee-management/employee-selfservice-portal/hr.workforce.ess-access.policy.server";
 
 function context(input: {
   readonly role?: "staff" | "manager" | "admin" | "owner";

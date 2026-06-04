@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   AAT_INTEGRATION_REQUIREMENT_COVERAGE,
   assertAatIntegrationCoverageComplete,
-} from "./hr.time.aat-acceptance-coverage.shared";
+} from "../src/time-attendance/absence-analytics-trends/hr.time.aat-acceptance-coverage.shared";
 
 describe("HRM-AAT-028 historical snapshots coverage", () => {
   it("marks snapshot requirement as shipped", () => {

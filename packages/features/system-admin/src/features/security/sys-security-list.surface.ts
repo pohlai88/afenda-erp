@@ -3,15 +3,15 @@ import type { ListSurfaceRendererConfigurationResolvedInput } from "@afenda/gove
 import {
   buildLinkedControlListSurface,
   moduleReadinessVerdictBadge,
-} from "../../overview/surfaces/system-admin.control-list.shared";
-import type { OrganizationSecuritySettings } from "../contracts/system-admin.security-settings.contract";
-import type { SecurityReadinessReport } from "../contracts/system-admin.security-readiness.contract";
-import { systemAdminSecurityUiCopy } from "./system-admin.security-ui.copy.shared";
-import { resolveEffectiveObjectStorageProviderLabel } from "../../tenant-execution/surface/system-admin.object-storage-provider.shared";
+} from "../overview/sys-control-list.shared";
+import type { OrganizationSecuritySettings } from "./sys-security-settings.contract";
+import type { SecurityReadinessReport } from "./sys-security-readiness.contract";
+import { systemAdminSecurityUiCopy } from "./sys-security-ui.copy.shared";
+import { resolveEffectiveObjectStorageProviderLabel } from "../tenant-execution/sys-object-storage-provider.shared";
 import {
   formatEncryptionModeLabel,
   formatKmsAdapterLabel,
-} from "../schemas/system-admin.object-storage-encryption.schema";
+} from "./sys-object-storage-encryption.schema";
 
 export const systemAdminSecuritySurfaceKey = "system-admin.security.list";
 

@@ -1,0 +1,10 @@
+{
+  "extends": "../config/tsconfig.library.base.json",
+  "include": ["${configDir}/src/**/*.ts", "${configDir}/src/**/*.tsx"],
+  "compilerOptions": {
+    "paths": {
+      "@afenda/ui": ["../ui/src/index.ts"],
+      "@afenda/ui/*": ["../ui/src/*"]
+    }
+  }
+}

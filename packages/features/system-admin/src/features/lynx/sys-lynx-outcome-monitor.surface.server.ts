@@ -3,13 +3,13 @@ import {
   getLynxOutcomeMonitorSettings,
   type LynxOutcomeMonitorSetting,
 } from "@afenda/db";
-import { LYNX_OUTCOME_MONITOR_IDS } from "@afenda/feature-lynx";
 import {
   buildLynxOutcomeMonitorControlListSurface,
   lynxOutcomeMonitorControlSurfaceKey,
   type LynxOutcomeMonitorControlRow,
 } from "@afenda/feature-lynx/metadata";
 import type { ListSurfaceRendererConfigurationResolvedInput } from "@afenda/governed-surface";
+import { systemAdminLynxOutcomeMonitorThresholdCatalog } from "./sys-lynx-outcome-monitor-catalog.contract";
 
 export { lynxOutcomeMonitorControlSurfaceKey };
 
@@ -17,6 +17,9 @@ export type SystemAdminLynxOutcomeMonitorState = {
   monitorSettings: LynxOutcomeMonitorSetting[];
   surface: ListSurfaceRendererConfigurationResolvedInput;
 };
+
+const systemAdminLynxOutcomeMonitorIds =
+  systemAdminLynxOutcomeMonitorThresholdCatalog.map((entry) => entry.monitorId);
 
 function toMonitorControlRows(
   monitorSettings: readonly LynxOutcomeMonitorSetting[],
@@ -48,7 +51,7 @@ export async function getSystemAdminLynxOutcomeMonitorState(input: {
 }): Promise<SystemAdminLynxOutcomeMonitorState> {
   const monitorSettings = await getLynxOutcomeMonitorSettings({
     organizationId: input.organizationId,
-    monitorIds: LYNX_OUTCOME_MONITOR_IDS,
+    monitorIds: systemAdminLynxOutcomeMonitorIds,
   });
 
   return {

@@ -1,30 +1,331 @@
-/** @afenda/governed-surface/schemas — flat barrel (GUARD 5). */
-export * from "./gov-schema-version-shared";
-export * from "./gov-erp-permission-shared";
-export * from "./gov-erp-permission-requirement-schema";
-export * from "./gov-server-actions-shared";
-export * from "./gov-action-bar-schema";
-export * from "./gov-action-result-shared";
-export * from "./gov-list-surface-schema";
-export * from "./gov-list-surface-renderer-schema";
-export * from "./gov-list-surface-toolbar-schema";
-export * from "./gov-list-surface-row-trailing-action-schema";
-export * from "./gov-list-trailing-cell-context-schema";
-export * from "./gov-stat-card-schema";
-export * from "./gov-presentation-profile-schema";
-export * from "./gov-approval-timeline-schema";
-export * from "./gov-multi-step-form-schema";
-export * from "./gov-scorecard-form-schema";
-export * from "./gov-surface-chrome-schema";
-export * from "./gov-surface-chrome-classes";
-export * from "./gov-detail-tabs-schema";
-export * from "./gov-audit-panel-schema";
-export * from "./gov-kanban-board-schema";
-export * from "./gov-governed-component-state-schema";
-export * from "./gov-page-header-schema";
-export * from "./gov-component-registry-schema";
-export * from "./gov-workbench-search-params-shared";
-export * from "./gov-chart-schema";
-export * from "./gov-section-schema";
-export * from "./gov-stack-schema";
-export * from "./gov-form-rules-schema";
+/**
+ * Narrow schema/parser door.
+ */
+export type { SchemaStability } from "./gov-_stability-shared";
+
+export {
+  GOVERNED_METADATA_SCHEMA_VERSION,
+  governedMetadataSchemaVersionSchema,
+  type GovernedMetadataSchemaVersion,
+} from "./gov-schema-version-shared";
+export {
+  ERP_FUNCTIONS,
+  type ErpFunction,
+  type ErpPermissionTuple,
+} from "./gov-erp-permission-shared";
+export {
+  erpPermissionRequirementSchema,
+  type ErpPermissionRequirement,
+} from "./gov-erp-permission-requirement-schema";
+export {
+  SCHEMA_STABILITY as ACTION_DESCRIPTOR_SCHEMA_STABILITY,
+  actionDescriptorSchema,
+  parseActionDescriptorData,
+  type ActionDescriptor,
+} from "./gov-action-schema";
+export {
+  GOVERNED_ACTION_BAR_CONFIGURATION_SCHEMA_ID,
+  GOVERNED_ACTION_BAR_CONFIGURATION_SCHEMA_STABILITY,
+  actionBarDataNatureSchema,
+  governedActionBarConfigurationSchema,
+  parseGovernedActionBarConfiguration,
+  type ActionBarDataNature,
+  type GovernedActionBarConfiguration,
+  type GovernedActionBarConfigurationInput,
+} from "./gov-action-bar-schema";
+export {
+  type ActionFieldErrors,
+  type ActionResult,
+  actionFailure,
+  actionSuccess,
+  assertFormActionResult,
+  isActionFailure,
+  isActionResultSuccess,
+  toVoidFormAction,
+  zodActionFailure,
+} from "./gov-action-result-shared";
+export {
+  GOVERNED_ACTION_ID_FIELD,
+  GOVERNED_CONFIRM_FIELD,
+  GOVERNED_FORM_ID_FIELD,
+  GOVERNED_SELECTED_ROW_ID_FIELD,
+  GOVERNED_STEP_UP_TOKEN_FIELD,
+  clearGovernedServerActionRegistryForTest,
+  getGovernedSelectedRowIds,
+  getGovernedServerActionRegistration,
+  getGovernedServerActionRegistry,
+  registerGovernedBulkServerAction,
+  registerGovernedGuardedServerAction,
+  registerGovernedPolicyBulkServerAction,
+  registerGovernedPolicyServerAction,
+  registerGovernedServerAction,
+  resolveGovernedBulkServerAction,
+  resolveGovernedServerAction,
+  setGovernedServerActionAuditSinkForTest,
+  validateGovernedServerActionPolicySubmission,
+  validateGovernedServerActionSubmission,
+  withGovernedServerActionPolicyGuard,
+  withGovernedServerActionSubmissionGuard,
+  type GovernedServerActionAuditEvent,
+  type GovernedServerActionAuditMetadata,
+  type GovernedServerActionAuditSink,
+  type GovernedServerActionAuditStage,
+  type GovernedServerActionHandler,
+  type GovernedServerActionPolicyExpectation,
+  type GovernedServerActionRegistration,
+  type GovernedServerActionRegistry,
+  type GovernedServerActionStepUpVerifier,
+  type GovernedServerActionSubmissionExpectation,
+} from "./gov-server-actions-shared";
+export {
+  SCHEMA_STABILITY as LIST_SURFACE_SCHEMA_STABILITY,
+  emptyStateSchema,
+  listCellKindSchema,
+  listColumnSchema,
+  listSurfaceSchema,
+  parseEmptyStateData,
+  parseListSurfaceData,
+  type EmptyState,
+  type ListCellKind,
+  type ListColumn,
+  type ListSurface,
+} from "./gov-list-surface-schema";
+export {
+  SCHEMA_STABILITY as LIST_SURFACE_RENDERER_SCHEMA_STABILITY,
+  listSurfaceRendererConfigurationSchema,
+  parseListSurfaceRendererConfiguration,
+  type ListSurfacePresentation,
+  type ListSurfaceRendererConfiguration,
+  type ListSurfaceRendererConfigurationInput,
+  type ListSurfaceRendererConfigurationResolvedInput,
+  type ListSurfaceRow,
+  type ListSurfaceRowDecisionLedger,
+  type ListSurfaceRowTone,
+} from "./gov-list-surface-renderer-schema";
+export {
+  listSurfaceToolbarSchema,
+  type ListSurfaceToolbar,
+  type ListSurfaceToolbarActionConfirm,
+  type ListSurfaceToolbarBulkAction,
+  type ListSurfaceToolbarExport,
+  type ListSurfaceToolbarFilter,
+  type ListSurfaceToolbarFilterOption,
+  type ListSurfaceToolbarSavedView,
+  type ListSurfaceToolbarSavedViewItem,
+  type ListSurfaceToolbarSearch,
+  type ListSurfaceToolbarSort,
+  type ListSurfaceToolbarSortOption,
+} from "./gov-list-surface-toolbar-schema";
+export {
+  SCHEMA_STABILITY as LIST_SURFACE_ROW_TRAILING_ACTION_SCHEMA_STABILITY,
+  listSurfaceRowTrailingActionSchema,
+  parseListSurfaceRowTrailingAction,
+  type ListSurfaceRowTrailingAction,
+} from "./gov-list-surface-row-trailing-action-schema";
+export {
+  SCHEMA_STABILITY as LIST_TRAILING_CELL_CONTEXT_SCHEMA_STABILITY,
+  governedListTrailingCellContextSchema,
+  parseGovernedListTrailingCellContext,
+  type GovernedListTrailingCellContext,
+} from "./gov-list-trailing-cell-context-schema";
+export {
+  SCHEMA_STABILITY as STAT_CARD_SCHEMA_STABILITY,
+  parseStatCardConfiguration,
+  statCardConfigurationSchema,
+  statCardDataNatureSchema,
+  statCardDensitySchema,
+  type StatCardComparison,
+  type StatCardConfiguration,
+  type StatCardConfigurationInput,
+  type StatCardConfigurationResolvedInput,
+  type StatCardDataNature,
+  type StatCardDensity,
+  type StatCardIcon,
+  type StatCardItem,
+  type StatCardProgress,
+  type StatCardSparkPoint,
+  type StatCardTone,
+} from "./gov-stat-card-schema";
+export {
+  chartPresentationProfileIdSchema,
+  isChartPresentationProfileId,
+  isListPresentationProfileId,
+  isStatPresentationProfileId,
+  listPresentationProfileIdSchema,
+  presentationProfileIdSchema,
+  statPresentationProfileIdSchema,
+  type ChartPresentationProfileId,
+  type ListPresentationProfileId,
+  type PresentationProfileId,
+  type StatPresentationProfileId,
+} from "./gov-presentation-profile-schema";
+export {
+  GOVERNED_CHART_CONFIGURATION_SCHEMA_ID,
+  GOVERNED_CHART_CONFIGURATION_SCHEMA_STABILITY,
+  chartActionSchema,
+  chartAnnotationSchema,
+  chartDataNatureSchema,
+  chartHeatmapSchema,
+  chartReferenceBandSchema,
+  chartSeriesSchema,
+  governedChartConfigurationSchema,
+  governedChartKindSchema,
+  parseGovernedChartConfiguration,
+  type ChartAction,
+  type ChartAnnotation,
+  type ChartDataNature,
+  type ChartHeatmapCell,
+  type ChartPoint,
+  type ChartReferenceBand,
+  type ChartSeries,
+  type GovernedChartConfiguration,
+  type GovernedChartConfigurationInput,
+  type GovernedChartKind,
+} from "./gov-chart-schema";
+export {
+  GOVERNED_APPROVAL_TIMELINE_SCHEMA_ID,
+  GOVERNED_APPROVAL_TIMELINE_SCHEMA_STABILITY,
+  approvalTimelineDataNatureSchema,
+  approvalTimelineStepSchema,
+  approvalTimelineStepStatusSchema,
+  governedApprovalTimelineConfigurationSchema,
+  parseGovernedApprovalTimelineConfiguration,
+  type ApprovalTimelineDataNature,
+  type ApprovalTimelineStep,
+  type ApprovalTimelineStepStatus,
+  type GovernedApprovalTimelineConfiguration,
+  type GovernedApprovalTimelineConfigurationInput,
+} from "./gov-approval-timeline-schema";
+export {
+  GOVERNED_KANBAN_BOARD_SCHEMA_ID,
+  GOVERNED_KANBAN_BOARD_SCHEMA_STABILITY,
+  governedKanbanBoardConfigurationSchema,
+  parseGovernedKanbanBoardConfiguration,
+  type GovernedKanbanBoardConfiguration,
+  type GovernedKanbanBoardConfigurationInput,
+  type KanbanBadgeTone,
+  type KanbanBoardCopy,
+  type KanbanCard,
+  type KanbanCardTransitionAvailability,
+  type KanbanColumn,
+  type KanbanInteractionMode,
+  type KanbanWorkflowTransition,
+} from "./gov-kanban-board-schema";
+export {
+  GOVERNED_COMPONENT_SCHEMA_ID,
+  GOVERNED_COMPONENT_SCHEMA_STABILITY,
+  governedComponentDiscriminatedSchema,
+  governedComponentTypeSchema,
+  parseGovernedComponentData,
+  type GovernedComponent,
+  type GovernedComponentType,
+} from "./gov-component-schema";
+export {
+  EMPTY_GOVERNED_COMPONENT_REGISTRY,
+  SCHEMA_STABILITY as GOVERNED_COMPONENT_REGISTRY_SCHEMA_STABILITY,
+  governedComponentRegistrySchema,
+  parseGovernedComponentRegistryData,
+  type GovernedComponentRegistry,
+} from "./gov-component-registry-schema";
+export {
+  SCHEMA_STABILITY as AUDIT_PANEL_SCHEMA_STABILITY,
+  auditPanelRowSchema,
+  auditPanelSchema,
+  parseAuditPanelData,
+  type AuditPanelModel,
+  type AuditPanelRow,
+} from "./gov-audit-panel-schema";
+export {
+  SCHEMA_STABILITY as DETAIL_TABS_SCHEMA_STABILITY,
+  governedDetailTabsSchema,
+  parseGovernedDetailTabsData,
+  type GovernedDetailSection,
+  type GovernedDetailTabKind,
+  type GovernedDetailTabsInput,
+  type GovernedDetailTabsModel,
+  type GovernedRevisionEntry,
+} from "./gov-detail-tabs-schema";
+export {
+  GOVERNED_FORM_RULES_SCHEMA_ID,
+  GOVERNED_FORM_RULES_SCHEMA_STABILITY,
+  formRuleConditionSchema,
+  formRuleEffectSchema,
+  formRuleFieldConditionSchema,
+  formRuleSchema,
+  parseFormRuleData,
+  type FormRule,
+  type FormRuleCondition,
+  type FormRuleEffect,
+  type FormRuleFieldCondition,
+} from "./gov-form-rules-schema";
+export {
+  GOVERNED_MULTI_STEP_FORM_SCHEMA_ID,
+  GOVERNED_MULTI_STEP_FORM_SCHEMA_STABILITY,
+  governedFormFieldKindSchema,
+  governedFormFieldOptionSchema,
+  governedFormFieldSchema,
+  governedFormStepSchema,
+  governedMultiStepFormConfigurationSchema,
+  multiStepFormDataNatureSchema,
+  parseGovernedMultiStepFormConfiguration,
+  type GovernedFormField,
+  type GovernedFormFieldKind,
+  type GovernedFormFieldOption,
+  type GovernedFormStep,
+  type GovernedMultiStepFormConfiguration,
+  type GovernedMultiStepFormConfigurationInput,
+  type MultiStepFormDataNature,
+} from "./gov-multi-step-form-schema";
+export {
+  GOVERNED_SCORECARD_FORM_SCHEMA_ID,
+  GOVERNED_SCORECARD_FORM_SCHEMA_STABILITY,
+  governedScorecardFormConfigurationSchema,
+  parseGovernedScorecardFormConfiguration,
+  scorecardCriterionSchema,
+  scorecardFormDataNatureSchema,
+  type GovernedScorecardFormConfiguration,
+  type GovernedScorecardFormConfigurationInput,
+  type ScorecardCriterion,
+  type ScorecardFormDataNature,
+} from "./gov-scorecard-form-schema";
+export {
+  GOVERNED_SECTION_CONFIGURATION_SCHEMA_ID,
+  GOVERNED_SECTION_CONFIGURATION_SCHEMA_STABILITY,
+  governedSectionConfigurationSchema,
+  parseGovernedSectionConfiguration,
+  type GovernedSectionConfiguration,
+  type GovernedSectionConfigurationInput,
+} from "./gov-section-schema";
+export {
+  GOVERNED_STACK_CONFIGURATION_SCHEMA_ID,
+  GOVERNED_STACK_CONFIGURATION_SCHEMA_STABILITY,
+  governedStackBentoTemplateSchema,
+  governedStackConfigurationSchema,
+  governedStackDirectionSchema,
+  parseGovernedStackConfiguration,
+  type GovernedStackConfiguration,
+  type GovernedStackConfigurationInput,
+  type GovernedStackDirection,
+} from "./gov-stack-schema";
+export {
+  GOVERNED_SURFACE_CHROME_SCHEMA_ID,
+  GOVERNED_SURFACE_CHROME_SCHEMA_STABILITY,
+  governedSurfaceChromeSchema,
+  governedSurfaceDensitySchema,
+  governedSurfaceElevationSchema,
+  governedSurfaceMaterialSchema,
+  parseGovernedSurfaceChromeData,
+  type GovernedSurfaceChrome,
+  type GovernedSurfaceChromeInput,
+  type GovernedSurfaceDensity,
+  type GovernedSurfaceElevation,
+  type GovernedSurfaceMaterial,
+} from "./gov-surface-chrome-schema";
+export {
+  GOVERNED_WORKBENCH_SEARCH_PARAM_KEYS,
+  type GovernedWorkbenchSearchParamKey,
+} from "./gov-workbench-search-params-shared";
+export type {
+  GovernedDataNatureTag,
+  GovernedRenderableState,
+} from "./gov-governed-component-state-schema";

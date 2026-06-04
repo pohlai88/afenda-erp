@@ -10,7 +10,7 @@ vi.mock("@afenda/kernel/execution", () => ({
 }));
 
 import type { ExecutionContext } from "@afenda/kernel/execution";
-import { hasSystemAdminAnyCapability } from "../../src/overview/policies/system-admin.capability.policy.server";
+import { hasSystemAdminAnyCapability } from "../../src/features/overview/sys-capability.policy.server";
 
 function buildContext(
   capabilities: ExecutionContext["capabilities"],

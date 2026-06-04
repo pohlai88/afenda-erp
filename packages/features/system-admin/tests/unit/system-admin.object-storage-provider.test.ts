@@ -36,7 +36,7 @@ vi.mock("../../src/security/policies/system-admin.security.policy.server", () =>
 }));
 
 import { writeExecutionAuditEvent } from "@afenda/kernel/execution";
-import { updateOrganizationObjectStorageProviderAction } from "../../src/security/actions/system-admin.object-storage-provider.actions.server";
+import { updateOrganizationObjectStorageProviderAction } from "../../src/features/security/sys-object-storage-provider.actions.server";
 
 describe("updateOrganizationObjectStorageProviderAction", () => {
   beforeEach(() => {

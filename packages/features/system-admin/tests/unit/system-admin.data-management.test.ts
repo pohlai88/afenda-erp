@@ -1,21 +1,19 @@
-import { appCapabilities, type AppCapability } from "@afenda/auth";
+import { appCapabilities, type AppCapability } from "@afenda/kernel";
 import { parseListSurfaceRendererConfiguration } from "@afenda/governed-surface/schemas";
 import { describe, expect, it } from "vitest";
-import { parseSystemAdminCsv } from "../../src/data-management/data/system-admin.data-management-csv.parse.shared";
+import { parseSystemAdminCsv } from "../../src/features/data-management/sys-data-management-csv.parse.shared";
 import {
   getSystemAdminImportAdapter,
   listSystemAdminImportTemplates,
-} from "../../src/data-management/data/system-admin.import-adapter.registry.server";
+} from "../../src/features/data-management/sys-import-adapter.registry.server";
 import {
   buildSystemAdminDataExportsListSurface,
   buildSystemAdminImportFailuresListSurface,
   buildSystemAdminImportJobsListSurface,
   buildSystemAdminImportTemplatesListSurface,
-} from "../../src/data-management/surface/system-admin.import-jobs-list.surface";
-import {
-  resolveSystemAdminNavItems,
-  systemAdminRoutePaths,
-} from "../../src/overview/contracts";
+} from "../../src/features/data-management/sys-import-jobs-list.surface";
+import { resolveSystemAdminNavItems } from "../../src/features/overview/sys-nav.contract";
+import { systemAdminRoutePaths } from "../../src/features/overview/sys-route-paths.contract";
 
 describe("system admin data management", () => {
   it("parses CSV with quoted commas and rejects duplicate headers", () => {

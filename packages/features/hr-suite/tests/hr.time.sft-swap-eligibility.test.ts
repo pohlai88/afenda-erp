@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { evaluateHrShiftSwapEligibility } from "./hr.time.sft-swap-eligibility.shared";
+import { evaluateHrShiftSwapEligibility } from "../src/time-attendance/shift-scheduling/hr.time.sft-swap-eligibility.shared";
 
 describe("SFT swap eligibility (HRM-SFT-020)", () => {
   const baseAssignment = {

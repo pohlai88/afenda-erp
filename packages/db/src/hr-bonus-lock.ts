@@ -8,10 +8,12 @@ import {
 } from "./hr-bonus.shared";
 import { createHrBonusPayrollPayoutReferenceInTx } from "./hr-bonus-payroll";
 import {
-  hrBonusCycles,
   hrBonusPayouts,
+} from "./dbx-hr-bonus";
+import {
+  hrBonusCycles,
   hrBonusPlans,
-} from "./hr-bonus";
+} from "./dbx-hr-bonus-incentive";
 
 /** HRM-BON-025 — block normal edits after final approval lock. */
 export async function assertHrBonusPayoutEditableInTx(
@@ -184,3 +186,4 @@ export async function loadHrBonusPayoutContextInTx(
 
   return row;
 }
+

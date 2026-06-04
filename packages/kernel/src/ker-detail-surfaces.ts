@@ -1,7 +1,9 @@
 import type { ModuleId } from "@afenda/config/module-ids";
-import { GOVERNED_METADATA_SCHEMA_VERSION } from "@afenda/governed-surface";
-import type { AuditPanelModel } from "@afenda/governed-surface/schemas";
-import type { GovernedDetailTabsInput } from "@afenda/governed-surface/schemas";
+import {
+  GOVERNED_METADATA_SCHEMA_VERSION,
+  type AuditPanelModel,
+  type GovernedDetailTabsInput,
+} from "./ker-governed-surface-contract";
 
 import type {
   ModuleWorkspaceRecordDetail,

@@ -1,19 +1,19 @@
 import { describe, expect, it } from "vitest";
-import { appCapabilities } from "@afenda/auth";
+import { appCapabilities } from "@afenda/kernel";
 import {
   getSystemAdminLynxOutcomeMonitorThresholdCatalog,
-} from "../../src/lynx/contracts/system-admin.lynx-outcome-monitor-catalog.contract";
+} from "../../src/features/lynx/sys-lynx-outcome-monitor-catalog.contract";
 import {
   isSystemAdminApiScope,
   isSystemAdminWebhookEvent,
   systemAdminApiScopes,
   systemAdminDefaultWebhookEventPresets,
   systemAdminWebhookEvents,
-} from "../../src/integrations/contracts/system-admin.integrations-catalog.contract";
+} from "../../src/features/integrations/sys-integrations-catalog.contract";
 import {
   isSystemAdminPermissionKey,
   systemAdminPermissionCatalog,
-} from "../../src/permissions/contracts/system-admin.permission-catalog.contract";
+} from "../../src/features/permissions/sys-permission-catalog.contract";
 
 describe("system admin catalogs", () => {
   it("backs RBAC override selection with the app capability catalog", () => {

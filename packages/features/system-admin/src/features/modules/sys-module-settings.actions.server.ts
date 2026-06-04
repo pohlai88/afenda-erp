@@ -11,27 +11,24 @@ import {
 } from "@afenda/kernel/execution";
 import { logServerEvent } from "@afenda/observability/server";
 import { revalidatePath, revalidateTag } from "next/cache";
-import { workspaceNavigationSettingsCacheTag } from "../../tenant-execution/contracts/system-admin.workspace-navigation-cache.shared";
+import { workspaceNavigationSettingsCacheTag } from "../tenant-execution/sys-workspace-navigation-cache.shared";
 import { z } from "zod";
 import {
   systemAdminActionFailure,
   systemAdminActionSuccess,
   type SystemAdminActionResult,
   zodActionFailure,
-} from "../../tenant-execution/contracts/system-admin.action-result.contract";
-import { systemAdminRoutePaths } from "../../overview/contracts/system-admin.route-paths.contract";
-import { dispatchSystemAdminWebhook } from "../../integrations/events/system-admin.webhook-dispatch.event";
-import {
-  formatModuleDependencyIssue,
-  listDisabledModuleDependencyKeys,
-  SYSTEM_ADMIN_PROTECTED_MODULE_KEY,
-} from "../contracts";
-import { requireSystemAdminModulesManage } from "../policies/system-admin.modules.policy.server";
+} from "../tenant-execution/sys-action-result.contract";
+import { systemAdminRoutePaths } from "../overview/sys-route-paths.contract";
+import { dispatchSystemAdminWebhook } from "../integrations/sys-webhook-dispatch.event";
+import { formatModuleDependencyIssue, listDisabledModuleDependencyKeys } from "./sys-module-dependencies.contract";
+import { SYSTEM_ADMIN_PROTECTED_MODULE_KEY } from "./sys-modules.contract";
+import { requireSystemAdminModulesManage } from "./sys-modules.policy.server";
 import {
   resolveSystemAdminModuleAuditAction,
   systemAdminModuleWebhookEvents,
-} from "../events/system-admin.modules.event";
-import { systemAdminModuleSettingsActionSchema } from "../schemas/system-admin.module-settings.schema";
+} from "./sys-modules.event";
+import { systemAdminModuleSettingsActionSchema } from "./sys-module-settings.schema";
 
 const setModuleEnabledInputSchema = z.object({
   moduleKey: z.string().trim().min(1).max(80),

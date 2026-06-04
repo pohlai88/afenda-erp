@@ -14,7 +14,7 @@ import {
   listHrCsfSkills,
   updateHrCsfCompetency,
   updateHrCsfSkill,
-} from "./hr.talent.csf-library.server";
+} from "./hrs-hr-talent-csf-library-server";
 import {
   HR_CSF_READ_CAPABILITY,
   HR_CSF_WRITE_CAPABILITY,

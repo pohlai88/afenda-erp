@@ -6,11 +6,11 @@ import {
   calculateBonusPayout,
   computeBonusAchievementPercent,
   enforceBonusPayoutBounds,
-} from "./hr.payroll.bonus-calculation.shared";
+} from "../src/payroll-compensation/bonus-incentive-management/hr.payroll.bonus-calculation.shared";
 import {
   recordBonusTargetAchievementSchema,
   upsertBonusPayoutFormulaSchema,
-} from "../schemas/hr.payroll.bonus-mutation.schema";
+} from "../src/payroll-compensation/bonus-incentive-management/hr.payroll.bonus-mutation.schema";
 
 describe("HRM-BON-008 achievement percentage", () => {
   it("computes percentage against target", () => {

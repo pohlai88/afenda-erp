@@ -4,8 +4,8 @@ import {
   type ListSurfaceRendererConfigurationResolvedInput,
 } from "@afenda/governed-surface";
 import { formatErpDateTime } from "@afenda/kernel";
-import { formatMaskedCredentialPrefix } from "../contracts/system-admin.credential-visibility.shared";
-import { catalogStatusBadge } from "../../overview/surfaces/system-admin.control-list.shared";
+import { formatMaskedCredentialPrefix } from "./sys-credential-visibility.shared";
+import { catalogStatusBadge } from "../overview/sys-control-list.shared";
 import {
   API_CREDENTIAL_STATUS_BADGE,
   formatApiCredentialStatusLabel,
@@ -13,22 +13,22 @@ import {
   formatWebhookStatusLabel,
   WEBHOOK_DELIVERY_STATUS_BADGE,
   WEBHOOK_STATUS_BADGE,
-} from "./system-admin.integrations-status.shared";
+} from "./sys-integrations-status.shared";
 import {
   buildSystemAdminListToolbar,
   buildSystemAdminStaticPagination,
-} from "../../overview/surfaces/system-admin.list-surface.shared";
+} from "../overview/sys-list-surface.shared";
 import type {
   SystemAdminApiCredentialListRow,
   SystemAdminSsoConnectionListRow,
   SystemAdminWebhookDeliveryListRow,
   SystemAdminWebhookListRow,
-} from "../contracts/system-admin.integrations-list.contract";
+} from "./sys-integrations-list.contract";
 import {
   resolveSystemAdminApiCredentialRowTrailingAction,
   resolveSystemAdminWebhookRowTrailingAction,
-} from "./system-admin.integrations-list-trailing.shared";
-import { systemAdminIntegrationsUiCopy } from "./system-admin.integrations-ui.copy.shared";
+} from "./sys-integrations-list-trailing.shared";
+import { systemAdminIntegrationsUiCopy } from "./sys-integrations-ui.copy.shared";
 
 export const systemAdminApiCredentialsSurfaceKey =
   "system-admin.api-credentials.list";

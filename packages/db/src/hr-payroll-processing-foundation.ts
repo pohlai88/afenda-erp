@@ -9,7 +9,7 @@ import {
   hrPayrollEmployeeAssignments,
   hrPayrollPayGroups,
   hrPayrollRuns,
-} from "./hr-payroll-processing";
+} from "./dbx-hr-payroll-processing";
 
 /** PAY-002 — create payroll pay group. */
 export async function createHrPayrollGroupInTx(
@@ -350,3 +350,4 @@ export async function listHrPayrollEmployeeAssignmentsWindow(
     totalCount: filtered.length,
   });
 }
+

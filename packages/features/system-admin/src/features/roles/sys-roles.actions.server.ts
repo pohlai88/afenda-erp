@@ -2,24 +2,24 @@
 
 import { writeExecutionAuditEvent } from "@afenda/kernel/execution";
 import { revalidatePath } from "next/cache";
-import { dispatchSystemAdminWebhook } from "../../integrations/events/system-admin.webhook-dispatch.event";
-import { systemAdminMembershipWebhookEvents } from "../../memberships/events/system-admin.memberships.event";
+import { dispatchSystemAdminWebhook } from "../integrations/sys-webhook-dispatch.event";
+import { systemAdminMembershipWebhookEvents } from "../memberships/sys-memberships.event";
 import {
   requireSystemAdminRolesManage,
-} from "../../overview/policies/system-admin.capability.policy.server";
+} from "../overview/sys-capability.policy.server";
 import {
   systemAdminActionFailure,
   systemAdminActionSuccess,
   type SystemAdminActionResult,
   zodActionFailure,
-} from "../../tenant-execution/contracts/system-admin.action-result.contract";
+} from "../tenant-execution/sys-action-result.contract";
 import {
   systemAdminAssignRoleInputSchema,
   systemAdminDeprecateRoleInputSchema,
   systemAdminReactivateRoleInputSchema,
   systemAdminRemoveRoleAssignmentInputSchema,
   systemAdminUpdateRoleInputSchema,
-} from "../schemas/system-admin.roles.schema";
+} from "./sys-roles.schema";
 
 export async function assignSystemAdminRole(
   _previous: SystemAdminActionResult | undefined,
@@ -36,7 +36,7 @@ export async function assignSystemAdminRole(
   }
 
   const { assignRoleToMembership } = await import(
-    "../data/system-admin.roles.query.server"
+    "./sys-roles.query.server"
   );
 
   try {
@@ -92,7 +92,7 @@ export async function removeSystemAdminRoleAssignmentForm(
   }
 
   const { removeRoleFromMembership } = await import(
-    "../data/system-admin.roles.query.server"
+    "./sys-roles.query.server"
   );
 
   try {

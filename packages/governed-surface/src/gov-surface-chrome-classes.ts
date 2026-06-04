@@ -7,7 +7,7 @@ import type {
   GovernedSurfaceDensity,
   GovernedSurfaceElevation,
   GovernedSurfaceMaterial,
-} from "./surface-chrome.schema";
+} from "./gov-surface-chrome-schema";
 
 export function densityGapClass(
   density: GovernedSurfaceDensity = "comfortable",

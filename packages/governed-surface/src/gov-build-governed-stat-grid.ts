@@ -1,5 +1,5 @@
 import { GOVERNED_METADATA_SCHEMA_VERSION } from "./gov-schema-version-shared";
-import { resolveGovernedStatPresentation } from "../resolvers/resolve-governed-presentation";
+import { resolveGovernedStatPresentation } from "./gov-resolve-governed-presentation";
 import type {
   StatCardConfigurationInput,
   StatCardConfigurationResolvedInput,

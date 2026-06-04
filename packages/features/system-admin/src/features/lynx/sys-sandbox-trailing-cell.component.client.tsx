@@ -9,12 +9,12 @@ import {
 import { Button } from "@afenda/ui/button";
 import { useState, useTransition } from "react";
 
-import type { SystemAdminActionResult } from "../contracts";
+import type { SystemAdminActionResult } from "../tenant-execution/sys-action-result.contract";
 import {
   approveSandbox,
   discardSandbox,
   rejectSandbox,
-} from "../actions/system-admin.lynx.actions.server";
+} from "./sys-lynx.actions.server";
 
 function toActionFailure(error: unknown): SystemAdminActionResult {
   return {

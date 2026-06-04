@@ -2,8 +2,8 @@ import { config } from "dotenv";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { dirname } from "node:path";
+import { getGatewaySpendReport } from "../packages/ai/src/ai-gateway.repository.server.ts";
 import { describeAiGatewayCredentialSources } from "../packages/config/src/env.ts";
-import { getGatewaySpendReport } from "../packages/ai/src/data/ai.gateway.data.server.ts";
 
 const rootDir = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 

@@ -1,9 +1,6 @@
 import { updateTenantMembershipStatus } from "@afenda/db";
-import { listTenantMembers } from "../../users/data/system-admin.identity.repository.server";
-import type {
-  SystemAdminMembershipRow,
-  SystemAdminMembershipStatus,
-} from "../contracts";
+import { listTenantMembers } from "../users/sys-identity.repository.server";
+import type { SystemAdminMembershipRow, SystemAdminMembershipStatus } from "./sys-memberships.contract";
 
 export async function listSystemAdminMemberships(input: {
   organizationId: string;

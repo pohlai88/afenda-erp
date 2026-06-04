@@ -7,7 +7,7 @@ import {
 import type { ActionDescriptor } from "./gov-action-schema";
 import type { ErpPermissionRequirement } from "./gov-erp-permission-requirement-schema";
 import type { ListSurfaceRowTrailingAction } from "./gov-list-surface-row-trailing-action-schema";
-import { resolveGovernedErpPermissionAllowed } from "./governed-permission-gate.server";
+import { resolveGovernedErpPermissionAllowed } from "./gov-governed-permission-gate-server";
 
 export type ResolveTrailingActionForErpPermissionInput = {
   requirement: ErpPermissionRequirement | undefined;

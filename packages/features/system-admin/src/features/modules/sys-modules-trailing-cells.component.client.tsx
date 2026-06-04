@@ -9,9 +9,9 @@ import {
 import { Button } from "@afenda/ui/button";
 import { BanIcon, PowerIcon } from "lucide-react";
 import { useState, useTransition } from "react";
-import { SystemAdminDestructiveConfirmButton } from "../../overview/components/system-admin.destructive-confirm-button.component.client";
-import type { SystemAdminActionResult } from "../../tenant-execution/contracts/system-admin.action-result.contract";
-import { setSystemAdminModuleEnabledAction } from "../actions/system-admin.module-settings.actions.server";
+import { SystemAdminDestructiveConfirmButton } from "../overview/sys-destructive-confirm-button.component.client";
+import type { SystemAdminActionResult } from "../tenant-execution/sys-action-result.contract";
+import { setSystemAdminModuleEnabledAction } from "./sys-module-settings.actions.server";
 
 export function SystemAdminModuleTrailingCell({
   row,

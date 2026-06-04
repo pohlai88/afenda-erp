@@ -2,22 +2,14 @@ import { GovernedPatternCListSection } from "@afenda/governed-surface/server";
 import { hasExecutionPermission } from "@afenda/kernel/execution";
 import { SectionPanel } from "@afenda/ui";
 
-import {
-  assignSystemAdminRole,
-  deprecateSystemAdminRoleForm,
-  reactivateSystemAdminRoleForm,
-  updateSystemAdminRoleForm,
-} from "../actions";
-import { buildSystemAdminRolesPageModel } from "../data";
+import { assignSystemAdminRole, deprecateSystemAdminRoleForm, reactivateSystemAdminRoleForm, updateSystemAdminRoleForm } from "./sys-roles.actions.server";
+import { buildSystemAdminRolesPageModel } from "./sys-roles.page-model.server";
 import { requireSystemAdminRolesRead } from "./sys-roles.policy.server";
-import {
-  buildRolesListSurface,
-  systemAdminRolesSurfaceKey,
-  systemAdminRolesUiCopy,
-} from "../surface";
-import { SystemAdminAssignRoleDialog } from "./system-admin.assign-role-dialog.component.client";
-import { SystemAdminRoleCatalogEditor } from "./system-admin.role-catalog-editor.component.client";
-import { SystemAdminRolesAccessDenied } from "./system-admin.roles-access.component.server";
+import { buildRolesListSurface, systemAdminRolesSurfaceKey } from "./sys-roles-list.surface";
+import { systemAdminRolesUiCopy } from "./sys-roles-ui.copy.shared";
+import { SystemAdminAssignRoleDialog } from "./sys-assign-role-dialog.component.client";
+import { SystemAdminRoleCatalogEditor } from "./sys-role-catalog-editor.component.client";
+import { SystemAdminRolesAccessDenied } from "./sys-roles-access.component.server";
 
 type SystemAdminRolesPageProps = {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;

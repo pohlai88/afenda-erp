@@ -4,11 +4,11 @@ import { describe, expect, it, vi } from "vitest";
 import {
   createHrTimeSftShiftTemplate,
   listHrTimeSftShiftTemplates,
-} from "./hr.time.sft-template.server";
+} from "../src/time-attendance/shift-scheduling/hrs-hr-time-sft-template-server";
 import {
   hrSftCreateShiftTemplateSchema,
   hrSftUpdateShiftTemplateSchema,
-} from "../schemas/hr.time.sft-template.schema";
+} from "../src/time-attendance/shift-scheduling/hr.time.sft-template.schema";
 
 vi.mock("@afenda/db", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@afenda/db")>();

@@ -1,6 +1,6 @@
 import type { SystemAdminReadiness } from "@afenda/db";
-import type { SystemAdminModuleCategory } from "./system-admin.module-category.contract";
-import type { SystemAdminModuleReadinessVerdict } from "./system-admin.modules-readiness.shared";
+import type { SystemAdminModuleCategory } from "./sys-module-category.contract";
+import type { SystemAdminModuleReadinessVerdict } from "./sys-modules-readiness.shared";
 
 export type SystemAdminModuleStatus =
   | "active"

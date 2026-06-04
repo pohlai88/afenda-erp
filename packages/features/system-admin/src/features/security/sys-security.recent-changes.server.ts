@@ -1,6 +1,6 @@
-import { listSystemAdminDiagnosticsRecentChanges } from "../../diagnostics/data/system-admin.diagnostics.recent-changes.server";
-import type { SystemAdminDiagnosticsRecentChangeRow } from "../../diagnostics/contracts/system-admin.diagnostics-coverage.contract";
-import { systemAdminSecurityAuditActions } from "../events/system-admin.security.event";
+import { listSystemAdminDiagnosticsRecentChanges } from "../diagnostics/sys-diagnostics.recent-changes.server";
+import type { SystemAdminDiagnosticsRecentChangeRow } from "../diagnostics/sys-diagnostics-coverage.contract";
+import { systemAdminSecurityAuditActions } from "./sys-security.event";
 
 const SECURITY_AUDIT_PREFIX = "system-admin.security";
 const SECURITY_CONFIGURATION_AUDIT_ACTIONS = new Set<string>(

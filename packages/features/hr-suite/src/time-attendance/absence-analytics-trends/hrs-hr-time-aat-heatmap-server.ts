@@ -8,7 +8,7 @@ import {
 import {
   loadHrAatHeatmapSourceFacts,
   type HrAatHeatmapSourceFact,
-} from "./hr.time.aat-comparison.server";
+} from "./hrs-hr-time-aat-comparison-server";
 
 /** HRM-AAT-016 — absence heatmap by date, team, department, location, or leave type. */
 export async function loadHrAatAbsenceHeatmap(

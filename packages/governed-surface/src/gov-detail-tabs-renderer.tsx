@@ -1,10 +1,10 @@
-import { GovernedDetailTabs } from "../../components/governed-detail-tabs";
-import { GovernedEmpty } from "./client";
+import { GovernedDetailTabs } from "./gov-governed-detail-tabs";
+import { GovernedEmpty } from "./gov-governed-empty";
 import { parseGovernedDetailTabsData } from "./gov-detail-tabs-schema";
-import { governedParseErrorCopy } from "../i18n/governed-renderer-copy.shared";
+import { governedParseErrorCopy } from "./gov-governed-renderer-copy-shared";
 
 import type { GovernedComponentRendererDiagnostics } from "./gov-registry";
-import type { RendererProps } from "../governed-renderer-dispatch";
+import type { RendererProps } from "./gov-governed-renderer-dispatch";
 
 /**
  * governed:detail-tabs — entity detail with overview / audit / revisions.

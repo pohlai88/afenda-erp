@@ -1,5 +1,5 @@
 import { HrBenefitsCommandError } from "./hr-benefits.shared";
-import type { hrBenefitEnrollments } from "./hr-benefits";
+import type { hrBenefitEnrollments } from "./dbx-hr-benefits";
 
 export const HR_BENEFIT_COVERAGE_STATUSES = [
   "pending",
@@ -84,3 +84,4 @@ export function resolveBenefitCoverageStatusForEmploymentChange(
 export const ADJUSTABLE_COVERAGE_STATUSES_FOR_EMPLOYMENT = new Set<
   HrBenefitCoverageStatus
 >(["pending", "active", "suspended"]);
+

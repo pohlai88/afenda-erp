@@ -6,7 +6,7 @@ import {
   getNeonAuthWebhookHooks,
   registerNeonAuthWebhookHooks,
   resetNeonAuthWebhookHooksForTests,
-} from "../../webhooks/hooks.server";
+} from "../src/aut-hooks-server";
 
 describe("registerNeonAuthWebhookHooks", () => {
   it("merges hook handlers", () => {

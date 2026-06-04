@@ -21,7 +21,7 @@ import {
   validateGovernedServerActionSubmission,
   withGovernedServerActionPolicyGuard,
   withGovernedServerActionSubmissionGuard,
-} from "../../src/schemas";
+} from "../../src/gov-schemas-barrel";
 
 describe("governed server action submission guard", () => {
   afterEach(() => {
@@ -275,7 +275,7 @@ describe("governed server action submission guard", () => {
 
   it("emits audit events for rejected and successful policy paths", async () => {
     const events: Array<{ stage: string; code?: string }> = [];
-    setGovernedServerActionAuditSinkForTest((event) => {
+    setGovernedServerActionAuditSinkForTest((event: { stage: string; code?: string }) => {
       events.push({ stage: event.stage, code: event.code });
     });
 

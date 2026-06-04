@@ -50,7 +50,7 @@ vi.mock("next/cache", () => ({
   revalidatePath: mocks.revalidatePath,
 }));
 
-import { updateLynxOutcomeMonitorSettingAction } from "../../src/lynx/actions/system-admin.lynx-outcome-monitor.actions.server";
+import { updateLynxOutcomeMonitorSettingAction } from "../../src/features/lynx/sys-lynx-outcome-monitor.actions.server";
 
 function monitorForm(overrides: Record<string, string> = {}) {
   const formData = new FormData();

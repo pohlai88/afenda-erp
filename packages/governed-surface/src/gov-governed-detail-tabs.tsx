@@ -17,19 +17,19 @@ import type {
 } from "./gov-detail-tabs-schema";
 import { governedDetailTabsSchema } from "./gov-detail-tabs-schema";
 
-import { governedRendererCopy } from "../i18n/governed-renderer-copy.shared";
-import { resolveGovernedDetailSectionContent } from "../metadata/detail-section.adapter";
-import { diagnosticsDataAttributes } from "../utils/governed-diagnostics.shared";
-import { GovernedHeading } from "../utils/governed-heading.shared";
+import { governedRendererCopy } from "./gov-governed-renderer-copy-shared";
+import { resolveGovernedDetailSectionContent } from "./gov-detail-section-adapter";
+import { diagnosticsDataAttributes } from "./gov-governed-diagnostics-shared";
+import { GovernedHeading } from "./gov-governed-heading-shared";
 import {
   governedDescriptionId,
   governedHeadingId,
   governedIdentityAttributes,
   governedTestId,
   toGovernedDomId,
-} from "../utils/governed-identity.shared";
-import { GovernedAuditPanel } from "./governed-audit-panel";
-import { GovernedEmpty } from "./governed-empty";
+} from "./gov-governed-identity-shared";
+import { GovernedAuditPanel } from "./gov-governed-audit-panel";
+import { GovernedEmpty } from "./gov-governed-empty";
 
 export type GovernedDetailTabsProps = {
   model: GovernedDetailTabsInput;

@@ -9,8 +9,8 @@ import {
 import { Button } from "@afenda/ui/button";
 import { useState, useTransition } from "react";
 
-import type { SystemAdminActionResult } from "../contracts";
-import { updateAiFeatureEntitlement } from "../actions/system-admin.lynx.actions.server";
+import type { SystemAdminActionResult } from "../tenant-execution/sys-action-result.contract";
+import { updateAiFeatureEntitlement } from "./sys-lynx.actions.server";
 
 const AI_FEATURE_IDS = [
   "assistant",

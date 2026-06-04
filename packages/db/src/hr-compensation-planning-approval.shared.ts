@@ -1,4 +1,4 @@
-import type { HrCompensationApprovalRules } from "./hr-compensation-planning";
+import type { HrCompensationApprovalRules } from "./dbx-hr-compensation-planning";
 
 export type HrCompensationApprovalRoutingStep =
   HrCompensationApprovalRules["steps"][number];
@@ -109,3 +109,4 @@ export function resolveHrCompensationApprovalSteps(input: {
     .sort((a, b) => a.order - b.order)
     .filter((step) => matchesCompensationRoutingStep(step, input.context));
 }
+

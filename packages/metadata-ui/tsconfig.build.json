@@ -1,0 +1,9 @@
+{
+  "extends": "../config/tsconfig.build.react.base.json",
+  "compilerOptions": {
+    "paths": {
+      "@afenda/ui": ["../ui/dist/index.d.ts"],
+      "@afenda/ui/*": ["../ui/dist/*.d.ts"]
+    }
+  }
+}

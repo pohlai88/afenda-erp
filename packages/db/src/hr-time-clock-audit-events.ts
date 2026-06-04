@@ -6,7 +6,7 @@ import { hrEmployees } from "./hr";
 import {
   hrTimeClockAuditEvents,
   hrTimeClockDevices,
-} from "./hr-time-clock";
+} from "./dbx-hr-time-clock";
 
 export type HrTimeClockAuditEventRow = {
   id: string;
@@ -118,3 +118,4 @@ export async function listHrTimeClockAuditEventsWindow(input: {
     });
   });
 }
+

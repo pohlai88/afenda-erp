@@ -1,13 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { filterSystemAdminListRows } from "../../src/overview/contracts/system-admin.list-filter.shared";
-import { resolveSystemAdminModuleAuditAction } from "../../src/modules/events/system-admin.modules.event";
-import { buildSystemAdminModuleCatalogRows } from "../../src/modules/data/system-admin.modules.query.server";
-import {
-  listDisabledModuleDependencyKeys,
-  resolveSystemAdminModuleAvailability,
-  resolveSystemAdminModuleReadinessVerdict,
-} from "../../src/modules/contracts";
-import { resolveSystemAdminModuleRowTrailingAction } from "../../src/modules/surface/system-admin.modules-list-trailing.shared";
+import { filterSystemAdminListRows } from "../../src/features/overview/sys-list-filter.shared";
+import { resolveSystemAdminModuleAuditAction } from "../../src/features/modules/sys-modules.event";
+import { buildSystemAdminModuleCatalogRows } from "../../src/features/modules/sys-modules.query.server";
+import { listDisabledModuleDependencyKeys } from "../../src/features/modules/sys-module-dependencies.contract";
+import { resolveSystemAdminModuleAvailability, resolveSystemAdminModuleReadinessVerdict } from "../../src/features/modules/sys-modules-readiness.shared";
+import { resolveSystemAdminModuleRowTrailingAction } from "../../src/features/modules/sys-modules-list-trailing.shared";
 
 describe("system admin modules readiness", () => {
   it("maps tenant settings to availability and readiness verdict", () => {

@@ -1,4 +1,4 @@
-import type { HrCareerPathingOverviewKpis } from "./hr.talent.career-pathing-readiness.server";
+import type { HrCareerPathingOverviewKpis } from "./hrs-hr-talent-career-pathing-readiness-server";
 import type { HrCareerPathingReportRow } from "./hr.talent.career-pathing.reports.shared";
 import type { HrCareerPathingAuditTrailWindow } from "./hr.talent.career-pathing-audit.shared";
 
@@ -35,7 +35,7 @@ export async function buildHrCareerPathingOverviewPageModel(input: {
   readinessSearch?: string;
 }): Promise<HrCareerPathingOverviewPageModel> {
   const { loadHrCareerPathingOverviewKpis } =
-    await import("./hr.talent.career-pathing-readiness.server");
+    await import("./hrs-hr-talent-career-pathing-readiness-server");
   const kpis = await loadHrCareerPathingOverviewKpis({
     organizationId: input.organizationId,
   });

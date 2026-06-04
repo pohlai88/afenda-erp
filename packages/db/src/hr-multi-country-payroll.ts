@@ -40,7 +40,7 @@ import {
   type HrMcpExportFormatConfig,
   type HrMcpRuleConfigPayload,
   type HrMcpRuleVersionSnapshotPayload,
-} from "./hr-multi-country-payroll";
+} from "./dbx-hr-multi-country-payroll";
 import { hrEmployees } from "./hr";
 
 export {
@@ -3217,3 +3217,4 @@ export async function listHrMcpExchangeRates(input: {
       .orderBy(desc(hrMcpExchangeRates.rateDate));
   });
 }
+

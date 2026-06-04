@@ -12,7 +12,7 @@ vi.mock(
   async (importOriginal) => {
     const actual =
       await importOriginal<
-        typeof import("../../src/overview/policies/system-admin.capability.policy.server")
+        typeof import("../../src/features/overview/sys-capability.policy.server")
       >();
     return {
       ...actual,
@@ -25,8 +25,11 @@ vi.mock("@afenda/kernel/execution", () => ({
   writeExecutionAuditEvent: (...args: unknown[]) => mockWriteAudit(...args),
 }));
 
-vi.mock("../../src/users/data", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("../../src/users/data")>();
+vi.mock("../../src/features/users/sys-users.query.server", async (importOriginal) => {
+  const actual =
+    await importOriginal<
+      typeof import("../../src/features/users/sys-users.query.server")
+    >();
   return {
     ...actual,
     assertSystemAdminUserCanBeInvited: (...args: unknown[]) =>
@@ -86,7 +89,7 @@ describe("system admin identity invitations", () => {
     "invites via identity.write with duplicate guard and audit",
     async () => {
       const { inviteMemberAction } = await import(
-        "../../src/users/actions/system-admin.identity-invitations.actions.server"
+        "../../src/features/users/sys-identity-invitations.actions.server"
       );
 
       const formData = new FormData();
@@ -118,7 +121,7 @@ describe("system admin identity invitations", () => {
       );
 
       const { inviteMemberAction } = await import(
-        "../../src/users/actions/system-admin.identity-invitations.actions.server"
+        "../../src/features/users/sys-identity-invitations.actions.server"
       );
 
       const formData = new FormData();
@@ -137,7 +140,7 @@ describe("system admin identity invitations", () => {
     mockRequireIdentityWrite.mockRejectedValueOnce(new Error("Forbidden"));
 
     const { requireSystemAdminIdentityWrite } = await import(
-      "../../src/overview/policies/system-admin.capability.policy.server"
+      "../../src/features/overview/sys-capability.policy.server"
     );
 
     await expect(requireSystemAdminIdentityWrite()).rejects.toThrow("Forbidden");

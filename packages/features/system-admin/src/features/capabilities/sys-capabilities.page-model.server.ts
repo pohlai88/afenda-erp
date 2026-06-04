@@ -1,16 +1,16 @@
-import { listUniqueExecutionCapabilities } from "./system-admin.capabilities-catalog.shared";
+import { listUniqueExecutionCapabilities } from "./sys-capabilities-catalog.shared";
 import {
   listTenantCapabilitySettings,
   listTenantModuleSettings,
-} from "../../tenant-execution/data/system-admin.execution-settings.repository.server";
-import { resolveSystemAdminListSearch } from "../../overview/contracts/system-admin.list-search.shared";
+} from "../tenant-execution/sys-execution-settings.repository.server";
+import { resolveSystemAdminListSearch } from "../overview/sys-list-search.shared";
 import {
   SYSTEM_ADMIN_CAPABILITY_SETTINGS_QUERY_LIMIT,
   SYSTEM_ADMIN_MODULE_SETTINGS_QUERY_LIMIT,
-} from "../contracts/system-admin.capabilities.limits.shared";
-import { buildSystemAdminCapabilityCoverageRows } from "./system-admin.capabilities.coverage.server";
-import { buildSystemAdminCapabilityRoleMatrix } from "./system-admin.capabilities-role-matrix.server";
-import { parseSystemAdminCapabilityMatrixRole } from "./system-admin.capabilities-matrix-role.shared";
+} from "./sys-capabilities.limits.shared";
+import { buildSystemAdminCapabilityCoverageRows } from "./sys-capabilities.coverage.server";
+import { buildSystemAdminCapabilityRoleMatrix } from "./sys-capabilities-role-matrix.server";
+import { parseSystemAdminCapabilityMatrixRole } from "./sys-capabilities-matrix-role.shared";
 
 export async function buildSystemAdminCapabilitiesPageModel(input: {
   organizationId: string;

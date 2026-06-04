@@ -9,9 +9,9 @@ import { Label } from "@afenda/ui/label";
 import { Progress } from "@afenda/ui/progress";
 import { RadioGroup, RadioGroupItem } from "@afenda/ui/radio-group";
 import { Textarea } from "@afenda/ui/textarea";
-import { GovernedEmpty } from "./client";
-import { ActionFormErrors } from "../../components/action-form-errors";
-import { governedRendererCopy } from "../i18n/governed-renderer-copy.shared";
+import { GovernedEmpty } from "./gov-governed-empty";
+import { ActionFormErrors } from "./gov-action-form-errors";
+import { governedRendererCopy } from "./gov-governed-renderer-copy-shared";
 import {
   actionFailure,
   type ActionResult,

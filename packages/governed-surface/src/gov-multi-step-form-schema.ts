@@ -2,9 +2,9 @@ import { z } from "zod";
 
 import type { SchemaStability } from "./gov-_stability-shared";
 
-import { formRuleSchema } from "./form-rules.schema";
+import { formRuleSchema } from "./gov-form-rules-schema";
 import { governedMetadataSchemaVersionSchema } from "./gov-schema-version-shared";
-import { governedSurfaceChromeSchema } from "./surface-chrome.schema";
+import { governedSurfaceChromeSchema } from "./gov-surface-chrome-schema";
 
 export const GOVERNED_MULTI_STEP_FORM_SCHEMA_ID =
   "governed.multi-step-form.configuration" as const;

@@ -2,9 +2,9 @@ import { z } from "zod";
 
 import type { SchemaStability } from "./gov-_stability-shared";
 
-import { emptyStateSchema } from "./list-surface.schema";
+import { emptyStateSchema } from "./gov-list-surface-schema";
 import { governedMetadataSchemaVersionSchema } from "./gov-schema-version-shared";
-import { governedSurfaceChromeSchema } from "./surface-chrome.schema";
+import { governedSurfaceChromeSchema } from "./gov-surface-chrome-schema";
 
 export const GOVERNED_CHART_CONFIGURATION_SCHEMA_ID =
   "governed.chart.configuration" as const;

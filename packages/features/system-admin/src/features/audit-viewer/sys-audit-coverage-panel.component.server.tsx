@@ -1,10 +1,10 @@
 import { Button } from "@afenda/ui";
 import Link from "next/link";
-import type { SystemAdminAuditCoverageGapRow } from "../contracts/system-admin.audit-coverage.contract";
-import { systemAdminAuditCoverageDiagnosticsHref } from "../../diagnostics/contracts/system-admin.diagnostics-links.shared";
-import { systemAdminControlLinks } from "../../overview/contracts/system-admin.control-links.contract";
-import { SYSTEM_ADMIN_AUDIT_COVERAGE_GAPS_PREVIEW_LIMIT } from "../contracts/system-admin.audit-viewer.limits.shared";
-import { systemAdminAuditUiCopy } from "../surface/system-admin.audit-ui.copy.shared";
+import type { SystemAdminAuditCoverageGapRow } from "./sys-audit-coverage.contract";
+import { systemAdminAuditCoverageDiagnosticsHref } from "../diagnostics/sys-diagnostics-links.shared";
+import { systemAdminControlLinks } from "../overview/sys-control-links.contract";
+import { SYSTEM_ADMIN_AUDIT_COVERAGE_GAPS_PREVIEW_LIMIT } from "./sys-audit-viewer.limits.shared";
+import { systemAdminAuditUiCopy } from "./sys-audit-ui.copy.shared";
 
 export function SystemAdminAuditCoveragePanel({
   gaps,

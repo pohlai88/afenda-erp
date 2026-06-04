@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   diagnosticsDataAttributes,
   type GovernedDiagnostics,
-} from "../../src/utils/governed-diagnostics.shared";
+} from "../../src/gov-governed-diagnostics-shared";
 
 describe("governed diagnostics", () => {
   it("distinguishes invalid configuration from runtime error states", () => {

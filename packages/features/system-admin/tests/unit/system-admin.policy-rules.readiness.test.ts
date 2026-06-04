@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import type { SystemAdminPolicyRule } from "../../src/policies/contracts/system-admin.policy-rule.contract";
-import { evaluatePolicyRuleReadiness } from "../../src/policies/data/system-admin.policy-rules.readiness.server";
+import type { SystemAdminPolicyRule } from "../../src/features/policies/system-admin.policy-rule.contract";
+import { evaluatePolicyRuleReadiness } from "../../src/features/policies/system-admin.policy-rules.readiness.server";
 
 function baseRule(
   overrides: Partial<SystemAdminPolicyRule> = {},

@@ -7,7 +7,7 @@
  */
 import { describe, expect, it } from "vitest";
 
-import { GovernedComponentTree } from "../../src/metadata/governed-component-tree";
+import { GovernedComponentTree } from "../../src/gov-governed-component-tree";
 import type { AfendaGovernedComponentRegistry } from "../../src/gov-registry";
 import { GOVERNED_METADATA_SCHEMA_VERSION } from "../../src/gov-schema-version-shared";
 

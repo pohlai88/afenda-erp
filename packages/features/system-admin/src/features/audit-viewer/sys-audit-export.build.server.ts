@@ -1,9 +1,9 @@
 import type { TenantAuditLog } from "@afenda/db";
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import * as XLSX from "xlsx";
-import type { SystemAdminAuditExportFormat } from "../schemas/system-admin.audit-export.schema";
-import { mapTenantAuditLogToRow } from "./system-admin.audit.query.server";
-import { redactAuditMetadata } from "./system-admin.audit-metadata.redact.shared";
+import type { SystemAdminAuditExportFormat } from "./sys-audit-export.schema";
+import { mapTenantAuditLogToRow } from "./sys-audit.query.server";
+import { redactAuditMetadata } from "./sys-audit-metadata.redact.shared";
 
 export type AuditExportBody = {
   content: string;

@@ -1,11 +1,11 @@
-import { organizationRoles } from "@afenda/auth";
+import { organizationRoles } from "@afenda/kernel";
 import { z } from "zod";
-import { isSystemAdminPermissionKey } from "../contracts/system-admin.permission-catalog.contract";
+import { isSystemAdminPermissionKey } from "./sys-permission-catalog.contract";
 import {
   requiresElevatedPermissionConfirmation,
   requiresHighRiskPermissionConfirmation,
-} from "../contracts/system-admin.permission-risk.shared";
-import { systemAdminPermissionKeySchema } from "./system-admin.permission-key.schema";
+} from "./sys-permission-risk.shared";
+import { systemAdminPermissionKeySchema } from "./sys-permission-key.schema";
 
 export const systemAdminRoleOverrideActionSchema = z
   .object({

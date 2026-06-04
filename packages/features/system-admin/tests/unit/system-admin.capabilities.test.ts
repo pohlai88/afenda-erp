@@ -1,12 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { buildCapabilitiesListSurface } from "../../src/capabilities/data/system-admin.capabilities-list.surface";
+import { buildCapabilitiesListSurface } from "../../src/features/capabilities/sys-capabilities-list.surface";
 import {
   evaluateCapabilityCoverage,
   resolveSystemAdminCapabilityReadinessVerdict,
-} from "../../src/capabilities/data/system-admin.capabilities.coverage.server";
-import { systemAdminCapabilitySettingsActionSchema } from "../../src/capabilities/schemas/system-admin.capability-settings.schema";
-import { resolveSystemAdminCapabilityAuditAction } from "../../src/capabilities/events/system-admin.capabilities.event";
-import { resolveSystemAdminCapabilityRowTrailingAction } from "../../src/capabilities/surface/system-admin.capabilities-list-trailing.shared";
+} from "../../src/features/capabilities/sys-capabilities.coverage.server";
+import { systemAdminCapabilitySettingsActionSchema } from "../../src/features/capabilities/sys-capability-settings.schema";
+import { resolveSystemAdminCapabilityAuditAction } from "../../src/features/capabilities/sys-capabilities.event";
+import { resolveSystemAdminCapabilityRowTrailingAction } from "../../src/features/capabilities/sys-capabilities-list-trailing.shared";
 
 const mockRequireCapabilitiesManage = vi.fn();
 const mockListCapabilitySettings = vi.fn();
@@ -104,7 +104,7 @@ describe("system admin capabilities actions", () => {
     mockRequireCapabilitiesManage.mockRejectedValue(new Error("Forbidden"));
 
     const { requireSystemAdminCapabilitiesManage } = await import(
-      "../../src/capabilities/policies/system-admin.capabilities.policy.server"
+      "../../src/features/capabilities/sys-capabilities.policy.server"
     );
 
     await expect(requireSystemAdminCapabilitiesManage()).rejects.toThrow(
@@ -122,7 +122,7 @@ describe("system admin capabilities actions", () => {
     ]);
 
     const { setSystemAdminCapabilityAvailabilityAction } = await import(
-      "../../src/capabilities/actions/system-admin.capability-settings.actions.server"
+      "../../src/features/capabilities/sys-capability-settings.actions.server"
     );
 
     const result = await setSystemAdminCapabilityAvailabilityAction({
@@ -150,7 +150,7 @@ describe("system admin capabilities actions", () => {
     ]);
 
     const { setSystemAdminCapabilityAvailabilityAction } = await import(
-      "../../src/capabilities/actions/system-admin.capability-settings.actions.server"
+      "../../src/features/capabilities/sys-capability-settings.actions.server"
     );
 
     const result = await setSystemAdminCapabilityAvailabilityAction({
@@ -173,7 +173,7 @@ describe("system admin capabilities actions", () => {
     );
 
     const { setSystemAdminCapabilityAvailabilityAction } = await import(
-      "../../src/capabilities/actions/system-admin.capability-settings.actions.server"
+      "../../src/features/capabilities/sys-capability-settings.actions.server"
     );
 
     const result = await setSystemAdminCapabilityAvailabilityAction({

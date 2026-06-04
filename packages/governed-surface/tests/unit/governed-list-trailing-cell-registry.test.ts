@@ -2,11 +2,11 @@ import { describe, expect, it, vi } from "vitest";
 
 import {
   GovernedMetadataTrailingCell,
-} from "../../src/components/governed-metadata-trailing-cell.client";
+} from "../../src/gov-governed-metadata-trailing-cell-client";
 import {
   GOVERNED_LIST_TRAILING_CELL_REGISTRY,
   resolveGovernedTrailingColumn,
-} from "../../src/components/governed-list-trailing-cell-registry.client";
+} from "../../src/gov-governed-list-trailing-cell-registry-client";
 import type { GovernedListTrailingCellProps } from "../../src/governed-pattern-c-trailing-column.shared";
 
 // A minimal stub component for testing explicit Cell overrides.

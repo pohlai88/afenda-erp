@@ -3,17 +3,17 @@ import type { ReactNode } from "react";
 import { cn } from "@afenda/ui/utils";
 
 import type { GovernedRenderableState } from "./gov-governed-component-state-schema";
-import { diagnosticsDataAttributes } from "../utils/governed-diagnostics.shared";
+import { diagnosticsDataAttributes } from "./gov-governed-diagnostics-shared";
 import {
   governedIdentityAttributes,
   governedTestId,
   toGovernedDomId,
-} from "../utils/governed-identity.shared";
-import { GovernedEmpty } from "./governed-empty";
+} from "./gov-governed-identity-shared";
+import { GovernedEmpty } from "./gov-governed-empty";
 import {
   GovernedSurfaceSectionCard,
   type GovernedSurfaceSectionCardBody,
-} from "./governed-surface-section-card";
+} from "./gov-governed-surface-section-card";
 
 export type GovernedPatternSectionLayout = "card" | "embedded";
 

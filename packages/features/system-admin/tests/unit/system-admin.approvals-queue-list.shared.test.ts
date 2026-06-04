@@ -12,8 +12,8 @@ import {
   resolveApprovalQueuePriorityLabel,
   resolveApprovalQueueStatusLabel,
   resolveApprovalQueueWorkItemHref,
-} from "../../src/approvals/surface/system-admin.approvals-queue-list.shared";
-import { systemAdminApprovalsUiCopy } from "../../src/approvals/surface/system-admin.approvals-ui.copy.shared";
+} from "../../src/features/approvals/sys-approvals-queue-list.shared";
+import { systemAdminApprovalsUiCopy } from "../../src/features/approvals/sys-approvals-ui.copy.shared";
 
 const baseQueueRow = {
   id: "work-1",

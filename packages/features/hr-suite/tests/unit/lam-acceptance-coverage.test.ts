@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   assertLamCoverageComplete,
   LAM_REQUIREMENT_COVERAGE,
-} from "../../src/time-attendance/leave-attendance-management/data/hr.time.lam-acceptance-coverage.shared";
+} from "../../src/time-attendance/leave-attendance-management/hr.time.lam-acceptance-coverage.shared";
 
 describe("LAM-001..030 acceptance coverage", () => {
   it("includes all requirement codes HRM-LAM-001 through HRM-LAM-030", () => {

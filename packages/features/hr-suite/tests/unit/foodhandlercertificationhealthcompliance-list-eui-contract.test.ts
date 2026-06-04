@@ -1,23 +1,23 @@
 import { parseListSurfaceRendererConfiguration } from "@afenda/governed-surface/schemas";
 import { describe, expect, it } from "vitest";
 
-import { hrIndustryFhcReadPermission } from "../../src/industry-specific/food-handler-certification-health-compliance/contracts/hr.industry.fhc.contract";
-import { buildHrIndustryFhcPageModel } from "../../src/industry-specific/food-handler-certification-health-compliance/data/hr.industry.fhc.page-model.server";
+import { hrIndustryFhcReadPermission } from "../../src/industry-specific/food-handler-certification-health-compliance/hr.industry.fhc.contract";
+import { buildHrIndustryFhcPageModel } from "../../src/industry-specific/food-handler-certification-health-compliance/hr.industry.fhc.page-model.server";
 import {
   listHrIndustryFhcComplianceTrainingRefs,
   listHrIndustryFhcLearningRequirementRefs,
   listHrIndustryFhcShiftSchedulingEligibilityRefs,
   resetHrIndustryFhcStore,
   resolveHrIndustryFhcEmployeeCompliance,
-} from "../../src/industry-specific/food-handler-certification-health-compliance/data/hr.industry.fhc-store.shared";
-import { hrFhcEvidenceSubmissionSchema } from "../../src/industry-specific/food-handler-certification-health-compliance/schemas/hr.industry.fhc.schema";
-import { buildHrIndustryFhcListSurface } from "../../src/industry-specific/food-handler-certification-health-compliance/surface/hr.industry.fhc-lists.surface";
+} from "../../src/industry-specific/food-handler-certification-health-compliance/hr.industry.fhc-store.shared";
+import { hrFhcEvidenceSubmissionSchema } from "../../src/industry-specific/food-handler-certification-health-compliance/hr.industry.fhc.schema";
+import { buildHrIndustryFhcListSurface } from "../../src/industry-specific/food-handler-certification-health-compliance/hr.industry.fhc-lists.surface";
 import {
   HR_INDUSTRY_FHC_LIST_SURFACE_KEYS,
   hrIndustryFhcEmployeeComplianceSurfaceKey,
   hrIndustryFhcHealthCertificationsSurfaceKey,
   hrIndustryFhcIntegrationExposuresSurfaceKey,
-} from "../../src/industry-specific/food-handler-certification-health-compliance/surface/hr.industry.fhc-surface-metadata.shared";
+} from "../../src/industry-specific/food-handler-certification-health-compliance/hr.industry.fhc-surface-metadata.shared";
 
 describe("food handler certification health compliance EUI contract", () => {
   it("builds governed server-window list configuration", () => {

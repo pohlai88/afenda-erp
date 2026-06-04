@@ -4,5 +4,7 @@
  */
 export * from "./metadata";
 export * from "./client";
-export * from "./contracts";
-export * from "./schemas";
+export * from "./sys-diagnostic-issue.contract";
+export * from "./sys-diagnostics-coverage.contract";
+export * from "./sys-diagnostics-filter.schema";
+export * from "./sys-diagnostics.schema";

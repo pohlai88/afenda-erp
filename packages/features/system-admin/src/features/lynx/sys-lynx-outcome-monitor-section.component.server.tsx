@@ -3,14 +3,14 @@ import {
   getSystemAdminLynxOutcomeMonitorState,
   lynxOutcomeMonitorControlSurfaceKey,
   type SystemAdminLynxOutcomeMonitorState,
-} from "./system-admin.lynx-outcome-monitor.surface.server";
+} from "./sys-lynx-outcome-monitor.surface.server";
 import { GovernedPatternCListSection } from "@afenda/governed-surface/server";
 import { SectionPanel } from "@afenda/ui";
 
-import type { SystemAdminActionResult } from "../contracts";
-import { LynxOutcomeMonitorSettingForms } from "./system-admin.lynx-outcome-monitor-setting-forms.component.server";
-import type { LynxOutcomeMonitorSetting } from "../contracts";
-import { LynxOutcomeMonitorTrailingCell } from "./system-admin.lynx-outcome-monitor-trailing-cell.component.client";
+import type { SystemAdminActionResult } from "../tenant-execution/sys-action-result.contract";
+import { LynxOutcomeMonitorSettingForms } from "./sys-lynx-outcome-monitor-setting-forms.component.server";
+import type { LynxOutcomeMonitorSetting } from "./sys-lynx-outcome-monitor.contract";
+import { LynxOutcomeMonitorTrailingCell } from "./sys-lynx-outcome-monitor-trailing-cell.component.client";
 
 type UpdateLynxOutcomeMonitorSettingAction = (
   state: SystemAdminActionResult | undefined,

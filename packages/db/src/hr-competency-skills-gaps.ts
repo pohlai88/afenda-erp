@@ -22,7 +22,7 @@ import {
   hrCsfProficiencyLevels,
   hrCsfSkillRequirements,
   hrCsfSkills,
-} from "./hr-competency-skills";
+} from "./dbx-hr-competency-skills";
 import { hrEmployees } from "./hr";
 
 export {
@@ -665,3 +665,4 @@ export async function getHrCsfGapDetail(input: {
     return row ?? null;
   });
 }
+

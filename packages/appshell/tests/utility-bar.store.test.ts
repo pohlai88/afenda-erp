@@ -5,7 +5,7 @@ import {
   selectAllItemsOrdered,
   selectVisibleItems,
   useUtilityBarStore,
-} from "../src/stores/utility-bar.store";
+} from "../src/app-utility-bar-store";
 
 describe("utility bar store", () => {
   beforeEach(() => {

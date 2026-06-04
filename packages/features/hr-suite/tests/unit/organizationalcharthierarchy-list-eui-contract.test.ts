@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { buildHrOrgUnitsListSurface } from "../../src/employee-management/organizational-chart-hierarchy/surface/hr.workforce.org-units-list.surface";
+import { buildHrOrgUnitsListSurface } from "../../src/employee-management/organizational-chart-hierarchy/hr.workforce.org-units-list.surface";
 
 describe("hr org units list EUI contract", () => {
   it("exposes search toolbar bound to the units registry param", () => {

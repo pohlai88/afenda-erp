@@ -18,7 +18,7 @@ import {
   hrBonusEligibilityRules,
   hrBonusPlanParticipants,
   hrBonusPlans,
-} from "./hr-bonus-incentive";
+} from "./dbx-hr-bonus-incentive";
 import { hrDepartments, hrEmployees } from "./hr";
 
 export type HrBonusEligibilityDetermination = {
@@ -382,3 +382,4 @@ export async function validateHrBonusEligibilityBeforePayoutInTx(
 
   return determination;
 }
+

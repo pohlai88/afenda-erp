@@ -2,7 +2,7 @@ import "server-only";
 
 import { cache } from "react";
 
-import { logGovernedListSurfaceRenderDiagnostic } from "./data/governed-logging.server";
+import { logGovernedListSurfaceRenderDiagnostic } from "./gov-governed-logging-server";
 
 import {
   buildGovernedListSurfaceRenderFingerprint,

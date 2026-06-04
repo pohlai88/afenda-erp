@@ -4,7 +4,7 @@ import {
   HR_TALENT_RSS_ACCEPTANCE_CRITERIA_COVERAGE,
   HR_TALENT_RSS_REQUIREMENT_COVERAGE,
   assertHrTalentRssEnterpriseCoverage,
-} from "../../src/talent-management/candidate-selfservice-portal/data/hr.talent.rss-coverage.shared";
+} from "../../src/talent-management/candidate-selfservice-portal/hr.talent.rss-coverage.shared";
 import { hrTalentRssAuditActions } from "../../src/talent-management/candidate-selfservice-portal/events";
 
 describe("Candidate Self-Service Portal enterprise coverage", () => {

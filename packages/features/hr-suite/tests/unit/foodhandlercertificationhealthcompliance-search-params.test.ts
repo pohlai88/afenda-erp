@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   parseHrIndustryFhcSearchParams,
   toHrIndustryFhcPageModelInput,
-} from "../../src/industry-specific/food-handler-certification-health-compliance/data/hr.industry.fhc-search-params.parse.shared";
+} from "../../src/industry-specific/food-handler-certification-health-compliance/hr.industry.fhc-search-params.parse.shared";
 
 describe("food handler certification health compliance search params", () => {
   it("parses list searches, status filters, and report grouping", () => {

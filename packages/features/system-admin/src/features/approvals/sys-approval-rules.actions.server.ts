@@ -1,6 +1,6 @@
 "use server";
 
-import { upsertTenantApprovalSettings } from "../../tenant-execution/data/system-admin.execution-settings.repository.server";
+import { upsertTenantApprovalSettings } from "../tenant-execution/sys-execution-settings.repository.server";
 import { writeExecutionAuditEvent } from "@afenda/kernel/execution";
 import { revalidatePath } from "next/cache";
 import {
@@ -8,35 +8,35 @@ import {
   systemAdminActionSuccess,
   type SystemAdminActionResult,
   zodActionFailure,
-} from "../../tenant-execution/contracts/system-admin.action-result.contract";
-import { readExecutionSettingConfiguration } from "../../tenant-execution/contracts/system-admin.execution-settings.shared";
-import { systemAdminRoutePaths } from "../../overview/contracts/system-admin.route-paths.contract";
-import { dispatchSystemAdminWebhook } from "../../integrations/events/system-admin.webhook-dispatch.event";
+} from "../tenant-execution/sys-action-result.contract";
+import { readExecutionSettingConfiguration } from "../tenant-execution/sys-execution-settings.shared";
+import { systemAdminRoutePaths } from "../overview/sys-route-paths.contract";
+import { dispatchSystemAdminWebhook } from "../integrations/sys-webhook-dispatch.event";
 import {
   assertApprovalRuleChangeAllowed,
   requireSystemAdminApprovalsManage,
   requireSystemAdminApprovalsReview,
-} from "../policies/system-admin.approval-rules.policy.server";
-import { assertApprovalRuleRolesAllowed } from "../policies/system-admin.approval-rules.roles.server";
+} from "./sys-approval-rules.policy.server";
+import { assertApprovalRuleRolesAllowed } from "./sys-approval-rules.roles.server";
 import {
   mapTenantApprovalSettingToRule,
   serializeApprovalRuleConfiguration,
-} from "./system-admin.approval-rules.mapper";
-import { findTenantApprovalSetting } from "./system-admin.approval-rules.query.server";
+} from "./sys-approval-rules.mapper";
+import { findTenantApprovalSetting } from "./sys-approval-rules.query.server";
 import {
   buildApprovalRuleAuditMetadata,
   parseApprovalRuleActionFormData,
   readConfiguredApprovalRuleStatus,
   resolveApprovalRuleKey,
   toEscalationMinutes,
-} from "./system-admin.approval-rules.shared";
+} from "./sys-approval-rules.shared";
 import {
   systemAdminApprovalRuleAuditActionsByMode,
   systemAdminApprovalRuleWebhookEvents,
   type SystemAdminApprovalRuleAuditAction,
-} from "../events/system-admin.approval-rules.event";
-import type { SystemAdminApprovalRuleActionInput } from "../schemas/system-admin.approval-rule.schema";
-import { reactivateDeprecatedApprovalRuleInputSchema } from "../schemas/system-admin.approval-rule.schema";
+} from "./sys-approval-rules.event";
+import type { SystemAdminApprovalRuleActionInput } from "./sys-approval-rule.schema";
+import { reactivateDeprecatedApprovalRuleInputSchema } from "./sys-approval-rule.schema";
 
 function resolveApprovalRuleAuditAction(input: {
   mode: "create" | "update";

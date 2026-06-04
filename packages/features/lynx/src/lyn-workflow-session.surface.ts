@@ -2,9 +2,9 @@ export {
   buildLynxWorkflowLinkedRunListSurface,
   buildLynxWorkflowSessionDetailStatGrid,
   buildLynxWorkflowSessionListSurface,
-} from "./lynx.surface.shared";
+} from "./lyn-surface.shared";
 export type {
   LynxRouteListPagination,
   LynxWorkflowSessionFilters,
   LynxWorkflowSessionRow,
-} from "./lynx.surface.shared";
+} from "./lyn-surface.shared";

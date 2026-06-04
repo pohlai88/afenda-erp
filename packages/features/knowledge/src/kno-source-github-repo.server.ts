@@ -1,8 +1,8 @@
-import type { KnowledgeSourceAdapter } from "../contracts/knowledge.source-adapter.contract";
+import type { KnowledgeSourceAdapter } from "./kno-source-adapter.contract";
 import {
   knowledgeGitHubRepoSourceConfigSchema,
   type KnowledgeGitHubRepoSourceConfig,
-} from "../schemas/knowledge.source-github-repo.schema";
+} from "./kno-source-github-repo.schema";
 
 const MAX_DOCS_PER_SYNC = 300;
 const DEFAULT_REF = "HEAD";

@@ -5,8 +5,8 @@ import type { ColumnDef } from "@tanstack/react-table";
 import type { ListColumn } from "./gov-list-surface-schema";
 import type { ListSurfaceRow } from "./gov-list-surface-renderer-schema";
 
-import { ListSurfaceCell } from "./list-surface-cell.client";
-import type { ListSurfaceTableTrailingColumn } from "./list-surface-table.client";
+import { ListSurfaceCell } from "./gov-list-surface-cell-client";
+import type { ListSurfaceTableTrailingColumn } from "./gov-list-surface-table-client";
 
 export function buildListSurfaceColumnDefs(
   columns: readonly ListColumn[],

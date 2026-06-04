@@ -1,18 +1,18 @@
-import { GovernedEmpty } from "./client";
+import { GovernedEmpty } from "./gov-governed-empty";
 import {
   GOVERNED_KANBAN_BOARD_SCHEMA_ID,
   parseGovernedKanbanBoardConfiguration,
 } from "./gov-kanban-board-schema";
-import { diagnosticsDataAttributes } from "../utils/governed-diagnostics.shared";
+import { diagnosticsDataAttributes } from "./gov-governed-diagnostics-shared";
 import {
   governedIdentityAttributes,
   governedTestId,
-} from "../utils/governed-identity.shared";
+} from "./gov-governed-identity-shared";
 
-import type { RendererProps } from "../governed-renderer-dispatch";
+import type { RendererProps } from "./gov-governed-renderer-dispatch";
 import type { GovernedComponentRendererDiagnostics } from "./gov-registry";
 
-import { KanbanBoardView } from "./kanban-board-view";
+import { KanbanBoardView } from "./gov-kanban-board-view";
 
 /** Declares container boundary for lint coverage; geometry lives in KanbanBoardView. */
 const KANBAN_RENDERER_SHELL_CLASS = "@container min-w-0";

@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   parseHrIndustryUcbSearchParams,
   toHrIndustryUcbPageModelInput,
-} from "../../src/industry-specific/union-management/data/hr.industry.ucb-search-params.parse.shared";
+} from "../../src/industry-specific/union-management/hr.industry.ucb-search-params.parse.shared";
 
 describe("union management search params", () => {
   it("parses list searches, status filters, and report grouping", () => {

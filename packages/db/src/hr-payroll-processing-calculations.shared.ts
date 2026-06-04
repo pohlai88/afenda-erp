@@ -1,7 +1,7 @@
 import type {
   HrPayrollRunLineComponent,
   HrPayrollRunLineSnapshot,
-} from "./hr-payroll-processing";
+} from "./dbx-hr-payroll-processing";
 import { formatPayrollNumeric } from "./hr-payroll-processing.shared";
 
 function formatNumeric(value: number, scale = 2): string {
@@ -464,3 +464,4 @@ export function computePayrollProrationFactor(input: PayrollProrationInput): num
   }
   return Math.min(1, Math.max(0, input.activeDays / input.periodDays));
 }
+

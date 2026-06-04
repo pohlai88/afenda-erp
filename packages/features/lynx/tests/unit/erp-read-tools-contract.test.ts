@@ -3,8 +3,8 @@ import {
   LYNX_ERP_READ_TOOL_IDS,
   lynxErpReadToolInputSchema,
   lynxErpReadToolOutputSchema,
-} from "../../src/contracts/lynx.erp-read-tools.contract";
-import { lynxToolMeta } from "../../src/tools/lynx.tool-meta";
+} from "../../src/lyn-erp-read-tools.contract";
+import { lynxToolMeta } from "../../src/lyn-tool-meta";
 
 describe("Lynx ERP read tools contract", () => {
   it("keeps tool inputs tenant-safe", () => {

@@ -1,8 +1,8 @@
-import { GovernedEmpty } from "./client";
+import { GovernedEmpty } from "./gov-governed-empty";
 import { parseEmptyStateData } from "./gov-list-surface-schema";
-import { governedParseErrorCopy } from "../i18n/governed-renderer-copy.shared";
+import { governedParseErrorCopy } from "./gov-governed-renderer-copy-shared";
 
-import type { RendererProps } from "../governed-renderer-dispatch";
+import type { RendererProps } from "./gov-governed-renderer-dispatch";
 import type { GovernedComponentRendererDiagnostics } from "./gov-registry";
 
 type EmptyRendererProps = Omit<

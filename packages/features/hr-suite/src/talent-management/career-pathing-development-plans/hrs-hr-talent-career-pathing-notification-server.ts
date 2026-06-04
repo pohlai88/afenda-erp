@@ -9,7 +9,7 @@ import {
 import { and, eq } from "drizzle-orm";
 
 import { hrTalentCareerPathingAuditActions } from "./hr.talent.career-pathing.event";
-import { emitHrCareerPathingAuditEvent } from "./hr.talent.career-pathing-audit.server";
+import { emitHrCareerPathingAuditEvent } from "./hrs-hr-talent-career-pathing-audit-server";
 import {
   listHrCareerPathingNotificationIntents,
   recordHrCareerPathingNotificationIntent,

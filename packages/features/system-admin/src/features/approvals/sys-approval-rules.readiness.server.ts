@@ -2,8 +2,8 @@ import { listExecutionCapabilities } from "@afenda/kernel/execution-capabilities
 import type {
   ApprovalReadinessVerdict,
   SystemAdminApprovalRule,
-} from "../contracts/system-admin.approval-rule.contract";
-import { resolveExecutionCapabilityForAction } from "../../tenant-execution/policies/system-admin.execution-capability.shared.server";
+} from "./sys-approval-rule.contract";
+import { resolveExecutionCapabilityForAction } from "../tenant-execution/sys-execution-capability.shared.server";
 
 function isInactiveApprovalRule(rule: SystemAdminApprovalRule) {
   return (

@@ -2,10 +2,10 @@
 
 import { ActionFormErrors } from "@afenda/governed-surface/client";
 import { useState, useTransition } from "react";
-import type { OrganizationRole } from "@afenda/auth";
-import { SystemAdminDestructiveConfirmButton } from "../../overview/components/system-admin.destructive-confirm-button.component.client";
-import type { SystemAdminActionResult } from "../../tenant-execution/contracts/system-admin.action-result.contract";
-import { systemAdminMembershipTrailingConfirms } from "../../memberships/surface/system-admin.memberships-trailing-confirm.client.shared";
+import type { OrganizationRole } from "@afenda/kernel";
+import { SystemAdminDestructiveConfirmButton } from "../overview/sys-destructive-confirm-button.component.client";
+import type { SystemAdminActionResult } from "../tenant-execution/sys-action-result.contract";
+import { systemAdminMembershipTrailingConfirms } from "../memberships/sys-memberships-trailing-confirm.client.shared";
 
 type RoleRemovalAction = (
   payload: FormData,

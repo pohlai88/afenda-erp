@@ -24,7 +24,7 @@ import {
   hrShiftRotationCycleSteps,
   hrShiftRotationCycles,
   hrShiftTemplates,
-} from "./hr-shift-scheduling";
+} from "./dbx-hr-shift-scheduling";
 
 export type HrShiftRosterRow = {
   id: string;
@@ -864,3 +864,4 @@ export async function applyHrShiftRotationCycle(input: {
 
   return { createdAssignmentIds, skippedDates };
 }
+

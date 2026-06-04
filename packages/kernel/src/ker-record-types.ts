@@ -5,7 +5,7 @@ import type {
   ListColumn,
   ListPresentationProfileId,
   ListSurfaceToolbar,
-} from "@afenda/governed-surface";
+} from "./ker-governed-surface-contract";
 import { z } from "zod";
 
 export type RecordTypeSortDefinition = {
@@ -198,7 +198,7 @@ const defaultRecordToolbar = {
   },
   resetParams: ["recordsCursor"],
   columnPicker: true,
-} as const satisfies ListSurfaceToolbar;
+} satisfies ListSurfaceToolbar;
 
 const defaultExtensionSchema = z.record(z.string(), z.unknown());
 

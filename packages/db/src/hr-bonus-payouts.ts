@@ -21,8 +21,8 @@ import {
   collectHrBonusPayoutValidationFlagsInTx,
 } from "./hr-bonus-payout-validation";
 import type { BonusPayoutCalculationInput } from "./hr-bonus-incentive-payout.shared";
-import { hrBonusCycles, hrBonusPlans } from "./hr-bonus-incentive";
-import { hrBonusPayouts } from "./hr-bonus";
+import { hrBonusCycles, hrBonusPlans } from "./dbx-hr-bonus-incentive";
+import { hrBonusPayouts } from "./dbx-hr-bonus";
 import { hrEmployees } from "./hr";
 
 export type PrepareHrBonusPayoutInput = {
@@ -235,3 +235,4 @@ export async function prepareHrBonusPayoutInTx(
     eligible: eligibility.eligible,
   };
 }
+

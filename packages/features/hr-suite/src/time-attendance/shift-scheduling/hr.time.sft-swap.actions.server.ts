@@ -3,17 +3,17 @@
 import {
   decideHrTimeSftScheduleChangeRequest,
   submitHrTimeSftScheduleChangeRequest,
-} from "./hr.time.sft-schedule-change.server";
+} from "./hrs-hr-time-sft-schedule-change-server";
 import {
   decideHrTimeSftSwapRequest,
   submitHrTimeSftSwapRequest,
-} from "./hr.time.sft-swap.server";
+} from "./hrs-hr-time-sft-swap-server";
 import {
   assertHrTimeSftSwapDecisionPermitted,
   canHrTimeSftInitiateScheduleChange,
   canHrTimeSftSubmitSwapRequest,
 } from "./hr.time.sft-swap.policy.server";
-import { readHrTimeSftSchedulingPolicy } from "./hr.time.sft-coverage.server";
+import { readHrTimeSftSchedulingPolicy } from "./hrs-hr-time-sft-coverage-server";
 import {
   finalizeHrTimeSftMutation,
   toHrTimeSftActionFailure,

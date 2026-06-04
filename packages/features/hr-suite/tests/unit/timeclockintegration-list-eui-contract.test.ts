@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
-import { buildHrTimeClockDevicesListSurface } from "../../src/time-attendance/time-clock-integration/surface/hr.time.clock-integration-devices-list.surface";
-import { hrTimeClockDevicesSurfaceKey } from "../../src/time-attendance/time-clock-integration/surface/hr.time.clock-integration-devices-list.surface";
+import { buildHrTimeClockDevicesListSurface } from "../../src/time-attendance/time-clock-integration/hr.time.clock-integration-devices-list.surface";
+import { hrTimeClockDevicesSurfaceKey } from "../../src/time-attendance/time-clock-integration/hr.time.clock-integration-devices-list.surface";
 
 describe("hr timeclockintegration list eui contract", () => {
   it("builds devices list surface with governed schema version", () => {

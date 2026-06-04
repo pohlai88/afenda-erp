@@ -5,7 +5,7 @@ import {
 } from "@afenda/governed-surface";
 import type { ListSurfaceRendererConfigurationResolvedInput } from "@afenda/governed-surface";
 
-import { buildHrTimeOtmReportRows } from "./hr.time.otm-report.server";
+import { buildHrTimeOtmReportRows } from "./hrs-hr-time-otm-report-server";
 import {
   hrOtmApprovedPayrollSurfaceKey,
   hrOtmMyRequestsSurfaceKey,

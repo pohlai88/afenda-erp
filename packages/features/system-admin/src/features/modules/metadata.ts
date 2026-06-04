@@ -2,4 +2,4 @@
  * Governed metadata door — system-admin/modules
  * List surfaces, surface keys, and metadata-only copy. No tenant I/O.
  */
-export * from "./surface";
+export * from "./sys-modules-list.surface";

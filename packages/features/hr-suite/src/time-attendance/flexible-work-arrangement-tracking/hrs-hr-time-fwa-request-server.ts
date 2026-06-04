@@ -2,7 +2,7 @@ import type { HrFwaArrangementKindInput } from "./hr.time.fwa-arrangement-types.
 import type { HrFwaEligibilityResultInput } from "./hr.time.fwa-eligibility.schema";
 import type { HrFwaSchedulePatternDetailsInput } from "./hr.time.fwa-schedule.schema";
 import { HrTimeFwaEligibilityBlockedError } from "./hr.time.fwa-action-result.shared";
-import { assertHrTimeFwaExceptionPath } from "./hr.time.fwa-exception.server";
+import { assertHrTimeFwaExceptionPath } from "./hrs-hr-time-fwa-exception-server";
 import {
   fwaDbCreateSchedulePattern,
   fwaDbSubmitRequest,

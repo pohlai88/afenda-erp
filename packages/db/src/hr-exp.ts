@@ -6,7 +6,7 @@ import {
   hrExpenseAuditEvents,
   hrExpenseClaims,
   hrExpenseExceptions,
-} from "./hr-expense";
+} from "./dbx-hr-expense";
 
 export * from "./hr-exp.shared";
 
@@ -90,3 +90,4 @@ export async function getHrExpenseClaimById(input: {
     return row ?? null;
   });
 }
+

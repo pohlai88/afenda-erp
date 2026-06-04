@@ -3,7 +3,7 @@ import "server-only";
 import {
   hasDocumentReadAccess,
   hasDocumentWriteAccess,
-} from "@afenda/auth";
+} from "@afenda/kernel";
 import { getErpModuleById, uploadRouteCopy, type ModuleId } from "@afenda/kernel";
 import { getOrganizationContext } from "@afenda/kernel/server";
 import { UploadRouteError } from "../domain/upload-route.error.shared";

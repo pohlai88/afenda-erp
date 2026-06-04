@@ -3,22 +3,22 @@ import {
   organizationRoles,
   type AppCapability,
   type OrganizationRole,
-} from "@afenda/auth";
+} from "@afenda/kernel";
 import type {
   TenantCapabilitySettingRow,
   TenantModuleSettingRow,
 } from "@afenda/db";
-import { listUniqueExecutionCapabilities } from "./system-admin.capabilities-catalog.shared";
-import { listRoleOverridesForOrganization } from "../../users/data/system-admin.identity.repository.server";
-import { resolveEffectivePermissionsForRole } from "../../permissions/data/system-admin.permissions.query.server";
-import { systemAdminSeedRoles } from "../../roles/contracts";
-import { SYSTEM_ADMIN_CAPABILITY_SETTINGS_QUERY_LIMIT } from "../contracts/system-admin.capabilities.limits.shared";
+import { listUniqueExecutionCapabilities } from "./sys-capabilities-catalog.shared";
+import { listRoleOverridesForOrganization } from "../users/sys-identity.repository.server";
+import { resolveEffectivePermissionsForRole } from "../permissions/sys-permissions.query.server";
+import { systemAdminSeedRoles } from "../roles/sys-roles.contract";
+import { SYSTEM_ADMIN_CAPABILITY_SETTINGS_QUERY_LIMIT } from "./sys-capabilities.limits.shared";
 import {
   buildSystemAdminCapabilitySettingsMap,
   buildSystemAdminModuleSettingsMap,
   isSystemAdminModuleDisabledForOrg,
   resolveSystemAdminCapabilityOrgAvailability,
-} from "./system-admin.capabilities-org-settings.shared";
+} from "./sys-capabilities-org-settings.shared";
 
 export type SystemAdminCapabilityRoleAccess = "granted" | "denied" | "blocked";
 

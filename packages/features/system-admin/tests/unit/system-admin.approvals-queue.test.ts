@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { mapWorkspaceItemsToSystemAdminApprovalQueueRows } from "../../src/approvals/data/system-admin.approvals-queue.mapper";
+import { mapWorkspaceItemsToSystemAdminApprovalQueueRows } from "../../src/features/approvals/sys-approvals-queue.mapper";
 
 describe("system-admin approvals queue mapper", () => {
   it("maps route and escalation from work item metadata", () => {

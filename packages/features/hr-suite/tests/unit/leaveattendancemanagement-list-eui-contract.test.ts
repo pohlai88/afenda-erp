@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
-import { buildHrLamAttendanceDaysListSurface } from "../../src/time-attendance/leave-attendance-management/surface/hr.time.lam-attendance-days-list.surface";
-import { hrLamAttendanceDaysSurfaceKey } from "../../src/time-attendance/leave-attendance-management/surface/hr.time.lam-surface-metadata.shared";
+import { buildHrLamAttendanceDaysListSurface } from "../../src/time-attendance/leave-attendance-management/hr.time.lam-attendance-days-list.surface";
+import { hrLamAttendanceDaysSurfaceKey } from "../../src/time-attendance/leave-attendance-management/hr.time.lam-surface-metadata.shared";
 
 describe("hr lam list eui contract", () => {
   it("builds attendance days list surface with governed schema version", () => {

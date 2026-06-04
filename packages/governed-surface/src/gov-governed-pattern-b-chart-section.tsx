@@ -2,10 +2,8 @@ import "server-only";
 
 import type { ReactNode } from "react";
 
-import { GovernedComponentRenderer } from "./index";
-import { logUnexpectedServerError } from "./governed-logging.server";
-import { getGovernedSurfaceTranslations } from "../i18n/governed-surface-copy";
-import { governedTestId } from "../utils/governed-identity.shared";
+import { GovernedComponentRenderer } from "./gov-render-governed-component";
+import { governedTestId } from "./gov-governed-identity-shared";
 
 import type { EmptyState } from "./gov-list-surface-schema";
 import {
@@ -17,10 +15,11 @@ import {
   type GovernedPatternSectionDensity,
   type GovernedPatternSectionLayout,
   type RenderGovernedPatternSectionShellInput,
-} from "./governed-pattern-section-shell.shared";
-import type { GovernedSurfaceSectionCardBody } from "./governed-surface-section-card";
-
-type GovernedPatternEmptyState = EmptyState & { emptyId?: string };
+} from "./gov-governed-pattern-section-shell-shared";
+import {
+  resolveMetadataSectionBody,
+  type GovernedPatternEmptyState,
+} from "./resolve-metadata-section-body.server";
 
 export type GovernedPatternBChartSectionLayout = GovernedPatternSectionLayout;
 
@@ -65,7 +64,6 @@ export async function GovernedPatternBChartSection({
   cardClassName,
   contentClassName,
 }: GovernedPatternBChartSectionProps) {
-  const t = await getGovernedSurfaceTranslations("Erp");
   const defaultSectionKey = `${surfaceKey}-chart`;
   const resolvedSectionKey = sectionKey ?? defaultSectionKey;
   const resolvedComponentKey = componentKey ?? resolvedSectionKey;
@@ -85,63 +83,46 @@ export async function GovernedPatternBChartSection({
     contentClassName,
   } satisfies Omit<RenderGovernedPatternSectionShellInput, "body">;
 
-  let body: GovernedSurfaceSectionCardBody;
-
-  if (loadError) {
-    body = {
-      state: "invalid",
-      model: {
-        ...loadError,
-        emptyId: loadError.emptyId ?? "chart-section-load-error",
-      },
-    };
-  } else if (forbidden) {
-    body = {
-      state: "forbidden",
-      model: forbidden,
-    };
-  } else {
-    const parsed = parseGovernedChartConfiguration(chartConfiguration);
-
-    if (!parsed.success) {
-      logUnexpectedServerError(
-        "GovernedPatternBChartSection invalid chart configuration",
-        parsed.error,
-        {
-          surfaceKey,
-          sectionKey: resolvedSectionKey,
-          componentKey: resolvedComponentKey,
-        },
-      );
-
-      body = {
-        state: "invalid",
-        model: {
-          variant: "error",
-          title: invalid?.title ?? t("GovernedSurface.invalidConfigTitle"),
-          description:
-            invalid?.description ?? t("GovernedSurface.invalidConfigDescription"),
-          emptyId: invalid?.emptyId ?? "chart-section-invalid-config",
-        },
-      };
-    } else {
-      body = {
-        state: "ready",
-        children: (
-          <GovernedComponentRenderer
-            surfaceKey={surfaceKey}
-            sectionKey={resolvedSectionKey}
-            componentKey={resolvedComponentKey}
-            component={{
-              type: "governed:chart",
-              serverType: "governed:chart",
-              configuration: parsed.data,
-            }}
-          />
-        ),
-      };
-    }
-  }
+  const body = await resolveMetadataSectionBody({
+    loadError,
+    forbiddenPreset: forbidden
+      ? ({
+          ...forbidden,
+          emptyId:
+            typeof (forbidden as GovernedPatternEmptyState).emptyId === "string"
+              ? (forbidden as GovernedPatternEmptyState).emptyId
+              : "chart-section-forbidden",
+        } satisfies GovernedPatternEmptyState)
+      : undefined,
+    parse: () => parseGovernedChartConfiguration(chartConfiguration),
+    parseErrorLabel: "GovernedPatternBChartSection invalid chart configuration",
+    parseContext: {
+      surfaceKey,
+      sectionKey: resolvedSectionKey,
+      componentKey: resolvedComponentKey,
+    },
+    emptyStateIds: {
+      loadError: "chart-section-load-error",
+      invalid: "chart-section-invalid-config",
+      forbidden: "chart-section-forbidden",
+    },
+    invalid,
+    buildReadyBody: (config) => ({
+      state: "ready",
+      children: (
+        <GovernedComponentRenderer
+          surfaceKey={surfaceKey}
+          sectionKey={resolvedSectionKey}
+          componentKey={resolvedComponentKey}
+          component={{
+            type: "governed:chart",
+            serverType: "governed:chart",
+            configuration: config,
+          }}
+        />
+      ),
+    }),
+  });
 
   return renderGovernedPatternSectionShell({
     ...shellInput,

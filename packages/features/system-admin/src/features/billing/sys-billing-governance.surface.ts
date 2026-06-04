@@ -2,13 +2,13 @@ import type { ListSurfaceRendererConfigurationResolvedInput } from "@afenda/gove
 import {
   buildLinkedControlListSurface,
   moduleReadinessVerdictBadge,
-} from "../../overview/surfaces/system-admin.control-list.shared";
+} from "../overview/sys-control-list.shared";
 import {
   formatBillingReadinessVerdictLabel,
   type BillingReadinessReport,
-} from "../contracts/system-admin.billing-readiness.contract";
-import type { OrganizationSubscription } from "../contracts/system-admin.billing-subscription.contract";
-import { systemAdminBillingUiCopy } from "./system-admin.billing-ui.copy.shared";
+} from "./sys-billing-readiness.contract";
+import type { OrganizationSubscription } from "./sys-billing-subscription.contract";
+import { systemAdminBillingUiCopy } from "./sys-billing-ui.copy.shared";
 
 export const systemAdminBillingGovernanceSurfaceKey =
   "system-admin.billing.governance";

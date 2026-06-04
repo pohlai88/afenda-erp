@@ -2,19 +2,19 @@ import { z } from "zod";
 
 import type { SchemaStability } from "./gov-_stability-shared";
 
-import { governedActionBarConfigurationSchema } from "./action-bar.schema";
-import { governedApprovalTimelineConfigurationSchema } from "./approval-timeline.schema";
-import { auditPanelSchema } from "./audit-panel.schema";
+import { governedActionBarConfigurationSchema } from "./gov-action-bar-schema";
+import { governedApprovalTimelineConfigurationSchema } from "./gov-approval-timeline-schema";
+import { auditPanelSchema } from "./gov-audit-panel-schema";
 import { governedChartConfigurationSchema } from "./gov-chart-schema";
-import { governedDetailTabsSchema } from "./detail-tabs.schema";
-import { governedKanbanBoardConfigurationSchema } from "./kanban-board.schema";
-import { emptyStateSchema } from "./list-surface.schema";
-import { listSurfaceRendererConfigurationSchema } from "./list-surface-renderer.schema";
-import { governedMultiStepFormConfigurationSchema } from "./multi-step-form.schema";
-import { governedScorecardFormConfigurationSchema } from "./scorecard-form.schema";
+import { governedDetailTabsSchema } from "./gov-detail-tabs-schema";
+import { governedKanbanBoardConfigurationSchema } from "./gov-kanban-board-schema";
+import { emptyStateSchema } from "./gov-list-surface-schema";
+import { listSurfaceRendererConfigurationSchema } from "./gov-list-surface-renderer-schema";
+import { governedMultiStepFormConfigurationSchema } from "./gov-multi-step-form-schema";
+import { governedScorecardFormConfigurationSchema } from "./gov-scorecard-form-schema";
 import { governedSectionConfigurationSchema } from "./gov-section-schema";
 import { governedStackConfigurationSchema } from "./gov-stack-schema";
-import { statCardConfigurationSchema } from "./stat-card.schema";
+import { statCardConfigurationSchema } from "./gov-stat-card-schema";
 
 export const GOVERNED_COMPONENT_SCHEMA_ID = "governed.component" as const;
 

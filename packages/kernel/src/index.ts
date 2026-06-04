@@ -2,7 +2,7 @@
  * FROZEN compat surface (ARCH-1002 §6.2). Bugfix-only — do not add module business logic,
  * list surfaces, or HITL here. New modules: @afenda/feature-* + @afenda/kernel/server.
  */
-import type { AppCapability, OrganizationRole } from "@afenda/auth";
+import type { AppCapability, OrganizationRole } from "./ker-app-capabilities";
 import {
   listAiUsageEvents,
   getTenantWorkItem,
@@ -31,32 +31,48 @@ import {
 import type {
   AuditPanelModel,
   AuditPanelRow,
-} from "@afenda/governed-surface/schemas";
-import { resolveModuleMetrics } from "./shared/module-metrics";
+} from "./ker-governed-surface-contract";
+import { resolveModuleMetrics } from "./ker-module-metrics";
 import type { ModuleId } from "@afenda/config/module-ids";
-import type { ModuleDataMode } from "./shared/workspace-data-mode";
+import type { ModuleDataMode } from "./ker-workspace-data-mode";
 import {
   toRecordWindowQuery,
   toDocumentWindowQuery,
   toDocumentActivityWindowQuery,
   toWorkItemWindowQuery,
   type ModuleWorkspaceListQuery,
-} from "./shared/module-workspace-query";
+} from "./ker-module-workspace-query";
 import {
   formatErpDateTime,
   formatErpFileSize,
   formatErpMoneyFromMinorUnits,
-} from "./shared/erp-formatting";
-import { parseRecordTypeExtension } from "./modules/record-types";
+} from "./ker-erp-formatting";
+import { parseRecordTypeExtension } from "./ker-record-types";
 
-export { resolveModuleMetrics } from "./shared/module-metrics";
+export { resolveModuleMetrics } from "./ker-module-metrics";
 export {
   formatErpDateTime,
   formatErpFileSize,
   formatErpMoneyFromMinorUnits,
   formatErpNumber,
-} from "./shared/erp-formatting";
+} from "./ker-erp-formatting";
 
+export {
+  appCapabilities,
+  documentReadCapability,
+  documentWriteCapability,
+  getActiveOrganization,
+  getCapabilitiesForOrganizationRole,
+  hasDocumentReadAccess,
+  hasDocumentWriteAccess,
+  isAppCapability,
+  isOrganizationRole,
+  organizationRoles,
+  type AppCapability,
+  type OrganizationRole,
+  type OrganizationSummary,
+  type UserSession,
+} from "./ker-app-capabilities";
 export {
   approvalToolModuleIds,
   coreModuleIds,
@@ -79,7 +95,7 @@ export {
   dashboardHardeningChecklistSurfaceKey,
   getDashboardListSurfaceKeys,
   getModuleListSurfaceKeys,
-} from "./modules/list-surfaces";
+} from "./ker-list-surfaces";
 export {
   buildDashboardKpiStatGrid,
   buildDashboardWorkflowSummaryStatGrid,
@@ -91,36 +107,36 @@ export {
   getModuleOverviewStatSurfaceKey,
   getModuleStatSurfaceKey,
   type ResolvedMetric,
-} from "./modules/stat-surfaces";
+} from "./ker-stat-surfaces";
 export {
   auditRowsFromPanel,
   buildRecordDetailTabs,
   buildWorkItemDetailTabs,
-} from "./modules/detail-surfaces";
+} from "./ker-detail-surfaces";
 export {
   buildDashboardHardeningChart,
   buildModuleObservabilityChart,
   dashboardHardeningChartSurfaceKey,
   getModuleObservabilityChartSurfaceKey,
-} from "./modules/chart-surfaces";
+} from "./ker-chart-surfaces";
 export {
   buildModuleWorkItemKanbanSurface,
   getModuleWorkItemKanbanSurfaceKey,
-} from "./modules/kanban-surfaces";
-export { buildDocumentExtractionFormMetadata } from "./modules/form-surfaces";
+} from "./ker-kanban-surfaces";
+export { buildDocumentExtractionFormMetadata } from "./ker-form-surfaces";
 export {
   createModuleFeatureMetadata,
   isCoreModuleId,
   type CoreModuleId,
   type ModuleFeatureMetadata,
-} from "./modules/feature-metadata";
+} from "./ker-feature-metadata";
 export {
   resolveModuleWorkspaceListQuery,
   toDocumentActivityWindowQuery,
   toDocumentWindowQuery,
   type ModuleWorkspaceListQuery,
   type ModuleWorkspaceSearchParams,
-} from "./shared/module-workspace-query";
+} from "./ker-module-workspace-query";
 export {
   fallbackModuleRecordColumns,
   getModuleRecordTypeDefinitions,
@@ -136,12 +152,12 @@ export {
   type RecordTypeListDefinition,
   type RecordTypeRouteDefinition,
   type RecordTypeSortDefinition,
-} from "./modules/record-types";
+} from "./ker-record-types";
 export {
   describeWorkspaceDataSource,
   resolveWorkspaceDataMode,
   type ModuleDataMode,
-} from "./shared/workspace-data-mode";
+} from "./ker-workspace-data-mode";
 export {
   getModuleObservabilityIndicators,
   type ModuleObservabilityIndicator,
@@ -149,8 +165,8 @@ export {
 export {
   getAssistantEmptyStateHint,
   getAssistantPromptDefinitions,
-} from "./modules/assistant-prompts";
-export type { AssistantPromptDefinition } from "./modules/assistant-prompts";
+} from "./ker-assistant-prompts";
+export type { AssistantPromptDefinition } from "./ker-assistant-prompts";
 export {
   appBrandName,
   dashboardRouteMetrics,
@@ -163,7 +179,7 @@ export {
   erpAssistantPanelCopy,
   documentWorkflowCopy,
   routeErrorCopy,
-} from "./shell/route-copy-metadata";
+} from "./ker-route-copy-metadata";
 export {
   appRootMetadataCopy,
   authApiRouteCopy,
@@ -187,7 +203,7 @@ export {
   signUpEnvironmentCopy,
   uploadRouteCopy,
   type AuthPageMetadataKey,
-} from "./shell/auth-route-copy";
+} from "./ker-auth-route-copy";
 export type {
   ErpModuleDefinition,
   BusinessProblemType,
@@ -200,14 +216,14 @@ export type {
   RecoveryPlaybookIconKey,
   SolutionWorkflowId,
   WorkflowAutomationDefinition,
-} from "./shared/module-types";
+} from "./ker-module-types";
 export {
   businessProblemTypes,
   getBusinessProblemTypeLabels,
   getSolutionToolModuleBindings,
   solutionToolModuleBindings,
   solutionWorkflowIds,
-} from "./modules/solution-playbooks";
+} from "./ker-solution-playbooks";
 import {
   erpModules,
   getErpModuleById,
@@ -224,25 +240,25 @@ export {
 export {
   applyTenantModuleAvailability,
   type TenantModuleAvailabilitySetting,
-} from "./modules/tenant-module-availability";
+} from "./ker-tenant-module-availability";
 export {
   applyTenantCapabilityAvailability,
   applyTenantNavigationAvailability,
   type TenantCapabilityAvailabilitySetting,
-} from "./modules/tenant-availability";
+} from "./ker-tenant-availability";
 export {
   getNavigationExtensions,
   getNavigationExtensionById,
   navigationExtensions,
-} from "./shell/navigation-extensions";
+} from "./ker-navigation-extensions";
 export {
   getRecoveryConsoleModuleIds,
   getRecoveryPlaybookByProblemType,
   getRecoveryPlaybookDefinitions,
   getWorkflowAutomationDefinitions,
-} from "./modules/workflow-metadata";
-export { getResolvedWorkflowAutomationRuns } from "./shared/workflow-resolution";
-import type { ErpModuleDefinition, ModuleMetric } from "./shared/module-types";
+} from "./ker-workflow-metadata";
+export { getResolvedWorkflowAutomationRuns } from "./ker-workflow-resolution";
+import type { ErpModuleDefinition, ModuleMetric } from "./ker-module-types";
 
 export type ModuleWorkspaceRecord = {
   id: string;
@@ -328,7 +344,7 @@ export type ModuleWorkspaceDocumentActivityEvent = {
 
 export type ModuleWorkspace = {
   module: ErpModuleDefinition;
-  dataMode: import("./shared/workspace-data-mode").ModuleDataMode;
+  dataMode: import("./ker-workspace-data-mode").ModuleDataMode;
   fallbackApplied: boolean;
   records: readonly ModuleWorkspaceRecord[];
   recordWindow: ModuleWorkspaceWindow;

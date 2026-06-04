@@ -11,9 +11,9 @@ import {
 } from "@afenda/governed-surface/schemas";
 import { describe, expect, it } from "vitest";
 import { buildAuditPanelModel } from "../../src/index";
-import { buildDashboardHardeningChart } from "../../src/modules/chart-surfaces";
-import { buildDocumentExtractionFormMetadata } from "../../src/modules/form-surfaces";
-import { buildModuleWorkItemKanbanSurface } from "../../src/modules/kanban-surfaces";
+import { buildDashboardHardeningChart } from "../../src/ker-chart-surfaces";
+import { buildDocumentExtractionFormMetadata } from "../../src/ker-form-surfaces";
+import { buildModuleWorkItemKanbanSurface } from "../../src/ker-kanban-surfaces";
 import {
   buildDashboardAutomationListSurface,
   buildDashboardHardeningChecklistSurface,
@@ -24,17 +24,17 @@ import {
   buildModuleRecordListSurface,
   buildModuleWorkItemListSurface,
   buildSavedViewsListSurface,
-} from "../../src/modules/list-surfaces";
+} from "../../src/ker-list-surfaces";
 import {
   buildDashboardWorkflowSummaryStatGrid,
   buildModuleScreenOverviewStatGrid,
   buildModuleWorkspaceCountStatGrid,
   buildModuleWorkspaceStatGrid,
-} from "../../src/modules/stat-surfaces";
+} from "../../src/ker-stat-surfaces";
 import {
   buildRecordDetailTabs,
   buildWorkItemDetailTabs,
-} from "../../src/modules/detail-surfaces";
+} from "../../src/ker-detail-surfaces";
 
 // ─── Shared fixtures ──────────────────────────────────────────────────────────
 

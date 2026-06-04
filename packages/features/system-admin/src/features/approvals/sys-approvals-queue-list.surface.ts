@@ -5,15 +5,15 @@ import {
 } from "@afenda/governed-surface";
 import type { ModuleWorkspaceListQuery } from "@afenda/kernel";
 
-import type { SystemAdminApprovalQueueListRow } from "../contracts/system-admin.approvals-queue.contract";
+import type { SystemAdminApprovalQueueListRow } from "./sys-approvals-queue.contract";
 import {
   applySystemAdminApprovalQueueToolbarState,
   buildSystemAdminApprovalQueuePagination,
   buildSystemAdminApprovalsQueueListColumns,
   mapApprovalQueueRowToListSurfaceRow,
   type SystemAdminApprovalQueueWindow,
-} from "./system-admin.approvals-queue-list.shared";
-import { systemAdminApprovalsUiCopy } from "./system-admin.approvals-ui.copy.shared";
+} from "./sys-approvals-queue-list.shared";
+import { systemAdminApprovalsUiCopy } from "./sys-approvals-ui.copy.shared";
 
 export const systemAdminApprovalsQueueSurfaceKey =
   "system-admin.approvals.queue.list";

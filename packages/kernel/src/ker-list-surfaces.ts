@@ -5,18 +5,18 @@ import {
   resolveListSurfaceRowTrailingAction,
   type ListSurfaceToolbar,
   type ListSurfaceRendererConfigurationResolvedInput,
-} from "@afenda/governed-surface";
-import type { ModuleWorkspaceListQuery } from "../shared/module-workspace-query";
+} from "./ker-governed-surface-contract";
+import type { ModuleWorkspaceListQuery } from "./ker-module-workspace-query";
 import {
   getModuleRecordTypeDefinitions,
   resolveModuleRecordListDefinition,
   resolveRecordTypeRowHref,
   resolveRecordTypeTrailingAction,
-} from "./record-types";
+} from "./ker-record-types";
 import {
   dashboardRouteSections,
   moduleScreenSections,
-} from "../shell/route-copy-metadata";
+} from "./ker-route-copy-metadata";
 
 type AiUsageListRow = {
   id: string;
@@ -168,7 +168,7 @@ const WORK_ITEM_TOOLBAR = {
   },
   resetParams: ["workItemsCursor"],
   columnPicker: true,
-} as const satisfies ListSurfaceToolbar;
+} satisfies ListSurfaceToolbar;
 
 function moduleSurfaceKey(moduleId: ModuleId, kind: "records" | "work-items") {
   return `${moduleId}.${kind}.list`;
@@ -527,7 +527,7 @@ export function buildModuleWorkItemListSurface(input: {
         title: moduleScreenSections.workflowQueue.description,
       },
     },
-    columns: MODULE_WORK_ITEM_COLUMNS,
+    columns: [...MODULE_WORK_ITEM_COLUMNS],
     rows: rows.map((item) => ({
       id: item.id,
       rowHref: buildWorkItemHref({
@@ -600,7 +600,7 @@ export function buildDashboardWorkflowListSurface(input: {
         title: "No active queue items",
       },
     },
-    columns: DASHBOARD_WORKFLOW_COLUMNS,
+    columns: [...DASHBOARD_WORKFLOW_COLUMNS],
     rows: rows.map((item) => ({
       id: item.id,
       rowHref: buildWorkItemHref({
@@ -654,7 +654,7 @@ export function buildDashboardAiUsageListSurface(input: {
         title: dashboardRouteSections.aiAssistant.aiUsageLedger.emptyRow[0],
       },
     },
-    columns: DASHBOARD_AI_USAGE_COLUMNS,
+    columns: [...DASHBOARD_AI_USAGE_COLUMNS],
     rows: rows.map((event) => ({
       id: event.id,
       cells: {
@@ -785,7 +785,7 @@ export function buildSavedViewsListSurface(input: {
         title: "No saved views are configured for this route yet.",
       },
     },
-    columns: SAVED_VIEWS_COLUMNS,
+    columns: [...SAVED_VIEWS_COLUMNS],
     rows: rows.map((view) => ({
       id: view.id,
       cells: {
@@ -845,7 +845,7 @@ export function buildDashboardAutomationListSurface(input: {
         title: "No scheduled automations are active.",
       },
     },
-    columns: AUTOMATION_RUN_COLUMNS,
+    columns: [...AUTOMATION_RUN_COLUMNS],
     rows: rows.map((run) => ({
       id: run.id,
       cells: {
@@ -1120,7 +1120,7 @@ export function buildDocumentRegistryListSurface(input: {
         title: moduleScreenSections.documents.emptyState,
       },
     },
-    columns: DOCUMENT_REGISTRY_COLUMNS,
+    columns: [...DOCUMENT_REGISTRY_COLUMNS],
     rows: rows.map((doc) =>
       mapDocumentRegistryRowCells({
         doc,
@@ -1162,7 +1162,7 @@ export function buildDocumentQuarantineInboxListSurface(input: {
         title: "No quarantined documents.",
       },
     },
-    columns: DOCUMENT_REGISTRY_COLUMNS,
+    columns: [...DOCUMENT_REGISTRY_COLUMNS],
     rows: rows.map((doc) =>
       mapDocumentRegistryRowCells({
         doc,
@@ -1231,7 +1231,7 @@ export function buildDocumentActivityLinesListSurface(input: {
         title: "No document activity recorded yet.",
       },
     },
-    columns: DOCUMENT_ACTIVITY_COLUMNS,
+    columns: [...DOCUMENT_ACTIVITY_COLUMNS],
     rows: rows.map((event) => ({
       id: event.id,
       cells: {

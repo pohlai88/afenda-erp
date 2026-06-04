@@ -1,7 +1,7 @@
 import type { ZodType } from "zod";
 
-import type { KnowledgeSourceKind } from "./knowledge.core.contract";
-import type { RawKnowledgeDocument } from "./knowledge.retrieval.contract";
+import type { KnowledgeSourceKind } from "./kno-core.contract";
+import type { RawKnowledgeDocument } from "./kno-retrieval.contract";
 
 export type KnowledgeSourceAdapterContext = {
   organizationId: string;

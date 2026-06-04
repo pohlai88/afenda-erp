@@ -1,4 +1,4 @@
-import type { UserSession } from "@afenda/auth";
+import type { UserSession } from "./ker-app-capabilities";
 
 export type ExecutionActorType = "user" | "system" | "agent";
 

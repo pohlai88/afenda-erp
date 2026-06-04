@@ -14,7 +14,7 @@ import {
   resolveWorkEligibilityListTrailingAction,
   deriveCorrectiveActionDuePosture,
   resolveCorrectiveActionDueBadgeTone,
-} from "../../src/employee-management/compliance-regulatory-tracking/surface/hr.workforce.compliance-list.shared";
+} from "../../src/employee-management/compliance-regulatory-tracking/hr.workforce.compliance-list.shared";
 
 describe("compliance list EUI tone helpers", () => {
   it("maps archived obligations to attention row tone", () => {

@@ -3,12 +3,12 @@ import {
   type ExecutionAuditDbInput,
   type ExecutionAuditEvent,
   type NormalizedExecutionAuditEvent,
-} from "./execution-audit.types";
-import { buildExecutionAuditDiff } from "./execution-audit-diff";
+} from "./ker-execution-audit-types";
+import { buildExecutionAuditDiff } from "./ker-execution-audit-diff";
 import {
   redactExecutionAuditDiff,
   redactExecutionAuditRecord,
-} from "./execution-audit-redaction";
+} from "./ker-execution-audit-redaction";
 
 const auditEntityTypeByTargetType: Record<string, AuditEntityType> = {
   organization: "organization",

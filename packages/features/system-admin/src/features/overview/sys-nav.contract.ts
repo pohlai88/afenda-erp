@@ -1,5 +1,5 @@
-import type { AppCapability } from "@afenda/auth";
-import { systemAdminRoutePaths } from "./system-admin.route-paths.contract";
+import type { AppCapability } from "@afenda/kernel";
+import { systemAdminRoutePaths } from "./sys-route-paths.contract";
 
 type SystemAdminNavCapability = Extract<AppCapability, `system-admin.${string}`>;
 

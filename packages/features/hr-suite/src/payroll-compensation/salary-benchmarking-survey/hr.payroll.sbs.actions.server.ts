@@ -15,13 +15,13 @@ import {
   hrSbsSubmitMappingSchema,
 } from "./hr.payroll.sbs-mapping.schema";
 import { hrSbsSurveyUploadSchema } from "./hr.payroll.sbs-survey-upload.schema";
-import { runHrSbsCompensationAnalysis } from "./hr.payroll.sbs-analysis.server";
+import { runHrSbsCompensationAnalysis } from "./hrs-hr-payroll-sbs-analysis-server";
 import {
   createHrSbsBenchmarkMapping,
   reviewHrSbsBenchmarkMapping,
   submitHrSbsBenchmarkMapping,
-} from "./hr.payroll.sbs-mapping.server";
-import { uploadHrSbsSurveyData } from "./hr.payroll.sbs-survey-data.server";
+} from "./hrs-hr-payroll-sbs-mapping-server";
+import { uploadHrSbsSurveyData } from "./hrs-hr-payroll-sbs-survey-data-server";
 import { buildHrSbsBenchmarkReportCsv } from "./hr.payroll.sbs-reports.shared";
 
 export async function uploadHrSbsSurveyAction(input: unknown) {

@@ -3,7 +3,7 @@ import { Badge } from "@afenda/ui";
 import type {
   ApprovalReadinessVerdict,
   SystemAdminApprovalRuleStatus,
-} from "../contracts/system-admin.approval-rule.contract";
+} from "./sys-approval-rule.contract";
 import {
   resolveSystemAdminApprovalEnabledBadgePresentation,
   resolveSystemAdminApprovalReadinessBadgePresentation,
@@ -11,7 +11,7 @@ import {
   systemAdminApprovalEnabledBadgeAriaLabel,
   systemAdminApprovalReadinessBadgeAriaLabel,
   systemAdminApprovalStatusBadgeAriaLabel,
-} from "../surface/system-admin.approvals-detail-badges.shared";
+} from "./sys-approvals-detail-badges.shared";
 
 export function SystemAdminApprovalStatusBadge({
   status,

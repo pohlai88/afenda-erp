@@ -1,5 +1,5 @@
 import { SectionPanel } from "@afenda/ui";
-import { systemAdminOrganizationUiCopy } from "../surface/system-admin.organization-ui.copy.shared";
+import { systemAdminOrganizationUiCopy } from "./sys-organization-ui.copy.shared";
 
 export function SystemAdminOrganizationAccessDenied() {
   const copy = systemAdminOrganizationUiCopy;

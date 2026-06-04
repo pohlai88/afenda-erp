@@ -8,7 +8,7 @@ import {
   hrBenefitEnrollmentContributions,
   hrBenefitEnrollments,
   hrBenefitPlans,
-} from "./hr-benefits";
+} from "./dbx-hr-benefits";
 import { hrEmployees } from "./hr";
 import { formatEmployeeLabel } from "./hr-benefits.shared";
 
@@ -315,3 +315,4 @@ export async function markHrBenefitDeductionRefsSyncedInTx(
 
   return { syncedCount: input.deductionReferenceIds.length };
 }
+

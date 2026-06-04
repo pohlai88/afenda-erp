@@ -1,6 +1,6 @@
-import { recordLynxRunFeedbackDomain } from "../domain/lynx.record-run-feedback.domain.server";
-import { assertLynxRunFeedbackAccess } from "../policies/lynx.run-feedback-access.policy.server";
-import type { LynxLiveRunFeedbackRequest } from "./lyn-run-feedback-schema";
+import { recordLynxRunFeedbackDomain } from "./lyn-record-run-feedback.domain.server";
+import { assertLynxRunFeedbackAccess } from "./lyn-run-feedback-access.policy.server";
+import type { LynxLiveRunFeedbackRequest } from "./lyn-run-feedback.schema";
 
 export async function executeLynxRecordRunFeedbackCommand(input: {
   organizationId: string;

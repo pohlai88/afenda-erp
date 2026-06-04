@@ -18,17 +18,17 @@ import {
   SelectValue,
 } from "@afenda/ui/select";
 import { Textarea } from "@afenda/ui/textarea";
+import { GovernedEmpty } from "./gov-governed-empty";
 import {
-  GovernedEmpty,
   resolveFormFieldRuleState,
   type FormRuleValues,
-} from "./client";
-import { ActionFormErrors } from "../../components/action-form-errors";
-import { governedRendererCopy } from "../i18n/governed-renderer-copy.shared";
+} from "./form-rules.evaluate.shared";
+import { ActionFormErrors } from "./gov-action-form-errors";
+import { governedRendererCopy } from "./gov-governed-renderer-copy-shared";
 import {
   GovernedFileUploadField,
   resolveGovernedFormModuleId,
-} from "./governed-file-upload-field.client";
+} from "./gov-governed-file-upload-field-client";
 import type {
   GovernedFormField,
   GovernedMultiStepFormConfiguration,

@@ -1,6 +1,6 @@
 import type { TenantAuditLogSearchFilters } from "@afenda/db";
 
-import type { SystemAdminAuditSearchParams } from "../schemas/system-admin.audit-filter.schema";
+import type { SystemAdminAuditSearchParams } from "./sys-audit-filter.schema";
 
 export function parseAuditFilterDate(value: string | undefined) {
   if (!value) {

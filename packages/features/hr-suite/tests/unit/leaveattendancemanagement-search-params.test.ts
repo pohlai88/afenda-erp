@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { parseHrLamSearchParams } from "../../src/time-attendance/leave-attendance-management/data/hr.time.lam-search-params.parse.shared";
+import { parseHrLamSearchParams } from "../../src/time-attendance/leave-attendance-management/hr.time.lam-search-params.parse.shared";
 
 describe("hr lam search params", () => {
   it("returns empty object when search params are undefined", () => {

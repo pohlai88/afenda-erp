@@ -4,8 +4,8 @@ import {
   HR_INDUSTRY_UCB_ACCEPTANCE_CRITERIA_COVERAGE,
   HR_INDUSTRY_UCB_REQUIREMENT_COVERAGE,
   assertHrIndustryUcbEnterpriseCoverage,
-} from "../../src/industry-specific/union-management/data/hr.industry.ucb-coverage.shared";
-import { hrIndustryUcbAuditActions } from "../../src/industry-specific/union-management/events/hr.industry.ucb.event";
+} from "../../src/industry-specific/union-management/hr.industry.ucb-coverage.shared";
+import { hrIndustryUcbAuditActions } from "../../src/industry-specific/union-management/hr.industry.ucb.event";
 
 describe("HRM-UCB-001..030 coverage registry", () => {
   it("registers all thirty requirements as shipped", () => {

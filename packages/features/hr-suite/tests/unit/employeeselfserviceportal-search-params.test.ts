@@ -3,12 +3,12 @@ import { describe, expect, it } from "vitest";
 import {
   parseHrWorkforceEssSearchParams,
   toHrWorkforceEssPageModelInput,
-} from "../../src/employee-management/employee-selfservice-portal/data/hr.workforce.ess-search-params.parse.shared";
+} from "../../src/employee-management/employee-selfservice-portal/hr.workforce.ess-search-params.parse.shared";
 import {
   HR_WORKFORCE_ESS_LIST_SEARCH_PARAM_MODEL_FIELDS,
   HR_WORKFORCE_ESS_LIST_SEARCH_PARAMS_BY_KEY,
   HR_WORKFORCE_ESS_LIST_SURFACE_KEYS,
-} from "../../src/employee-management/employee-selfservice-portal/surface/hr.workforce.ess-surface-metadata.shared";
+} from "../../src/employee-management/employee-selfservice-portal/hr.workforce.ess-surface-metadata.shared";
 
 describe("Employee Self-Service Portal search params", () => {
   it("parses and trims ESS list, grouping, and status params", () => {

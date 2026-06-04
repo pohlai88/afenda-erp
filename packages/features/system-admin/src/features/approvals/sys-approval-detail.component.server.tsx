@@ -19,20 +19,20 @@ import {
   TableRow,
 } from "@afenda/ui";
 import Link from "next/link";
-import { systemAdminControlLinks } from "../../overview/contracts/system-admin.control-links.contract";
+import { systemAdminControlLinks } from "../overview/sys-control-links.contract";
 import type {
   ApprovalEscalationBehavior,
   SystemAdminApprovalMode,
   SystemAdminApprovalRuleDetail,
-} from "../contracts/system-admin.approval-rule.contract";
-import { systemAdminApprovalsUiCopy } from "../surface/system-admin.approvals-ui.copy.shared";
+} from "./sys-approval-rule.contract";
+import { systemAdminApprovalsUiCopy } from "./sys-approvals-ui.copy.shared";
 import {
   SystemAdminApprovalEnabledBadge,
   SystemAdminApprovalReadinessBadge,
   SystemAdminApprovalStatusBadge,
-} from "./system-admin.approvals-detail-badges.component.server";
-import { SystemAdminApprovalReactivateControl } from "./system-admin.approval-reactivate.component.client";
-import type { SystemAdminActionResult } from "../../tenant-execution/contracts/system-admin.action-result.contract";
+} from "./sys-approvals-detail-badges.component.server";
+import { SystemAdminApprovalReactivateControl } from "./sys-approval-reactivate.component.client";
+import type { SystemAdminActionResult } from "../tenant-execution/sys-action-result.contract";
 
 type ReactivateAction = (input: {
   approvalKey: string;

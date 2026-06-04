@@ -1,9 +1,9 @@
-import { systemAdminControlLinks } from "../../overview/contracts/system-admin.control-links.contract";
-import { systemAdminRoutePaths } from "../../overview/contracts/system-admin.route-paths.contract";
+import { systemAdminControlLinks } from "../overview/sys-control-links.contract";
+import { systemAdminRoutePaths } from "../overview/sys-route-paths.contract";
 import type {
   SystemAdminDiagnosticCategory,
   SystemAdminDiagnosticTargetType,
-} from "./system-admin.diagnostic-issue.contract";
+} from "./sys-diagnostic-issue.contract";
 
 export function resolveSystemAdminDiagnosticTargetHref(input: {
   targetType: SystemAdminDiagnosticTargetType;

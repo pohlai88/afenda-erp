@@ -1,16 +1,12 @@
 import { hasExecutionPermission } from "@afenda/kernel/execution";
 
-import {
-  createApiCredentialFormAction,
-  createWebhookFormAction,
-  upsertSsoConnectionFormAction,
-} from "../actions";
-import { buildSystemAdminIntegrationsPageModel } from "../data";
+import { createApiCredentialFormAction, createWebhookFormAction, upsertSsoConnectionFormAction } from "./sys-integrations.actions.server";
+import { buildSystemAdminIntegrationsPageModel } from "./sys-integrations.page-model.server";
 import { requireSystemAdminIntegrationsRead } from "./sys-integrations.policy.server";
 import {
   SystemAdminIntegrationsAccessDenied,
   SystemAdminIntegrationsSection,
-} from "./system-admin.integrations-section.component.server";
+} from "./sys-integrations-section.component.server";
 
 export async function SystemAdminIntegrationsPage() {
   try {

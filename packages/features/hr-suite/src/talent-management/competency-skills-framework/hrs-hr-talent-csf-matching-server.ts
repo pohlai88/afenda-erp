@@ -5,7 +5,7 @@ import {
   listHrCsfRoleRequirementsFromStore,
   proficiencyIndex,
 } from "./hr.talent.csf-store.shared";
-import { emitHrCsfAuditTrailEvent } from "./hr.talent.csf-audit.server";
+import { emitHrCsfAuditTrailEvent } from "./hrs-hr-talent-csf-audit-server";
 import { hrTalentCsfAuditActions } from "./hr.talent.csf-audit.event";
 
 type MatchQuery = {

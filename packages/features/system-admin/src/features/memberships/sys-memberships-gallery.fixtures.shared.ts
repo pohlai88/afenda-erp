@@ -1,4 +1,4 @@
-import type { SystemAdminMembershipRow } from "../contracts";
+import type { SystemAdminMembershipRow } from "./sys-memberships.contract";
 
 export const systemAdminMembershipsGalleryRows: readonly SystemAdminMembershipRow[] =
   [

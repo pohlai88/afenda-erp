@@ -6,7 +6,7 @@ vi.mock("server-only", () => ({}));
 import {
   GovernedPatternBStatSection,
   type GovernedPatternBStatGroup,
-} from "../../src/components/governed-pattern-b-stat-section";
+} from "../../src/gov-governed-pattern-b-stat-section";
 
 const statGroup: GovernedPatternBStatGroup = {
   groupKey: "operations",

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { formatSystemAdminListPreview } from "../../src/overview/components/system-admin.list-preview.shared";
-import { systemAdminUserStatusBadgeVariant } from "../../src/users/surface/system-admin.users-status-badge.shared";
+import { formatSystemAdminListPreview } from "../../src/features/overview/sys-list-preview.shared";
+import { systemAdminUserStatusBadgeVariant } from "../../src/features/users/sys-users-status-badge.shared";
 
 describe("system admin list preview formatter", () => {
   it("returns empty label when no values", () => {

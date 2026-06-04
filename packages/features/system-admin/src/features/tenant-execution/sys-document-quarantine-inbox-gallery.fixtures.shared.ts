@@ -1,4 +1,4 @@
-import type { SystemAdminDocumentQuarantineInboxRow } from "./system-admin.document-quarantine-inbox.read-model.server";
+import type { SystemAdminDocumentQuarantineInboxRow } from "./sys-document-quarantine-inbox.read-model.server";
 
 export const systemAdminDocumentQuarantineInboxSurfaceKey =
   "system-admin.documents.quarantine-inbox";

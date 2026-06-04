@@ -1,13 +1,13 @@
 import type { ReactNode } from "react";
 
-import { diagnosticsDataAttributes } from "../utils/governed-diagnostics.shared";
-import { GovernedHeading } from "../utils/governed-heading.shared";
+import { diagnosticsDataAttributes } from "./gov-governed-diagnostics-shared";
+import { GovernedHeading } from "./gov-governed-heading-shared";
 import {
   governedDescriptionId,
   governedHeadingId,
   governedIdentityAttributes,
   governedTestId,
-} from "../utils/governed-identity.shared";
+} from "./gov-governed-identity-shared";
 
 export type ModulePageHeaderProps = {
   title: ReactNode;

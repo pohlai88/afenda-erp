@@ -12,7 +12,7 @@ vi.mock(
   async (importOriginal) => {
     const actual =
       await importOriginal<
-        typeof import("../../src/audit-viewer/policies/system-admin.audit-viewer.policy.server")
+        typeof import("../../src/features/audit-viewer/sys-audit-viewer.policy.server")
       >();
     return {
       ...actual,
@@ -105,15 +105,15 @@ const reviewGuardContext = {
 };
 
 describe("system admin audit viewer", () => {
-  let exportSystemAdminAuditLogsAction: typeof import("../../src/audit-viewer/actions/system-admin.audit.actions.server").exportSystemAdminAuditLogsAction;
-  let upsertSystemAdminRetentionPolicyAction: typeof import("../../src/audit-viewer/actions/system-admin.audit.actions.server").upsertSystemAdminRetentionPolicyAction;
+  let exportSystemAdminAuditLogsAction: typeof import("../../src/features/audit-viewer/sys-audit.actions.server").exportSystemAdminAuditLogsAction;
+  let upsertSystemAdminRetentionPolicyAction: typeof import("../../src/features/audit-viewer/sys-audit.actions.server").upsertSystemAdminRetentionPolicyAction;
 
   beforeAll(async () => {
     ({
       exportSystemAdminAuditLogsAction,
       upsertSystemAdminRetentionPolicyAction,
     } = await import(
-      "../../src/audit-viewer/actions/system-admin.audit.actions.server"
+      "../../src/features/audit-viewer/sys-audit.actions.server"
     ));
   });
 
@@ -130,7 +130,7 @@ describe("system admin audit viewer", () => {
     mockRequireAuditRead.mockRejectedValue(new Error("Forbidden"));
 
     const { requireSystemAdminAuditRead } = await import(
-      "../../src/audit-viewer/policies/system-admin.audit-viewer.policy.server"
+      "../../src/features/audit-viewer/sys-audit-viewer.policy.server"
     );
 
     await expect(requireSystemAdminAuditRead()).rejects.toThrow("Forbidden");
@@ -227,7 +227,7 @@ describe("system admin audit viewer", () => {
 
   it("skips list-view audit on paginated pages", async () => {
     const { shouldRecordSystemAdminAuditListView } = await import(
-      "../../src/audit-viewer/data/system-admin.audit-view-event.server"
+      "../../src/features/audit-viewer/sys-audit-view-event.server"
     );
 
     expect(shouldRecordSystemAdminAuditListView({ auditPage: 1, auditPageSize: 25 })).toBe(
@@ -240,7 +240,7 @@ describe("system admin audit viewer", () => {
 
   it("redacts sensitive metadata keys", async () => {
     const { redactAuditMetadata } = await import(
-      "../../src/audit-viewer/data/system-admin.audit-metadata.redact.shared"
+      "../../src/features/audit-viewer/sys-audit-metadata.redact.shared"
     );
 
     const redacted = redactAuditMetadata({
@@ -254,7 +254,7 @@ describe("system admin audit viewer", () => {
 
   it("orders evidence timeline chronologically", async () => {
     const { listSystemAdminAuditTargetTimeline } = await import(
-      "../../src/audit-viewer/data/system-admin.audit.query.server"
+      "../../src/features/audit-viewer/sys-audit.query.server"
     );
 
     mockSearchAudit.mockResolvedValue({
@@ -308,7 +308,7 @@ describe("system admin audit viewer", () => {
 
   it("scopes audit search to the organization", async () => {
     const { searchSystemAdminAuditEvents } = await import(
-      "../../src/audit-viewer/data/system-admin.audit.query.server"
+      "../../src/features/audit-viewer/sys-audit.query.server"
     );
 
     await searchSystemAdminAuditEvents({

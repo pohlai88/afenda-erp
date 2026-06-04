@@ -1,4 +1,4 @@
-import { organizationRoles } from "@afenda/auth";
+import { organizationRoles } from "@afenda/kernel";
 import { z } from "zod";
 import {
   APPROVAL_RULE_DELEGATION_VALID_DAYS_MAX,
@@ -11,7 +11,7 @@ import {
   APPROVAL_RULE_MIN_APPROVALS_MIN,
   APPROVAL_RULE_NAME_MAX_LENGTH,
   APPROVAL_RULE_ROLE_KEYS_INPUT_MAX_LENGTH,
-} from "../contracts/system-admin.approval-rule.limits.shared";
+} from "./sys-approval-rule.limits.shared";
 
 const booleanFormSchema = z
   .enum(["true", "false"])

@@ -1,13 +1,13 @@
 import type { ListSurfaceRendererConfigurationResolvedInput } from "@afenda/governed-surface";
-import { systemAdminControlLinks } from "../../overview/contracts/system-admin.control-links.contract";
-import { systemAdminRoutePaths } from "../../overview/contracts/system-admin.route-paths.contract";
+import { systemAdminControlLinks } from "../overview/sys-control-links.contract";
+import { systemAdminRoutePaths } from "../overview/sys-route-paths.contract";
 import {
   buildLinkedControlListSurface,
   catalogStatusBadge,
   linkCell,
-} from "../../overview/surfaces/system-admin.control-list.shared";
+} from "../overview/sys-control-list.shared";
 import type { SystemAdminRoleRow } from "./sys-roles.contract";
-import { systemAdminRolesUiCopy } from "../surface/system-admin.roles-ui.copy.shared";
+import { systemAdminRolesUiCopy } from "./sys-roles-ui.copy.shared";
 
 export const systemAdminRolesSurfaceKey = "system-admin.roles.list";
 

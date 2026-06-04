@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { parseHrTimeClockSearchParams } from "../../src/time-attendance/time-clock-integration/data/hr.time.clock-integration-search-params.parse.shared";
+import { parseHrTimeClockSearchParams } from "../../src/time-attendance/time-clock-integration/hr.time.clock-integration-search-params.parse.shared";
 
 describe("timeclockintegration search params", () => {
   it("parses legacy timeClockSearch fallback", () => {

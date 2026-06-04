@@ -1,5 +1,5 @@
-import type { AppCapability } from "@afenda/auth";
-import type { SystemAdminPermissionRiskLevel } from "./system-admin.permissions.contract";
+import type { AppCapability } from "@afenda/kernel";
+import type { SystemAdminPermissionRiskLevel } from "./sys-permissions.contract";
 
 /** Permissions that must not be stripped from owner/admin roles via overrides. */
 export const systemAdminProtectedAdminPermissions = [

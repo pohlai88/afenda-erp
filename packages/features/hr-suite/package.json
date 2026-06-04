@@ -14,7 +14,9 @@
         "time-attendance",
         "hr-suite-integration"
       ],
-      "flatAtFeatureRoot": ["hr-suite-integration"]
+      "flatAtFeatureRoot": [
+        "hr-suite-integration"
+      ]
     }
   },
   "exports": {
@@ -47,6 +49,7 @@
     "@afenda/object-storage": "workspace:*",
     "@afenda/ui": "workspace:*",
     "drizzle-orm": "catalog:",
+    "server-only": "^0.0.1",
     "zod": "catalog:"
   },
   "scripts": {

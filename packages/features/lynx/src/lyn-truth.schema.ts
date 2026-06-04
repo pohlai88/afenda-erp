@@ -2,7 +2,7 @@ import { z } from "zod";
 import {
   lynxClaimValidationResultSchema,
   lynxQualityGateResultSchema,
-} from "./lynx.evidence-trust.schema";
+} from "./lyn-evidence-trust.schema";
 
 export const lynxTruthRetrievalStatusSchema = z.enum([
   "ok",

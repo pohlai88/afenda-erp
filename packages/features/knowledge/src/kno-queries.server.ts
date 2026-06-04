@@ -8,7 +8,7 @@ import {
   knowledgeSources,
 } from "@afenda/db";
 
-import type { SimilarChunkRow } from "../contracts/knowledge.retrieval.contract";
+import type { SimilarChunkRow } from "./kno-retrieval.contract";
 
 export type KnowledgeChunkListRow = {
   id: string;

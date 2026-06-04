@@ -1,13 +1,13 @@
 import type { ReactNode } from "react";
 
-import { GovernedEmpty } from "./client";
+import { GovernedEmpty } from "./gov-governed-empty";
 import {
   parseGovernedComponentData,
   type GovernedComponent,
 } from "./gov-component-schema";
-import { governedSurfaceParseErrorCopy } from "../i18n/governed-renderer-copy.shared";
+import { governedSurfaceParseErrorCopy } from "./gov-governed-renderer-copy-shared";
 
-import { GovernedComponentTree } from "./governed-component-tree";
+import { GovernedComponentTree } from "./gov-governed-component-tree";
 import type { GovernedComponentRendererDiagnostics } from "./gov-registry";
 
 /** Renders nested governed children with enterprise-safe fallbacks for invalid nodes. */

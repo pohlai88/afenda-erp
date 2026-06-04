@@ -1,5 +1,5 @@
 import { SectionPanel } from "@afenda/ui";
-import { systemAdminDiagnosticsUiCopy } from "../surface/system-admin.diagnostics-ui.copy.shared";
+import { systemAdminDiagnosticsUiCopy } from "./sys-diagnostics-ui.copy.shared";
 
 export function SystemAdminDiagnosticsAccessDenied() {
   const copy = systemAdminDiagnosticsUiCopy;

@@ -4,8 +4,8 @@ import { ActionFormErrors } from "@afenda/governed-surface/client";
 import {
   systemAdminEmailRoleActionFormFooterClass,
   systemAdminEmailRoleActionFormGridClass,
-} from "../../overview/surfaces/system-admin.form-layout.shared";
-import type { SystemAdminActionResult } from "../../tenant-execution/contracts/system-admin.action-result.contract";
+} from "../overview/sys-form-layout.shared";
+import type { SystemAdminActionResult } from "../tenant-execution/sys-action-result.contract";
 import {
   Button,
   Field,

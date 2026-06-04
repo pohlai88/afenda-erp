@@ -1,6 +1,6 @@
-import { requireCapability } from "./server";
+import { requireCapability } from "./lyn-api-auth.server";
 
-import { buildLynxRunLedgerExportCsv } from "../read-models/lynx.run-ledger-export.read-model.server";
+import { buildLynxRunLedgerExportCsv } from "./lyn-run-ledger-export.read-model.server";
 
 export async function handleLynxRunsExportGet(request: Request): Promise<Response> {
   const { organization } = await requireCapability("system-admin.lynx.read");

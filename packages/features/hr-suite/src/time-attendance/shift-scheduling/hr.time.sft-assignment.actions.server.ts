@@ -12,16 +12,16 @@ import { toHrTimeSftActionFailure } from "./hr.time.sft-action-result.shared";
 import {
   assignHrTimeSftShift,
   bulkAssignHrTimeSftShifts,
-} from "./hr.time.sft-assignment.server";
+} from "./hrs-hr-time-sft-assignment-server";
 import {
   applyHrTimeSftRecurrenceRule,
   createHrTimeSftRecurrenceRule,
-} from "./hr.time.sft-recurrence.server";
+} from "./hrs-hr-time-sft-recurrence-server";
 import {
   addHrTimeSftRotationCycleStep,
   applyHrTimeSftRotationCycle,
   createHrTimeSftRotationCycle,
-} from "./hr.time.sft-rotation.server";
+} from "./hrs-hr-time-sft-rotation-server";
 import { hrTimeSftRoutePaths } from "./hr.time.sft-route.contract";
 import { requireHrTimeSftManage } from "./hr.time.sft-access.policy.server";
 import {

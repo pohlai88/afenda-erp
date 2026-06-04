@@ -1,8 +1,5 @@
-import type {
-  SystemAdminAuditCoverageGapRow,
-  SystemAdminAuditEventDetail,
-  SystemAdminAuditEventRow,
-} from "../contracts";
+import type { SystemAdminAuditCoverageGapRow } from "./sys-audit-coverage.contract";
+import type { SystemAdminAuditEventDetail, SystemAdminAuditEventRow } from "./sys-audit-event.contract";
 
 export const systemAdminAuditViewerGalleryRows: readonly SystemAdminAuditEventRow[] =
   [

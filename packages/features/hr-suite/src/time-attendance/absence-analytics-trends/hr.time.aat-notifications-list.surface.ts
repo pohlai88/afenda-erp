@@ -1,4 +1,4 @@
-import type { HrAatNotificationWindow } from "./hr.time.aat-notifications.server";
+import type { HrAatNotificationWindow } from "./hrs-hr-time-aat-notifications-server";
 import {
   buildAatListSearchToolbar,
   buildAatOperationalListSurface,

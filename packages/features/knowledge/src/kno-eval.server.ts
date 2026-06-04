@@ -8,12 +8,12 @@ import {
   upsertLynxEvalCase,
 } from "@afenda/db";
 
-import { KNOWLEDGE_AUDIT_ACTIONS } from "../contracts/knowledge.core.contract";
-import type { HybridRetrievalRow } from "../contracts/knowledge.retrieval.contract";
-import type { LynxSemanticClaimGrade } from "../schemas/knowledge.eval-dataset.schema";
-import { knowledgeEvalRunInputSchema } from "../schemas/knowledge.eval-run-input.schema";
-import { emitKnowledgeAuditEvent } from "./knowledge.audit.server";
-import { retrieveKnowledgeChunks } from "./knowledge.retrieve-hybrid.server";
+import { KNOWLEDGE_AUDIT_ACTIONS } from "./kno-core.contract";
+import type { HybridRetrievalRow } from "./kno-retrieval.contract";
+import type { LynxSemanticClaimGrade } from "./kno-eval-dataset.schema";
+import { knowledgeEvalRunInputSchema } from "./kno-eval-run-input.schema";
+import { emitKnowledgeAuditEvent } from "./kno-audit.server";
+import { retrieveKnowledgeChunks } from "./kno-retrieve-hybrid.server";
 
 export type EvalCase = {
   id: string;

@@ -9,7 +9,7 @@ import {
 import {
   BONUS_FOUNDATION_REQUIREMENT_COVERAGE,
   BONUS_REQUIREMENT_COVERAGE,
-} from "./hr.payroll.bonus-acceptance-coverage.shared";
+} from "../src/payroll-compensation/bonus-incentive-management/hr.payroll.bonus-acceptance-coverage.shared";
 
 const BON_001_006_CODES = [
   "HRM-BON-001",

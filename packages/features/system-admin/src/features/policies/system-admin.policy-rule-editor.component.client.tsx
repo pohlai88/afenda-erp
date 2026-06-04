@@ -12,7 +12,7 @@ import {
 } from "@afenda/ui";
 import { ScaleIcon } from "lucide-react";
 import { useActionState } from "react";
-import type { SystemAdminActionResult } from "../../tenant-execution/contracts/system-admin.action-result.contract";
+import type { SystemAdminActionResult } from "../tenant-execution/sys-action-result.contract";
 import type { SystemAdminPolicyRuleEditorDefaults } from "./system-admin.policy-rule.contract";
 
 type PolicyRuleAction = (

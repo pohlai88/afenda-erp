@@ -1,12 +1,12 @@
 import { describe, expect, it } from "vitest";
 
-import { hrWorkforceOffboardingReadPermission } from "../../src/employee-management/offboarding-exit-management/contracts/hr.workforce.offboarding.contract";
-import { buildHrOffboardingCasesListSurface } from "../../src/employee-management/offboarding-exit-management/surface/hr.workforce.offboarding-cases-list.surface";
-import { buildHrOffboardingClearanceListSurface } from "../../src/employee-management/offboarding-exit-management/surface/hr.workforce.offboarding-clearance-list.surface";
-import { hrOffboardingCasesColumnsId } from "../../src/employee-management/offboarding-exit-management/surface/hr.workforce.offboarding-surface-columns.shared";
-import { hrOffboardingClearanceColumnsId } from "../../src/employee-management/offboarding-exit-management/surface/hr.workforce.offboarding-surface-columns.shared";
-import { hrOffboardingCasesSurfaceKey } from "../../src/employee-management/offboarding-exit-management/surface/hr.workforce.offboarding-cases-list.surface";
-import { hrOffboardingClearanceSurfaceKey } from "../../src/employee-management/offboarding-exit-management/surface/hr.workforce.offboarding-clearance-list.surface";
+import { hrWorkforceOffboardingReadPermission } from "../../src/employee-management/offboarding-exit-management/hr.workforce.offboarding.contract";
+import { buildHrOffboardingCasesListSurface } from "../../src/employee-management/offboarding-exit-management/hr.workforce.offboarding-cases-list.surface";
+import { buildHrOffboardingClearanceListSurface } from "../../src/employee-management/offboarding-exit-management/hr.workforce.offboarding-clearance-list.surface";
+import { hrOffboardingCasesColumnsId } from "../../src/employee-management/offboarding-exit-management/hr.workforce.offboarding-surface-columns.shared";
+import { hrOffboardingClearanceColumnsId } from "../../src/employee-management/offboarding-exit-management/hr.workforce.offboarding-surface-columns.shared";
+import { hrOffboardingCasesSurfaceKey } from "../../src/employee-management/offboarding-exit-management/hr.workforce.offboarding-cases-list.surface";
+import { hrOffboardingClearanceSurfaceKey } from "../../src/employee-management/offboarding-exit-management/hr.workforce.offboarding-clearance-list.surface";
 
 const emptyWindow = {
   rows: [],

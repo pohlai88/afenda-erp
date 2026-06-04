@@ -106,6 +106,13 @@ const packageArchitectureRules: Record<string, PackageArchitectureRule> = {
     requiresPackageBuild: true,
     turboBuildOutputs: ["dist/**"],
   },
+  "@afenda/metadata-ui": {
+    category: "runtime-library",
+    workspaceRoot: "packages",
+    requiresCompiledDistExports: true,
+    requiresPackageBuild: true,
+    turboBuildOutputs: ["dist/**"],
+  },
   "@afenda/observability": {
     category: "runtime-library",
     workspaceRoot: "packages",

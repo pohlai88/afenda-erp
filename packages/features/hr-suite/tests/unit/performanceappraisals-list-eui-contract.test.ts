@@ -1,18 +1,18 @@
 import { describe, expect, it } from "vitest";
 
-import { hrTalentPerformanceReadPermission } from "../../src/talent-management/performance-appraisals/contracts/hr.talent.performance.contract";
+import { hrTalentPerformanceReadPermission } from "../../src/talent-management/performance-appraisals/hr.talent.performance.contract";
 import {
   buildHrPerformanceAppraisalsCyclesListSurface,
   buildHrPerformanceAppraisalsReviewsListSurface,
-} from "../../src/talent-management/performance-appraisals/surface/hr.talent.performance-lists.surface";
+} from "../../src/talent-management/performance-appraisals/hr.talent.performance-lists.surface";
 import {
   createSeedHrPerformanceStore,
-} from "../../src/talent-management/performance-appraisals/data/hr.talent.performance-store.shared";
+} from "../../src/talent-management/performance-appraisals/hr.talent.performance-store.shared";
 import {
   hrPerformanceAppraisalsCyclesSearchParam,
   hrPerformanceAppraisalsCyclesSurfaceKey,
   hrPerformanceAppraisalsReviewsSurfaceKey,
-} from "../../src/talent-management/performance-appraisals/data/hr.talent.performance-search-params.parse.shared";
+} from "../../src/talent-management/performance-appraisals/hr.talent.performance-search-params.parse.shared";
 
 describe("performance appraisals list EUI contract", () => {
   const store = createSeedHrPerformanceStore("org-1");

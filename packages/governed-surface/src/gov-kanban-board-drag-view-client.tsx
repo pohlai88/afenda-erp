@@ -8,11 +8,11 @@ import type {
 } from "./gov-kanban-board-schema";
 import {
   buildKanbanCardMovePayload,
-  governedKanbanCardTestId,
   isKanbanCardDraggable,
   resolveKanbanCardDropState,
   type KanbanCardMovePayload,
-} from "./client";
+} from "./kanban-card-drop.shared";
+import { governedKanbanCardTestId } from "./kanban-surface-identity.shared";
 import { buildKanbanBoardDataAttributes } from "./kanban-surface-identity.shared";
 
 import {
@@ -22,7 +22,7 @@ import {
   KanbanCardTile,
   KanbanColumnPanel,
   resolveKanbanColumns,
-} from "./kanban-board-presentation";
+} from "./gov-kanban-board-presentation";
 
 export type KanbanBoardDragViewProps = {
   board: GovernedKanbanBoardConfiguration;

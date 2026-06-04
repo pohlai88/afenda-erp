@@ -6,7 +6,7 @@ import {
   type ToolLoopAgentSettings,
   type ToolSet,
 } from "ai";
-import { getSolutionProviderSystemPrompt } from "../prompts/lynx.solution-provider-prompt.server";
+import { getSolutionProviderSystemPrompt } from "./lyn-solution-provider-prompt.server";
 
 const DEFAULT_MAX_STEPS = 8;
 const MIN_MAX_STEPS = 1;

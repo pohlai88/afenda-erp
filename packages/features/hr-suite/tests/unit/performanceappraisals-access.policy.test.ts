@@ -27,7 +27,7 @@ import {
   requireHrPerformanceApprove,
   requireHrPerformanceRead,
   requireHrPerformanceWrite,
-} from "../../src/talent-management/performance-appraisals/policies/hr.talent.performance-access.policy.server";
+} from "../../src/talent-management/performance-appraisals/hr.talent.performance-access.policy.server";
 
 function mockContext(capabilities: string[]) {
   vi.mocked(requireExecutionContext).mockResolvedValue({

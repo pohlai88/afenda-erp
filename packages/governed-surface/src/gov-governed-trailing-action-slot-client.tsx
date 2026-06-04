@@ -6,11 +6,11 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@afenda/ui/tooltip";
 
 import { isListSurfaceTrailingActionRenderable } from "./list-surface-trailing-action.shared";
 import type { ListSurfaceRowTrailingAction } from "./gov-list-surface-row-trailing-action-schema";
-import { diagnosticsDataAttributes } from "../utils/governed-diagnostics.shared";
+import { diagnosticsDataAttributes } from "./gov-governed-diagnostics-shared";
 import {
   governedIdentityAttributes,
   governedTestId,
-} from "../utils/governed-identity.shared";
+} from "./gov-governed-identity-shared";
 
 export type GovernedTrailingActionSlotProps = {
   trailingAction?: ListSurfaceRowTrailingAction;

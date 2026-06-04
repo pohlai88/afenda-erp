@@ -1,19 +1,19 @@
-import { GovernedEmpty } from "./client";
+import { GovernedEmpty } from "./gov-governed-empty";
 import { parseGovernedStackConfiguration } from "./gov-stack-schema";
 import {
   densityGapClass,
   elevatedChromeFrameClass,
 } from "./gov-surface-chrome-classes";
-import { governedSurfaceParseErrorCopy } from "../i18n/governed-renderer-copy.shared";
+import { governedSurfaceParseErrorCopy } from "./gov-governed-renderer-copy-shared";
 import { cn } from "@afenda/ui/utils";
 
-import { renderGovernedChildTree } from "../render-governed-child-tree.shared";
-import type { RendererProps } from "../governed-renderer-dispatch";
-import { diagnosticsDataAttributes } from "../utils/governed-diagnostics.shared";
+import { renderGovernedChildTree } from "./gov-render-governed-child-tree-shared";
+import type { RendererProps } from "./gov-governed-renderer-dispatch";
+import { diagnosticsDataAttributes } from "./gov-governed-diagnostics-shared";
 import {
   governedIdentityAttributes,
   governedTestId,
-} from "../utils/governed-identity.shared";
+} from "./gov-governed-identity-shared";
 
 /**
  * governed:stack — flex layout for nested governed children.

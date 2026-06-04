@@ -7,8 +7,8 @@ import { useState, useTransition } from "react";
 import {
   systemAdminActionFailure,
   type SystemAdminActionResult,
-} from "../../tenant-execution/contracts/system-admin.action-result.contract";
-import { systemAdminDiagnosticsUiCopy } from "../surface/system-admin.diagnostics-ui.copy.shared";
+} from "../tenant-execution/sys-action-result.contract";
+import { systemAdminDiagnosticsUiCopy } from "./sys-diagnostics-ui.copy.shared";
 
 export type ExportSystemAdminDiagnosticsAction = () => Promise<
   SystemAdminActionResult<{ csv: string; rowCount: number }>

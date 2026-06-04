@@ -1,5 +1,5 @@
-import { readOptionalFormValue } from "../../tenant-execution/contracts/system-admin.execution-settings.shared";
-import { systemAdminCapabilitySettingsActionSchema } from "../schemas/system-admin.capability-settings.schema";
+import { readOptionalFormValue } from "../tenant-execution/sys-execution-settings.shared";
+import { systemAdminCapabilitySettingsActionSchema } from "./sys-capability-settings.schema";
 
 export function parseSystemAdminCapabilitySettingsFormData(formData: FormData) {
   return systemAdminCapabilitySettingsActionSchema.safeParse({

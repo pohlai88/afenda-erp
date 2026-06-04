@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   extractLynxTruthCitations,
   validateLynxTruthResponse,
-} from "../../src/contracts/lynx.truth.contract";
+} from "../../src/lyn-truth.contract";
 
 const canonicalTruthResponse = [
   "### Answer",

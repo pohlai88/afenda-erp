@@ -23,7 +23,7 @@ import {
   requireHrRonOfferApprove,
   requireHrRonRead,
   requireHrRonWrite,
-} from "../../src/talent-management/recruitment-onboarding/policies/hr.talent.ron-access.policy.server";
+} from "../../src/talent-management/recruitment-onboarding/hr.talent.ron-access.policy.server";
 
 function mockContext(capabilities: string[]) {
   vi.mocked(requireExecutionContext).mockResolvedValue({

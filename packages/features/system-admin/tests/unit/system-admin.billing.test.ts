@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { evaluateBillingReadiness } from "../../src/billing/data/system-admin.billing.readiness.server";
+import { evaluateBillingReadiness } from "../../src/features/billing/sys-billing.readiness.server";
 
 describe("evaluateBillingReadiness", () => {
   const baseSubscription = {

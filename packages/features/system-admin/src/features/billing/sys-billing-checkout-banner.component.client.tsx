@@ -1,7 +1,7 @@
 "use client";
 
 import { Alert, AlertDescription, AlertTitle } from "@afenda/ui";
-import { systemAdminBillingUiCopy } from "../surface/system-admin.billing-ui.copy.shared";
+import { systemAdminBillingUiCopy } from "./sys-billing-ui.copy.shared";
 
 export function SystemAdminBillingCheckoutBanner({
   checkoutStatus,

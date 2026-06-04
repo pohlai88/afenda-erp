@@ -10,17 +10,17 @@ import { Button } from "@afenda/ui/button";
 import Link from "next/link";
 import { RotateCcwIcon, ShieldOffIcon, UserMinusIcon } from "lucide-react";
 import { useState, useTransition } from "react";
-import type { OrganizationRole } from "@afenda/auth";
-import { SystemAdminDestructiveConfirmButton } from "../../overview/components/system-admin.destructive-confirm-button.component.client";
-import { SystemAdminTrailingActionStack } from "../../overview/components/system-admin.trailing-action-stack.component.client";
-import type { SystemAdminActionResult } from "../../tenant-execution/contracts/system-admin.action-result.contract";
-import { removeSystemAdminRoleAssignmentForm } from "../../roles/actions/system-admin.roles.actions.server";
+import type { OrganizationRole } from "@afenda/kernel";
+import { SystemAdminDestructiveConfirmButton } from "../overview/sys-destructive-confirm-button.component.client";
+import { SystemAdminTrailingActionStack } from "../overview/sys-trailing-action-stack.component.client";
+import type { SystemAdminActionResult } from "../tenant-execution/sys-action-result.contract";
+import { removeSystemAdminRoleAssignmentForm } from "../roles/sys-roles.actions.server";
 import {
   reactivateSystemAdminMembership,
   removeSystemAdminMembership,
   suspendSystemAdminMembership,
-} from "../actions/system-admin.memberships.actions.server";
-import { systemAdminMembershipTrailingConfirms } from "../surface/system-admin.memberships-trailing-confirm.client.shared";
+} from "./sys-memberships.actions.server";
+import { systemAdminMembershipTrailingConfirms } from "./sys-memberships-trailing-confirm.client.shared";
 
 export function SystemAdminMembershipTrailingCell({
   row,

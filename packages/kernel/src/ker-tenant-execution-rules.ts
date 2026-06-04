@@ -1,7 +1,7 @@
 import type {
   ExecutionPolicyCheck,
   ExecutionPolicyVerdict,
-} from "./execution-policy-types";
+} from "./ker-execution-policy-types";
 
 export const executionPolicyEffects = [
   "allow",

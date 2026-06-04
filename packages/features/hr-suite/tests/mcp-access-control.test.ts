@@ -21,13 +21,13 @@ import {
   HR_MCP_WRITE_CAPABILITY,
   requireHrMcpRead,
   requireHrMcpWrite,
-} from "../policies/hr.payroll.mcp-access.policy.server";
+} from "../src/payroll-compensation/multi-country-payroll/hr.payroll.mcp-access.policy.server";
 import {
   assertHrMcpStatutoryRuleModificationAllowed,
   canHrMcpModifyStatutoryRules,
   HR_MCP_STATUTORY_ADMIN_CAPABILITY,
   requireHrMcpStatutoryAdmin,
-} from "../policies/hr.payroll.mcp-statutory-admin.policy.server";
+} from "../src/payroll-compensation/multi-country-payroll/hr.payroll.mcp-statutory-admin.policy.server";
 
 function mockContext(capabilities: string[]) {
   vi.mocked(requireExecutionContext).mockResolvedValue({

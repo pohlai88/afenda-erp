@@ -2,19 +2,15 @@ import { GovernedPatternCListSection } from "@afenda/governed-surface/server";
 import { hasExecutionPermission } from "@afenda/kernel/execution";
 import { SectionPanel } from "@afenda/ui";
 
-import { updateSystemAdminCapabilitySettingsAction } from "../actions";
-import { buildSystemAdminCapabilitiesPageModel } from "../data";
+import { updateSystemAdminCapabilitySettingsAction } from "./sys-capability-settings.actions.server";
+import { buildSystemAdminCapabilitiesPageModel } from "./sys-capabilities.page-model.server";
 import { requireSystemAdminCapabilitiesRead } from "./sys-capabilities.policy.server";
-import {
-  buildCapabilitiesListSurface,
-  buildCapabilityRoleMatrixListSurface,
-  systemAdminCapabilitiesSurfaceKey,
-  systemAdminCapabilityRoleMatrixSurfaceKey,
-  systemAdminCapabilitiesUiCopy,
-} from "../surface";
-import { SystemAdminCapabilitiesAccessDenied } from "./system-admin.capabilities-access.component.server";
-import { SystemAdminCapabilityTrailingCell } from "./system-admin.capabilities-trailing-cells.component.client";
-import { SystemAdminCapabilitySettingsDialog } from "./system-admin.capability-settings-dialog.component.client";
+import { buildCapabilitiesListSurface, systemAdminCapabilitiesSurfaceKey } from "./sys-capabilities-list.surface";
+import { buildCapabilityRoleMatrixListSurface, systemAdminCapabilityRoleMatrixSurfaceKey } from "./sys-capabilities-role-matrix.surface";
+import { systemAdminCapabilitiesUiCopy } from "./sys-capabilities-ui.copy.shared";
+import { SystemAdminCapabilitiesAccessDenied } from "./sys-capabilities-access.component.server";
+import { SystemAdminCapabilityTrailingCell } from "./sys-capabilities-trailing-cells.component.client";
+import { SystemAdminCapabilitySettingsDialog } from "./sys-capability-settings-dialog.component.client";
 
 type SystemAdminCapabilitiesPageProps = {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;

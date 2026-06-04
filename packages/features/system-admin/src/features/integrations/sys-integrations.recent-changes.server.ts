@@ -1,8 +1,8 @@
 import { searchTenantAuditLogs } from "@afenda/db";
 import { formatErpDateTime } from "@afenda/kernel";
-import { buildSystemAdminAuditEventDetailHref } from "../../audit-viewer/surface/system-admin.audit-pagination.shared";
-import { systemAdminWebhookEvents } from "../contracts/system-admin.integrations-catalog.contract";
-import type { SystemAdminIntegrationsRecentChangeRow } from "../contracts/system-admin.integrations-list.contract";
+import { buildSystemAdminAuditEventDetailHref } from "../audit-viewer/sys-audit-pagination.shared";
+import { systemAdminWebhookEvents } from "./sys-integrations-catalog.contract";
+import type { SystemAdminIntegrationsRecentChangeRow } from "./sys-integrations-list.contract";
 
 const INTEGRATION_AUDIT_PREFIXES = [
   "tenant.api-credential",

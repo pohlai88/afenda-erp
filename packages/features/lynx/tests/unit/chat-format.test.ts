@@ -4,12 +4,12 @@ import {
   getLynxRunStepState,
   isSafeLynxHref,
   linkLynxCitations,
-} from "../../src/components/lynx.chat-format.shared";
+} from "../../src/lyn-chat-format.shared";
 import {
   getLynxToolStateLabel,
   getLynxToolStateTone,
-} from "../../src/components/lynx.tool-state.shared";
-import { getLynxToolDisplayName } from "../../src/components/lynx.tool-output.component.client";
+} from "../../src/lyn-tool-state.shared";
+import { getLynxToolDisplayName } from "../../src/lyn-tool-output.component.client";
 
 describe("Lynx chat formatting", () => {
   it("maps AI SDK statuses to Lynx-facing states", () => {

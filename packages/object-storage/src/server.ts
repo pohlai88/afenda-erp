@@ -14,6 +14,7 @@ export * from "./_object-storage-integration/api/object-storage-handlers.server"
 export * from "./_object-storage-integration/api/object-storage-metrics.server";
 export * from "./_object-storage-integration/api/server-encrypted-upload.server";
 export * from "./_object-storage-integration/api/upload-registration.server";
+export type * from "./_object-storage-integration/contracts";
 export * from "./_object-storage-integration/domain/create-key-management.server";
 export * from "./_object-storage-integration/domain/create-object-store.server";
 export * from "./_object-storage-integration/domain/envelope-encryption.server";

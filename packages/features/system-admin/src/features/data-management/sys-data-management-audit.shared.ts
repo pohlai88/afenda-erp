@@ -2,8 +2,8 @@ import {
   writeExecutionAuditEvent,
   type ExecutionActorType,
 } from "@afenda/kernel/execution";
-import { SYSTEM_ADMIN_DATA_MANAGEMENT_AUDIT_TARGET_TYPE } from "../contracts/system-admin.data-management.limits.shared";
-import type { SystemAdminDataManagementAuditAction } from "../events/system-admin.data-management.event";
+import { SYSTEM_ADMIN_DATA_MANAGEMENT_AUDIT_TARGET_TYPE } from "./sys-data-management.limits.shared";
+import type { SystemAdminDataManagementAuditAction } from "./sys-data-management.event";
 
 export async function writeSystemAdminDataManagementAudit(input: {
   organizationId: string;

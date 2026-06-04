@@ -1,18 +1,19 @@
 import { homepageContent } from "./pub-homepage-content";
 import { homepageContentSchema } from "./pub-homepage-schema";
-import { HomepageHero } from "./homepage-hero.server";
-import { SiteHeader } from "./site-header.server";
+import { HomepageHero } from "./pub-homepage-hero-server";
+import { HomepageShellClient } from "./pub-homepage-shell.client";
+import { SiteHeader } from "./pub-site-header-server";
 import styles from "../styles/public-homepage.module.css";
 
 export function HomepageShell() {
   const content = homepageContentSchema.parse(homepageContent);
 
   return (
-    <div className={styles.shell}>
+    <HomepageShellClient content={content}>
       <SiteHeader content={content} />
-      <main className={styles.main}>
+      <main id="public-home-main" className={styles.main}>
         <HomepageHero content={content} />
       </main>
-    </div>
+    </HomepageShellClient>
   );
 }

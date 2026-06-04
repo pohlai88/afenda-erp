@@ -7,12 +7,12 @@ import { cn } from "@afenda/ui/utils";
 
 import type { EmptyState } from "./gov-list-surface-schema";
 import type { GovernedRenderableState } from "./gov-governed-component-state-schema";
-import { diagnosticsDataAttributes } from "../utils/governed-diagnostics.shared";
+import { diagnosticsDataAttributes } from "./gov-governed-diagnostics-shared";
 import {
   governedIdentityAttributes,
   governedTestId,
-} from "../utils/governed-identity.shared";
-import { asGovernedRoute } from "../utils/governed-safe-route";
+} from "./gov-governed-identity-shared";
+import { asGovernedRoute } from "./gov-governed-safe-route";
 
 export type GovernedEmptyProps = {
   model: EmptyState & {

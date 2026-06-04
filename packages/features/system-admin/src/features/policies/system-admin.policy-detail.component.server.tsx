@@ -1,4 +1,4 @@
-import { systemAdminControlLinks } from "../../overview/contracts/system-admin.control-links.contract";
+import { systemAdminControlLinks } from "../overview/sys-control-links.contract";
 import type { SystemAdminPolicyRuleDetail } from "./system-admin.policy-rule.contract";
 import { systemAdminPoliciesUiCopy } from "./system-admin.policies-ui.copy.shared";
 import { Button } from "@afenda/ui";

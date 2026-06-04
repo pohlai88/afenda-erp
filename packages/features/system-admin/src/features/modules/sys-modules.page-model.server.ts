@@ -4,10 +4,10 @@ import { writeExecutionAuditEvent } from "@afenda/kernel/execution";
 import {
   listTenantModuleSettings,
   listTenantPolicySettings,
-} from "../../tenant-execution/data/system-admin.execution-settings.repository.server";
-import { filterSystemAdminListRows } from "../../overview/contracts/system-admin.list-filter.shared";
-import { resolveSystemAdminListSearch } from "../../overview/contracts/system-admin.list-search.shared";
-import { buildSystemAdminModuleCatalogRows } from "./system-admin.modules.query.server";
+} from "../tenant-execution/sys-execution-settings.repository.server";
+import { filterSystemAdminListRows } from "../overview/sys-list-filter.shared";
+import { resolveSystemAdminListSearch } from "../overview/sys-list-search.shared";
+import { buildSystemAdminModuleCatalogRows } from "./sys-modules.query.server";
 
 const MODULE_LIST_SEARCH_FIELDS = ["module", "id", "category"] as const;
 

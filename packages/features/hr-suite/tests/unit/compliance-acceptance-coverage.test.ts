@@ -4,7 +4,7 @@ import {
   HR_WORKFORCE_COMPLIANCE_ACCEPTANCE_CRITERIA_COVERAGE,
   HR_WORKFORCE_COMPLIANCE_REQUIREMENT_COVERAGE,
   assertHrWorkforceComplianceEnterpriseCoverage,
-} from "../../src/employee-management/compliance-regulatory-tracking/data/hr.workforce.compliance-coverage.shared";
+} from "../../src/employee-management/compliance-regulatory-tracking/hr.workforce.compliance-coverage.shared";
 import { HR_COMPLIANCE_LIST_SURFACE_KEYS } from "../../src/employee-management/compliance-regulatory-tracking/metadata";
 
 describe("Compliance Regulatory Tracking enterprise coverage", () => {

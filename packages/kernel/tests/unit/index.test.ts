@@ -37,7 +37,7 @@ describe("domain modules", () => {
 
   it("resolves navigation extension metadata by id", async () => {
     const { getNavigationExtensionById } =
-      await import("../../src/shell/navigation-extensions");
+      await import("../../src/ker-navigation-extensions");
     const extension = getNavigationExtensionById("lynx");
 
     expect(extension?.href).toBe("/lynx");

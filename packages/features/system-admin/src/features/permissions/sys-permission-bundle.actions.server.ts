@@ -1,22 +1,22 @@
 "use server";
 
-import type { OrganizationRole } from "@afenda/auth";
+import type { OrganizationRole } from "@afenda/kernel";
 import { upsertRoleOverride } from "@afenda/db";
 import { writeExecutionAuditEvent } from "@afenda/kernel/execution";
 import { logServerEvent } from "@afenda/observability/server";
 import { revalidatePath } from "next/cache";
-import { dispatchSystemAdminWebhook } from "../../integrations/events/system-admin.webhook-dispatch.event";
-import { requireSystemAdminPermissionsManage } from "../policies/system-admin.permissions.policy.server";
+import { dispatchSystemAdminWebhook } from "../integrations/sys-webhook-dispatch.event";
+import { requireSystemAdminPermissionsManage } from "./sys-permissions.policy.server";
 import {
   assertSystemAdminFormActionResult,
   systemAdminActionFailure,
   systemAdminActionSuccess,
   type SystemAdminActionResult,
   zodActionFailure,
-} from "../../tenant-execution/contracts/system-admin.action-result.contract";
-import { systemAdminPermissionBundleWebhookEvents } from "../events/system-admin.permissions.event";
-import { assertRolePermissionBundleChangeAllowed } from "../policies/system-admin.permission-bundle.policy.server";
-import { systemAdminRoleOverrideActionSchema } from "../schemas/system-admin.role-override.schema";
+} from "../tenant-execution/sys-action-result.contract";
+import { systemAdminPermissionBundleWebhookEvents } from "./sys-permissions.event";
+import { assertRolePermissionBundleChangeAllowed } from "./sys-permission-bundle.policy.server";
+import { systemAdminRoleOverrideActionSchema } from "./sys-role-override.schema";
 
 function logPermissionBundleMutation(input: {
   operation: string;

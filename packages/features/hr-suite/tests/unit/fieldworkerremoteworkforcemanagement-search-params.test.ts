@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   parseHrIndustryFrmSearchParams,
   toHrIndustryFrmPageModelInput,
-} from "../../src/industry-specific/field-worker-remote-workforce-management/data/hr.industry.frm-search-params.parse.shared";
+} from "../../src/industry-specific/field-worker-remote-workforce-management/hr.industry.frm-search-params.parse.shared";
 
 describe("field worker remote workforce search params", () => {
   it("parses list searches and report grouping", () => {

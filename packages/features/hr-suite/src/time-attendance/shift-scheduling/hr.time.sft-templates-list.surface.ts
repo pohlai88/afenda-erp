@@ -1,4 +1,4 @@
-import type { HrShiftTemplateWindow } from "./hr.time.sft-template.server";
+import type { HrShiftTemplateWindow } from "./hrs-hr-time-sft-template-server";
 import {
   buildSftListSearchToolbar,
   buildSftOperationalListSurface,

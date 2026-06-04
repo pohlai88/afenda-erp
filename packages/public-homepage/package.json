@@ -46,6 +46,6 @@
     "react-dom": "catalog:"
   },
   "sideEffects": [
-    "./src/styles/*.css"
+    "./styles/*.css"
   ]
 }

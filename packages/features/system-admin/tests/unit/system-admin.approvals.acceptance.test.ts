@@ -14,14 +14,14 @@ import {
   APPROVAL_REQUIREMENT_COVERAGE,
   assertApprovalAcceptanceCriteriaComplete,
   assertApprovalCoverageComplete,
-} from "../../src/approvals/data/system-admin.approval-rules.coverage.shared";
-import { buildSystemAdminApprovalRuleDetail } from "../../src/approvals/data/system-admin.approval-rules.detail.server";
+} from "../../src/features/approvals/sys-approval-rules.coverage.shared";
+import { buildSystemAdminApprovalRuleDetail } from "../../src/features/approvals/sys-approval-rules.detail.server";
 import {
   mapTenantApprovalSettingToKernelRecord,
   mapTenantApprovalSettingToRule,
-} from "../../src/approvals/data/system-admin.approval-rules.mapper";
-import { evaluateApprovalRuleReadiness } from "../../src/approvals/data/system-admin.approval-rules.readiness.server";
-import { updateApprovalRuleInputSchema } from "../../src/approvals/schemas/system-admin.approval-rule.schema";
+} from "../../src/features/approvals/sys-approval-rules.mapper";
+import { evaluateApprovalRuleReadiness } from "../../src/features/approvals/sys-approval-rules.readiness.server";
+import { updateApprovalRuleInputSchema } from "../../src/features/approvals/sys-approval-rule.schema";
 
 describe("SUC-001..030 coverage registry", () => {
   it("registers all thirty functional requirements", () => {

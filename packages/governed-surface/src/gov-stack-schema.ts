@@ -2,7 +2,7 @@ import { z } from "zod";
 
 import type { SchemaStability } from "./gov-_stability-shared";
 
-import { governedSurfaceChromeSchema } from "./surface-chrome.schema";
+import { governedSurfaceChromeSchema } from "./gov-surface-chrome-schema";
 
 export const GOVERNED_STACK_CONFIGURATION_SCHEMA_ID =
   "governed.stack.configuration" as const;

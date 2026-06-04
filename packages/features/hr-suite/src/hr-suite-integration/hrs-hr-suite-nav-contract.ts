@@ -1,4 +1,4 @@
-import type { AppCapability } from "@afenda/auth";
+import type { AppCapability } from "@afenda/kernel";
 
 import { hrComplianceRoutePaths } from "../employee-management/compliance-regulatory-tracking/hr.workforce.compliance-route.contract";
 import { hrDocumentsRoutePaths } from "../employee-management/documents-management/hr.workforce.documents-route.contract";

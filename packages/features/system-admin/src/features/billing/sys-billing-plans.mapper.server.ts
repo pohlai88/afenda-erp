@@ -2,7 +2,7 @@ import {
   formatStripePlanPrice,
   listStripeBillingPlans,
 } from "@afenda/billing/server";
-import type { SystemAdminBillingPlanRow } from "../contracts/system-admin.billing-plans.contract";
+import type { SystemAdminBillingPlanRow } from "./sys-billing-plans.contract";
 
 export function mapStripeBillingPlansToRows(): readonly SystemAdminBillingPlanRow[] {
   return listStripeBillingPlans().map((plan) => ({

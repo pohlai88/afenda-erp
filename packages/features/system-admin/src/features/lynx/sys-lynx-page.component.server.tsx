@@ -11,16 +11,19 @@ import { GovernedPatternCListSection } from "@afenda/governed-surface/server";
 import { formatErpDateTime } from "@afenda/kernel";
 import { SectionPanel } from "@afenda/ui";
 
-import { updateLynxOutcomeMonitorSettingAction } from "../actions";
+import { updateLynxOutcomeMonitorSettingAction } from "./sys-lynx-outcome-monitor.actions.server";
 import {
   getAiApprovalsSummary,
   getAiFeatureEntitlementsSummary,
   getAiSandboxesSummary,
   getAiUsageRouteSummary,
-} from "./system-admin.lynx.query.server";
-import { getTenantAiSpendEntries } from "./system-admin.lynx-spend.query.server";
+} from "./sys-lynx.query.server";
+import { getTenantAiSpendEntries } from "./sys-lynx-spend.query.server";
 import {
   buildGatewaySpendListSurface,
+  systemAdminGatewaySpendSurfaceKey,
+} from "./sys-gateway-spend.surface";
+import {
   buildSystemAdminAiApprovalsListSurface,
   buildSystemAdminAiEntitlementsListSurface,
   buildSystemAdminAiSandboxesListSurface,
@@ -29,16 +32,13 @@ import {
   systemAdminAiEntitlementsSurfaceKey,
   systemAdminAiSandboxesSurfaceKey,
   systemAdminAiUsageSurfaceKey,
-  systemAdminGatewaySpendSurfaceKey,
-  systemAdminLynxUiCopy,
-} from "../approvals/metadata";
+} from "./sys-lynx.surface";
+import { systemAdminLynxUiCopy } from "./sys-lynx-ui.copy.shared";
 import { requireSystemAdminLynxRead } from "./sys-lynx.policy.server";
-import {
-  AiFeatureEntitlementTrailingCell,
-  LynxOutcomeMonitorSection,
-  SandboxTrailingCell,
-  SystemAdminLynxAccessDenied,
-} from "./index";
+import { AiFeatureEntitlementTrailingCell } from "./sys-ai-feature-entitlement-trailing-cell.component.client";
+import { SystemAdminLynxAccessDenied } from "./sys-lynx-access.component.server";
+import { LynxOutcomeMonitorSection } from "./sys-lynx-outcome-monitor-section.component.server";
+import { SandboxTrailingCell } from "./sys-sandbox-trailing-cell.component.client";
 
 export async function SystemAdminLynxPage() {
   let organization: Awaited<

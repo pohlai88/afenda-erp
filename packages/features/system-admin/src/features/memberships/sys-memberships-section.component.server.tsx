@@ -1,12 +1,12 @@
 import { GovernedPatternCListSection } from "@afenda/governed-surface/server";
 import { SectionPanel } from "@afenda/ui";
-import type { SystemAdminMembershipRow } from "../contracts";
+import type { SystemAdminMembershipRow } from "./sys-memberships.contract";
 import {
   buildMembersListSurface,
   systemAdminMembersSurfaceKey,
-} from "../surface/system-admin.memberships-list.surface";
-import { systemAdminMembershipsUiCopy } from "../surface/system-admin.memberships-ui.copy.shared";
-import { SystemAdminMembershipTrailingCell } from "./system-admin.memberships-trailing-cells.component.client";
+} from "./sys-memberships-list.surface";
+import { systemAdminMembershipsUiCopy } from "./sys-memberships-ui.copy.shared";
+import { SystemAdminMembershipTrailingCell } from "./sys-memberships-trailing-cells.component.client";
 
 export function SystemAdminMembershipsSection({
   memberships,

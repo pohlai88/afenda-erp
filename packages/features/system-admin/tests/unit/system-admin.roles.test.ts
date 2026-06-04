@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { systemAdminSeedRoles } from "../../src/roles/contracts";
-import { buildRolesListSurface } from "../../src/roles/data/system-admin.roles-list.surface";
+import { systemAdminSeedRoles } from "../../src/features/roles/sys-roles.contract";
+import { buildRolesListSurface } from "../../src/features/roles/sys-roles-list.surface";
 import { parseListSurfaceRendererConfiguration } from "@afenda/governed-surface/schemas";
 
 const mockListTenantMembers = vi.fn();
@@ -24,7 +24,7 @@ vi.mock(
   async (importOriginal) => {
     const actual =
       await importOriginal<
-        typeof import("../../src/overview/policies/system-admin.capability.policy.server")
+        typeof import("../../src/features/overview/sys-capability.policy.server")
       >();
     return {
       ...actual,
@@ -80,7 +80,7 @@ describe("system admin roles", () => {
     "lists seeded roles with active assignment counts",
     async () => {
       const { listSystemAdminRoles } = await import(
-        "../../src/roles/data/system-admin.roles.query.server"
+        "../../src/features/roles/sys-roles.query.server"
       );
 
       const roles = await listSystemAdminRoles({ organizationId: "org_1" });
@@ -92,7 +92,7 @@ describe("system admin roles", () => {
 
   it("builds page model with permission counts and catalog view audit", async () => {
     const { buildSystemAdminRolesPageModel } = await import(
-      "../../src/roles/data/system-admin.roles.page-model.server"
+      "../../src/features/roles/sys-roles.page-model.server"
     );
 
     const model = await buildSystemAdminRolesPageModel({
@@ -116,7 +116,7 @@ describe("system admin roles", () => {
 
   it("blocks assignment of deprecated catalog roles", async () => {
     const { assignRoleToMembership } = await import(
-      "../../src/roles/data/system-admin.roles.query.server"
+      "../../src/features/roles/sys-roles.query.server"
     );
 
     const deprecatedRoles = systemAdminSeedRoles.filter(
@@ -146,7 +146,7 @@ describe("system admin roles", () => {
 
   it("records audit when assigning a role", async () => {
     const { assignSystemAdminRole } = await import(
-      "../../src/roles/actions/system-admin.roles.actions.server"
+      "../../src/features/roles/sys-roles.actions.server"
     );
 
     const formData = new FormData();
@@ -169,7 +169,7 @@ describe("system admin roles", () => {
     mockRequireRolesManage.mockRejectedValue(new Error("Forbidden"));
 
     const { assignSystemAdminRole } = await import(
-      "../../src/roles/actions/system-admin.roles.actions.server"
+      "../../src/features/roles/sys-roles.actions.server"
     );
 
     const formData = new FormData();
@@ -185,7 +185,7 @@ describe("system admin roles", () => {
     mockRequireRolesRead.mockRejectedValue(new Error("Forbidden"));
 
     const { requireSystemAdminRolesRead } = await import(
-      "../../src/roles/policies/system-admin.roles.policy.server"
+      "../../src/features/roles/sys-roles.policy.server"
     );
 
     await expect(requireSystemAdminRolesRead()).rejects.toThrow("Forbidden");

@@ -1,27 +1,23 @@
 import { GovernedPatternBStatSection, GovernedPatternCListSection } from "@afenda/governed-surface/server";
 import { SectionPanel } from "@afenda/ui";
-import type { AppCapability } from "@afenda/auth";
-import type { SystemAdminActionResult } from "../../tenant-execution/contracts/system-admin.action-result.contract";
-import { SystemAdminDocumentQuarantineInboxSection } from "../../tenant-execution/components/system-admin.document-quarantine-inbox-section.component.server";
-import type { SystemAdminDocumentQuarantineInboxWindow } from "../../tenant-execution/data/system-admin.document-quarantine-inbox.read-model.server";
-import type { OrganizationStorageQuotaSnapshot } from "../../tenant-execution/data/system-admin.organization-storage-quota.read-model.server";
+import type { AppCapability } from "@afenda/kernel";
+import type { SystemAdminActionResult } from "../tenant-execution/sys-action-result.contract";
+import { SystemAdminDocumentQuarantineInboxSection } from "../tenant-execution/sys-document-quarantine-inbox-section.component.server";
+import type { SystemAdminDocumentQuarantineInboxWindow } from "../tenant-execution/sys-document-quarantine-inbox.read-model.server";
+import type { OrganizationStorageQuotaSnapshot } from "../tenant-execution/sys-organization-storage-quota.read-model.server";
 import {
   buildSystemAdminOrganizationStorageQuotaStatGroups,
   systemAdminOrganizationStorageQuotaSurfaceKey,
-} from "../../tenant-execution/surface/system-admin.organization-storage-quota-stat.surface";
-import type { OrganizationSecuritySettings } from "../contracts/system-admin.security-settings.contract";
-import type { SecurityReadinessReport } from "../contracts/system-admin.security-readiness.contract";
-import type { SystemAdminDiagnosticsRecentChangeRow } from "../../diagnostics/contracts/system-admin.diagnostics-coverage.contract";
-import {
-  buildSystemAdminSecurityRecentChangesListSurface,
-  buildSystemAdminSecuritySettingsListSurface,
-  systemAdminSecurityRecentChangesSurfaceKey,
-  systemAdminSecuritySurfaceKey,
-  systemAdminSecurityUiCopy,
-} from "../surface";
-import { SystemAdminSecurityForm } from "./system-admin.security-form.component.client";
-import { SystemAdminObjectStorageProviderForm } from "./system-admin.object-storage-provider-form.component.client";
-import { SystemAdminObjectStorageEncryptionForm } from "./system-admin.object-storage-encryption-form.component.client";
+} from "../tenant-execution/sys-organization-storage-quota-stat.surface";
+import type { OrganizationSecuritySettings } from "./sys-security-settings.contract";
+import type { SecurityReadinessReport } from "./sys-security-readiness.contract";
+import type { SystemAdminDiagnosticsRecentChangeRow } from "../diagnostics/sys-diagnostics-coverage.contract";
+import { buildSystemAdminSecurityRecentChangesListSurface, systemAdminSecurityRecentChangesSurfaceKey } from "./sys-security-recent-changes.surface";
+import { buildSystemAdminSecuritySettingsListSurface, systemAdminSecuritySurfaceKey } from "./sys-security-list.surface";
+import { systemAdminSecurityUiCopy } from "./sys-security-ui.copy.shared";
+import { SystemAdminSecurityForm } from "./sys-security-form.component.client";
+import { SystemAdminObjectStorageProviderForm } from "./sys-object-storage-provider-form.component.client";
+import { SystemAdminObjectStorageEncryptionForm } from "./sys-object-storage-encryption-form.component.client";
 
 type UpdateSecuritySettingsAction = (
   state: SystemAdminActionResult | undefined,

@@ -2,9 +2,9 @@ import { z } from "zod";
 
 import type { SchemaStability } from "./gov-_stability-shared";
 
-import { erpPermissionRequirementSchema } from "./erp-permission-requirement.schema";
+import { erpPermissionRequirementSchema } from "./gov-erp-permission-requirement-schema";
 import { actionDescriptorSchema } from "./gov-action-schema";
-import { governedSurfaceChromeSchema } from "./surface-chrome.schema";
+import { governedSurfaceChromeSchema } from "./gov-surface-chrome-schema";
 
 export const GOVERNED_ACTION_BAR_CONFIGURATION_SCHEMA_ID =
   "governed.action-bar.configuration" as const;

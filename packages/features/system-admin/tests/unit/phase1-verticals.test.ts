@@ -1,14 +1,7 @@
 import { describe, expect, it } from "vitest";
-import {
-  systemAdminInviteUserInputSchema,
-  systemAdminUserStatusInputSchema,
-} from "../../src/users/schemas";
-import {
-  systemAdminAssignRoleInputSchema,
-} from "../../src/roles/schemas";
-import {
-  systemAdminSeedRoles,
-} from "../../src/roles/contracts";
+import { systemAdminInviteUserInputSchema, systemAdminUserStatusInputSchema } from "../../src/features/users/sys-users.schema";
+import { systemAdminAssignRoleInputSchema } from "../../src/features/roles/sys-roles.schema";
+import { systemAdminSeedRoles } from "../../src/features/roles/sys-roles.contract";
 
 describe("system admin phase 1 vertical contracts", () => {
   it("validates and normalizes invite user input", () => {

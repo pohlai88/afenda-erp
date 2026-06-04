@@ -1,8 +1,8 @@
 import { buildDocumentQuarantineInboxListSurface } from "@afenda/kernel";
 import type { ListSurfaceRendererConfigurationResolvedInput } from "@afenda/governed-surface/schemas";
 
-import type { SystemAdminDocumentQuarantineInboxRow } from "./system-admin.document-quarantine-inbox.read-model.server";
-import { systemAdminDocumentQuarantineInboxSurfaceKey } from "./system-admin.document-quarantine-inbox-gallery.fixtures.shared";
+import type { SystemAdminDocumentQuarantineInboxRow } from "./sys-document-quarantine-inbox.read-model.server";
+import { systemAdminDocumentQuarantineInboxSurfaceKey } from "./sys-document-quarantine-inbox-gallery.fixtures.shared";
 
 export { systemAdminDocumentQuarantineInboxSurfaceKey };
 

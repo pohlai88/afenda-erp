@@ -4,7 +4,6 @@ import {
   featureFlatFileViolation,
   featurePublicDoorFiles,
   getRepositoryRoot,
-  isFeatureFlatFileName,
   isLegacyFeatureFolder,
 } from "./lib/scaffold-grammar.mts";
 

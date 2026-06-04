@@ -4,7 +4,7 @@ import {
   buildHrSuiteListSearchToolbar,
   buildHrSuiteOperationalListSurface,
   type HrSuiteListSurfaceProfile,
-} from "../../employee-management/compliance-regulatory-tracking/metadata";
+} from "../../hr-suite-integration/metadata";
 import { hrTalentSuccessionReadPermission } from "./hr.talent.succession.contract";
 import {
   hrSuccessionCriticalRoleDetailRoutePath,

@@ -6,16 +6,16 @@ import { cn } from "@afenda/ui/utils";
 
 import type { GovernedRenderableState } from "./gov-governed-component-state-schema";
 import type { PageHeader } from "./gov-page-header-schema";
-import { diagnosticsDataAttributes } from "../utils/governed-diagnostics.shared";
+import { diagnosticsDataAttributes } from "./gov-governed-diagnostics-shared";
 import {
   governedHeadingId,
   governedIdentityAttributes,
   governedTestId,
   toGovernedDomId,
-} from "../utils/governed-identity.shared";
-import { asGovernedRoute } from "../utils/governed-safe-route";
+} from "./gov-governed-identity-shared";
+import { asGovernedRoute } from "./gov-governed-safe-route";
 
-import { ModulePageHeader } from "./module-page-header";
+import { ModulePageHeader } from "./gov-module-page-header";
 
 export type GovernedSurfaceProps = {
   header: PageHeader;

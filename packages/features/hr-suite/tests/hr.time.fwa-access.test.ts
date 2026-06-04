@@ -5,7 +5,7 @@ import {
   hrTimeFwaPayrollReadPermission,
   hrTimeFwaReadPermission,
   hrTimeFwaWritePermission,
-} from "../contracts/hr.time.fwa.contract";
+} from "../src/time-attendance/flexible-work-arrangement-tracking/hr.time.fwa.contract";
 
 describe("FWA ERP permissions (HRM-FWA-031)", () => {
   it("declares read and write permission objects for governed surfaces", () => {

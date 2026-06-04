@@ -4,5 +4,7 @@
  */
 export * from "./metadata";
 export * from "./client";
-export * from "./contracts";
-export * from "./schemas";
+export * from "./sys-memberships-action-dtos.contract";
+export * from "./sys-memberships.contract";
+export * from "./sys-memberships-action.schema";
+export * from "./sys-memberships.schema";

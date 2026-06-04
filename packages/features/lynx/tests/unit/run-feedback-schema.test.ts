@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   lynxLiveRunFeedbackRequestSchema,
   lynxRunContextMetadataSchema,
-} from "../../src/schemas/lynx.run-feedback.schema";
+} from "../../src/lyn-run-feedback.schema";
 
 describe("Lynx run feedback schemas", () => {
   it("accepts run context metadata for streamed Lynx messages", () => {

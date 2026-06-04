@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formatSystemAdminUserLastActive } from "../../src/users/data/system-admin.users-last-active.shared";
+import { formatSystemAdminUserLastActive } from "../../src/features/users/sys-users-last-active.shared";
 
 describe("formatSystemAdminUserLastActive", () => {
   it("labels invited users as not joined", () => {

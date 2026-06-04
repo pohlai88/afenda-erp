@@ -27,13 +27,13 @@ import {
   type LynxErpReadEvidence,
   type LynxErpReadToolInput,
   type LynxErpReadToolOutput,
-} from "./lyn-erp-read-tools-schema";
+} from "./lyn-erp-read-tools.schema";
 import {
   getAggregateLynxReadinessStatus,
   type LynxReadinessSnapshot,
   type LynxReadinessStatus,
-} from "./lyn-readiness-contract";
-import { lynxToolMeta } from "./lynx.tool-meta";
+} from "./lyn-readiness.contract";
+import { lynxToolMeta } from "./lyn-tool-meta";
 
 type SessionSource = "dev" | "neon";
 

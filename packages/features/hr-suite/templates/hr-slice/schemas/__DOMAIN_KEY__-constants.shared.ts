@@ -1,4 +1,4 @@
-import type { AppCapability } from "@afenda/auth";
+import type { AppCapability } from "@afenda/kernel";
 
 export const __CONSTANT_PREFIX___READ_CAPABILITY =
   "hr.view" satisfies AppCapability;
