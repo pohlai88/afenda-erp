@@ -10,7 +10,7 @@ import type {
   ModuleWorkspaceRecord,
 } from "@afenda/kernel";
 import { moduleIds } from "@afenda/config/module-ids";
-import { combineLynxQualityGates } from "../contracts/lynx.evidence-trust.contract";
+import { combineLynxQualityGates } from "./lyn-evidence-trust-contract";
 import {
   LYNX_OUTCOME_MONITOR_IDS,
   lynxOutcomeMonitorResultSchema,
@@ -19,9 +19,9 @@ import {
   type LynxOutcomeMonitorResult,
   type LynxOutcomeMonitorSeverity,
   type LynxOutcomeMonitorStatus,
-} from "../schemas/lynx.outcome-monitor.schema";
-import type { LynxQualityGateResult } from "../schemas/lynx.evidence-trust.schema";
-import type { LynxReadinessSnapshot } from "../schemas/lynx.readiness.schema";
+} from "./lyn-outcome-monitor-schema";
+import type { LynxQualityGateResult } from "./lyn-evidence-trust-schema";
+import type { LynxReadinessSnapshot } from "./lyn-readiness-schema";
 
 const LYNX_OUTCOME_SWEEP_ORIGIN = "proactive-outcome-sweep";
 const LYNX_OUTCOME_SWEEP_ROUTE = "/api/internal/v1/cron/lynx-outcomes";

@@ -1,5 +1,5 @@
-import type { SyncOrgResult } from "../data/knowledge.sync.server";
-import { syncOrgKnowledge } from "../data/knowledge.sync.server";
+import type { SyncOrgResult } from "./knowledge.sync.server";
+import { syncOrgKnowledge } from "./knowledge.sync.server";
 
 /**
  * Domain entry for org-wide knowledge source sync.

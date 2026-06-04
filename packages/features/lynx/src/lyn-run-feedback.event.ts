@@ -1,9 +1,9 @@
-import { LYNX_AUDIT_ACTIONS } from "../contracts/lynx.core.contract";
+import { LYNX_AUDIT_ACTIONS } from "./lyn-core-contract";
 import type {
   LynxLiveRunFeedbackRequest,
   LynxRunFeedbackCategory,
   LynxRunFeedbackRating,
-} from "../schemas/lynx.run-feedback.schema";
+} from "./lyn-run-feedback-schema";
 
 export const LYNX_RUN_FEEDBACK_AUDIT_ACTION = LYNX_AUDIT_ACTIONS.runFeedback;
 

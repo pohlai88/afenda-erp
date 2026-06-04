@@ -4,17 +4,17 @@ import { parseGovernedSectionConfiguration } from "./gov-section-schema";
 import {
   densityGapClass,
   elevatedChromeFrameClass,
-} from "../../schemas/surface-chrome.classes";
-import { governedSurfaceParseErrorCopy } from "../../i18n/governed-renderer-copy.shared";
+} from "./gov-surface-chrome-classes";
+import { governedSurfaceParseErrorCopy } from "../i18n/governed-renderer-copy.shared";
 import { cn } from "@afenda/ui/utils";
 
 import { renderGovernedChildTree } from "../render-governed-child-tree.shared";
 import type { GovernedComponentRendererDiagnostics } from "./gov-registry";
-import { diagnosticsDataAttributes } from "../../utils/governed-diagnostics.shared";
+import { diagnosticsDataAttributes } from "../utils/governed-diagnostics.shared";
 import {
   governedIdentityAttributes,
   governedTestId,
-} from "../../utils/governed-identity.shared";
+} from "../utils/governed-identity.shared";
 
 export type SectionRendererProps = {
   configuration: unknown;

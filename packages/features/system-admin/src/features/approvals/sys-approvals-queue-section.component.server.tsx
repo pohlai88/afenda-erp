@@ -2,7 +2,7 @@ import { GovernedPatternCListSection } from "@afenda/governed-surface/server";
 import { Alert, AlertDescription, SectionPanel } from "@afenda/ui";
 import type { ModuleWorkspace, ModuleWorkspaceListQuery } from "@afenda/kernel";
 
-import { mapWorkspaceItemsToSystemAdminApprovalQueueRows } from "../data/system-admin.approvals-queue.mapper";
+import { mapWorkspaceItemsToSystemAdminApprovalQueueRows } from "./system-admin.approvals-queue.mapper";
 import {
   buildSystemAdminApprovalQueueListSurface,
   systemAdminApprovalsQueueSurfaceKey,

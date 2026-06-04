@@ -7,7 +7,7 @@ import {
 import { GovernedPatternCListSection } from "@afenda/governed-surface/server";
 import { SectionPanel } from "@afenda/ui";
 
-import type { SystemAdminDocumentQuarantineInboxWindow } from "../data/system-admin.document-quarantine-inbox.read-model.server";
+import type { SystemAdminDocumentQuarantineInboxWindow } from "./system-admin.document-quarantine-inbox.read-model.server";
 import {
   buildSystemAdminDocumentQuarantineInboxListSurface,
   systemAdminDocumentQuarantineInboxSurfaceKey,

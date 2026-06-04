@@ -1,11 +1,11 @@
-import { GOVERNED_METADATA_SCHEMA_VERSION } from "../schemas/schema-version.shared";
+import { GOVERNED_METADATA_SCHEMA_VERSION } from "./gov-schema-version-shared";
 import { resolveGovernedStatPresentation } from "../resolvers/resolve-governed-presentation";
 import type {
   StatCardConfigurationInput,
   StatCardConfigurationResolvedInput,
   StatCardDensity,
-} from "../schemas/stat-card.schema";
-import type { StatPresentationProfileId } from "../schemas/presentation-profile.schema";
+} from "./gov-stat-card-schema";
+import type { StatPresentationProfileId } from "./gov-presentation-profile-schema";
 
 export type BuildGovernedStatGridInput = Omit<
   StatCardConfigurationInput,

@@ -775,7 +775,7 @@ export async function upsertHrFwaRemoteLocation(input: {
   organizationId: string;
   employeeId: string;
   label: string;
-  locationKind?: (typeof import("./schema/hr").hrFwaRemoteLocationKindEnum.enumValues)[number];
+  locationKind?: (typeof import("./hr").hrFwaRemoteLocationKindEnum.enumValues)[number];
   countryCode?: string | null;
   regionCode?: string | null;
   addressLine?: string | null;
@@ -1037,7 +1037,7 @@ export async function getHrFwaArrangementById(input: {
 
 export async function appendHrFwaAuditEvent(input: {
   organizationId: string;
-  action: (typeof import("./schema/hr").hrFwaAuditActionEnum.enumValues)[number];
+  action: (typeof import("./hr").hrFwaAuditActionEnum.enumValues)[number];
   summary: string;
   arrangementId?: string | null;
   requestId?: string | null;

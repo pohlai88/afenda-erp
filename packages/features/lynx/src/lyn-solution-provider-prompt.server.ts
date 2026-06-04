@@ -1,4 +1,4 @@
-import { getBusinessProblemTypeLabels } from "../schemas/lynx.solution-provider.schema";
+import { getBusinessProblemTypeLabels } from "./lyn-solution-provider.schema";
 
 export function getSolutionProviderSystemPrompt(input: {
   organizationName: string;

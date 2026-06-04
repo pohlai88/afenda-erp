@@ -9,7 +9,7 @@ import {
   updateSystemAdminRoleForm,
 } from "../actions";
 import { buildSystemAdminRolesPageModel } from "../data";
-import { requireSystemAdminRolesRead } from "../policies";
+import { requireSystemAdminRolesRead } from "./sys-roles.policy.server";
 import {
   buildRolesListSurface,
   systemAdminRolesSurfaceKey,

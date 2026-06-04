@@ -1,7 +1,7 @@
 import type {
   KanbanCard,
   KanbanWorkflowTransition,
-} from "./schemas/kanban-board.schema";
+} from "./gov-kanban-board-schema";
 
 export type KanbanWorkflowEdgeMap = Readonly<
   Record<string, readonly KanbanWorkflowTransition[]>

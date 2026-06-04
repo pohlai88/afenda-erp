@@ -2,14 +2,14 @@ import { GovernedEmpty } from "./client";
 import {
   GOVERNED_SCORECARD_FORM_SCHEMA_ID,
   parseGovernedScorecardFormConfiguration,
-} from "../../schemas/scorecard-form.schema";
-import { resolveGovernedServerAction } from "../../schemas/server-actions.shared";
-import { governedParseErrorCopy } from "../../i18n/governed-renderer-copy.shared";
-import { diagnosticsDataAttributes } from "../../utils/governed-diagnostics.shared";
+} from "./gov-scorecard-form-schema";
+import { resolveGovernedServerAction } from "./gov-server-actions-shared";
+import { governedParseErrorCopy } from "../i18n/governed-renderer-copy.shared";
+import { diagnosticsDataAttributes } from "../utils/governed-diagnostics.shared";
 import {
   governedIdentityAttributes,
   governedTestId,
-} from "../../utils/governed-identity.shared";
+} from "../utils/governed-identity.shared";
 
 import type { RendererProps } from "../governed-renderer-dispatch";
 

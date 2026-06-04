@@ -1,6 +1,6 @@
 import { Alert, Badge, Card, CardContent, CardHeader, CardTitle } from "@afenda/ui";
 import type { SystemAdminDiagnosticsSummary } from "../contracts/system-admin.diagnostic-issue.contract";
-import { formatGovernanceHealthVerdictLabel } from "../data/system-admin.diagnostics.verdict.server";
+import { formatGovernanceHealthVerdictLabel } from "./system-admin.diagnostics.verdict.server";
 import { systemAdminDiagnosticsUiCopy } from "../surface/system-admin.diagnostics-ui.copy.shared";
 
 function verdictBadgeVariant(

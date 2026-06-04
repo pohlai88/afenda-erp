@@ -1,6 +1,6 @@
 import { GovernedEmpty } from "./client";
-import { parseEmptyStateData } from "../../schemas/list-surface.schema";
-import { governedParseErrorCopy } from "../../i18n/governed-renderer-copy.shared";
+import { parseEmptyStateData } from "./gov-list-surface-schema";
+import { governedParseErrorCopy } from "../i18n/governed-renderer-copy.shared";
 
 import type { RendererProps } from "../governed-renderer-dispatch";
 import type { GovernedComponentRendererDiagnostics } from "./gov-registry";

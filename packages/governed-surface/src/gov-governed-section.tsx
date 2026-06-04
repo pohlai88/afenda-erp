@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 
 import { cn } from "@afenda/ui/utils";
 
-import type { GovernedRenderableState } from "../schemas/governed-component-state.schema";
+import type { GovernedRenderableState } from "./gov-governed-component-state-schema";
 import { diagnosticsDataAttributes } from "../utils/governed-diagnostics.shared";
 import { GovernedHeading } from "../utils/governed-heading.shared";
 import {

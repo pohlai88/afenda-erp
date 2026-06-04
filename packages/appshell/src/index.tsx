@@ -1,4 +1,4 @@
-export { AppShell } from "./app-shell/appshell";
+export { AppShell } from "./app-app-shell.server";
 export { AppShellQuickPushMount } from "./app-appshell-quick-push-mount-client";
 export { AppSubLayout } from "./app-appshell-sub-layout";
 export { AppShellSurface } from "./app-appshell-sub-layout-surface";

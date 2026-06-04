@@ -12,7 +12,7 @@ import {
   listHrIndustryRwsOpenShiftEligibilityRefs,
   listHrIndustryRwsPayrollScheduleRefs,
 } from "./hr.industry.rws-store.shared";
-import { hrIndustryRwsAuditActions } from "../events";
+import { hrIndustryRwsAuditActions } from "./hr.industry.rws.event";
 import {
   requireHrIndustryRwsApprove,
   requireHrIndustryRwsRead,
@@ -25,7 +25,7 @@ import {
   type HrRwsOpenShiftInput,
   type HrRwsRetailScheduleInput,
   type HrRwsShiftSwapRequestInput,
-} from "../schemas";
+} from "./hr.industry.rws.schema";
 
 type ScheduleDraftInput = Omit<
   HrRwsRetailScheduleInput,

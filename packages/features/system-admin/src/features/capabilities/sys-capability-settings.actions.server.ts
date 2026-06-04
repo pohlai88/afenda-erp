@@ -27,7 +27,7 @@ import {
 } from "../contracts";
 import { isCriticalExecutionCapability } from "../contracts/system-admin.capability-safety.contract";
 import { requireSystemAdminCapabilitiesManage } from "../policies/system-admin.capabilities.policy.server";
-import { parseSystemAdminCapabilitySettingsFormData } from "../data/system-admin.capability-settings-form.shared";
+import { parseSystemAdminCapabilitySettingsFormData } from "./system-admin.capability-settings-form.shared";
 import {
   resolveSystemAdminCapabilityAuditAction,
   SYSTEM_ADMIN_CAPABILITY_SETTINGS_WEBHOOK_EVENT,

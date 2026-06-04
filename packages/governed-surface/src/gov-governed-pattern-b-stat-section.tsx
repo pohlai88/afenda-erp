@@ -3,7 +3,7 @@ import "server-only";
 import type { ReactNode } from "react";
 
 import { GovernedComponentRenderer } from "./index";
-import { logUnexpectedServerError } from "../data/governed-logging.server";
+import { logUnexpectedServerError } from "./governed-logging.server";
 import { governedRendererCopy } from "../i18n/governed-renderer-copy.shared";
 import { getGovernedSurfaceTranslations } from "../i18n/governed-surface-copy";
 import { diagnosticsDataAttributes } from "../utils/governed-diagnostics.shared";
@@ -12,11 +12,11 @@ import {
   governedTestId,
 } from "../utils/governed-identity.shared";
 
-import type { EmptyState } from "../schemas/list-surface.schema";
+import type { EmptyState } from "./gov-list-surface-schema";
 import {
   parseStatCardConfiguration,
   type StatCardConfigurationInput,
-} from "../schemas/stat-card.schema";
+} from "./gov-stat-card-schema";
 import type { GovernedSurfaceSectionCardBody } from "./governed-surface-section-card";
 import {
   renderGovernedPatternSectionShell,

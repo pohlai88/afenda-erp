@@ -4,7 +4,7 @@ import { describe, expect, it, vi } from "vitest";
 import {
   createHrTimeSftShiftTemplate,
   listHrTimeSftShiftTemplates,
-} from "../data/hr.time.sft-template.server";
+} from "./hr.time.sft-template.server";
 import {
   hrSftCreateShiftTemplateSchema,
   hrSftUpdateShiftTemplateSchema,

@@ -8,7 +8,7 @@ import type {
 import {
   hrIndustryMscAuditActions,
   type HrIndustryMscAuditAction,
-} from "../events";
+} from "./hr.industry.msc.event";
 import type {
   HrMscEligibilityStatus,
   HrMscReportGroupBy,

@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   parseGovernedListTrailingCellContext,
-} from "../../src/schemas/list-trailing-cell-context.schema";
+} from "../../src/gov-list-trailing-cell-context-schema";
 
 describe("parseGovernedListTrailingCellContext", () => {
   it("accepts an empty object (both fields optional)", () => {

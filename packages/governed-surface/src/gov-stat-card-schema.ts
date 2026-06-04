@@ -6,7 +6,7 @@ import { prepareGovernedConfigurationForParse } from "./migrate-governed-configu
 import { resolveGovernedStatPresentation } from "../resolvers/resolve-governed-presentation";
 import { refineStatCardDisplayStrings } from "./display-string.shared";
 import { statPresentationProfileIdSchema } from "./presentation-profile.schema";
-import { governedMetadataSchemaVersionSchema } from "./schema-version.shared";
+import { governedMetadataSchemaVersionSchema } from "./gov-schema-version-shared";
 import { governedSurfaceChromeSchema } from "./surface-chrome.schema";
 
 export const SCHEMA_STABILITY: SchemaStability = "beta";

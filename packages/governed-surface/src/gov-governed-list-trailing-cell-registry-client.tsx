@@ -9,7 +9,7 @@ import type {
 import {
   parseGovernedListTrailingCellContext,
   type GovernedListTrailingCellContext,
-} from "../schemas/list-trailing-cell-context.schema";
+} from "./gov-list-trailing-cell-context-schema";
 
 import { GovernedMetadataTrailingCell } from "./governed-metadata-trailing-cell.client";
 

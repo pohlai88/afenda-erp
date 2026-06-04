@@ -3,7 +3,7 @@ import type {
   ErpPermissionRequirement,
 } from "@afenda/governed-surface";
 
-import { HR_MODULE_ID, type HrModuleId } from "./hr-suite-module.contract";
+import { HR_MODULE_ID, type HrModuleId } from "./hrs-hr-suite-module-contract";
 
 export type HrSuiteErpPermissionDescriptor = Omit<
   ErpPermissionRequirement,

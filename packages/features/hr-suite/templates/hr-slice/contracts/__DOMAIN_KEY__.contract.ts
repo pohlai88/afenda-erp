@@ -1,4 +1,4 @@
-import { defineHrSuiteReadPermission } from "../../../hr-suite-integration";
+import { defineHrSuiteReadPermission } from "../../hr-suite-integration";
 
 export const __IDENTIFIER_CAMEL__ReadPermission =
   defineHrSuiteReadPermission("__DOMAIN_TAIL__");

@@ -2,8 +2,8 @@
 
 import type { ColumnDef } from "@tanstack/react-table";
 
-import type { ListColumn } from "../../schemas/list-surface.schema";
-import type { ListSurfaceRow } from "../../schemas/list-surface-renderer.schema";
+import type { ListColumn } from "./gov-list-surface-schema";
+import type { ListSurfaceRow } from "./gov-list-surface-renderer-schema";
 
 import { ListSurfaceCell } from "./list-surface-cell.client";
 import type { ListSurfaceTableTrailingColumn } from "./list-surface-table.client";

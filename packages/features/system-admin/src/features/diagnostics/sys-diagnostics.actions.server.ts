@@ -6,7 +6,7 @@ import {
   type SystemAdminActionResult,
 } from "../../tenant-execution/contracts/system-admin.action-result.contract";
 import { requireSystemAdminDiagnosticsRead } from "../policies/system-admin.diagnostics.policy.server";
-import { getSystemAdminDiagnosticsPageModel } from "../data/system-admin.diagnostics.page-model.server";
+import { getSystemAdminDiagnosticsPageModel } from "./system-admin.diagnostics.page-model.server";
 
 function escapeCsvCell(value: string) {
   if (/[",\n]/.test(value)) {

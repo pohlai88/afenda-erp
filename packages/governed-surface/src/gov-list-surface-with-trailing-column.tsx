@@ -2,7 +2,7 @@ import {
   ListSurfaceTable,
   type ListSurfaceTableProps,
   type ListSurfaceTableTrailingColumn,
-} from "./renderers/list-surface-table";
+} from "./gov-list-surface-table";
 
 export type { ListSurfaceTableTrailingColumn };
 

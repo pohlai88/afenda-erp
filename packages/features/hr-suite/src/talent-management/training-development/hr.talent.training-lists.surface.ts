@@ -1,4 +1,4 @@
-import { buildHrStaticListWindow } from "../../../hr-suite-integration";
+import { buildHrStaticListWindow } from "../../hr-suite-integration";
 import {
   buildHrSuiteListSearchToolbarFromRegistryEntry,
   buildHrSuiteOperationalListSurface,

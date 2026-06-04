@@ -1,6 +1,6 @@
-import { GOVERNED_WORKBENCH_SEARCH_PARAM_KEYS } from "../schemas/workbench-search-params.shared";
-import type { ListSurfacePresentation } from "../schemas/list-surface-renderer.schema";
-import type { ListSurfaceToolbar } from "../schemas/list-surface-toolbar.schema";
+import { GOVERNED_WORKBENCH_SEARCH_PARAM_KEYS } from "./gov-workbench-search-params-shared";
+import type { ListSurfacePresentation } from "./gov-list-surface-renderer-schema";
+import type { ListSurfaceToolbar } from "./gov-list-surface-toolbar-schema";
 
 export type GovernedWorkbenchFocusSearchInput = {
   label: string;

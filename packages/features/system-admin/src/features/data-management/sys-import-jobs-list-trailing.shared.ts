@@ -1,5 +1,5 @@
 import { resolveListSurfaceRowTrailingAction } from "@afenda/governed-surface";
-import type { SystemAdminImportJobStatus } from "../contracts";
+import type { SystemAdminImportJobStatus } from "./sys-import-job.contract";
 import { systemAdminDataManagementUiCopy } from "./system-admin.data-management-ui.copy.shared";
 
 export function resolveSystemAdminImportJobRowTrailingAction(input: {

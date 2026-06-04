@@ -5,7 +5,7 @@ import type { ReactNode } from "react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@afenda/ui/tooltip";
 
 import { isListSurfaceTrailingActionRenderable } from "./list-surface-trailing-action.shared";
-import type { ListSurfaceRowTrailingAction } from "../schemas/list-surface-row-trailing-action.schema";
+import type { ListSurfaceRowTrailingAction } from "./gov-list-surface-row-trailing-action-schema";
 import { diagnosticsDataAttributes } from "../utils/governed-diagnostics.shared";
 import {
   governedIdentityAttributes,

@@ -1,7 +1,7 @@
 import { GovernedAuditPanel } from "../../components/governed-audit-panel";
 import { GovernedEmpty } from "./client";
-import { parseAuditPanelData } from "../../schemas/audit-panel.schema";
-import { governedParseErrorCopy } from "../../i18n/governed-renderer-copy.shared";
+import { parseAuditPanelData } from "./gov-audit-panel-schema";
+import { governedParseErrorCopy } from "../i18n/governed-renderer-copy.shared";
 
 import type { RendererProps } from "../governed-renderer-dispatch";
 import type { GovernedComponentRendererDiagnostics } from "./gov-registry";

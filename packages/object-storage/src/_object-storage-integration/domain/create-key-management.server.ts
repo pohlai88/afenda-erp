@@ -7,8 +7,8 @@ import type {
   OrganizationEncryptionSettings,
 } from "../contracts/key-management.port.shared";
 import { usesEnvelopeEncryption } from "./envelope-encryption.server";
-import { createAwsKmsKeyManagement } from "./kms-adapters/aws-kms.server";
-import { createVaultTransitKeyManagement } from "./kms-adapters/vault-transit.server";
+import { createAwsKmsKeyManagement } from "./obj-aws-kms-server";
+import { createVaultTransitKeyManagement } from "./obj-vault-transit-server";
 
 export function createKeyManagement(input: {
   organizationId: string;

@@ -1,7 +1,7 @@
 import "server-only";
 
 import { getNeonAuthEnv, isNeonAuthEnabled } from "@afenda/config/env";
-import { verifyNeonAuthWebhookPayload } from "../security/webhook-verify.server";
+import { verifyNeonAuthWebhookPayload } from "./aut-webhook-verify-server";
 import { neonAuthWebhookEnvelopeSchema } from "./aut-contract";
 import { getNeonAuthWebhookHooks } from "./aut-hooks-server";
 import {

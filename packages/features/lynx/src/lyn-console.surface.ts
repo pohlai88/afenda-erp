@@ -1,4 +1,4 @@
-import { LYNX_MODULE_ID } from "../contracts/lynx.core.contract";
+import { LYNX_MODULE_ID } from "./lyn-core-contract";
 import { lynxConsoleSections } from "./lynx.console-ui.copy.shared";
 import {
   buildGovernedListSurface,

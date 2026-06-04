@@ -20,14 +20,14 @@
       "default": "./dist/client.js"
     },
     "./neon-auth": {
-      "types": "./src/neon-auth/index.ts",
-      "development": "./src/neon-auth/index.ts",
-      "default": "./dist/neon-auth/index.js"
+      "types": "./src/aut-neon-compat-index.ts",
+      "development": "./src/aut-neon-compat-index.ts",
+      "default": "./dist/aut-neon-compat-index.js"
     },
     "./neon-auth/server": {
-      "types": "./src/neon-auth/server.ts",
-      "development": "./src/neon-auth/server.ts",
-      "default": "./dist/neon-auth/server.js"
+      "types": "./src/aut-neon-compat-server.ts",
+      "development": "./src/aut-neon-compat-server.ts",
+      "default": "./dist/aut-neon-compat-server.js"
     },
     "./neon-auth/client": {
       "types": "./src/neon-auth/client.ts",
@@ -35,29 +35,29 @@
       "default": "./dist/neon-auth/client.js"
     },
     "./neon-auth/neon-cookies": {
-      "types": "./src/neon-auth/runtime/neon-cookies.shared.ts",
-      "development": "./src/neon-auth/runtime/neon-cookies.shared.ts",
-      "default": "./dist/neon-auth/runtime/neon-cookies.shared.js"
+      "types": "./src/aut-neon-cookies-shared.ts",
+      "development": "./src/aut-neon-cookies-shared.ts",
+      "default": "./dist/aut-neon-cookies-shared.js"
     },
     "./neon-auth/neon-session": {
-      "types": "./src/neon-auth/runtime/neon-session.server.ts",
-      "development": "./src/neon-auth/runtime/neon-session.server.ts",
-      "default": "./dist/neon-auth/runtime/neon-session.server.js"
+      "types": "./src/aut-neon-session-server.ts",
+      "development": "./src/aut-neon-session-server.ts",
+      "default": "./dist/aut-neon-session-server.js"
     },
     "./neon-auth/paths": {
-      "types": "./src/neon-auth/contracts/paths.shared.ts",
-      "development": "./src/neon-auth/contracts/paths.shared.ts",
-      "default": "./dist/neon-auth/contracts/paths.shared.js"
+      "types": "./src/aut-paths-shared.ts",
+      "development": "./src/aut-paths-shared.ts",
+      "default": "./dist/aut-paths-shared.js"
     },
     "./neon-auth/ui": {
-      "types": "./src/neon-auth/ui/index.ts",
-      "development": "./src/neon-auth/ui/index.ts",
-      "default": "./dist/neon-auth/ui/index.js"
+      "types": "./src/aut-neon-compat-ui.ts",
+      "development": "./src/aut-neon-compat-ui.ts",
+      "default": "./dist/aut-neon-compat-ui.js"
     },
     "./neon-auth/pages": {
-      "types": "./src/neon-auth/pages/index.ts",
-      "development": "./src/neon-auth/pages/index.ts",
-      "default": "./dist/neon-auth/pages/index.js"
+      "types": "./src/aut-neon-compat-pages.ts",
+      "development": "./src/aut-neon-compat-pages.ts",
+      "default": "./dist/aut-neon-compat-pages.js"
     }
   },
   "dependencies": {

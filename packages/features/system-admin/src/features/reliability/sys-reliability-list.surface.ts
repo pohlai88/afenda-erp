@@ -10,7 +10,7 @@ import type {
 import {
   formatReliabilityCategoryLabel,
   formatReliabilitySeverityLabel,
-} from "../data/system-admin.reliability.verdict.server";
+} from "./system-admin.reliability.verdict.server";
 import { systemAdminReliabilityUiCopy } from "./system-admin.reliability-ui.copy.shared";
 
 export const systemAdminReliabilitySurfaceKey = "system-admin.reliability.list";

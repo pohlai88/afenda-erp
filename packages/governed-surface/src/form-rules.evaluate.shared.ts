@@ -3,7 +3,7 @@ import type {
   FormRuleCondition,
   FormRuleEffect,
   FormRuleFieldCondition,
-} from "./schemas/form-rules.schema";
+} from "./gov-form-rules-schema";
 
 export type FormFieldRuleState = {
   visible: boolean;

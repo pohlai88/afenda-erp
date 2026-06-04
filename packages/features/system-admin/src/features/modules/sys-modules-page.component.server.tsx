@@ -4,7 +4,7 @@ import { SectionPanel } from "@afenda/ui";
 
 import { updateSystemAdminModuleSettingsAction } from "../actions";
 import { buildSystemAdminModulesPageModel } from "../data";
-import { requireSystemAdminModulesRead } from "../policies";
+import { requireSystemAdminModulesRead } from "./sys-modules.policy.server";
 import {
   buildModulesListSurface,
   systemAdminModulesSurfaceKey,

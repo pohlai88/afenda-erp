@@ -14,8 +14,8 @@ import type {
   GovernedDetailTabKind,
   GovernedDetailTabsModel,
   GovernedRevisionEntry,
-} from "../schemas/detail-tabs.schema";
-import { governedDetailTabsSchema } from "../schemas/detail-tabs.schema";
+} from "./gov-detail-tabs-schema";
+import { governedDetailTabsSchema } from "./gov-detail-tabs-schema";
 
 import { governedRendererCopy } from "../i18n/governed-renderer-copy.shared";
 import { resolveGovernedDetailSectionContent } from "../metadata/detail-section.adapter";

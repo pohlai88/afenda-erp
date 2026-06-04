@@ -4,7 +4,7 @@ import { SectionPanel } from "@afenda/ui";
 import Link from "next/link";
 import { systemAdminRoutePaths } from "../../overview/contracts/system-admin.route-paths.contract";
 import { buildSystemAdminMembershipsPageModel } from "../data";
-import { requireSystemAdminMembershipsRead } from "../policies";
+import { requireSystemAdminMembershipsRead } from "./sys-memberships.policy.server";
 import { systemAdminMembershipsUiCopy } from "../surface/system-admin.memberships-ui.copy.shared";
 import {
   SystemAdminMembershipsAccessDenied,

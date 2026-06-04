@@ -9,7 +9,7 @@ import {
 } from "@afenda/governed-surface/schemas";
 
 import { requireHrRead } from "../../employee-management/compliance-regulatory-tracking/server";
-import { linkGapDevelopmentResource } from "../data/hr.talent.csf-development.server";
+import { linkGapDevelopmentResource } from "./hr.talent.csf-development.server";
 import {
   hrCsfLinkDevelopmentResourceSchema,
   hrCsfListDevelopmentForGapSchema,

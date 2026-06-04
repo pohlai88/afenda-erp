@@ -62,7 +62,7 @@ async function appendShiftAuditEvent(
   db: AfendaTransaction,
   input: {
     organizationId: string;
-    action: (typeof import("./schema/hr-shift-scheduling").hrShiftAuditActionEnum.enumValues)[number];
+    action: (typeof import("./hr-shift-scheduling").hrShiftAuditActionEnum.enumValues)[number];
     summary: string;
     actorAuthUserId?: string | null;
     employeeId?: string | null;
@@ -621,7 +621,7 @@ export async function decideHrShiftSwapRequest(input: {
     }
 
     let nextStatus: (typeof hrShiftSwapRequests.$inferSelect)["status"];
-    let auditAction: (typeof import("./schema/hr-shift-scheduling").hrShiftAuditActionEnum.enumValues)[number];
+    let auditAction: (typeof import("./hr-shift-scheduling").hrShiftAuditActionEnum.enumValues)[number];
 
     switch (input.decision) {
       case "approve":
@@ -964,7 +964,7 @@ export async function decideHrShiftScheduleChangeRequest(input: {
     }
 
     let nextStatus: (typeof hrShiftScheduleChangeRequests.$inferSelect)["status"];
-    let auditAction: (typeof import("./schema/hr-shift-scheduling").hrShiftAuditActionEnum.enumValues)[number];
+    let auditAction: (typeof import("./hr-shift-scheduling").hrShiftAuditActionEnum.enumValues)[number];
 
     switch (input.decision) {
       case "approve":

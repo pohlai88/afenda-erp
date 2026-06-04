@@ -1,10 +1,10 @@
-import type { ListSurfacePresentation } from "../schemas/list-surface-renderer.schema";
-import type { StatCardDensity } from "../schemas/stat-card.schema";
+import type { ListSurfacePresentation } from "./gov-list-surface-renderer-schema";
+import type { StatCardDensity } from "./gov-stat-card-schema";
 import type {
   ChartPresentationProfileId,
   ListPresentationProfileId,
   StatPresentationProfileId,
-} from "../schemas/presentation-profile.schema";
+} from "./gov-presentation-profile-schema";
 import type { ChartDataNature, GovernedChartKind } from "./gov-chart-schema";
 
 export type GovernedListPresentationProfileDefaults = ListSurfacePresentation;

@@ -19,7 +19,7 @@ import {
   parseAuditPanelData,
   parseGovernedApprovalTimelineConfiguration,
   parseGovernedChartConfiguration,
-} from "../../src/schemas/index";
+} from "../../src/gov-schemas-barrel";
 
 describe("resolveGovernedListPresentation", () => {
   it("merges profile defaults with export toolbar override", () => {

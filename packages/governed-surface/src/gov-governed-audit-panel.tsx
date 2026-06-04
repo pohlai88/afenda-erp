@@ -15,7 +15,7 @@ import { governedRendererCopy } from "../i18n/governed-renderer-copy.shared";
 import {
   auditPanelSchema,
   type AuditPanelModel,
-} from "../schemas/audit-panel.schema";
+} from "./gov-audit-panel-schema";
 import { diagnosticsDataAttributes } from "../utils/governed-diagnostics.shared";
 import { GovernedHeading } from "../utils/governed-heading.shared";
 import {

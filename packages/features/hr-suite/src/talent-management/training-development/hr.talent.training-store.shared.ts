@@ -3,7 +3,7 @@ import type {
   HrTrainingComplianceCompletionRef,
   HrTrainingReadinessRef,
 } from "./hr.talent.training.contract";
-import { hrTrainingAuditActions, type HrTrainingAuditAction } from "../events";
+import { hrTrainingAuditActions, type HrTrainingAuditAction } from "./hr.talent.training.event";
 import type { HrTrainingReportGroupBy } from "./hr.talent.training-constants.shared";
 import type {
   HrTrainingAssessmentInput,

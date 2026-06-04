@@ -10,7 +10,7 @@ import {
   computeAatTotalLostWorkdays,
   HrAatAnalyticsInvariantError,
   resolveAatDimensionGroup,
-} from "../data/hr.time.aat-analytics-core.shared";
+} from "./hr.time.aat-analytics-core.shared";
 import {
   hrAatAnalyticsQuerySchema,
   hrAatAnalyticsSnapshotSchema,

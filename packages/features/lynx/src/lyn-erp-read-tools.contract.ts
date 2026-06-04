@@ -5,10 +5,10 @@ export {
   lynxErpReadSignalSchema,
   lynxErpReadToolInputSchema,
   lynxErpReadToolOutputSchema,
-} from "../schemas/lynx.erp-read-tools.schema";
+} from "./lyn-erp-read-tools-schema";
 export type {
   LynxErpReadEvidence,
   LynxErpReadToolId,
   LynxErpReadToolInput,
   LynxErpReadToolOutput,
-} from "../schemas/lynx.erp-read-tools.schema";
+} from "./lyn-erp-read-tools-schema";

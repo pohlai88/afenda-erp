@@ -37,14 +37,14 @@ import { ActionFormErrors } from "../../components/action-form-errors";
 import {
   actionFailure,
   type ActionResult,
-} from "../../schemas/action-result.shared";
-import type { ListSurfaceToolbar } from "../../schemas/list-surface-toolbar.schema";
+} from "./gov-action-result-shared";
+import type { ListSurfaceToolbar } from "./gov-list-surface-toolbar-schema";
 import {
   GOVERNED_ACTION_ID_FIELD,
   GOVERNED_CONFIRM_FIELD,
   GOVERNED_SELECTED_ROW_ID_FIELD,
   type GovernedServerActionHandler,
-} from "../../schemas/server-actions.shared";
+} from "./gov-server-actions-shared";
 import type { uiDensity } from "@afenda/ui/design-system";
 
 export type ListSurfaceToolbarClientProps = {

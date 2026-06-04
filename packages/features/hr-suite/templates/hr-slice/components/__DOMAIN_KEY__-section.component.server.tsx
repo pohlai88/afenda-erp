@@ -7,7 +7,7 @@ import { SectionPanel } from "@afenda/ui";
 import type {
   __IDENTIFIER__PageModel,
   __IDENTIFIER__PageModelListSection,
-} from "../data/__DOMAIN_KEY__.page-model.server";
+} from "./__DOMAIN_KEY__.page-model.server";
 import { __IDENTIFIER_CAMEL__OverviewKpiSurfaceKey } from "../surface/__DOMAIN_KEY__-surface-metadata.shared";
 import { __IDENTIFIER_CAMEL__UiCopy } from "../surface/__DOMAIN_KEY__-ui.copy.shared";
 

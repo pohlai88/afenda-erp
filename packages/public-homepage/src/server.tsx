@@ -1,9 +1,9 @@
 import "server-only";
 
-import { HomepageShell } from "./components/homepage-shell.server";
+import { HomepageShell } from "./pub-homepage-shell-server";
 import { homepageContent } from "./pub-homepage-content";
 import { homepageContentSchema } from "./pub-homepage-schema";
-import { buildHomepageMetadata } from "./seo/homepage-seo";
+import { buildHomepageMetadata } from "./pub-homepage-seo";
 
 const content = homepageContentSchema.parse(homepageContent);
 

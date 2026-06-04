@@ -8,8 +8,8 @@
 import { describe, expect, it } from "vitest";
 
 import { GovernedComponentTree } from "../../src/metadata/governed-component-tree";
-import type { AfendaGovernedComponentRegistry } from "../../src/metadata/registry";
-import { GOVERNED_METADATA_SCHEMA_VERSION } from "../../src/schemas/schema-version.shared";
+import type { AfendaGovernedComponentRegistry } from "../../src/gov-registry";
+import { GOVERNED_METADATA_SCHEMA_VERSION } from "../../src/gov-schema-version-shared";
 
 // Helper: extract the `model` prop from a GovernedEmpty element.
 function getEmptyModel(

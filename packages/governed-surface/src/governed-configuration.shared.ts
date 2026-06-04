@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import type { GovernedDetailSection } from "./schemas/detail-tabs.schema";
+import type { GovernedDetailSection } from "./gov-detail-tabs-schema";
 import type { GovernedComponentRendererInput } from "./gov-registry";
 
 const configurationDataNatureProbeSchema = z

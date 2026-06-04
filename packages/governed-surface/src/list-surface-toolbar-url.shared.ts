@@ -1,4 +1,4 @@
-import type { ListSurfaceToolbar } from "./schemas/list-surface-toolbar.schema";
+import type { ListSurfaceToolbar } from "./gov-list-surface-toolbar-schema";
 
 const LOCAL_URL_BASE = "http://localhost";
 

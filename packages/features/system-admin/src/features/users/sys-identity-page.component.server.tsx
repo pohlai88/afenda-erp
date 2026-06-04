@@ -1,6 +1,6 @@
 import { hasExecutionPermission } from "@afenda/kernel/execution";
 import { listRoleOverridesForOrganization } from "../data";
-import { requireSystemAdminUsersRead } from "../policies";
+import { requireSystemAdminUsersRead } from "./sys-users.policy.server";
 import {
   SystemAdminIdentityAccessDenied,
 } from "./system-admin.identity-access.component.server";

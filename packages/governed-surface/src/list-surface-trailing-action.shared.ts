@@ -1,5 +1,5 @@
 import type { ActionDescriptor } from "./gov-action-schema";
-import type { ListSurfaceRowTrailingAction } from "./schemas/list-surface-row-trailing-action.schema";
+import type { ListSurfaceRowTrailingAction } from "./gov-list-surface-row-trailing-action-schema";
 
 export type ResolveListSurfaceRowTrailingActionInput = {
   /** When false, the trailing column omits UI for this row. Default true. */

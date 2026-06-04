@@ -23,8 +23,8 @@ import {
   diffSecurityDomainChanges,
   getSystemAdminOrganizationSecuritySettings,
   mapParsedSecurityInputToOrganizationSettings,
-} from "../data/system-admin.security.query.server";
-import { mapOrganizationSecurityToTenantPatch } from "../data/system-admin.security.mapper";
+} from "./system-admin.security.query.server";
+import { mapOrganizationSecurityToTenantPatch } from "./system-admin.security.mapper";
 import { redactAuditMetadata } from "../../audit-viewer/data/system-admin.audit-metadata.redact.shared";
 import {
   systemAdminSecurityAuditActions,

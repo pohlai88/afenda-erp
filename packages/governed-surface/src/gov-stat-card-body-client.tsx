@@ -19,7 +19,7 @@ import type {
   StatCardIcon,
   StatCardItem,
   StatCardTone,
-} from "../../schemas/stat-card.schema";
+} from "./gov-stat-card-schema";
 import { cn } from "@afenda/ui/utils";
 
 import { ListSurfaceSparkline } from "./list-surface-sparkline.client";

@@ -1,13 +1,13 @@
 import {
   getLynxRunDetail,
   recordLynxRunFeedback,
-} from "../data/lynx.run-ledger.repository.server";
+} from "./lynx.run-ledger.repository.server";
 import { writeExecutionAuditEvent } from "@afenda/kernel/execution";
 import {
   buildLynxRunFeedbackRecordedEventMetadata,
   LYNX_RUN_FEEDBACK_AUDIT_ACTION,
 } from "../events/lynx.run-feedback.event";
-import type { LynxLiveRunFeedbackRequest } from "../schemas/lynx.run-feedback.schema";
+import type { LynxLiveRunFeedbackRequest } from "./lyn-run-feedback-schema";
 
 export async function recordLynxRunFeedbackDomain(input: {
   organizationId: string;

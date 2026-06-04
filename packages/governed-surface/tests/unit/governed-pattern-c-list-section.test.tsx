@@ -10,7 +10,7 @@ import { GovernedPatternCListSection } from "../../src/components/governed-patte
 import { resolvePatternCTableTrailingColumn } from "../../src/components/governed-pattern-c-list-table-host.client";
 import {
   type ListSurfaceRendererConfigurationInput,
-} from "../../src/schemas/list-surface-renderer.schema";
+} from "../../src/gov-list-surface-renderer-schema";
 
 function buildListConfig(
   rows: ListSurfaceRendererConfigurationInput["rows"] = [],

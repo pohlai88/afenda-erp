@@ -18,7 +18,7 @@ import {
   rankDimensionTrendRows,
   type HrAatTrendMovementRow,
 } from "../schemas/hr.time.aat-comparison.schema";
-import { projectHeatmapFact } from "../data/hr.time.aat-heatmap.server";
+import { projectHeatmapFact } from "./hr.time.aat-heatmap.server";
 
 describe("HRM-AAT-012 planned vs unplanned classification", () => {
   it("treats annual leave with notice as planned", () => {

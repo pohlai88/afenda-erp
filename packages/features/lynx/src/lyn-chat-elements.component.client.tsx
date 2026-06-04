@@ -23,18 +23,18 @@ import {
   useState,
 } from "react";
 import { Streamdown, type Components, type ExtraProps } from "streamdown";
-import { LYNX_ERP_HTTP_ROUTES } from "../contracts/lynx.core.contract";
+import { LYNX_ERP_HTTP_ROUTES } from "./lyn-core-contract";
 import {
   lynxRunContextDataSchema,
   lynxRunContextMetadataSchema,
   type LynxRunContextData,
   type LynxRunFeedbackCategory,
   type LynxRunFeedbackRating,
-} from "../schemas/lynx.run-feedback.schema";
+} from "./lyn-run-feedback-schema";
 import {
   lynxTruthEvidenceDataSchema,
   lynxTruthQualityGateDataSchema,
-} from "../schemas/lynx.truth.schema";
+} from "./lyn-truth-schema";
 import {
   getLynxChatStatus,
   getLynxRunStepState,

@@ -1,11 +1,11 @@
-import { GOVERNED_METADATA_SCHEMA_VERSION } from "../schemas/schema-version.shared";
+import { GOVERNED_METADATA_SCHEMA_VERSION } from "./gov-schema-version-shared";
 import { resolveGovernedListPresentation } from "../resolvers/resolve-governed-presentation";
 import type {
   ListSurfacePresentation,
   ListSurfaceRendererConfigurationInput,
   ListSurfaceRendererConfigurationResolvedInput,
-} from "../schemas/list-surface-renderer.schema";
-import type { ListPresentationProfileId } from "../schemas/presentation-profile.schema";
+} from "./gov-list-surface-renderer-schema";
+import type { ListPresentationProfileId } from "./gov-presentation-profile-schema";
 
 export type BuildGovernedListSurfaceInput = Omit<
   ListSurfaceRendererConfigurationInput,

@@ -17,8 +17,8 @@ import {
   getAiFeatureEntitlementsSummary,
   getAiSandboxesSummary,
   getAiUsageRouteSummary,
-} from "../data/system-admin.lynx.query.server";
-import { getTenantAiSpendEntries } from "../data/system-admin.lynx-spend.query.server";
+} from "./system-admin.lynx.query.server";
+import { getTenantAiSpendEntries } from "./system-admin.lynx-spend.query.server";
 import {
   buildGatewaySpendListSurface,
   buildSystemAdminAiApprovalsListSurface,
@@ -32,7 +32,7 @@ import {
   systemAdminGatewaySpendSurfaceKey,
   systemAdminLynxUiCopy,
 } from "../approvals/metadata";
-import { requireSystemAdminLynxRead } from "../policies";
+import { requireSystemAdminLynxRead } from "./sys-lynx.policy.server";
 import {
   AiFeatureEntitlementTrailingCell,
   LynxOutcomeMonitorSection,

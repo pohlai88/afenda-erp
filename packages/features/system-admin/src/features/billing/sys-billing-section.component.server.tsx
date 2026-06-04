@@ -1,6 +1,6 @@
 import { GovernedPatternCListSection } from "@afenda/governed-surface/server";
 import { SectionPanel } from "@afenda/ui";
-import type { SystemAdminBillingPageModel } from "../data/system-admin.billing.page-model.server";
+import type { SystemAdminBillingPageModel } from "./system-admin.billing.page-model.server";
 import {
   buildBillingContactsListSurface,
   buildBillingEntitlementsListSurface,

@@ -42,7 +42,7 @@ import {
   createAiUsageEvent,
   isAiFeatureEnabledForOrganization,
   registerAiApprovalProposal,
-} from "../data/ai-http-persistence.repository.server";
+} from "./ai-http-persistence.repository.server";
 
 export const AI_ERP_ASSISTANT_MAX_DURATION = 30;
 

@@ -4,8 +4,8 @@ import Link from "next/link";
 import { Button } from "@afenda/ui/button";
 import { cn } from "@afenda/ui/utils";
 
-import type { GovernedRenderableState } from "../schemas/governed-component-state.schema";
-import type { PageHeader } from "../schemas/page-header.schema";
+import type { GovernedRenderableState } from "./gov-governed-component-state-schema";
+import type { PageHeader } from "./gov-page-header-schema";
 import { diagnosticsDataAttributes } from "../utils/governed-diagnostics.shared";
 import {
   governedHeadingId,

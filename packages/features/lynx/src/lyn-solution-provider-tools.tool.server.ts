@@ -27,7 +27,7 @@ import {
   evidenceRecordSchema,
   recoveryPlaybookSchema,
   rootCauseAnalysisSchema,
-} from "../schemas/lynx.solution-provider.schema";
+} from "./lyn-solution-provider.schema";
 
 const recoveryConsoleModuleIds = getRecoveryConsoleModuleIds();
 const solutionToolModuleBindings = getSolutionToolModuleBindings();

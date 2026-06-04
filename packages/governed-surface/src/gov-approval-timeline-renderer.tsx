@@ -10,16 +10,16 @@ import {
   parseGovernedApprovalTimelineConfiguration,
   type ApprovalTimelineDataNature,
   type ApprovalTimelineStepStatus,
-} from "../../schemas/approval-timeline.schema";
+} from "./gov-approval-timeline-schema";
 import {
   governedParseErrorCopy,
   governedRendererCopy,
-} from "../../i18n/governed-renderer-copy.shared";
-import { diagnosticsDataAttributes } from "../../utils/governed-diagnostics.shared";
+} from "../i18n/governed-renderer-copy.shared";
+import { diagnosticsDataAttributes } from "../utils/governed-diagnostics.shared";
 import {
   governedIdentityAttributes,
   governedTestId,
-} from "../../utils/governed-identity.shared";
+} from "../utils/governed-identity.shared";
 import { cn } from "@afenda/ui/utils";
 
 import type { RendererProps } from "../governed-renderer-dispatch";

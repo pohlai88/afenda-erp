@@ -1,7 +1,7 @@
 import { GovernedDetailTabs } from "../../components/governed-detail-tabs";
 import { GovernedEmpty } from "./client";
-import { parseGovernedDetailTabsData } from "../../schemas/detail-tabs.schema";
-import { governedParseErrorCopy } from "../../i18n/governed-renderer-copy.shared";
+import { parseGovernedDetailTabsData } from "./gov-detail-tabs-schema";
+import { governedParseErrorCopy } from "../i18n/governed-renderer-copy.shared";
 
 import type { GovernedComponentRendererDiagnostics } from "./gov-registry";
 import type { RendererProps } from "../governed-renderer-dispatch";

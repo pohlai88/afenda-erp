@@ -5,8 +5,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { ReactNode } from "react";
 
-import { neonAuthClient } from "../runtime/neon-auth.client";
-import { resolveNeonAuthUiProviderOptions } from "./neon-auth-ui.config.shared";
+import { neonAuthClient } from "./aut-neon-auth-client";
+import { resolveNeonAuthUiProviderOptions } from "./aut-neon-auth-ui-config-shared";
 
 export type NeonAuthUiProviderProps = {
   children: ReactNode;

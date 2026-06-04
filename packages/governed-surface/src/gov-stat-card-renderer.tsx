@@ -4,20 +4,20 @@ import {
   parseStatCardConfiguration,
   type StatCardDensity,
   type StatCardItem,
-} from "../../schemas/stat-card.schema";
+} from "./gov-stat-card-schema";
 import {
   governedParseErrorCopy,
   governedRendererCopy,
-} from "../../i18n/governed-renderer-copy.shared";
+} from "../i18n/governed-renderer-copy.shared";
 import { GOVERNED_STAT_GRID_CLASS } from "./stat-card-layout.shared";
-import { diagnosticsDataAttributes } from "../../utils/governed-diagnostics.shared";
+import { diagnosticsDataAttributes } from "../utils/governed-diagnostics.shared";
 import {
   governedIdentityAttributes,
   governedTestId,
-} from "../../utils/governed-identity.shared";
+} from "../utils/governed-identity.shared";
 
 import type { GovernedComponentRendererDiagnostics } from "./gov-registry";
-import { StatCardBody } from "./stat-card-body.client";
+import { StatCardBody } from "./gov-stat-card-body-client";
 
 export type StatCardRendererProps = {
   configuration: unknown;

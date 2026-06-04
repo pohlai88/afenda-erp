@@ -4,7 +4,7 @@ import {
 } from "@afenda/governed-surface";
 import type { StatCardConfigurationResolvedInput } from "@afenda/governed-surface/schemas";
 
-import type { OrganizationStorageQuotaSnapshot } from "../data/system-admin.organization-storage-quota.read-model.server";
+import type { OrganizationStorageQuotaSnapshot } from "./system-admin.organization-storage-quota.read-model.server";
 
 export const systemAdminOrganizationStorageQuotaSurfaceKey =
   "system-admin.organization-storage-quota";

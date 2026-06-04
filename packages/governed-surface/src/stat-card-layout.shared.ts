@@ -1,4 +1,4 @@
-import type { StatCardDensity } from "./schemas/stat-card.schema";
+import type { StatCardDensity } from "./gov-stat-card-schema";
 
 /** Shared stat-card grid geometry — keep skeletons and renderers in sync. */
 export const GOVERNED_STAT_GRID_CLASS: Record<StatCardDensity, string> = {

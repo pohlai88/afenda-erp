@@ -6,7 +6,7 @@ import { erpPreLoginPostAuthPath } from "./aut-paths-shared";
 import {
   readNeonAuthSessionPayload,
   type NeonAuthSessionPayload,
-} from "../runtime/neon-session.server";
+} from "./aut-neon-session-server";
 
 export { erpPreLoginPostAuthPath };
 

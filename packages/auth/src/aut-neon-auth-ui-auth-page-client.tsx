@@ -2,7 +2,7 @@
 
 import { AuthView } from "@neondatabase/auth-ui";
 
-import type { NeonAuthUiAuthViewSlug } from "./neon-auth-ui.routes.shared";
+import type { NeonAuthUiAuthViewSlug } from "./aut-neon-auth-ui-routes-shared";
 
 export type NeonAuthUiAuthPageProps = {
   view: NeonAuthUiAuthViewSlug;

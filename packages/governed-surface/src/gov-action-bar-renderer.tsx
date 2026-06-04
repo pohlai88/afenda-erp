@@ -2,15 +2,15 @@ import { GovernedEmpty } from "./client";
 import {
   GOVERNED_ACTION_BAR_CONFIGURATION_SCHEMA_ID,
   parseGovernedActionBarConfiguration,
-} from "../../schemas/action-bar.schema";
-import { governedParseErrorCopy } from "../../i18n/governed-renderer-copy.shared";
-import { densityGapClass } from "../../schemas/surface-chrome.classes";
-import { diagnosticsDataAttributes } from "../../utils/governed-diagnostics.shared";
+} from "./gov-action-bar-schema";
+import { governedParseErrorCopy } from "../i18n/governed-renderer-copy.shared";
+import { densityGapClass } from "./gov-surface-chrome-classes";
+import { diagnosticsDataAttributes } from "../utils/governed-diagnostics.shared";
 import {
   governedIdentityAttributes,
   governedTestId,
-} from "../../utils/governed-identity.shared";
-import { resolveGovernedServerAction } from "../../schemas/server-actions.shared";
+} from "../utils/governed-identity.shared";
+import { resolveGovernedServerAction } from "./gov-server-actions-shared";
 import { Badge } from "@afenda/ui/badge";
 import { cn } from "@afenda/ui/utils";
 

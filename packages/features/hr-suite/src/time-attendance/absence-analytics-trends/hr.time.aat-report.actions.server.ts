@@ -7,7 +7,7 @@ import {
   buildHrAatTrendReport,
   buildHrAatTrendReportCsv,
   toHrAatReportActionFailure,
-} from "../data/hr.time.aat-report.server";
+} from "./hr.time.aat-report.server";
 import {
   HrAatAccessDeniedError,
   requireHrAatReportExport,

@@ -10,9 +10,9 @@ import {
 } from "@afenda/ui/card";
 import { cn } from "@afenda/ui/utils";
 
-import type { GovernedRenderableState } from "../schemas/governed-component-state.schema";
-import type { EmptyState } from "../schemas/list-surface.schema";
-import { densityGapClass } from "../schemas/surface-chrome.classes";
+import type { GovernedRenderableState } from "./gov-governed-component-state-schema";
+import type { EmptyState } from "./gov-list-surface-schema";
+import { densityGapClass } from "./gov-surface-chrome-classes";
 import { diagnosticsDataAttributes } from "../utils/governed-diagnostics.shared";
 import {
   governedIdentityAttributes,

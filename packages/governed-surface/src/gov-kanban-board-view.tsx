@@ -4,7 +4,7 @@ import type {
   GovernedKanbanBoardConfiguration,
   KanbanCard,
   KanbanCardTransitionAvailability,
-} from "../../schemas/kanban-board.schema";
+} from "./gov-kanban-board-schema";
 import {
   GovernedKanbanTransitionHint,
   governedKanbanCardTestId,
@@ -21,7 +21,7 @@ import {
   resolveKanbanColumns,
 } from "./kanban-board-presentation";
 import { GovernedEmpty } from "./client";
-import { governedRendererCopy } from "../../i18n/governed-renderer-copy.shared";
+import { governedRendererCopy } from "../i18n/governed-renderer-copy.shared";
 
 export {
   groupCardsByColumn,

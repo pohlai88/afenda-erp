@@ -11,7 +11,7 @@ import {
   assertSftRequirementCoverageComplete,
   assertSftWorkflowCoverageComplete,
   SFT_REQUIREMENT_COVERAGE,
-} from "../data/hr.time.sft-acceptance-coverage.shared";
+} from "./hr.time.sft-acceptance-coverage.shared";
 import {
   hrTimeSftAuditActions,
   HR_SFT_EMITTED_AUDIT_ACTIONS,

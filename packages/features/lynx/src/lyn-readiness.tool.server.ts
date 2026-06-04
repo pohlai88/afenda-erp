@@ -3,8 +3,8 @@ import {
   type GovernedToolAuditLogger,
 } from "@afenda/ai/server";
 import { tool } from "ai";
-import type { LynxReadinessSnapshot } from "../contracts/lynx.readiness.contract";
-import { inspectLynxReadinessInputSchema } from "../schemas/lynx.readiness-tools.schema";
+import type { LynxReadinessSnapshot } from "./lyn-readiness-contract";
+import { inspectLynxReadinessInputSchema } from "./lyn-readiness-tools-schema";
 import { lynxReadinessToolMeta } from "./lynx.tool-meta";
 
 export function createLynxReadinessTools(input: {

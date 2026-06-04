@@ -3,12 +3,12 @@ import "server-only";
 import { connection } from "next/server";
 import { notFound } from "next/navigation";
 
-import { NeonAuthUiAuthPage } from "./neon-auth-ui-auth-page.client";
-import { NeonAuthUiPageGate } from "./neon-auth-ui-page-gate.server";
+import { NeonAuthUiAuthPage } from "./aut-neon-auth-ui-auth-page-client";
+import { NeonAuthUiPageGate } from "./aut-neon-auth-ui-page-gate-server";
 import {
   isNeonAuthUiAuthViewPath,
   neonAuthUiAuthGenerateStaticParams,
-} from "./neon-auth-ui.routes.shared";
+} from "./aut-neon-auth-ui-routes-shared";
 
 export { neonAuthUiAuthGenerateStaticParams as generateStaticParams };
 

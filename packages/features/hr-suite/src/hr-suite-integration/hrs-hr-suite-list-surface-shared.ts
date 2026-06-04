@@ -11,8 +11,8 @@ import {
   type ResolveListSurfaceRowTrailingActionInput,
 } from "@afenda/governed-surface";
 
-import type { HrListWindow } from "../contracts/hr-suite-pagination.contract";
-import type { HrSuiteErpPermissionDescriptor } from "../contracts/hr-suite-permission.contract";
+import type { HrListWindow } from "./hrs-hr-suite-pagination-contract";
+import type { HrSuiteErpPermissionDescriptor } from "./hrs-hr-suite-permission-contract";
 
 export type HrSuiteListColumn =
   ListSurfaceRendererConfigurationInput["columns"][number];

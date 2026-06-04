@@ -1,6 +1,6 @@
 "use server";
 
-import { executeApprovedSandbox } from "../data/ai-sandbox-executors.data.server";
+import { executeApprovedSandbox } from "./ai-sandbox-executors.data.server";
 import {
   transitionAiActionSandbox,
   upsertAiFeatureEntitlement,

@@ -18,7 +18,7 @@ import {
 import {
   evaluateLynxEvalGate,
   getAggregateLynxReadinessStatus,
-} from "../contracts/lynx.readiness.contract";
+} from "./lyn-readiness-contract";
 import {
   lynxReadinessSnapshotSchema,
   type LynxModuleReadiness,
@@ -26,7 +26,7 @@ import {
   type LynxReadinessSnapshot,
   type LynxReadinessStatus,
   type LynxToolAvailability,
-} from "../schemas/lynx.readiness.schema";
+} from "./lyn-readiness-schema";
 
 type SessionSource = "dev" | "neon";
 

@@ -3,15 +3,15 @@ import {
   GOVERNED_LIST_PRESENTATION_PROFILES,
   GOVERNED_STAT_PRESENTATION_PROFILES,
 } from "../profiles/governed-presentation-profiles";
-import type { ListSurfacePresentation } from "../schemas/list-surface-renderer.schema";
-import type { StatCardDensity } from "../schemas/stat-card.schema";
+import type { ListSurfacePresentation } from "./gov-list-surface-renderer-schema";
+import type { StatCardDensity } from "./gov-stat-card-schema";
 import type { ChartDataNature, GovernedChartKind } from "./gov-chart-schema";
-import type { ListSurfaceToolbar } from "../schemas/list-surface-toolbar.schema";
+import type { ListSurfaceToolbar } from "./gov-list-surface-toolbar-schema";
 import type {
   ChartPresentationProfileId,
   ListPresentationProfileId,
   StatPresentationProfileId,
-} from "../schemas/presentation-profile.schema";
+} from "./gov-presentation-profile-schema";
 
 function mergeListSurfaceToolbar(
   base: ListSurfaceToolbar | undefined,

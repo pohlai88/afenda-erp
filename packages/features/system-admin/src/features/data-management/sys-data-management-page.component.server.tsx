@@ -2,7 +2,7 @@ import { hasExecutionPermission } from "@afenda/kernel/execution";
 
 import { exportSystemAdminDataManagementAction } from "../actions";
 import { buildSystemAdminDataManagementPageModel } from "../data";
-import { requireSystemAdminDataManagementRead } from "../policies";
+import { requireSystemAdminDataManagementRead } from "./sys-data-management.policy.server";
 import {
   SystemAdminDataManagementAccessDenied,
   SystemAdminDataManagementSection,

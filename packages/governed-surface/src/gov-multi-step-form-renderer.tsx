@@ -2,14 +2,14 @@ import { GovernedEmpty } from "./client";
 import {
   GOVERNED_MULTI_STEP_FORM_SCHEMA_ID,
   parseGovernedMultiStepFormConfiguration,
-} from "../../schemas/multi-step-form.schema";
-import { resolveGovernedServerAction } from "../../schemas/server-actions.shared";
-import { governedParseErrorCopy } from "../../i18n/governed-renderer-copy.shared";
-import { diagnosticsDataAttributes } from "../../utils/governed-diagnostics.shared";
+} from "./gov-multi-step-form-schema";
+import { resolveGovernedServerAction } from "./gov-server-actions-shared";
+import { governedParseErrorCopy } from "../i18n/governed-renderer-copy.shared";
+import { diagnosticsDataAttributes } from "../utils/governed-diagnostics.shared";
 import {
   governedIdentityAttributes,
   governedTestId,
-} from "../../utils/governed-identity.shared";
+} from "../utils/governed-identity.shared";
 
 import type { RendererProps } from "../governed-renderer-dispatch";
 

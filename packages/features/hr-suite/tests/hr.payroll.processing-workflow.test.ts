@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { PAYROLL_WORKFLOW_TRANSITIONS } from "../data/hr.payroll.processing-workflow.shared";
+import { PAYROLL_WORKFLOW_TRANSITIONS } from "./hr.payroll.processing-workflow.shared";
 
 describe("HRM-PAY-021..023 payroll workflow transitions", () => {
   it("defines preview before approval path", () => {

@@ -17,15 +17,15 @@ import {
   type HrPayrollRunCalculationResult,
 } from "@afenda/db";
 
-import { importHrPayrollInputsForRun } from "../data/hr.payroll.processing-input-collection.server";
+import { importHrPayrollInputsForRun } from "./hr.payroll.processing-input-collection.server";
 import {
   approvePayrollRun,
   finalizePayrollRun,
   generatePayrollPreview,
   lockPayrollRun,
   submitPayrollForApproval,
-} from "../data/hr.payroll.processing-workflow.server";
-import { runHrPayrollProcessingValidation } from "../data/hr.payroll.processing-validation.server";
+} from "./hr.payroll.processing-workflow.server";
+import { runHrPayrollProcessingValidation } from "./hr.payroll.processing-validation.server";
 import {
   runHrPayrollValidationFormSchema,
 } from "./hr.payroll.processing-validation.schema";

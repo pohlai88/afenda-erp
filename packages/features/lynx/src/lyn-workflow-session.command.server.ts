@@ -1,9 +1,9 @@
 import {
   createLynxWorkflowSession,
   updateLynxWorkflowSession,
-} from "../data/lynx.workflow-session.repository.server";
-import type { LynxQualityGateResult } from "../schemas/lynx.evidence-trust.schema";
-import type { LynxWorkflowSessionStatus } from "../data/lynx.run-ledger.repository.server";
+} from "./lynx.workflow-session.repository.server";
+import type { LynxQualityGateResult } from "./lyn-evidence-trust-schema";
+import type { LynxWorkflowSessionStatus } from "./lynx.run-ledger.repository.server";
 
 type JsonRecord = Record<string, unknown>;
 

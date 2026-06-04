@@ -1,4 +1,4 @@
-import type { HrAatAnalyticsSnapshotWindow } from "../data/hr.time.aat-snapshots.server";
+import type { HrAatAnalyticsSnapshotWindow } from "./hr.time.aat-snapshots.server";
 import {
   buildAatListSearchToolbar,
   buildAatOperationalListSurface,

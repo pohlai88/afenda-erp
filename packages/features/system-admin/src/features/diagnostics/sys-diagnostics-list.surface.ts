@@ -12,7 +12,7 @@ import {
   formatDiagnosticCategoryLabel,
   formatDiagnosticSeverityLabel,
   formatModuleCoverageStatusLabel,
-} from "../data/system-admin.diagnostics.verdict.server";
+} from "./system-admin.diagnostics.verdict.server";
 import { systemAdminDiagnosticsUiCopy } from "./system-admin.diagnostics-ui.copy.shared";
 
 export const systemAdminDiagnosticsSurfaceKey =

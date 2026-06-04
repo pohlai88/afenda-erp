@@ -1,7 +1,7 @@
 import type {
   AuditPanelModel,
   AuditPanelRow,
-} from "../schemas/audit-panel.schema";
+} from "./gov-audit-panel-schema";
 
 export type BuildGovernedAuditRowInput = Omit<AuditPanelRow, "tone"> & {
   tone?: AuditPanelRow["tone"];

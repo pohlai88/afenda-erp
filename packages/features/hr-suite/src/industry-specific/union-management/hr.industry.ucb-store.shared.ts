@@ -8,7 +8,7 @@ import type {
 import {
   hrIndustryUcbAuditActions,
   type HrIndustryUcbAuditAction,
-} from "../events";
+} from "./hr.industry.ucb.event";
 import type { HrUcbReportGroupBy } from "./hr.industry.ucb-constants.shared";
 import type {
   HrUcbAlertInput,

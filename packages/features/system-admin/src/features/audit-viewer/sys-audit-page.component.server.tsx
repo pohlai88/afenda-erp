@@ -5,7 +5,7 @@ import {
   upsertSystemAdminRetentionPolicyAction,
 } from "../actions";
 import { buildSystemAdminAuditPageModel } from "../data";
-import { requireSystemAdminAuditRead } from "../policies";
+import { requireSystemAdminAuditRead } from "./sys-audit-viewer.policy.server";
 import {
   SystemAdminAuditAccessDenied,
   SystemAdminAuditSection,

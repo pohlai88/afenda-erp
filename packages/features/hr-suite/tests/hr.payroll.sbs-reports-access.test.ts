@@ -4,11 +4,11 @@ import {
   buildHrSbsBenchmarkReportCsv,
   buildHrSbsBenchmarkReportRows,
   filterHrSbsPayEquityReportRows,
-} from "../data/hr.payroll.sbs-reports.shared";
+} from "./hr.payroll.sbs-reports.shared";
 import {
   deriveHrSbsBandReviewIndicator,
   deriveHrSbsMarketMovementIndicator,
-} from "../data/hr.payroll.sbs-recommendations.server";
+} from "./hr.payroll.sbs-recommendations.server";
 
 describe("hr.payroll.sbs reports", () => {
   it("filters benchmark report rows by market position", () => {

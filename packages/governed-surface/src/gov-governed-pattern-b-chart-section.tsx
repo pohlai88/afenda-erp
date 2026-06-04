@@ -3,11 +3,11 @@ import "server-only";
 import type { ReactNode } from "react";
 
 import { GovernedComponentRenderer } from "./index";
-import { logUnexpectedServerError } from "../data/governed-logging.server";
+import { logUnexpectedServerError } from "./governed-logging.server";
 import { getGovernedSurfaceTranslations } from "../i18n/governed-surface-copy";
 import { governedTestId } from "../utils/governed-identity.shared";
 
-import type { EmptyState } from "../schemas/list-surface.schema";
+import type { EmptyState } from "./gov-list-surface-schema";
 import {
   parseGovernedChartConfiguration,
   type GovernedChartConfigurationInput,

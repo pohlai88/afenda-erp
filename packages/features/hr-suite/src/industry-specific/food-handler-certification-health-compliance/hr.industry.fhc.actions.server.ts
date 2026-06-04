@@ -10,7 +10,7 @@ import {
   listHrIndustryFhcLearningRequirementRefs,
   listHrIndustryFhcShiftSchedulingEligibilityRefs,
 } from "./hr.industry.fhc-store.shared";
-import { hrIndustryFhcAuditActions } from "../events";
+import { hrIndustryFhcAuditActions } from "./hr.industry.fhc.event";
 import {
   requireHrIndustryFhcApprove,
   requireHrIndustryFhcRead,
@@ -23,7 +23,7 @@ import {
   type HrFhcDutyRestrictionInput,
   type HrFhcEvidenceSubmissionInput,
   type HrFhcRenewalCaseInput,
-} from "../schemas";
+} from "./hr.industry.fhc.schema";
 
 type EvidenceSubmissionActionInput = Omit<
   HrFhcEvidenceSubmissionInput,

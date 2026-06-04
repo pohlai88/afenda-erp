@@ -14,13 +14,13 @@ import {
   type LynxRunLedgerFilters,
   type LynxRunLedgerSummary,
   type LynxWorkflowSessionStatus,
-} from "../data/lynx.run-ledger.repository.server";
+} from "./lynx.run-ledger.repository.server";
 import {
   getLynxWorkflowSession,
   listLynxWorkflowSessions,
   type LynxWorkflowSessionFilters,
   type LynxWorkflowSessionSummary,
-} from "../data/lynx.workflow-session.repository.server";
+} from "./lynx.workflow-session.repository.server";
 import {
   buildLynxClaimValidationListSurface,
   buildLynxRunDetailStatGrid,

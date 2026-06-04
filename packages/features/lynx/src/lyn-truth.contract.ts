@@ -4,14 +4,14 @@ export {
   lynxTruthEvidencePassageSchema,
   lynxTruthQualityGateDataSchema,
   lynxTruthRetrievalStateDataSchema,
-} from "../schemas/lynx.truth.schema";
+} from "./lyn-truth-schema";
 export type {
   LynxTruthEvidenceData,
   LynxTruthEvidencePassage,
   LynxTruthQualityGateData,
   LynxTruthRetrievalStateData,
   LynxTruthRetrievalStatus,
-} from "../schemas/lynx.truth.schema";
+} from "./lyn-truth-schema";
 
 export type LynxTruthValidation = {
   hasRequiredSections: boolean;

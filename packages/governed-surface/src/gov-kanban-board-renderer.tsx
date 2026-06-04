@@ -2,12 +2,12 @@ import { GovernedEmpty } from "./client";
 import {
   GOVERNED_KANBAN_BOARD_SCHEMA_ID,
   parseGovernedKanbanBoardConfiguration,
-} from "../../schemas/kanban-board.schema";
-import { diagnosticsDataAttributes } from "../../utils/governed-diagnostics.shared";
+} from "./gov-kanban-board-schema";
+import { diagnosticsDataAttributes } from "../utils/governed-diagnostics.shared";
 import {
   governedIdentityAttributes,
   governedTestId,
-} from "../../utils/governed-identity.shared";
+} from "../utils/governed-identity.shared";
 
 import type { RendererProps } from "../governed-renderer-dispatch";
 import type { GovernedComponentRendererDiagnostics } from "./gov-registry";

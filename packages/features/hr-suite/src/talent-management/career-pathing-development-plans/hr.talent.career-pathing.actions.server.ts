@@ -23,7 +23,7 @@ import {
   listHrCareerPathingReadinessWindow,
   writeCareerPathReadinessExportAudit,
   type HrCareerReadinessComputeResult,
-} from "../data/hr.talent.career-pathing-readiness.server";
+} from "./hr.talent.career-pathing-readiness.server";
 import { hrTalentCareerPathAuditActions } from "./hr.talent.career-pathing.event";
 import {
   requireHrCareerPathingRead,

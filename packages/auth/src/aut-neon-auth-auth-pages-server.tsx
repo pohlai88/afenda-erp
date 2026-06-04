@@ -1,8 +1,8 @@
 import "server-only";
 
-import { NeonAuthUiAuthPage } from "./neon-auth-ui-auth-page.client";
-import { NeonAuthUiPageGate } from "./neon-auth-ui-page-gate.server";
-import { neonAuthUiAuthViews, type NeonAuthUiAuthViewSlug } from "./neon-auth-ui.routes.shared";
+import { NeonAuthUiAuthPage } from "./aut-neon-auth-ui-auth-page-client";
+import { NeonAuthUiPageGate } from "./aut-neon-auth-ui-page-gate-server";
+import { neonAuthUiAuthViews, type NeonAuthUiAuthViewSlug } from "./aut-neon-auth-ui-routes-shared";
 
 async function renderAuthView(view: NeonAuthUiAuthViewSlug) {
   return (

@@ -2,18 +2,18 @@ export {
   GOVERNED_METADATA_SCHEMA_VERSION,
   governedMetadataSchemaVersionSchema,
   type GovernedMetadataSchemaVersion,
-} from "./schemas/schema-version.shared";
+} from "./gov-schema-version-shared";
 
 export {
   ERP_FUNCTIONS,
   type ErpFunction,
   type ErpPermissionTuple,
-} from "./schemas/erp-permission.shared";
+} from "./gov-erp-permission-shared";
 
 export {
   erpPermissionRequirementSchema,
   type ErpPermissionRequirement,
-} from "./schemas/erp-permission-requirement.schema";
+} from "./gov-erp-permission-requirement-schema";
 
 export { resolveErpCapabilityForPermission } from "./erp-permission-capability.shared";
 
@@ -55,7 +55,7 @@ export {
   type GovernedServerActionRegistry,
   type GovernedServerActionStepUpVerifier,
   type GovernedServerActionSubmissionExpectation,
-} from "./schemas/server-actions.shared";
+} from "./gov-server-actions-shared";
 
 export {
   GOVERNED_ACTION_BAR_CONFIGURATION_SCHEMA_ID,
@@ -66,7 +66,7 @@ export {
   type ActionBarDataNature,
   type GovernedActionBarConfiguration,
   type GovernedActionBarConfigurationInput,
-} from "./schemas/action-bar.schema";
+} from "./gov-action-bar-schema";
 
 export {
   emptyStateSchema,
@@ -79,7 +79,7 @@ export {
   type ListCellKind,
   type ListColumn,
   type ListSurface,
-} from "./schemas/list-surface.schema";
+} from "./gov-list-surface-schema";
 
 export {
   listSurfaceRendererConfigurationSchema,
@@ -91,7 +91,7 @@ export {
   type ListSurfaceRow,
   type ListSurfaceRowDecisionLedger,
   type ListSurfaceRowTone,
-} from "./schemas/list-surface-renderer.schema";
+} from "./gov-list-surface-renderer-schema";
 
 export {
   listSurfaceToolbarSchema,
@@ -106,13 +106,13 @@ export {
   type ListSurfaceToolbarSearch,
   type ListSurfaceToolbarSort,
   type ListSurfaceToolbarSortOption,
-} from "./schemas/list-surface-toolbar.schema";
+} from "./gov-list-surface-toolbar-schema";
 
 export {
   listSurfaceRowTrailingActionSchema,
   parseListSurfaceRowTrailingAction,
   type ListSurfaceRowTrailingAction,
-} from "./schemas/list-surface-row-trailing-action.schema";
+} from "./gov-list-surface-row-trailing-action-schema";
 
 export {
   parseStatCardConfiguration,
@@ -128,7 +128,7 @@ export {
   type StatCardProgress,
   type StatCardSparkPoint,
   type StatCardTone,
-} from "./schemas/stat-card.schema";
+} from "./gov-stat-card-schema";
 
 export {
   chartPresentationProfileIdSchema,
@@ -142,7 +142,7 @@ export {
   type ListPresentationProfileId,
   type PresentationProfileId,
   type StatPresentationProfileId,
-} from "./schemas/presentation-profile.schema";
+} from "./gov-presentation-profile-schema";
 
 export {
   GOVERNED_CHART_PRESENTATION_PROFILES,
@@ -218,7 +218,7 @@ export {
   type ApprovalTimelineStepStatus,
   type GovernedApprovalTimelineConfiguration,
   type GovernedApprovalTimelineConfigurationInput,
-} from "./schemas/approval-timeline.schema";
+} from "./gov-approval-timeline-schema";
 
 export {
   GOVERNED_MULTI_STEP_FORM_SCHEMA_ID,
@@ -237,7 +237,7 @@ export {
   type GovernedMultiStepFormConfiguration,
   type GovernedMultiStepFormConfigurationInput,
   type MultiStepFormDataNature,
-} from "./schemas/multi-step-form.schema";
+} from "./gov-multi-step-form-schema";
 
 export {
   GOVERNED_SCORECARD_FORM_SCHEMA_ID,
@@ -250,7 +250,7 @@ export {
   type GovernedScorecardFormConfigurationInput,
   type ScorecardCriterion,
   type ScorecardFormDataNature,
-} from "./schemas/scorecard-form.schema";
+} from "./gov-scorecard-form-schema";
 
 export {
   GOVERNED_SECTION_CONFIGURATION_SCHEMA_ID,
@@ -286,7 +286,7 @@ export {
   type GovernedSurfaceDensity,
   type GovernedSurfaceElevation,
   type GovernedSurfaceMaterial,
-} from "./schemas/surface-chrome.schema";
+} from "./gov-surface-chrome-schema";
 
 export {
   buildKanbanWorkflowFromColumnTransitions,

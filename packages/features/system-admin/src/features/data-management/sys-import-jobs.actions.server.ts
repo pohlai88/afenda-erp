@@ -12,9 +12,9 @@ import {
 import type {
   CreateSystemAdminImportJobActionData,
   ExportSystemAdminDataManagementActionData,
-} from "../contracts";
+} from "./sys-import-job.contract";
 import { SYSTEM_ADMIN_DATA_MANAGEMENT_QUERY_LIMIT } from "../contracts/system-admin.data-management.limits.shared";
-import { systemAdminDataManagementAuditActions } from "../events";
+import { systemAdminDataManagementAuditActions } from "./sys-data-management.event";
 import {
   requireSystemAdminDataManagementCancel,
   requireSystemAdminDataManagementExport,
@@ -24,16 +24,16 @@ import {
 import {
   exportSystemAdminDataManagementSchema,
   systemAdminImportJobCommandSchema,
-} from "../schemas";
-import { parseSystemAdminCsv } from "../data/system-admin.data-management-csv.parse.shared";
-import { writeSystemAdminDataManagementAudit } from "../data/system-admin.data-management-audit.shared";
-import { buildSystemAdminDataManagementExportCsv } from "../data/system-admin.data-management-export.build.server";
-import { findMissingCsvHeaders } from "../data/system-admin.data-management-headers.shared";
+} from "./sys-import-job.schema";
+import { parseSystemAdminCsv } from "./system-admin.data-management-csv.parse.shared";
+import { writeSystemAdminDataManagementAudit } from "./system-admin.data-management-audit.shared";
+import { buildSystemAdminDataManagementExportCsv } from "./system-admin.data-management-export.build.server";
+import { findMissingCsvHeaders } from "./system-admin.data-management-headers.shared";
 import {
   getSystemAdminImportAdapter,
   getSystemAdminImportTemplate,
-} from "../data/system-admin.import-adapter.registry.server";
-import { parseSystemAdminImportJobFormData } from "../data/system-admin.import-job-form.shared";
+} from "./system-admin.import-adapter.registry.server";
+import { parseSystemAdminImportJobFormData } from "./system-admin.import-job-form.shared";
 import {
   cancelSystemAdminDataImportJob,
   createSystemAdminDataImportJob,
@@ -41,8 +41,8 @@ import {
   recordSystemAdminDataExportJob,
   retrySystemAdminDataImportJob,
   runSystemAdminDataImportJob,
-} from "../data/system-admin.import-jobs.query.server";
-import { buildSystemAdminDataManagementPageModel } from "../data/system-admin.data-management.page-model.server";
+} from "./system-admin.import-jobs.query.server";
+import { buildSystemAdminDataManagementPageModel } from "./system-admin.data-management.page-model.server";
 
 function digest(value: string) {
   return createHash("sha256").update(value).digest("hex");

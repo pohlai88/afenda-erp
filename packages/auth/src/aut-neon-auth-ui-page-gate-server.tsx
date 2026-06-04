@@ -3,8 +3,8 @@ import "server-only";
 import { connection } from "next/server";
 import type { ReactNode } from "react";
 
-import { isNeonAuthUiReady } from "../runtime/neon-auth.server";
-import { NeonAuthUiNotReadyPanel } from "./neon-auth-ui-not-ready-panel.server";
+import { isNeonAuthUiReady } from "./aut-neon-auth-server";
+import { NeonAuthUiNotReadyPanel } from "./aut-neon-auth-ui-not-ready-panel-server";
 
 export type NeonAuthUiPageGateProps = {
   children: ReactNode;

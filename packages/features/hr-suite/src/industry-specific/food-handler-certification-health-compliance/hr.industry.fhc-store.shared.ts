@@ -6,7 +6,7 @@ import type {
 import {
   hrIndustryFhcAuditActions,
   type HrIndustryFhcAuditAction,
-} from "../events";
+} from "./hr.industry.fhc.event";
 import type {
   HrFhcComplianceStatus,
   HrFhcDutyRestrictionReason,

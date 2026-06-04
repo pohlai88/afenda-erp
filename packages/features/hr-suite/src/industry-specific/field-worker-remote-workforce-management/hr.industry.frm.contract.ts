@@ -1,4 +1,4 @@
-import { defineHrSuiteReadPermission } from "../../../hr-suite-integration";
+import { defineHrSuiteReadPermission } from "../../hr-suite-integration";
 
 export const hrIndustryFrmReadPermission =
   defineHrSuiteReadPermission("industry.frm");

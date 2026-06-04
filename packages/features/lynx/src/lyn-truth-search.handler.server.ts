@@ -9,7 +9,7 @@ import {
 import { getApiAuthContext } from "./server";
 import {
   isAiFeatureEnabledForOrganization,
-} from "../data/lynx.run-lifecycle.repository.server";
+} from "./lynx.run-lifecycle.repository.server";
 import {
   executeLynxCompleteRunCommand,
   executeLynxCreateAiUsageEventCommand,
@@ -49,7 +49,7 @@ import {
   extractLatestQueryFromLynxTruthUiMessages,
   lynxTruthSearchRequestSchema,
   lynxTruthSearchUiRequestSchema,
-} from "../schemas/lynx.truth-search.schema";
+} from "./lyn-truth-search-schema";
 
 type LynxTruthDataParts = {
   "lynx-run-context": LynxRunContextData;

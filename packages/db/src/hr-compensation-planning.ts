@@ -1667,7 +1667,7 @@ export async function getHrCompensationParticipantContext(input: {
   participantId: string;
 }): Promise<HrCompensationParticipantContext | null> {
   const { alias } = await import("drizzle-orm/pg-core");
-  const { hrDepartments } = await import("./schema/hr");
+  const { hrDepartments } = await import("./hr");
   const { formatEmployeeLabel } = await import("./hr-benefits.shared");
 
   const managerEmployee = alias(hrEmployees, "cpm_manager_employee");

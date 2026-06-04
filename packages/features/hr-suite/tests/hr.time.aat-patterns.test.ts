@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { analyzeAttendanceExceptionTrends } from "../data/hr.time.aat-exceptions.server";
+import { analyzeAttendanceExceptionTrends } from "./hr.time.aat-exceptions.server";
 import {
   analyzeUnplannedLeaveTrends,
   buildEmployeeAbsenceMetrics,
@@ -9,7 +9,7 @@ import {
   detectExcessiveAbsence,
   detectHighAbsenceRateGroups,
   detectRepeatedShortAbsencePatterns,
-} from "../data/hr.time.aat-patterns.server";
+} from "./hr.time.aat-patterns.server";
 import type { AatAbsenceEvent } from "../schemas/hr.time.aat-patterns.schema";
 
 const employeeA = "emp-a";

@@ -9,7 +9,7 @@ import { Button, Field, FieldGroup, FieldLabel, Input, NativeSelect } from "@afe
 import { UserCogIcon } from "lucide-react";
 import { useActionState } from "react";
 import type { SystemAdminActionResult } from "../../tenant-execution/contracts/system-admin.action-result.contract";
-import { systemAdminSeedRoles } from "../contracts";
+import { systemAdminSeedRoles } from "./sys-roles.contract";
 
 type RoleAction = (
   state: SystemAdminActionResult | undefined,

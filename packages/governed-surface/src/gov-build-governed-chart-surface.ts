@@ -1,11 +1,11 @@
-import { GOVERNED_METADATA_SCHEMA_VERSION } from "../schemas/schema-version.shared";
+import { GOVERNED_METADATA_SCHEMA_VERSION } from "./gov-schema-version-shared";
 import { resolveGovernedChartPresentation } from "../resolvers/resolve-governed-presentation";
 import type {
   ChartDataNature,
   GovernedChartConfigurationInput,
   GovernedChartKind,
 } from "./gov-chart-schema";
-import type { ChartPresentationProfileId } from "../schemas/presentation-profile.schema";
+import type { ChartPresentationProfileId } from "./gov-presentation-profile-schema";
 
 export type BuildGovernedChartSurfaceInput = Omit<
   GovernedChartConfigurationInput,

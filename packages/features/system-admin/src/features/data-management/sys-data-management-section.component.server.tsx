@@ -1,6 +1,6 @@
 import { GovernedPatternCListSection } from "@afenda/governed-surface/server";
 import { Alert, AlertDescription, AlertTitle, SectionPanel } from "@afenda/ui";
-import type { SystemAdminDataManagementPageModel } from "../data/system-admin.data-management.page-model.server";
+import type { SystemAdminDataManagementPageModel } from "./system-admin.data-management.page-model.server";
 import {
   buildSystemAdminDataExportsListSurface,
   buildSystemAdminImportFailuresListSurface,

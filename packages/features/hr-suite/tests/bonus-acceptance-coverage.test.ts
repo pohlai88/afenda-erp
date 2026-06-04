@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { BONUS_REQUIREMENT_COVERAGE } from "../data/hr.payroll.bonus-acceptance-coverage.shared";
+import { BONUS_REQUIREMENT_COVERAGE } from "./hr.payroll.bonus-acceptance-coverage.shared";
 
 const BON_007_012_CODES = [
   "HRM-BON-007",

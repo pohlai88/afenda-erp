@@ -1,4 +1,4 @@
-import type { HrSftAvailabilityWindow } from "../data/hr.time.sft-availability.server";
+import type { HrSftAvailabilityWindow } from "./hr.time.sft-availability.server";
 import { hrTimeSftAvailabilitySurfaceKey } from "./hr.time.sft.contract";
 import {
   buildSftListSearchToolbar,

@@ -8,7 +8,7 @@ import {
   buildPoliciesListSurface,
   buildSystemAdminPoliciesPageModel,
 } from "../data";
-import { requireSystemAdminPoliciesRead } from "../policies";
+import { requireSystemAdminPoliciesRead } from "./system-admin.policy-rules.policy.server";
 import {
   systemAdminPoliciesSurfaceKey,
   systemAdminPoliciesUiCopy,

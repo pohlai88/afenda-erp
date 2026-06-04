@@ -3,7 +3,7 @@
 import { useMemo } from "react";
 
 import { useTranslations } from "../i18n/governed-surface-copy.client";
-import { KanbanBoardDragView } from "../metadata/renderers/kanban-board-drag-view.client";
+import { KanbanBoardDragView } from "./gov-kanban-board-drag-view-client";
 
 import {
   parseGovernedKanbanBoardConfiguration,

@@ -25,7 +25,7 @@ vi.mock("../../src/metadata/index", () => ({
 }));
 
 import { GovernedPatternBListSection } from "../../src/components/governed-pattern-b-list-section";
-import type { ListSurfaceRendererConfigurationInput } from "../../src/schemas/list-surface-renderer.schema";
+import type { ListSurfaceRendererConfigurationInput } from "../../src/gov-list-surface-renderer-schema";
 
 function buildListConfig(
   rows: ListSurfaceRendererConfigurationInput["rows"] = [],

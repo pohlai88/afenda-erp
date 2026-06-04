@@ -1,5 +1,5 @@
 import { getOperationalSkills } from "../catalogs/lynx.operational-skill.catalog.server";
-import { listLynxRunLedger } from "../data/lynx.run-ledger.repository.server";
+import { listLynxRunLedger } from "./lynx.run-ledger.repository.server";
 import {
   describeWorkspaceDataSource,
   getAccessibleModules,
@@ -19,7 +19,7 @@ import type { Tone } from "@afenda/ui";
 import {
   LYNX_MODULE_ID,
   LYNX_WORKSPACE_ROUTES,
-} from "../contracts/lynx.core.contract";
+} from "./lyn-core-contract";
 import {
   getLynxNavigationExtensionHeroCopy,
   lynxConsoleMetrics,
@@ -41,7 +41,7 @@ import {
   buildLynxToolAvailabilityListSurface,
   getLynxReadinessSurfaceKeys,
 } from "../surface/lynx.readiness.surface";
-import { getLynxReadinessSnapshot } from "../data/lynx.readiness.query.server";
+import { getLynxReadinessSnapshot } from "./lynx.readiness.query.server";
 
 type SessionSource = "dev" | "neon";
 

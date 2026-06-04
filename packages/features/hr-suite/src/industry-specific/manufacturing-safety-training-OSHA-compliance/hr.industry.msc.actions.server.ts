@@ -12,7 +12,7 @@ import {
   listHrIndustryMscLearningRequirementRefs,
   listHrIndustryMscShiftSchedulingEligibilityRefs,
 } from "./hr.industry.msc-store.shared";
-import { hrIndustryMscAuditActions } from "../events";
+import { hrIndustryMscAuditActions } from "./hr.industry.msc.event";
 import {
   requireHrIndustryMscApprove,
   requireHrIndustryMscRead,
@@ -29,7 +29,7 @@ import {
   type HrMscTrainingAssignmentInput,
   type HrMscWorkplaceIncidentInput,
   type HrMscWorkRestrictionInput,
-} from "../schemas";
+} from "./hr.industry.msc.schema";
 
 type TrainingCompletionActionInput = {
   readonly assignmentId: string;

@@ -21,15 +21,15 @@ import { assertApprovalRuleRolesAllowed } from "../policies/system-admin.approva
 import {
   mapTenantApprovalSettingToRule,
   serializeApprovalRuleConfiguration,
-} from "../data/system-admin.approval-rules.mapper";
-import { findTenantApprovalSetting } from "../data/system-admin.approval-rules.query.server";
+} from "./system-admin.approval-rules.mapper";
+import { findTenantApprovalSetting } from "./system-admin.approval-rules.query.server";
 import {
   buildApprovalRuleAuditMetadata,
   parseApprovalRuleActionFormData,
   readConfiguredApprovalRuleStatus,
   resolveApprovalRuleKey,
   toEscalationMinutes,
-} from "../data/system-admin.approval-rules.shared";
+} from "./system-admin.approval-rules.shared";
 import {
   systemAdminApprovalRuleAuditActionsByMode,
   systemAdminApprovalRuleWebhookEvents,

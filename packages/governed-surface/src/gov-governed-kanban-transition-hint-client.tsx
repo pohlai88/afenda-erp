@@ -4,7 +4,7 @@ import { Badge } from "@afenda/ui/badge";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@afenda/ui/tooltip";
 import { cn } from "@afenda/ui/utils";
 
-import type { KanbanCardTransitionAvailability } from "../schemas/kanban-board.schema";
+import type { KanbanCardTransitionAvailability } from "./gov-kanban-board-schema";
 import { governedKanbanTransitionTestId } from "./kanban-surface-identity.shared";
 import { diagnosticsDataAttributes } from "../utils/governed-diagnostics.shared";
 import { governedIdentityAttributes } from "../utils/governed-identity.shared";

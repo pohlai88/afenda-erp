@@ -25,7 +25,7 @@ export type HrFwaRequestDecision =
   | "exception_approve";
 
 export type HrFwaApprovalRoute = {
-  initialStage: (typeof import("./schema/hr").hrFwaApprovalStageKindEnum.enumValues)[number];
+  initialStage: (typeof import("./hr").hrFwaApprovalStageKindEnum.enumValues)[number];
   requiresHrStage: boolean;
   requiresDepartmentStage: boolean;
   requiresExceptionStage: boolean;

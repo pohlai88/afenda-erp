@@ -1,4 +1,4 @@
-import { formatApprovalEscalationSummary } from "../data/system-admin.approval-rules.shared";
+import { formatApprovalEscalationSummary } from "./system-admin.approval-rules.shared";
 import type {
   ApprovalEscalationBehavior,
   SystemAdminApprovalMode,

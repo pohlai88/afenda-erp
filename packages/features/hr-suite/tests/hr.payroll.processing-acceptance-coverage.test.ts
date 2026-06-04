@@ -4,7 +4,7 @@ import {
   assertPayrollCoverageComplete,
   PAYROLL_ACCEPTANCE_CRITERIA_COVERAGE,
   PAYROLL_REQUIREMENT_COVERAGE,
-} from "../data/hr.payroll.processing-acceptance-coverage.shared";
+} from "./hr.payroll.processing-acceptance-coverage.shared";
 
 describe("HRM-PAY-001..030 acceptance coverage", () => {
   it("maps all 30 payroll requirements", () => {

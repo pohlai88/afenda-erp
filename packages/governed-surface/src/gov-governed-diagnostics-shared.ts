@@ -3,4 +3,4 @@ export {
   type GovernedDiagnostics,
   type GovernedDiagnosticsDataAttributes,
   type GovernedRenderableState,
-} from "../../utils/governed-diagnostics.shared";
+} from "../utils/governed-diagnostics.shared";

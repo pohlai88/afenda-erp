@@ -15,8 +15,8 @@ import {
   toHrSftReportActionFailure,
   type HrSftReportCsvResult,
   type HrSftReportResult,
-} from "../data/hr.time.sft-report.server";
-import { emitHrSftAuditEvent } from "../data/hr.time.sft-audit.server";
+} from "./hr.time.sft-report.server";
+import { emitHrSftAuditEvent } from "./hr.time.sft-audit.server";
 import {
   HrSftAccessDeniedError,
   requireHrSftManage,

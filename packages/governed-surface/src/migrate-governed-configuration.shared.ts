@@ -1,4 +1,4 @@
-import { GOVERNED_METADATA_SCHEMA_VERSION } from "./schemas/schema-version.shared";
+import { GOVERNED_METADATA_SCHEMA_VERSION } from "./gov-schema-version-shared";
 
 /**
  * Normalises stored/cached governed configuration before Zod parse.

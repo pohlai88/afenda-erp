@@ -30,7 +30,7 @@ import {
   createAiUsageEvent,
   isAiFeatureEnabledForOrganization,
   registerAiDocumentExtraction,
-} from "../data/ai-http-persistence.repository.server";
+} from "./ai-http-persistence.repository.server";
 
 export const AI_EXTRACT_MAX_DURATION = 30;
 

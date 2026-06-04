@@ -8,7 +8,7 @@ import type { OrganizationRole } from "@afenda/auth";
 import {
   systemAdminSeedRoles,
   type SystemAdminRoleRow,
-} from "../contracts";
+} from "./sys-roles.contract";
 
 function mergeRoleCatalog(
   role: (typeof systemAdminSeedRoles)[number],

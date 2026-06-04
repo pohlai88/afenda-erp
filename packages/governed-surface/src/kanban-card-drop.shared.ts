@@ -1,7 +1,7 @@
 import type {
   KanbanCard,
   KanbanCardTransitionAvailability,
-} from "./schemas/kanban-board.schema";
+} from "./gov-kanban-board-schema";
 import {
   indexKanbanWorkflowTransitions,
   isKanbanTransitionAllowed,

@@ -3,8 +3,8 @@ import "server-only";
 import type { ReactNode } from "react";
 
 import { GovernedComponentRenderer } from "./index";
-import { logUnexpectedServerError } from "../data/governed-logging.server";
-import { resolveGovernedErpPermissionAllowed } from "../data/governed-permission-gate.server";
+import { logUnexpectedServerError } from "./governed-logging.server";
+import { resolveGovernedErpPermissionAllowed } from "./governed-permission-gate.server";
 import { getGovernedSurfaceTranslations } from "../i18n/governed-surface-copy";
 import { logGovernedListSurfaceRender } from "./log-governed-list-surface-render.server";
 import {
@@ -12,12 +12,12 @@ import {
   summarizeListSurfaceTrailingActions,
 } from "./list-surface-identity.shared";
 
-import type { EmptyState } from "../schemas/list-surface.schema";
+import type { EmptyState } from "./gov-list-surface-schema";
 import {
   parseListSurfaceRendererConfiguration,
   type ListSurfaceRendererConfiguration,
   type ListSurfaceRendererConfigurationInput,
-} from "../schemas/list-surface-renderer.schema";
+} from "./gov-list-surface-renderer-schema";
 import {
   renderGovernedPatternSectionShell,
   type GovernedPatternSectionDensity,

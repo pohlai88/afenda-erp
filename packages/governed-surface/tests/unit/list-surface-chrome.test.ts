@@ -4,7 +4,7 @@ import {
   LIST_SURFACE_CARD_CHROME_CLASS,
   LIST_SURFACE_TABLE_VIEWPORT_CLASS,
   listSurfaceChromeXClass,
-} from "../../src/metadata/renderers/list-surface-chrome.shared";
+} from "../../src/gov-list-surface-chrome-shared";
 
 describe("list surface chrome classes", () => {
   it("uses table-shell as the single clip boundary", () => {

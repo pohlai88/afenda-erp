@@ -3,7 +3,7 @@ import { isOrganizationDocumentLegalHoldActive } from "@afenda/db";
 
 import { updateSystemAdminSecuritySettingsAction, updateOrganizationObjectStorageProviderAction, updateOrganizationEncryptionSettingsAction } from "../actions";
 import { buildSystemAdminSecurityPageModel } from "../data";
-import { requireSystemAdminSecurityRead } from "../policies";
+import { requireSystemAdminSecurityRead } from "./sys-security.policy.server";
 import {
   SystemAdminSecurityAccessDenied,
   SystemAdminSecuritySection,

@@ -5,7 +5,7 @@ import {
   zodActionFailure,
 } from "@afenda/governed-surface/schemas";
 
-import { submitHrTimeOtmRequest } from "../data/hr.time.otm-request-commands.server";
+import { submitHrTimeOtmRequest } from "./hr.time.otm-request-commands.server";
 import { hrTimeOtmAuditActions } from "./hr.time.otm.event";
 import {
   assertHrTimeOtmCanSubmitForEmployee,

@@ -5,7 +5,7 @@ import {
   LIST_SURFACE_TABLE_SCROLL_PADDING_PX,
   LIST_SURFACE_TRAILING_COLUMN_MIN_WIDTH_PX,
   resolveListSurfaceTableMinWidthPx,
-} from "../../src/metadata/renderers/list-surface-table-layout.shared";
+} from "../../src/gov-list-surface-table-layout-shared";
 
 describe("resolveListSurfaceTableMinWidthPx", () => {
   it("sums column min widths, trailing column, and scroll padding", () => {

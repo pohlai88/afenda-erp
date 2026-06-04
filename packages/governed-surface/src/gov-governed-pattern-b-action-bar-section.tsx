@@ -3,15 +3,15 @@ import "server-only";
 import type { ReactNode } from "react";
 
 import { GovernedComponentRenderer } from "./index";
-import { logUnexpectedServerError } from "../data/governed-logging.server";
-import { resolveGovernedErpPermissionAllowed } from "../data/governed-permission-gate.server";
+import { logUnexpectedServerError } from "./governed-logging.server";
+import { resolveGovernedErpPermissionAllowed } from "./governed-permission-gate.server";
 import { getGovernedSurfaceTranslations } from "../i18n/governed-surface-copy";
 
 import {
   parseGovernedActionBarConfiguration,
   type GovernedActionBarConfigurationInput,
-} from "../schemas/action-bar.schema";
-import type { EmptyState } from "../schemas/list-surface.schema";
+} from "./gov-action-bar-schema";
+import type { EmptyState } from "./gov-list-surface-schema";
 import {
   renderGovernedPatternSectionShell,
   type GovernedPatternSectionDensity,

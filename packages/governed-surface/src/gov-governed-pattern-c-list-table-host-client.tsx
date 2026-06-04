@@ -5,11 +5,11 @@ import {
   type ListSurfaceTableTrailingColumn,
 } from "./index";
 
-import type { EmptyState, ListColumn } from "../schemas/list-surface.schema";
+import type { EmptyState, ListColumn } from "./gov-list-surface-schema";
 import type {
   ListSurfaceRendererConfiguration,
   ListSurfaceRow,
-} from "../schemas/list-surface-renderer.schema";
+} from "./gov-list-surface-renderer-schema";
 
 import {
   resolveGovernedTrailingColumn,

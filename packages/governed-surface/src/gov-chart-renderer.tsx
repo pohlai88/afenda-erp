@@ -12,18 +12,18 @@ import {
   CardTitle,
 } from "@afenda/ui/card";
 import { GovernedEmpty } from "./client";
-import { resolveGovernedServerAction } from "../../schemas/server-actions.shared";
+import { resolveGovernedServerAction } from "./gov-server-actions-shared";
 import {
   parseGovernedChartConfiguration,
   type ChartAction,
   type ChartDataNature,
 } from "./gov-chart-schema";
-import { governedParseErrorCopy } from "../../i18n/governed-renderer-copy.shared";
-import { diagnosticsDataAttributes } from "../../utils/governed-diagnostics.shared";
+import { governedParseErrorCopy } from "../i18n/governed-renderer-copy.shared";
+import { diagnosticsDataAttributes } from "../utils/governed-diagnostics.shared";
 import {
   governedIdentityAttributes,
   governedTestId,
-} from "../../utils/governed-identity.shared";
+} from "../utils/governed-identity.shared";
 
 import type { GovernedComponentRendererDiagnostics } from "./gov-registry";
 import { ActionBarActionForm } from "./action-bar-action.client";

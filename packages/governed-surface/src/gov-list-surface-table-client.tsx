@@ -40,17 +40,17 @@ import {
   governedListRowTestId,
   governedListSurfaceTestId,
 } from "./client";
-import type { EmptyState, ListColumn } from "../../schemas/list-surface.schema";
+import type { EmptyState, ListColumn } from "./gov-list-surface-schema";
 import type {
   ListSurfaceRendererDataNature,
   ListSurfacePresentation,
   ListSurfaceRow,
   ListSurfaceRowDecisionLedger,
   ListSurfaceRowTone,
-} from "../../schemas/list-surface-renderer.schema";
-import type { ListSurfaceToolbar } from "../../schemas/list-surface-toolbar.schema";
-import type { GovernedServerActionHandler } from "../../schemas/server-actions.shared";
-import type { GovernedListTrailingCellContext } from "../../schemas/list-trailing-cell-context.schema";
+} from "./gov-list-surface-renderer-schema";
+import type { ListSurfaceToolbar } from "./gov-list-surface-toolbar-schema";
+import type { GovernedServerActionHandler } from "./gov-server-actions-shared";
+import type { GovernedListTrailingCellContext } from "./gov-list-trailing-cell-context-schema";
 import type { uiDensity } from "@afenda/ui/design-system";
 import { cn } from "@afenda/ui/utils";
 

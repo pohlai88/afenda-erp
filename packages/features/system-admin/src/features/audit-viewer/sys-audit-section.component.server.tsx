@@ -17,7 +17,7 @@ import {
 import { SystemAdminAuditDetailPanel } from "./system-admin.audit-detail.component.server";
 import { SystemAdminAuditExportActions } from "./system-admin.audit-export-actions.component.client";
 import { RetentionPolicyForm } from "./system-admin.retention-policy-form.component.client";
-import { buildSystemAdminAuditExportFilterFields } from "../data/system-admin.audit-export-filters.shared";
+import { buildSystemAdminAuditExportFilterFields } from "./system-admin.audit-export-filters.shared";
 import { SystemAdminAuditCoveragePanel } from "./system-admin.audit-coverage-panel.component.server";
 import type { SystemAdminAuditCoverageGapRow } from "../contracts/system-admin.audit-coverage.contract";
 import type { SystemAdminActionResult } from "../../tenant-execution/contracts/system-admin.action-result.contract";

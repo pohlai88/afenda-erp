@@ -2,17 +2,17 @@ import { readFileSync, readdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { AFENDA_GOVERNED_COMPONENT_REGISTRY } from "../src/metadata/registry.ts";
+import { AFENDA_GOVERNED_COMPONENT_REGISTRY } from "../src/gov-registry.ts";
 
 const packageRoot = join(dirname(fileURLToPath(import.meta.url)), "..");
-const renderersDir = join(packageRoot, "src/metadata/renderers");
+const srcRoot = join(packageRoot, "src");
 
-const rendererFiles = readdirSync(renderersDir).filter((file) =>
-  file.endsWith(".renderer.tsx"),
+const rendererFiles = readdirSync(srcRoot).filter((file) =>
+  /^gov-.+-renderer\.tsx$/.test(file),
 );
 
 const rendererIdsFromFiles = new Set(
-  rendererFiles.map((file) => file.replace(/\.renderer\.tsx$/, "")),
+  rendererFiles.map((file) => file.replace(/^gov-(.+)-renderer\.tsx$/, "$1")),
 );
 
 const registryRendererIds = new Set(
@@ -57,12 +57,9 @@ const IMPORT_RE =
   /^\s*import\s+(?:type\s+)?(?:[\w*{}\s,]+\s+from\s+)?["']([^"']+)["']/gm;
 
 const importErrors: string[] = [];
-const allRendererTsx = readdirSync(renderersDir).filter((file) =>
-  file.endsWith(".tsx"),
-);
 
-for (const file of allRendererTsx) {
-  const content = readFileSync(join(renderersDir, file), "utf8");
+for (const file of rendererFiles) {
+  const content = readFileSync(join(srcRoot, file), "utf8");
   let match: RegExpExecArray | null;
   IMPORT_RE.lastIndex = 0;
   while ((match = IMPORT_RE.exec(content)) !== null) {

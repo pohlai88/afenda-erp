@@ -3,7 +3,7 @@ import {
   getSystemAdminLynxOutcomeMonitorState,
   lynxOutcomeMonitorControlSurfaceKey,
   type SystemAdminLynxOutcomeMonitorState,
-} from "../data/system-admin.lynx-outcome-monitor.surface.server";
+} from "./system-admin.lynx-outcome-monitor.surface.server";
 import { GovernedPatternCListSection } from "@afenda/governed-surface/server";
 import { SectionPanel } from "@afenda/ui";
 

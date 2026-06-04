@@ -1,7 +1,7 @@
 "use client";
 
 import type { Route } from "next";
-import { useLocale } from "../../i18n/governed-surface-copy.client";
+import { useLocale } from "../i18n/governed-surface-copy.client";
 import { AlertTriangle } from "lucide-react";
 
 import Link from "next/link";
@@ -13,8 +13,8 @@ import type {
   ListCellKind,
   ListCellTone,
   ListColumn,
-} from "../../schemas/list-surface.schema";
-import type { ListSurfaceRow } from "../../schemas/list-surface-renderer.schema";
+} from "./gov-list-surface-schema";
+import type { ListSurfaceRow } from "./gov-list-surface-renderer-schema";
 import { cn } from "@afenda/ui/utils";
 
 import { ListSurfaceSparkline } from "./list-surface-sparkline.client";

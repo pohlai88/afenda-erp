@@ -1,16 +1,11 @@
 /**
- * @afenda/feature-lynx
- *
- * Lynx product surface — Truth Retrieval and Decision Operator.
- * Substrate (@afenda/feature-knowledge) composes into this module.
- *
- * Doctrine: docs/architecture/1005-infrastructure.md (ARCH-1005)
- * Track: docs/roadmap/005-lynx-knowledge-substrate.md (TRACK-005)
+ * @afenda/feature-lynx — client/public surface.
  */
-export * from "./contracts";
+export { LYNX_ERP_HTTP_ROUTES } from "./lyn-core.contract";
+export type { LynxErpHttpRoute } from "./lyn-core.contract";
 export {
   buildLynxRunFilterSearchParams,
   lynxOperatorRequestSchema,
   parseLynxRunFilters,
-} from "./schemas";
-export type { LynxOperatorRequest } from "./schemas/lynx.operator.schema";
+} from "./lyn-operator.schema";
+export type { LynxOperatorRequest } from "./lyn-operator.schema";

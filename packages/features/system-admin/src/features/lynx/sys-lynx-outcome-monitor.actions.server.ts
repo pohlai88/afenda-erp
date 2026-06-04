@@ -12,7 +12,7 @@ import { requireSystemAdminLynxApprove } from "../policies/system-admin.lynx.pol
 import {
   isSystemAdminLynxOutcomeMonitorSeverityMode,
   parseSystemAdminLynxOutcomeMonitorThresholds,
-} from "../schemas";
+} from "./sys-lynx-outcome-monitor-action.schema";
 
 export async function updateLynxOutcomeMonitorSettingAction(
   _previous: SystemAdminActionResult | undefined,

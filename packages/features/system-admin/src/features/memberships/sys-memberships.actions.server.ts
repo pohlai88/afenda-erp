@@ -8,7 +8,7 @@ import {
   type SystemAdminActionResult,
   zodActionFailure,
 } from "../../tenant-execution/contracts/system-admin.action-result.contract";
-import { updateMembershipStatus } from "../data/system-admin.memberships.query.server";
+import { updateMembershipStatus } from "./system-admin.memberships.query.server";
 import {
   assertSystemAdminMembershipStatusChangeAllowed,
   requireSystemAdminMembershipsManage,

@@ -24,7 +24,7 @@ import {
   type FormRuleValues,
 } from "./client";
 import { ActionFormErrors } from "../../components/action-form-errors";
-import { governedRendererCopy } from "../../i18n/governed-renderer-copy.shared";
+import { governedRendererCopy } from "../i18n/governed-renderer-copy.shared";
 import {
   GovernedFileUploadField,
   resolveGovernedFormModuleId,
@@ -33,13 +33,13 @@ import type {
   GovernedFormField,
   GovernedMultiStepFormConfiguration,
   MultiStepFormDataNature,
-} from "../../schemas/multi-step-form.schema";
+} from "./gov-multi-step-form-schema";
 import {
   actionFailure,
   type ActionResult,
-} from "../../schemas/action-result.shared";
-import type { GovernedServerActionHandler } from "../../schemas/server-actions.shared";
-import { densityGapClass } from "../../schemas/surface-chrome.classes";
+} from "./gov-action-result-shared";
+import type { GovernedServerActionHandler } from "./gov-server-actions-shared";
+import { densityGapClass } from "./gov-surface-chrome-classes";
 import { cn } from "@afenda/ui/utils";
 
 const DATA_NATURE_CLASS: Record<MultiStepFormDataNature, string> = {

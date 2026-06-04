@@ -3,4 +3,4 @@ export {
   type GovernedHeadingLevel,
   type GovernedHeadingProps,
   type GovernedHeadingVariant,
-} from "../../utils/governed-heading.shared";
+} from "../utils/governed-heading.shared";

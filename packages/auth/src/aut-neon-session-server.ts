@@ -1,7 +1,7 @@
 import "server-only";
 
 import { z } from "zod";
-import { getNeonAuthServer, isNeonAuthReady } from "./neon-auth.server";
+import { getNeonAuthServer, isNeonAuthReady } from "./aut-neon-auth-server";
 
 export type NeonAuthSessionPayload = {
   session: {

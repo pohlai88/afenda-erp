@@ -1,4 +1,4 @@
-import type { HrAatAuditTrailWindow } from "../data/hr.time.aat-audit.server";
+import type { HrAatAuditTrailWindow } from "./hr.time.aat-audit.server";
 import {
   buildAatListSearchToolbar,
   buildAatOperationalListSurface,

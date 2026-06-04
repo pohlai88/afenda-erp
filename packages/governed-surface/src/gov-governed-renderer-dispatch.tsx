@@ -1,25 +1,25 @@
 import type { ReactNode } from "react";
 
 import { GovernedEmpty } from "./client";
-import { governedDispatchErrorCopy } from "../i18n/governed-renderer-copy.shared";
+import { governedDispatchErrorCopy } from "./gov-governed-renderer-copy-shared";
 
 import type {
   AfendaGovernedRendererId,
   GovernedComponentRendererDiagnostics,
 } from "./gov-registry";
-import { ActionBarRenderer } from "./renderers/action-bar.renderer";
-import { AuditPanelRenderer } from "./renderers/audit-panel.renderer";
-import { DetailTabsRenderer } from "./renderers/detail-tabs.renderer";
-import { ApprovalTimelineRenderer } from "./renderers/approval-timeline.renderer";
+import { ActionBarRenderer } from "./gov-action-bar-renderer";
+import { AuditPanelRenderer } from "./gov-audit-panel-renderer";
+import { DetailTabsRenderer } from "./gov-detail-tabs-renderer";
+import { ApprovalTimelineRenderer } from "./gov-approval-timeline-renderer";
 import { ChartRenderer } from "./gov-chart-renderer";
 import { EmptyRenderer } from "./gov-empty-renderer";
-import { KanbanBoardRenderer } from "./renderers/kanban-board.renderer";
-import { MultiStepFormRenderer } from "./renderers/multi-step-form.renderer";
-import { ScorecardFormRenderer } from "./renderers/scorecard-form.renderer";
-import { ListSurfaceRenderer } from "./renderers/list-surface.renderer";
+import { KanbanBoardRenderer } from "./gov-kanban-board-renderer";
+import { MultiStepFormRenderer } from "./gov-multi-step-form-renderer";
+import { ScorecardFormRenderer } from "./gov-scorecard-form-renderer";
+import { ListSurfaceRenderer } from "./gov-list-surface-renderer";
 import { SectionRenderer } from "./gov-section-renderer";
 import { StackRenderer } from "./gov-stack-renderer";
-import { StatCardRenderer } from "./renderers/stat-card.renderer";
+import { StatCardRenderer } from "./gov-stat-card-renderer";
 
 export type RendererProps = {
   configuration: unknown;

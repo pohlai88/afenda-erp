@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 import { GovernedEmpty } from "./client";
 import { governedSurfaceParseErrorCopy } from "../i18n/governed-renderer-copy.shared";
 import { toGovernedComponentEnvelopeFromDetailSection } from "./governed-configuration.shared";
-import type { GovernedDetailSection } from "../schemas/detail-tabs.schema";
+import type { GovernedDetailSection } from "./gov-detail-tabs-schema";
 
 import { GovernedComponentRenderer } from "./render-governed-component";
 

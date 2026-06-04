@@ -15,7 +15,7 @@ import type {
   SystemAdminImportJobStatus,
   SystemAdminImportRowFailure,
   SystemAdminImportTemplate,
-} from "../contracts";
+} from "./sys-import-job.contract";
 import { systemAdminDataManagementUiCopy } from "./system-admin.data-management-ui.copy.shared";
 import { resolveSystemAdminImportJobRowTrailingAction } from "./system-admin.import-jobs-list-trailing.shared";
 

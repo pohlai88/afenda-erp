@@ -1,7 +1,7 @@
 import type { ListSurfaceRendererConfigurationResolvedInput } from "@afenda/governed-surface";
 import { buildLinkedControlListSurface } from "../../overview/surfaces/system-admin.control-list.shared";
 import { systemAdminCapabilitiesUiCopy } from "./system-admin.capabilities-ui.copy.shared";
-import type { SystemAdminCapabilityRoleMatrixRow } from "../data/system-admin.capabilities-role-matrix.server";
+import type { SystemAdminCapabilityRoleMatrixRow } from "./system-admin.capabilities-role-matrix.server";
 
 export const systemAdminCapabilityRoleMatrixSurfaceKey =
   "system-admin.capabilities.role-matrix";

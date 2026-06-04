@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 import { Card, CardContent } from "@afenda/ui/card";
 import { cn } from "@afenda/ui/utils";
 
-import type { EmptyState, ListSurface } from "../schemas/list-surface.schema";
+import type { EmptyState, ListSurface } from "./gov-list-surface-schema";
 import {
   buildGovernedListSurfaceDataAttributes,
   type GovernedListSurfaceRenderState,

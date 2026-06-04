@@ -1,5 +1,5 @@
-import type { ListSurfaceRendererDataNature } from "./schemas/list-surface-renderer.schema";
-import type { ListSurfaceRowTrailingAction } from "./schemas/list-surface-row-trailing-action.schema";
+import type { ListSurfaceRendererDataNature } from "./gov-list-surface-renderer-schema";
+import type { ListSurfaceRowTrailingAction } from "./gov-list-surface-row-trailing-action-schema";
 import {
   diagnosticsDataAttributes,
   type GovernedDiagnosticsDataAttributes,

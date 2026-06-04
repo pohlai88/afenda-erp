@@ -1,4 +1,4 @@
-import type { EmptyState } from "../schemas/list-surface.schema";
+import type { EmptyState } from "./gov-list-surface-schema";
 
 export type GovernedEmptyVariant = EmptyState["variant"];
 

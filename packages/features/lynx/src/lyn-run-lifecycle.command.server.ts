@@ -2,13 +2,13 @@ import type {
   AiFeature,
   AiRequestStatus,
   ErpModuleId,
-} from "../data/lynx.run-ledger.repository.server";
+} from "./lynx.run-ledger.repository.server";
 import {
   completeLynxRun,
   createAiUsageEvent,
   createLynxRun,
   recordLynxRunEvent,
-} from "../data/lynx.run-lifecycle.repository.server";
+} from "./lynx.run-lifecycle.repository.server";
 
 type JsonRecord = Record<string, unknown>;
 

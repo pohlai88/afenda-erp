@@ -11,7 +11,7 @@ import { tool } from "ai";
 import {
   recentKnowledgeChunksInputSchema,
   searchKnowledgeInputSchema,
-} from "../schemas/lynx.knowledge-tools.schema";
+} from "./lyn-knowledge-tools-schema";
 import { lynxKnowledgeToolMeta } from "./lynx.tool-meta";
 
 export type LynxKnowledgeToolsContext = {

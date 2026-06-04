@@ -1,4 +1,4 @@
-import type { HrShiftRosterWindow } from "../data/hr.time.sft-roster.server";
+import type { HrShiftRosterWindow } from "./hr.time.sft-roster.server";
 import {
   buildSftListSearchToolbar,
   buildSftOperationalListSurface,

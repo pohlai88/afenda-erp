@@ -8,14 +8,14 @@ import {
   detectHrSftRestPeriodConflicts,
   detectHrSftWeeklyHoursConflicts,
   intervalsOverlap,
-} from "../data/hr.time.sft-conflict.shared";
+} from "./hr.time.sft-conflict.shared";
 import {
   assertSftConflictRequirementCoverageComplete,
   SFT_CONFLICT_REQUIREMENT_COVERAGE,
   type HrSftShiftSlice,
 } from "../schemas/hr.time.sft-conflict.schema";
 import { DEFAULT_HR_SFT_SCHEDULING_POLICY } from "../schemas/hr.time.sft-policy.schema";
-import { assertSftConflictPolicyCoverageComplete } from "../data/hr.time.sft-acceptance-coverage.shared";
+import { assertSftConflictPolicyCoverageComplete } from "./hr.time.sft-acceptance-coverage.shared";
 
 function shift(overrides: Partial<HrSftShiftSlice> = {}): HrSftShiftSlice {
   return {

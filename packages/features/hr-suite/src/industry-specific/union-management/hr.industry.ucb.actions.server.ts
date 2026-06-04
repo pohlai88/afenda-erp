@@ -13,7 +13,7 @@ import {
   listHrIndustryUcbRuleReferenceExports,
   listHrIndustryUcbSeniorityDecisionRefs,
 } from "./hr.industry.ucb-store.shared";
-import { hrIndustryUcbAuditActions } from "../events";
+import { hrIndustryUcbAuditActions } from "./hr.industry.ucb.event";
 import {
   requireHrIndustryUcbApprove,
   requireHrIndustryUcbRead,

@@ -21,16 +21,16 @@ import {
 import {
   assertSystemAdminUserCanBeInvited,
   createSystemAdminUserInvitation,
-} from "../data/system-admin.users.query.server";
-import { inspectSystemAdminUserAccess } from "../data/system-admin.users-access.query.server";
-import { requireSystemAdminUsersManage, requireSystemAdminUsersRead } from "../policies";
+} from "./system-admin.users.query.server";
+import { inspectSystemAdminUserAccess } from "./system-admin.users-access.query.server";
+import { requireSystemAdminUsersManage, requireSystemAdminUsersRead } from "./sys-users.policy.server";
 import {
   systemAdminCancelInvitationInputSchema,
   systemAdminInspectUserAccessInputSchema,
   systemAdminInviteUserInputSchema,
   systemAdminResendInvitationInputSchema,
   systemAdminUserStatusInputSchema,
-} from "../schemas";
+} from "./sys-users.schema";
 import type {
   SystemAdminInviteUserResult,
   SystemAdminResendInvitationResult,

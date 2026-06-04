@@ -3,8 +3,8 @@ import type {
   GovernedDetailTabKind,
   GovernedDetailTabsInput,
   GovernedRevisionEntry,
-} from "../schemas/detail-tabs.schema";
-import type { AuditPanelRow } from "../schemas/audit-panel.schema";
+} from "./gov-detail-tabs-schema";
+import type { AuditPanelRow } from "./gov-audit-panel-schema";
 
 export type BuildGovernedDetailSectionInput = Omit<
   GovernedDetailSection,

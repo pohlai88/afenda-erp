@@ -1,7 +1,7 @@
 import type {
   LynxRecoveryPlaybookOutput,
   SolutionProviderRun,
-} from "../schemas/lynx.solution-provider.schema";
+} from "./lyn-solution-provider.schema";
 
 export type LynxSolutionRunComponentData = {
   run: SolutionProviderRun;

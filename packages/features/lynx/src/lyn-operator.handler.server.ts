@@ -17,11 +17,11 @@ import { solutionProviderToolMeta } from "../tools/lynx.solution-provider-tool-m
 import { getApiAuthContext } from "./server";
 import {
   isAiFeatureEnabledForOrganization,
-} from "../data/lynx.run-lifecycle.repository.server";
+} from "./lynx.run-lifecycle.repository.server";
 import {
   getLynxWorkflowSession,
   type LynxWorkflowSessionSummary,
-} from "../data/lynx.workflow-session.repository.server";
+} from "./lynx.workflow-session.repository.server";
 import {
   executeLynxCompleteRunCommand,
   executeLynxCreateAiUsageEventCommand,
@@ -35,20 +35,20 @@ import {
   summarizeLynxQualityGate,
   validateLynxClaims,
   type LynxQualityGateResult,
-} from "../contracts/lynx.evidence-trust.contract";
-import { createLynxOperatorCheckpoint } from "../contracts/lynx.operator-checkpoint.contract";
+} from "./lyn-evidence-trust-contract";
+import { createLynxOperatorCheckpoint } from "./lyn-operator-checkpoint-contract";
 import {
   LYNX_AUDIT_ACTIONS,
   LYNX_ERP_HTTP_ROUTES,
   LYNX_GATEWAY_FEATURES,
   LYNX_MODULE_ID,
   LYNX_OPERATOR_MAX_STEPS,
-} from "../contracts/lynx.core.contract";
+} from "./lyn-core-contract";
 import type {
   LynxRunContextData,
   LynxRunContextMetadata,
-} from "../schemas/lynx.run-feedback.schema";
-import { getLynxReadinessSnapshot } from "../data/lynx.readiness.query.server";
+} from "./lyn-run-feedback-schema";
+import { getLynxReadinessSnapshot } from "./lynx.readiness.query.server";
 import {
   createLynxErpReadTools,
   createLynxKnowledgeTools,
@@ -59,7 +59,7 @@ import { getRequestId, logServerEvent } from "@afenda/observability/server";
 import { solutionWorkflowIds, type SolutionWorkflowId } from "@afenda/kernel";
 import { createAgentUIStreamResponse, type UIMessage } from "ai";
 import { NextResponse } from "next/server";
-import { lynxOperatorRequestSchema } from "../schemas/lynx.operator.schema";
+import { lynxOperatorRequestSchema } from "./lyn-operator-schema";
 import {
   createRouteAgentStepLogger,
   createRouteAiTelemetrySettings,

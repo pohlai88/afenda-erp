@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   assertFwaCoverageComplete,
   FWA_REQUIREMENT_COVERAGE,
-} from "../data/hr.time.fwa-acceptance-coverage.shared";
+} from "./hr.time.fwa-acceptance-coverage.shared";
 
 describe("FWA acceptance coverage matrix", () => {
   it("lists all 32 HRM-FWA requirements", () => {

@@ -6,7 +6,7 @@ import {
   upsertSsoConnectionFormAction,
 } from "../actions";
 import { buildSystemAdminIntegrationsPageModel } from "../data";
-import { requireSystemAdminIntegrationsRead } from "../policies";
+import { requireSystemAdminIntegrationsRead } from "./sys-integrations.policy.server";
 import {
   SystemAdminIntegrationsAccessDenied,
   SystemAdminIntegrationsSection,

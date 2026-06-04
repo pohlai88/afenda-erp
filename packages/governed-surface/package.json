@@ -28,14 +28,14 @@
       "default": "./dist/server.js"
     },
     "./metadata": {
-      "types": "./src/metadata/index.ts",
-      "development": "./src/metadata/index.ts",
-      "default": "./dist/metadata/index.js"
+      "types": "./src/gov-metadata-barrel.ts",
+      "development": "./src/gov-metadata-barrel.ts",
+      "default": "./dist/gov-metadata-barrel.js"
     },
     "./schemas": {
-      "types": "./src/schemas/index.ts",
-      "development": "./src/schemas/index.ts",
-      "default": "./dist/schemas/index.js"
+      "types": "./src/gov-schemas-barrel.ts",
+      "development": "./src/gov-schemas-barrel.ts",
+      "default": "./dist/gov-schemas-barrel.js"
     }
   },
   "dependencies": {

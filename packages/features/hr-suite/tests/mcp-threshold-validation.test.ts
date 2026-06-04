@@ -5,8 +5,8 @@ import {
   evaluatePayrollThresholdViolations,
   resolveDefaultThresholdRules,
   validatePayrollThresholds,
-} from "../data/hr.payroll.mcp-threshold-validation.shared";
-import { HrMcpValidationError } from "../data/hr.payroll.mcp-statutory-readiness.shared";
+} from "./hr.payroll.mcp-threshold-validation.shared";
+import { HrMcpValidationError } from "./hr.payroll.mcp-statutory-readiness.shared";
 import type { HrMcpThresholdValidationInput } from "../schemas/hr.payroll.mcp-validation.schema";
 
 const baseInput: HrMcpThresholdValidationInput = {

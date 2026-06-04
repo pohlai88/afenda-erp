@@ -8,7 +8,7 @@ import {
   systemAdminActionFailure,
   type SystemAdminActionResult,
 } from "../../tenant-execution/contracts/system-admin.action-result.contract";
-import type { ExportSystemAdminDataManagementActionData } from "../contracts";
+import type { ExportSystemAdminDataManagementActionData } from "./sys-import-job.contract";
 import { systemAdminDataManagementUiCopy } from "../surface/system-admin.data-management-ui.copy.shared";
 
 export type ExportSystemAdminDataManagementAction = (input?: {

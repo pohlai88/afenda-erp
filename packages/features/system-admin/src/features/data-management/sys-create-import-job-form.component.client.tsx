@@ -17,7 +17,7 @@ import { useActionState } from "react";
 import type {
   CreateSystemAdminImportJobActionData,
   SystemAdminImportTemplate,
-} from "../contracts";
+} from "./sys-import-job.contract";
 import {
   SYSTEM_ADMIN_IMPORT_FILENAME_MAX_LENGTH,
   SYSTEM_ADMIN_IMPORT_SOURCE_LABEL_MAX_LENGTH,

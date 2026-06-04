@@ -44,7 +44,7 @@ export type HrFwaWeeklyScheduleMetrics = {
 };
 
 export function computeHrFwaWeeklyScheduleMetrics(input: {
-  patternDetails: import("./schema/hr").HrFwaSchedulePatternDetails;
+  patternDetails: import("./hr").HrFwaSchedulePatternDetails;
 }): HrFwaWeeklyScheduleMetrics {
   const details = input.patternDetails;
   return {

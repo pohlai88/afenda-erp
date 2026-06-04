@@ -6,7 +6,7 @@ import {
   calculateBonusPayout,
   computeBonusAchievementPercent,
   enforceBonusPayoutBounds,
-} from "../data/hr.payroll.bonus-calculation.shared";
+} from "./hr.payroll.bonus-calculation.shared";
 import {
   recordBonusTargetAchievementSchema,
   upsertBonusPayoutFormulaSchema,

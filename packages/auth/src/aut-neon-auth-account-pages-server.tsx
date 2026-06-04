@@ -1,11 +1,11 @@
 import "server-only";
 
-import { NeonAuthUiAccountPage } from "./neon-auth-ui-account-page.client";
-import { NeonAuthUiPageGate } from "./neon-auth-ui-page-gate.server";
+import { NeonAuthUiAccountPage } from "./aut-neon-auth-ui-account-page-client";
+import { NeonAuthUiPageGate } from "./aut-neon-auth-ui-page-gate-server";
 import {
   neonAuthUiAccountViews,
   type NeonAuthUiAccountViewSlug,
-} from "./neon-auth-ui.routes.shared";
+} from "./aut-neon-auth-ui-routes-shared";
 
 async function renderAccountView(view: NeonAuthUiAccountViewSlug) {
   return (

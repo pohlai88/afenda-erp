@@ -5,7 +5,7 @@ import { useCallback, useState, type DragEvent } from "react";
 import type {
   GovernedKanbanBoardConfiguration,
   KanbanCard,
-} from "../../schemas/kanban-board.schema";
+} from "./gov-kanban-board-schema";
 import {
   buildKanbanCardMovePayload,
   governedKanbanCardTestId,

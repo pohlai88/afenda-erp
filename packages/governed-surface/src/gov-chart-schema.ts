@@ -3,7 +3,7 @@ import { z } from "zod";
 import type { SchemaStability } from "./gov-_stability-shared";
 
 import { emptyStateSchema } from "./list-surface.schema";
-import { governedMetadataSchemaVersionSchema } from "./schema-version.shared";
+import { governedMetadataSchemaVersionSchema } from "./gov-schema-version-shared";
 import { governedSurfaceChromeSchema } from "./surface-chrome.schema";
 
 export const GOVERNED_CHART_CONFIGURATION_SCHEMA_ID =

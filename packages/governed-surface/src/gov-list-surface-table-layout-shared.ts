@@ -1,6 +1,6 @@
 import type { CSSProperties } from "react";
 
-import type { ListColumn } from "../../schemas/list-surface.schema";
+import type { ListColumn } from "./gov-list-surface-schema";
 
 /** TanStack column id for Pattern C trailing action cells. */
 export const LIST_SURFACE_TRAILING_COLUMN_ID = "__trailing";

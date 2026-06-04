@@ -10,8 +10,8 @@ import {
   LYNX_ERP_HTTP_ROUTES,
   LYNX_MODULE_ID,
   LYNX_WORKSPACE_ROUTES,
-} from "../contracts/lynx.core.contract";
-import { lynxLiveRunFeedbackRequestSchema } from "../schemas/lynx.run-feedback.schema";
+} from "./lyn-core-contract";
+import { lynxLiveRunFeedbackRequestSchema } from "./lyn-run-feedback-schema";
 
 export async function handleLynxRecordRunFeedbackPost(
   request: Request,

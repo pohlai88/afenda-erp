@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   assertHrPayrollCanFinalize,
   runHrPayrollValidationChecks,
-} from "../data/hr.payroll.processing-validation.shared";
+} from "./hr.payroll.processing-validation.shared";
 
 describe("HRM-PAY-017..020 payroll validation", () => {
   it("flags missing pay group and bank account as blocking", () => {

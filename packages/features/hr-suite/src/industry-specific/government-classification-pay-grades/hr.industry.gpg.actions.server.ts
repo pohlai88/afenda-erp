@@ -13,7 +13,7 @@ import {
   listHrIndustryGpgStepIncreaseEligibilityRefs,
   validateHrIndustryGpgAssignment,
 } from "./hr.industry.gpg-store.shared";
-import { hrIndustryGpgAuditActions } from "../events";
+import { hrIndustryGpgAuditActions } from "./hr.industry.gpg.event";
 import {
   requireHrIndustryGpgApprove,
   requireHrIndustryGpgRead,
@@ -26,7 +26,7 @@ import {
   type HrGpgClassificationReviewInput,
   type HrGpgGradeMovementInput,
   type HrGpgPositionAssignmentInput,
-} from "../schemas";
+} from "./hr.industry.gpg.schema";
 
 type PositionAssignmentActionInput = Omit<
   HrGpgPositionAssignmentInput,

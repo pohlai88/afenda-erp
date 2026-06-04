@@ -9,14 +9,14 @@ import {
   buildGovernedStatGrid,
 } from "@afenda/governed-surface";
 import { governedRendererCopy } from "../../src/i18n/governed-renderer-copy.shared";
-import { StatCardRenderer } from "../../src/metadata/renderers/stat-card.renderer";
-import { ApprovalTimelineRenderer } from "../../src/metadata/renderers/approval-timeline.renderer";
-import { ActionBarRenderer } from "../../src/metadata/renderers/action-bar.renderer";
-import { ChartRenderer } from "../../src/metadata/renderers/chart.renderer";
-import { EmptyRenderer } from "../../src/metadata/renderers/empty.renderer";
-import { ListSurfaceRenderer } from "../../src/metadata/renderers/list-surface.renderer";
-import { MultiStepFormRenderer } from "../../src/metadata/renderers/multi-step-form.renderer";
-import { ScorecardFormRenderer } from "../../src/metadata/renderers/scorecard-form.renderer";
+import { StatCardRenderer } from "../../src/gov-stat-card-renderer";
+import { ApprovalTimelineRenderer } from "../../src/gov-approval-timeline-renderer";
+import { ActionBarRenderer } from "../../src/gov-action-bar-renderer";
+import { ChartRenderer } from "../../src/gov-chart-renderer";
+import { EmptyRenderer } from "../../src/gov-empty-renderer";
+import { ListSurfaceRenderer } from "../../src/gov-list-surface-renderer";
+import { MultiStepFormRenderer } from "../../src/gov-multi-step-form-renderer";
+import { ScorecardFormRenderer } from "../../src/gov-scorecard-form-renderer";
 import {
   GOVERNED_CONFIRM_FIELD,
   actionSuccess,

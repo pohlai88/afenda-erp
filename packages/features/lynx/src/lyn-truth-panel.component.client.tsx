@@ -4,7 +4,7 @@ import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
 import { Search } from "lucide-react";
 import { useState } from "react";
-import { LYNX_ERP_HTTP_ROUTES } from "../contracts/lynx.core.contract";
+import { LYNX_ERP_HTTP_ROUTES } from "./lyn-core-contract";
 import {
   LynxConversation,
   LynxMessage,

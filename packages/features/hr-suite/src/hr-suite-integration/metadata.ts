@@ -2,7 +2,7 @@ export {
   hrModuleNavItems,
   resolveHrModuleNavItems,
   type HrModuleNavItem,
-} from "./navigation/hr-suite-nav.contract";
+} from "./hrs-hr-suite-nav-contract";
 export {
   buildHrSuiteListSurfaceColumnsByKey,
   buildHrSuiteListSurfaceKeys,
@@ -25,4 +25,4 @@ export {
   type HrSuiteListSurfaceProfile,
   type HrSuiteSearchParamSource,
   type HrSuiteSearchParamRegistryEntry,
-} from "./surface/hr-suite-list-surface.shared";
+} from "./hrs-hr-suite-list-surface-shared";

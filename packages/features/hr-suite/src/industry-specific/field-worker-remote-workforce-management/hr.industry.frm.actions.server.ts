@@ -8,7 +8,7 @@ import {
   listHrIndustryFrmOvertimeWorkHourRefs,
   listHrIndustryFrmPayrollReferences,
 } from "./hr.industry.frm-store.shared";
-import { hrIndustryFrmAuditActions } from "../events";
+import { hrIndustryFrmAuditActions } from "./hr.industry.frm.event";
 import {
   requireHrIndustryFrmApprove,
   requireHrIndustryFrmRead,
@@ -20,7 +20,7 @@ import type {
   HrFrmOfflineSyncInput,
   HrFrmPerDiemReferenceInput,
   HrFrmTravelStatusInput,
-} from "../schemas";
+} from "./hr.industry.frm.schema";
 
 type AssignmentActionInput = Omit<
   HrFrmAssignmentInput,

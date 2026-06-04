@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   MCP_ACCEPTANCE_CRITERIA_COVERAGE,
   MCP_REQUIREMENT_COVERAGE,
-} from "../data/hr.payroll.mcp-acceptance-coverage.shared";
+} from "./hr.payroll.mcp-acceptance-coverage.shared";
 
 const EXPECTED_MCP_CODES = Array.from({ length: 28 }, (_, index) => {
   const number = String(index + 1).padStart(3, "0");

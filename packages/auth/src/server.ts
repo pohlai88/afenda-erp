@@ -4,13 +4,6 @@
 import "server-only";
 
 export * from "./aut-catalog";
-export * from "./aut-catalog.alt.alt2";
-export * from "./aut-catalog.alt.alt3";
-export * from "./aut-catalog.alt.alt4";
-export * from "./aut-catalog.alt.alt5";
-export * from "./aut-catalog.alt.alt6";
-export * from "./aut-catalog.alt.alt7";
-export * from "./aut-catalog.alt.alt8";
 export * from "./aut-contract";
 export * from "./aut-env-contract";
 export * from "./aut-errors-catalog";

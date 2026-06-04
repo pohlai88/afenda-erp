@@ -1,4 +1,4 @@
-import type { KanbanCardTransitionAvailability } from "./schemas/kanban-board.schema";
+import type { KanbanCardTransitionAvailability } from "./gov-kanban-board-schema";
 import { kanbanTransitionId } from "./kanban-workflow.shared";
 
 export type ResolveKanbanCardTransitionInput = {

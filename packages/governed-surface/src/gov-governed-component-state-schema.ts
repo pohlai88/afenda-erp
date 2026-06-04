@@ -1,4 +1,4 @@
 export type {
   GovernedDataNatureTag,
   GovernedRenderableState,
-} from "../../schemas/governed-component-state.schema";
+} from "./gov-governed-component-state-schema";

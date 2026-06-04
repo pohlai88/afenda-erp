@@ -5,7 +5,7 @@ import {
   type AppCapability,
 } from "@afenda/auth";
 
-import type { ErpPermissionTuple } from "./schemas/erp-permission.shared";
+import type { ErpPermissionTuple } from "./gov-erp-permission-shared";
 
 /**
  * Maps governed `requiresErpPermission` tuples to `@afenda/auth` capabilities.

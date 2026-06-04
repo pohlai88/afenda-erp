@@ -11,7 +11,7 @@ import {
 import { Braces, Check, Copy, X } from "lucide-react";
 import type { ComponentProps } from "react";
 import { useEffect, useState } from "react";
-import { lynxErpReadToolOutputSchema } from "../schemas/lynx.erp-read-tools.schema";
+import { lynxErpReadToolOutputSchema } from "./lyn-erp-read-tools-schema";
 import {
   LynxEvidenceCard,
   LynxMetricCard,

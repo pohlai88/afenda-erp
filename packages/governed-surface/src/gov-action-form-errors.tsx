@@ -1,6 +1,6 @@
 import { Alert, AlertDescription, AlertTitle } from "@afenda/ui/alert";
 
-import type { ActionResult } from "../schemas/action-result.shared";
+import type { ActionResult } from "./gov-action-result-shared";
 import { governedTestId } from "../utils/governed-identity.shared";
 
 export type ActionFormErrorKind =

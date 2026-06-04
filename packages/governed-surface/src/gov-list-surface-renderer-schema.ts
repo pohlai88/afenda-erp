@@ -13,7 +13,7 @@ import {
 } from "./list-surface.schema";
 import { listSurfaceRowTrailingActionSchema } from "./list-surface-row-trailing-action.schema";
 import { listSurfaceToolbarSchema } from "./list-surface-toolbar.schema";
-import { governedMetadataSchemaVersionSchema } from "./schema-version.shared";
+import { governedMetadataSchemaVersionSchema } from "./gov-schema-version-shared";
 
 export const SCHEMA_STABILITY: SchemaStability = "beta";
 

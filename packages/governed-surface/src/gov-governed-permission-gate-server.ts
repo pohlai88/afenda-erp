@@ -3,8 +3,8 @@ import "server-only";
 import { getOrganizationContext } from "@afenda/kernel/server";
 
 import { resolveErpCapabilityForPermission } from "./erp-permission-capability.shared";
-import type { ErpPermissionRequirement } from "../schemas/erp-permission-requirement.schema";
-import type { ErpPermissionTuple } from "../schemas/erp-permission.shared";
+import type { ErpPermissionRequirement } from "./gov-erp-permission-requirement-schema";
+import type { ErpPermissionTuple } from "./gov-erp-permission-shared";
 
 export async function canUseErpPermissionForCurrentOrg(
   permission: ErpPermissionTuple,

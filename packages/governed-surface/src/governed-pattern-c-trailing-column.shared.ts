@@ -1,7 +1,7 @@
 import type { ComponentType } from "react";
 
-import type { GovernedListTrailingCellContext } from "./schemas/list-trailing-cell-context.schema";
-import type { ListSurfaceRow } from "./schemas/list-surface-renderer.schema";
+import type { GovernedListTrailingCellContext } from "./gov-list-trailing-cell-context-schema";
+import type { ListSurfaceRow } from "./gov-list-surface-renderer-schema";
 
 export type GovernedListTrailingCellProps = {
   row: ListSurfaceRow;

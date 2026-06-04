@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 
 import { cn } from "@afenda/ui/utils";
 
-import type { EmptyState } from "../schemas/list-surface.schema";
+import type { EmptyState } from "./gov-list-surface-schema";
 import {
   buildKanbanSectionDataAttributes,
   governedKanbanSectionTestId,

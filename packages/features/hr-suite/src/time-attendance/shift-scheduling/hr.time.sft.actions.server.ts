@@ -14,8 +14,8 @@ import {
   deleteHrSftEmployeeAvailability,
   HrSftAvailabilityError,
   updateHrSftEmployeeAvailability,
-} from "../data/hr.time.sft-availability.server";
-import { upsertHrSftSchedulingPolicy } from "../data/hr.time.sft-policy.server";
+} from "./hr.time.sft-availability.server";
+import { upsertHrSftSchedulingPolicy } from "./hr.time.sft-policy.server";
 import { hrTimeSftAuditActions } from "./hr.time.sft.event";
 import {
   HrSftAccessDeniedError,

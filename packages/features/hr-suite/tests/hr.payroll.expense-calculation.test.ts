@@ -9,7 +9,7 @@ import {
   createExchangeRateProvider,
   getExchangeRate,
   roundCurrencyAmount,
-} from "../data/hr.payroll.expense-calculation.shared";
+} from "./hr.payroll.expense-calculation.shared";
 import {
   hrExpenseClaimCalculationInputSchema,
   hrExpenseForeignCurrencyLineItemSchema,

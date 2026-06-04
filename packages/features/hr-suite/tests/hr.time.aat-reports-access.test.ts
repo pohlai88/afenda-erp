@@ -26,7 +26,7 @@ import {
 import {
   AAT_SENSITIVE_REASON_MASK,
   maskHrAatAbsenceReason,
-} from "../data/hr.time.aat-reason-masking.server";
+} from "./hr.time.aat-reason-masking.server";
 import {
   HrAatAccessDeniedError,
   requireHrAatReportExport,

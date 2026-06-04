@@ -5,19 +5,19 @@ import {
   LMS_REQUIREMENT_COVERAGE,
   assertLmsAcceptanceCriteriaComplete,
   assertLmsCoverageComplete,
-} from "../data/hr.talent.lms-acceptance-coverage.shared";
+} from "./hr.talent.lms-acceptance-coverage.shared";
 import {
   getLmsComplianceCompletionSnapshot,
   getLmsOnboardingCompletionSnapshot,
   getLmsTrainingDevelopmentRefs,
-} from "../data/hr.talent.lms-integration.server";
-import { buildHrLmsReportRows, listHrLmsLearningHistory } from "../data/hr.talent.lms-reports.server";
-import { emitHrLmsAuditTrailEvent, listHrLmsAuditTrail } from "../data/hr.talent.lms-audit.server";
+} from "./hr.talent.lms-integration.server";
+import { buildHrLmsReportRows, listHrLmsLearningHistory } from "./hr.talent.lms-reports.server";
+import { emitHrLmsAuditTrailEvent, listHrLmsAuditTrail } from "./hr.talent.lms-audit.server";
 import {
   createHrLmsCourseInStore,
   resetHrLmsStoreForTests,
   submitHrLmsAssessmentAttemptInStore,
-} from "../data/hr.talent.lms-store.shared";
+} from "./hr.talent.lms-store.shared";
 
 const ORG = "org_lms_test";
 

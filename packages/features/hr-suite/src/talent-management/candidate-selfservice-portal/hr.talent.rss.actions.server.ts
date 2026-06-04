@@ -9,7 +9,7 @@ import {
   listHrTalentRssIntegrationExposures,
   nextHrTalentRssId,
 } from "./hr.talent.rss-store.shared";
-import { hrTalentRssAuditActions } from "../events";
+import { hrTalentRssAuditActions } from "./hr.talent.rss.event";
 import {
   requireHrTalentRssApprove,
   requireHrTalentRssRead,
@@ -32,7 +32,7 @@ import {
   type HrTalentRssRequisitionRequestInput,
   type HrTalentRssRetentionActionInput,
   type HrTalentRssScorecardInput,
-} from "../schemas";
+} from "./hr.talent.rss.schema";
 
 type CandidateProfileActionInput = Omit<
   HrTalentRssCandidateProfileInput,

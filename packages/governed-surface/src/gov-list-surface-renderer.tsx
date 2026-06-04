@@ -4,9 +4,9 @@ import { buildGovernedListSurfaceDataAttributes } from "./list-surface-identity.
 import {
   parseListSurfaceRendererConfiguration,
   type ListSurfaceRendererConfiguration,
-} from "../../schemas/list-surface-renderer.schema";
-import { resolveGovernedBulkServerAction } from "../../schemas/server-actions.shared";
-import { governedParseErrorCopy } from "../../i18n/governed-renderer-copy.shared";
+} from "./gov-list-surface-renderer-schema";
+import { resolveGovernedBulkServerAction } from "./gov-server-actions-shared";
+import { governedParseErrorCopy } from "../i18n/governed-renderer-copy.shared";
 
 import type { GovernedComponentRendererDiagnostics } from "./gov-registry";
 import type { ListSurfaceTableClientProps } from "./list-surface-table.client";

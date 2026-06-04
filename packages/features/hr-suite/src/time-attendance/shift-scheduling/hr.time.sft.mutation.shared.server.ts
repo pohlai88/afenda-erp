@@ -10,7 +10,7 @@ import { ZodError } from "zod";
 
 import { hrTimeSftRoutePaths } from "./hr.time.sft-route.contract";
 import { hrTimeSftAuditActions } from "./hr.time.sft.event";
-import { HrTimeSftSwapIneligibleError } from "../data/hr.time.sft-swap.server";
+import { HrTimeSftSwapIneligibleError } from "./hr.time.sft-swap.server";
 
 const SFT_REVALIDATE_PATH = hrTimeSftRoutePaths.hub;
 

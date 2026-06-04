@@ -10,14 +10,14 @@ import { ActionFormErrors } from "../../components/action-form-errors";
 import {
   actionFailure,
   type ActionResult,
-} from "../../schemas/action-result.shared";
+} from "./gov-action-result-shared";
 import type { ActionDescriptor } from "./gov-action-schema";
 import {
   GOVERNED_ACTION_ID_FIELD,
   GOVERNED_CONFIRM_FIELD,
   GOVERNED_STEP_UP_TOKEN_FIELD,
   type GovernedServerActionHandler,
-} from "../../schemas/server-actions.shared";
+} from "./gov-server-actions-shared";
 
 const ACTION_INTENT_META = {
   default: { label: "Standard", badge: "secondary", button: "secondary" },

@@ -4,7 +4,7 @@ import { SectionPanel } from "@afenda/ui";
 
 import { updateSystemAdminCapabilitySettingsAction } from "../actions";
 import { buildSystemAdminCapabilitiesPageModel } from "../data";
-import { requireSystemAdminCapabilitiesRead } from "../policies";
+import { requireSystemAdminCapabilitiesRead } from "./sys-capabilities.policy.server";
 import {
   buildCapabilitiesListSurface,
   buildCapabilityRoleMatrixListSurface,

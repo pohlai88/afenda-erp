@@ -6,7 +6,7 @@ import {
   catalogStatusBadge,
   linkCell,
 } from "../../overview/surfaces/system-admin.control-list.shared";
-import type { SystemAdminRoleRow } from "../contracts";
+import type { SystemAdminRoleRow } from "./sys-roles.contract";
 import { systemAdminRolesUiCopy } from "../surface/system-admin.roles-ui.copy.shared";
 
 export const systemAdminRolesSurfaceKey = "system-admin.roles.list";

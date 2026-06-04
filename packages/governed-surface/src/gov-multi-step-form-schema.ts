@@ -3,7 +3,7 @@ import { z } from "zod";
 import type { SchemaStability } from "./gov-_stability-shared";
 
 import { formRuleSchema } from "./form-rules.schema";
-import { governedMetadataSchemaVersionSchema } from "./schema-version.shared";
+import { governedMetadataSchemaVersionSchema } from "./gov-schema-version-shared";
 import { governedSurfaceChromeSchema } from "./surface-chrome.schema";
 
 export const GOVERNED_MULTI_STEP_FORM_SCHEMA_ID =

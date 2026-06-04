@@ -5,7 +5,7 @@ import Link from "next/link";
 import { systemAdminRoutePaths } from "../../overview/contracts/system-admin.route-paths.contract";
 import { inviteSystemAdminUser } from "../actions";
 import { buildSystemAdminUsersPageModel } from "../data";
-import { requireSystemAdminUsersRead } from "../policies";
+import { requireSystemAdminUsersRead } from "./sys-users.policy.server";
 import { systemAdminUsersUiCopy } from "../surface/system-admin.users-ui.copy.shared";
 import { SystemAdminInviteUserDialog } from "./system-admin.invite-user-dialog.component.client";
 import {

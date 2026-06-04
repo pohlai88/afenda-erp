@@ -1,7 +1,7 @@
 import { buildDocumentRegistryListSurface } from "@afenda/kernel";
 import { describe, expect, it } from "vitest";
 
-import { parseListSurfaceRendererConfiguration } from "../../src/schemas/list-surface-renderer.schema";
+import { parseListSurfaceRendererConfiguration } from "../../src/gov-list-surface-renderer-schema";
 
 describe("document registry shadow cells contract", () => {
   it("parses rows with scanStatusValue and retentionClassValue for document-lifecycle trailing", () => {

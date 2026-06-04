@@ -9,7 +9,7 @@ import {
 } from "@afenda/governed-surface/schemas";
 
 import { requireHrRead } from "../../employee-management/compliance-regulatory-tracking/server";
-import { analyzeEmployeeSkillAndCompetencyGaps } from "../data/hr.talent.csf-gap.server";
+import { analyzeEmployeeSkillAndCompetencyGaps } from "./hr.talent.csf-gap.server";
 import {
   classifyGap,
   computeCompetencyGap,

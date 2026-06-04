@@ -8,7 +8,7 @@ import type {
 import {
   hrIndustryRwsAuditActions,
   type HrIndustryRwsAuditAction,
-} from "../events";
+} from "./hr.industry.rws.event";
 import type { HrRwsReportGroupBy } from "./hr.industry.rws-constants.shared";
 import type {
   HrRwsAttendanceComparisonInput,

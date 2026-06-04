@@ -1,4 +1,4 @@
-import type { GovernedComponentRegistry } from "../schemas/component-registry.schema";
+import type { GovernedComponentRegistry } from "./gov-component-registry-schema";
 
 /**
  * Maps governed component `type` to internal renderer id.

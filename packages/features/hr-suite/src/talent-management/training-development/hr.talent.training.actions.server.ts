@@ -14,7 +14,7 @@ import type {
   HrTrainingCompletionInput,
   HrTrainingCourseInput,
   HrTrainingEnrollmentInput,
-} from "../schemas";
+} from "./hr.talent.training.schema";
 import {
   assignHrTraining,
   createHrTrainingCourse,
@@ -28,7 +28,7 @@ import {
   recordHrTrainingCertification,
   recordHrTrainingCompletion,
 } from "./hr.talent.training-store.shared";
-import { hrTrainingAuditActions } from "../events";
+import { hrTrainingAuditActions } from "./hr.talent.training.event";
 
 type CourseActionInput = Omit<HrTrainingCourseInput, "id" | "organizationId">;
 type AssignmentActionInput = Omit<

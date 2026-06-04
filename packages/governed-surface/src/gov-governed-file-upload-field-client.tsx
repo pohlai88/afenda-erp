@@ -13,7 +13,7 @@ import { Input } from "@afenda/ui/input";
 import { Label } from "@afenda/ui/label";
 import { useRef, useState } from "react";
 
-import type { GovernedFormField } from "../../schemas/multi-step-form.schema";
+import type { GovernedFormField } from "./gov-multi-step-form-schema";
 
 export type GovernedFileUploadValue = {
   blobUrl: string;

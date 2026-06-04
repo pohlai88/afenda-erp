@@ -3,15 +3,15 @@ import "server-only";
 import type { ReactNode } from "react";
 
 import { GovernedComponentRenderer } from "./index";
-import { logUnexpectedServerError } from "../data/governed-logging.server";
+import { logUnexpectedServerError } from "./governed-logging.server";
 import { governedRendererCopy } from "../i18n/governed-renderer-copy.shared";
 import { getGovernedSurfaceTranslations } from "../i18n/governed-surface-copy";
 
-import type { EmptyState } from "../schemas/list-surface.schema";
+import type { EmptyState } from "./gov-list-surface-schema";
 import {
   parseGovernedApprovalTimelineConfiguration,
   type GovernedApprovalTimelineConfigurationInput,
-} from "../schemas/approval-timeline.schema";
+} from "./gov-approval-timeline-schema";
 import {
   renderGovernedPatternSectionShell,
   type GovernedPatternSectionDensity,

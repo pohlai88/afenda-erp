@@ -6,7 +6,7 @@ import {
   HrMcpValidationError,
   resolveRequiredStatutoryIdKeys,
   validateEmployeeStatutoryReadiness,
-} from "../data/hr.payroll.mcp-statutory-readiness.shared";
+} from "./hr.payroll.mcp-statutory-readiness.shared";
 import type { HrMcpStatutoryReadinessInput } from "../schemas/hr.payroll.mcp-validation.schema";
 
 const readyEmployeeInput: HrMcpStatutoryReadinessInput = {

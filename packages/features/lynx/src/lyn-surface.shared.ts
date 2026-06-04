@@ -10,15 +10,15 @@ import {
   type StatCardConfigurationResolvedInput,
   type StatCardTone,
 } from "@afenda/governed-surface";
-import { LYNX_ERP_HTTP_ROUTES } from "../contracts/lynx.core.contract";
-import type { LynxQualityGateResult } from "../contracts/lynx.evidence-trust.contract";
+import { LYNX_ERP_HTTP_ROUTES } from "./lyn-core-contract";
+import type { LynxQualityGateResult } from "./lyn-evidence-trust-contract";
 import type {
   LynxModuleReadiness,
   LynxReadinessSignal,
   LynxReadinessSnapshot,
   LynxReadinessStatus,
   LynxToolAvailability,
-} from "../contracts/lynx.readiness.contract";
+} from "./lyn-readiness-contract";
 
 const LYNX_MONITOR_CONFIGURE_APPROVE_REASON =
   "Requires system-admin.lynx.approve.";

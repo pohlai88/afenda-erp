@@ -16,8 +16,8 @@ import {
   upsertHrGeoEligibilityRuleCommand,
   upsertHrGeoGeofenceCommand,
   HrGeoCommandError,
-} from "../data/hr.time.geo-admin.server";
-import { submitHrGeoRemoteCheckinCapture } from "../data/hr.time.geo-capture.server";
+} from "./hr.time.geo-admin.server";
+import { submitHrGeoRemoteCheckinCapture } from "./hr.time.geo-capture.server";
 import {
   requireHrGeoEmployeeCapture,
   requireHrGeoWrite,

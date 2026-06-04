@@ -8,7 +8,7 @@ import {
   type GovernedKanbanBoardConfigurationInput,
 } from "./client";
 
-import { KanbanBoardView } from "../metadata/renderers/kanban-board-view";
+import { KanbanBoardView } from "./gov-kanban-board-view";
 import { GovernedEmpty } from "./governed-empty";
 
 export type GovernedKanbanReadOnlyBoardProps = {

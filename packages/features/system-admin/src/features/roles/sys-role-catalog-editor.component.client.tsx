@@ -17,7 +17,7 @@ import {
 } from "@afenda/ui";
 import { ShieldOffIcon, ShieldPlusIcon, UserPenIcon } from "lucide-react";
 import { useActionState } from "react";
-import { systemAdminSeedRoles } from "../contracts";
+import { systemAdminSeedRoles } from "./sys-roles.contract";
 
 type RoleFormAction = (formData: FormData) => Promise<SystemAdminActionResult>;
 

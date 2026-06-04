@@ -7,7 +7,7 @@ import type {
 import {
   hrIndustryGpgAuditActions,
   type HrIndustryGpgAuditAction,
-} from "../events";
+} from "./hr.industry.gpg.event";
 import type { HrGpgReportGroupBy } from "./hr.industry.gpg-constants.shared";
 import type {
   HrGpgClassificationReviewInput,

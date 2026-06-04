@@ -6,7 +6,7 @@ import type {
 import {
   hrIndustryFrmAuditActions,
   type HrIndustryFrmAuditAction,
-} from "../events";
+} from "./hr.industry.frm.event";
 import type { HrFrmReportGroupBy } from "./hr.industry.frm-constants.shared";
 import type {
   HrFrmAssignmentInput,

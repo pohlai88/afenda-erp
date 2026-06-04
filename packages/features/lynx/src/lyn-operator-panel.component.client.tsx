@@ -25,7 +25,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { useState } from "react";
-import { LYNX_ERP_HTTP_ROUTES } from "../contracts/lynx.core.contract";
+import { LYNX_ERP_HTTP_ROUTES } from "./lyn-core-contract";
 import {
   LynxConversation,
   LynxMessage,
