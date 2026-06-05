@@ -26,24 +26,14 @@ packages/public-homepage/
   src/
     index.ts
     server.ts
-    components/
-      homepage-shell.server.tsx
-      homepage-shell.client.tsx
-      homepage-hero.server.tsx
-      machine-intro-scene.client.tsx
-      machine-intro-lazy.client.tsx
-      machine-intro-resolver.ts
-      machine-intro-config.ts
-      site-header.server.tsx
-    content/
-      homepage.content.ts
-    schemas/
-      homepage.schema.ts
-    seo/
-      homepage-seo.ts
-    styles/
-      public-homepage.module.css
-      machine-intro.module.css
+    pub-homepage-shell-server.tsx
+    pub-homepage-hero-server.tsx
+    pub-site-header-server.tsx
+    pub-homepage-content.ts
+    pub-homepage-schema.ts
+    pub-homepage-seo.ts
+  styles/
+    public-homepage.module.css
 ```
 
 ## Package Boundary
@@ -69,7 +59,7 @@ apps/erp/src/app/page.tsx
 
 The route remains a React Server Component path. There is no API data fetch and no auth
 redirect. Signed-in and signed-out users see the same page. Sign-in is available from the
-header menu. The header may own a small client island for the menu and theme toggle only.
+hero CTA.
 
 ## Ownership
 
@@ -83,17 +73,11 @@ The package must not import `@afenda/auth`, `@afenda/db`, `@afenda/kernel`, feat
 or workspace governed-surface builders. Those belong to tenant/workspace runtime, not the
 anonymous homepage.
 
-## Server And Client Components
+## Server Components
 
-Default to Server Components. Client components are allowed only at interaction leaves:
-
-| Component type | Allowed responsibilities |
-| -------------- | ------------------------ |
-| Server | Layout, content composition, metadata, static links |
-| Client | Header menu state, theme toggle, machine intro cinematic (WebGL + canvas), skip/replay policy |
-
-Client islands receive small serializable props. They do not fetch homepage data, read session
-state, call Server Actions, or import server-only modules.
+The homepage is server-rendered. Static links, metadata, content composition, and the
+image-led hero all remain in React Server Components. Do not add client islands unless a
+specific interaction requires browser state.
 
 ## App Integration
 
