@@ -128,6 +128,7 @@ export function createMetadataUiStatFixture(
     key: input.key ?? "metadata-ui.fixture.stat",
     title: input.title ?? "Fixture stats",
     description: input.description,
+    dataNature: "kpi",
     items: [
       createNumberStatItem({
         key: "total",

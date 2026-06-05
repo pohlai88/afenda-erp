@@ -165,7 +165,7 @@ export const METADATA_UI_SERVER_RENDERER_REGISTRY =
       id: "metadata-ui.renderer.page-header",
       sectionKind: "page-header",
       schemaId: METADATA_UI_PAGE_HEADER_SCHEMA_ID,
-      modulePath: "sections/page-header/page-header.server",
+      modulePath: "sections/page-header/page-header-renderer.server",
       exportName: "default",
       description: "Server renderer metadata for page-header sections.",
     },

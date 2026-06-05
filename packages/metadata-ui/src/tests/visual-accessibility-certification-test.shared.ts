@@ -103,9 +103,19 @@ describe("metadata-ui visual and accessibility certification", () => {
       completedChecks: plan.requiredChecks,
       reviewer: "metadata-ui-certification",
     }));
-    const allowed = createMetadataUiCertificationEvidenceGate({
+    const planningOnlyAllowed = createMetadataUiCertificationEvidenceGate({
       plans,
       evidence: completeEvidence,
+      requireArtifactFiles: false,
+    });
+    const firstPlan = plans[0];
+    const firstEvidence = completeEvidence[0];
+    if (!firstPlan || !firstEvidence) {
+      throw new Error("Expected at least one metadata-ui certification plan.");
+    }
+    const blockedByMissingFiles = createMetadataUiCertificationEvidenceGate({
+      plans: [firstPlan],
+      evidence: [firstEvidence],
     });
 
     expect(blocked.canReplace).toBe(false);
@@ -113,12 +123,21 @@ describe("metadata-ui visual and accessibility certification", () => {
     expect(blocked.requiredEvidence).toContain(
       "artifacts stored under .artifacts/metadata-ui/e10/",
     );
-    expect(allowed.canReplace).toBe(true);
-    expect(allowed.blockers).toEqual([]);
+    expect(planningOnlyAllowed.canReplace).toBe(true);
+    expect(planningOnlyAllowed.blockers).toEqual([]);
+    expect(blockedByMissingFiles.blockers).toEqual(
+      expect.arrayContaining([
+        `${firstPlan.surface}:desktop-screenshot-file`,
+        `${firstPlan.surface}:mobile-screenshot-file`,
+      ]),
+    );
   });
 
   it("rejects stale or mismatched certification artifacts", () => {
     const [plan] = createMetadataUiVisualCertificationPlan();
+    if (!plan) {
+      throw new Error("Expected at least one metadata-ui certification plan.");
+    }
     const gate = createMetadataUiCertificationEvidenceGate({
       plans: [plan],
       evidence: [

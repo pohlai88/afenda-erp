@@ -79,8 +79,9 @@ export const METADATA_UI_ACTION_BAR_OVERFLOW_SCHEMA = z.object({
   collapseAfter: z.number().int().min(1).max(12).optional(),
 });
 
-export const METADATA_UI_ACTION_BAR_ITEM_SCHEMA = z.object({
-  key: METADATA_UI_ACTION_KEY_SCHEMA,
+export const METADATA_UI_ACTION_BAR_ITEM_SCHEMA = z
+  .object({
+    key: METADATA_UI_ACTION_KEY_SCHEMA,
 
   /**
    * Registry action reference.
@@ -112,13 +113,23 @@ export const METADATA_UI_ACTION_BAR_ITEM_SCHEMA = z.object({
     })
     .optional(),
 
-  diagnostics: z
-    .object({
-      testId: z.string().min(1).max(160).optional(),
-      telemetryKey: z.string().min(1).max(160).optional(),
-    })
-    .optional(),
-});
+    diagnostics: z
+      .object({
+        testId: z.string().min(1).max(160).optional(),
+        telemetryKey: z.string().min(1).max(160).optional(),
+      })
+      .optional(),
+  })
+  .strict()
+  .superRefine((item, ctx) => {
+    if (item.disabled?.value && !item.disabled.reason) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["disabled", "reason"],
+        message: "Disabled action bar items must provide a reason.",
+      });
+    }
+  });
 
 export const METADATA_UI_ACTION_BAR_SCHEMA = z.object({
   schemaId: z.literal(METADATA_UI_ACTION_BAR_SCHEMA_ID).default(
@@ -222,7 +233,7 @@ export type MetadataUiActionBarDisabledState =
   | {
       disabled: {
         value: true;
-        reason?: string;
+        reason: string;
       };
     };
 

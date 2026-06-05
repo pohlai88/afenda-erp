@@ -7,7 +7,9 @@ import {
 } from "../../primitives/field.server";
 import {
   type MetadataUiForm,
+  type MetadataUiFormField,
   type MetadataUiFormInput,
+  type MetadataUiFormSection,
   parseMetadataUiForm,
 } from "../../schemas/form.schema";
 import { MetadataUiClientForm } from "./form.client";
@@ -44,6 +46,72 @@ function groupMetadataUiFormActions(
   return groups;
 }
 
+function doesMetadataUiFormDependencyMatch(
+  dependency: MetadataUiFormField["dependencies"][number],
+  values: ReadonlyMap<string, unknown>,
+): boolean {
+  const value = values.get(dependency.sourceField);
+
+  if (dependency.condition === "provided") {
+    return value !== undefined && value !== null && value !== "";
+  }
+
+  if (dependency.condition === "equals") {
+    return value === dependency.value;
+  }
+
+  return value !== dependency.value;
+}
+
+function resolveMetadataUiFormFieldForDependencies(
+  field: MetadataUiFormField,
+  values: ReadonlyMap<string, unknown>,
+): MetadataUiFormField | null {
+  let resolvedField = field;
+
+  for (const dependency of field.dependencies) {
+    const matched = doesMetadataUiFormDependencyMatch(dependency, values);
+
+    if ((dependency.effect === "show" && !matched) || (dependency.effect === "hide" && matched)) {
+      return null;
+    }
+
+    if (dependency.effect === "disable" && matched) {
+      resolvedField = {
+        ...resolvedField,
+        disabled: {
+          value: true,
+          reason: dependency.reason ?? "Disabled by host dependency metadata.",
+        },
+      };
+    }
+
+    if (dependency.effect === "enable" && !matched) {
+      resolvedField = {
+        ...resolvedField,
+        disabled: {
+          value: true,
+          reason: dependency.reason ?? "Enabled only when dependency metadata matches.",
+        },
+      };
+    }
+  }
+
+  return resolvedField;
+}
+
+function resolveMetadataUiFormSectionFields(
+  section: MetadataUiFormSection,
+): readonly MetadataUiFormField[] {
+  const values = new Map<string, unknown>(
+    section.fields.map((field) => [field.name, field.defaultValue]),
+  );
+
+  return section.fields
+    .map((field) => resolveMetadataUiFormFieldForDependencies(field, values))
+    .filter((field): field is MetadataUiFormField => field !== null);
+}
+
 export function MetadataUiFormRenderer({ metadata }: MetadataUiFormRendererProps) {
   const form = parseMetadataUiForm(metadata);
   const actions = groupMetadataUiFormActions(form);
@@ -73,7 +141,7 @@ export function MetadataUiFormRenderer({ metadata }: MetadataUiFormRendererProps
       ) : null}
       {form.sections.map((section) => (
         <MetadataUiPrimitiveFieldGroup key={section.key} section={section}>
-          {section.fields.map((field) => (
+          {resolveMetadataUiFormSectionFields(section).map((field) => (
             <MetadataUiPrimitiveField
               key={field.key}
               field={field}

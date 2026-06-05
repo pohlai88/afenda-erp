@@ -1,6 +1,9 @@
 import { z } from "zod";
 
-import { metadataUiActionContractSchema } from "../contracts/action.contract";
+import {
+  metadataUiActionContractSchema,
+  metadataUiSafeNavigationHrefSchema,
+} from "../contracts/action.contract";
 import type { MetadataUiActionContract } from "../contracts/action.contract";
 import { metadataUiPermissionContractSchema } from "../contracts/permission.contract";
 import type { MetadataUiPermissionContract } from "../contracts/permission.contract";
@@ -228,6 +231,23 @@ export const METADATA_UI_LIST_TRAILING_CELL_SCHEMA = z
         message: "Status trailing cells must declare statusField.",
       });
     }
+
+    if (cell.kind === "document" && !cell.documentKeyField) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["documentKeyField"],
+        message: "Document trailing cells must declare documentKeyField.",
+      });
+    }
+
+    if (cell.kind === "quarantine" && !cell.field && !cell.disabledReason) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["field"],
+        message:
+          "Quarantine trailing cells must declare a field or disabledReason.",
+      });
+    }
   });
 
 export const METADATA_UI_LIST_BULK_ACTION_SCHEMA = z.object({
@@ -257,7 +277,7 @@ export const METADATA_UI_LIST_VIRTUALIZATION_SCHEMA = z.object({
 export const METADATA_UI_LIST_SAVED_VIEW_SCHEMA = z.object({
   key: METADATA_UI_LIST_KEY_SCHEMA,
   label: z.string().min(1).max(120),
-  href: z.string().min(1).max(500).optional(),
+  href: metadataUiSafeNavigationHrefSchema.optional(),
   active: z.boolean().default(false),
 });
 
@@ -361,6 +381,10 @@ type MetadataUiListRowActionSchemaOutput = z.output<
   typeof METADATA_UI_LIST_ROW_ACTION_SCHEMA
 >;
 
+type MetadataUiListTrailingCellSchemaOutput = z.output<
+  typeof METADATA_UI_LIST_TRAILING_CELL_SCHEMA
+>;
+
 type MetadataUiListBulkActionSchemaOutput = z.output<
   typeof METADATA_UI_LIST_BULK_ACTION_SCHEMA
 >;
@@ -403,6 +427,10 @@ export type MetadataUiListRowActionInput = z.input<
   typeof METADATA_UI_LIST_ROW_ACTION_SCHEMA
 >;
 
+export type MetadataUiListTrailingCellInput = z.input<
+  typeof METADATA_UI_LIST_TRAILING_CELL_SCHEMA
+>;
+
 export type MetadataUiListBulkActionInput = z.input<
   typeof METADATA_UI_LIST_BULK_ACTION_SCHEMA
 >;
@@ -434,6 +462,9 @@ export type MetadataUiListFilterOperator =
 
 export type MetadataUiListRowActionPlacement =
   (typeof METADATA_UI_LIST_ROW_ACTION_PLACEMENT_VALUES)[number];
+
+export type MetadataUiListTrailingCellKind =
+  (typeof METADATA_UI_LIST_TRAILING_CELL_KIND_VALUES)[number];
 
 declare const metadataUiListKeyBrand: unique symbol;
 declare const metadataUiListFieldKeyBrand: unique symbol;
@@ -551,6 +582,61 @@ export type MetadataUiListRowAction = {
   [Placement in MetadataUiListRowActionPlacement]: MetadataUiListRowActionForPlacement<Placement>;
 }[MetadataUiListRowActionPlacement];
 
+export type MetadataUiListTrailingCellForKind<
+  Kind extends MetadataUiListTrailingCellKind,
+> = Omit<
+  MetadataUiListTrailingCellSchemaOutput,
+  | "action"
+  | "documentKeyField"
+  | "field"
+  | "key"
+  | "kind"
+  | "permission"
+  | "statusField"
+> & {
+  key: MetadataUiListKey;
+  kind: Kind;
+  permission?: MetadataUiPermissionContract;
+} & (Kind extends "action"
+    ? {
+        action: MetadataUiActionContract;
+        field?: MetadataUiListFieldKey;
+        statusField?: never;
+        documentKeyField?: never;
+      }
+    : Kind extends "status"
+      ? {
+          statusField: MetadataUiListFieldKey;
+          field?: MetadataUiListFieldKey;
+          action?: never;
+          documentKeyField?: never;
+        }
+      : Kind extends "document"
+        ? {
+            documentKeyField: MetadataUiListFieldKey;
+            field?: MetadataUiListFieldKey;
+            action?: never;
+            statusField?: never;
+          }
+        : Kind extends "quarantine"
+          ? {
+              field?: MetadataUiListFieldKey;
+              disabledReason?: string;
+              action?: never;
+              statusField?: never;
+              documentKeyField?: never;
+            }
+          : {
+              field: MetadataUiListFieldKey;
+              action?: never;
+              statusField?: never;
+              documentKeyField?: never;
+            });
+
+export type MetadataUiListTrailingCell = {
+  [Kind in MetadataUiListTrailingCellKind]: MetadataUiListTrailingCellForKind<Kind>;
+}[MetadataUiListTrailingCellKind];
+
 export type MetadataUiListBulkAction = Omit<
   MetadataUiListBulkActionSchemaOutput,
   "action" | "permission"
@@ -576,6 +662,11 @@ export type MetadataUiListBoundedSorts =
 
 export type MetadataUiListBoundedRowActions =
   MetadataUiListTupleUpTo<MetadataUiListRowAction, 12> & {
+    readonly [metadataUiListBoundedActionsBrand]: true;
+  };
+
+export type MetadataUiListBoundedTrailingCells =
+  MetadataUiListTupleUpTo<MetadataUiListTrailingCell, 8> & {
     readonly [metadataUiListBoundedActionsBrand]: true;
   };
 
@@ -616,6 +707,7 @@ export type MetadataUiList = Omit<
   | "presentation"
   | "rowActions"
   | "rowKey"
+  | "trailingCells"
 > & {
   key: MetadataUiListKey;
   rowKey: MetadataUiListFieldKey;
@@ -623,6 +715,7 @@ export type MetadataUiList = Omit<
   filters: MetadataUiListBoundedFilters;
   defaultSort: MetadataUiListBoundedSorts;
   rowActions: MetadataUiListBoundedRowActions;
+  trailingCells: MetadataUiListBoundedTrailingCells;
   bulkActions: MetadataUiListBoundedBulkActions;
   emptyStateKey?: MetadataUiListKey;
   presentation?: MetadataUiPresentationContract;

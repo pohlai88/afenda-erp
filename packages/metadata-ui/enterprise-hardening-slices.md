@@ -692,3 +692,74 @@ Implemented readiness:
 
 Global governed-surface removal is a later migration milestone, not a slice
 objective.
+
+---
+
+## Stabilization Pass — 2026-06-05
+
+The enterprise hardening implementation was synchronized against the actual
+runtime after parallel slice audits.
+
+Closed gaps:
+
+* list row identity now fails closed when `rowKey` is missing instead of falling
+  back to array index
+* list saved views, export descriptors, bulk actions, trailing cells, and pinned
+  columns are serialized into the table client model and surfaced in the client
+  island
+* confirmed navigation actions preserve their link execution through the
+  confirmation dialog
+* chart rendering now has explicit scatter and heatmap paths, honors
+  `allow-animation`, keeps table fallback, and uses design-system tokens in the
+  server wrapper
+* stat `dataNature` and migration metadata are preserved by schema, not stripped
+  as unknown fields
+* form dependency metadata affects initial server rendering, and file upload
+  host actions render through metadata-ui action buttons
+* kanban swimlanes, transition hints, disabled transition reasons, and footer
+  column counts are represented in the client model/renderers
+* migration replacement gates now require guard, package build, package tests,
+  visual evidence, and import-audit evidence
+* visual/accessibility certification can require screenshot artifact files when
+  used as a replacement gate
+
+Verified package-local checks:
+
+```bash
+pnpm --filter @afenda/metadata-ui build
+pnpm --filter @afenda/metadata-ui test
+pnpm guard:metadata-ui
+```
+
+Repo-wide `pnpm architecture:check` remains blocked by non-metadata-ui
+and metadata-ui-adjacent violations in existing architecture-doc placement,
+feature package layout, object-storage layout, and feature server-boundary
+markers. The package-local runtime is validated by build/test/guard, but
+repo-wide architecture compliance is not complete until the central architecture
+document allowlist/placement issue is resolved.
+
+### Stabilization Correction — 2026-06-05
+
+Closed after parallel full-directory review:
+
+* component registry now includes section and renderer component entries for
+  `multi-step-form`, `scorecard-form`, and `approval-timeline`
+* `page-header` now has a dedicated `page-header-renderer.server.tsx`, and the
+  renderer registry/guard require that artifact instead of pointing at the
+  section entry
+* page-header breadcrumbs and list saved views use the shared safe navigation
+  href schema
+* external-link actions are restricted to http(s) URLs
+* action-bar disabled items, page-header current breadcrumbs, detail-tabs
+  default selection, list trailing cells, kanban keys/swimlane references, and
+  stat `dataNature` are fail-closed schema invariants
+* list and kanban client islands reset local state when server models change
+* select fields preserve required/invalid/described-by metadata on the trigger
+* visual certification requires screenshot artifact files by default; synthetic
+  evidence is only valid when an explicit planning mode disables file checks
+
+Clarification:
+
+* E10 defines the certification plan and fail-closed gate; it does not yet run a
+  browser screenshot harness. Actual Playwright/browser artifact capture remains
+  the next implementation target before production replacement.

@@ -60,6 +60,27 @@ describe("metadata-ui enterprise table state", () => {
           },
         },
       ],
+      trailingCells: [
+        {
+          key: "metadata-ui.fixture.trailing-status",
+          kind: "status",
+          label: "State",
+          statusField: "status",
+        },
+        {
+          key: "metadata-ui.fixture.trailing-action",
+          kind: "action",
+          label: "Open",
+          action: {
+            id: "metadata-ui.fixture.open-trailing",
+            label: "Open",
+            execution: {
+              kind: "client-event",
+              eventKey: "metadata-ui.fixture.open-trailing",
+            },
+          },
+        },
+      ],
     });
 
     const model = createMetadataUiTableClientModel(list, [
@@ -116,6 +137,25 @@ describe("metadata-ui enterprise table state", () => {
         label: "View",
         disabledReason:
           "Row action execution must be provided by the host feature.",
+      },
+    ]);
+    expect(model.trailingCells).toEqual([
+      {
+        key: "metadata-ui.fixture.trailing-status",
+        kind: "status",
+        label: "State",
+        statusField: "status",
+        hidden: false,
+      },
+      {
+        key: "metadata-ui.fixture.trailing-action",
+        kind: "action",
+        label: "Open",
+        actionId: "metadata-ui.fixture.open-trailing",
+        actionLabel: "Open",
+        hidden: false,
+        disabledReason:
+          "Trailing action execution must be provided by the host feature.",
       },
     ]);
     expect(shouldRenderMetadataUiClientTable(model)).toBe(true);
@@ -211,6 +251,19 @@ describe("metadata-ui enterprise table state", () => {
           },
         },
       },
+      bulkActions: [
+        {
+          action: {
+            id: "metadata-ui.fixture.bulk-approve",
+            label: "Approve selected",
+            execution: {
+              kind: "client-event",
+              eventKey: "metadata-ui.fixture.bulk-approve",
+            },
+          },
+          requiresSelection: true,
+        },
+      ],
     });
 
     const model = createMetadataUiTableClientModel(list, [
@@ -255,8 +308,40 @@ describe("metadata-ui enterprise table state", () => {
     expect(model.toolbar.exportAction).toEqual({
       id: "metadata-ui.fixture.export-list",
       label: "Export",
-      disabledReason: "Export execution must be provided by the host feature.",
+      href: "/workspace/tasks/export",
+      disabledReason: "Export navigation is provided by the host feature.",
     });
+    expect(model.toolbar.bulkActions).toEqual([
+      {
+        id: "metadata-ui.fixture.bulk-approve",
+        label: "Approve selected",
+        requiresSelection: true,
+        disabledReason:
+          "Bulk action execution must be provided by the host feature.",
+      },
+    ]);
     expect(shouldRenderMetadataUiClientTable(model)).toBe(true);
+  });
+
+  it("fails closed when server-window rows omit the configured row key", () => {
+    const list = createList({
+      key: "metadata-ui.fixture.identity-list",
+      rowKey: "id",
+      columns: [
+        {
+          key: "name",
+          field: "name",
+          label: "Name",
+        },
+      ],
+    });
+
+    expect(() =>
+      createMetadataUiTableClientModel(list, [
+        {
+          name: "Missing id",
+        },
+      ]),
+    ).toThrow(/rowKey "id"/i);
   });
 });

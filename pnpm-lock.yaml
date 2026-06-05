@@ -854,12 +854,6 @@ importers:
 
   packages/metadata-ui:
     dependencies:
-      '@afenda/config':
-        specifier: workspace:*
-        version: link:../config
-      '@afenda/kernel':
-        specifier: workspace:*
-        version: link:../kernel
       '@afenda/ui':
         specifier: workspace:*
         version: link:../ui
@@ -888,6 +882,12 @@ importers:
         specifier: 'catalog:'
         version: 4.4.3
     devDependencies:
+      '@afenda/config':
+        specifier: workspace:*
+        version: link:../config
+      '@playwright/test':
+        specifier: ^1.55.1
+        version: 1.60.0
       '@types/react':
         specifier: 'catalog:'
         version: 19.2.15

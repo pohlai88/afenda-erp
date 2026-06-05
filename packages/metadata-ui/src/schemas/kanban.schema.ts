@@ -245,6 +245,36 @@ export const METADATA_UI_KANBAN_SCHEMA = z.object({
   .strict()
   .superRefine((kanban, ctx) => {
     const columnKeys = new Set(kanban.columns.map((column) => column.key));
+    const swimlaneKeys = new Set(
+      kanban.swimlanes.map((swimlane) => swimlane.key),
+    );
+
+    for (const [columnIndex, column] of kanban.columns.entries()) {
+      if (
+        kanban.columns.findIndex((candidate) => candidate.key === column.key) !==
+        columnIndex
+      ) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["columns", columnIndex, "key"],
+          message: "Kanban column keys must be unique.",
+        });
+      }
+    }
+
+    for (const [swimlaneIndex, swimlane] of kanban.swimlanes.entries()) {
+      if (
+        kanban.swimlanes.findIndex(
+          (candidate) => candidate.key === swimlane.key,
+        ) !== swimlaneIndex
+      ) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["swimlanes", swimlaneIndex, "key"],
+          message: "Kanban swimlane keys must be unique.",
+        });
+      }
+    }
 
     for (const [columnIndex, column] of kanban.columns.entries()) {
       if (!column.drop.enabled && !column.drop.disabledReason) {
@@ -285,6 +315,22 @@ export const METADATA_UI_KANBAN_SCHEMA = z.object({
           path: ["cards", cardIndex, "record", kanban.cardTemplate.titleField],
           message: "Kanban card must contain the template title field.",
         });
+      }
+
+      if (kanban.swimlaneField) {
+        const swimlaneValue = card.record[kanban.swimlaneField];
+        if (
+          typeof swimlaneValue === "string" &&
+          kanban.swimlanes.length > 0 &&
+          !swimlaneKeys.has(swimlaneValue)
+        ) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["cards", cardIndex, "record", kanban.swimlaneField],
+            message:
+              "Kanban card swimlane field must reference a declared swimlane.",
+          });
+        }
       }
     }
   });

@@ -510,7 +510,7 @@ Status: complete.
 2. P02 - Approval Timeline Section
 3. P03 - Multi-Step Form Section
 4. P04 - Scorecard Form Section
-5. P05 - List Trailing Cell Registry Parity
+5. P05 - List Trailing Cell Serialization Parity
 6. P07 - Chart Heatmap, Annotations, And Reference Bands
 7. P06 - Host Upload Field Affordance
 8. P08 - Kanban Transition Hints, Read-Only Board, And Footer Parity
@@ -519,3 +519,17 @@ Status: complete.
 
 This order builds missing renderable sections first, then closes partial
 behavior gaps, then certifies migration readiness.
+
+---
+
+## Stabilization Correction — 2026-06-05
+
+P05 is implemented as schema/runtime serialization parity for trailing cells,
+not as a separate client registry. Trailing-cell variants are parsed by
+`list.schema.ts`, serialized in `table-state.shared.ts`, and rendered by the
+list table island.
+
+P07 currently covers implemented heatmap/table-fallback behavior and renderer
+source-boundary markers. Browser screenshot evidence and negative visual
+artifact checks are governed by the E10 certification gate and require a
+dedicated browser harness before migration replacement.

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type {
   Cell,
   CellContext,
@@ -96,7 +96,10 @@ function createMetadataUiInitialColumnPinning(
     },
     {
       left: [],
-      right: model.rowActions.length > 0 ? ["metadata-ui-row-actions"] : [],
+      right: [
+        ...(model.trailingCells.length > 0 ? ["metadata-ui-trailing-cells"] : []),
+        ...(model.rowActions.length > 0 ? ["metadata-ui-row-actions"] : []),
+      ],
     },
   );
 }
@@ -240,6 +243,54 @@ function MetadataUiListActionCell({
   );
 }
 
+function MetadataUiListTrailingCell({
+  row,
+  trailingCells,
+}: Readonly<{
+  row: Row<MetadataUiTableRowModel>;
+  trailingCells: MetadataUiTableClientModel["trailingCells"];
+}>) {
+  return (
+    <div className="inline-flex flex-wrap justify-end gap-surface-xs">
+      {trailingCells.map((cell) => {
+        const fieldKey =
+          cell.kind === "status"
+            ? cell.statusField
+            : cell.kind === "document"
+              ? cell.documentKeyField
+              : cell.field;
+        const value = fieldKey ? row.original.cells[fieldKey] : undefined;
+
+        if (cell.kind === "action") {
+          return (
+            <Button
+              key={cell.key}
+              type="button"
+              variant="ghost"
+              size="sm"
+              disabled
+              title={cell.disabledReason}
+            >
+              {cell.actionLabel ?? cell.label}
+            </Button>
+          );
+        }
+
+        return (
+          <span
+            key={cell.key}
+            className="text-muted-foreground"
+            data-metadata-ui-trailing-cell-kind={cell.kind}
+            title={cell.label}
+          >
+            {value || cell.label}
+          </span>
+        );
+      })}
+    </div>
+  );
+}
+
 function createMetadataUiDataColumn(
   column: MetadataUiTableColumnModel,
 ): ColumnDef<MetadataUiTableRowModel, unknown> {
@@ -283,6 +334,20 @@ function createMetadataUiActionColumn(
   };
 }
 
+function createMetadataUiTrailingColumn(
+  trailingCells: MetadataUiTableClientModel["trailingCells"],
+): ColumnDef<MetadataUiTableRowModel> {
+  return {
+    id: "metadata-ui-trailing-cells",
+    header: () => <span>Details</span>,
+    cell: ({ row }) => (
+      <MetadataUiListTrailingCell row={row} trailingCells={trailingCells} />
+    ),
+    enableSorting: false,
+    enableHiding: false,
+  };
+}
+
 function createMetadataUiColumnDefinitions(
   model: MetadataUiTableClientModel,
 ): ColumnDef<MetadataUiTableRowModel>[] {
@@ -296,6 +361,10 @@ function createMetadataUiColumnDefinitions(
 
   if (model.rowActions.length > 0) {
     columns.push(createMetadataUiActionColumn(model.rowActions));
+  }
+
+  if (model.trailingCells.length > 0) {
+    columns.push(createMetadataUiTrailingColumn(model.trailingCells));
   }
 
   return columns;
@@ -320,7 +389,24 @@ function getMetadataUiColumnAlignClass(
 function getMetadataUiCellAlignClass(
   cell: Cell<MetadataUiTableRowModel, unknown>,
 ): string {
-  return getMetadataUiColumnAlignClass(cell.column.columnDef.meta);
+  return cn(
+    getMetadataUiColumnAlignClass(cell.column.columnDef.meta),
+    getMetadataUiPinnedColumnClass(cell.column.getIsPinned()),
+  );
+}
+
+function getMetadataUiPinnedColumnClass(
+  pinned: false | "left" | "right",
+): string {
+  if (pinned === "left") {
+    return "sticky left-0 z-10 bg-background";
+  }
+
+  if (pinned === "right") {
+    return "sticky right-0 z-10 bg-background";
+  }
+
+  return "";
 }
 
 function getMetadataUiTableDensity(
@@ -348,6 +434,7 @@ function MetadataUiListTableHeader({
               className={cn(
                 ui.table.headerCell,
                 getMetadataUiColumnAlignClass(header.column.columnDef.meta),
+                getMetadataUiPinnedColumnClass(header.column.getIsPinned()),
               )}
             >
               {header.isPlaceholder
@@ -368,7 +455,21 @@ export function MetadataUiClientListTable({
   model,
   className,
 }: MetadataUiClientListTableProps) {
+  const virtualScrollRef = useRef<HTMLDivElement>(null);
   const columns = useMemo(() => createMetadataUiColumnDefinitions(model), [model]);
+  const modelSignature = useMemo(
+    () =>
+      JSON.stringify({
+        key: model.listKey,
+        columnKeys: model.columns.map((column) => column.key),
+        rows: model.rows.map((row) => row.id),
+        trailingCells: model.trailingCells.map((cell) => cell.key),
+        rowActions: model.rowActions.map((action) => action.id),
+        density: model.density,
+        defaultSorting: model.defaultSorting,
+      }),
+    [model],
+  );
   const [sorting, setSorting] = useState<SortingState>(() =>
     createMetadataUiInitialSorting(model),
   );
@@ -386,7 +487,6 @@ export function MetadataUiClientListTable({
     () => filterMetadataUiTableRows(model.rows, searchQuery),
     [model.rows, searchQuery],
   );
-  const selectedRowCount = Object.keys(rowSelection).length;
 
   const table = useReactTable({
     data: filteredRows,
@@ -408,6 +508,18 @@ export function MetadataUiClientListTable({
     onRowSelectionChange: setRowSelection,
   });
   const tableRows = table.getRowModel().rows;
+  const selectedRowCount = table
+    .getSelectedRowModel()
+    .rows.filter((row) => row.getIsSelected()).length;
+
+  useEffect(() => {
+    setSearchQuery("");
+    setDensity(model.density);
+    setSorting(createMetadataUiInitialSorting(model));
+    setColumnVisibility(createMetadataUiInitialVisibility(model));
+    setColumnPinning(createMetadataUiInitialColumnPinning(model));
+    setRowSelection({});
+  }, [model, modelSignature]);
 
   function resetMetadataUiTableToolbarState() {
     setSearchQuery("");
@@ -443,18 +555,26 @@ export function MetadataUiClientListTable({
         data-metadata-ui-server-window-rows={model.serverWindow.rowCount}
       >
         {toolbar}
-        <div className={ui.surface.inset}>
-          <table className="metadata-ui-table metadata-ui-table-tanstack w-full caption-bottom text-sm">
+        <div
+          ref={virtualScrollRef}
+          className={cn(ui.surface.inset, "overflow-y-auto")}
+          style={{ maxHeight: model.virtualization.maxHeight }}
+        >
+          <Table
+            density={getMetadataUiTableDensity(density)}
+            className="metadata-ui-table metadata-ui-table-tanstack"
+          >
             <TableCaption>{model.serverWindow.caption}</TableCaption>
             <MetadataUiListTableHeader table={table} />
-          </table>
           <MetadataUiVirtualListWindow
             rows={tableRows}
             columnCount={table.getVisibleLeafColumns().length}
             virtualization={model.virtualization}
+            scrollElementRef={virtualScrollRef}
             getCellClassName={getMetadataUiCellAlignClass}
             getRowClassName={getMetadataUiPinnedRowClass}
           />
+          </Table>
         </div>
       </div>
     );
@@ -485,6 +605,7 @@ export function MetadataUiClientListTable({
                   className={cn(
                     ui.table.cell,
                     getMetadataUiColumnAlignClass(cell.column.columnDef.meta),
+                    getMetadataUiPinnedColumnClass(cell.column.getIsPinned()),
                   )}
                 >
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}

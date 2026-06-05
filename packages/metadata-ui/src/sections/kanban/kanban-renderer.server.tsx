@@ -49,6 +49,18 @@ export function MetadataUiKanbanRenderer({ metadata }: MetadataUiKanbanRendererP
           <span className={cn(ui.typography.caption, ui.color.ink.muted)}>
             {kanban.footer.summaryLabel ?? `${kanban.cards.length} cards`}
           </span>
+          {kanban.footer.showColumnCounts ? (
+            <div className="flex flex-wrap items-center gap-surface-xs">
+              {model.columns.map((column) => (
+                <span
+                  key={column.key}
+                  className={cn(ui.typography.caption, ui.color.ink.muted)}
+                >
+                  {column.label}: {column.cards.length}
+                </span>
+              ))}
+            </div>
+          ) : null}
           <div className="flex flex-wrap items-center gap-surface-xs">
             {kanban.footer.actions.map((entry) => (
               <MetadataUiPrimitiveActionButton

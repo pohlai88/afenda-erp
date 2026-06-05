@@ -524,7 +524,10 @@ export function adaptGovernedAuditPanel(
 export function createMetadataUiMigrationReplacementGate(input: {
   parityNotes: readonly MetadataUiGovernedSurfaceParityNote[];
   guardPassed: boolean;
+  packageBuildPassed: boolean;
+  packageTestsPassed: boolean;
   visualEvidence: boolean;
+  importAuditPassed: boolean;
 }): MetadataUiMigrationReplacementGate {
   const unsupported = input.parityNotes.filter(
     (entry) => entry.disposition === "unsupported",
@@ -532,7 +535,10 @@ export function createMetadataUiMigrationReplacementGate(input: {
   const blockers = [
     ...unsupported.map((entry) => `${entry.surface}:${entry.sourceField}`),
     ...(input.guardPassed ? [] : ["guard:metadata-ui"]),
+    ...(input.packageBuildPassed ? [] : ["metadata-ui:build"]),
+    ...(input.packageTestsPassed ? [] : ["metadata-ui:test"]),
     ...(input.visualEvidence ? [] : ["visual-evidence"]),
+    ...(input.importAuditPassed ? [] : ["feature-import-audit"]),
   ];
 
   return {

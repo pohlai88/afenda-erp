@@ -69,7 +69,12 @@ export function MetadataUiListRenderer({
   }
 
   if (shouldRenderMetadataUiClientTable(tableModel)) {
-    return <MetadataUiClientListTable model={tableModel} />;
+    return (
+      <MetadataUiClientListTable
+        key={`${tableModel.listKey}:${tableModel.serverWindow.rowCount}:${tableModel.rows.map((row) => row.id).join("|")}`}
+        model={tableModel}
+      />
+    );
   }
 
   return (

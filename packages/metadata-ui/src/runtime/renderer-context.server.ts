@@ -21,6 +21,9 @@ export type MetadataUiRendererContextBySection<Value> = Readonly<
 export type MetadataUiRendererContextInput = Readonly<{
   childrenBySectionKey?: MetadataUiRendererContextBySection<ReactNode>;
   domAttributesBySectionKey?: MetadataUiRendererContextBySection<MetadataUiDomAttributes>;
+  rowsBySectionKey?: MetadataUiRendererContextBySection<
+    readonly Record<string, unknown>[]
+  >;
   diagnostics?: readonly MetadataUiRuntimeDiagnostic[];
   diagnosticsBySectionKey?: MetadataUiRendererContextBySection<
     readonly MetadataUiRuntimeDiagnostic[]
@@ -39,6 +42,7 @@ export type MetadataUiResolvedSectionRenderContext = Readonly<{
   sectionKey: string;
   children?: ReactNode;
   domAttributes?: MetadataUiDomAttributes;
+  rows?: readonly Record<string, unknown>[];
   diagnostics: readonly MetadataUiRuntimeDiagnostic[];
   presentation: MetadataUiPresentationContract;
   permission?: MetadataUiPermissionContract;
@@ -82,6 +86,10 @@ export function extendMetadataUiRendererContext(
       base?.domAttributesBySectionKey,
       extension.domAttributesBySectionKey,
     ),
+    rowsBySectionKey: mergeMetadataUiRendererContextRecord(
+      base?.rowsBySectionKey,
+      extension.rowsBySectionKey,
+    ),
     diagnostics: [
       ...(base?.diagnostics ?? []),
       ...(extension.diagnostics ?? []),
@@ -111,6 +119,7 @@ export function resolveMetadataUiSectionRenderContext(
     sectionKey,
     children: context?.childrenBySectionKey?.[sectionKey],
     domAttributes: context?.domAttributesBySectionKey?.[sectionKey],
+    rows: context?.rowsBySectionKey?.[sectionKey],
     diagnostics: [
       ...(context?.diagnostics ?? []),
       ...(context?.diagnosticsBySectionKey?.[sectionKey] ?? []),

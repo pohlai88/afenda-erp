@@ -109,9 +109,11 @@ export function MetadataUiStatRenderer({ metadata }: MetadataUiStatRendererProps
             <div className="min-w-0">
               <div className={ui.typography.label}>{item.label}</div>
               {item.display.iconKey ? (
-                <div className={ui.typography.caption}>
-                  {item.display.iconKey}
-                </div>
+                <span
+                  className="inline-block size-2 rounded-full bg-current opacity-60"
+                  aria-hidden="true"
+                  data-metadata-ui-stat-icon={item.display.iconKey}
+                />
               ) : null}
             </div>
             {item.tone !== "neutral" ? (

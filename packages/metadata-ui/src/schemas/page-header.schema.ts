@@ -1,6 +1,9 @@
 import { z } from "zod";
 
-import { metadataUiActionContractSchema } from "../contracts/action.contract";
+import {
+  metadataUiActionContractSchema,
+  metadataUiSafeNavigationHrefSchema,
+} from "../contracts/action.contract";
 import type { MetadataUiActionContract } from "../contracts/action.contract";
 import { metadataUiPermissionContractSchema } from "../contracts/permission.contract";
 import type { MetadataUiPermissionContract } from "../contracts/permission.contract";
@@ -55,7 +58,7 @@ export const METADATA_UI_PAGE_HEADER_LEVEL_SCHEMA = z.enum(
 export const METADATA_UI_PAGE_HEADER_BREADCRUMB_SCHEMA = z.object({
   key: METADATA_UI_PAGE_HEADER_KEY_SCHEMA,
   label: z.string().min(1).max(120),
-  href: z.string().min(1).max(300).optional(),
+  href: metadataUiSafeNavigationHrefSchema.max(300).optional(),
   current: z.boolean().default(false),
 });
 
@@ -337,6 +340,12 @@ function assertMetadataUiPageHeaderInvariants(
 
   if (pageHeader.actions.length > 8) {
     throw new Error("Page headers may declare at most eight actions.");
+  }
+
+  if (
+    pageHeader.breadcrumbs.filter((breadcrumb) => breadcrumb.current).length > 1
+  ) {
+    throw new Error("Page headers may declare at most one current breadcrumb.");
   }
 }
 

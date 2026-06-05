@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import { Badge, Button, ScrollArea } from "@afenda/ui";
 import { cn } from "@afenda/ui/utils";
@@ -60,6 +60,18 @@ export function MetadataUiKanbanDragBoard({
   const [cardState, setCardState] = useState(() =>
     createInitialKanbanCardState(model),
   );
+  const [draggingCardKey, setDraggingCardKey] = useState<string | null>(null);
+  const modelSignature = useMemo(
+    () =>
+      JSON.stringify({
+        key: model.key,
+        columns: model.columns.map((column) => ({
+          key: column.key,
+          cards: column.cards.map((card) => card.key),
+        })),
+      }),
+    [model],
+  );
   const staticMotion =
     model.reducedMotion === "always-static" ||
     (model.reducedMotion === "respect-user" && prefersReducedMotion);
@@ -67,6 +79,11 @@ export function MetadataUiKanbanDragBoard({
     () => new Map(cardState.map((state) => [state.cardKey, state.columnKey])),
     [cardState],
   );
+
+  useEffect(() => {
+    setCardState(createInitialKanbanCardState(model));
+    setDraggingCardKey(null);
+  }, [model, modelSignature]);
 
   function moveCard(intent: MetadataUiKanbanMoveIntent) {
     if (!intent.available) {
@@ -85,6 +102,24 @@ export function MetadataUiKanbanDragBoard({
     );
   }
 
+  function moveDraggedCardToColumn(toColumnKey: string) {
+    if (!draggingCardKey) {
+      return;
+    }
+
+    const fromColumnKey = columnKeyByCard.get(draggingCardKey);
+    const sourceColumn = model.columns.find((column) => column.key === fromColumnKey);
+    const intent = sourceColumn
+      ? resolveKanbanTransition(sourceColumn.transitions, draggingCardKey, toColumnKey)
+      : undefined;
+
+    if (intent) {
+      moveCard(intent);
+    }
+
+    setDraggingCardKey(null);
+  }
+
   return (
     <div
       className="metadata-ui-kanban-board grid gap-3 md:grid-cols-3"
@@ -92,6 +127,15 @@ export function MetadataUiKanbanDragBoard({
       data-metadata-ui-kanban-mode={model.mode}
       data-metadata-ui-movement-enabled={model.movementEnabled}
     >
+      {model.swimlanes.length > 0 ? (
+        <div className="metadata-ui-kanban-swimlanes flex flex-wrap gap-2 md:col-span-3">
+          {model.swimlanes.map((swimlane) => (
+            <Badge key={swimlane.key} variant="outline">
+              {swimlane.label}: {swimlane.cardCount}
+            </Badge>
+          ))}
+        </div>
+      ) : null}
       {model.columns.map((column) => {
         const cards = model.columns
           .flatMap((sourceColumn) => sourceColumn.cards)
@@ -104,6 +148,15 @@ export function MetadataUiKanbanDragBoard({
             key={column.key}
             className="min-w-0 rounded-md border border-zinc-200 bg-zinc-50 p-3"
             data-metadata-ui-kanban-column={column.key}
+            onDragOver={(event) => {
+              if (model.movementEnabled && draggingCardKey) {
+                event.preventDefault();
+              }
+            }}
+            onDrop={(event) => {
+              event.preventDefault();
+              moveDraggedCardToColumn(column.key);
+            }}
             aria-describedby={
               column.disabledReason ? `${column.key}-drop-reason` : undefined
             }
@@ -154,6 +207,8 @@ export function MetadataUiKanbanDragBoard({
                       key={card.key}
                       layout={!staticMotion}
                       draggable={model.movementEnabled && !card.disabledReason}
+                      onDragStart={() => setDraggingCardKey(card.key)}
+                      onDragEnd={() => setDraggingCardKey(null)}
                       className={cn(
                         "rounded-md border border-zinc-200 bg-white p-3 shadow-sm",
                         card.disabledReason && "opacity-70",
@@ -198,26 +253,39 @@ export function MetadataUiKanbanDragBoard({
                             const disabledReason =
                               intent?.disabledReason ??
                               "Move unavailable.";
+                            const disabledReasonId = `${card.key}-${targetColumn.key}-move-reason`;
 
                             return (
-                              <Button
-                                key={targetColumn.key}
-                                type="button"
-                                size="sm"
-                                variant="outline"
-                                disabled={!intent?.available}
-                                title={!intent?.available ? disabledReason : undefined}
-                                data-metadata-ui-move-intent={JSON.stringify(
-                                  intent?.payload ?? {},
-                                )}
-                                onClick={() => {
-                                  if (intent) {
-                                    moveCard(intent);
+                              <span key={targetColumn.key} className="inline-grid gap-1">
+                                <Button
+                                  type="button"
+                                  size="sm"
+                                  variant="outline"
+                                  disabled={!intent?.available}
+                                  title={!intent?.available ? disabledReason : intent?.hint}
+                                  aria-describedby={
+                                    !intent?.available ? disabledReasonId : undefined
                                   }
-                                }}
-                              >
-                                {targetColumn.label}
-                              </Button>
+                                  data-metadata-ui-move-intent={JSON.stringify(
+                                    intent?.payload ?? {},
+                                  )}
+                                  onClick={() => {
+                                    if (intent) {
+                                      moveCard(intent);
+                                    }
+                                  }}
+                                >
+                                  {targetColumn.label}
+                                </Button>
+                                {!intent?.available ? (
+                                  <span
+                                    id={disabledReasonId}
+                                    className="sr-only"
+                                  >
+                                    {disabledReason}
+                                  </span>
+                                ) : null}
+                              </span>
                             );
                           })}
                         </div>

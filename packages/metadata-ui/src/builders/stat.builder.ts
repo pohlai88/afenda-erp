@@ -66,10 +66,12 @@ export type MetadataUiStatThresholdBuilderResult<
 export type MetadataUiStatGroupInput<
   Key extends string = string,
   Items extends readonly MetadataUiStatItemInput[] = MetadataUiStatItemInput[],
-> = {
+> = Omit<
+  StatBuilderInput,
+  "items" | "key" | "layout"
+> & {
   key: Key;
-  title?: string;
-  description?: string;
+  layout?: "grid";
   items: Items;
 };
 
@@ -108,11 +110,8 @@ export function createStatGroup<const Input extends MetadataUiStatGroupInput>(
   input: Input,
 ): MetadataUiStatForLayout<"grid"> {
   return createStat({
-    key: input.key,
-    title: input.title,
-    description: input.description,
+    ...input,
     layout: "grid",
-    items: input.items,
   });
 }
 

@@ -1,35 +1,11 @@
 "use client";
 
-import {
-  Area,
-  AreaChart,
-  Bar,
-  BarChart,
-  CartesianGrid,
-  Cell,
-  ComposedChart,
-  Line,
-  LineChart,
-  Pie,
-  PieChart,
-  XAxis,
-  YAxis,
-} from "recharts";
-import {
-  ChartContainer,
-  ChartLegend,
-  ChartLegendContent,
-  ChartTooltip,
-  ChartTooltipContent,
-  type ChartConfig,
-} from "@afenda/ui";
+import { lazy, Suspense } from "react";
 import { cn } from "@afenda/ui/utils";
 
 import type {
   MetadataUiChart,
   MetadataUiChartDatum,
-  MetadataUiChartSeries,
-  MetadataUiChartTone,
   MetadataUiChartValue,
   MetadataUiChartValueFormat,
 } from "../../schemas/chart.schema";
@@ -38,31 +14,11 @@ export type MetadataUiChartBodyProps = Readonly<{
   chart: MetadataUiChart;
 }>;
 
-const CHART_TONE_COLOR = {
-  neutral: "var(--chart-1)",
-  info: "var(--chart-2)",
-  positive: "var(--chart-3)",
-  warning: "var(--chart-4)",
-  critical: "var(--chart-5)",
-} as const satisfies Record<MetadataUiChartTone, string>;
-
-function getMetadataUiChartSeriesColor(series: MetadataUiChartSeries): string {
-  return series.color ?? CHART_TONE_COLOR[series.tone];
-}
-
-function createMetadataUiChartConfig(
-  series: readonly MetadataUiChartSeries[],
-): ChartConfig {
-  return Object.fromEntries(
-    series.map((item) => [
-      item.valueKey,
-      {
-        label: item.label,
-        color: getMetadataUiChartSeriesColor(item),
-      },
-    ]),
-  );
-}
+const MetadataUiRechartsBody = lazy(() =>
+  import("./chart-recharts.client").then((module) => ({
+    default: module.MetadataUiRechartsBody,
+  })),
+);
 
 function formatMetadataUiChartValue(
   value: MetadataUiChartValue | undefined,
@@ -103,175 +59,82 @@ function formatMetadataUiChartValue(
   }).format(value);
 }
 
-function renderMetadataUiCartesianSeries(
-  series: MetadataUiChartSeries,
-  chartKind: MetadataUiChart["kind"],
-) {
-  const commonProps = {
-    dataKey: series.valueKey,
-    name: series.label,
-    stroke: getMetadataUiChartSeriesColor(series),
-    fill: getMetadataUiChartSeriesColor(series),
-    stackId: series.stackKey,
-    isAnimationActive: false,
-  } as const;
-
-  if (chartKind === "line") {
-    return (
-      <Line
-        key={series.key}
-        {...commonProps}
-        type="monotone"
-        strokeWidth={2}
-        dot={false}
-      />
-    );
-  }
-
-  if (chartKind === "area") {
-    return (
-      <Area
-        key={series.key}
-        {...commonProps}
-        type="monotone"
-        fillOpacity={0.18}
-      />
-    );
-  }
-
-  if (chartKind === "composed") {
-    return series.stackKey ? (
-      <Bar key={series.key} {...commonProps} radius={3} />
-    ) : (
-      <Line
-        key={series.key}
-        {...commonProps}
-        type="monotone"
-        strokeWidth={2}
-        dot={false}
-      />
-    );
-  }
-
-  return <Bar key={series.key} {...commonProps} radius={3} />;
+function readMetadataUiChartDatumValue(
+  datum: MetadataUiChartDatum,
+  key: string,
+): MetadataUiChartValue | undefined {
+  return (datum as Readonly<Record<string, MetadataUiChartValue>>)[key];
 }
 
-function MetadataUiChartAxes({ chart }: MetadataUiChartBodyProps) {
-  return (
-    <>
-      <CartesianGrid vertical={false} />
-      <XAxis
-        dataKey={chart.categoryKey}
-        tickLine={false}
-        axisLine={false}
-        tickMargin={8}
-        hide={chart.xAxis?.hidden}
-      />
-      <YAxis
-        tickLine={false}
-        axisLine={false}
-        tickMargin={8}
-        hide={chart.yAxis?.hidden}
-      />
-    </>
-  );
-}
+function MetadataUiHeatmapBody({ chart }: MetadataUiChartBodyProps) {
+  const heatmap = chart.heatmap;
 
-function MetadataUiChartOverlay({ chart }: MetadataUiChartBodyProps) {
-  if (chart.display.tooltip.mode === "none" && chart.display.legend === "none") {
+  if (!heatmap) {
     return null;
   }
 
   return (
-    <>
-      {chart.display.tooltip.mode === "none" ? null : (
-        <ChartTooltip
-          content={
-            <ChartTooltipContent
-              hideIndicator={!chart.display.tooltip.showIndicators}
-              labelKey={chart.display.tooltip.labelKey}
-            />
-          }
-        />
-      )}
-      {chart.display.legend === "none" ? null : (
-        <ChartLegend
-          verticalAlign={chart.display.legend === "top" ? "top" : "bottom"}
-          align={chart.display.legend === "right" ? "right" : "center"}
-          content={<ChartLegendContent />}
-        />
-      )}
-    </>
+    <div
+      className="grid gap-surface-xs"
+      style={{ minHeight: chart.display.height }}
+      data-metadata-ui-chart-heatmap="true"
+      role="img"
+      aria-label={chart.title ?? chart.display.tableFallbackLabel}
+    >
+      {chart.data.map((datum, index) => {
+        const xValue = readMetadataUiChartDatumValue(datum, heatmap.xKey);
+        const yValue = readMetadataUiChartDatumValue(datum, heatmap.yKey);
+        const value = readMetadataUiChartDatumValue(datum, heatmap.valueKey);
+        const numericValue = typeof value === "number" ? value : 0;
+        const opacity = Math.max(0.16, Math.min(1, numericValue / 100));
+
+        return (
+          <div
+            key={`${String(xValue)}-${String(yValue)}-${index}`}
+            className="rounded border px-3 py-2 text-sm"
+            style={{
+              backgroundColor: `color-mix(in srgb, var(--chart-1) ${Math.round(opacity * 100)}%, transparent)`,
+            }}
+            data-metadata-ui-heatmap-x={String(xValue ?? "")}
+            data-metadata-ui-heatmap-y={String(yValue ?? "")}
+          >
+            <span>{String(xValue ?? "")}</span>
+            <span className="mx-2 text-muted-foreground">
+              {String(yValue ?? "")}
+            </span>
+            {heatmap.showValues ? <strong>{String(value ?? "")}</strong> : null}
+          </div>
+        );
+      })}
+    </div>
   );
 }
 
-function MetadataUiPieChartBody({ chart }: MetadataUiChartBodyProps) {
-  const [series] = chart.series;
+function MetadataUiChartMetadataSummary({ chart }: MetadataUiChartBodyProps) {
+  if (chart.annotations.length === 0 && chart.referenceBands.length === 0) {
+    return null;
+  }
 
   return (
-    <PieChart accessibilityLayer>
-      <ChartTooltip
-        content={
-          <ChartTooltipContent
-            hideIndicator={!chart.display.tooltip.showIndicators}
-            nameKey={chart.categoryKey}
-          />
-        }
-      />
-      <Pie
-        data={chart.data}
-        dataKey={series?.valueKey}
-        nameKey={chart.categoryKey}
-        innerRadius={chart.kind === "donut" ? 56 : 0}
-        outerRadius="80%"
-        isAnimationActive={false}
-      >
-        {chart.data.map((datum, index) => (
-          <Cell
-            key={`${String(datum[chart.categoryKey])}-${index}`}
-            fill={
-              chart.series[index]
-                ? getMetadataUiChartSeriesColor(chart.series[index])
-                : getMetadataUiChartSeriesColor(series)
-            }
-          />
-        ))}
-      </Pie>
-      {chart.display.legend === "none" ? null : (
-        <ChartLegend content={<ChartLegendContent nameKey={chart.categoryKey} />} />
-      )}
-    </PieChart>
+    <div className="mt-surface-sm grid gap-surface-xs text-sm text-muted-foreground">
+      {chart.annotations.length > 0 ? (
+        <ul data-metadata-ui-chart-annotations="true">
+          {chart.annotations.map((annotation) => (
+            <li key={annotation.key}>{annotation.label}</li>
+          ))}
+        </ul>
+      ) : null}
+      {chart.referenceBands.length > 0 ? (
+        <ul data-metadata-ui-chart-reference-bands="true">
+          {chart.referenceBands.map((band) => (
+            <li key={band.key}>
+              {band.label}: {String(band.from)}-{String(band.to)}
+            </li>
+          ))}
+        </ul>
+      ) : null}
+    </div>
   );
-}
-
-function MetadataUiCartesianChartBody({ chart }: MetadataUiChartBodyProps) {
-  const children = (
-    <>
-      <MetadataUiChartAxes chart={chart} />
-      <MetadataUiChartOverlay chart={chart} />
-      {chart.series.map((series) =>
-        renderMetadataUiCartesianSeries(series, chart.kind),
-      )}
-    </>
-  );
-
-  if (chart.kind === "line") {
-    return <LineChart accessibilityLayer data={chart.data}>{children}</LineChart>;
-  }
-
-  if (chart.kind === "area") {
-    return <AreaChart accessibilityLayer data={chart.data}>{children}</AreaChart>;
-  }
-
-  if (chart.kind === "composed") {
-    return (
-      <ComposedChart accessibilityLayer data={chart.data}>
-        {children}
-      </ComposedChart>
-    );
-  }
-
-  return <BarChart accessibilityLayer data={chart.data}>{children}</BarChart>;
 }
 
 function MetadataUiChartTableFallback({ chart }: MetadataUiChartBodyProps) {
@@ -310,8 +173,7 @@ function MetadataUiChartTableFallback({ chart }: MetadataUiChartBodyProps) {
 }
 
 export function MetadataUiChartBody({ chart }: MetadataUiChartBodyProps) {
-  const config = createMetadataUiChartConfig(chart.series);
-  const isPieLike = chart.kind === "pie" || chart.kind === "donut";
+  const isHeatmap = chart.kind === "heatmap";
 
   return (
     <div
@@ -319,21 +181,21 @@ export function MetadataUiChartBody({ chart }: MetadataUiChartBodyProps) {
       data-metadata-ui-chart-kind={chart.kind}
       data-metadata-ui-reduced-motion={chart.display.reducedMotion}
     >
-      <ChartContainer
-        config={config}
-        className="w-full"
-        style={{ minHeight: chart.display.height }}
-        initialDimension={{
-          width: 640,
-          height: chart.display.height,
-        }}
-      >
-        {isPieLike ? (
-          <MetadataUiPieChartBody chart={chart} />
-        ) : (
-          <MetadataUiCartesianChartBody chart={chart} />
-        )}
-      </ChartContainer>
+      {isHeatmap ? (
+        <MetadataUiHeatmapBody chart={chart} />
+      ) : (
+        <Suspense
+          fallback={
+            <div
+              style={{ minHeight: chart.display.height }}
+              data-metadata-ui-chart-loading="true"
+            />
+          }
+        >
+          <MetadataUiRechartsBody chart={chart} />
+        </Suspense>
+      )}
+      <MetadataUiChartMetadataSummary chart={chart} />
       <MetadataUiChartTableFallback chart={chart} />
     </div>
   );

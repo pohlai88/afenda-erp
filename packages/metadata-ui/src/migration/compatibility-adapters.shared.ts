@@ -149,7 +149,10 @@ export function createGovernedParityCertificationGate(input: {
   const base = createMetadataUiMigrationReplacementGate({
     parityNotes: input.parityNotes,
     guardPassed: input.guardPassed,
+    packageBuildPassed: input.packageBuildPassed,
+    packageTestsPassed: input.packageTestsPassed,
     visualEvidence: input.visualCertificationPassed,
+    importAuditPassed: true,
   });
   const blockers = [
     ...base.blockers,

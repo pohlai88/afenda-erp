@@ -1,7 +1,5 @@
 import "server-only";
 
-import type { ReactNode } from "react";
-
 import type { MetadataUiRendererContract } from "../contracts/renderer.contract";
 import {
   parseMetadataUiSectionContract,
@@ -29,8 +27,9 @@ export type MetadataUiRenderSectionProps = Readonly<{
 export type MetadataUiRenderSectionState = Readonly<{
   section: MetadataUiSectionContract;
   renderer: MetadataUiRendererContract;
-  children?: ReactNode;
+  children?: import("react").ReactNode;
   domAttributes?: MetadataUiDomAttributes;
+  rows?: readonly Record<string, unknown>[];
   capabilities: readonly string[];
   diagnosticsCount: number;
 }>;
@@ -52,6 +51,7 @@ export function resolveMetadataUiRenderSectionState(
     renderer: resolution.renderer,
     children: sectionContext.children,
     domAttributes: sectionContext.domAttributes,
+    rows: sectionContext.rows,
     capabilities: sectionContext.capabilities,
     diagnosticsCount: sectionContext.diagnostics.length,
   };

@@ -109,20 +109,28 @@ export function MetadataUiClientListToolbar({
           </div>
         ) : null}
         {toolbar.showSavedViews && toolbar.savedViews.length > 0 ? (
-          <NativeSelect
-            aria-label="Saved views"
-            className="h-8 w-44"
-            defaultValue={
-              toolbar.savedViews.find((savedView) => savedView.active)?.key ??
-              toolbar.savedViews[0]?.key
-            }
-          >
-            {toolbar.savedViews.map((savedView) => (
-              <option key={savedView.key} value={savedView.key}>
-                {savedView.label}
-              </option>
-            ))}
-          </NativeSelect>
+          <div className={cn("flex flex-wrap items-center", ui.surfaceGap.xs)}>
+            {toolbar.savedViews.map((savedView) =>
+              savedView.href ? (
+                <Button
+                  key={savedView.key}
+                  asChild
+                  type="button"
+                  variant={savedView.active ? "secondary" : "outline"}
+                  size="sm"
+                >
+                  <a href={savedView.href}>{savedView.label}</a>
+                </Button>
+              ) : (
+                <Badge
+                  key={savedView.key}
+                  variant={savedView.active ? "secondary" : "outline"}
+                >
+                  {savedView.label}
+                </Badge>
+              ),
+            )}
+          </div>
         ) : null}
         {toolbar.showSort && toolbar.sortOptions.length > 0 ? (
           <NativeSelect
@@ -171,16 +179,34 @@ export function MetadataUiClientListToolbar({
         </Badge>
         <Badge variant="outline">{rowCount} rows</Badge>
         {toolbar.showExport && toolbar.exportAction ? (
+          toolbar.exportAction.href ? (
+            <Button type="button" variant="outline" size="sm" asChild>
+              <a href={toolbar.exportAction.href}>{toolbar.exportAction.label}</a>
+            </Button>
+          ) : (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              disabled
+              title={toolbar.exportAction.disabledReason}
+            >
+              {toolbar.exportAction.label}
+            </Button>
+          )
+        ) : null}
+        {toolbar.bulkActions.map((action) => (
           <Button
+            key={action.id}
             type="button"
             variant="outline"
             size="sm"
-            disabled
-            title={toolbar.exportAction.disabledReason}
+            disabled={action.requiresSelection && selectedRowCount === 0}
+            title={action.disabledReason}
           >
-            {toolbar.exportAction.label}
+            {action.label}
           </Button>
-        ) : null}
+        ))}
         <Button type="button" variant="ghost" size="sm" onClick={onReset}>
           {toolbar.resetLabel}
         </Button>

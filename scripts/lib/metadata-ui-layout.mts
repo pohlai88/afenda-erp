@@ -43,6 +43,13 @@ export const METADATA_UI_SECTION_KINDS = new Set([
 ]);
 
 const PUBLIC_DOOR_FILES = new Set(["index.ts", "client.ts", "server.ts"]);
+const SECTION_COMPOSITION_FILES = new Set([
+  "render-child-tree.server.tsx",
+  "render-component.server.tsx",
+  "render-registered-section.server.tsx",
+  "render-section.server.tsx",
+  "render-stack.server.tsx",
+]);
 
 /** purpose + runtime — e.g. list-section.server.tsx, list.schema.ts */
 export const METADATA_UI_FILE_NAME =
@@ -160,7 +167,15 @@ function scanMetadataUiSections(
     const rel = `${sectionsRel}/${entry.name}`;
 
     if (entry.isFile()) {
-      problems.push(`metadata-ui: ${rel} — section files belong in sections/<kind>/`);
+      if (!SECTION_COMPOSITION_FILES.has(entry.name)) {
+        problems.push(`metadata-ui: ${rel} — section files belong in sections/<kind>/`);
+        continue;
+      }
+
+      const violation = metadataUiFileNameViolation(entry.name);
+      if (violation) {
+        problems.push(`metadata-ui: ${rel}: ${violation}`);
+      }
       continue;
     }
 

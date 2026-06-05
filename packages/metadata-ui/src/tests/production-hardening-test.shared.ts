@@ -109,7 +109,10 @@ describe("metadata-ui production hardening", () => {
       "runtime/renderer-context.server.ts",
     );
     const renderSectionSource = readMetadataUiSource(
-      "renderers/render-section.server.tsx",
+      "sections/render-section.server.tsx",
+    );
+    const registeredDispatcherSource = readMetadataUiSource(
+      "sections/render-registered-section.server.tsx",
     );
 
     expect(rendererContextSource.startsWith('import "server-only";')).toBe(
@@ -122,6 +125,11 @@ describe("metadata-ui production hardening", () => {
     expect(renderSectionSource).toContain(
       "data-metadata-ui-diagnostics-count={state.diagnosticsCount}",
     );
+    expect(renderSectionSource).toContain("renderMetadataUiRegisteredSection");
+    expect(registeredDispatcherSource.startsWith('import "server-only";')).toBe(
+      true,
+    );
+    expect(registeredDispatcherSource).toContain("MetadataUiListRenderer");
   });
 
   it("keeps form field primitives behavior-safe for server rendering", () => {
@@ -318,6 +326,9 @@ describe("metadata-ui production hardening", () => {
     const chartBodySource = readMetadataUiSource(
       "sections/chart/chart-body.client.tsx",
     );
+    const chartRechartsSource = readMetadataUiSource(
+      "sections/chart/chart-recharts.client.tsx",
+    );
     const chartRendererSource = readMetadataUiSource(
       "sections/chart/chart-renderer.server.tsx",
     );
@@ -331,10 +342,14 @@ describe("metadata-ui production hardening", () => {
     expect(chartBuilderSource).toContain("createComposedChart");
     expect(chartBuilderSource).toContain("withChartDisplay");
     expect(chartBodySource.startsWith('"use client";')).toBe(true);
-    expect(chartBodySource).toContain('from "recharts"');
-    expect(chartBodySource).toContain("ChartContainer");
-    expect(chartBodySource).toContain("ChartTooltip");
+    expect(chartBodySource).toContain("lazy(() =>");
+    expect(chartBodySource).toContain("chart-recharts.client");
+    expect(chartBodySource).not.toContain('from "recharts"');
     expect(chartBodySource).toContain("<table>");
+    expect(chartRechartsSource.startsWith('"use client";')).toBe(true);
+    expect(chartRechartsSource).toContain('from "recharts"');
+    expect(chartRechartsSource).toContain("ChartContainer");
+    expect(chartRechartsSource).toContain("ChartTooltip");
     expect(chartBodySource).not.toContain("fetch(");
     expect(chartBodySource).not.toContain("localStorage");
     expect(chartRendererSource.startsWith('import "server-only";')).toBe(true);

@@ -343,6 +343,10 @@ function assertMetadataUiDetailTabsInvariants(
   if (detailTabs.actions.length > 8) {
     throw new Error("Detail tabs may declare at most eight actions.");
   }
+
+  if (detailTabs.tabs.filter((tab) => tab.defaultSelected).length > 1) {
+    throw new Error("Detail tabs may declare at most one default selected tab.");
+  }
 }
 
 export function parseMetadataUiDetailTabs(

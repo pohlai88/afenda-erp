@@ -37,6 +37,11 @@ describe("governed stat migration adapter", () => {
     expect(result.stat.schemaId).toBe(METADATA_UI_STAT_SCHEMA_ID);
     expect(result.stat.key).toBe("finance.close-summary");
     expect(result.stat.layout).toBe("grid");
+    expect(result.stat.dataNature).toBe("kpi");
+    expect(result.stat.metadata).toMatchObject({
+      migrationSource: "governed-surface.stat-card",
+      governedDataNature: "kpi",
+    });
     expect(result.stat.presentation?.chrome.density).toBe("compact");
     expect(result.stat.presentation?.metadata).toMatchObject({
       migrationSource: "governed-surface.stat-card",
@@ -112,6 +117,7 @@ describe("governed stat migration adapter", () => {
     });
 
     expect(result.stat.layout).toBe("row");
+    expect(result.stat.dataNature).toBe("snapshot-summary");
     expect(result.stat.items).toHaveLength(5);
     expect(result.parityNotes).toHaveLength(0);
   });

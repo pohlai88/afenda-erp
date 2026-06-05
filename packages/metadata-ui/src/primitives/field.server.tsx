@@ -22,11 +22,13 @@ import {
 import { ui } from "@afenda/ui/design-system";
 import { cn } from "@afenda/ui/utils";
 
+import type { MetadataUiActionContract } from "../contracts/action.contract";
 import type {
   MetadataUiFormField,
   MetadataUiFormFieldKind,
   MetadataUiFormSection,
 } from "../schemas/form.schema";
+import { MetadataUiPrimitiveActionButton } from "./action-button.server";
 
 export type MetadataUiPrimitiveFieldProps = Readonly<{
   field: MetadataUiFormField;
@@ -197,9 +199,15 @@ function renderMetadataUiPrimitiveFieldControl(
         defaultValue={stringifyMetadataUiFieldValue(field.defaultValue)}
       >
         <SelectTrigger
-          id={fieldId}
+          id={commonProps.id}
+          aria-describedby={commonProps["aria-describedby"]}
+          aria-invalid={commonProps["aria-invalid"]}
+          aria-required={commonProps.required || undefined}
           className="w-full"
-          data-testid={field.diagnostics?.testId}
+          data-metadata-ui-field-state={
+            commonProps["data-metadata-ui-field-state"]
+          }
+          data-testid={commonProps["data-testid"]}
         >
           <SelectValue placeholder={field.placeholder ?? "Select"} />
         </SelectTrigger>
@@ -339,9 +347,34 @@ export function MetadataUiPrimitiveField({
       {field.kind === "file" && field.fileUpload?.existingFiles.length ? (
         <ul className="list-disc pl-5 text-sm">
           {field.fileUpload.existingFiles.map((file) => (
-            <li key={file.key}>{file.fileName}</li>
+            <li key={file.key}>
+              <span>{file.fileName}</span>
+              <span className="ml-2 inline-flex gap-surface-2xs">
+                {file.downloadAction ? (
+                  <MetadataUiPrimitiveActionButton
+                    action={file.downloadAction as MetadataUiActionContract}
+                    priority="tertiary"
+                    label="Download"
+                  />
+                ) : null}
+                {file.removeAction ? (
+                  <MetadataUiPrimitiveActionButton
+                    action={file.removeAction as MetadataUiActionContract}
+                    priority="tertiary"
+                    label="Remove"
+                  />
+                ) : null}
+              </span>
+            </li>
           ))}
         </ul>
+      ) : null}
+      {field.kind === "file" && field.fileUpload?.uploadAction ? (
+        <MetadataUiPrimitiveActionButton
+          action={field.fileUpload.uploadAction as MetadataUiActionContract}
+          priority="secondary"
+          label={field.fileUpload.uploadAction.label}
+        />
       ) : null}
       {field.kind === "file" && field.fileUpload?.blockedReason ? (
         <FieldDescription>{field.fileUpload.blockedReason}</FieldDescription>

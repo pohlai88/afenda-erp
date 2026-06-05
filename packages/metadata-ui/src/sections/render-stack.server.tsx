@@ -1,14 +1,12 @@
 import "server-only";
 
+import type { MetadataUiRendererDataContext } from "../runtime/renderer-context.server";
 import {
   MetadataUiRenderSection,
   type MetadataUiRenderableSection,
 } from "./render-section.server";
-import type { MetadataUiRendererDataContext } from "../runtime/renderer-context.server";
 
-export type {
-  MetadataUiRenderableSection,
-} from "./render-section.server";
+export type { MetadataUiRenderableSection } from "./render-section.server";
 export type { MetadataUiRendererDataContext } from "../runtime/renderer-context.server";
 
 export type MetadataUiRenderableSectionStackItem = Readonly<{

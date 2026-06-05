@@ -183,6 +183,14 @@ export function MetadataUiPrimitiveActionButton({
   const confirmationDescription =
     action?.confirmation?.description ??
     "Confirm this action only if you understand the effect. This operation may be irreversible.";
+  const confirmationHref =
+    requiresMetadataUiActionConfirmation(action) ? resolveMetadataUiActionHref(action) : undefined;
+  const confirmationTarget =
+    action?.execution.kind === "external-link" ||
+    (action?.execution.kind === "navigation" &&
+      action.execution.target === "new-tab")
+      ? "_blank"
+      : undefined;
 
   if (requiresMetadataUiActionConfirmation(action) && !isDisabled) {
     return (
@@ -209,9 +217,21 @@ export function MetadataUiPrimitiveActionButton({
               <AlertDialogCancel>
                 {action.confirmation.cancelLabel}
               </AlertDialogCancel>
-              <AlertDialogAction variant="destructive">
-                {action.confirmation.confirmLabel}
-              </AlertDialogAction>
+              {confirmationHref ? (
+                <AlertDialogAction variant="destructive" asChild>
+                  <a
+                    href={confirmationHref}
+                    target={confirmationTarget}
+                    rel={confirmationTarget === "_blank" ? "noreferrer" : undefined}
+                  >
+                    {action.confirmation.confirmLabel}
+                  </a>
+                </AlertDialogAction>
+              ) : (
+                <AlertDialogAction variant="destructive">
+                  {action.confirmation.confirmLabel}
+                </AlertDialogAction>
+              )}
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>

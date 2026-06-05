@@ -1,3 +1,5 @@
+import fs from "node:fs";
+
 import type { MetadataUiFixtureKey } from "./fixture-builders.shared";
 import { createMetadataUiFixtureTestId } from "./metadata-ui-test-ids.shared";
 
@@ -202,6 +204,7 @@ function createMetadataUiEvidenceBySurface(
 function getMetadataUiMissingEvidenceChecks(
   plan: MetadataUiCertificationSurfacePlan,
   evidence: MetadataUiCertificationEvidence | undefined,
+  options?: { requireArtifactFiles?: boolean },
 ): readonly string[] {
   if (!evidence) {
     return [`${plan.surface}:missing-evidence`];
@@ -214,21 +217,35 @@ function getMetadataUiMissingEvidenceChecks(
   const missingScreenshots = (["desktop", "mobile"] as const)
     .filter((viewport) => evidence.screenshots[viewport] !== plan.screenshots[viewport])
     .map((viewport) => `${plan.surface}:${viewport}-screenshot-artifact`);
+  const requireArtifactFiles = options?.requireArtifactFiles ?? true;
+  const missingArtifactFiles = requireArtifactFiles
+    ? (["desktop", "mobile"] as const)
+        .filter((viewport) => !fs.existsSync(evidence.screenshots[viewport] ?? ""))
+        .map((viewport) => `${plan.surface}:${viewport}-screenshot-file`)
+    : [];
   const staleEvidence = Number.isNaN(Date.parse(evidence.capturedAt))
     ? [`${plan.surface}:captured-at`]
     : [];
 
-  return [...missingChecks, ...missingScreenshots, ...staleEvidence];
+  return [
+    ...missingChecks,
+    ...missingScreenshots,
+    ...missingArtifactFiles,
+    ...staleEvidence,
+  ];
 }
 
 export function createMetadataUiCertificationEvidenceGate(input: {
   plans: readonly MetadataUiCertificationSurfacePlan[];
   evidence: readonly MetadataUiCertificationEvidence[];
+  requireArtifactFiles?: boolean;
 }): MetadataUiCertificationEvidenceGate {
   const planBlockers = createMetadataUiCertificationBlockers(input.plans);
   const evidenceBySurface = createMetadataUiEvidenceBySurface(input.evidence);
   const evidenceBlockers = input.plans.flatMap((plan) =>
-    getMetadataUiMissingEvidenceChecks(plan, evidenceBySurface.get(plan.surface)),
+    getMetadataUiMissingEvidenceChecks(plan, evidenceBySurface.get(plan.surface), {
+      requireArtifactFiles: input.requireArtifactFiles,
+    }),
   );
   const blockers = [...planBlockers, ...evidenceBlockers];
 

@@ -2,6 +2,7 @@ import type {
   MetadataUiKanban,
   MetadataUiKanbanCard,
   MetadataUiKanbanColumn,
+  MetadataUiKanbanSwimlane,
   MetadataUiKanbanTransition,
 } from "../schemas/kanban.schema";
 
@@ -14,6 +15,15 @@ export type MetadataUiKanbanMoveIntent = Readonly<{
   confirmationRequired: boolean;
   available: boolean;
   disabledReason?: string;
+  hint?: string;
+}>;
+
+export type MetadataUiKanbanSwimlaneModel = Readonly<{
+  key: string;
+  label: string;
+  description?: string;
+  order: number;
+  cardCount: number;
 }>;
 
 export type MetadataUiKanbanColumnModel = Readonly<{
@@ -35,12 +45,14 @@ export type MetadataUiKanbanClientModel = Readonly<{
   cardKeyField: string;
   columnField: string;
   cardTemplate: MetadataUiKanban["cardTemplate"];
+  swimlaneField?: string;
+  swimlanes: readonly MetadataUiKanbanSwimlaneModel[];
   columns: readonly MetadataUiKanbanColumnModel[];
 }>;
 
 function compareKanbanOrder(
-  left: Pick<MetadataUiKanbanColumn, "key" | "order">,
-  right: Pick<MetadataUiKanbanColumn, "key" | "order">,
+  left: Pick<MetadataUiKanbanColumn | MetadataUiKanbanSwimlane, "key" | "order">,
+  right: Pick<MetadataUiKanbanColumn | MetadataUiKanbanSwimlane, "key" | "order">,
 ): number {
   return left.order - right.order || left.key.localeCompare(right.key);
 }
@@ -86,6 +98,7 @@ function createKanbanMoveIntent(input: {
     confirmationRequired: input.kanban.movement.requireConfirmation,
     available,
     disabledReason: available ? undefined : disabledReason ?? "Move unavailable.",
+    hint: input.transition?.hint,
   };
 }
 
@@ -93,6 +106,7 @@ export function createMetadataUiKanbanClientModel(
   kanban: MetadataUiKanban,
 ): MetadataUiKanbanClientModel {
   const orderedColumns = [...kanban.columns].sort(compareKanbanOrder);
+  const orderedSwimlanes = [...kanban.swimlanes].sort(compareKanbanOrder);
   const cardsByColumn = new Map<string, MetadataUiKanbanCard[]>();
   const transitionsByPair = new Map<string, MetadataUiKanbanTransition>();
 
@@ -123,6 +137,19 @@ export function createMetadataUiKanbanClientModel(
     cardKeyField: kanban.cardKeyField,
     columnField: kanban.columnField,
     cardTemplate: kanban.cardTemplate,
+    swimlaneField: kanban.swimlaneField,
+    swimlanes: orderedSwimlanes.map((swimlane) => ({
+      key: swimlane.key,
+      label: swimlane.label,
+      description: swimlane.description,
+      order: swimlane.order,
+      cardCount: kanban.cards.filter((card) => {
+        const value = kanban.swimlaneField
+          ? card.record[kanban.swimlaneField]
+          : undefined;
+        return value === swimlane.key;
+      }).length,
+    })),
     columns: orderedColumns.map((column) => {
       const cards = cardsByColumn.get(column.key) ?? [];
       const transitions = cards.flatMap((card) =>

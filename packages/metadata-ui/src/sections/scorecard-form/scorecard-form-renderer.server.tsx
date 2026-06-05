@@ -50,7 +50,10 @@ export function MetadataUiScorecardFormRenderer({
           >
             <div className="flex flex-wrap items-start justify-between gap-surface-sm">
               <div className="grid gap-surface-2xs">
-                <span className={cn(ui.typography.subtitle, ui.color.ink.foreground)}>
+                <span
+                  id={`${criterion.key}-label`}
+                  className={cn(ui.typography.subtitle, ui.color.ink.foreground)}
+                >
                   {criterion.label}
                   {criterion.required ? <span aria-hidden="true">*</span> : null}
                 </span>
@@ -66,7 +69,11 @@ export function MetadataUiScorecardFormRenderer({
                 <MetadataUiPrimitiveBadge tone="neutral">Readonly</MetadataUiPrimitiveBadge>
               ) : null}
             </div>
-            <div className="flex flex-wrap gap-surface-xs" role="radiogroup">
+            <div
+              className="flex flex-wrap gap-surface-xs"
+              role="radiogroup"
+              aria-labelledby={`${criterion.key}-label`}
+            >
               {criterion.options.map((option) => (
                 <label
                   key={option.value}

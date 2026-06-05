@@ -53,6 +53,12 @@ const METADATA_UI_STAT_LAYOUT_VALUES = [
   "column",
 ] as const;
 
+const METADATA_UI_STAT_DATA_NATURE_VALUES = [
+  "kpi",
+  "snapshot-summary",
+  "operational",
+] as const;
+
 export const METADATA_UI_STAT_KEY_SCHEMA = z
   .string()
   .min(1)
@@ -208,6 +214,10 @@ export const METADATA_UI_STAT_LAYOUT_SCHEMA = z.enum(
   METADATA_UI_STAT_LAYOUT_VALUES,
 );
 
+export const METADATA_UI_STAT_DATA_NATURE_SCHEMA = z.enum(
+  METADATA_UI_STAT_DATA_NATURE_VALUES,
+);
+
 export const METADATA_UI_STAT_SCHEMA = z.object({
   schemaId: z
     .literal(METADATA_UI_STAT_SCHEMA_ID)
@@ -229,6 +239,8 @@ export const METADATA_UI_STAT_SCHEMA = z.object({
 
   layout: METADATA_UI_STAT_LAYOUT_SCHEMA.default("grid"),
 
+  dataNature: METADATA_UI_STAT_DATA_NATURE_SCHEMA,
+
   items: z
     .array(METADATA_UI_STAT_ITEM_SCHEMA)
     .min(1)
@@ -246,6 +258,8 @@ export const METADATA_UI_STAT_SCHEMA = z.object({
       testId: z.string().min(1).max(160).optional(),
     })
     .optional(),
+
+  metadata: z.record(z.string(), z.unknown()).default({}),
 });
 
 type MetadataUiStatSchemaOutput = z.output<
@@ -308,6 +322,9 @@ export type MetadataUiStatTrendDirection =
 
 export type MetadataUiStatLayout =
   (typeof METADATA_UI_STAT_LAYOUT_VALUES)[number];
+
+export type MetadataUiStatDataNature =
+  (typeof METADATA_UI_STAT_DATA_NATURE_VALUES)[number];
 
 declare const metadataUiStatKeyBrand: unique symbol;
 declare const metadataUiStatDiagnosticKeyBrand: unique symbol;

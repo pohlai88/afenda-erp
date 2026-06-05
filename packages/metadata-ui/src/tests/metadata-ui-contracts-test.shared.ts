@@ -196,6 +196,7 @@ describe("@afenda/metadata-ui shared runtime surface", () => {
     );
     const stat = createStatGroup({
       key: "metadata-ui.fixture.metric-group",
+      dataNature: "kpi",
       items: [item],
     });
 

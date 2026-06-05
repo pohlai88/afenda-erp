@@ -128,12 +128,18 @@ describe("governed surface parity adapter pack", () => {
     const blocked = createMetadataUiMigrationReplacementGate({
       parityNotes: unsupported.parityNotes,
       guardPassed: true,
+      packageBuildPassed: true,
+      packageTestsPassed: true,
       visualEvidence: true,
+      importAuditPassed: true,
     });
     const allowed = createMetadataUiMigrationReplacementGate({
       parityNotes: [],
       guardPassed: true,
+      packageBuildPassed: true,
+      packageTestsPassed: true,
       visualEvidence: true,
+      importAuditPassed: true,
     });
 
     expect(blocked.canReplace).toBe(false);

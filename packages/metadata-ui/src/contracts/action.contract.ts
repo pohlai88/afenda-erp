@@ -102,6 +102,53 @@ const METADATA_UI_UNSAFE_HREF =
 
 const METADATA_UI_RELATIVE_HREF = /^(\/|\.\.?\/|#)/;
 
+export const metadataUiSafeNavigationHrefSchema = z
+  .string()
+  .trim()
+  .min(1)
+  .max(500)
+  .superRefine((href, ctx) => {
+    if (METADATA_UI_UNSAFE_HREF.test(href)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Navigation href must not use unsafe URL schemes.",
+      });
+    }
+
+    if (
+      !METADATA_UI_RELATIVE_HREF.test(href) &&
+      !href.startsWith("http://") &&
+      !href.startsWith("https://")
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message:
+          "Navigation href must be relative (/...), hash (#...), or http(s) URL.",
+      });
+    }
+  });
+
+export const metadataUiSafeExternalHrefSchema = z
+  .string()
+  .trim()
+  .url()
+  .max(500)
+  .superRefine((href, ctx) => {
+    if (METADATA_UI_UNSAFE_HREF.test(href)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "External links must not use unsafe URL schemes.",
+      });
+    }
+
+    if (!href.startsWith("http://") && !href.startsWith("https://")) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "External links must use http(s) URL schemes.",
+      });
+    }
+  });
+
 export const metadataUiActionKindSchema = z.enum(
   METADATA_UI_ACTION_KIND_VALUES,
 );
@@ -215,7 +262,7 @@ export const metadataUiActionTelemetrySchema = z
 const metadataUiNavigationActionSchema = z
   .object({
     kind: z.literal("navigation"),
-    href: z.string().trim().min(1).max(500),
+    href: metadataUiSafeNavigationHrefSchema,
     target: metadataUiActionTargetSchema.default("self"),
   })
   .strict();
@@ -223,7 +270,7 @@ const metadataUiNavigationActionSchema = z
 const metadataUiExternalLinkActionSchema = z
   .object({
     kind: z.literal("external-link"),
-    href: z.string().url().max(500),
+    href: metadataUiSafeExternalHrefSchema,
     target: z.literal("new-tab"),
   })
   .strict();

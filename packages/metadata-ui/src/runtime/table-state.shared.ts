@@ -7,6 +7,7 @@ import type {
   MetadataUiListFilterOperator,
   MetadataUiListSelectionMode,
   MetadataUiListSortDirection,
+  MetadataUiListTrailingCellKind,
   MetadataUiListToolbar,
   MetadataUiListVirtualization,
 } from "../schemas/list.schema";
@@ -42,6 +43,19 @@ export type MetadataUiTableRowActionModel = Readonly<{
   id: string;
   label: string;
   disabledReason: string;
+}>;
+
+export type MetadataUiTableTrailingCellModel = Readonly<{
+  key: string;
+  kind: MetadataUiListTrailingCellKind;
+  label: string;
+  field?: string;
+  statusField?: string;
+  documentKeyField?: string;
+  actionId?: string;
+  actionLabel?: string;
+  hidden: boolean;
+  disabledReason?: string;
 }>;
 
 export type MetadataUiTableServerWindowModel = Readonly<{
@@ -81,6 +95,14 @@ export type MetadataUiTableToolbarSortOptionModel = Readonly<{
 export type MetadataUiTableToolbarExportModel = Readonly<{
   id: string;
   label: string;
+  href?: string;
+  disabledReason: string;
+}>;
+
+export type MetadataUiTableBulkActionModel = Readonly<{
+  id: string;
+  label: string;
+  requiresSelection: boolean;
   disabledReason: string;
 }>;
 
@@ -94,6 +116,7 @@ export type MetadataUiTableToolbarModel = Readonly<
     savedViews: readonly MetadataUiTableToolbarSavedViewModel[];
     sortOptions: readonly MetadataUiTableToolbarSortOptionModel[];
     exportAction?: MetadataUiTableToolbarExportModel;
+    bulkActions: readonly MetadataUiTableBulkActionModel[];
   }
 >;
 
@@ -105,6 +128,7 @@ export type MetadataUiTableClientModel = Readonly<{
   rows: readonly MetadataUiTableRowModel[];
   defaultSorting: readonly MetadataUiTableSortingModel[];
   rowActions: readonly MetadataUiTableRowActionModel[];
+  trailingCells: readonly MetadataUiTableTrailingCellModel[];
   serverWindow: MetadataUiTableServerWindowModel;
   virtualization: MetadataUiTableVirtualizationModel;
   toolbar: MetadataUiTableToolbarModel;
@@ -153,8 +177,13 @@ function createMetadataUiTableRowModel(
   list: MetadataUiList,
   columns: readonly MetadataUiTableColumnModel[],
   row: Readonly<Record<string, unknown>>,
-  rowIndex: number,
 ): MetadataUiTableRowModel {
+  if (!(list.rowKey in row)) {
+    throw new Error(
+      `List row is missing required rowKey "${list.rowKey}". Metadata UI tables require stable row identity.`,
+    );
+  }
+
   const cells = columns.reduce<Record<string, MetadataUiTableCellValue>>(
     (accumulator, column) => {
       accumulator[column.key] = stringifyMetadataUiTableCellValue(
@@ -166,7 +195,7 @@ function createMetadataUiTableRowModel(
   );
 
   return {
-    id: String(row[list.rowKey] ?? rowIndex),
+    id: String(row[list.rowKey]),
     cells,
   };
 }
@@ -202,9 +231,39 @@ function createMetadataUiTableRowActions(
     }));
 }
 
+function createMetadataUiTableTrailingCells(
+  list: MetadataUiList,
+): readonly MetadataUiTableTrailingCellModel[] {
+  return list.trailingCells
+    .filter((cell) => !cell.hidden)
+    .map((cell) => ({
+      key: cell.key,
+      kind: cell.kind,
+      label: cell.label,
+      field: cell.field,
+      statusField: cell.statusField,
+      documentKeyField: cell.documentKeyField,
+      actionId: cell.action?.id,
+      actionLabel: cell.action?.label,
+      hidden: cell.hidden,
+      disabledReason:
+        cell.disabledReason ??
+        (cell.kind === "action"
+          ? "Trailing action execution must be provided by the host feature."
+          : undefined),
+    }));
+}
+
 function createMetadataUiTableToolbar(
   list: MetadataUiList,
 ): MetadataUiTableToolbarModel {
+  const exportExecution = list.toolbar.exportAction?.execution;
+  const exportHref =
+    exportExecution?.kind === "navigation" ||
+    exportExecution?.kind === "external-link"
+      ? exportExecution.href
+      : undefined;
+
   return {
     ...list.toolbar,
     searchPlaceholder: list.toolbar.searchPlaceholder,
@@ -239,11 +298,22 @@ function createMetadataUiTableToolbar(
       ? {
           id: list.toolbar.exportAction.id,
           label: list.toolbar.exportAction.label,
+          href: exportHref,
           disabledReason:
             list.toolbar.exportAction.disabledReason ??
-            "Export execution must be provided by the host feature.",
+            (exportHref
+              ? "Export navigation is provided by the host feature."
+              : "Export execution must be provided by the host feature."),
         }
       : undefined,
+    bulkActions: list.bulkActions.map((bulkAction) => ({
+      id: bulkAction.action.id,
+      label: bulkAction.action.label,
+      requiresSelection: bulkAction.requiresSelection,
+      disabledReason:
+        bulkAction.action.disabledReason ??
+        "Bulk action execution must be provided by the host feature.",
+    })),
   };
 }
 
@@ -258,11 +328,10 @@ export function createMetadataUiTableClientModel(
     density: list.density,
     selectionMode: list.selectionMode,
     columns,
-    rows: rows.map((row, rowIndex) =>
-      createMetadataUiTableRowModel(list, columns, row, rowIndex),
-    ),
+    rows: rows.map((row) => createMetadataUiTableRowModel(list, columns, row)),
     defaultSorting: createMetadataUiTableDefaultSorting(list),
     rowActions: createMetadataUiTableRowActions(list),
+    trailingCells: createMetadataUiTableTrailingCells(list),
     serverWindow: {
       rowKey: list.rowKey,
       rowCount: rows.length,
@@ -285,6 +354,8 @@ export function shouldRenderMetadataUiClientTable(
     model.toolbar.enabled ||
     model.virtualization.enabled ||
     model.defaultSorting.length > 0 ||
+    model.trailingCells.length > 0 ||
+    model.toolbar.bulkActions.length > 0 ||
     model.columns.some(
       (column) => column.sortable || column.pinned || column.hidden,
     )

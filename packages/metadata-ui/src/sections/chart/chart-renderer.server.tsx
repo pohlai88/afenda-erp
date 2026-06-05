@@ -6,6 +6,8 @@ import {
   parseMetadataUiChart,
 } from "../../schemas/chart.schema";
 import { MetadataUiEmptyState } from "../../shell/empty-state.server";
+import { ui } from "@afenda/ui/design-system";
+import { cn } from "@afenda/ui/utils";
 import { MetadataUiChartBody } from "./chart-body.client";
 
 export type MetadataUiChartRendererProps = Readonly<{
@@ -14,11 +16,11 @@ export type MetadataUiChartRendererProps = Readonly<{
 
 function renderMetadataUiChartServerSummary(chart: MetadataUiChart) {
   return (
-    <div className="flex flex-wrap gap-2" aria-hidden="true">
+    <div className={cn("flex flex-wrap", ui.surfaceGap.xs)} aria-hidden="true">
       {chart.series.map((series) => (
         <span
           key={series.key}
-          className="rounded border border-zinc-200 px-2 py-1 text-xs text-zinc-600"
+          className={cn(ui.radius.control, ui.surface.inset, ui.typography.caption)}
         >
           {series.label}
         </span>
@@ -41,7 +43,7 @@ export function MetadataUiChartRenderer({ metadata }: MetadataUiChartRendererPro
 
   return (
     <div
-      className="metadata-ui-chart space-y-3"
+      className={cn("metadata-ui-chart", ui.surfaceGap.sm)}
       aria-label={chart.title ?? chart.key}
       data-metadata-ui-chart={chart.key}
       data-metadata-ui-chart-kind={chart.kind}
@@ -49,7 +51,7 @@ export function MetadataUiChartRenderer({ metadata }: MetadataUiChartRendererPro
       data-metadata-ui-chart-series={chart.series.length}
     >
       {renderMetadataUiChartServerSummary(chart)}
-      <div className="min-w-0 rounded-md border border-zinc-200 p-3">
+      <div className={cn("min-w-0", ui.surface.inset, ui.padding.card)}>
         <MetadataUiChartBody chart={chart} />
       </div>
     </div>

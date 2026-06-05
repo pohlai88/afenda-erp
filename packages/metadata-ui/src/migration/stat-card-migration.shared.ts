@@ -301,6 +301,7 @@ export function adaptGovernedStatCardToMetadataUiStat(
       input.dataNature === "snapshot-summary" || input.stats.length > 4
         ? "row"
         : "grid",
+    dataNature: input.dataNature ?? "kpi",
     items: adaptedItems.map((entry) => entry.item),
     presentation: resolveGovernedStatPresentation(input),
     metadata: {

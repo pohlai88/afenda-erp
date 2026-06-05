@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import type { RefObject } from "react";
 import type { Cell, Row } from "@tanstack/react-table";
 import { flexRender } from "@tanstack/react-table";
 import { useVirtualizer } from "@tanstack/react-virtual";
@@ -29,6 +29,7 @@ export type MetadataUiVirtualListWindowProps = Readonly<{
   rows: readonly Row<MetadataUiTableRowModel>[];
   columnCount: number;
   virtualization: MetadataUiTableClientModel["virtualization"];
+  scrollElementRef: RefObject<HTMLDivElement | null>;
   getCellClassName: MetadataUiVirtualListCellClassResolver;
   getRowClassName: MetadataUiVirtualListRowClassResolver;
 }>;
@@ -59,13 +60,13 @@ export function MetadataUiVirtualListWindow({
   rows,
   columnCount,
   virtualization,
+  scrollElementRef,
   getCellClassName,
   getRowClassName,
 }: MetadataUiVirtualListWindowProps) {
-  const parentRef = useRef<HTMLDivElement>(null);
   const rowVirtualizer = useVirtualizer({
     count: rows.length,
-    getScrollElement: () => parentRef.current,
+    getScrollElement: () => scrollElementRef.current,
     estimateSize: () => virtualization.rowEstimate,
     overscan: virtualization.overscan,
   });
@@ -78,51 +79,44 @@ export function MetadataUiVirtualListWindow({
       : 0;
 
   return (
-    <div
-      ref={parentRef}
-      className="overflow-y-auto"
-      style={{ maxHeight: virtualization.maxHeight }}
+    <TableBody
       data-metadata-ui-virtual-window="current-server-window"
       data-metadata-ui-virtual-row-count={rows.length}
     >
-      <table className="w-full caption-bottom text-sm">
-        <TableBody>
-          <MetadataUiVirtualSpacerRow
-            height={topPadding}
-            columnCount={columnCount}
-          />
-          {virtualItems.map((virtualItem) => {
-            const row = rows[virtualItem.index];
+      <MetadataUiVirtualSpacerRow
+        height={topPadding}
+        columnCount={columnCount}
+      />
+      {virtualItems.map((virtualItem) => {
+        const row = rows[virtualItem.index];
 
-            if (!row) {
-              return null;
-            }
+        if (!row) {
+          return null;
+        }
 
-            return (
-              <TableRow
-                key={row.id}
-                className={cn(ui.table.rowInteractive, getRowClassName(row))}
-                data-index={virtualItem.index}
-                data-selected={row.getIsSelected() || undefined}
-                ref={rowVirtualizer.measureElement}
+        return (
+          <TableRow
+            key={row.id}
+            className={cn(ui.table.rowInteractive, getRowClassName(row))}
+            data-index={virtualItem.index}
+            data-selected={row.getIsSelected() || undefined}
+            ref={rowVirtualizer.measureElement}
+          >
+            {row.getVisibleCells().map((cell) => (
+              <TableCell
+                key={cell.id}
+                className={cn(ui.table.cell, getCellClassName(cell))}
               >
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell
-                    key={cell.id}
-                    className={cn(ui.table.cell, getCellClassName(cell))}
-                  >
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </TableCell>
-                ))}
-              </TableRow>
-            );
-          })}
-          <MetadataUiVirtualSpacerRow
-            height={bottomPadding}
-            columnCount={columnCount}
-          />
-        </TableBody>
-      </table>
-    </div>
+                {flexRender(cell.column.columnDef.cell, cell.getContext())}
+              </TableCell>
+            ))}
+          </TableRow>
+        );
+      })}
+      <MetadataUiVirtualSpacerRow
+        height={bottomPadding}
+        columnCount={columnCount}
+      />
+    </TableBody>
   );
 }

@@ -114,6 +114,7 @@ export const METADATA_UI_SECTION_CONTRACT = [
     schema: "page-header.schema.ts",
     builder: "page-header.builder.ts",
     section: "page-header.server.tsx",
+    renderer: "page-header-renderer.server.tsx",
   },
 ] as const;
 
