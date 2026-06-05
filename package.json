@@ -23,6 +23,7 @@
     "env:sync:github-turbo": "tsx scripts/sync-github-turbo-secrets.mts",
     "turbo:link": "tsx scripts/link-turbo-remote-cache.mts",
     "dev": "tsx scripts/run-turbo.mts dev --filter=@afenda/erp",
+    "dev:metadata-ui-playground": "tsx scripts/dev-metadata-ui-playground.mts",
     "build": "tsx scripts/run-turbo.mts build",
     "build:affected": "tsx scripts/run-turbo.mts build --affected",
     "lint": "tsx scripts/run-turbo.mts lint",

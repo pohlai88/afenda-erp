@@ -12,6 +12,7 @@ const ALLOWED_TOP_LEVEL_DIRS = [
   "(workspace)",
   "api",
   "onboarding",
+  "playground-metadataui",
 ] as const;
 
 const ALLOWED_TOP_LEVEL_FILES = new Set([
@@ -56,7 +57,7 @@ function checkGuard2() {
         )
       ) {
         problems.push(
-          `GUARD 2: forbidden top-level directory ${rel}/ — only (auth)/, (workspace)/, api/, onboarding/ are allowed.`,
+          `GUARD 2: forbidden top-level directory ${rel}/ — only (auth)/, (workspace)/, api/, onboarding/, playground-metadataui/ are allowed.`,
         );
       }
       continue;
@@ -85,6 +86,7 @@ if (problems.length > 0) {
   console.error("  (workspace)/");
   console.error("  api/");
   console.error("  onboarding/");
+  console.error("  playground-metadataui/  # dev-only metadata UI playground");
   console.error("  page.tsx, layout.tsx, loading.tsx, error.tsx, global-error.tsx");
   console.error("  not-found.tsx, template.tsx, default.tsx, forbidden.tsx, unauthorized.tsx");
   console.error("  globals.css, favicon.ico");

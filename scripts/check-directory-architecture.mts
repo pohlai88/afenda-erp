@@ -329,6 +329,9 @@ function checkDocumentationNaming(filePath: string) {
     /^packages\/metadata-ui\/(?:architecture|architecture-[a-z0-9-]+)\.md$/.test(
       normalizedRel,
     );
+  const isMetadataUiPlaygroundArchitectureDoc =
+    normalizedRel ===
+    "apps/erp/src/app/playground-metadataui/architecture.md";
   if (
     isArchitectureDoc &&
     !rel.startsWith("docs/architecture/") &&
@@ -338,7 +341,8 @@ function checkDocumentationNaming(filePath: string) {
     !isObservabilityArchitectureDoc &&
     !isObjectStorageArchitectureDoc &&
     !isPublicHomepageArchitectureDoc &&
-    !isMetadataUiArchitectureDoc
+    !isMetadataUiArchitectureDoc &&
+    !isMetadataUiPlaygroundArchitectureDoc
   ) {
     problems.push(
       `Architecture docs must live under docs/architecture/, an allowed package architecture supplement, or a feature vertical bucket: ${rel}`,

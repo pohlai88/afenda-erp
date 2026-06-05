@@ -35,6 +35,7 @@
     "@afenda/billing": "workspace:*",
     "@afenda/db": "workspace:*",
     "@afenda/kernel": "workspace:*",
+    "@afenda/metadata-ui": "workspace:*",
     "@afenda/feature-crm": "workspace:*",
     "@afenda/feature-dashboard": "workspace:*",
     "@afenda/feature-finance": "workspace:*",

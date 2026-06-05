@@ -7,6 +7,7 @@ import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
 const AFENDA_SESSION_COOKIE = "afenda-dev-session";
+const METADATA_UI_PLAYGROUND_PATH = "/playground-metadataui";
 
 function isPreLoginAuthPath(pathname: string) {
   return erpPreLoginAuthPathPrefixes.some((prefix) =>
@@ -28,6 +29,14 @@ export async function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
   if (pathname === "/") {
+    return NextResponse.next();
+  }
+
+  if (
+    process.env.AFENDA_ENABLE_DEV_PLAYGROUNDS === "1" &&
+    (pathname === METADATA_UI_PLAYGROUND_PATH ||
+      pathname.startsWith(`${METADATA_UI_PLAYGROUND_PATH}/`))
+  ) {
     return NextResponse.next();
   }
 
