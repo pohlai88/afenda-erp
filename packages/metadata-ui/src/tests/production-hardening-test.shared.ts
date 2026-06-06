@@ -7,6 +7,12 @@ import {
   createMetadataUiSectionIdentity,
   createMetadataUiTestId,
 } from "../identity/identity.shared";
+import {
+  createMetadataUiRenderLogEvent,
+} from "../logging/render-log.server";
+import { createMetadataUiRenderLogger } from "../logging/render-log.server";
+import { createMetadataUiListRenderLogEvent } from "../logging/list-render-log.server";
+import { emitMetadataUiListRenderLog } from "../logging/list-render-log.server";
 import { adaptGovernedStatCardToMetadataUiStat } from "../migration/stat-card-migration.shared";
 import {
   createMetadataUiCapabilitySet,
@@ -30,6 +36,12 @@ describe("metadata-ui production hardening", () => {
       null,
       "primary action",
     );
+    const trimmedTestId = createMetadataUiTestId(
+      " metadata-ui ",
+      " section ",
+      "   ",
+      "   Finance Close   ",
+    );
     const identity = createMetadataUiSectionIdentity({
       sectionKind: "list",
       key: "finance.close-list",
@@ -38,8 +50,14 @@ describe("metadata-ui production hardening", () => {
         rendererKey: "metadata-ui.renderer.custom-list",
       },
     });
+    const fallbackIdentity = createMetadataUiSectionIdentity({
+      sectionKind: "list",
+      key: " finance.close-list ",
+      id: "   ",
+    });
 
     expect(testId).toBe("metadata-ui-list-quarter-close-primary-action");
+    expect(trimmedTestId).toBe("metadata-ui-section-finance-close");
     expect(identity.id).toBe("metadata-ui-list-finance-close-list");
     expect(identity.domAttributes).toMatchObject({
       "data-metadata-ui-kind": "list",
@@ -48,6 +66,10 @@ describe("metadata-ui production hardening", () => {
       "data-metadata-ui-renderer": "metadata-ui.renderer.custom-list",
       "data-testid": "metadata-ui-list-finance-close-list",
     });
+    expect(fallbackIdentity.id).toBe("metadata-ui-list-finance-close-list");
+    expect(fallbackIdentity.domAttributes["data-metadata-ui-section"]).toBe(
+      "finance.close-list",
+    );
   });
 
   it("normalizes capability inventories and resolves route policies fail-closed", () => {
@@ -132,6 +154,80 @@ describe("metadata-ui production hardening", () => {
     expect(registeredDispatcherSource).toContain("MetadataUiListRenderer");
   });
 
+  it("keeps render logs canonical and identity-normalized", async () => {
+    const renderLog = createMetadataUiRenderLogEvent({
+      state: "loading",
+      identity: {
+        componentKey: " metadata-ui.section.list ",
+        sectionKey: " finance.close-list ",
+        rendererKey: " metadata-ui.renderer.list ",
+        testId: " metadata-ui-list-finance-close-list ",
+      },
+      metadata: {
+        source: "production-hardening-test",
+      },
+    });
+    const listLogger = createMetadataUiRenderLogger();
+    const listLog = createMetadataUiListRenderLogEvent({
+      window: {
+        rowCount: 0,
+        visibleRowCount: 0,
+        pageSize: 25,
+        pageIndex: 0,
+        totalRowCount: 0,
+      },
+      metadata: {
+        source: "production-hardening-test",
+      },
+    });
+    const emittedListLog = await emitMetadataUiListRenderLog(listLogger, {
+      window: {
+        rowCount: 12,
+        visibleRowCount: 12,
+        pageSize: 25,
+        pageIndex: 0,
+        totalRowCount: 12,
+      },
+      identity: {
+        componentKey: " metadata-ui.section.list ",
+        sectionKey: " finance.close-list ",
+        rendererKey: " metadata-ui.renderer.list ",
+        testId: " metadata-ui-list-finance-close-list ",
+      },
+      metadata: {
+        source: "production-hardening-test",
+      },
+    });
+
+    expect(renderLog.componentKey).toBe("metadata-ui.section.list");
+    expect(renderLog.sectionKey).toBe("finance.close-list");
+    expect(renderLog.rendererKey).toBe("metadata-ui.renderer.list");
+    expect(renderLog.testId).toBe("metadata-ui-list-finance-close-list");
+    expect(renderLog.level).toBe("debug");
+    expect(renderLog.name).toBe("metadata-ui.render.started");
+    expect(renderLog.metadata).toEqual({
+      source: "production-hardening-test",
+    });
+    expect(listLog.name).toBe("metadata-ui.render.empty");
+    expect(listLog.state).toBe("empty");
+    expect(listLog.metadata).toEqual({
+      source: "production-hardening-test",
+      list: {
+        rowCount: 0,
+        visibleRowCount: 0,
+        pageSize: 25,
+        pageIndex: 0,
+        totalRowCount: 0,
+      },
+    });
+    expect(emittedListLog.name).toBe("metadata-ui.render.completed");
+    expect(emittedListLog.state).toBe("ready");
+    expect(emittedListLog.componentKey).toBe("metadata-ui.section.list");
+    expect(emittedListLog.sectionKey).toBe("finance.close-list");
+    expect(emittedListLog.rendererKey).toBe("metadata-ui.renderer.list");
+    expect(emittedListLog.testId).toBe("metadata-ui-list-finance-close-list");
+  });
+
   it("keeps form field primitives behavior-safe for server rendering", () => {
     const fieldPrimitiveSource = readMetadataUiSource(
       "primitives/field.server.tsx",
@@ -176,7 +272,7 @@ describe("metadata-ui production hardening", () => {
 
     expect(tabsPrimitiveSource.startsWith('import "server-only";')).toBe(true);
     expect(tabsPrimitiveSource).not.toContain("renderPanel");
-    expect(tabsPrimitiveSource).not.toContain("ReactNode");
+    expect(tabsPrimitiveSource).toContain("ReactNode");
     expect(tabsPrimitiveSource).toContain("MetadataUiPrimitiveTabPanel");
     expect(tabsPrimitiveSource).toContain("data-metadata-ui-tab-section");
   });
@@ -222,6 +318,9 @@ describe("metadata-ui production hardening", () => {
     );
     expect(listRendererSource.startsWith('import "server-only";')).toBe(true);
     expect(listRendererSource).not.toContain("@tanstack/react-table");
+    expect(listRendererSource).toContain("title={list.title}");
+    expect(listRendererSource).toContain("description={list.description}");
+    expect(listRendererSource).toContain("MetadataUiPrimitiveListWindow");
     expect(tableStateSource).not.toContain("@tanstack/react-table");
     expect(serverDoorSource).not.toContain("list-table.client");
     expect(sharedDoorSource).not.toContain("@tanstack/react-table");
@@ -271,6 +370,9 @@ describe("metadata-ui production hardening", () => {
     expect(toolbarClientSource).toContain("showSavedViews");
     expect(toolbarClientSource).toContain("showDensity");
     expect(toolbarClientSource).toContain("showExport");
+    expect(toolbarClientSource).toContain('role="toolbar"');
+    expect(toolbarClientSource).toContain('aria-live="polite"');
+    expect(toolbarClientSource).toContain("data-metadata-ui-list-toolbar-summary");
     expect(tableSource).toContain("filterMetadataUiTableRows");
     expect(tableSource).toContain("resetMetadataUiTableToolbarState");
   });
@@ -287,6 +389,9 @@ describe("metadata-ui production hardening", () => {
     );
     const actionButtonSource = readMetadataUiSource(
       "primitives/action-button.server.tsx",
+    );
+    const actionMenuSource = readMetadataUiSource(
+      "primitives/action-menu.server.tsx",
     );
     const actionBarRendererSource = readMetadataUiSource(
       "sections/action-bar/action-bar-renderer.server.tsx",
@@ -308,12 +413,16 @@ describe("metadata-ui production hardening", () => {
     expect(actionButtonSource).toContain("aria-live");
     expect(actionButtonSource).toContain("may be irreversible");
     expect(actionButtonSource).toContain("data-metadata-ui-action-state");
+    expect(actionMenuSource).toContain("data-metadata-ui-action-menu=\"true\"");
+    expect(actionMenuSource).toContain("aria-haspopup=\"menu\"");
     expect(actionBarRendererSource).toContain(
       "resolveMetadataUiActionLifecycle",
     );
     expect(actionBarRendererSource).toContain(
       "data-metadata-ui-action-state",
     );
+    expect(actionBarRendererSource).toContain('role="toolbar"');
+    expect(actionBarRendererSource).toContain("data-metadata-ui-action-bar-main-count");
   });
 
   it("keeps Recharts isolated to the chart client island with accessible fallbacks", () => {
@@ -370,6 +479,10 @@ describe("metadata-ui production hardening", () => {
     const statValueSource = readMetadataUiSource(
       "primitives/stat-value.client.tsx",
     );
+    const metricCardSource = readMetadataUiSource(
+      "primitives/metric-card.server.tsx",
+    );
+    const emptyStateSource = readMetadataUiSource("primitives/empty.server.tsx");
     const statRendererSource = readMetadataUiSource(
       "sections/stat/stat-renderer.server.tsx",
     );
@@ -393,9 +506,15 @@ describe("metadata-ui production hardening", () => {
     expect(statValueSource).not.toContain("localStorage");
     expect(statRendererSource.startsWith('import "server-only";')).toBe(true);
     expect(statRendererSource).not.toContain("@number-flow/react");
-    expect(statRendererSource).toContain("MetadataUiPrimitiveStatValue");
-    expect(statRendererSource).toContain('role="progressbar"');
-    expect(statRendererSource).toContain('role="img"');
+    expect(statRendererSource).toContain("MetadataUiPrimitiveMetricCard");
+    expect(metricCardSource).toContain('role="group"');
+    expect(metricCardSource).toContain('role="progressbar"');
+    expect(metricCardSource).toContain('role="img"');
+    expect(metricCardSource).toContain("data-metadata-ui-metric-card");
+    expect(metricCardSource).toContain("data-metadata-ui-metric-progress");
+    expect(emptyStateSource).toContain("data-metadata-ui-empty-kind");
+    expect(emptyStateSource).toContain("data-metadata-ui-empty-tone");
+    expect(emptyStateSource).toContain("data-metadata-ui-empty-alert");
     expect(migrationSource).toContain("sparkline");
     expect(migrationSource).toContain("progress");
     expect(sharedDoorSource).not.toContain("@number-flow/react");
@@ -434,6 +553,8 @@ describe("metadata-ui production hardening", () => {
     expect(kanbanClientSource).toContain("motion/react");
     expect(kanbanClientSource).toContain("useReducedMotion");
     expect(kanbanClientSource).toContain("data-metadata-ui-move-intent");
+    expect(kanbanClientSource).toContain('aria-live="polite"');
+    expect(kanbanClientSource).toContain("data-metadata-ui-kanban-dragging");
     expect(kanbanClientSource).not.toContain("fetch(");
     expect(kanbanClientSource).not.toContain("localStorage");
     expect(kanbanClientSource).not.toContain("execute");

@@ -105,6 +105,18 @@ export type MetadataUiKanbanSafeCreateResult<
       error: z.ZodError;
     };
 
+export type MetadataUiKanbanBoardBuilderResult<
+  Input extends MetadataUiKanbanBasicInput,
+> = MetadataUiKanbanBuilderResult<{
+  key: Input["key"];
+  columnField: Input["columnField"];
+  columns: Input["columns"];
+  cardTemplate: Input["cardTemplate"];
+}> & {
+  columns: Input["columns"];
+  cardTemplate: Input["cardTemplate"];
+};
+
 export function createKanban<const Input extends KanbanBuilderInput>(
   input: Input,
 ): MetadataUiKanbanBuilderResult<Input> {
@@ -115,12 +127,7 @@ export function createKanban<const Input extends KanbanBuilderInput>(
 
 export function createKanbanBoard<const Input extends MetadataUiKanbanBasicInput>(
   input: Input,
-): MetadataUiKanbanBuilderResult<{
-  key: Input["key"];
-  columnField: Input["columnField"];
-  columns: Input["columns"];
-  cardTemplate: Input["cardTemplate"];
-}> {
+): MetadataUiKanbanBoardBuilderResult<Input> {
   return createKanban({
     key: input.key,
     title: input.title,
@@ -131,7 +138,7 @@ export function createKanbanBoard<const Input extends MetadataUiKanbanBasicInput
     cardTemplate: input.cardTemplate,
     cardActions: [],
     footer: input.footer,
-  });
+  }) as MetadataUiKanbanBoardBuilderResult<Input>;
 }
 
 export function createKanbanColumn<
@@ -172,90 +179,90 @@ export function createKanbanCardAction<
   ) as MetadataUiKanbanCardActionBuilderResult<Input>;
 }
 
-export function withKanbanMode(
-  kanban: MetadataUiKanbanInput,
+export function withKanbanMode<const Input extends KanbanBuilderInput>(
+  kanban: Input,
   mode: MetadataUiKanbanBoardMode,
-): MetadataUiKanban {
+): MetadataUiKanbanBuilderResult<Input> {
   return createKanban({
     ...kanban,
     mode,
   });
 }
 
-export function withKanbanMovement(
-  kanban: MetadataUiKanbanInput,
+export function withKanbanMovement<const Input extends KanbanBuilderInput>(
+  kanban: Input,
   movement: NonNullable<MetadataUiKanbanInput["movement"]>,
-): MetadataUiKanban {
+): MetadataUiKanbanBuilderResult<Input> {
   return createKanban({
     ...kanban,
     movement,
   });
 }
 
-export function withKanbanColumns(
-  kanban: MetadataUiKanbanInput,
+export function withKanbanColumns<const Input extends KanbanBuilderInput>(
+  kanban: Input,
   columns: MetadataUiKanbanColumnInput[],
-): MetadataUiKanban {
+): MetadataUiKanbanBuilderResult<Input> {
   return createKanban({
     ...kanban,
     columns,
   });
 }
 
-export function appendKanbanColumn(
-  kanban: MetadataUiKanbanInput,
+export function appendKanbanColumn<const Input extends KanbanBuilderInput>(
+  kanban: Input,
   column: MetadataUiKanbanColumnInput,
-): MetadataUiKanban {
+): MetadataUiKanbanBuilderResult<Input> {
   return createKanban({
     ...kanban,
     columns: [...kanban.columns, column],
   });
 }
 
-export function withKanbanCards(
-  kanban: MetadataUiKanbanInput,
+export function withKanbanCards<const Input extends KanbanBuilderInput>(
+  kanban: Input,
   cards: MetadataUiKanbanCardInput[],
-): MetadataUiKanban {
+): MetadataUiKanbanBuilderResult<Input> {
   return createKanban({
     ...kanban,
     cards,
   });
 }
 
-export function withKanbanTransitions(
-  kanban: MetadataUiKanbanInput,
+export function withKanbanTransitions<const Input extends KanbanBuilderInput>(
+  kanban: Input,
   transitions: MetadataUiKanbanTransitionInput[],
-): MetadataUiKanban {
+): MetadataUiKanbanBuilderResult<Input> {
   return createKanban({
     ...kanban,
     transitions,
   });
 }
 
-export function withKanbanSwimlanes(
-  kanban: MetadataUiKanbanInput,
+export function withKanbanSwimlanes<const Input extends KanbanBuilderInput>(
+  kanban: Input,
   swimlanes: MetadataUiKanbanSwimlaneInput[],
-): MetadataUiKanban {
+): MetadataUiKanbanBuilderResult<Input> {
   return createKanban({
     ...kanban,
     swimlanes,
   });
 }
 
-export function withKanbanCardActions(
-  kanban: MetadataUiKanbanInput,
+export function withKanbanCardActions<const Input extends KanbanBuilderInput>(
+  kanban: Input,
   cardActions: MetadataUiKanbanCardActionInput[],
-): MetadataUiKanban {
+): MetadataUiKanbanBuilderResult<Input> {
   return createKanban({
     ...kanban,
     cardActions,
   });
 }
 
-export function appendKanbanCardAction(
-  kanban: MetadataUiKanbanInput,
+export function appendKanbanCardAction<const Input extends KanbanBuilderInput>(
+  kanban: Input,
   action: MetadataUiKanbanCardActionInput,
-): MetadataUiKanban {
+): MetadataUiKanbanBuilderResult<Input> {
   return createKanban({
     ...kanban,
     cardActions: [...(kanban.cardActions ?? []), action],

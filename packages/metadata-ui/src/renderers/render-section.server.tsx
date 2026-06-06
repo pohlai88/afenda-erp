@@ -27,6 +27,7 @@ export type MetadataUiRenderSectionProps = Readonly<{
 
 export type MetadataUiRenderSectionState = Readonly<{
   section: MetadataUiSectionContract;
+  sectionKey: string;
   renderer: MetadataUiRendererContract;
   children?: import("react").ReactNode;
   domAttributes?: MetadataUiDomAttributes;
@@ -78,6 +79,7 @@ export function resolveMetadataUiRenderSectionState(
       permission: sectionContext.permission,
       presentation: sectionContext.presentation,
     },
+    sectionKey: sectionContext.sectionKey,
     renderer: resolution.renderer,
     children: sectionContext.children,
     domAttributes: sectionContext.domAttributes,
@@ -96,7 +98,7 @@ export function MetadataUiRenderSection({
   return (
     <section
       {...state.domAttributes}
-      data-metadata-ui-section={state.section.id}
+      data-metadata-ui-section={state.sectionKey}
       data-metadata-ui-section-kind={state.section.kind}
       data-metadata-ui-renderer={state.renderer.id}
       data-metadata-ui-capabilities={state.capabilities.join(" ")}

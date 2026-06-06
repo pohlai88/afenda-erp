@@ -41,8 +41,8 @@ export const METADATA_UI_MULTI_STEP_FORM_STEP_STATUS_SCHEMA = z.enum(
 export const METADATA_UI_MULTI_STEP_FORM_STEP_SCHEMA = z
   .object({
     key: METADATA_UI_FORM_KEY_SCHEMA,
-    title: z.string().min(1).max(120),
-    description: z.string().min(1).max(320).optional(),
+    title: z.string().trim().min(1).max(120),
+    description: z.string().trim().min(1).max(320).optional(),
     status: METADATA_UI_MULTI_STEP_FORM_STEP_STATUS_SCHEMA.default("available"),
     order: z.number().int().min(0).max(100),
     sections: z.array(METADATA_UI_FORM_SECTION_SCHEMA).min(1).max(12),
@@ -84,8 +84,8 @@ export const METADATA_UI_MULTI_STEP_FORM_SCHEMA = z
       .literal(METADATA_UI_MULTI_STEP_FORM_SCHEMA_STABILITY)
       .default(METADATA_UI_MULTI_STEP_FORM_SCHEMA_STABILITY),
     key: METADATA_UI_FORM_KEY_SCHEMA,
-    title: z.string().min(1).max(120).default("Form"),
-    description: z.string().min(1).max(320).optional(),
+    title: z.string().trim().min(1).max(120).default("Form"),
+    description: z.string().trim().min(1).max(320).optional(),
     mode: z.enum(["create", "edit", "view", "review"]).default("view"),
     state: METADATA_UI_FORM_STATE_SCHEMA.default("clean"),
     activeStepKey: METADATA_UI_FORM_KEY_SCHEMA.optional(),
@@ -95,10 +95,10 @@ export const METADATA_UI_MULTI_STEP_FORM_SCHEMA = z
     permission: metadataUiPermissionContractSchema.optional(),
     diagnostics: z
       .object({
-        componentKey: z.string().min(1).max(160).optional(),
-        sectionKey: z.string().min(1).max(160).optional(),
-        rendererKey: z.string().min(1).max(160).optional(),
-        testId: z.string().min(1).max(160).optional(),
+        componentKey: z.string().trim().min(1).max(160).optional(),
+        sectionKey: z.string().trim().min(1).max(160).optional(),
+        rendererKey: z.string().trim().min(1).max(160).optional(),
+        testId: z.string().trim().min(1).max(160).optional(),
       })
       .optional(),
   })

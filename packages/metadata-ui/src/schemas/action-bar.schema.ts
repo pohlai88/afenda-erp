@@ -5,13 +5,9 @@ import {
   METADATA_UI_ACTION_KEY_SCHEMA,
 } from "../contracts/action.contract";
 import type { MetadataUiActionContract } from "../contracts/action.contract";
-import {
-  metadataUiPresentationContractSchema,
-} from "../contracts/presentation.contract";
+import { metadataUiPresentationContractSchema } from "../contracts/presentation.contract";
 import type { MetadataUiPresentationContract } from "../contracts/presentation.contract";
-import {
-  metadataUiPermissionContractSchema,
-} from "../contracts/permission.contract";
+import { metadataUiPermissionContractSchema } from "../contracts/permission.contract";
 import type { MetadataUiPermissionContract } from "../contracts/permission.contract";
 
 export const METADATA_UI_ACTION_BAR_SCHEMA_ID =
@@ -58,6 +54,7 @@ const METADATA_UI_ACTION_BAR_DEFAULT_OVERFLOW = {
 
 export const METADATA_UI_ACTION_BAR_KEY_SCHEMA = z
   .string()
+  .trim()
   .min(1)
   .max(160)
   .regex(
@@ -75,48 +72,42 @@ export const METADATA_UI_ACTION_BAR_ALIGNMENT_SCHEMA = z.enum(
 
 export const METADATA_UI_ACTION_BAR_OVERFLOW_SCHEMA = z.object({
   enabled: z.boolean().default(true),
-  triggerLabel: z.string().min(1).max(80).default("More actions"),
+  triggerLabel: z.string().trim().min(1).max(80).default("More actions"),
   collapseAfter: z.number().int().min(1).max(12).optional(),
 });
 
 export const METADATA_UI_ACTION_BAR_ITEM_SCHEMA = z
   .object({
     key: METADATA_UI_ACTION_KEY_SCHEMA,
-
-  /**
-   * Registry action reference.
-   * The full action contract may be supplied for local metadata previews,
-   * but production rendering should resolve from the action registry.
-   */
-  action: metadataUiActionContractSchema.optional(),
-
-  label: z.string().min(1).max(120).optional(),
-  description: z.string().min(1).max(240).optional(),
-
-  /**
-   * Presentation only.
-   * Does not define business permission or workflow policy.
-   */
-  priority: z
-    .enum(METADATA_UI_ACTION_BAR_ITEM_PRIORITY_VALUES)
-    .default("secondary"),
-  placement: z
-    .enum(METADATA_UI_ACTION_BAR_ITEM_PLACEMENT_VALUES)
-    .default("main"),
-
-  permission: metadataUiPermissionContractSchema.optional(),
-
-  disabled: z
-    .object({
-      value: z.boolean(),
-      reason: z.string().min(1).max(240).optional(),
-    })
-    .optional(),
-
+    /**
+     * Registry action reference.
+     * The full action contract may be supplied for local metadata previews,
+     * but production rendering should resolve from the action registry.
+     */
+    action: metadataUiActionContractSchema.optional(),
+    label: z.string().trim().min(1).max(120).optional(),
+    description: z.string().trim().min(1).max(240).optional(),
+    /**
+     * Presentation only.
+     * Does not define business permission or workflow policy.
+     */
+    priority: z
+      .enum(METADATA_UI_ACTION_BAR_ITEM_PRIORITY_VALUES)
+      .default("secondary"),
+    placement: z
+      .enum(METADATA_UI_ACTION_BAR_ITEM_PLACEMENT_VALUES)
+      .default("main"),
+    permission: metadataUiPermissionContractSchema.optional(),
+    disabled: z
+      .object({
+        value: z.boolean(),
+        reason: z.string().trim().min(1).max(240).optional(),
+      })
+      .optional(),
     diagnostics: z
       .object({
-        testId: z.string().min(1).max(160).optional(),
-        telemetryKey: z.string().min(1).max(160).optional(),
+        testId: z.string().trim().min(1).max(160).optional(),
+        telemetryKey: z.string().trim().min(1).max(160).optional(),
       })
       .optional(),
   })
@@ -144,8 +135,8 @@ export const METADATA_UI_ACTION_BAR_SCHEMA = z.object({
 
   key: METADATA_UI_ACTION_BAR_KEY_SCHEMA,
 
-  title: z.string().min(1).max(120).optional(),
-  description: z.string().min(1).max(240).optional(),
+  title: z.string().trim().min(1).max(120).optional(),
+  description: z.string().trim().min(1).max(240).optional(),
 
   layout: METADATA_UI_ACTION_BAR_LAYOUT_SCHEMA.default("toolbar"),
   alignment: METADATA_UI_ACTION_BAR_ALIGNMENT_SCHEMA.default("end"),
@@ -160,13 +151,60 @@ export const METADATA_UI_ACTION_BAR_SCHEMA = z.object({
 
   diagnostics: z
     .object({
-      componentKey: z.string().min(1).max(160).optional(),
-      sectionKey: z.string().min(1).max(160).optional(),
-      rendererKey: z.string().min(1).max(160).optional(),
-      testId: z.string().min(1).max(160).optional(),
+      componentKey: z.string().trim().min(1).max(160).optional(),
+      sectionKey: z.string().trim().min(1).max(160).optional(),
+      rendererKey: z.string().trim().min(1).max(160).optional(),
+      testId: z.string().trim().min(1).max(160).optional(),
     })
     .optional(),
-});
+})
+  .strict()
+  .superRefine((actionBar, ctx) => {
+    const actionKeys = new Set<string>();
+
+    actionBar.actions.forEach((action, index) => {
+      if (actionKeys.has(action.key)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["actions", index, "key"],
+          message: "Action bar items must use unique keys.",
+        });
+      }
+      actionKeys.add(action.key);
+    });
+
+    if (!actionBar.overflow.enabled) {
+      if (actionBar.overflow.collapseAfter !== undefined) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["overflow", "collapseAfter"],
+          message: "collapseAfter requires overflow.enabled to be true.",
+        });
+      }
+
+      actionBar.actions.forEach((action, index) => {
+        if (action.placement === "overflow") {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["actions", index, "placement"],
+            message:
+              "Overflow placement requires overflow.enabled to be true.",
+          });
+        }
+      });
+    }
+
+    if (
+      actionBar.layout === "overflow" &&
+      actionBar.actions.some((action) => action.placement === "main")
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["actions"],
+        message: "Overflow action bars must place all items in overflow.",
+      });
+    }
+  });
 
 type MetadataUiActionBarSchemaOutput = z.output<
   typeof METADATA_UI_ACTION_BAR_SCHEMA

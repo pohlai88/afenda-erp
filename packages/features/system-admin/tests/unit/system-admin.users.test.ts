@@ -13,13 +13,22 @@ import { SYSTEM_ADMIN_USERS_BULK_SUSPEND_ACTION_ID } from "../../src/features/us
 const mockRequireUsersManage = vi.fn();
 const mockRequireUsersRead = vi.fn();
 const mockWriteAudit = vi.fn();
+const mockRequireExecutionContext = vi.fn();
 const mockUpdateMembershipStatus = vi.fn();
 const mockResendInvitation = vi.fn();
 const mockRevokeInvitation = vi.fn();
 const mockGetMembership = vi.fn();
+const mockListActorLastActivityAt = vi.fn();
+const mockCreateOrganizationInvitation = vi.fn();
+const mockHasOrganizationInvitationWithEmail = vi.fn();
+const mockHasTenantMemberWithEmail = vi.fn();
 const mockAssertInvite = vi.fn();
 const mockCreateInvite = vi.fn();
 const mockInspectAccess = vi.fn();
+const mockCreateNeonAuthUser = vi.fn();
+const mockBanNeonAuthUser = vi.fn();
+const mockRevokeNeonAuthUserSessions = vi.fn();
+const mockImpersonateNeonAuthUser = vi.fn();
 
 vi.mock(
   "../../src/overview/policies/system-admin.capability.policy.server",
@@ -36,12 +45,28 @@ vi.mock(
   },
 );
 
-vi.mock("@afenda/kernel/execution", () => ({
-  writeExecutionAuditEvent: (...args: unknown[]) => mockWriteAudit(...args),
+vi.mock("@afenda/kernel/execution", async (importOriginal) => {
+  const actual =
+    await importOriginal<typeof import("@afenda/kernel/execution")>();
+  return {
+    ...actual,
+    requireExecutionContext: () => mockRequireExecutionContext(),
+    writeExecutionAuditEvent: (...args: unknown[]) => mockWriteAudit(...args),
+  };
+});
+
+vi.mock("@afenda/auth/server", () => ({
+  createNeonAuthAdminUser: (...args: unknown[]) =>
+    mockCreateNeonAuthUser(...args),
+  banNeonAuthAdminUser: (...args: unknown[]) => mockBanNeonAuthUser(...args),
+  revokeNeonAuthAdminUserSessions: (...args: unknown[]) =>
+    mockRevokeNeonAuthUserSessions(...args),
+  impersonateNeonAuthAdminUser: (...args: unknown[]) =>
+    mockImpersonateNeonAuthUser(...args),
 }));
 
 vi.mock(
-  "../../src/memberships/data/system-admin.memberships.query.server",
+  "../../src/features/memberships/sys-memberships.query.server",
   async (importOriginal) => {
     const actual =
       await importOriginal<
@@ -55,11 +80,17 @@ vi.mock(
   },
 );
 
-vi.mock("@afenda/db", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("@afenda/db")>();
+vi.mock("@afenda/db", () => {
   return {
-    ...actual,
+    createOrganizationInvitation: (...args: unknown[]) =>
+      mockCreateOrganizationInvitation(...args),
     getTenantMembershipById: (...args: unknown[]) => mockGetMembership(...args),
+    hasOrganizationInvitationWithEmail: (...args: unknown[]) =>
+      mockHasOrganizationInvitationWithEmail(...args),
+    hasTenantMemberWithEmail: (...args: unknown[]) =>
+      mockHasTenantMemberWithEmail(...args),
+    listActorLastActivityAt: (...args: unknown[]) =>
+      mockListActorLastActivityAt(...args),
     resendOrganizationInvitation: (...args: unknown[]) =>
       mockResendInvitation(...args),
     revokeOrganizationInvitation: (...args: unknown[]) =>
@@ -68,7 +99,7 @@ vi.mock("@afenda/db", async (importOriginal) => {
 });
 
 vi.mock(
-  "../../src/users/data/system-admin.users.query.server",
+  "../../src/features/users/sys-users.query.server",
   async (importOriginal) => {
     const actual =
       await importOriginal<
@@ -85,7 +116,7 @@ vi.mock(
 );
 
 vi.mock(
-  "../../src/users/data/system-admin.users-access.query.server",
+  "../../src/features/users/sys-users-access.query.server",
   async (importOriginal) => {
     const actual =
       await importOriginal<
@@ -104,8 +135,34 @@ vi.mock("next/cache", () => ({
 }));
 
 const guardContext = {
-  context: { userId: "actor_1", actorType: "user" as const },
-  organization: { id: "org_1" },
+  context: {
+    organizationId: "org_1",
+    organizationSlug: "demo-org",
+    userId: "actor_1",
+    membershipId: "member_actor",
+    locale: "en-MY",
+    actorType: "user" as const,
+    capabilities: [
+      "system-admin.users.read",
+      "system-admin.users.manage",
+      "system-admin.identity.read",
+      "system-admin.identity.write",
+    ],
+    role: "admin" as const,
+    sessionSource: "neon" as const,
+  },
+  organization: {
+    id: "org_1",
+    slug: "demo-org",
+    locale: "en-MY",
+    role: "admin" as const,
+    capabilities: [
+      "system-admin.users.read",
+      "system-admin.users.manage",
+      "system-admin.identity.read",
+      "system-admin.identity.write",
+    ],
+  },
   session: { id: "actor_1" },
 };
 
@@ -144,7 +201,15 @@ describe("system admin users actions", () => {
     vi.clearAllMocks();
     mockRequireUsersManage.mockResolvedValue(guardContext);
     mockRequireUsersRead.mockResolvedValue(guardContext);
+    mockRequireExecutionContext.mockResolvedValue(guardContext.context);
     mockUpdateMembershipStatus.mockResolvedValue(undefined);
+    mockListActorLastActivityAt.mockResolvedValue(new Map());
+    mockCreateOrganizationInvitation.mockResolvedValue({
+      invitationId: "invite_1",
+      token: "tok",
+    });
+    mockHasOrganizationInvitationWithEmail.mockResolvedValue(false);
+    mockHasTenantMemberWithEmail.mockResolvedValue(false);
     mockGetMembership.mockResolvedValue({
       membershipId: "member_1",
       authUserId: "user_2",
@@ -155,6 +220,10 @@ describe("system admin users actions", () => {
     mockAssertInvite.mockResolvedValue(undefined);
     mockResendInvitation.mockResolvedValue({ invitationId: "invite_1", token: "tok2" });
     mockRevokeInvitation.mockResolvedValue(undefined);
+    mockCreateNeonAuthUser.mockResolvedValue({ id: "user_new" });
+    mockBanNeonAuthUser.mockResolvedValue({ id: "user_2" });
+    mockRevokeNeonAuthUserSessions.mockResolvedValue({ revoked: true });
+    mockImpersonateNeonAuthUser.mockResolvedValue({ redirectTo: "/account" });
     mockInspectAccess.mockResolvedValue({
       membershipId: "member_1",
       userLabel: "Alex",
@@ -174,7 +243,7 @@ describe("system admin users actions", () => {
   });
 
   it("denies non-admin from reading users via policy guard", async () => {
-    mockRequireUsersRead.mockRejectedValue(new Error("Forbidden"));
+    mockRequireExecutionContext.mockRejectedValueOnce(new Error("Forbidden"));
 
     const { requireSystemAdminUsersRead } = await import(
       "../../src/features/overview/sys-capability.policy.server"
@@ -184,7 +253,7 @@ describe("system admin users actions", () => {
   });
 
   it("denies non-admin from manage mutations via policy guard", async () => {
-    mockRequireUsersManage.mockRejectedValue(new Error("Forbidden"));
+    mockRequireExecutionContext.mockRejectedValueOnce(new Error("Forbidden"));
 
     const { requireSystemAdminUsersManage } = await import(
       "../../src/features/overview/sys-capability.policy.server"
@@ -431,6 +500,78 @@ describe("system admin users actions", () => {
       expect(result.data?.assignedRoles).toEqual(["admin"]);
       expect(result.data?.effectivePermissions).toContain("system-admin.users.read");
     }
+  });
+
+  it("creates a Neon Auth identity through system-admin", async () => {
+    const { createSystemAdminNeonAuthUser } = await import(
+      "../../src/features/users/sys-users.actions.server"
+    );
+    const formData = new FormData();
+    formData.set("email", "new-auth@example.com");
+    formData.set("name", "New Auth");
+    formData.set("password", "temporary-secret");
+
+    const result = await createSystemAdminNeonAuthUser(undefined, formData);
+
+    expect(result.ok).toBe(true);
+    expect(mockCreateNeonAuthUser).toHaveBeenCalledWith({
+      email: "new-auth@example.com",
+      name: "New Auth",
+      password: "temporary-secret",
+    });
+    expect(mockWriteAudit).toHaveBeenCalledWith(
+      expect.objectContaining({
+        action: "system-admin.neon-auth.user.create",
+        targetType: "neon_auth_user",
+      }),
+    );
+  });
+
+  it("runs Neon Auth ban, session revocation, and impersonation against linked auth user ids", async () => {
+    const {
+      banSystemAdminNeonAuthUser,
+      revokeSystemAdminNeonAuthUserSessions,
+      impersonateSystemAdminNeonAuthUser,
+    } = await import("../../src/features/users/sys-users.actions.server");
+
+    await banSystemAdminNeonAuthUser("member_1");
+    await revokeSystemAdminNeonAuthUserSessions("member_1");
+    await impersonateSystemAdminNeonAuthUser("member_1");
+
+    expect(mockBanNeonAuthUser).toHaveBeenCalledWith(
+      expect.objectContaining({ userId: "user_2" }),
+    );
+    expect(mockRevokeNeonAuthUserSessions).toHaveBeenCalledWith({
+      userId: "user_2",
+    });
+    expect(mockImpersonateNeonAuthUser).toHaveBeenCalledWith({
+      userId: "user_2",
+    });
+    expect(mockWriteAudit).toHaveBeenCalledWith(
+      expect.objectContaining({
+        action: "system-admin.neon-auth.user.ban",
+        targetType: "neon_auth_user",
+        targetId: "user_2",
+      }),
+    );
+  });
+
+  it("blocks Neon Auth identity admin actions against the current session", async () => {
+    mockGetMembership.mockResolvedValueOnce({
+      membershipId: "member_1",
+      authUserId: "actor_1",
+      role: "admin",
+      status: "active",
+    });
+
+    const { banSystemAdminNeonAuthUser } = await import(
+      "../../src/features/users/sys-users.actions.server"
+    );
+
+    const result = await banSystemAdminNeonAuthUser("member_1");
+
+    expect(result.ok).toBe(false);
+    expect(mockBanNeonAuthUser).not.toHaveBeenCalled();
   });
 });
 

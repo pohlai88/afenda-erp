@@ -2,6 +2,7 @@ import "server-only";
 
 import { upsertUserProfile } from "@afenda/db";
 import {
+  handleNeonAuthCustomDeliveryRequired,
   registerNeonAuthWebhookHooks,
   type NeonAuthWebhookEnvelope,
 } from "@afenda/auth/neon-auth/server";
@@ -25,6 +26,7 @@ export function registerErpNeonAuthWebhookHooks() {
 
   registerNeonAuthWebhookHooks({
     onUserCreated: handleUserCreated,
+    onCustomDeliveryRequired: handleNeonAuthCustomDeliveryRequired,
   });
 }
 

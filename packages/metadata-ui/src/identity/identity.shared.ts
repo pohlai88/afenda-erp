@@ -23,25 +23,36 @@ export type MetadataUiSectionIdentity = Readonly<{
   domAttributes: MetadataUiDomAttributes;
 }>;
 
+function normalizeMetadataUiIdentityTextPart(
+  part: string,
+): string {
+  return part.trim();
+}
+
 export function createMetadataUiSectionIdentity({
   sectionKind,
   key,
   id = createMetadataUiTestId("metadata-ui", sectionKind, key),
   diagnostics,
 }: MetadataUiSectionIdentityInput): MetadataUiSectionIdentity {
+  const normalizedKey = normalizeMetadataUiIdentityTextPart(key);
+  const resolvedSectionKey = normalizedKey || sectionKind;
+  const normalizedId =
+    normalizeMetadataUiIdentityTextPart(id) ||
+    createMetadataUiTestId("metadata-ui", sectionKind, resolvedSectionKey);
   const normalizedDiagnostics = createMetadataUiDiagnosticsIdentity(
     sectionKind,
-    key,
+    resolvedSectionKey,
     diagnostics,
   );
 
   return {
-    id,
+    id: normalizedId,
     diagnostics: normalizedDiagnostics,
     domAttributes: createMetadataUiDomAttributes(
       sectionKind,
       normalizedDiagnostics,
-      id,
+      normalizedId,
     ),
   };
 }

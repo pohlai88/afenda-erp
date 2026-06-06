@@ -13,6 +13,7 @@ import {
   type MetadataUiActionBarItemInput,
   type MetadataUiActionBarItemPlacement,
   type MetadataUiActionBarLayout,
+  type MetadataUiActionBarOverflow,
 } from "../schemas/action-bar.schema";
 
 type MetadataUiActionBarSystemFields =
@@ -68,10 +69,98 @@ type ActionBarInput = Omit<
   "schemaId" | "schemaVersion" | "stability"
 >;
 
+type MetadataUiActionBarLayoutDefaults = Readonly<
+  Pick<ActionBarInput, "alignment" | "layout"> & {
+    overflow: MetadataUiActionBarOverflow;
+  }
+>;
+
+const METADATA_UI_ACTION_BAR_LAYOUT_DEFAULTS = {
+  inline: {
+    layout: "inline",
+    alignment: "start",
+    overflow: {
+      enabled: false,
+      triggerLabel: "More actions",
+    },
+  },
+  toolbar: {
+    layout: "toolbar",
+    alignment: "end",
+    overflow: {
+      enabled: true,
+      triggerLabel: "More actions",
+      collapseAfter: 3,
+    },
+  },
+  split: {
+    layout: "split",
+    alignment: "between",
+    overflow: {
+      enabled: true,
+      triggerLabel: "More actions",
+      collapseAfter: 2,
+    },
+  },
+  overflow: {
+    layout: "overflow",
+    alignment: "end",
+    overflow: {
+      enabled: true,
+      triggerLabel: "More actions",
+      collapseAfter: 1,
+    },
+  },
+  "sticky-footer": {
+    layout: "sticky-footer",
+    alignment: "end",
+    overflow: {
+      enabled: true,
+      triggerLabel: "More actions",
+      collapseAfter: 2,
+    },
+  },
+} as const satisfies Record<
+  MetadataUiActionBarLayout,
+  MetadataUiActionBarLayoutDefaults
+>;
+
+function normalizeActionBarOverflowForLayout(
+  layout: MetadataUiActionBarLayout,
+  overflow: ActionBarInput["overflow"],
+): MetadataUiActionBarOverflow {
+  const defaults = METADATA_UI_ACTION_BAR_LAYOUT_DEFAULTS[layout].overflow;
+
+  return {
+    ...defaults,
+    ...overflow,
+  };
+}
+
 export function createActionBar<
   const Input extends MetadataUiActionBarBuilderInput,
 >(input: Input): MetadataUiActionBarBuilderResult<Input> {
   return parseMetadataUiActionBar(input) as MetadataUiActionBarBuilderResult<Input>;
+}
+
+export function createActionBarForLayout<
+  const Layout extends MetadataUiActionBarLayout,
+>(
+  input: Omit<ActionBarInput, "alignment" | "layout" | "overflow"> & {
+    alignment?: MetadataUiActionBarAlignment;
+    layout?: Layout;
+    overflow?: ActionBarInput["overflow"];
+  },
+  layout: Layout,
+): MetadataUiActionBarForLayout<Layout> {
+  const defaults = METADATA_UI_ACTION_BAR_LAYOUT_DEFAULTS[layout];
+
+  return createActionBar({
+    ...input,
+    layout,
+    alignment: input.alignment ?? defaults.alignment,
+    overflow: normalizeActionBarOverflowForLayout(layout, input.overflow),
+  });
 }
 
 export function createActionBarItem<
@@ -85,21 +174,36 @@ export function createActionBarItem<
 export function createToolbarActionBar(
   input: Omit<ActionBarInput, "layout" | "alignment">,
 ): MetadataUiActionBarForLayout<"toolbar"> {
-  return createActionBar({
-    ...input,
-    layout: "toolbar",
-    alignment: "end",
-  });
+  return createActionBarForLayout(input, "toolbar");
 }
 
 export function createInlineActionBar(
   input: Omit<ActionBarInput, "layout" | "alignment">,
 ): MetadataUiActionBarForLayout<"inline"> {
-  return createActionBar({
-    ...input,
-    layout: "inline",
-    alignment: "start",
-  });
+  return createActionBarForLayout(input, "inline");
+}
+
+export function createSplitActionBar(
+  input: Omit<ActionBarInput, "layout" | "alignment">,
+): MetadataUiActionBarForLayout<"split"> {
+  return createActionBarForLayout(input, "split");
+}
+
+export function createOverflowActionBar(
+  input: Omit<ActionBarInput, "layout" | "alignment" | "actions"> & {
+    actions: MetadataUiActionBarItemInput[];
+  },
+): MetadataUiActionBarForLayout<"overflow"> {
+  return createActionBarForLayout(
+    {
+      ...input,
+      actions: input.actions.map((action) => ({
+        ...action,
+        placement: "overflow",
+      })),
+    },
+    "overflow",
+  );
 }
 
 export function createStickyFooterActionBar(
@@ -109,6 +213,37 @@ export function createStickyFooterActionBar(
     ...input,
     layout: "sticky-footer",
     alignment: "end",
+    overflow: normalizeActionBarOverflowForLayout(
+      "sticky-footer",
+      input.overflow,
+    ),
+  });
+}
+
+export function withActionBarActions(
+  actionBar: MetadataUiActionBarInput,
+  actions: MetadataUiActionBarItemInput[],
+): MetadataUiActionBar {
+  return createActionBar({
+    ...actionBar,
+    actions,
+  });
+}
+
+export function appendActionBarAction(
+  actionBar: MetadataUiActionBarInput,
+  action: MetadataUiActionBarItemInput,
+): MetadataUiActionBar {
+  return withActionBarActions(actionBar, [...actionBar.actions, action]);
+}
+
+export function withActionBarOverflow(
+  actionBar: MetadataUiActionBarInput,
+  overflow: NonNullable<MetadataUiActionBarInput["overflow"]>,
+): MetadataUiActionBar {
+  return createActionBar({
+    ...actionBar,
+    overflow,
   });
 }
 

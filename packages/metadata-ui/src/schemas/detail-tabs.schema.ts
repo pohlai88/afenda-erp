@@ -42,6 +42,7 @@ const METADATA_UI_DETAIL_TAB_ACTION_PLACEMENT_VALUES = [
 
 export const METADATA_UI_DETAIL_TABS_KEY_SCHEMA = z
   .string()
+  .trim()
   .min(1)
   .max(160)
   .regex(
@@ -66,9 +67,9 @@ export const METADATA_UI_DETAIL_TAB_BADGE_SCHEMA = z.object({
 export const METADATA_UI_DETAIL_TAB_SCHEMA = z.object({
   key: METADATA_UI_DETAIL_TABS_KEY_SCHEMA,
 
-  label: z.string().min(1).max(120),
+  label: z.string().trim().min(1).max(120),
 
-  description: z.string().min(1).max(240).optional(),
+  description: z.string().trim().min(1).max(240).optional(),
 
   kind: METADATA_UI_DETAIL_TAB_KIND_SCHEMA.default("content"),
 
@@ -79,7 +80,7 @@ export const METADATA_UI_DETAIL_TAB_SCHEMA = z.object({
    *
    * Metadata UI does not embed renderers directly.
    */
-  sectionKey: z.string().min(1).max(160),
+  sectionKey: z.string().trim().min(1).max(160),
 
   defaultSelected: z.boolean().default(false),
 
@@ -113,9 +114,9 @@ export const METADATA_UI_DETAIL_TABS_SCHEMA = z.object({
 
   key: METADATA_UI_DETAIL_TABS_KEY_SCHEMA,
 
-  title: z.string().min(1).max(120).optional(),
+  title: z.string().trim().min(1).max(120).optional(),
 
-  description: z.string().min(1).max(320).optional(),
+  description: z.string().trim().min(1).max(320).optional(),
 
   tabs: z
     .array(METADATA_UI_DETAIL_TAB_SCHEMA)
@@ -133,10 +134,10 @@ export const METADATA_UI_DETAIL_TABS_SCHEMA = z.object({
 
   diagnostics: z
     .object({
-      componentKey: z.string().min(1).max(160).optional(),
-      sectionKey: z.string().min(1).max(160).optional(),
-      rendererKey: z.string().min(1).max(160).optional(),
-      testId: z.string().min(1).max(160).optional(),
+      componentKey: z.string().trim().min(1).max(160).optional(),
+      sectionKey: z.string().trim().min(1).max(160).optional(),
+      rendererKey: z.string().trim().min(1).max(160).optional(),
+      testId: z.string().trim().min(1).max(160).optional(),
     })
     .optional(),
 });

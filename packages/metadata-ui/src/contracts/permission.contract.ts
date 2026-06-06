@@ -20,6 +20,11 @@ const METADATA_UI_PERMISSION_VISIBILITY_VALUES = [
   "hidden",
 ] as const;
 
+const METADATA_UI_PERMISSION_FAILURE_SURFACE_VISIBILITY_VALUES = [
+  "visible",
+  "disabled",
+] as const;
+
 export const metadataUiPermissionOperatorSchema = z.enum(
   METADATA_UI_PERMISSION_OPERATOR_VALUES,
 );
@@ -32,8 +37,13 @@ export const metadataUiPermissionVisibilitySchema = z.enum(
   METADATA_UI_PERMISSION_VISIBILITY_VALUES,
 );
 
+export const metadataUiPermissionFailureSurfaceVisibilitySchema = z.enum(
+  METADATA_UI_PERMISSION_FAILURE_SURFACE_VISIBILITY_VALUES,
+);
+
 export const metadataUiCapabilityKeySchema = z
   .string()
+  .trim()
   .min(1)
   .max(160)
   .regex(
@@ -46,13 +56,30 @@ export const metadataUiPermissionRequirementSchema = z.object({
   effect: metadataUiPermissionEffectSchema.default("allow"),
 });
 
-export const metadataUiPermissionFailureSchema = z.object({
-  visibility: metadataUiPermissionVisibilitySchema.default("hidden"),
+const metadataUiPermissionFailureHiddenSchema = z
+  .object({
+    visibility: z.literal("hidden").default("hidden"),
+    title: z.never().optional(),
+    description: z.never().optional(),
+  })
+  .strict();
 
-  title: z.string().min(1).max(120).optional(),
+const metadataUiPermissionFailureSurfaceSchema = z
+  .object({
+    visibility: metadataUiPermissionFailureSurfaceVisibilitySchema,
+    title: z.string().trim().min(1).max(120),
+    description: z.string().trim().min(1).max(240).optional(),
+  })
+  .strict();
 
-  description: z.string().min(1).max(240).optional(),
-});
+export const metadataUiPermissionFailureSchema = z
+  .union([
+    metadataUiPermissionFailureHiddenSchema,
+    metadataUiPermissionFailureSurfaceSchema,
+  ])
+  .default({
+    visibility: "hidden",
+  });
 
 export const metadataUiPermissionContractSchema = z
   .object({
@@ -80,6 +107,18 @@ export const metadataUiPermissionContractSchema = z
 
       unique.add(key);
     }
+
+    if (
+      permission.failure.visibility !== "hidden" &&
+      !permission.failure.title
+    ) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["failure", "title"],
+        message:
+          "Visible or disabled permission failures must provide a title.",
+      });
+    }
   });
 
 export type MetadataUiPermissionOperator = z.infer<
@@ -92,6 +131,10 @@ export type MetadataUiPermissionEffect = z.infer<
 
 export type MetadataUiPermissionVisibility = z.infer<
   typeof metadataUiPermissionVisibilitySchema
+>;
+
+export type MetadataUiPermissionFailureSurfaceVisibility = z.infer<
+  typeof metadataUiPermissionFailureSurfaceVisibilitySchema
 >;
 
 export type MetadataUiCapabilityKey = z.infer<

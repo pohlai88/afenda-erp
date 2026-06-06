@@ -32,13 +32,35 @@ import { MetadataUiPrimitiveActionButton } from "./action-button.server";
 
 export type MetadataUiPrimitiveFieldProps = Readonly<{
   field: MetadataUiFormField;
-  mode?: "create" | "edit" | "view" | "review";
+  mode?: MetadataUiPrimitiveFieldMode;
 }>;
+
+export type MetadataUiPrimitiveFieldMode =
+  | "create"
+  | "edit"
+  | "view"
+  | "review";
+
+export type MetadataUiPrimitiveFieldControlKind =
+  | "hidden"
+  | "text"
+  | "textarea"
+  | "select"
+  | "multi-select"
+  | "boolean"
+  | "checkbox-group"
+  | "radio"
+  | "custom";
 
 export type MetadataUiPrimitiveFieldGroupProps = Readonly<{
   section: MetadataUiFormSection;
   children: ReactNode;
+  eyebrow?: ReactNode;
+  meta?: ReactNode;
+  actions?: ReactNode;
+  footer?: ReactNode;
   className?: string;
+  bodyClassName?: string;
 }>;
 
 const TEXT_INPUT_KIND_TO_TYPE = {
@@ -85,7 +107,7 @@ function stringifyMetadataUiFieldValueSet(value: unknown): ReadonlySet<string> {
 
 function isMetadataUiFieldDisabled(
   field: MetadataUiFormField,
-  mode: MetadataUiPrimitiveFieldProps["mode"],
+  mode: MetadataUiPrimitiveFieldMode | undefined,
 ): boolean {
   return Boolean(
     field.disabled?.value ||
@@ -96,6 +118,16 @@ function isMetadataUiFieldDisabled(
       field.state.value === "blocked" ||
       mode === "view" ||
       mode === "review",
+  );
+}
+
+function isMetadataUiFieldInvalid(field: MetadataUiFormField): boolean {
+  return field.state.value === "invalid";
+}
+
+function isMetadataUiFieldGroupDisabled(section: MetadataUiFormSection): boolean {
+  return section.fields.length > 0 && section.fields.every((field) =>
+    isMetadataUiFieldDisabled(field, "view"),
   );
 }
 
@@ -155,7 +187,7 @@ function renderMetadataUiCheckboxOptionGroup(
 
 function renderMetadataUiPrimitiveFieldControl(
   field: MetadataUiFormField,
-  mode: MetadataUiPrimitiveFieldProps["mode"],
+  mode: MetadataUiPrimitiveFieldMode | undefined,
 ) {
   const disabled = isMetadataUiFieldDisabled(field, mode);
   const fieldId = getMetadataUiPrimitiveFieldId(field);
@@ -165,7 +197,7 @@ function renderMetadataUiPrimitiveFieldControl(
     disabled,
     required: field.validation?.required,
     "aria-describedby": getMetadataUiFieldDescribedBy(field),
-    "aria-invalid": field.state.value === "invalid" || undefined,
+    "aria-invalid": isMetadataUiFieldInvalid(field) || undefined,
     "data-metadata-ui-field-state": field.state.value,
     "data-testid": field.diagnostics?.testId,
   };
@@ -279,21 +311,47 @@ function renderMetadataUiPrimitiveFieldControl(
 export function MetadataUiPrimitiveFieldGroup({
   section,
   children,
+  eyebrow,
+  meta,
+  actions,
+  footer,
   className,
+  bodyClassName,
 }: MetadataUiPrimitiveFieldGroupProps) {
   return (
     <FieldSet
       className={cn(ui.surface.inset, ui.surfaceGap.sm, className)}
       data-collapsible={section.collapsible || undefined}
       data-default-collapsed={section.defaultCollapsed || undefined}
+      data-disabled={isMetadataUiFieldGroupDisabled(section) || undefined}
     >
-      {section.title ? <FieldLegend>{section.title}</FieldLegend> : null}
+      {(eyebrow || section.title || meta || actions) ? (
+        <div className="flex flex-wrap items-start justify-between gap-surface-sm">
+          <div className="grid min-w-0 gap-surface-2xs">
+            {eyebrow ? (
+              <p className={cn(ui.typography.label, ui.color.ink.muted)}>
+                {eyebrow}
+              </p>
+            ) : null}
+            {section.title ? <FieldLegend>{section.title}</FieldLegend> : null}
+            {meta ? (
+              <p className={cn(ui.typography.caption, ui.color.ink.muted)}>
+                {meta}
+              </p>
+            ) : null}
+          </div>
+          {actions ? <div className="flex flex-wrap items-center gap-surface-xs">{actions}</div> : null}
+        </div>
+      ) : null}
       {section.description ? (
         <FieldDescription>{section.description}</FieldDescription>
       ) : null}
-      <FieldGroup className={cn("grid md:grid-cols-2", ui.surfaceGap.sm)}>
+      <FieldGroup
+        className={cn("grid md:grid-cols-2", ui.surfaceGap.sm, bodyClassName)}
+      >
         {children}
       </FieldGroup>
+      {footer ? <div className="flex flex-wrap items-center gap-surface-xs">{footer}</div> : null}
     </FieldSet>
   );
 }
@@ -314,6 +372,7 @@ export function MetadataUiPrimitiveField({
   return (
     <Field
       data-disabled={isMetadataUiFieldDisabled(field, mode)}
+      data-invalid={isMetadataUiFieldInvalid(field) || undefined}
       data-metadata-ui-field-state={field.state.value}
       data-metadata-ui-dependent-field={
         field.dependencies.length > 0 ? "true" : undefined

@@ -9,10 +9,12 @@ import {
 import {
   createMultiStepForm,
   createMultiStepFormStep,
+  appendMultiStepFormStep,
 } from "../builders/multi-step-form.builder";
 import {
   createScorecardCriterion,
   createScorecardForm,
+  appendScorecardCriterion,
 } from "../builders/scorecard-form.builder";
 
 const SRC_ROOT = path.join(process.cwd(), "src");
@@ -58,10 +60,22 @@ describe("multi-step and scorecard form parity sections", () => {
         },
       },
     });
+    const appendedForm = appendMultiStepFormStep(
+      form,
+      createMultiStepFormStep({
+        key: "metadata-ui.fixture.step.review",
+        title: "Review",
+        status: "available",
+        order: 1,
+        sections: [detailsSection],
+      }),
+    );
 
     expect(form.activeStepKey).toBe("metadata-ui.fixture.step.details");
     expect(form.steps[0]?.sections[0]?.fields[0]?.label).toBe("Name");
     expect(form.submitAction?.execution.kind).toBe("server-action");
+    expect(appendedForm.steps).toHaveLength(2);
+    expect(appendedForm.activeStepKey).toBe("metadata-ui.fixture.step.details");
   });
 
   it("rejects unsafe multi-step form states", () => {
@@ -126,10 +140,20 @@ describe("multi-step and scorecard form parity sections", () => {
         }),
       ],
     });
+    const appendedScorecard = appendScorecardCriterion(
+      scorecard,
+      createScorecardCriterion({
+        key: "metadata-ui.fixture.quality-followup",
+        label: "Quality follow-up",
+        options: [{ value: "review", label: "Review" }],
+      }),
+    );
 
     expect(scorecard.criteria).toHaveLength(2);
     expect(scorecard.criteria[0]?.selectedValue).toBe("pass");
     expect(scorecard.criteria[1]?.blockedReason).toContain("host workflow");
+    expect(appendedScorecard.criteria).toHaveLength(3);
+    expect(appendedScorecard.key).toBe("metadata-ui.fixture.scorecard");
   });
 
   it("rejects unsafe scorecard criteria", () => {

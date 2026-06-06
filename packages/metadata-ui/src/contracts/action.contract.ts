@@ -326,8 +326,17 @@ export const metadataUiActionContractSchema = z
 
     metadata: z.record(z.string(), z.unknown()).default({}),
   })
-  .strict()
-  .superRefine((action, ctx) => {
+.strict()
+.superRefine((action, ctx) => {
+    if (action.visibility !== "visible" && action.confirmation) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["confirmation"],
+        message:
+          "Hidden and disabled actions must not declare confirmation metadata.",
+      });
+    }
+
     if (action.visibility === "disabled" && !action.disabledReason) {
       ctx.addIssue({
         code: "custom",
@@ -574,6 +583,12 @@ function assertMetadataUiActionContractInvariants(
 ): asserts action is MetadataUiActionContract {
   if (action.visibility === "disabled" && !action.disabledReason) {
     throw new Error("Disabled actions must provide disabledReason.");
+  }
+
+  if (action.visibility !== "visible" && action.confirmation) {
+    throw new Error(
+      "Hidden and disabled actions must not declare confirmation metadata.",
+    );
   }
 
   if (

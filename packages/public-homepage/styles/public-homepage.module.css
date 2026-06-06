@@ -17,11 +17,7 @@
   gap: 1rem;
   min-height: clamp(4rem, 7svh, 5rem);
   padding: 0 clamp(1.125rem, 4vw, 4.5rem);
-  background: linear-gradient(
-    to bottom,
-    rgb(2 5 6 / 86%),
-    rgb(2 5 6 / 0%)
-  );
+  background: linear-gradient(to bottom, rgb(2 5 6 / 86%), rgb(2 5 6 / 0%));
 }
 
 .brand {
@@ -268,28 +264,5 @@
   .title,
   .heroCta {
     animation: none;
-  }
-}
-
-@media (max-width: 48rem) {
-  .header {
-    padding-inline: 1rem;
-    min-height: 4.25rem;
-  }
-
-  .hero {
-    grid-template-rows: minmax(0, 64svh) minmax(9rem, 1fr);
-    gap: 1.75rem;
-    padding-bottom: 1.75rem;
-  }
-
-  .heroImage {
-    object-position: 52% 43%;
-  }
-
-  .title {
-    max-width: 10ch;
-    font-size: clamp(2.85rem, 12.6vw, 4.15rem);
-    line-height: 0.94;
   }
 }

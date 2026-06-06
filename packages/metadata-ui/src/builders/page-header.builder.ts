@@ -1,12 +1,14 @@
-import { z } from "zod";
-
 import {
+  METADATA_UI_PAGE_HEADER_ACTION_SCHEMA,
   METADATA_UI_PAGE_HEADER_BADGE_SCHEMA,
   METADATA_UI_PAGE_HEADER_BREADCRUMB_SCHEMA,
-  METADATA_UI_PAGE_HEADER_SCHEMA,
   parseMetadataUiPageHeader,
+  safeParseMetadataUiPageHeader,
   type MetadataUiPageHeader,
+  type MetadataUiPageHeaderAction,
+  type MetadataUiPageHeaderActionForPlacement,
   type MetadataUiPageHeaderActionInput,
+  type MetadataUiPageHeaderActionPlacement,
   type MetadataUiPageHeaderBadge,
   type MetadataUiPageHeaderBadgeForTone,
   type MetadataUiPageHeaderBadgeInput,
@@ -16,6 +18,7 @@ import {
   type MetadataUiPageHeaderForLevel,
   type MetadataUiPageHeaderInput,
   type MetadataUiPageHeaderLevel,
+  type MetadataUiPageHeaderParseResult,
 } from "../schemas/page-header.schema";
 
 type MetadataUiPageHeaderSystemFields =
@@ -50,6 +53,14 @@ export type MetadataUiPageHeaderBadgeBuilderResult<
   ? MetadataUiPageHeaderBadgeForTone<Tone>
   : MetadataUiPageHeaderBadge;
 
+export type MetadataUiPageHeaderActionBuilderResult<
+  Input extends MetadataUiPageHeaderActionInput,
+> = Input extends {
+  placement?: infer Placement extends MetadataUiPageHeaderActionPlacement;
+}
+  ? MetadataUiPageHeaderActionForPlacement<Placement>
+  : MetadataUiPageHeaderAction;
+
 export type MetadataUiPageHeaderBasicInput<
   Key extends string = string,
   Title extends string = string,
@@ -68,78 +79,128 @@ export type MetadataUiRecordPageHeaderInput<
   badges?: MetadataUiPageHeaderBadgeInput[];
 };
 
-export type MetadataUiPageHeaderSafeCreateResult<
-  Data extends MetadataUiPageHeader = MetadataUiPageHeader,
-> =
-  | {
-      success: true;
-      data: Data;
-      error?: never;
-    }
-  | {
-      success: false;
-      data?: never;
-      error: z.ZodError;
-    };
+export type MetadataUiPageHeaderSafeCreateResult =
+  MetadataUiPageHeaderParseResult;
+
+function normalizePageHeaderBasicInput<
+  Input extends MetadataUiPageHeaderBasicInput,
+>(input: Input): MetadataUiPageHeaderBasicInput {
+  return {
+    ...input,
+    key: input.key.trim(),
+    title: input.title.trim(),
+    description: input.description?.trim(),
+    eyebrow: input.eyebrow?.trim(),
+  };
+}
+
+function normalizePageHeaderBreadcrumbInput<
+  Input extends MetadataUiPageHeaderBreadcrumbInput,
+>(input: Input): MetadataUiPageHeaderBreadcrumbInput {
+  return {
+    ...input,
+    key: input.key.trim(),
+    label: input.label.trim(),
+    href: input.href?.trim(),
+    current: input.current ?? false,
+  };
+}
+
+function normalizePageHeaderBadgeInput<
+  Input extends MetadataUiPageHeaderBadgeInput,
+>(input: Input): MetadataUiPageHeaderBadgeInput {
+  return {
+    ...input,
+    key: input.key.trim(),
+    label: input.label.trim(),
+    tone: input.tone ?? "neutral",
+  };
+}
+
+function normalizePageHeaderActionInput<
+  Input extends MetadataUiPageHeaderActionInput,
+>(input: Input): MetadataUiPageHeaderActionInput {
+  return {
+    ...input,
+    placement: input.placement ?? "secondary",
+  };
+}
+
+function createPageHeaderForLevel<const Level extends MetadataUiPageHeaderLevel>(
+  input: MetadataUiPageHeaderBasicInput,
+  level: Level,
+): MetadataUiPageHeaderForLevel<Level> {
+  return createPageHeader({
+    ...normalizePageHeaderBasicInput(input),
+    level,
+    breadcrumbs: [],
+    badges: [],
+    actions: [],
+  });
+}
 
 export function createPageHeader<const Input extends PageHeaderBuilderInput>(
   input: Input,
 ): MetadataUiPageHeaderBuilderResult<Input> {
-  return parseMetadataUiPageHeader(
-    input,
-  ) as MetadataUiPageHeaderBuilderResult<Input>;
+  return parseMetadataUiPageHeader({
+    ...normalizePageHeaderBasicInput(input),
+    breadcrumbs:
+      input.breadcrumbs?.map((breadcrumb) =>
+        normalizePageHeaderBreadcrumbInput(breadcrumb),
+      ) ?? [],
+    badges:
+      input.badges?.map((badge) => normalizePageHeaderBadgeInput(badge)) ?? [],
+    actions:
+      input.actions?.map((action) => normalizePageHeaderActionInput(action)) ??
+      [],
+  }) as MetadataUiPageHeaderBuilderResult<Input>;
+}
+
+export function createWorkspacePageHeader<
+  const Input extends MetadataUiPageHeaderBasicInput,
+>(input: Input): MetadataUiPageHeaderForLevel<"workspace"> {
+  return createPageHeaderForLevel(input, "workspace");
 }
 
 export function createModulePageHeader<
   const Input extends MetadataUiPageHeaderBasicInput,
 >(input: Input): MetadataUiPageHeaderForLevel<"module"> {
-  return createPageHeader({
-    key: input.key,
-    level: "module",
-    title: input.title,
-    description: input.description,
-    eyebrow: input.eyebrow,
-    breadcrumbs: [],
-    badges: [],
-    actions: [],
-  });
+  return createPageHeaderForLevel(input, "module");
 }
 
 export function createSurfacePageHeader<
   const Input extends MetadataUiPageHeaderBasicInput,
 >(input: Input): MetadataUiPageHeaderForLevel<"surface"> {
-  return createPageHeader({
-    key: input.key,
-    level: "surface",
-    title: input.title,
-    description: input.description,
-    eyebrow: input.eyebrow,
-    breadcrumbs: [],
-    badges: [],
-    actions: [],
-  });
+  return createPageHeaderForLevel(input, "surface");
 }
 
 export function createRecordPageHeader<
   const Input extends MetadataUiRecordPageHeaderInput,
 >(input: Input): MetadataUiPageHeaderForLevel<"record"> {
   return createPageHeader({
-    key: input.key,
+    ...normalizePageHeaderBasicInput(input),
     level: "record",
-    title: input.title,
-    description: input.description,
-    eyebrow: input.eyebrow,
-    breadcrumbs: input.breadcrumbs ?? [],
-    badges: input.badges ?? [],
+    breadcrumbs:
+      input.breadcrumbs?.map((breadcrumb) =>
+        normalizePageHeaderBreadcrumbInput(breadcrumb),
+      ) ?? [],
+    badges:
+      input.badges?.map((badge) => normalizePageHeaderBadgeInput(badge)) ?? [],
     actions: [],
   });
+}
+
+export function createDialogPageHeader<
+  const Input extends MetadataUiPageHeaderBasicInput,
+>(input: Input): MetadataUiPageHeaderForLevel<"dialog"> {
+  return createPageHeaderForLevel(input, "dialog");
 }
 
 export function createPageHeaderBreadcrumb<
   const Input extends MetadataUiPageHeaderBreadcrumbInput,
 >(input: Input): MetadataUiPageHeaderBreadcrumb {
   return METADATA_UI_PAGE_HEADER_BREADCRUMB_SCHEMA.parse(
-    input,
+    normalizePageHeaderBreadcrumbInput(input),
   ) as MetadataUiPageHeaderBreadcrumb;
 }
 
@@ -147,8 +208,16 @@ export function createPageHeaderBadge<
   const Input extends MetadataUiPageHeaderBadgeInput,
 >(input: Input): MetadataUiPageHeaderBadgeBuilderResult<Input> {
   return METADATA_UI_PAGE_HEADER_BADGE_SCHEMA.parse(
-    input,
+    normalizePageHeaderBadgeInput(input),
   ) as MetadataUiPageHeaderBadgeBuilderResult<Input>;
+}
+
+export function createPageHeaderAction<
+  const Input extends MetadataUiPageHeaderActionInput,
+>(input: Input): MetadataUiPageHeaderActionBuilderResult<Input> {
+  return METADATA_UI_PAGE_HEADER_ACTION_SCHEMA.parse(
+    normalizePageHeaderActionInput(input),
+  ) as MetadataUiPageHeaderActionBuilderResult<Input>;
 }
 
 export function withPageHeaderLevel<const Level extends MetadataUiPageHeaderLevel>(
@@ -171,6 +240,16 @@ export function withPageHeaderBreadcrumbs(
   });
 }
 
+export function appendPageHeaderBreadcrumb(
+  header: MetadataUiPageHeaderInput,
+  breadcrumb: MetadataUiPageHeaderBreadcrumbInput,
+): MetadataUiPageHeader {
+  return createPageHeader({
+    ...header,
+    breadcrumbs: [...(header.breadcrumbs ?? []), breadcrumb],
+  });
+}
+
 export function withPageHeaderBadges(
   header: MetadataUiPageHeaderInput,
   badges: MetadataUiPageHeaderBadgeInput[],
@@ -178,6 +257,16 @@ export function withPageHeaderBadges(
   return createPageHeader({
     ...header,
     badges,
+  });
+}
+
+export function appendPageHeaderBadge(
+  header: MetadataUiPageHeaderInput,
+  badge: MetadataUiPageHeaderBadgeInput,
+): MetadataUiPageHeader {
+  return createPageHeader({
+    ...header,
+    badges: [...(header.badges ?? []), badge],
   });
 }
 
@@ -191,20 +280,18 @@ export function withPageHeaderActions(
   });
 }
 
+export function appendPageHeaderAction(
+  header: MetadataUiPageHeaderInput,
+  action: MetadataUiPageHeaderActionInput,
+): MetadataUiPageHeader {
+  return createPageHeader({
+    ...header,
+    actions: [...(header.actions ?? []), action],
+  });
+}
+
 export function safeCreatePageHeader(
   input: unknown,
 ): MetadataUiPageHeaderSafeCreateResult {
-  const result = METADATA_UI_PAGE_HEADER_SCHEMA.safeParse(input);
-
-  if (!result.success) {
-    return {
-      success: false,
-      error: result.error,
-    };
-  }
-
-  return {
-    success: true,
-    data: parseMetadataUiPageHeader(result.data),
-  };
+  return safeParseMetadataUiPageHeader(input);
 }

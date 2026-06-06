@@ -36,6 +36,12 @@ One Next.js app · One Neon Postgres · pnpm monorepo
 
 Guards: `pnpm architecture:check`. Roadmaps: [`docs/roadmap/`](../roadmap/).
 
+## Supplemental notes
+
+| Topic | File |
+| -- | ---- |
+| Tenant onboarding decision | [tenant-onboarding.md](tenant-onboarding.md) |
+
 **Platform supplements** (linked from parent books, not numbered ARCH-100x):
 
 | ID | File | Layer |
@@ -43,4 +49,3 @@ Guards: `pnpm architecture:check`. Roadmaps: [`docs/roadmap/`](../roadmap/).
 | **ARCH-OS-1001** | [object-storage evidence](../../packages/object-storage/docs/arch-os-1001-object-storage-evidence-architecture.md) | `@afenda/object-storage` |
 
 **Vercel platform** (Fluid Compute, Remote Cache, AI Gateway, Blob, BotID, Firewall, Runtime Cache): **1003** §8–§9, §13 · **1004** §5–§6 · **1005** §2–§4, §9–§10.
-

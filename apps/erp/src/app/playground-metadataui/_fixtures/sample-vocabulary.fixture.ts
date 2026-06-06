@@ -5,11 +5,11 @@ export const METADATA_UI_PLAYGROUND_SAMPLE_COPY = {
   appTitle: "Metadata UI Playground",
   appEyebrow: "Developer preview",
   appDescription:
-    "Static fixture surface for previewing metadata UI renderer work without workspace auth, tenant data, or ERP behavior.",
+    "Metadata-driven fixture atlas for previewing governed renderers and shadcn primitives composed exclusively through @afenda/metadata-ui — no direct shadcn imports in this route.",
   overviewNavLabel: "Overview",
-  overviewCommandLabel: "Open playground overview",
+  overviewCommandLabel: "Open playground atlas",
   overviewCommandDescription:
-    "Inspect the static metadata UI playground shell.",
+    "Inspect the full static metadata UI playground surface.",
 } as const;
 
 export const METADATA_UI_PLAYGROUND_SAMPLE_LABELS = {

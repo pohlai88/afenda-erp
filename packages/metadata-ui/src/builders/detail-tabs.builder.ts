@@ -95,12 +95,28 @@ export type MetadataUiDetailTabsSafeCreateResult<
       error: z.ZodError;
     };
 
+function normalizeDetailTabInput(
+  input: MetadataUiDetailTabInput,
+): MetadataUiDetailTabInput {
+  return {
+    ...input,
+    key: input.key.trim(),
+    label: input.label.trim(),
+    description: input.description?.trim(),
+    sectionKey: input.sectionKey.trim(),
+  };
+}
+
 export function createDetailTabs<const Input extends DetailTabsBuilderInput>(
   input: Input,
 ): MetadataUiDetailTabsBuilderResult<Input> {
-  return parseMetadataUiDetailTabs(
-    input,
-  ) as MetadataUiDetailTabsBuilderResult<Input>;
+  return parseMetadataUiDetailTabs({
+    ...input,
+    key: input.key.trim(),
+    title: input.title?.trim(),
+    description: input.description?.trim(),
+    tabs: input.tabs.map((tab) => normalizeDetailTabInput(tab)),
+  }) as MetadataUiDetailTabsBuilderResult<Input>;
 }
 
 export function createDetailTab<const Input extends MetadataUiDetailTabInput>(
@@ -123,11 +139,11 @@ export function createContentTab<
   const Input extends MetadataUiDetailTabBasicInput,
 >(input: Input): MetadataUiDetailTabForKind<"content"> {
   return createDetailTab({
-    key: input.key,
-    label: input.label,
-    description: input.description,
+    key: input.key.trim(),
+    label: input.label.trim(),
+    description: input.description?.trim(),
     kind: "content",
-    sectionKey: input.sectionKey,
+    sectionKey: input.sectionKey.trim(),
     defaultSelected: input.defaultSelected ?? false,
     lazy: true,
   });
@@ -137,11 +153,11 @@ export function createAuditTab<
   const Input extends MetadataUiAuditDetailTabInput,
 >(input: Input): MetadataUiDetailTabForKind<"audit"> {
   return createDetailTab({
-    key: input.key,
-    label: input.label ?? "Audit",
-    description: input.description,
+    key: input.key.trim(),
+    label: (input.label ?? "Audit").trim(),
+    description: input.description?.trim(),
     kind: "audit",
-    sectionKey: input.sectionKey,
+    sectionKey: input.sectionKey.trim(),
     defaultSelected: false,
     lazy: true,
   });
@@ -151,9 +167,9 @@ export function createDetailTabsSet<
   const Input extends MetadataUiDetailTabsSetInput,
 >(input: Input): MetadataUiDetailTabs {
   return createDetailTabs({
-    key: input.key,
-    title: input.title,
-    description: input.description,
+    key: input.key.trim(),
+    title: input.title?.trim(),
+    description: input.description?.trim(),
     tabs: input.tabs,
     actions: [],
   });
@@ -212,7 +228,7 @@ export function safeCreateDetailTabs(
   }
 
   return {
-    success: true,
+    success: true as const,
     data: parseMetadataUiDetailTabs(result.data),
   };
 }

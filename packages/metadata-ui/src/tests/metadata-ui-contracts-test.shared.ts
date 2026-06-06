@@ -6,6 +6,13 @@ import {
 } from "../contracts/action.contract";
 import { parseMetadataUiComponentContract } from "../contracts/component.contract";
 import {
+  createOverflowActionBar,
+  createSplitActionBar,
+  createToolbarActionBar,
+  withActionBarOverflow,
+  appendActionBarAction,
+} from "../builders/action-bar.builder";
+import {
   createComposedChart,
   createChart,
   createChartSeries,
@@ -36,6 +43,7 @@ import {
 import {
   createCompactStatItem,
   createStatGroup,
+  withStatItems,
   withStatDisplay,
 } from "../builders/stat.builder";
 import { createMetadataUiKanbanClientModel } from "../runtime/kanban-state.shared";
@@ -90,6 +98,30 @@ describe("@afenda/metadata-ui shared runtime surface", () => {
         capabilities: ["render"],
       }),
     ).toThrow(/renderer components must declare rendererId/i);
+
+    expect(() =>
+      parseMetadataUiComponentContract({
+        id: "metadata-ui.renderer.invalid-capabilities",
+        kind: "renderer",
+        runtime: "server",
+        label: "Invalid renderer capabilities",
+        description: "Renderer with extra capabilities should fail.",
+        capabilities: ["render", "compose"],
+        rendererId: "metadata-ui.renderer.invalid-capabilities",
+      }),
+    ).toThrow(/declare only render capability/i);
+
+    expect(() =>
+      parseMetadataUiComponentContract({
+        id: "metadata-ui.renderer.invalid-id",
+        kind: "renderer",
+        runtime: "server",
+        label: "Invalid renderer id",
+        description: "Renderer with mismatched rendererId should fail.",
+        capabilities: ["render"],
+        rendererId: "metadata-ui.renderer.other",
+      }),
+    ).toThrow(/matches id/i);
   });
 
   it("builds a valid list fixture with expected schema and columns", () => {
@@ -208,6 +240,31 @@ describe("@afenda/metadata-ui shared runtime surface", () => {
       max: 100,
     });
     expect(stat.items[0]?.display.sparkline).toHaveLength(3);
+  });
+
+  it("preserves stat group typing when replacing items", () => {
+    const base = createStatGroup({
+      key: "metadata-ui.fixture.stat-group",
+      dataNature: "kpi",
+      items: [
+        createCompactStatItem({
+          key: "metadata-ui.fixture.metric-base",
+          label: "Base metric",
+          value: 10,
+        }),
+      ],
+    });
+    const next = withStatItems(base, [
+      createCompactStatItem({
+        key: "metadata-ui.fixture.metric-next",
+        label: "Next metric",
+        value: 20,
+      }),
+    ]);
+
+    expect(next.key).toBe("metadata-ui.fixture.stat-group");
+    expect(next.items).toHaveLength(1);
+    expect(next.items[0]?.key).toBe("metadata-ui.fixture.metric-next");
   });
 
   it("rejects uncontrolled stat display metadata", () => {
@@ -549,6 +606,136 @@ describe("@afenda/metadata-ui shared runtime surface", () => {
     );
   });
 
+  it("builds action bars through deterministic primitive-safe presets", () => {
+    const toolbar = createToolbarActionBar({
+      key: "metadata-ui.fixture.actions",
+      actions: [
+        {
+          key: "open",
+          label: "Open",
+          priority: "primary",
+          placement: "main",
+        },
+        {
+          key: "audit",
+          label: "Audit",
+          placement: "overflow",
+        },
+        {
+          key: "export",
+          label: "Export",
+          placement: "overflow",
+        },
+      ],
+    });
+    const split = createSplitActionBar({
+      key: "metadata-ui.fixture.split-actions",
+      actions: [
+        {
+          key: "approve",
+          label: "Approve",
+          placement: "main",
+        },
+        {
+          key: "more",
+          label: "More",
+          placement: "overflow",
+        },
+      ],
+    });
+    const overflow = createOverflowActionBar({
+      key: "metadata-ui.fixture.overflow-actions",
+      actions: [
+        {
+          key: "inspect",
+          label: "Inspect",
+          placement: "main",
+        },
+      ],
+    });
+
+    expect(toolbar).toMatchObject({
+      layout: "toolbar",
+      alignment: "end",
+      overflow: {
+        enabled: true,
+        collapseAfter: 3,
+      },
+    });
+    expect(split).toMatchObject({
+      layout: "split",
+      alignment: "between",
+      overflow: {
+        enabled: true,
+        collapseAfter: 2,
+      },
+    });
+    expect(overflow.layout).toBe("overflow");
+    expect(overflow.actions.every((action) => action.placement === "overflow")).toBe(
+      true,
+    );
+  });
+
+  it("rejects action bar metadata that would drift overflow composition", () => {
+    expect(() =>
+      createToolbarActionBar({
+        key: "metadata-ui.fixture.duplicate-actions",
+        actions: [
+          {
+            key: "open",
+            label: "Open",
+          },
+          {
+            key: "open",
+            label: "Open duplicate",
+          },
+        ],
+      }),
+    ).toThrow(/unique keys/i);
+
+    expect(() =>
+      withActionBarOverflow(
+        createToolbarActionBar({
+          key: "metadata-ui.fixture.disabled-overflow",
+          actions: [
+            {
+              key: "open",
+              label: "Open",
+            },
+            {
+              key: "audit",
+              label: "Audit",
+              placement: "overflow",
+            },
+          ],
+        }),
+        {
+          enabled: false,
+          triggerLabel: "More actions",
+        },
+      ),
+    ).toThrow(/overflow placement/i);
+
+    expect(() =>
+      appendActionBarAction(
+        createOverflowActionBar({
+          key: "metadata-ui.fixture.overflow-only",
+          actions: [
+            {
+              key: "inspect",
+              label: "Inspect",
+            },
+          ],
+        }),
+        {
+          key: "pin",
+          label: "Pinned",
+          placement: "main",
+        },
+      ),
+    ).toThrow(/must place all items in overflow/i);
+  });
+
   it("keeps hidden, disabled, confirmation, and pending action states explicit", () => {
     const hiddenAction = parseMetadataUiActionContract({
       ...BASE_SERVER_ACTION,
@@ -606,6 +793,19 @@ describe("@afenda/metadata-ui shared runtime surface", () => {
         visibility: "disabled",
       }),
     ).toThrow(/disabled actions must provide/i);
+
+    expect(() =>
+      parseMetadataUiActionContract({
+        ...BASE_SERVER_ACTION,
+        id: "metadata-ui.test.hidden.confirmation",
+        visibility: "hidden",
+        confirmation: {
+          title: "Hidden action",
+          confirmLabel: "Confirm",
+          cancelLabel: "Cancel",
+        },
+      }),
+    ).toThrow(/must not declare confirmation metadata/i);
     expect(() =>
       parseMetadataUiActionContract({
         ...BASE_SERVER_ACTION,

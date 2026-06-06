@@ -31,7 +31,7 @@ const METADATA_UI_RUNTIME_DOORS_BY_RUNTIME = {
   shared: ["index", "client", "server"],
   server: ["server"],
   client: ["client"],
-  action: ["server"],
+  action: ["index", "server"],
 } as const satisfies Record<MetadataUiRuntime, readonly MetadataUiRuntimeDoor[]>;
 
 export function inferMetadataUiRuntimeFromFileName(
@@ -95,10 +95,7 @@ export function assertMetadataUiRuntimeModuleBoundary(
   const expectedDirective =
     METADATA_UI_RUNTIME_DIRECTIVE_BY_RUNTIME[module.runtime];
 
-  if (
-    module.runtime !== "server" &&
-    module.directive !== expectedDirective
-  ) {
+  if (module.directive !== expectedDirective) {
     throw new MetadataUiRuntimeError(
       "metadata-ui.runtime.boundary",
       `Metadata UI ${module.runtime} module "${module.id}" has invalid runtime directive.`,

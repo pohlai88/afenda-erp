@@ -5,6 +5,12 @@ import {
   type ActionResult,
 } from "@afenda/governed-surface/schemas";
 import {
+  banNeonAuthAdminUser,
+  createNeonAuthAdminUser,
+  impersonateNeonAuthAdminUser,
+  revokeNeonAuthAdminUserSessions,
+} from "@afenda/auth/server";
+import {
   getTenantMembershipById,
   resendOrganizationInvitation,
   revokeOrganizationInvitation,
@@ -26,8 +32,10 @@ import { inspectSystemAdminUserAccess } from "./sys-users-access.query.server";
 import { requireSystemAdminUsersManage, requireSystemAdminUsersRead } from "./sys-users.policy.server";
 import {
   systemAdminCancelInvitationInputSchema,
+  systemAdminCreateNeonAuthUserInputSchema,
   systemAdminInspectUserAccessInputSchema,
   systemAdminInviteUserInputSchema,
+  systemAdminNeonAuthIdentityInputSchema,
   systemAdminResendInvitationInputSchema,
   systemAdminUserStatusInputSchema,
 } from "./sys-users.schema";
@@ -342,6 +350,222 @@ export async function inspectSystemAdminUserAccessAction(
   } catch (error) {
     return systemAdminActionFailure(
       error instanceof Error ? error.message : "Access inspection failed.",
+    );
+  }
+}
+
+async function getSystemAdminNeonAuthIdentityTarget(input: {
+  membershipId: string;
+  operation: "ban" | "revoke_sessions" | "impersonate";
+}) {
+  const { context, organization, session } = await requireSystemAdminUsersManage();
+  const parsed = systemAdminNeonAuthIdentityInputSchema.safeParse({
+    membershipId: input.membershipId,
+  });
+
+  if (!parsed.success) {
+    return { ok: false as const, result: zodActionFailure(parsed.error) };
+  }
+
+  const membership = await getTenantMembershipById({
+    organizationId: organization.id,
+    membershipId: parsed.data.membershipId,
+  });
+
+  if (!membership) {
+    return {
+      ok: false as const,
+      result: systemAdminActionFailure("Organization membership was not found."),
+    };
+  }
+
+  if (!membership.authUserId) {
+    return {
+      ok: false as const,
+      result: systemAdminActionFailure(
+        "This membership is not linked to a Neon Auth user.",
+      ),
+    };
+  }
+
+  if (membership.authUserId === session.id) {
+    return {
+      ok: false as const,
+      result: systemAdminActionFailure(
+        "You cannot run Neon Auth identity admin actions against your own session.",
+        undefined,
+        `system-admin.users.neon.${input.operation}.self`,
+      ),
+    };
+  }
+
+  return {
+    ok: true as const,
+    context,
+    organization,
+    membership,
+    authUserId: membership.authUserId,
+  };
+}
+
+async function writeNeonIdentityAuditEvent(input: {
+  organizationId: string;
+  actorId: string;
+  actorType: "user" | "system" | "agent";
+  action: string;
+  targetAuthUserId: string;
+  membershipId: string;
+}) {
+  await writeExecutionAuditEvent({
+    organizationId: input.organizationId,
+    actorId: input.actorId,
+    actorType: input.actorType,
+    action: input.action,
+    targetType: "neon_auth_user",
+    targetId: input.targetAuthUserId,
+    metadata: {
+      membershipId: input.membershipId,
+      identityPlane: "neon-auth",
+    },
+  });
+}
+
+export async function createSystemAdminNeonAuthUser(
+  _previous: SystemAdminActionResult<unknown> | undefined,
+  formData: FormData,
+): Promise<SystemAdminActionResult<unknown>> {
+  const { context, organization } = await requireSystemAdminUsersManage();
+  const parsed = systemAdminCreateNeonAuthUserInputSchema.safeParse({
+    email: formData.get("email"),
+    name: formData.get("name") || undefined,
+    password: formData.get("password") || undefined,
+    role: formData.get("role") || undefined,
+  });
+
+  if (!parsed.success) {
+    return zodActionFailure(parsed.error);
+  }
+
+  try {
+    const result = await createNeonAuthAdminUser(parsed.data);
+
+    await writeExecutionAuditEvent({
+      organizationId: organization.id,
+      actorId: context.userId,
+      actorType: context.actorType,
+      action: "system-admin.neon-auth.user.create",
+      targetType: "neon_auth_user",
+      targetId: parsed.data.email,
+      metadata: {
+        email: parsed.data.email,
+        role: parsed.data.role ?? null,
+        identityPlane: "neon-auth",
+      },
+    });
+
+    revalidateSystemAdminUsers();
+    return systemAdminActionSuccess(result);
+  } catch (error) {
+    return systemAdminActionFailure(
+      error instanceof Error ? error.message : "Neon Auth user create failed.",
+    );
+  }
+}
+
+export async function banSystemAdminNeonAuthUser(membershipId: string) {
+  const target = await getSystemAdminNeonAuthIdentityTarget({
+    membershipId,
+    operation: "ban",
+  });
+
+  if (!target.ok) return target.result;
+
+  try {
+    const result = await banNeonAuthAdminUser({
+      userId: target.authUserId,
+      banReason: "Suspended from Afenda system-admin.",
+    });
+
+    await writeNeonIdentityAuditEvent({
+      organizationId: target.organization.id,
+      actorId: target.context.userId,
+      actorType: target.context.actorType,
+      action: "system-admin.neon-auth.user.ban",
+      targetAuthUserId: target.authUserId,
+      membershipId,
+    });
+
+    revalidateSystemAdminUsers();
+    return systemAdminActionSuccess(result);
+  } catch (error) {
+    return systemAdminActionFailure(
+      error instanceof Error ? error.message : "Neon Auth user ban failed.",
+    );
+  }
+}
+
+export async function revokeSystemAdminNeonAuthUserSessions(membershipId: string) {
+  const target = await getSystemAdminNeonAuthIdentityTarget({
+    membershipId,
+    operation: "revoke_sessions",
+  });
+
+  if (!target.ok) return target.result;
+
+  try {
+    const result = await revokeNeonAuthAdminUserSessions({
+      userId: target.authUserId,
+    });
+
+    await writeNeonIdentityAuditEvent({
+      organizationId: target.organization.id,
+      actorId: target.context.userId,
+      actorType: target.context.actorType,
+      action: "system-admin.neon-auth.sessions.revoke",
+      targetAuthUserId: target.authUserId,
+      membershipId,
+    });
+
+    revalidateSystemAdminUsers();
+    return systemAdminActionSuccess(result);
+  } catch (error) {
+    return systemAdminActionFailure(
+      error instanceof Error
+        ? error.message
+        : "Neon Auth session revocation failed.",
+    );
+  }
+}
+
+export async function impersonateSystemAdminNeonAuthUser(membershipId: string) {
+  const target = await getSystemAdminNeonAuthIdentityTarget({
+    membershipId,
+    operation: "impersonate",
+  });
+
+  if (!target.ok) return target.result;
+
+  try {
+    const result = await impersonateNeonAuthAdminUser({
+      userId: target.authUserId,
+    });
+
+    await writeNeonIdentityAuditEvent({
+      organizationId: target.organization.id,
+      actorId: target.context.userId,
+      actorType: target.context.actorType,
+      action: "system-admin.neon-auth.user.impersonate",
+      targetAuthUserId: target.authUserId,
+      membershipId,
+    });
+
+    revalidateSystemAdminUsers();
+    return systemAdminActionSuccess(result);
+  } catch (error) {
+    return systemAdminActionFailure(
+      error instanceof Error
+        ? error.message
+        : "Neon Auth impersonation failed.",
     );
   }
 }

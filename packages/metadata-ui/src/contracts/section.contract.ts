@@ -46,6 +46,22 @@ const METADATA_UI_SECTION_COMPOSITION_VALUES = [
   "nested",
 ] as const;
 
+const METADATA_UI_SECTION_ID_BY_KIND = {
+  list: "metadata-ui.section.list",
+  stat: "metadata-ui.section.stat",
+  chart: "metadata-ui.section.chart",
+  "action-bar": "metadata-ui.section.action-bar",
+  form: "metadata-ui.section.form",
+  "multi-step-form": "metadata-ui.section.multi-step-form",
+  "scorecard-form": "metadata-ui.section.scorecard-form",
+  kanban: "metadata-ui.section.kanban",
+  "audit-panel": "metadata-ui.section.audit-panel",
+  "approval-timeline": "metadata-ui.section.approval-timeline",
+  "detail-tabs": "metadata-ui.section.detail-tabs",
+  "page-header": "metadata-ui.section.page-header",
+  custom: "metadata-ui.section.custom",
+} as const satisfies Record<MetadataUiSectionKind, string>;
+
 const METADATA_UI_SECTION_DEFAULT_PRESENTATION = {
   chrome: {
     surface: "section",
@@ -84,6 +100,7 @@ export const metadataUiSectionCompositionSchema = z.enum(
 
 export const metadataUiSectionIdSchema = z
   .string()
+  .trim()
   .min(1)
   .max(120)
   .regex(
@@ -97,9 +114,9 @@ export const metadataUiSectionContractSchema = z
 
     kind: metadataUiSectionKindSchema,
 
-    title: z.string().min(1).max(120),
+    title: z.string().trim().min(1).max(120),
 
-    description: z.string().max(500).optional(),
+    description: z.string().trim().min(1).max(500).optional(),
 
     runtime: metadataUiRuntimeSchema.default("server"),
 
@@ -107,9 +124,9 @@ export const metadataUiSectionContractSchema = z
 
     composition: metadataUiSectionCompositionSchema.default("standalone"),
 
-    schemaId: z.string().min(1).max(160),
+    schemaId: z.string().trim().min(1).max(160),
 
-    rendererId: z.string().min(1).max(160),
+    rendererId: z.string().trim().min(1).max(160),
 
     presentation: metadataUiPresentationContractSchema.default(
       METADATA_UI_SECTION_DEFAULT_PRESENTATION,
@@ -123,6 +140,7 @@ export const metadataUiSectionContractSchema = z
 
     metadata: z.record(z.string(), z.unknown()).default({}),
   })
+  .strict()
   .superRefine((section, ctx) => {
     if (section.runtime !== "server") {
       ctx.addIssue({
@@ -154,6 +172,44 @@ export const metadataUiSectionContractSchema = z
         path: ["actions"],
         message:
           "Page-header sections should not directly own actions.",
+      });
+    }
+
+    const expectedSchemaId = `metadata-ui.schema.${section.kind}`;
+    if (section.schemaId !== expectedSchemaId) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["schemaId"],
+        message: `Section schemaId must be ${expectedSchemaId}.`,
+      });
+    }
+
+    const expectedRendererId = `metadata-ui.renderer.${section.kind}`;
+    if (section.rendererId !== expectedRendererId) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["rendererId"],
+        message: `Section rendererId must be ${expectedRendererId}.`,
+      });
+    }
+
+    if (
+      section.presentation.visibility.showChrome === false &&
+      section.presentation.visibility.showDivider === true
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["presentation", "visibility", "showDivider"],
+        message: "Sections without chrome must not render a divider.",
+      });
+    }
+
+    const expectedSectionId = METADATA_UI_SECTION_ID_BY_KIND[section.kind];
+    if (section.id !== expectedSectionId) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["id"],
+        message: `Section id must be ${expectedSectionId}.`,
       });
     }
   });
@@ -202,13 +258,17 @@ export type MetadataUiSectionIdFor<
 > = `${Lowercase<Namespace>}.${Lowercase<Name>}` &
   MetadataUiBrandedSectionId;
 
+export type MetadataUiSectionIdForKind<
+  Kind extends MetadataUiSectionKind,
+> = (typeof METADATA_UI_SECTION_ID_BY_KIND)[Kind] & MetadataUiBrandedSectionId;
+
 export type MetadataUiSectionSchemaIdFor<
   Kind extends MetadataUiSectionKind,
-> = `${Kind}.schema` & MetadataUiSectionSchemaId;
+> = `metadata-ui.schema.${Kind}` & MetadataUiSectionSchemaId;
 
 export type MetadataUiSectionRendererIdFor<
   Kind extends MetadataUiSectionKind,
-> = `${Kind}.renderer` & MetadataUiSectionRendererId;
+> = `metadata-ui.renderer.${Kind}` & MetadataUiSectionRendererId;
 
 export type MetadataUiNonEmptySectionChildren = [
   MetadataUiBrandedSectionId,
@@ -267,7 +327,7 @@ export type MetadataUiSectionContractForKind<
   MetadataUiSectionActionsState<Kind> &
   MetadataUiSectionCompositionState &
   MetadataUiSectionLifecycleState & {
-    id: MetadataUiBrandedSectionId;
+    id: MetadataUiSectionIdForKind<Kind>;
     kind: Kind;
     runtime: "server";
     schemaId: MetadataUiSectionSchemaId;
@@ -312,6 +372,28 @@ function assertMetadataUiSectionContractInvariants(
   if (section.kind === "page-header" && section.actions.length > 0) {
     throw new Error("Page-header sections should not directly own actions.");
   }
+
+  const expectedSchemaId = `metadata-ui.schema.${section.kind}`;
+  if (section.schemaId !== expectedSchemaId) {
+    throw new Error(`Section schemaId must be ${expectedSchemaId}.`);
+  }
+
+  const expectedRendererId = `metadata-ui.renderer.${section.kind}`;
+  if (section.rendererId !== expectedRendererId) {
+    throw new Error(`Section rendererId must be ${expectedRendererId}.`);
+  }
+
+  if (
+    section.presentation.visibility.showChrome === false &&
+    section.presentation.visibility.showDivider === true
+  ) {
+    throw new Error("Sections without chrome must not render a divider.");
+  }
+
+  const expectedSectionId = METADATA_UI_SECTION_ID_BY_KIND[section.kind];
+  if (section.id !== expectedSectionId) {
+    throw new Error(`Section id must be ${expectedSectionId}.`);
+  }
 }
 
 export function parseMetadataUiSectionContract(
@@ -334,4 +416,41 @@ export function safeParseMetadataUiSectionContract(
     };
   }
   return result;
+}
+
+export function getMetadataUiSectionIdForKind(
+  kind: MetadataUiSectionKind,
+): MetadataUiSectionIdForKind<typeof kind> {
+  return METADATA_UI_SECTION_ID_BY_KIND[kind] as MetadataUiSectionIdForKind<
+    typeof kind
+  >;
+}
+
+export function resolveMetadataUiSectionInstanceKey(
+  section: Pick<MetadataUiSectionContractSchemaOutput, "id" | "metadata">,
+): string {
+  const metadata = section.metadata;
+
+  if (metadata && typeof metadata === "object" && !Array.isArray(metadata)) {
+    const diagnostics = (
+      metadata as {
+        diagnostics?: {
+          sectionKey?: unknown;
+        };
+      }
+    ).diagnostics;
+    const diagnosticSectionKey = diagnostics?.sectionKey;
+
+    if (typeof diagnosticSectionKey === "string" && diagnosticSectionKey.trim()) {
+      return diagnosticSectionKey.trim();
+    }
+
+    const metadataKey = (metadata as { key?: unknown }).key;
+
+    if (typeof metadataKey === "string" && metadataKey.trim()) {
+      return metadataKey.trim();
+    }
+  }
+
+  return section.id;
 }

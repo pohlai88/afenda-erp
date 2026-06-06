@@ -7,6 +7,10 @@ export const METADATA_UI_PLAYGROUND_FIXTURE_IDS = {
   stack: "metadata-ui.playground.stack",
   pageHeaderSection: "metadata-ui.playground.page-header",
   pageHeaderMetadata: "metadata-ui.playground.header",
+  pageHeaderShowcaseSection:
+    "metadata-ui.playground.page-header.showcase",
+  pageHeaderShowcaseMetadata:
+    "metadata-ui.playground.page-header.showcase.metadata",
   rendererGalleryHeaderSection:
     "metadata-ui.playground.group.renderer-gallery",
   rendererGalleryHeaderMetadata:

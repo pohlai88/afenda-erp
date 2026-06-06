@@ -1,6 +1,9 @@
 import "server-only";
 
+import type { ReactNode } from "react";
 import { MetadataUiPrimitiveActionButton } from "../../primitives/action-button.server";
+import { MetadataUiPrimitiveDescriptionList } from "../../primitives/description-list.server";
+import { MetadataUiPrimitiveListWindow } from "../../primitives/list-window.server";
 import {
   MetadataUiPrimitiveTable,
   type MetadataUiPrimitiveTableRow,
@@ -58,36 +61,142 @@ export function MetadataUiListRenderer({
   const list = parseMetadataUiList(metadata);
   const tableModel = createMetadataUiTableClientModel(list, rows);
   const visibleColumns = tableModel.columns.filter((column) => !column.hidden);
+  const summary = (
+    <MetadataUiPrimitiveDescriptionList
+      title="Window summary"
+      description="Contract-backed metadata for the current governed list window."
+      columns={3}
+      items={[
+        {
+          key: "selection",
+          label: "Selection",
+          value: list.selectionMode,
+        },
+        {
+          key: "density",
+          label: "Density",
+          value: list.density,
+        },
+        {
+          key: "rows",
+          label: "Rows",
+          value: tableModel.serverWindow.rowCount,
+          copyValue: tableModel.serverWindow.caption,
+        },
+        {
+          key: "columns",
+          label: "Columns",
+          value: visibleColumns.length,
+        },
+        {
+          key: "toolbar",
+          label: "Toolbar",
+          value: list.toolbar.enabled ? "Enabled" : "Disabled",
+        },
+        {
+          key: "virtualization",
+          label: "Virtualization",
+          value: list.virtualization.enabled ? "Enabled" : "Disabled",
+        },
+      ]}
+    />
+  );
 
   if (rows.length === 0) {
     return (
-      <MetadataUiEmptyState
-        title="No records"
-        description="No rows are available for this list window."
+      <MetadataUiListWindowShell
+        title={list.title}
+        description={list.description}
+        content={
+          <div
+            className="grid gap-surface-sm"
+            data-metadata-ui-list-key={list.key}
+            data-metadata-ui-list-row-count={tableModel.serverWindow.rowCount}
+            data-metadata-ui-list-selection-mode={list.selectionMode}
+            data-metadata-ui-list-toolbar-enabled={list.toolbar.enabled}
+            data-metadata-ui-list-virtualization-enabled={list.virtualization.enabled}
+          >
+            {summary}
+            <MetadataUiEmptyState
+              title="No records"
+              description="No rows are available for this list window."
+            />
+          </div>
+        }
       />
     );
   }
 
   if (shouldRenderMetadataUiClientTable(tableModel)) {
     return (
-      <MetadataUiClientListTable
-        key={`${tableModel.listKey}:${tableModel.serverWindow.rowCount}:${tableModel.rows.map((row) => row.id).join("|")}`}
-        model={tableModel}
+      <MetadataUiListWindowShell
+        title={list.title}
+        description={list.description}
+        content={
+          <div
+            className="grid gap-surface-sm"
+            data-metadata-ui-list-key={list.key}
+            data-metadata-ui-list-row-count={tableModel.serverWindow.rowCount}
+            data-metadata-ui-list-selection-mode={list.selectionMode}
+            data-metadata-ui-list-toolbar-enabled={list.toolbar.enabled}
+            data-metadata-ui-list-virtualization-enabled={list.virtualization.enabled}
+          >
+            {summary}
+            <MetadataUiClientListTable
+              key={`${tableModel.listKey}:${tableModel.serverWindow.rowCount}:${tableModel.rows.map((row) => row.id).join("|")}`}
+              model={tableModel}
+            />
+          </div>
+        }
       />
     );
   }
 
   return (
-    <MetadataUiPrimitiveTable
-      columns={visibleColumns.map((column) => ({
-        key: column.key,
-        label: column.label,
-        align: column.align,
-        width: column.width,
-      }))}
-      rows={resolveMetadataUiListRows(list, tableModel)}
-      density={list.density}
-      caption={tableModel.serverWindow.caption}
+    <MetadataUiListWindowShell
+      title={list.title}
+      description={list.description}
+      content={
+        <div
+          className="grid gap-surface-sm"
+          data-metadata-ui-list-key={list.key}
+          data-metadata-ui-list-row-count={tableModel.serverWindow.rowCount}
+          data-metadata-ui-list-selection-mode={list.selectionMode}
+          data-metadata-ui-list-toolbar-enabled={list.toolbar.enabled}
+          data-metadata-ui-list-virtualization-enabled={list.virtualization.enabled}
+        >
+          {summary}
+          <MetadataUiPrimitiveTable
+            columns={visibleColumns.map((column) => ({
+              key: column.key,
+              label: column.label,
+              align: column.align,
+              width: column.width,
+            }))}
+            rows={resolveMetadataUiListRows(list, tableModel)}
+            density={list.density}
+            caption={tableModel.serverWindow.caption}
+          />
+        </div>
+      }
+    />
+  );
+}
+
+function MetadataUiListWindowShell({
+  title,
+  description,
+  content,
+}: Readonly<{
+  title?: ReactNode;
+  description?: ReactNode;
+  content: ReactNode;
+}>) {
+  return (
+    <MetadataUiPrimitiveListWindow
+      title={title}
+      description={description}
+      content={content}
     />
   );
 }

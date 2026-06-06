@@ -145,7 +145,7 @@ test.describe("Afenda ERP dev auth flow", () => {
     skipWhenNeonAuthEnabled();
   });
 
-  test("loads a protected route after floating dev sign-in @dev-auth-flow", async ({
+  test("completes onboarding after floating dev sign-in @dev-auth-flow", async ({
     page,
   }) => {
     test.setTimeout(75_000);
@@ -161,15 +161,34 @@ test.describe("Afenda ERP dev auth flow", () => {
 
     await initialDevPanel.getByText("Developer sign-in").click();
     await Promise.all([
-      page.waitForURL(/\/dashboard/, {
+      page.waitForURL(/\/onboarding(?:\?|$)/, {
         timeout: 60_000,
         waitUntil: "domcontentloaded",
       }),
       initialDevPanel.getByRole("button", { name: "Continue here" }).click(),
     ]);
-    await gotoApp(page, "/finance");
+
     await expect(
-      page.getByRole("heading", { level: 1, name: "Finance" }),
+      page.getByRole("heading", {
+        name: "Create the first tenant workspace",
+      }).first(),
+    ).toBeVisible();
+
+    const organizationName = "Afenda E2E Workspace";
+    await page.getByTestId("onboarding-organization-name").fill(organizationName);
+    await Promise.all([
+      page.waitForURL(/\/dashboard(?:\?|$)/, {
+        timeout: 60_000,
+        waitUntil: "domcontentloaded",
+      }),
+      page.getByRole("button", { name: "Create workspace" }).click(),
+    ]);
+
+    await expect(
+      page.getByRole("heading", {
+        level: 2,
+        name: "Production hardening",
+      }),
     ).toBeVisible();
   });
 });

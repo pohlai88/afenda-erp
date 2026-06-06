@@ -33,6 +33,7 @@ import {
   type MetadataUiListSortInput,
   type MetadataUiListToolbar,
   type MetadataUiListToolbarInput,
+  type MetadataUiListTrailingCellInput,
 } from "../schemas/list.schema";
 
 type MetadataUiListSystemFields = "schemaId" | "schemaVersion" | "stability";
@@ -121,10 +122,135 @@ export type MetadataUiListSafeCreateResult<
       error: z.ZodError;
     };
 
+function normalizeMetadataUiListColumnInput(
+  input: MetadataUiListColumnInput,
+): MetadataUiListColumnInput {
+  return {
+    ...input,
+    key: input.key.trim(),
+    label: input.label.trim(),
+    description: input.description?.trim(),
+    field: input.field.trim(),
+  };
+}
+
+function normalizeMetadataUiListFilterInput(
+  input: MetadataUiListFilterInput,
+): MetadataUiListFilterInput {
+  return {
+    ...input,
+    key: input.key.trim(),
+    label: input.label.trim(),
+    field: input.field.trim(),
+  };
+}
+
+function normalizeMetadataUiListSortInput(
+  input: MetadataUiListSortInput,
+): MetadataUiListSortInput {
+  return {
+    ...input,
+    field: input.field.trim(),
+  };
+}
+
+function normalizeMetadataUiListRowActionInput(
+  input: MetadataUiListRowActionInput,
+): MetadataUiListRowActionInput {
+  return {
+    ...input,
+    stateField: input.stateField?.trim(),
+    disabledReasonField: input.disabledReasonField?.trim(),
+  };
+}
+
+function normalizeMetadataUiListTrailingCellInput(
+  input: MetadataUiListTrailingCellInput,
+): MetadataUiListTrailingCellInput {
+  return {
+    ...input,
+    key: input.key.trim(),
+    label: input.label.trim(),
+    field: input.field?.trim(),
+    stateField: input.stateField?.trim(),
+    disabledReasonField: input.disabledReasonField?.trim(),
+    statusField: input.statusField?.trim(),
+    documentKeyField: input.documentKeyField?.trim(),
+    disabledReason: input.disabledReason?.trim(),
+  };
+}
+
+function normalizeMetadataUiListSavedViewInput(
+  input: NonNullable<MetadataUiListToolbarInput["savedViews"]>[number],
+): NonNullable<MetadataUiListToolbarInput["savedViews"]>[number] {
+  return {
+    ...input,
+    key: input.key.trim(),
+    label: input.label.trim(),
+    href: input.href?.trim(),
+  };
+}
+
+function normalizeMetadataUiListToolbarInput(
+  input: MetadataUiListToolbarInput,
+): MetadataUiListToolbarInput {
+  return {
+    ...input,
+    searchPlaceholder: input.searchPlaceholder?.trim(),
+    savedViews: (input.savedViews ?? []).map((savedView) =>
+      normalizeMetadataUiListSavedViewInput(savedView),
+    ),
+    resetLabel: input.resetLabel?.trim(),
+  };
+}
+
+function normalizeMetadataUiListInput(input: ListBuilderInput): ListBuilderInput {
+  return {
+    ...input,
+    key: input.key.trim(),
+    title: input.title?.trim(),
+    description: input.description?.trim(),
+    rowKey: input.rowKey?.trim(),
+    selectableField: input.selectableField?.trim(),
+    selectionDisabledReasonField: input.selectionDisabledReasonField?.trim(),
+    columns: input.columns.map((column) =>
+      normalizeMetadataUiListColumnInput(column),
+    ),
+    filters: (input.filters ?? []).map((filter) =>
+      normalizeMetadataUiListFilterInput(filter),
+    ),
+    defaultSort: (input.defaultSort ?? []).map((sort) =>
+      normalizeMetadataUiListSortInput(sort),
+    ),
+    rowActions: (input.rowActions ?? []).map((rowAction) =>
+      normalizeMetadataUiListRowActionInput(rowAction),
+    ),
+    trailingCells: (input.trailingCells ?? []).map((trailingCell) =>
+      normalizeMetadataUiListTrailingCellInput(trailingCell),
+    ),
+    bulkActions: input.bulkActions,
+    emptyStateKey: input.emptyStateKey?.trim(),
+    diagnostics: input.diagnostics
+      ? {
+          ...input.diagnostics,
+          componentKey: input.diagnostics.componentKey?.trim(),
+          sectionKey: input.diagnostics.sectionKey?.trim(),
+          rendererKey: input.diagnostics.rendererKey?.trim(),
+          testId: input.diagnostics.testId?.trim(),
+        }
+      : input.diagnostics,
+    toolbar: input.toolbar
+      ? normalizeMetadataUiListToolbarInput(input.toolbar)
+      : input.toolbar,
+  };
+}
+
 export function createList<const Input extends ListBuilderInput>(
   input: Input,
 ): MetadataUiListBuilderResult<Input> {
-  return parseMetadataUiList(input) as MetadataUiListBuilderResult<Input>;
+  return parseMetadataUiList(
+    normalizeMetadataUiListInput(input),
+  ) as MetadataUiListBuilderResult<Input>;
 }
 
 export function createListForSelectionMode<
@@ -171,7 +297,7 @@ export function createListColumn<const Input extends MetadataUiListColumnInput>(
   input: Input,
 ): MetadataUiListColumnBuilderResult<Input> {
   return METADATA_UI_LIST_COLUMN_SCHEMA.parse(
-    input,
+    normalizeMetadataUiListColumnInput(input),
   ) as MetadataUiListColumnBuilderResult<Input>;
 }
 
@@ -224,7 +350,7 @@ export function createListFilter<const Input extends MetadataUiListFilterInput>(
   input: Input,
 ): MetadataUiListFilterBuilderResult<Input> {
   return METADATA_UI_LIST_FILTER_SCHEMA.parse(
-    input,
+    normalizeMetadataUiListFilterInput(input),
   ) as MetadataUiListFilterBuilderResult<Input>;
 }
 
@@ -249,14 +375,16 @@ export function createContainsFilter<
 export function createListSort<const Input extends MetadataUiListSortInput>(
   input: Input,
 ): MetadataUiListSort {
-  return METADATA_UI_LIST_SORT_SCHEMA.parse(input) as MetadataUiListSort;
+  return METADATA_UI_LIST_SORT_SCHEMA.parse(
+    normalizeMetadataUiListSortInput(input),
+  ) as MetadataUiListSort;
 }
 
 export function createListRowAction<
   const Input extends MetadataUiListRowActionInput,
 >(input: Input): MetadataUiListRowActionBuilderResult<Input> {
   return METADATA_UI_LIST_ROW_ACTION_SCHEMA.parse(
-    input,
+    normalizeMetadataUiListRowActionInput(input),
   ) as MetadataUiListRowActionBuilderResult<Input>;
 }
 
@@ -271,7 +399,9 @@ export function createListBulkAction<const Input extends MetadataUiListBulkActio
 export function createListToolbar<const Input extends MetadataUiListToolbarInput>(
   input: Input,
 ): MetadataUiListToolbar {
-  return METADATA_UI_LIST_TOOLBAR_SCHEMA.parse(input);
+  return METADATA_UI_LIST_TOOLBAR_SCHEMA.parse(
+    normalizeMetadataUiListToolbarInput(input),
+  );
 }
 
 export function withListColumns(
@@ -365,7 +495,7 @@ export function safeCreateList(input: unknown): MetadataUiListSafeCreateResult {
   }
 
   return {
-    success: true,
+    success: true as const,
     data: parseMetadataUiList(result.data),
   };
 }

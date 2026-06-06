@@ -20,20 +20,22 @@ export function MetadataUiDetailTabsRenderer({
   );
 
   return (
-    <div className="grid gap-surface-sm">
-      {headerActions.length > 0 ? (
-        <div className="flex flex-wrap justify-end gap-surface-xs">
-          {headerActions.map((action) => (
-            <MetadataUiPrimitiveActionButton
-              key={action.action.id}
-              action={action.action}
-              priority="secondary"
-            />
-          ))}
-        </div>
-      ) : null}
-      <MetadataUiPrimitiveTabs detailTabs={detailTabs} />
-    </div>
+    <MetadataUiPrimitiveTabs
+      detailTabs={detailTabs}
+      trailing={
+        headerActions.length > 0 ? (
+          <div className="flex flex-wrap items-center gap-surface-xs">
+            {headerActions.map((action) => (
+              <MetadataUiPrimitiveActionButton
+                key={action.action.id}
+                action={action.action}
+                priority="secondary"
+              />
+            ))}
+          </div>
+        ) : undefined
+      }
+    />
   );
 }
 

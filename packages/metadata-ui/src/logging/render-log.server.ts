@@ -1,5 +1,3 @@
-import "server-only";
-
 import type { MetadataUiRenderableState } from "../contracts/runtime.contract";
 import type { MetadataUiSectionKind } from "../contracts/section.contract";
 import type { MetadataUiDiagnosticsIdentity } from "../identity/diagnostics.shared";
@@ -51,6 +49,14 @@ export type MetadataUiRenderLogger = Readonly<{
   child(metadata: Readonly<Record<string, unknown>>): MetadataUiRenderLogger;
 }>;
 
+function normalizeMetadataUiRenderLogIdentityPart(
+  part: string | undefined,
+): string | undefined {
+  const normalized = part?.trim();
+
+  return normalized ? normalized : undefined;
+}
+
 function inferMetadataUiRenderLogName(
   state: MetadataUiRenderableState,
 ): MetadataUiRenderLogEventName {
@@ -91,16 +97,30 @@ export function createMetadataUiRenderLogEvent(
   input: MetadataUiRenderLogInput,
 ): MetadataUiRenderLogEvent {
   const state = input.state ?? "ready";
+  const identity = input.identity
+    ? {
+        componentKey: normalizeMetadataUiRenderLogIdentityPart(
+          input.identity.componentKey,
+        ),
+        sectionKey: normalizeMetadataUiRenderLogIdentityPart(
+          input.identity.sectionKey,
+        ),
+        rendererKey: normalizeMetadataUiRenderLogIdentityPart(
+          input.identity.rendererKey,
+        ),
+        testId: normalizeMetadataUiRenderLogIdentityPart(input.identity.testId),
+      }
+    : undefined;
 
   return {
     name: input.name ?? inferMetadataUiRenderLogName(state),
     level: input.level ?? inferMetadataUiRenderLogLevel(state),
     state,
     sectionKind: input.sectionKind,
-    sectionKey: input.identity?.sectionKey,
-    rendererKey: input.identity?.rendererKey,
-    componentKey: input.identity?.componentKey,
-    testId: input.identity?.testId,
+    sectionKey: identity?.sectionKey,
+    rendererKey: identity?.rendererKey,
+    componentKey: identity?.componentKey,
+    testId: identity?.testId,
     durationMs: input.durationMs,
     diagnostics: input.diagnostics ?? [],
     metadata: input.metadata ?? {},

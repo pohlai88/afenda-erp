@@ -25,9 +25,9 @@ export const METADATA_UI_SCORECARD_FORM_SCHEMA_STABILITY: MetadataUiScorecardFor
 
 export const METADATA_UI_SCORECARD_SCORE_OPTION_SCHEMA = z
   .object({
-    value: z.string().min(1).max(80),
-    label: z.string().min(1).max(120),
-    description: z.string().min(1).max(240).optional(),
+    value: z.string().trim().min(1).max(80),
+    label: z.string().trim().min(1).max(120),
+    description: z.string().trim().min(1).max(240).optional(),
     weight: z.number().min(0).max(100).optional(),
   })
   .strict();
@@ -35,14 +35,17 @@ export const METADATA_UI_SCORECARD_SCORE_OPTION_SCHEMA = z
 export const METADATA_UI_SCORECARD_CRITERION_SCHEMA = z
   .object({
     key: METADATA_UI_FORM_KEY_SCHEMA,
-    label: z.string().min(1).max(160),
-    description: z.string().min(1).max(320).optional(),
+    label: z.string().trim().min(1).max(160),
+    description: z.string().trim().min(1).max(320).optional(),
     required: z.boolean().default(false),
     readonly: z.boolean().default(false),
-    blockedReason: z.string().min(1).max(240).optional(),
-    selectedValue: z.string().min(1).max(80).optional(),
-    reason: z.string().min(1).max(500).optional(),
-    requireReasonWhenSelected: z.array(z.string().min(1).max(80)).max(20).default([]),
+    blockedReason: z.string().trim().min(1).max(240).optional(),
+    selectedValue: z.string().trim().min(1).max(80).optional(),
+    reason: z.string().trim().min(1).max(500).optional(),
+    requireReasonWhenSelected: z
+      .array(z.string().trim().min(1).max(80))
+      .max(20)
+      .default([]),
     options: z.array(METADATA_UI_SCORECARD_SCORE_OPTION_SCHEMA).min(1).max(20),
     permission: metadataUiPermissionContractSchema.optional(),
   })
@@ -92,8 +95,8 @@ export const METADATA_UI_SCORECARD_FORM_SCHEMA = z
       .literal(METADATA_UI_SCORECARD_FORM_SCHEMA_STABILITY)
       .default(METADATA_UI_SCORECARD_FORM_SCHEMA_STABILITY),
     key: METADATA_UI_FORM_KEY_SCHEMA,
-    title: z.string().min(1).max(120).default("Scorecard"),
-    description: z.string().min(1).max(320).optional(),
+    title: z.string().trim().min(1).max(120).default("Scorecard"),
+    description: z.string().trim().min(1).max(320).optional(),
     state: METADATA_UI_FORM_STATE_SCHEMA.default("clean"),
     criteria: z.array(METADATA_UI_SCORECARD_CRITERION_SCHEMA).min(1).max(80),
     errorSummary: METADATA_UI_FORM_ERROR_SUMMARY_SCHEMA.default({
@@ -105,16 +108,19 @@ export const METADATA_UI_SCORECARD_FORM_SCHEMA = z
     permission: metadataUiPermissionContractSchema.optional(),
     diagnostics: z
       .object({
-        componentKey: z.string().min(1).max(160).optional(),
-        sectionKey: z.string().min(1).max(160).optional(),
-        rendererKey: z.string().min(1).max(160).optional(),
-        testId: z.string().min(1).max(160).optional(),
+        componentKey: z.string().trim().min(1).max(160).optional(),
+        sectionKey: z.string().trim().min(1).max(160).optional(),
+        rendererKey: z.string().trim().min(1).max(160).optional(),
+        testId: z.string().trim().min(1).max(160).optional(),
       })
       .optional(),
   })
   .strict()
   .superRefine((scorecard, ctx) => {
-    if (scorecard.state === "invalid" && scorecard.errorSummary.errors.length === 0) {
+    if (
+      scorecard.state === "invalid" &&
+      scorecard.errorSummary.errors.length === 0
+    ) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: ["errorSummary", "errors"],

@@ -7,11 +7,13 @@ export function normalizeMetadataUiIdentityPart(
     return undefined;
   }
 
-  return String(part)
+  const normalized = String(part)
     .trim()
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
+
+  return normalized.length > 0 ? normalized : undefined;
 }
 
 export function createMetadataUiTestId(

@@ -11,7 +11,6 @@ import {
   type MetadataUiStatComparisonForDirection,
   type MetadataUiStatComparisonInput,
   type MetadataUiStatDisplayInput,
-  type MetadataUiStatForLayout,
   type MetadataUiStatFormat,
   type MetadataUiStatInput,
   type MetadataUiStatItem,
@@ -33,11 +32,15 @@ export type StatBuilderInput = Omit<
 >;
 
 export type MetadataUiStatBuilderResult<Input extends StatBuilderInput> =
-  Input extends {
+  MetadataUiStat & {
+    key: Input["key"];
+  } & (Input extends {
     layout?: infer Layout extends MetadataUiStatLayout;
   }
-    ? MetadataUiStatForLayout<Layout>
-    : MetadataUiStat;
+    ? {
+        layout: Layout;
+      }
+    : object);
 
 export type MetadataUiStatItemBuilderResult<
   Input extends MetadataUiStatItemInput,
@@ -108,11 +111,11 @@ export function createStat<const Input extends StatBuilderInput>(
 
 export function createStatGroup<const Input extends MetadataUiStatGroupInput>(
   input: Input,
-): MetadataUiStatForLayout<"grid"> {
+): MetadataUiStatBuilderResult<Input & { layout: "grid" }> {
   return createStat({
     ...input,
     layout: "grid",
-  });
+  }) as MetadataUiStatBuilderResult<Input & { layout: "grid" }>;
 }
 
 export function createStatItem<const Input extends MetadataUiStatItemInput>(
@@ -197,44 +200,50 @@ export function createStatThreshold<
   ) as MetadataUiStatThresholdBuilderResult<Input>;
 }
 
-export function withStatItems(
-  stat: MetadataUiStatInput,
+export function withStatItems<const Input extends StatBuilderInput>(
+  stat: Input,
   items: MetadataUiStatItemInput[],
-): MetadataUiStat {
+): MetadataUiStatBuilderResult<Input> {
   return createStat({
     ...stat,
     items,
-  });
+  }) as MetadataUiStatBuilderResult<Input>;
 }
 
-export function withStatComparison(
-  item: MetadataUiStatItemInput,
+export function withStatComparison<
+  const Input extends MetadataUiStatItemInput,
+>(
+  item: Input,
   comparison: MetadataUiStatComparisonInput,
-): MetadataUiStatItem {
+): MetadataUiStatItemBuilderResult<Input> {
   return createStatItem({
     ...item,
     comparison,
-  });
+  }) as MetadataUiStatItemBuilderResult<Input>;
 }
 
-export function withStatThresholds(
-  item: MetadataUiStatItemInput,
+export function withStatThresholds<
+  const Input extends MetadataUiStatItemInput,
+>(
+  item: Input,
   thresholds: MetadataUiStatThresholdInput[],
-): MetadataUiStatItem {
+): MetadataUiStatItemBuilderResult<Input> {
   return createStatItem({
     ...item,
     thresholds,
-  });
+  }) as MetadataUiStatItemBuilderResult<Input>;
 }
 
-export function withStatDisplay(
-  item: MetadataUiStatItemInput,
+export function withStatDisplay<
+  const Input extends MetadataUiStatItemInput,
+>(
+  item: Input,
   display: MetadataUiStatDisplayInput,
-): MetadataUiStatItem {
+): MetadataUiStatItemBuilderResult<Input> {
   return createStatItem({
     ...item,
     display,
-  });
+  }) as MetadataUiStatItemBuilderResult<Input>;
 }
 
 export function safeCreateStat(

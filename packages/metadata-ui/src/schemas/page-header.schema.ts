@@ -44,6 +44,7 @@ const METADATA_UI_PAGE_HEADER_ACTION_PLACEMENT_VALUES = [
 
 export const METADATA_UI_PAGE_HEADER_KEY_SCHEMA = z
   .string()
+  .trim()
   .min(1)
   .max(160)
   .regex(
@@ -57,14 +58,14 @@ export const METADATA_UI_PAGE_HEADER_LEVEL_SCHEMA = z.enum(
 
 export const METADATA_UI_PAGE_HEADER_BREADCRUMB_SCHEMA = z.object({
   key: METADATA_UI_PAGE_HEADER_KEY_SCHEMA,
-  label: z.string().min(1).max(120),
+  label: z.string().trim().min(1).max(120),
   href: metadataUiSafeNavigationHrefSchema.max(300).optional(),
   current: z.boolean().default(false),
 });
 
 export const METADATA_UI_PAGE_HEADER_BADGE_SCHEMA = z.object({
   key: METADATA_UI_PAGE_HEADER_KEY_SCHEMA,
-  label: z.string().min(1).max(80),
+  label: z.string().trim().min(1).max(80),
   tone: z
     .enum(METADATA_UI_PAGE_HEADER_BADGE_TONE_VALUES)
     .default("neutral"),
@@ -95,9 +96,9 @@ export const METADATA_UI_PAGE_HEADER_SCHEMA = z.object({
 
   level: METADATA_UI_PAGE_HEADER_LEVEL_SCHEMA.default("surface"),
 
-  eyebrow: z.string().min(1).max(80).optional(),
-  title: z.string().min(1).max(160),
-  description: z.string().min(1).max(360).optional(),
+  eyebrow: z.string().trim().min(1).max(80).optional(),
+  title: z.string().trim().min(1).max(160),
+  description: z.string().trim().min(1).max(360).optional(),
 
   breadcrumbs: z
     .array(METADATA_UI_PAGE_HEADER_BREADCRUMB_SCHEMA)
@@ -113,10 +114,10 @@ export const METADATA_UI_PAGE_HEADER_SCHEMA = z.object({
 
   diagnostics: z
     .object({
-      componentKey: z.string().min(1).max(160).optional(),
-      sectionKey: z.string().min(1).max(160).optional(),
-      rendererKey: z.string().min(1).max(160).optional(),
-      testId: z.string().min(1).max(160).optional(),
+      componentKey: z.string().trim().min(1).max(160).optional(),
+      sectionKey: z.string().trim().min(1).max(160).optional(),
+      rendererKey: z.string().trim().min(1).max(160).optional(),
+      testId: z.string().trim().min(1).max(160).optional(),
     })
     .optional(),
 });

@@ -4,7 +4,11 @@ import { HomepageHero } from "./pub-homepage-hero-server";
 import { SiteHeader } from "./pub-site-header-server";
 import styles from "../styles/public-homepage.module.css";
 
-export function HomepageShell({ initialSkip = false }: { initialSkip?: boolean }) {
+export function HomepageShell({
+  initialSkip = false,
+}: {
+  initialSkip?: boolean;
+}) {
   const content = homepageContentSchema.parse(homepageContent);
 
   return (

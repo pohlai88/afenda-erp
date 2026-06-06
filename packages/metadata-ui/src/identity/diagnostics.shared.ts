@@ -15,15 +15,37 @@ export type MetadataUiDiagnosticsIdentity = Readonly<{
   testId: string;
 }>;
 
+function normalizeMetadataUiIdentityTextPart(
+  part: string | undefined,
+): string | undefined {
+  const normalized = part?.trim();
+  return normalized ? normalized : undefined;
+}
+
 export function createMetadataUiDiagnosticsIdentity(
   sectionKind: MetadataUiSectionKind,
   key: string,
   diagnostics: MetadataUiDiagnosticsInput = {},
 ): MetadataUiDiagnosticsIdentity {
+  const normalizedComponentKey = normalizeMetadataUiIdentityTextPart(
+    diagnostics.componentKey,
+  );
+  const normalizedSectionKey = normalizeMetadataUiIdentityTextPart(
+    diagnostics.sectionKey,
+  );
+  const normalizedRendererKey = normalizeMetadataUiIdentityTextPart(
+    diagnostics.rendererKey,
+  );
+  const normalizedTestId = normalizeMetadataUiIdentityTextPart(diagnostics.testId);
+
   return {
-    componentKey: diagnostics.componentKey ?? `metadata-ui.section.${sectionKind}`,
-    sectionKey: diagnostics.sectionKey ?? key,
-    rendererKey: diagnostics.rendererKey ?? `metadata-ui.renderer.${sectionKind}`,
-    testId: diagnostics.testId ?? createMetadataUiTestId("metadata-ui", sectionKind, key),
+    componentKey:
+      normalizedComponentKey ?? `metadata-ui.section.${sectionKind}`,
+    sectionKey: normalizedSectionKey ?? key,
+    rendererKey:
+      normalizedRendererKey ?? `metadata-ui.renderer.${sectionKind}`,
+    testId:
+      normalizedTestId ??
+      createMetadataUiTestId("metadata-ui", sectionKind, key),
   };
 }

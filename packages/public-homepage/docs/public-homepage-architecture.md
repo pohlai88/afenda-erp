@@ -8,7 +8,7 @@ Its purpose is to communicate Afenda's core differentiation:
 
 > Afenda is not just ERP. It is an ERP where every module can be searched, reasoned over, and operated with evidence.
 
-The section positions modules as **coverage proof**, not the headline.
+The section positions modules as **coverage proof**, not the headline, and it can surface roadmap-safe breadth as long as the state is labeled honestly.
 
 The primary story is:
 
@@ -41,7 +41,7 @@ Afenda lets operators prove, decide, and act across them.
 
 ## 3. Visual Architecture
 
-The section should feel like a **command map**, not a feature grid.
+The section should feel like a **command map**, not a feature grid. The hero carries proof points, and the map itself uses stage cards, source rails, the Lynx core, and visible roadmap badges.
 
 ```txt
 ERP Modules
@@ -61,7 +61,7 @@ Modules orbit around Lynx as connected evidence sources.
 
 ## 4. Information Architecture
 
-The section contains five layers:
+The section contains six layers:
 
 ### Layer 1 — Hero Claim
 
@@ -72,6 +72,8 @@ Every ERP module.
 One evidence engine.
 One decision operator.
 ```
+
+Add proof points below the differentiation line so the hero can carry breadth without turning into a marketing wall. Use them to communicate coverage, roadmap honesty, and the operating-model angle.
 
 ### Layer 2 — Two Killer Feature Panels
 
@@ -105,7 +107,21 @@ Key bullets:
 * Records runs, feedback, and outcomes.
 * Built for governed operations, not chat novelty.
 
-### Layer 3 — Command Map
+### Layer 3 — Command Map Stages
+
+The command map should present the operating flow as named stages:
+
+```txt
+Question
+Evidence
+Lynx
+Approval
+Audit
+```
+
+Each stage should include a short detail line so the map reads as an operating pattern, not a decorative path.
+
+### Layer 4 — Command Map
 
 Visual center:
 
@@ -135,9 +151,9 @@ Integrations
 Billing
 ```
 
-### Layer 4 — Module Coverage
+### Layer 5 — Module Coverage
 
-Modules appear as proof of breadth.
+Modules appear as proof of breadth, and roadmap modules may be shown if they are labeled as roadmap rather than shipped.
 
 #### Core Operations
 
@@ -183,7 +199,7 @@ Modules appear as proof of breadth.
 * Reports / analytics
 * Dashboard
 
-### Layer 5 — Closing Proof Line
+### Layer 6 — Closing Proof Line
 
 ```txt
 Every record, document, workflow, and approval becomes part of the same operating truth.
@@ -206,6 +222,7 @@ erp-truth-section.content.ts
 erp-truth-section.schema.ts
 erp-truth-command-map.server.tsx
 erp-truth-feature-panels.server.tsx
+erp-truth-section-header.server.tsx
 erp-truth-coverage-grid.server.tsx
 erp-truth-evidence-path.server.tsx
 index.ts
@@ -229,7 +246,7 @@ It may:
 
 * Render static marketing content.
 * Show product positioning.
-* Show module coverage as roadmap-safe coverage.
+* Show module coverage as roadmap-safe coverage when clearly labeled.
 * Use visual examples of evidence and decisions.
 * Use CSS-only animation.
 
@@ -245,6 +262,8 @@ Evidence lines
 Module nodes
 Enterprise-grade restraint
 Scientific / operational tone
+Hero proof strip
+Roadmap-safe badges
 ```
 
 Avoid:

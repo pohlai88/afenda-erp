@@ -3,21 +3,18 @@ import path from "node:path";
 
 import { expect, test as setup } from "@playwright/test";
 
-import {
-  AFENDA_SESSION_COOKIE,
-  DEMO_ORG_ID,
-  DEMO_ORG_NAME,
-  DEMO_USER_EMAIL,
-  DEMO_USER_ID,
-  DEMO_USER_NAME,
-  DEV_SESSION_MAX_AGE_SECONDS,
-} from "@/auth/contracts/auth.constants.shared";
-import { userSessionSchema } from "@/auth/contracts/auth.session-contracts.shared";
-
 import { baseURL, PLAYWRIGHT_ARTIFACTS } from "./playwright.shared.cjs";
 
+const AFENDA_SESSION_COOKIE = "afenda-dev-session";
+const DEMO_USER_ID = "user_demo_owner";
+const DEMO_USER_NAME = "Demo Operator";
+const DEMO_USER_EMAIL = "demo.operator@afenda.test";
+const DEMO_ORG_ID = "org_demo";
+const DEMO_ORG_NAME = "Demo organization";
+const DEV_SESSION_MAX_AGE_SECONDS = 60 * 60 * 24 * 30;
+
 function createE2eDevSessionCookie() {
-  const session = userSessionSchema.parse({
+  const session = {
     source: "dev",
     id: DEMO_USER_ID,
     name: DEMO_USER_NAME,
@@ -34,7 +31,7 @@ function createE2eDevSessionCookie() {
         capabilities: ["dashboard.view"],
       },
     ],
-  });
+  };
 
   return Buffer.from(JSON.stringify(session), "utf8").toString("base64url");
 }

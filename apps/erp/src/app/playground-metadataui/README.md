@@ -1,11 +1,12 @@
 # Metadata UI Playground
 
-This playground is a development-only screenshot surface for governed metadata UI renderers. It is fixture-backed and deterministic so renderer reviews can compare stable screenshots without touching tenant data, auth state, feature packages, or HTTP APIs.
+This playground is a development-only screenshot atlas for governed metadata UI renderers. It is fixture-backed and deterministic so renderer reviews can compare stable screenshots without touching tenant data, auth state, feature packages, or HTTP APIs.
 
 The advanced ERP-like pattern target is documented in
 [`advanced-patterns.md`](./advanced-patterns.md). The current implementation is
-metadata-only for visible renderer content, including advanced operations,
-records, workflow, planning, analytics, table lab, and state matrix patterns.
+metadata-only for visible renderer content, including the full advanced
+operations, records, workflow, planning, analytics, table lab, and state matrix
+pattern catalog.
 
 ## Local Preview
 
@@ -20,6 +21,8 @@ Open the route directly:
 ```txt
 http://127.0.0.1:4000/playground-metadataui
 ```
+
+Use `127.0.0.1`, not `localhost`. The playground dev script binds IPv4 loopback only (`--hostname 127.0.0.1`). Opening `http://localhost:4000/...` can fail on Windows when the browser resolves `localhost` to IPv6 while nothing is listening on `[::1]:4000`, which produces a Chrome error page (`chrome-error://chromewebdata/`) and console messages such as “Unsafe attempt to load URL … from frame”.
 
 The route is available only when the development playground flag is enabled:
 
@@ -73,6 +76,8 @@ Slice 09 adds `checkMetadataUiPlaygroundImportBoundaries()` to `scripts/check-di
 - server action modules
 
 The playground may import UI/runtime packages such as `@afenda/metadata-ui/server`, `@afenda/ui`, React, and local `_fixtures/` modules. It must not become a tenant workspace route, a data access layer, or a write transport preview.
+
+**shadcn boundary:** This route never imports shadcn or `@afenda/ui` components directly for renderer content. Breadcrumb, Badge, Button, DropdownMenu, Table, Tabs, and related primitives are composed inside `packages/metadata-ui` and rendered here only through metadata fixtures and registered renderers.
 
 ## Certification
 

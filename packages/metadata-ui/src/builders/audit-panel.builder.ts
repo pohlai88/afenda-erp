@@ -92,8 +92,8 @@ export function createAuditTrailPanel<
 }> {
   return createAuditPanel({
     key: input.key,
-    title: input.title ?? "Audit trail",
-    description: input.description,
+    title: input.title?.trim() ?? "Audit trail",
+    description: input.description?.trim(),
     events: input.events ?? [],
     actions: [],
   });
@@ -168,7 +168,7 @@ export function safeCreateAuditPanel(
   }
 
   return {
-    success: true,
+    success: true as const,
     data: parseMetadataUiAuditPanel(result.data),
   };
 }

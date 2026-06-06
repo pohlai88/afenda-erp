@@ -1,3 +1,5 @@
+import { z } from "zod";
+
 import {
   METADATA_UI_SCORECARD_CRITERION_SCHEMA,
   METADATA_UI_SCORECARD_FORM_SCHEMA,
@@ -18,37 +20,68 @@ export type ScorecardFormBuilderInput = Omit<
   MetadataUiScorecardFormSystemFields
 >;
 
+export type MetadataUiScorecardFormBuilderResult<
+  Input extends ScorecardFormBuilderInput,
+> = MetadataUiScorecardForm & {
+  key: Input["key"];
+};
+
+export type MetadataUiScorecardCriterionBuilderResult<
+  Input extends MetadataUiScorecardCriterionInput,
+> = MetadataUiScorecardCriterion & {
+  key: Input["key"];
+};
+
+export type MetadataUiScorecardFormSafeCreateResult<
+  Data extends MetadataUiScorecardForm = MetadataUiScorecardForm,
+> =
+  | {
+      success: true;
+      data: Data;
+      error?: never;
+    }
+  | {
+      success: false;
+      data?: never;
+      error: z.ZodError;
+    };
+
 export function createScorecardForm<const Input extends ScorecardFormBuilderInput>(
   input: Input,
-): MetadataUiScorecardForm & { key: Input["key"] } {
-  return parseMetadataUiScorecardForm(input) as MetadataUiScorecardForm & {
-    key: Input["key"];
-  };
+): MetadataUiScorecardFormBuilderResult<Input> {
+  return parseMetadataUiScorecardForm(input) as MetadataUiScorecardFormBuilderResult<Input>;
 }
 
 export function createScorecardCriterion<
   const Input extends MetadataUiScorecardCriterionInput,
->(input: Input): MetadataUiScorecardCriterion & { key: Input["key"] } {
+>(input: Input): MetadataUiScorecardCriterionBuilderResult<Input> {
   return METADATA_UI_SCORECARD_CRITERION_SCHEMA.parse(
     input,
-  ) as MetadataUiScorecardCriterion & { key: Input["key"] };
+  ) as MetadataUiScorecardCriterionBuilderResult<Input>;
 }
 
-export function appendScorecardCriterion(
-  scorecard: MetadataUiScorecardFormInput,
+export function appendScorecardCriterion<
+  const Input extends ScorecardFormBuilderInput,
+>(
+  scorecard: Input,
   criterion: MetadataUiScorecardCriterionInput,
-): MetadataUiScorecardForm {
+): MetadataUiScorecardFormBuilderResult<Input> {
   return createScorecardForm({
     ...scorecard,
     criteria: [...scorecard.criteria, criterion],
-  });
+  }) as MetadataUiScorecardFormBuilderResult<Input>;
 }
 
-export function safeCreateScorecardForm(input: unknown) {
+export function safeCreateScorecardForm(
+  input: unknown,
+): MetadataUiScorecardFormSafeCreateResult {
   const result = METADATA_UI_SCORECARD_FORM_SCHEMA.safeParse(input);
 
   if (!result.success) {
-    return result;
+    return {
+      success: false,
+      error: result.error,
+    };
   }
 
   return {

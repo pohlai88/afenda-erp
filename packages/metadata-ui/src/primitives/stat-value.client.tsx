@@ -1,6 +1,7 @@
 "use client";
 
 import NumberFlow, { type Format, useCanAnimate } from "@number-flow/react";
+import type { ReactNode } from "react";
 
 import type {
   MetadataUiStatAnimationMode,
@@ -17,7 +18,9 @@ export type MetadataUiPrimitiveStatValueProps = Readonly<{
     currency: string;
     locale?: string;
   }>;
+  prefix?: ReactNode;
   unit?: string;
+  postfix?: ReactNode;
   className?: string;
 }>;
 
@@ -93,7 +96,9 @@ export function MetadataUiPrimitiveStatValue({
   value,
   format,
   display,
+  prefix,
   unit,
+  postfix,
   className,
 }: MetadataUiPrimitiveStatValueProps) {
   const numericValue = getMetadataUiStatNumber(value);
@@ -114,21 +119,25 @@ export function MetadataUiPrimitiveStatValue({
         data-metadata-ui-stat-value="static"
         suppressHydrationWarning
       >
+        {prefix ? <span className="mr-1">{prefix}</span> : null}
         {formatMetadataUiStatStaticValue({ value, format, display })}
         {suffix}
+        {postfix ? <span className="ml-1">{postfix}</span> : null}
       </span>
     );
   }
 
   return (
-    <NumberFlow
-      className={className}
-      data-metadata-ui-stat-value="animated"
-      value={numericValue}
-      locales={display.locale}
-      format={createMetadataUiStatNumberFormat(format, display)}
-      suffix={suffix}
-      willChange
-    />
+    <span className={className} data-metadata-ui-stat-value="animated">
+      {prefix ? <span className="mr-1">{prefix}</span> : null}
+      <NumberFlow
+        value={numericValue}
+        locales={display.locale}
+        format={createMetadataUiStatNumberFormat(format, display)}
+        suffix={suffix}
+        willChange
+      />
+      {postfix ? <span className="ml-1">{postfix}</span> : null}
+    </span>
   );
 }

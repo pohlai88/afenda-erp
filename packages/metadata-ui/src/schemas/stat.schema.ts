@@ -61,6 +61,7 @@ const METADATA_UI_STAT_DATA_NATURE_VALUES = [
 
 export const METADATA_UI_STAT_KEY_SCHEMA = z
   .string()
+  .trim()
   .min(1)
   .max(160)
   .regex(
@@ -85,7 +86,7 @@ export const METADATA_UI_STAT_TREND_DIRECTION_SCHEMA = z.enum(
 );
 
 export const METADATA_UI_STAT_COMPARISON_SCHEMA = z.object({
-  label: z.string().min(1).max(120),
+  label: z.string().trim().min(1).max(120),
 
   value: z.union([
     z.number(),
@@ -96,7 +97,7 @@ export const METADATA_UI_STAT_COMPARISON_SCHEMA = z.object({
 
   percentageChange: z.number().optional(),
 
-  explanation: z.string().min(1).max(240).optional(),
+  explanation: z.string().trim().min(1).max(240).optional(),
 });
 
 export const METADATA_UI_STAT_THRESHOLD_SCHEMA = z.object({
@@ -107,7 +108,7 @@ export const METADATA_UI_STAT_THRESHOLD_SCHEMA = z.object({
 
   tone: METADATA_UI_STAT_TONE_SCHEMA,
 
-  label: z.string().min(1).max(120).optional(),
+  label: z.string().trim().min(1).max(120).optional(),
 });
 
 export const METADATA_UI_STAT_DRILLDOWN_SCHEMA = z.object({
@@ -120,7 +121,7 @@ export const METADATA_UI_STAT_PROGRESS_SCHEMA = z
   .object({
     value: z.number().min(0),
     max: z.number().positive(),
-    label: z.string().min(1).max(120).optional(),
+    label: z.string().trim().min(1).max(120).optional(),
   })
   .strict()
   .superRefine((progress, ctx) => {
@@ -136,7 +137,7 @@ export const METADATA_UI_STAT_PROGRESS_SCHEMA = z
 export const METADATA_UI_STAT_SPARK_POINT_SCHEMA = z
   .object({
     value: z.number(),
-    label: z.string().min(1).max(120).optional(),
+    label: z.string().trim().min(1).max(120).optional(),
   })
   .strict();
 
@@ -170,16 +171,16 @@ export const METADATA_UI_STAT_DISPLAY_SCHEMA = z
 export const METADATA_UI_STAT_ITEM_SCHEMA = z.object({
   key: METADATA_UI_STAT_KEY_SCHEMA,
 
-  label: z.string().min(1).max(120),
+  label: z.string().trim().min(1).max(120),
 
-  description: z.string().min(1).max(240).optional(),
+  description: z.string().trim().min(1).max(240).optional(),
 
   value: z.union([
     z.number(),
     z.string(),
   ]),
 
-  unit: z.string().min(1).max(32).optional(),
+  unit: z.string().trim().min(1).max(32).optional(),
 
   format: METADATA_UI_STAT_FORMAT_SCHEMA.default("number"),
 
@@ -204,8 +205,8 @@ export const METADATA_UI_STAT_ITEM_SCHEMA = z.object({
 
   telemetry: z
     .object({
-      metricKey: z.string().min(1).max(160),
-      source: z.string().min(1).max(160).optional(),
+      metricKey: z.string().trim().min(1).max(160),
+      source: z.string().trim().min(1).max(160).optional(),
     })
     .optional(),
 });
@@ -233,9 +234,9 @@ export const METADATA_UI_STAT_SCHEMA = z.object({
 
   key: METADATA_UI_STAT_KEY_SCHEMA,
 
-  title: z.string().min(1).max(120).optional(),
+  title: z.string().trim().min(1).max(120).optional(),
 
-  description: z.string().min(1).max(320).optional(),
+  description: z.string().trim().min(1).max(320).optional(),
 
   layout: METADATA_UI_STAT_LAYOUT_SCHEMA.default("grid"),
 
@@ -252,10 +253,10 @@ export const METADATA_UI_STAT_SCHEMA = z.object({
 
   diagnostics: z
     .object({
-      componentKey: z.string().min(1).max(160).optional(),
-      sectionKey: z.string().min(1).max(160).optional(),
-      rendererKey: z.string().min(1).max(160).optional(),
-      testId: z.string().min(1).max(160).optional(),
+      componentKey: z.string().trim().min(1).max(160).optional(),
+      sectionKey: z.string().trim().min(1).max(160).optional(),
+      rendererKey: z.string().trim().min(1).max(160).optional(),
+      testId: z.string().trim().min(1).max(160).optional(),
     })
     .optional(),
 

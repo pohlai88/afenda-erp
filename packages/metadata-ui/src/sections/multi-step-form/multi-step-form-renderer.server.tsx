@@ -1,13 +1,16 @@
 import "server-only";
 
+import { Alert, AlertDescription, AlertTitle } from "@afenda/ui";
 import { ui } from "@afenda/ui/design-system";
 import { cn } from "@afenda/ui/utils";
 
 import { MetadataUiPrimitiveActionButton } from "../../primitives/action-button.server";
+import { MetadataUiPrimitiveDescriptionList } from "../../primitives/description-list.server";
 import {
   MetadataUiPrimitiveField,
   MetadataUiPrimitiveFieldGroup,
 } from "../../primitives/field.server";
+import { MetadataUiPrimitiveStepper } from "../../primitives/stepper.server";
 import {
   parseMetadataUiMultiStepForm,
   type MetadataUiMultiStepFormInput,
@@ -36,34 +39,74 @@ export function MetadataUiMultiStepFormRenderer({
       noValidate
       data-metadata-ui-active-step={activeStep?.key}
     >
-      <ol className="flex flex-wrap items-center gap-surface-xs">
-        {orderedSteps.map((step) => (
-          <li key={step.key}>
-            <span
-              aria-current={step.key === activeStep?.key ? "step" : undefined}
-              className={cn(ui.typography.caption, ui.color.ink.muted)}
-              data-metadata-ui-step-status={step.status}
-            >
-              {step.title}
-            </span>
-          </li>
-        ))}
-      </ol>
+      <MetadataUiPrimitiveStepper
+        steps={orderedSteps.map((step) => ({
+          key: step.key,
+          label: step.title,
+          description: step.description,
+          status: step.status,
+          meta:
+            step.key === activeStep?.key
+            ? "Current step"
+            : `${step.sections.length} section${step.sections.length === 1 ? "" : "s"}`,
+        }))}
+      />
+      <MetadataUiPrimitiveDescriptionList
+        title="Workflow metadata"
+        description="Step-level status and scope for the current flow."
+        columns={3}
+        items={[
+          {
+            key: "mode",
+            label: "Mode",
+            value: form.mode,
+          },
+          {
+            key: "state",
+            label: "State",
+            value: form.state,
+          },
+          {
+            key: "steps",
+            label: "Steps",
+            value: orderedSteps.length,
+          },
+          {
+            key: "active-step",
+            label: "Active step",
+            value: activeStep?.title ?? "None",
+          },
+          {
+            key: "sections",
+            label: "Sections",
+            value: activeStep ? activeStep.sections.length : 0,
+          },
+          {
+            key: "errors",
+            label: "Errors",
+            value: activeStep?.errorSummary.errors.length ?? 0,
+          },
+        ]}
+      />
       {activeStep ? (
         <section className={cn("grid", ui.surfaceGap.sm)}>
           {activeStep.errorSummary.errors.length > 0 ? (
-            <div
-              className="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-900"
+            <Alert
+              variant="destructive"
               aria-live="polite"
               data-metadata-ui-step-error-summary="true"
             >
-              <h3 className="font-medium">{activeStep.errorSummary.title}</h3>
-              <ul className="mt-2 list-disc pl-5">
-                {activeStep.errorSummary.errors.map((error) => (
-                  <li key={`${error.fieldKey}-${error.message}`}>{error.message}</li>
-                ))}
-              </ul>
-            </div>
+              <AlertTitle>{activeStep.errorSummary.title}</AlertTitle>
+              <AlertDescription>
+                <ul className="mt-2 list-disc pl-5">
+                  {activeStep.errorSummary.errors.map((error) => (
+                    <li key={`${error.fieldKey}-${error.message}`}>
+                      {error.message}
+                    </li>
+                  ))}
+                </ul>
+              </AlertDescription>
+            </Alert>
           ) : null}
           {activeStep.sections.map((section) => (
             <MetadataUiPrimitiveFieldGroup key={section.key} section={section}>

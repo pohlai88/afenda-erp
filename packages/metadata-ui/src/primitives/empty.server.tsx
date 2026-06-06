@@ -22,8 +22,11 @@ import type {
 
 export type MetadataUiPrimitiveEmptyStateProps = Readonly<{
   title: ReactNode;
+  eyebrow?: ReactNode;
   description?: ReactNode;
   actions?: ReactNode;
+  meta?: ReactNode;
+  footer?: ReactNode;
   icon?: ReactNode;
   kind?: MetadataUiEmptyStateKind;
   tone?: MetadataUiEmptyStateTone;
@@ -52,8 +55,11 @@ export function shouldRenderMetadataUiPrimitiveEmptyAsAlert(
 
 export function MetadataUiPrimitiveEmptyState({
   title,
+  eyebrow,
   description,
   actions,
+  meta,
+  footer,
   icon,
   kind = "empty",
   tone = "neutral",
@@ -64,27 +70,59 @@ export function MetadataUiPrimitiveEmptyState({
       <Alert
         variant={tone === "critical" ? "destructive" : "default"}
         className={cn(EMPTY_STATE_CLASS_BY_TONE[tone], className)}
+        data-metadata-ui-empty-kind={kind}
+        data-metadata-ui-empty-tone={tone}
+        data-metadata-ui-empty-alert="true"
       >
         {icon}
-        <AlertTitle>{title}</AlertTitle>
+        <div className="grid gap-1">
+          {eyebrow ? (
+            <p className={cn(ui.typography.label, ui.color.ink.muted)}>
+              {eyebrow}
+            </p>
+          ) : null}
+          <AlertTitle>{title}</AlertTitle>
+          {meta ? (
+            <p className={cn(ui.typography.caption, ui.color.ink.muted)}>
+              {meta}
+            </p>
+          ) : null}
+        </div>
         {description ? (
           <AlertDescription>{description}</AlertDescription>
         ) : null}
         {actions ? <div data-slot="metadata-ui-empty-actions">{actions}</div> : null}
+        {footer ? <div className="pt-surface-xs">{footer}</div> : null}
       </Alert>
     );
   }
 
   return (
-    <Empty className={cn(EMPTY_STATE_CLASS_BY_TONE[tone], className)}>
+    <Empty
+      className={cn(EMPTY_STATE_CLASS_BY_TONE[tone], className)}
+      data-metadata-ui-empty-kind={kind}
+      data-metadata-ui-empty-tone={tone}
+      data-metadata-ui-empty-alert="false"
+    >
       <EmptyHeader>
+        {eyebrow ? (
+          <p className={cn(ui.typography.label, ui.color.ink.muted)}>
+            {eyebrow}
+          </p>
+        ) : null}
         {icon ? <EmptyMedia variant="icon">{icon}</EmptyMedia> : null}
         <EmptyTitle>{title}</EmptyTitle>
+        {meta ? (
+          <p className={cn(ui.typography.caption, ui.color.ink.muted)}>
+            {meta}
+          </p>
+        ) : null}
         {description ? (
           <EmptyDescription>{description}</EmptyDescription>
         ) : null}
       </EmptyHeader>
       {actions ? <EmptyContent>{actions}</EmptyContent> : null}
+      {footer ? <div className="pt-surface-xs">{footer}</div> : null}
     </Empty>
   );
 }

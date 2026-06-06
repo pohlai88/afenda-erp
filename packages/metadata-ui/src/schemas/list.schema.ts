@@ -111,6 +111,7 @@ const METADATA_UI_LIST_DEFAULT_TOOLBAR = {
 
 export const METADATA_UI_LIST_KEY_SCHEMA = z
   .string()
+  .trim()
   .min(1)
   .max(160)
   .regex(
@@ -141,11 +142,11 @@ export const METADATA_UI_LIST_DENSITY_SCHEMA = z.enum(
 export const METADATA_UI_LIST_COLUMN_SCHEMA = z.object({
   key: METADATA_UI_LIST_KEY_SCHEMA,
 
-  label: z.string().min(1).max(120),
+  label: z.string().trim().min(1).max(120),
 
-  description: z.string().min(1).max(240).optional(),
+  description: z.string().trim().min(1).max(240).optional(),
 
-  field: z.string().min(1).max(160),
+  field: z.string().trim().min(1).max(160),
 
   format: METADATA_UI_LIST_COLUMN_FORMAT_SCHEMA.default("text"),
 
@@ -177,9 +178,9 @@ export const METADATA_UI_LIST_FILTER_OPERATOR_SCHEMA = z.enum(
 export const METADATA_UI_LIST_FILTER_SCHEMA = z.object({
   key: METADATA_UI_LIST_KEY_SCHEMA,
 
-  label: z.string().min(1).max(120),
+  label: z.string().trim().min(1).max(120),
 
-  field: z.string().min(1).max(160),
+  field: z.string().trim().min(1).max(160),
 
   operator: METADATA_UI_LIST_FILTER_OPERATOR_SCHEMA,
 
@@ -191,15 +192,15 @@ export const METADATA_UI_LIST_FILTER_SCHEMA = z.object({
 });
 
 export const METADATA_UI_LIST_SORT_SCHEMA = z.object({
-  field: z.string().min(1).max(160),
+  field: z.string().trim().min(1).max(160),
   direction: METADATA_UI_LIST_SORT_DIRECTION_SCHEMA.default("asc"),
 });
 
 export const METADATA_UI_LIST_ROW_ACTION_SCHEMA = z.object({
   action: metadataUiActionContractSchema,
   placement: z.enum(METADATA_UI_LIST_ROW_ACTION_PLACEMENT_VALUES).default("overflow"),
-  stateField: z.string().min(1).max(160).optional(),
-  disabledReasonField: z.string().min(1).max(160).optional(),
+  stateField: z.string().trim().min(1).max(160).optional(),
+  disabledReasonField: z.string().trim().min(1).max(160).optional(),
   permission: metadataUiPermissionContractSchema.optional(),
 });
 
@@ -207,15 +208,15 @@ export const METADATA_UI_LIST_TRAILING_CELL_SCHEMA = z
   .object({
     key: METADATA_UI_LIST_KEY_SCHEMA,
     kind: z.enum(METADATA_UI_LIST_TRAILING_CELL_KIND_VALUES),
-    label: z.string().min(1).max(120),
-    field: z.string().min(1).max(160).optional(),
+    label: z.string().trim().min(1).max(120),
+    field: z.string().trim().min(1).max(160).optional(),
     action: metadataUiActionContractSchema.optional(),
-    statusField: z.string().min(1).max(160).optional(),
-    documentKeyField: z.string().min(1).max(160).optional(),
-    stateField: z.string().min(1).max(160).optional(),
-    disabledReasonField: z.string().min(1).max(160).optional(),
+    statusField: z.string().trim().min(1).max(160).optional(),
+    documentKeyField: z.string().trim().min(1).max(160).optional(),
+    stateField: z.string().trim().min(1).max(160).optional(),
+    disabledReasonField: z.string().trim().min(1).max(160).optional(),
     hidden: z.boolean().default(false),
-    disabledReason: z.string().min(1).max(240).optional(),
+    disabledReason: z.string().trim().min(1).max(240).optional(),
     permission: metadataUiPermissionContractSchema.optional(),
   })
   .strict()
@@ -280,7 +281,7 @@ export const METADATA_UI_LIST_VIRTUALIZATION_SCHEMA = z.object({
 
 export const METADATA_UI_LIST_SAVED_VIEW_SCHEMA = z.object({
   key: METADATA_UI_LIST_KEY_SCHEMA,
-  label: z.string().min(1).max(120),
+  label: z.string().trim().min(1).max(120),
   href: metadataUiSafeNavigationHrefSchema.optional(),
   active: z.boolean().default(false),
 });
@@ -288,7 +289,7 @@ export const METADATA_UI_LIST_SAVED_VIEW_SCHEMA = z.object({
 export const METADATA_UI_LIST_TOOLBAR_SCHEMA = z.object({
   enabled: z.boolean().default(false),
   showSearch: z.boolean().default(false),
-  searchPlaceholder: z.string().min(1).max(120).default("Search current window"),
+  searchPlaceholder: z.string().trim().min(1).max(120).default("Search current window"),
   showFilters: z.boolean().default(false),
   showSavedViews: z.boolean().default(false),
   savedViews: z.array(METADATA_UI_LIST_SAVED_VIEW_SCHEMA).max(12).default([]),
@@ -296,7 +297,7 @@ export const METADATA_UI_LIST_TOOLBAR_SCHEMA = z.object({
   showDensity: z.boolean().default(false),
   showExport: z.boolean().default(false),
   exportAction: metadataUiActionContractSchema.optional(),
-  resetLabel: z.string().min(1).max(80).default("Reset"),
+  resetLabel: z.string().trim().min(1).max(80).default("Reset"),
 });
 
 export const METADATA_UI_LIST_SCHEMA = z.object({
@@ -314,19 +315,19 @@ export const METADATA_UI_LIST_SCHEMA = z.object({
 
   key: METADATA_UI_LIST_KEY_SCHEMA,
 
-  title: z.string().min(1).max(120).optional(),
+  title: z.string().trim().min(1).max(120).optional(),
 
-  description: z.string().min(1).max(320).optional(),
+  description: z.string().trim().min(1).max(320).optional(),
 
-  rowKey: z.string().min(1).max(160).default("id"),
+  rowKey: z.string().trim().min(1).max(160).default("id"),
 
   density: METADATA_UI_LIST_DENSITY_SCHEMA.default("comfortable"),
 
   selectionMode: METADATA_UI_LIST_SELECTION_MODE_SCHEMA.default("none"),
 
-  selectableField: z.string().min(1).max(160).optional(),
+  selectableField: z.string().trim().min(1).max(160).optional(),
 
-  selectionDisabledReasonField: z.string().min(1).max(160).optional(),
+  selectionDisabledReasonField: z.string().trim().min(1).max(160).optional(),
 
   columns: z.array(METADATA_UI_LIST_COLUMN_SCHEMA).min(1).max(64),
 
@@ -363,10 +364,10 @@ export const METADATA_UI_LIST_SCHEMA = z.object({
 
   diagnostics: z
     .object({
-      componentKey: z.string().min(1).max(160).optional(),
-      sectionKey: z.string().min(1).max(160).optional(),
-      rendererKey: z.string().min(1).max(160).optional(),
-      testId: z.string().min(1).max(160).optional(),
+      componentKey: z.string().trim().min(1).max(160).optional(),
+      sectionKey: z.string().trim().min(1).max(160).optional(),
+      rendererKey: z.string().trim().min(1).max(160).optional(),
+      testId: z.string().trim().min(1).max(160).optional(),
     })
     .optional(),
 });

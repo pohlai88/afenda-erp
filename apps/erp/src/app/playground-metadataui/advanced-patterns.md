@@ -64,9 +64,10 @@ Recommended groups:
 | States | Ready, loading, empty, forbidden, error | State renderer matrix after handroll removal. |
 | Table Lab | TanStack list variants | Column, filter, sort, selection, and action patterns. |
 
-The first implementation can keep a single route and render groups as metadata
-sections. Later slices may introduce static route segments only if they remain
-developer-only and do not read request-bound data.
+The root landing page now renders the full catalog as metadata sections. The
+pattern routes remain the isolate views for deeper inspection. Later slices may
+introduce additional static route segments only if they remain developer-only
+and do not read request-bound data.
 
 ## Seed Architecture
 

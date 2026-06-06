@@ -42,6 +42,7 @@ const METADATA_UI_EMPTY_STATE_ACTION_PLACEMENT_VALUES = [
 
 export const METADATA_UI_EMPTY_STATE_KEY_SCHEMA = z
   .string()
+  .trim()
   .min(1)
   .max(160)
   .regex(
@@ -59,7 +60,7 @@ export const METADATA_UI_EMPTY_STATE_TONE_SCHEMA = z.enum(
 
 export const METADATA_UI_EMPTY_STATE_ILLUSTRATION_SCHEMA = z.object({
   key: METADATA_UI_EMPTY_STATE_KEY_SCHEMA,
-  label: z.string().min(1).max(120).optional(),
+  label: z.string().trim().min(1).max(120).optional(),
   decorative: z.boolean().default(true),
 });
 
@@ -89,8 +90,8 @@ export const METADATA_UI_EMPTY_STATE_SCHEMA = z.object({
   kind: METADATA_UI_EMPTY_STATE_KIND_SCHEMA.default("empty"),
   tone: METADATA_UI_EMPTY_STATE_TONE_SCHEMA.default("neutral"),
 
-  title: z.string().min(1).max(140),
-  description: z.string().min(1).max(320).optional(),
+  title: z.string().trim().min(1).max(140),
+  description: z.string().trim().min(1).max(320).optional(),
 
   illustration: METADATA_UI_EMPTY_STATE_ILLUSTRATION_SCHEMA.optional(),
 
@@ -101,10 +102,10 @@ export const METADATA_UI_EMPTY_STATE_SCHEMA = z.object({
 
   diagnostics: z
     .object({
-      componentKey: z.string().min(1).max(160).optional(),
-      sectionKey: z.string().min(1).max(160).optional(),
-      rendererKey: z.string().min(1).max(160).optional(),
-      testId: z.string().min(1).max(160).optional(),
+      componentKey: z.string().trim().min(1).max(160).optional(),
+      sectionKey: z.string().trim().min(1).max(160).optional(),
+      rendererKey: z.string().trim().min(1).max(160).optional(),
+      testId: z.string().trim().min(1).max(160).optional(),
     })
     .optional(),
 });

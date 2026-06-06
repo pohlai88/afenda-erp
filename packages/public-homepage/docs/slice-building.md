@@ -14,8 +14,10 @@ erp-truth-section.content.ts
 Content groups:
 
 * hero claim
+* hero proof points
 * truth retrieval panel
 * decision operator panel
+* command map stages
 * command map nodes
 * coverage groups
 * closing statement
@@ -25,6 +27,7 @@ Acceptance:
 * No JSX hardcoded copy.
 * All module names come from content config.
 * Unshipped modules can be marked as `coverage`, `planned`, or hidden.
+* Roadmap-safe modules can still render if they are labeled as roadmap.
 
 ---
 
@@ -77,6 +80,7 @@ Acceptance:
 * Strong visual hierarchy.
 * No generic ERP wording.
 * Immediate differentiation above the fold of the section.
+* Include proof points beneath the differentiation line.
 
 ---
 
@@ -124,6 +128,8 @@ Acceptance:
 * Works without animation.
 * Responsive on desktop/tablet/mobile.
 * Lynx is visually central.
+* Stage labels should carry one-line details.
+* Roadmap states should remain visible, but clearly labeled.
 
 ---
 
@@ -176,6 +182,7 @@ Acceptance:
 * Modules are proof, not headline.
 * Grid is secondary to Lynx.
 * No fake module claims.
+* Planned modules may render if labeled as roadmap.
 
 ---
 
@@ -265,3 +272,4 @@ Acceptance:
 * Section strengthens homepage story.
 * It does not duplicate module grid.
 * It becomes the main Afenda differentiation block.
+* Proof strip should remain visible without crowding the headline.

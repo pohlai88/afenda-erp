@@ -76,6 +76,17 @@ const METADATA_UI_ACCESSIBILITY_LANDMARK_ROLE_VALUES = [
   "search",
 ] as const;
 
+const METADATA_UI_COMPONENT_REQUIRED_CAPABILITIES_BY_KIND = {
+  section: ["render", "compose"],
+  renderer: ["render"],
+  shell: ["render", "compose"],
+  primitive: ["render"],
+  "client-island": ["interact"],
+} as const satisfies Record<
+  z.infer<typeof metadataUiComponentKindSchema>,
+  readonly z.infer<typeof metadataUiComponentCapabilitySchema>[]
+>;
+
 /** Component and renderer registry ids share action-key formatting. */
 export const metadataUiComponentIdSchema =
   METADATA_UI_ACTION_KEY_SCHEMA.max(120);
@@ -197,11 +208,47 @@ export const metadataUiComponentContractSchema = z
       });
     }
 
+    const requiredCapabilities =
+      METADATA_UI_COMPONENT_REQUIRED_CAPABILITIES_BY_KIND[component.kind];
+    for (const capability of requiredCapabilities) {
+      if (!component.capabilities.includes(capability)) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["capabilities"],
+          message: `Component kind "${component.kind}" requires ${capability} capability.`,
+        });
+      }
+    }
+
+    if (
+      component.kind === "renderer" &&
+      (component.capabilities.length !== 1 ||
+        component.capabilities[0] !== "render")
+    ) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["capabilities"],
+        message: "Renderer components must declare only render capability.",
+      });
+    }
+
     if (component.kind === "renderer" && !component.rendererId) {
       ctx.addIssue({
         code: "custom",
         path: ["rendererId"],
         message: "Renderer components must declare rendererId.",
+      });
+    }
+
+    if (
+      component.kind === "renderer" &&
+      component.rendererId &&
+      component.rendererId !== component.id
+    ) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["rendererId"],
+        message: "Renderer components must use rendererId that matches id.",
       });
     }
 
@@ -504,8 +551,29 @@ function assertMetadataUiComponentContractInvariants(
     throw new Error("Renderer components must declare rendererId.");
   }
 
+  if (component.kind === "renderer" && component.rendererId !== component.id) {
+    throw new Error("Renderer components must use rendererId that matches id.");
+  }
+
   if (component.kind !== "renderer" && component.rendererId) {
     throw new Error("rendererId is only valid for renderer components.");
+  }
+
+  const requiredCapabilities =
+    METADATA_UI_COMPONENT_REQUIRED_CAPABILITIES_BY_KIND[component.kind];
+  for (const capability of requiredCapabilities) {
+    if (!component.capabilities.includes(capability)) {
+      throw new Error(
+        `Component kind "${component.kind}" requires ${capability} capability.`,
+      );
+    }
+  }
+
+  if (
+    component.kind === "renderer" &&
+    (component.capabilities.length !== 1 || component.capabilities[0] !== "render")
+  ) {
+    throw new Error("Renderer components must declare only render capability.");
   }
 
   if (

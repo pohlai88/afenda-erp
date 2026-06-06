@@ -62,6 +62,15 @@ export function MetadataUiKanbanDragBoard({
     createInitialKanbanCardState(model),
   );
   const [draggingCardKey, setDraggingCardKey] = useState<string | null>(null);
+  const cardByKey = useMemo(
+    () =>
+      new Map(
+        model.columns
+          .flatMap((column) => column.cards)
+          .map((card) => [card.key, card] as const),
+      ),
+    [model.columns],
+  );
   const modelSignature = useMemo(
     () =>
       JSON.stringify({
@@ -80,6 +89,31 @@ export function MetadataUiKanbanDragBoard({
     () => new Map(cardState.map((state) => [state.cardKey, state.columnKey])),
     [cardState],
   );
+  const cardsByColumn = useMemo(() => {
+    type KanbanCard = (typeof model.columns)[number]["cards"][number];
+    const buckets = new Map(
+      model.columns.map((column) => [column.key, [] as KanbanCard[]]),
+    );
+
+    for (const state of cardState) {
+      const card = cardByKey.get(state.cardKey);
+      const bucket = buckets.get(state.columnKey);
+
+      if (card && bucket) {
+        bucket.push(card);
+      }
+    }
+
+    return buckets;
+  }, [cardByKey, cardState, model.columns]);
+  const draggingCardTitle = draggingCardKey
+    ? getKanbanRecordText(
+        cardByKey.get(draggingCardKey)?.record ?? {},
+        model.cardTemplate.titleField,
+      )
+    : undefined;
+  const boardDescriptionId = `${model.key}-kanban-description`;
+  const boardLiveRegionId = `${model.key}-kanban-live-region`;
 
   useEffect(() => {
     setCardState(createInitialKanbanCardState(model));
@@ -127,9 +161,30 @@ export function MetadataUiKanbanDragBoard({
       data-metadata-ui-kanban={model.key}
       data-metadata-ui-kanban-mode={model.mode}
       data-metadata-ui-movement-enabled={model.movementEnabled}
+      data-metadata-ui-kanban-static-motion={staticMotion}
+      data-metadata-ui-kanban-dragging={draggingCardKey ?? ""}
+      role="region"
+      aria-label="Kanban board"
+      aria-describedby={boardDescriptionId}
     >
+      <p id={boardDescriptionId} className="sr-only">
+        {model.movementEnabled
+          ? "Use the move buttons within each card to place it into a different column."
+          : "This kanban board is read only."}
+      </p>
+      <p id={boardLiveRegionId} className="sr-only" aria-live="polite" aria-atomic="true">
+        {draggingCardKey
+          ? `Dragging ${draggingCardTitle ?? draggingCardKey}.`
+          : "No card is being dragged."}
+      </p>
       {model.swimlanes.length > 0 ? (
-        <div className={cn("metadata-ui-kanban-swimlanes flex flex-wrap md:col-span-3", ui.surfaceGap.xs)}>
+        <div
+          className={cn(
+            "metadata-ui-kanban-swimlanes flex flex-wrap md:col-span-3",
+            ui.surfaceGap.xs,
+          )}
+          data-metadata-ui-kanban-swimlane-count={model.swimlanes.length}
+        >
           {model.swimlanes.map((swimlane) => (
             <Badge key={swimlane.key} variant="outline">
               {swimlane.label}: {swimlane.cardCount}
@@ -138,17 +193,16 @@ export function MetadataUiKanbanDragBoard({
         </div>
       ) : null}
       {model.columns.map((column) => {
-        const cards = model.columns
-          .flatMap((sourceColumn) => sourceColumn.cards)
-          .filter(
-            (card) => columnKeyByCard.get(card.key) === column.key,
-          );
+        const cards = cardsByColumn.get(column.key) ?? [];
+        const columnLabelId = `${column.key}-column-label`;
 
         return (
           <section
             key={column.key}
             className={cn("min-w-0", ui.radius.section, ui.surface.inset, ui.padding.card)}
             data-metadata-ui-kanban-column={column.key}
+            data-metadata-ui-kanban-column-drop-enabled={column.dropEnabled}
+            data-metadata-ui-kanban-column-card-count={cards.length}
             onDragOver={(event) => {
               if (model.movementEnabled && draggingCardKey) {
                 event.preventDefault();
@@ -158,13 +212,12 @@ export function MetadataUiKanbanDragBoard({
               event.preventDefault();
               moveDraggedCardToColumn(column.key);
             }}
-            aria-describedby={
-              column.disabledReason ? `${column.key}-drop-reason` : undefined
-            }
+            aria-labelledby={columnLabelId}
+            aria-describedby={column.disabledReason ? `${column.key}-drop-reason` : undefined}
           >
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
-                <h3 className="text-sm font-semibold text-foreground">
+                <h3 id={columnLabelId} className="text-sm font-semibold text-foreground">
                   {column.label}
                 </h3>
                 {column.description ? (
@@ -183,9 +236,17 @@ export function MetadataUiKanbanDragBoard({
               </p>
             ) : null}
             <ScrollArea className="mt-3 max-h-96 pr-2">
-              <div className={cn("grid", ui.surfaceGap.xs)}>
+              <div className={cn("grid", ui.surfaceGap.xs)} role="list">
                 {cards.length === 0 ? (
-                  <div className={cn("border border-dashed text-sm text-muted-foreground", ui.radius.control, ui.surface.panel, ui.padding.dense)}>
+                  <div
+                    className={cn(
+                      "border border-dashed text-sm text-muted-foreground",
+                      ui.radius.control,
+                      ui.surface.panel,
+                      ui.padding.dense,
+                    )}
+                    role="status"
+                  >
                     No cards
                   </div>
                 ) : null}
@@ -218,10 +279,16 @@ export function MetadataUiKanbanDragBoard({
                         card.disabledReason && "opacity-70",
                       )}
                       data-metadata-ui-kanban-card={card.key}
+                      data-metadata-ui-kanban-card-dragging={draggingCardKey === card.key}
+                      data-metadata-ui-kanban-card-disabled={Boolean(card.disabledReason)}
+                      data-metadata-ui-kanban-card-metadata-fields={model.cardTemplate.metadataFields.length}
                       data-metadata-ui-move-payload={JSON.stringify({
                         cardKey: card.key,
                         columnKey: column.key,
                       })}
+                      aria-label={title}
+                      aria-grabbed={draggingCardKey === card.key}
+                      role="listitem"
                     >
                       <div className="grid gap-surface-2xs">
                         <h4 className="text-sm font-medium text-foreground">
@@ -266,6 +333,7 @@ export function MetadataUiKanbanDragBoard({
                                   size="sm"
                                   variant="outline"
                                   disabled={!intent?.available}
+                                  aria-label={`Move ${title} to ${targetColumn.label}`}
                                   title={!intent?.available ? disabledReason : intent?.hint}
                                   aria-describedby={
                                     !intent?.available ? disabledReasonId : undefined

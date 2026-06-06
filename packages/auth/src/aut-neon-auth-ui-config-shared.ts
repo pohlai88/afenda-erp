@@ -15,13 +15,14 @@ type NeonAuthUiProviderOptions = Omit<
   "authClient" | "children" | "navigate" | "Link"
 >;
 
-/** Default Neon Auth UI provider props — production branch, shared Neon email, Google OAuth only. Phone OTP off. */
+/** Default Neon Auth UI provider props — production branch, dedicated email provider, Google OAuth only. Phone OTP off. */
 export function resolveNeonAuthUiProviderOptions(
   overrides?: Partial<NeonAuthUiProviderOptions>,
 ): NeonAuthUiProviderOptions {
   return {
     basePath: erpNeonAuthUiBasePath,
     redirectTo: erpPreLoginPostAuthPath,
+    organization: {},
     social: {
       providers: [...neonAuthUiSocialProviders],
     },

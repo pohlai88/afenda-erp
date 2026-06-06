@@ -13,20 +13,26 @@ import { Button } from "@afenda/ui/button";
 import Link from "next/link";
 import {
   BanIcon,
+  KeyRoundIcon,
   RotateCcwIcon,
   SearchIcon,
   SendIcon,
   ShieldOffIcon,
+  UserCheckIcon,
   UserMinusIcon,
+  UserXIcon,
 } from "lucide-react";
 import { useState, useTransition } from "react";
 import { SystemAdminDestructiveConfirmButton } from "../overview/sys-destructive-confirm-button.component.client";
 import type { SystemAdminActionResult } from "../tenant-execution/sys-action-result.contract";
 import {
   cancelSystemAdminInvitation,
+  banSystemAdminNeonAuthUser,
   inspectSystemAdminUserAccessAction,
+  impersonateSystemAdminNeonAuthUser,
   reactivateSystemAdminUser,
   removeSystemAdminUser,
+  revokeSystemAdminNeonAuthUserSessions,
   resendSystemAdminInvitation,
   suspendSystemAdminUser,
 } from "./sys-users.actions.server";
@@ -152,6 +158,43 @@ export function SystemAdminUserTrailingCell({ row }: GovernedListTrailingCellPro
           >
             <UserMinusIcon data-icon="inline-start" />
             {labels.remove}
+          </SystemAdminDestructiveConfirmButton>
+        ) : null}
+        {userStatus !== "removed" ? (
+          <SystemAdminDestructiveConfirmButton
+            confirm={systemAdminUserTrailingConfirms.neonBan}
+            disabled={disabled}
+            variant="outline"
+            onConfirm={() => run(() => banSystemAdminNeonAuthUser(membershipId))}
+          >
+            <UserXIcon data-icon="inline-start" />
+            {labels.neonBan}
+          </SystemAdminDestructiveConfirmButton>
+        ) : null}
+        {userStatus !== "removed" ? (
+          <SystemAdminDestructiveConfirmButton
+            confirm={systemAdminUserTrailingConfirms.neonRevokeSessions}
+            disabled={disabled}
+            variant="outline"
+            onConfirm={() =>
+              run(() => revokeSystemAdminNeonAuthUserSessions(membershipId))
+            }
+          >
+            <KeyRoundIcon data-icon="inline-start" />
+            {labels.neonRevokeSessions}
+          </SystemAdminDestructiveConfirmButton>
+        ) : null}
+        {userStatus !== "removed" ? (
+          <SystemAdminDestructiveConfirmButton
+            confirm={systemAdminUserTrailingConfirms.neonImpersonate}
+            disabled={disabled}
+            variant="outline"
+            onConfirm={() =>
+              run(() => impersonateSystemAdminNeonAuthUser(membershipId))
+            }
+          >
+            <UserCheckIcon data-icon="inline-start" />
+            {labels.neonImpersonate}
           </SystemAdminDestructiveConfirmButton>
         ) : null}
         <Button

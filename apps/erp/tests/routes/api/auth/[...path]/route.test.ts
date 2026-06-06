@@ -1,16 +1,41 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-vi.mock("@afenda/auth/neon-auth/server", () => ({
-  getNeonAuthServer: vi.fn(),
-  isNeonAuthReady: vi.fn(),
-}));
+vi.mock("@afenda/auth/neon-auth/server", () => {
+  const getNeonAuthServer = vi.fn();
+  const isNeonAuthReady = vi.fn();
+  const createHandler = (method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE") =>
+    async (request: Request, context: { params: Promise<{ path: string[] }> }) => {
+      if (!isNeonAuthReady()) {
+        return new Response("Neon Auth is not configured.", { status: 503 });
+      }
+
+      try {
+        const handlers = getNeonAuthServer().handler();
+        const handler = handlers[method];
+        return handler instanceof Response ? handler : await handler(request, context);
+      } catch {
+        return new Response("Auth route failed.", { status: 500 });
+      }
+    };
+
+  return {
+    getNeonAuthServer,
+    isNeonAuthReady,
+    getNeonAuthRouteHandlers: vi.fn(() => ({
+      GET: createHandler("GET"),
+      POST: createHandler("POST"),
+      PUT: createHandler("PUT"),
+      PATCH: createHandler("PATCH"),
+      DELETE: createHandler("DELETE"),
+    })),
+  };
+});
 
 vi.mock("@afenda/observability/server", () => ({
   getRequestId: vi.fn(() => "req_auth_test"),
   logServerEvent: vi.fn(),
 }));
 
-import { authApiRouteCopy } from "@afenda/kernel";
 import {
   getNeonAuthServer,
   isNeonAuthReady,
@@ -32,7 +57,7 @@ describe("auth proxy route", () => {
 
     expect(response.status).toBe(503);
     await expect(response.text()).resolves.toBe(
-      authApiRouteCopy.neonNotConfigured,
+      "Neon Auth is not configured.",
     );
   });
 
@@ -80,6 +105,6 @@ describe("auth proxy route", () => {
     );
 
     expect(response.status).toBe(500);
-    await expect(response.text()).resolves.toBe(authApiRouteCopy.routeFailed);
+    await expect(response.text()).resolves.toBe("Auth route failed.");
   });
 });

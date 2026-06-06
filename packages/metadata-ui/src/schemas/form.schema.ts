@@ -78,6 +78,7 @@ const METADATA_UI_FORM_DEPENDENCY_CONDITION_VALUES = [
 
 export const METADATA_UI_FORM_KEY_SCHEMA = z
   .string()
+  .trim()
   .min(1)
   .max(160)
   .regex(
@@ -103,8 +104,8 @@ export const METADATA_UI_FORM_DEPENDENCY_CONDITION_SCHEMA = z.enum(
 
 export const METADATA_UI_FORM_FIELD_OPTION_SCHEMA = z.object({
   value: z.union([z.string(), z.number(), z.boolean()]),
-  label: z.string().min(1).max(160),
-  description: z.string().min(1).max(240).optional(),
+  label: z.string().trim().min(1).max(160),
+  description: z.string().trim().min(1).max(240).optional(),
   disabled: z.boolean().default(false),
 });
 
@@ -114,13 +115,13 @@ export const METADATA_UI_FORM_FIELD_VALIDATION_SCHEMA = z.object({
   maxLength: z.number().int().min(1).max(10000).optional(),
   min: z.number().optional(),
   max: z.number().optional(),
-  pattern: z.string().min(1).max(500).optional(),
-  message: z.string().min(1).max(240).optional(),
+  pattern: z.string().trim().min(1).max(500).optional(),
+  message: z.string().trim().min(1).max(240).optional(),
 });
 
 export const METADATA_UI_FORM_FIELD_ERROR_SCHEMA = z
   .object({
-    message: z.string().min(1).max(240),
+    message: z.string().trim().min(1).max(240),
     severity: z.enum(["info", "warning", "error"]).default("error"),
   })
   .strict();
@@ -128,7 +129,7 @@ export const METADATA_UI_FORM_FIELD_ERROR_SCHEMA = z
 export const METADATA_UI_FORM_FIELD_STATE_SCHEMA = z
   .object({
     value: METADATA_UI_FORM_STATE_SCHEMA.default("clean"),
-    reason: z.string().min(1).max(240).optional(),
+    reason: z.string().trim().min(1).max(240).optional(),
     errors: z.array(METADATA_UI_FORM_FIELD_ERROR_SCHEMA).max(12).default([]),
   })
   .strict()
@@ -152,21 +153,21 @@ export const METADATA_UI_FORM_FIELD_STATE_SCHEMA = z
 
 export const METADATA_UI_FORM_FIELD_DEPENDENCY_SCHEMA = z
   .object({
-    sourceField: z.string().min(1).max(160),
+    sourceField: z.string().trim().min(1).max(160),
     condition: METADATA_UI_FORM_DEPENDENCY_CONDITION_SCHEMA,
     value: z.union([z.string(), z.number(), z.boolean()]).optional(),
     effect: METADATA_UI_FORM_DEPENDENCY_EFFECT_SCHEMA,
-    reason: z.string().min(1).max(240).optional(),
+    reason: z.string().trim().min(1).max(240).optional(),
   })
   .strict();
 
 export const METADATA_UI_FORM_FILE_UPLOAD_SCHEMA = z
   .object({
-    hostUploadKey: z.string().min(1).max(160),
-    accept: z.array(z.string().min(1).max(80)).max(20).default([]),
+    hostUploadKey: z.string().trim().min(1).max(160),
+    accept: z.array(z.string().trim().min(1).max(80)).max(20).default([]),
     maxSizeBytes: z.number().int().positive().max(1024 * 1024 * 1024).optional(),
     multiple: z.boolean().default(false),
-    description: z.string().min(1).max(240).optional(),
+    description: z.string().trim().min(1).max(240).optional(),
     status: z
       .enum(["empty", "selected", "uploading", "uploaded", "failed", "blocked"])
       .default("empty"),
@@ -174,8 +175,8 @@ export const METADATA_UI_FORM_FILE_UPLOAD_SCHEMA = z
       .array(
         z
           .object({
-            key: z.string().min(1).max(160),
-            fileName: z.string().min(1).max(240),
+            key: z.string().trim().min(1).max(160),
+            fileName: z.string().trim().min(1).max(240),
             sizeBytes: z.number().int().positive().optional(),
             downloadAction: metadataUiActionContractSchema.optional(),
             removeAction: metadataUiActionContractSchema.optional(),
@@ -185,15 +186,19 @@ export const METADATA_UI_FORM_FILE_UPLOAD_SCHEMA = z
       .max(20)
       .default([]),
     uploadAction: metadataUiActionContractSchema.optional(),
-    blockedReason: z.string().min(1).max(240).optional(),
+    blockedReason: z.string().trim().min(1).max(240).optional(),
   })
   .strict()
   .superRefine((upload, ctx) => {
-    if ((upload.status === "blocked" || upload.status === "failed") && !upload.blockedReason) {
+    if (
+      (upload.status === "blocked" || upload.status === "failed") &&
+      !upload.blockedReason
+    ) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: ["blockedReason"],
-        message: "Blocked and failed upload descriptors must provide blockedReason.",
+        message:
+          "Blocked and failed upload descriptors must provide blockedReason.",
       });
     }
   });
@@ -201,15 +206,15 @@ export const METADATA_UI_FORM_FILE_UPLOAD_SCHEMA = z
 export const METADATA_UI_FORM_FIELD_SCHEMA = z.object({
   key: METADATA_UI_FORM_KEY_SCHEMA,
 
-  name: z.string().min(1).max(160),
+  name: z.string().trim().min(1).max(160),
 
-  label: z.string().min(1).max(160),
+  label: z.string().trim().min(1).max(160),
 
-  description: z.string().min(1).max(320).optional(),
+  description: z.string().trim().min(1).max(320).optional(),
 
   kind: METADATA_UI_FORM_FIELD_KIND_SCHEMA,
 
-  placeholder: z.string().min(1).max(160).optional(),
+  placeholder: z.string().trim().min(1).max(160).optional(),
 
   defaultValue: z.unknown().optional(),
 
@@ -227,7 +232,7 @@ export const METADATA_UI_FORM_FIELD_SCHEMA = z.object({
   disabled: z
     .object({
       value: z.boolean(),
-      reason: z.string().min(1).max(240).optional(),
+      reason: z.string().trim().min(1).max(240).optional(),
     })
     .optional(),
 
@@ -244,8 +249,8 @@ export const METADATA_UI_FORM_FIELD_SCHEMA = z.object({
 
   diagnostics: z
     .object({
-      testId: z.string().min(1).max(160).optional(),
-      telemetryKey: z.string().min(1).max(160).optional(),
+      testId: z.string().trim().min(1).max(160).optional(),
+      telemetryKey: z.string().trim().min(1).max(160).optional(),
     })
     .optional(),
 })
@@ -279,9 +284,9 @@ export const METADATA_UI_FORM_FIELD_SCHEMA = z.object({
 export const METADATA_UI_FORM_SECTION_SCHEMA = z.object({
   key: METADATA_UI_FORM_KEY_SCHEMA,
 
-  title: z.string().min(1).max(120).optional(),
+  title: z.string().trim().min(1).max(120).optional(),
 
-  description: z.string().min(1).max(320).optional(),
+  description: z.string().trim().min(1).max(320).optional(),
 
   fields: z.array(METADATA_UI_FORM_FIELD_SCHEMA).min(1).max(80),
 
@@ -308,13 +313,13 @@ export const METADATA_UI_FORM_LAYOUT_SCHEMA = z.enum(
 
 export const METADATA_UI_FORM_ERROR_SUMMARY_SCHEMA = z
   .object({
-    title: z.string().min(1).max(120).default("Review fields"),
+    title: z.string().trim().min(1).max(120).default("Review fields"),
     errors: z
       .array(
         z
           .object({
             fieldKey: METADATA_UI_FORM_KEY_SCHEMA,
-            message: z.string().min(1).max(240),
+            message: z.string().trim().min(1).max(240),
             severity: z.enum(["info", "warning", "error"]).default("error"),
           })
           .strict(),
@@ -339,9 +344,9 @@ export const METADATA_UI_FORM_SCHEMA = z.object({
 
   key: METADATA_UI_FORM_KEY_SCHEMA,
 
-  title: z.string().min(1).max(120).optional(),
+  title: z.string().trim().min(1).max(120).optional(),
 
-  description: z.string().min(1).max(320).optional(),
+  description: z.string().trim().min(1).max(320).optional(),
 
   mode: METADATA_UI_FORM_MODE_SCHEMA.default("view"),
 
@@ -366,10 +371,10 @@ export const METADATA_UI_FORM_SCHEMA = z.object({
 
   diagnostics: z
     .object({
-      componentKey: z.string().min(1).max(160).optional(),
-      sectionKey: z.string().min(1).max(160).optional(),
-      rendererKey: z.string().min(1).max(160).optional(),
-      testId: z.string().min(1).max(160).optional(),
+      componentKey: z.string().trim().min(1).max(160).optional(),
+      sectionKey: z.string().trim().min(1).max(160).optional(),
+      rendererKey: z.string().trim().min(1).max(160).optional(),
+      testId: z.string().trim().min(1).max(160).optional(),
     })
     .optional(),
 })

@@ -16,6 +16,7 @@ export const METADATA_UI_KANBAN_SCHEMA_STABILITY: MetadataUiKanbanSchemaStabilit
 
 export const METADATA_UI_KANBAN_KEY_SCHEMA = z
   .string()
+  .trim()
   .min(1)
   .max(160)
   .regex(
@@ -36,8 +37,8 @@ export const METADATA_UI_KANBAN_REDUCED_MOTION_SCHEMA = z.enum([
 
 export const METADATA_UI_KANBAN_SWIMLANE_SCHEMA = z.object({
   key: METADATA_UI_KANBAN_KEY_SCHEMA,
-  label: z.string().min(1).max(120),
-  description: z.string().min(1).max(240).optional(),
+  label: z.string().trim().min(1).max(120),
+  description: z.string().trim().min(1).max(240).optional(),
   order: z.number().int().min(0).max(999),
   collapsible: z.boolean().default(false),
   permission: metadataUiPermissionContractSchema.optional(),
@@ -46,9 +47,9 @@ export const METADATA_UI_KANBAN_SWIMLANE_SCHEMA = z.object({
 export const METADATA_UI_KANBAN_COLUMN_SCHEMA = z.object({
   key: METADATA_UI_KANBAN_KEY_SCHEMA,
 
-  label: z.string().min(1).max(120),
+  label: z.string().trim().min(1).max(120),
 
-  description: z.string().min(1).max(240).optional(),
+  description: z.string().trim().min(1).max(240).optional(),
 
   order: z.number().int().min(0).max(999),
 
@@ -59,7 +60,7 @@ export const METADATA_UI_KANBAN_COLUMN_SCHEMA = z.object({
   drop: z
     .object({
       enabled: z.boolean().default(true),
-      disabledReason: z.string().min(1).max(240).optional(),
+      disabledReason: z.string().trim().min(1).max(240).optional(),
     })
     .strict()
     .default({
@@ -98,13 +99,13 @@ export const METADATA_UI_KANBAN_TRANSITION_SCHEMA = z
     key: METADATA_UI_KANBAN_KEY_SCHEMA,
     fromColumnKey: METADATA_UI_KANBAN_KEY_SCHEMA,
     toColumnKey: METADATA_UI_KANBAN_KEY_SCHEMA,
-    label: z.string().min(1).max(120),
+    label: z.string().trim().min(1).max(120),
     available: z.boolean().default(true),
-    disabledReason: z.string().min(1).max(240).optional(),
-    hint: z.string().min(1).max(240).optional(),
+    disabledReason: z.string().trim().min(1).max(240).optional(),
+    hint: z.string().trim().min(1).max(240).optional(),
     intent: z
       .object({
-        actionKey: z.string().min(1).max(160).optional(),
+        actionKey: z.string().trim().min(1).max(160).optional(),
         payload: z.record(z.string(), z.unknown()).default({}),
       })
       .strict()
@@ -124,7 +125,7 @@ export const METADATA_UI_KANBAN_TRANSITION_SCHEMA = z
 export const METADATA_UI_KANBAN_FOOTER_SCHEMA = z
   .object({
     enabled: z.boolean().default(false),
-    summaryLabel: z.string().min(1).max(160).optional(),
+    summaryLabel: z.string().trim().min(1).max(160).optional(),
     showColumnCounts: z.boolean().default(true),
     actions: z
       .array(
@@ -141,23 +142,23 @@ export const METADATA_UI_KANBAN_FOOTER_SCHEMA = z
   .strict();
 
 export const METADATA_UI_KANBAN_CARD_TEMPLATE_SCHEMA = z.object({
-  titleField: z.string().min(1).max(160),
+  titleField: z.string().trim().min(1).max(160),
 
-  descriptionField: z.string().min(1).max(160).optional(),
+  descriptionField: z.string().trim().min(1).max(160).optional(),
 
-  badgeFields: z.array(z.string().min(1).max(160)).max(12).default([]),
+  badgeFields: z.array(z.string().trim().min(1).max(160)).max(12).default([]),
 
-  metadataFields: z.array(z.string().min(1).max(160)).max(20).default([]),
+  metadataFields: z.array(z.string().trim().min(1).max(160)).max(20).default([]),
 });
 
 export const METADATA_UI_KANBAN_CARD_SCHEMA = z
   .object({
     key: METADATA_UI_KANBAN_KEY_SCHEMA,
     record: z.record(
-      z.string().min(1).max(160),
+      z.string().trim().min(1).max(160),
       z.union([z.string(), z.number(), z.boolean(), z.null()]),
     ),
-    disabledReason: z.string().min(1).max(240).optional(),
+    disabledReason: z.string().trim().min(1).max(240).optional(),
     metadata: z.record(z.string(), z.unknown()).default({}),
   })
   .strict();
@@ -177,15 +178,15 @@ export const METADATA_UI_KANBAN_SCHEMA = z.object({
 
   key: METADATA_UI_KANBAN_KEY_SCHEMA,
 
-  title: z.string().min(1).max(120).optional(),
+  title: z.string().trim().min(1).max(120).optional(),
 
-  description: z.string().min(1).max(320).optional(),
+  description: z.string().trim().min(1).max(320).optional(),
 
-  cardKeyField: z.string().min(1).max(160).default("id"),
+  cardKeyField: z.string().trim().min(1).max(160).default("id"),
 
-  columnField: z.string().min(1).max(160),
+  columnField: z.string().trim().min(1).max(160),
 
-  swimlaneField: z.string().min(1).max(160).optional(),
+  swimlaneField: z.string().trim().min(1).max(160).optional(),
 
   mode: METADATA_UI_KANBAN_BOARD_MODE_SCHEMA.default("read-only"),
 
@@ -235,10 +236,10 @@ export const METADATA_UI_KANBAN_SCHEMA = z.object({
 
   diagnostics: z
     .object({
-      componentKey: z.string().min(1).max(160).optional(),
-      sectionKey: z.string().min(1).max(160).optional(),
-      rendererKey: z.string().min(1).max(160).optional(),
-      testId: z.string().min(1).max(160).optional(),
+      componentKey: z.string().trim().min(1).max(160).optional(),
+      sectionKey: z.string().trim().min(1).max(160).optional(),
+      rendererKey: z.string().trim().min(1).max(160).optional(),
+      testId: z.string().trim().min(1).max(160).optional(),
     })
     .optional(),
 })

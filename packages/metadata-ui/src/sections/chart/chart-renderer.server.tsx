@@ -1,33 +1,17 @@
 import "server-only";
 
 import {
-  type MetadataUiChart,
   type MetadataUiChartInput,
   parseMetadataUiChart,
 } from "../../schemas/chart.schema";
+import { MetadataUiPrimitiveBadge } from "../../primitives/badge.server";
 import { MetadataUiEmptyState } from "../../shell/empty-state.server";
-import { ui } from "@afenda/ui/design-system";
-import { cn } from "@afenda/ui/utils";
+import { MetadataUiPrimitiveChartShell } from "../../primitives/chart-shell.server";
 import { MetadataUiChartBody } from "./chart-body.client";
 
 export type MetadataUiChartRendererProps = Readonly<{
   metadata: MetadataUiChartInput;
 }>;
-
-function renderMetadataUiChartServerSummary(chart: MetadataUiChart) {
-  return (
-    <div className={cn("flex flex-wrap", ui.surfaceGap.xs)} aria-hidden="true">
-      {chart.series.map((series) => (
-        <span
-          key={series.key}
-          className={cn(ui.radius.control, ui.surface.inset, ui.typography.caption)}
-        >
-          {series.label}
-        </span>
-      ))}
-    </div>
-  );
-}
 
 export function MetadataUiChartRenderer({ metadata }: MetadataUiChartRendererProps) {
   const chart = parseMetadataUiChart(metadata);
@@ -42,19 +26,26 @@ export function MetadataUiChartRenderer({ metadata }: MetadataUiChartRendererPro
   }
 
   return (
-    <div
-      className={cn("metadata-ui-chart", ui.surfaceGap.sm)}
-      aria-label={chart.title ?? chart.key}
+    <MetadataUiPrimitiveChartShell
+      chart={chart}
+      className="metadata-ui-chart"
+      summary={
+        <div className="flex flex-wrap gap-surface-xs" aria-hidden="true">
+          {chart.series.map((series) => (
+            <MetadataUiPrimitiveBadge key={series.key} tone={series.tone}>
+              {series.label}
+            </MetadataUiPrimitiveBadge>
+          ))}
+        </div>
+      }
       data-metadata-ui-chart={chart.key}
       data-metadata-ui-chart-kind={chart.kind}
       data-metadata-ui-chart-rows={chart.data.length}
       data-metadata-ui-chart-series={chart.series.length}
+      aria-label={chart.title ?? chart.key}
     >
-      {renderMetadataUiChartServerSummary(chart)}
-      <div className={cn("min-w-0", ui.surface.inset, ui.padding.card)}>
-        <MetadataUiChartBody chart={chart} />
-      </div>
-    </div>
+      <MetadataUiChartBody chart={chart} />
+    </MetadataUiPrimitiveChartShell>
   );
 }
 

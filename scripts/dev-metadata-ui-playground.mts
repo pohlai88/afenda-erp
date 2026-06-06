@@ -5,6 +5,20 @@ const PORT = 4000;
 const HOST = "127.0.0.1";
 const PLAYGROUND_URL = `http://${HOST}:${PORT}/playground-metadataui`;
 
+function runPnpm(args: readonly string[], stdio: "inherit" | "pipe" = "inherit") {
+  return spawnSync("pnpm", args, {
+    cwd: process.cwd(),
+    env: Object.fromEntries(
+      Object.entries({
+        ...process.env,
+        AFENDA_ENABLE_DEV_PLAYGROUNDS: "1",
+      }).filter((entry): entry is [string, string] => typeof entry[1] === "string"),
+    ),
+    stdio,
+    shell: true,
+  });
+}
+
 function assertPortAvailable(port: number): Promise<void> {
   return new Promise((resolve, reject) => {
     const server = createServer();
@@ -36,20 +50,11 @@ await assertPortAvailable(PORT).catch((error: unknown) => {
 });
 
 console.log(`Starting metadata UI playground at ${PLAYGROUND_URL}`);
-
-const env = Object.fromEntries(
-  Object.entries({
-    ...process.env,
-    AFENDA_ENABLE_DEV_PLAYGROUNDS: "1",
-  }).filter((entry): entry is [string, string] => typeof entry[1] === "string"),
+console.log(
+  "Use 127.0.0.1 (not localhost) — the dev server binds IPv4 loopback only.",
 );
-const pnpmCommand = process.platform === "win32" ? "pnpm.cmd" : "pnpm";
 
-const envSync = spawnSync(pnpmCommand, ["env:sync"], {
-  cwd: process.cwd(),
-  env,
-  stdio: "inherit",
-});
+const envSync = runPnpm(["env:sync"]);
 
 if (envSync.error) {
   console.error(envSync.error.message);
@@ -60,8 +65,15 @@ if (envSync.status !== 0) {
   process.exit(envSync.status ?? 1);
 }
 
+const env = Object.fromEntries(
+  Object.entries({
+    ...process.env,
+    AFENDA_ENABLE_DEV_PLAYGROUNDS: "1",
+  }).filter((entry): entry is [string, string] => typeof entry[1] === "string"),
+);
+
 const child = spawn(
-  pnpmCommand,
+  "pnpm",
   [
     "--filter",
     "@afenda/erp",
@@ -77,7 +89,7 @@ const child = spawn(
     cwd: process.cwd(),
     env,
     stdio: "inherit",
-    shell: false,
+    shell: true,
   },
 );
 

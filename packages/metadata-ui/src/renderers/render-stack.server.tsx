@@ -2,6 +2,7 @@ import "server-only";
 
 import { cn } from "@afenda/ui/utils";
 
+import { resolveMetadataUiSectionInstanceKey } from "../contracts/section.contract";
 import {
   MetadataUiRenderSection,
   type MetadataUiRenderableSection,
@@ -38,8 +39,10 @@ function getMetadataUiStackSectionKey(
 ): string {
   const section = item.section;
 
-  if (typeof section === "object" && section && "id" in section) {
-    return String(section.id);
+  if (typeof section === "object" && section && "id" in section && "kind" in section) {
+    return resolveMetadataUiSectionInstanceKey(
+      section as Parameters<typeof resolveMetadataUiSectionInstanceKey>[0],
+    );
   }
 
   return `section:${index}`;

@@ -68,6 +68,7 @@ const METADATA_UI_CHART_REDUCED_MOTION_VALUES = [
 
 export const METADATA_UI_CHART_KEY_SCHEMA = z
   .string()
+  .trim()
   .min(1)
   .max(160)
   .regex(
@@ -100,19 +101,19 @@ export const METADATA_UI_CHART_REDUCED_MOTION_SCHEMA = z.enum(
 );
 
 export const METADATA_UI_CHART_AXIS_SCHEMA = z.object({
-  key: z.string().min(1).max(120),
-  label: z.string().min(1).max(120).optional(),
+  key: z.string().trim().min(1).max(120),
+  label: z.string().trim().min(1).max(120).optional(),
   format: METADATA_UI_CHART_VALUE_FORMAT_SCHEMA.default("number"),
   hidden: z.boolean().default(false),
 });
 
 export const METADATA_UI_CHART_SERIES_SCHEMA = z.object({
   key: METADATA_UI_CHART_KEY_SCHEMA,
-  label: z.string().min(1).max(120),
-  valueKey: z.string().min(1).max(120),
+  label: z.string().trim().min(1).max(120),
+  valueKey: z.string().trim().min(1).max(120),
   tone: METADATA_UI_CHART_TONE_SCHEMA.default("neutral"),
   format: METADATA_UI_CHART_VALUE_FORMAT_SCHEMA.default("number"),
-  stackKey: z.string().min(1).max(80).optional(),
+  stackKey: z.string().trim().min(1).max(80).optional(),
   color: z
     .string()
     .trim()
@@ -127,7 +128,7 @@ export const METADATA_UI_CHART_SERIES_SCHEMA = z.object({
 
 export const METADATA_UI_CHART_DATUM_SCHEMA = z
   .record(
-    z.string().min(1).max(120),
+    z.string().trim().min(1).max(120),
     z.union([z.string(), z.number(), z.boolean(), z.null()]),
   )
   .superRefine((datum, ctx) => {
@@ -147,9 +148,9 @@ export const METADATA_UI_CHART_DRILLDOWN_SCHEMA = z.object({
 export const METADATA_UI_CHART_ANNOTATION_SCHEMA = z
   .object({
     key: METADATA_UI_CHART_KEY_SCHEMA,
-    label: z.string().min(1).max(120),
-    description: z.string().min(1).max(320).optional(),
-    datumKey: z.string().min(1).max(120).optional(),
+    label: z.string().trim().min(1).max(120),
+    description: z.string().trim().min(1).max(320).optional(),
+    datumKey: z.string().trim().min(1).max(120).optional(),
     tone: METADATA_UI_CHART_TONE_SCHEMA.default("neutral"),
   })
   .strict();
@@ -157,7 +158,7 @@ export const METADATA_UI_CHART_ANNOTATION_SCHEMA = z
 export const METADATA_UI_CHART_REFERENCE_BAND_SCHEMA = z
   .object({
     key: METADATA_UI_CHART_KEY_SCHEMA,
-    label: z.string().min(1).max(120),
+    label: z.string().trim().min(1).max(120),
     axis: z.enum(["x", "y"]).default("y"),
     from: z.union([z.string(), z.number()]),
     to: z.union([z.string(), z.number()]),
@@ -167,9 +168,9 @@ export const METADATA_UI_CHART_REFERENCE_BAND_SCHEMA = z
 
 export const METADATA_UI_CHART_HEATMAP_SCHEMA = z
   .object({
-    xKey: z.string().min(1).max(120),
-    yKey: z.string().min(1).max(120),
-    valueKey: z.string().min(1).max(120),
+    xKey: z.string().trim().min(1).max(120),
+    yKey: z.string().trim().min(1).max(120),
+    valueKey: z.string().trim().min(1).max(120),
     showValues: z.boolean().default(false),
   })
   .strict();
@@ -177,7 +178,7 @@ export const METADATA_UI_CHART_HEATMAP_SCHEMA = z
 export const METADATA_UI_CHART_TOOLTIP_SCHEMA = z
   .object({
     mode: METADATA_UI_CHART_TOOLTIP_MODE_SCHEMA.default("compact"),
-    labelKey: z.string().min(1).max(120).optional(),
+    labelKey: z.string().trim().min(1).max(120).optional(),
     valueFormat: METADATA_UI_CHART_VALUE_FORMAT_SCHEMA.optional(),
     showIndicators: z.boolean().default(true),
   })
@@ -227,12 +228,12 @@ export const METADATA_UI_CHART_SCHEMA = z.object({
 
   key: METADATA_UI_CHART_KEY_SCHEMA,
 
-  title: z.string().min(1).max(120).optional(),
-  description: z.string().min(1).max(320).optional(),
+  title: z.string().trim().min(1).max(120).optional(),
+  description: z.string().trim().min(1).max(320).optional(),
 
   kind: METADATA_UI_CHART_KIND_SCHEMA,
 
-  categoryKey: z.string().min(1).max(120),
+  categoryKey: z.string().trim().min(1).max(120),
 
   xAxis: METADATA_UI_CHART_AXIS_SCHEMA.optional(),
   yAxis: METADATA_UI_CHART_AXIS_SCHEMA.optional(),
@@ -263,16 +264,19 @@ export const METADATA_UI_CHART_SCHEMA = z.object({
 
   diagnostics: z
     .object({
-      componentKey: z.string().min(1).max(160).optional(),
-      sectionKey: z.string().min(1).max(160).optional(),
-      rendererKey: z.string().min(1).max(160).optional(),
-      testId: z.string().min(1).max(160).optional(),
+      componentKey: z.string().trim().min(1).max(160).optional(),
+      sectionKey: z.string().trim().min(1).max(160).optional(),
+      rendererKey: z.string().trim().min(1).max(160).optional(),
+      testId: z.string().trim().min(1).max(160).optional(),
     })
     .optional(),
 })
   .strict()
   .superRefine((chart, ctx) => {
-    if ((chart.kind === "pie" || chart.kind === "donut") && chart.series.length !== 1) {
+    if (
+      (chart.kind === "pie" || chart.kind === "donut") &&
+      chart.series.length !== 1
+    ) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: ["series"],

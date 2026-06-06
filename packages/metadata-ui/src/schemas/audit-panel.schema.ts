@@ -40,6 +40,7 @@ const METADATA_UI_AUDIT_PANEL_ACTION_PLACEMENT_VALUES = [
 
 export const METADATA_UI_AUDIT_PANEL_KEY_SCHEMA = z
   .string()
+  .trim()
   .min(1)
   .max(160)
   .regex(
@@ -52,15 +53,15 @@ export const METADATA_UI_AUDIT_EVENT_TONE_SCHEMA = z.enum(
 );
 
 export const METADATA_UI_AUDIT_ACTOR_SCHEMA = z.object({
-  actorId: z.string().min(1).max(160),
+  actorId: z.string().trim().min(1).max(160),
   actorType: z.enum(METADATA_UI_AUDIT_ACTOR_TYPE_VALUES),
-  displayName: z.string().min(1).max(160).optional(),
+  displayName: z.string().trim().min(1).max(160).optional(),
 });
 
 export const METADATA_UI_AUDIT_TARGET_SCHEMA = z.object({
-  targetType: z.string().min(1).max(120),
-  targetId: z.string().min(1).max(160),
-  label: z.string().min(1).max(160).optional(),
+  targetType: z.string().trim().min(1).max(120),
+  targetId: z.string().trim().min(1).max(160),
+  label: z.string().trim().min(1).max(160).optional(),
 });
 
 export const METADATA_UI_AUDIT_EVENT_SCHEMA = z.object({
@@ -68,9 +69,9 @@ export const METADATA_UI_AUDIT_EVENT_SCHEMA = z.object({
 
   occurredAt: z.string().datetime(),
 
-  action: z.string().min(1).max(160),
+  action: z.string().trim().min(1).max(160),
 
-  summary: z.string().min(1).max(240),
+  summary: z.string().trim().min(1).max(240),
 
   tone: METADATA_UI_AUDIT_EVENT_TONE_SCHEMA.default("neutral"),
 
@@ -78,14 +79,14 @@ export const METADATA_UI_AUDIT_EVENT_SCHEMA = z.object({
 
   target: METADATA_UI_AUDIT_TARGET_SCHEMA.optional(),
 
-  reason: z.string().min(1).max(320).optional(),
+  reason: z.string().trim().min(1).max(320).optional(),
 
   source: z
     .object({
-      moduleKey: z.string().min(1).max(160).optional(),
-      featureKey: z.string().min(1).max(160).optional(),
-      requestId: z.string().min(1).max(160).optional(),
-      correlationId: z.string().min(1).max(160).optional(),
+      moduleKey: z.string().trim().min(1).max(160).optional(),
+      featureKey: z.string().trim().min(1).max(160).optional(),
+      requestId: z.string().trim().min(1).max(160).optional(),
+      correlationId: z.string().trim().min(1).max(160).optional(),
     })
     .optional(),
 
@@ -115,8 +116,8 @@ export const METADATA_UI_AUDIT_PANEL_SCHEMA = z.object({
 
   key: METADATA_UI_AUDIT_PANEL_KEY_SCHEMA,
 
-  title: z.string().min(1).max(120).default("Audit trail"),
-  description: z.string().min(1).max(320).optional(),
+  title: z.string().trim().min(1).max(120).default("Audit trail"),
+  description: z.string().trim().min(1).max(320).optional(),
 
   target: METADATA_UI_AUDIT_TARGET_SCHEMA.optional(),
 
@@ -131,10 +132,10 @@ export const METADATA_UI_AUDIT_PANEL_SCHEMA = z.object({
 
   diagnostics: z
     .object({
-      componentKey: z.string().min(1).max(160).optional(),
-      sectionKey: z.string().min(1).max(160).optional(),
-      rendererKey: z.string().min(1).max(160).optional(),
-      testId: z.string().min(1).max(160).optional(),
+      componentKey: z.string().trim().min(1).max(160).optional(),
+      sectionKey: z.string().trim().min(1).max(160).optional(),
+      rendererKey: z.string().trim().min(1).max(160).optional(),
+      testId: z.string().trim().min(1).max(160).optional(),
     })
     .optional(),
 });

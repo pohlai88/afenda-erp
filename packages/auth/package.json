@@ -29,10 +29,15 @@
       "development": "./src/aut-neon-compat-server.ts",
       "default": "./dist/aut-neon-compat-server.js"
     },
+    "./neon-auth/middleware": {
+      "types": "./src/aut-neon-auth-middleware.ts",
+      "development": "./src/aut-neon-auth-middleware.ts",
+      "default": "./dist/aut-neon-auth-middleware.js"
+    },
     "./neon-auth/client": {
-      "types": "./src/neon-auth/client.ts",
-      "development": "./src/neon-auth/client.ts",
-      "default": "./dist/neon-auth/client.js"
+      "types": "./src/aut-neon-auth-client.ts",
+      "development": "./src/aut-neon-auth-client.ts",
+      "default": "./dist/aut-neon-auth-client.js"
     },
     "./neon-auth/neon-cookies": {
       "types": "./src/aut-neon-cookies-shared.ts",

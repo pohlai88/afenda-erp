@@ -44,7 +44,7 @@ export type MetadataUiApprovalTimelineBasicInput<
   title?: string;
   description?: string;
   steps?: Steps;
-  currentStepKey?: string;
+  currentStepKey?: Steps[number]["key"];
 };
 
 export type MetadataUiApprovalTimelineSafeCreateResult<
@@ -61,6 +61,24 @@ export type MetadataUiApprovalTimelineSafeCreateResult<
       error: z.ZodError;
     };
 
+export type MetadataUiApprovalTimelineFlowBuilderResult<
+  Input extends MetadataUiApprovalTimelineBasicInput,
+> = MetadataUiApprovalTimelineBuilderResult<{
+  key: Input["key"];
+  title: string;
+  steps: Input["steps"] extends readonly MetadataUiApprovalTimelineStepInput[]
+    ? Input["steps"]
+    : [];
+  currentStepKey: Input["currentStepKey"];
+}> &
+  (Input extends {
+    currentStepKey?: infer CurrentStepKey extends string;
+  }
+    ? {
+        currentStepKey?: CurrentStepKey;
+      }
+    : object);
+
 export function createApprovalTimeline<
   const Input extends ApprovalTimelineBuilderInput,
 >(input: Input): MetadataUiApprovalTimelineBuilderResult<Input> {
@@ -71,21 +89,14 @@ export function createApprovalTimeline<
 
 export function createApprovalFlowTimeline<
   const Input extends MetadataUiApprovalTimelineBasicInput,
->(input: Input): MetadataUiApprovalTimelineBuilderResult<{
-  key: Input["key"];
-  title: string;
-  steps: Input["steps"] extends readonly MetadataUiApprovalTimelineStepInput[]
-    ? Input["steps"]
-    : [];
-  currentStepKey: Input["currentStepKey"];
-}> {
+>(input: Input): MetadataUiApprovalTimelineFlowBuilderResult<Input> {
   return createApprovalTimeline({
     key: input.key,
     title: input.title ?? "Approval timeline",
     description: input.description,
     steps: input.steps ?? [],
     currentStepKey: input.currentStepKey,
-  });
+  }) as MetadataUiApprovalTimelineFlowBuilderResult<Input>;
 }
 
 export function createApprovalTimelineStep<

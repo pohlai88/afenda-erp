@@ -118,10 +118,127 @@ export type MetadataUiFormSafeCreateResult<
       error: z.ZodError;
     };
 
+function normalizeFormFieldOptionInput(
+  option: NonNullable<MetadataUiFormFieldInput["options"]>[number],
+): NonNullable<MetadataUiFormFieldInput["options"]>[number] {
+  return {
+    ...option,
+    label: option.label.trim(),
+    description: option.description?.trim(),
+  };
+}
+
+function normalizeFormFieldInput(
+  input: MetadataUiFormFieldInput,
+): MetadataUiFormFieldInput {
+  return {
+    ...input,
+    key: input.key.trim(),
+    name: input.name.trim(),
+    label: input.label.trim(),
+    description: input.description?.trim(),
+    placeholder: input.placeholder?.trim(),
+    options: (input.options ?? []).map((option) =>
+      normalizeFormFieldOptionInput(option),
+    ),
+    validation: input.validation
+      ? {
+          ...input.validation,
+          message: input.validation.message?.trim(),
+        }
+      : input.validation,
+    state: input.state
+      ? {
+          ...input.state,
+          reason: input.state.reason?.trim(),
+          errors: (input.state.errors ?? []).map((error) => ({
+            ...error,
+            message: error.message.trim(),
+          })),
+        }
+      : input.state,
+    disabled: input.disabled
+      ? {
+          ...input.disabled,
+          reason: input.disabled.reason?.trim(),
+        }
+      : input.disabled,
+    dependencies: (input.dependencies ?? []).map((dependency) => ({
+      ...dependency,
+      sourceField: dependency.sourceField.trim(),
+      reason: dependency.reason?.trim(),
+    })),
+    fileUpload: input.fileUpload
+      ? {
+          ...input.fileUpload,
+          hostUploadKey: input.fileUpload.hostUploadKey.trim(),
+          description: input.fileUpload.description?.trim(),
+          blockedReason: input.fileUpload.blockedReason?.trim(),
+          existingFiles: (input.fileUpload.existingFiles ?? []).map((file) => ({
+            ...file,
+            key: file.key.trim(),
+            fileName: file.fileName.trim(),
+          })),
+        }
+      : input.fileUpload,
+    diagnostics: input.diagnostics
+      ? {
+          ...input.diagnostics,
+          testId: input.diagnostics.testId?.trim(),
+          telemetryKey: input.diagnostics.telemetryKey?.trim(),
+        }
+      : input.diagnostics,
+  };
+}
+
+function normalizeFormSectionInput(
+  input: MetadataUiFormSectionInput,
+): MetadataUiFormSectionInput {
+  return {
+    ...input,
+    key: input.key.trim(),
+    title: input.title?.trim(),
+    description: input.description?.trim(),
+    fields: input.fields.map((field) => normalizeFormFieldInput(field)),
+  };
+}
+
+function normalizeFormInput(input: FormBuilderInput): FormBuilderInput {
+  const errorSummaryTitle = input.errorSummary?.title ?? "Review fields";
+  const errorSummaryErrors = input.errorSummary?.errors ?? [];
+
+  return {
+    ...input,
+    key: input.key.trim(),
+    title: input.title?.trim(),
+    description: input.description?.trim(),
+    sections: input.sections.map((section) => normalizeFormSectionInput(section)),
+    errorSummary: {
+      title: errorSummaryTitle.trim(),
+      errors: errorSummaryErrors.map((error) => ({
+        ...error,
+        fieldKey: error.fieldKey.trim(),
+        message: error.message.trim(),
+      })),
+    },
+    diagnostics: input.diagnostics
+      ? {
+          ...input.diagnostics,
+          componentKey: input.diagnostics.componentKey?.trim(),
+          sectionKey: input.diagnostics.sectionKey?.trim(),
+          rendererKey: input.diagnostics.rendererKey?.trim(),
+          testId: input.diagnostics.testId?.trim(),
+        }
+      : input.diagnostics,
+  };
+}
+
 export function createForm<const Input extends FormBuilderInput>(
   input: Input,
 ): MetadataUiFormBuilderResult<Input> {
-  return parseMetadataUiForm(input) as MetadataUiFormBuilderResult<Input>;
+  return parseMetadataUiForm(
+    normalizeFormInput(input),
+  ) as MetadataUiFormBuilderResult<Input>;
 }
 
 export function createFormForMode<const Mode extends MetadataUiFormMode>(
@@ -162,7 +279,7 @@ export function createFormField<const Input extends MetadataUiFormFieldInput>(
   input: Input,
 ): MetadataUiFormFieldBuilderResult<Input> {
   return METADATA_UI_FORM_FIELD_SCHEMA.parse(
-    input,
+    normalizeFormFieldInput(input),
   ) as MetadataUiFormFieldBuilderResult<Input>;
 }
 
@@ -272,7 +389,7 @@ export function createFormSection<
   const Input extends MetadataUiFormSectionInput,
 >(input: Input): MetadataUiFormSectionBuilderResult<Input> {
   return METADATA_UI_FORM_SECTION_SCHEMA.parse(
-    input,
+    normalizeFormSectionInput(input),
   ) as MetadataUiFormSectionBuilderResult<Input>;
 }
 
@@ -398,7 +515,7 @@ export function safeCreateForm(input: unknown): MetadataUiFormSafeCreateResult {
   }
 
   return {
-    success: true,
+    success: true as const,
     data: parseMetadataUiForm(result.data),
   };
 }

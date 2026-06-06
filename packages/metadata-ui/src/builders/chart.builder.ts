@@ -16,6 +16,7 @@ import {
   type MetadataUiChartSeriesInput,
   type MetadataUiChartTone,
   type MetadataUiChartValueFormat,
+  type MetadataUiChartDatumInput,
 } from "../schemas/chart.schema";
 
 type MetadataUiChartSystemFields = "schemaId" | "schemaVersion" | "stability";
@@ -153,28 +154,30 @@ export function createComposedChart<const Input extends MetadataUiChartBasicInpu
   });
 }
 
-export function createChartDatum(input: unknown): MetadataUiChartDatum {
+export function createChartDatum<const Input extends MetadataUiChartDatumInput>(
+  input: Input,
+): MetadataUiChartDatum {
   return METADATA_UI_CHART_DATUM_SCHEMA.parse(input) as MetadataUiChartDatum;
 }
 
-export function withChartData(
-  chart: MetadataUiChartInput,
+export function withChartData<const Input extends ChartBuilderInput>(
+  chart: Input,
   data: MetadataUiChartDatum[],
-): MetadataUiChart {
+): MetadataUiChartBuilderResult<Input> {
   return createChart({
     ...chart,
     data,
-  });
+  } as Input);
 }
 
-export function withChartSeries(
-  chart: MetadataUiChartInput,
+export function withChartSeries<const Input extends ChartBuilderInput>(
+  chart: Input,
   series: MetadataUiChartSeriesInput[],
-): MetadataUiChart {
+): MetadataUiChartBuilderResult<Input> {
   return createChart({
     ...chart,
     series,
-  });
+  } as Input);
 }
 
 export function withChartKind<const Kind extends MetadataUiChartKind>(
@@ -187,24 +190,24 @@ export function withChartKind<const Kind extends MetadataUiChartKind>(
   });
 }
 
-export function withChartDisplay(
-  chart: MetadataUiChartInput,
+export function withChartDisplay<const Input extends ChartBuilderInput>(
+  chart: Input,
   display: MetadataUiChartDisplayInput,
-): MetadataUiChart {
+): MetadataUiChartBuilderResult<Input> {
   return createChart({
     ...chart,
     display,
-  });
+  } as Input);
 }
 
-export function appendChartDatum(
-  chart: MetadataUiChartInput,
+export function appendChartDatum<const Input extends ChartBuilderInput>(
+  chart: Input,
   datum: MetadataUiChartDatum,
-): MetadataUiChart {
+): MetadataUiChartBuilderResult<Input> {
   return createChart({
     ...chart,
     data: [...(chart.data ?? []), datum],
-  });
+  } as Input);
 }
 
 export function safeCreateChart(

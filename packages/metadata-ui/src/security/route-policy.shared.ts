@@ -33,7 +33,13 @@ export function normalizeMetadataUiCapabilityKeys(
     return [];
   }
 
-  return Array.from(new Set(Array.from(capabilities))).filter(
+  return Array.from(
+    new Set(
+      Array.from(capabilities, (capability) =>
+        typeof capability === "string" ? capability.trim() : String(capability),
+      ),
+    ),
+  ).filter(
     (capability): capability is MetadataUiCapabilityKey =>
       /^[a-z][a-z0-9]*(?:[._][a-z0-9]+)*$/.test(capability),
   );

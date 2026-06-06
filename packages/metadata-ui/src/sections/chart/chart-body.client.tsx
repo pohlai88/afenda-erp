@@ -1,6 +1,7 @@
 "use client";
 
 import { lazy, Suspense } from "react";
+import { ui } from "@afenda/ui/design-system";
 import { cn } from "@afenda/ui/utils";
 
 import type {
@@ -91,7 +92,11 @@ function MetadataUiHeatmapBody({ chart }: MetadataUiChartBodyProps) {
         return (
           <div
             key={`${String(xValue)}-${String(yValue)}-${index}`}
-            className="rounded border px-3 py-2 text-sm"
+            className={cn(
+              ui.radius.control,
+              ui.typography.body,
+              "border border-border bg-card px-surface-sm py-surface-xs",
+            )}
             style={{
               backgroundColor: `color-mix(in srgb, var(--chart-1) ${Math.round(opacity * 100)}%, transparent)`,
             }}

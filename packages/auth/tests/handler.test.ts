@@ -7,7 +7,7 @@ vi.mock("@afenda/config/env", () => ({
   isNeonAuthEnabled: vi.fn(),
 }));
 
-vi.mock("../../security/webhook-verify.server", () => ({
+vi.mock("../src/aut-webhook-verify-server", () => ({
   verifyNeonAuthWebhookPayload: vi.fn(),
 }));
 

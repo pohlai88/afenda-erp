@@ -41,6 +41,7 @@ import {
 } from "../builders/list.builder";
 import {
   createPageHeader,
+  createPageHeaderAction,
   createPageHeaderBadge,
   createPageHeaderBreadcrumb,
 } from "../builders/page-header.builder";
@@ -268,10 +269,12 @@ export function adaptGovernedPageHeader(
           tone: badge.tone ?? "neutral",
         }),
       ),
-      actions: (input.actions ?? []).map((action) => ({
-        action: adaptAction(action, "page-header"),
-        placement: "secondary",
-      })),
+      actions: (input.actions ?? []).map((action) =>
+        createPageHeaderAction({
+          action: adaptAction(action, "page-header"),
+          placement: "secondary",
+        }),
+      ),
     }),
     parityNotes,
   };

@@ -25,7 +25,7 @@ export function MetadataUiRenderSection({
   return (
     <section
       {...state.domAttributes}
-      data-metadata-ui-section={state.section.id}
+      data-metadata-ui-section={state.sectionKey}
       data-metadata-ui-section-kind={state.section.kind}
       data-metadata-ui-renderer={state.renderer.id}
       data-metadata-ui-capabilities={state.capabilities.join(" ")}

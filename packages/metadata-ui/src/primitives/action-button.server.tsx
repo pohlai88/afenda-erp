@@ -29,6 +29,11 @@ export type MetadataUiPrimitiveActionButtonState =
   | MetadataUiActionLifecycleState
   | "disabled";
 
+export type MetadataUiPrimitiveActionButtonRenderMode =
+  | "button"
+  | "link"
+  | "confirmation";
+
 export type MetadataUiPrimitiveActionButtonProps = Readonly<{
   action?: MetadataUiActionContract;
   label?: ReactNode;
@@ -103,6 +108,25 @@ function requiresMetadataUiActionConfirmation(
   confirmation: NonNullable<MetadataUiActionContract["confirmation"]>;
 } {
   return Boolean(action?.confirmation);
+}
+
+function resolveMetadataUiPrimitiveActionButtonRenderMode(
+  action: MetadataUiActionContract | undefined,
+  isDisabled: boolean,
+): MetadataUiPrimitiveActionButtonRenderMode {
+  if (requiresMetadataUiActionConfirmation(action) && !isDisabled) {
+    return "confirmation";
+  }
+
+  if (
+    !isDisabled &&
+    (action?.execution.kind === "navigation" ||
+      action?.execution.kind === "external-link")
+  ) {
+    return "link";
+  }
+
+  return "button";
 }
 
 export function MetadataUiPrimitiveActionButton({
@@ -191,8 +215,30 @@ export function MetadataUiPrimitiveActionButton({
       action.execution.target === "new-tab")
       ? "_blank"
       : undefined;
+  const renderMode = resolveMetadataUiPrimitiveActionButtonRenderMode(
+    action,
+    isDisabled,
+  );
+  const resolvedAction = action;
 
-  if (requiresMetadataUiActionConfirmation(action) && !isDisabled) {
+  if (renderMode === "confirmation") {
+    if (!resolvedAction?.confirmation) {
+      return (
+        <>
+          <Button
+            type="button"
+            variant={variant}
+            size={size}
+            {...commonProps}
+          >
+            {content}
+          </Button>
+          {disabledReasonNode}
+          {feedbackNode}
+        </>
+      );
+    }
+
     return (
       <>
         <AlertDialog>
@@ -208,28 +254,28 @@ export function MetadataUiPrimitiveActionButton({
           </AlertDialogTrigger>
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle>{action.confirmation.title}</AlertDialogTitle>
+              <AlertDialogTitle>{resolvedAction.confirmation.title}</AlertDialogTitle>
               <AlertDialogDescription>
                 {confirmationDescription}
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogCancel>
-                {action.confirmation.cancelLabel}
+                {resolvedAction.confirmation.cancelLabel}
               </AlertDialogCancel>
               {confirmationHref ? (
                 <AlertDialogAction variant="destructive" asChild>
                   <a
                     href={confirmationHref}
                     target={confirmationTarget}
-                    rel={confirmationTarget === "_blank" ? "noreferrer" : undefined}
+                    rel={confirmationTarget === "_blank" ? "noreferrer noopener" : undefined}
                   >
-                    {action.confirmation.confirmLabel}
+                    {resolvedAction.confirmation.confirmLabel}
                   </a>
                 </AlertDialogAction>
               ) : (
                 <AlertDialogAction variant="destructive">
-                  {action.confirmation.confirmLabel}
+                  {resolvedAction.confirmation.confirmLabel}
                 </AlertDialogAction>
               )}
             </AlertDialogFooter>
@@ -241,7 +287,7 @@ export function MetadataUiPrimitiveActionButton({
     );
   }
 
-  if (href && !isDisabled) {
+  if (renderMode === "link" && href) {
     const target =
       action?.execution.kind === "external-link" ||
       (action?.execution.kind === "navigation" &&
@@ -260,7 +306,7 @@ export function MetadataUiPrimitiveActionButton({
           <a
             href={href}
             target={target}
-            rel={target === "_blank" ? "noreferrer" : undefined}
+            rel={target === "_blank" ? "noreferrer noopener" : undefined}
           >
             {content}
           </a>

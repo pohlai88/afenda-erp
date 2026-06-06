@@ -1,11 +1,10 @@
 import { and, eq } from "drizzle-orm";
 import { insertAuditLog } from "./audit";
-import { getDb, runWithBootstrapContext } from "./client";
+import { getDb, runWithBootstrapContext, type AfendaTransaction } from "./client";
 import { seedCoreErpModuleData } from "./erp";
 import { createEntityId } from "./ids";
 import { organizationMemberships, organizations, userProfiles } from "./schema";
 import {
-  getUserProfile,
   listOrganizationsForUser,
   setDefaultOrganizationForUser,
   upsertUserProfile,
@@ -27,6 +26,39 @@ function isUniqueViolation(error: unknown) {
   );
 }
 
+export class OrganizationAlreadyBootstrappedError extends Error {
+  readonly code = "organization-already-bootstrapped" as const;
+  readonly organizationId: string;
+
+  constructor(organizationId: string) {
+    super("Operator already belongs to a bootstrapped workspace.");
+    this.name = "OrganizationAlreadyBootstrappedError";
+    this.organizationId = organizationId;
+  }
+}
+
+export function isOrganizationAlreadyBootstrappedError(
+  error: unknown,
+): error is OrganizationAlreadyBootstrappedError {
+  return error instanceof OrganizationAlreadyBootstrappedError;
+}
+
+async function assertNoExistingBootstrapMembership(
+  db: AfendaTransaction,
+  authUserId: string,
+) {
+  const existingMembership = await db.query.organizationMemberships.findFirst({
+    where: eq(organizationMemberships.authUserId, authUserId),
+    columns: { organizationId: true },
+  });
+
+  if (existingMembership) {
+    throw new OrganizationAlreadyBootstrappedError(
+      existingMembership.organizationId,
+    );
+  }
+}
+
 export async function bootstrapOrganizationForUser(input: {
   authUserId: string;
   email: string;
@@ -46,28 +78,12 @@ export async function bootstrapOrganizationForUser(input: {
   );
 
   if (existingOrganizations.length > 0) {
-    const profile = await getUserProfile(input.authUserId);
-
-    if (
-      profile?.defaultOrganizationId &&
-      existingOrganizations.some(
-        (organization) => organization.id === profile.defaultOrganizationId,
-      )
-    ) {
-      return profile.defaultOrganizationId;
-    }
-
     const firstOrganization = existingOrganizations[0];
     if (!firstOrganization) {
       throw new Error("Invariant: expected at least one organization for user");
     }
 
-    await setDefaultOrganizationForUser({
-      authUserId: input.authUserId,
-      organizationId: firstOrganization.id,
-    });
-
-    return firstOrganization.id;
+    throw new OrganizationAlreadyBootstrappedError(firstOrganization.id);
   }
 
   const organizationId = createEntityId("org");
@@ -78,6 +94,8 @@ export async function bootstrapOrganizationForUser(input: {
     input.authUserId,
     organizationId,
     async (db) => {
+      await assertNoExistingBootstrapMembership(db, input.authUserId);
+
       let slug = baseSlug;
       let suffix = 1;
 

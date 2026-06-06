@@ -15,6 +15,7 @@ The playground may render:
 
 - static AppShell chrome built from local fixtures
 - metadata-ui section stacks
+- a full landing-page atlas that renders every certified governed pattern
 - representative list, stat, chart, form, action, timeline, analytics, and state matrix surfaces
 - intentionally seeded sample rows for visual and interaction review
 
@@ -169,16 +170,16 @@ keeping the route deterministic and free of request-bound APIs.
 
 ## Rendering Pattern
 
-The page should stay thin:
+The root page should render the full atlas and stay metadata-ui only:
 
 ```tsx
 import { MetadataUiRenderStack } from "@afenda/metadata-ui/server";
-import { createMetadataUiPlaygroundStackForPattern } from "./_fixtures/stack.fixture";
+import { createMetadataUiPlaygroundStack } from "./_fixtures/stack.fixture";
 
 export default function MetadataUiPlaygroundPage() {
   return (
     <MetadataUiRenderStack
-      sections={createMetadataUiPlaygroundStackForPattern("overview")}
+      sections={createMetadataUiPlaygroundStack()}
     />
   );
 }

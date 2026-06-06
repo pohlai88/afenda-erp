@@ -1,13 +1,12 @@
-import { z } from "zod";
-
 import {
-  METADATA_UI_SURFACE_CHROME_SCHEMA,
   METADATA_UI_SURFACE_SECTION_REF_SCHEMA,
   parseMetadataUiSurfaceChrome,
+  safeParseMetadataUiSurfaceChrome,
   type MetadataUiSurfaceChrome,
   type MetadataUiSurfaceChromeForDensity,
   type MetadataUiSurfaceChromeForVariant,
   type MetadataUiSurfaceChromeInput,
+  type MetadataUiSurfaceChromeParseResult,
   type MetadataUiSurfaceDensity,
   type MetadataUiSurfaceRegion,
   type MetadataUiSurfaceSectionRef,
@@ -76,64 +75,97 @@ export type MetadataUiSurfaceChromeBuilderResultFor<
 > = MetadataUiSurfaceChromeForVariant<Variant> &
   MetadataUiSurfaceChromeForDensity<Density>;
 
-export type MetadataUiSurfaceChromeSafeCreateResult<
-  Data extends MetadataUiSurfaceChrome = MetadataUiSurfaceChrome,
-> =
-  | {
-      success: true;
-      data: Data;
-      error?: never;
-    }
-  | {
-      success: false;
-      data?: never;
-      error: z.ZodError;
-    };
+export type MetadataUiSurfaceChromeSafeCreateResult =
+  MetadataUiSurfaceChromeParseResult;
 
-export function createSurfaceChrome<
-  const Input extends SurfaceChromeBuilderInput,
->(input: Input): MetadataUiSurfaceChromeBuilderResult<Input> {
-  return parseMetadataUiSurfaceChrome(
-    input,
-  ) as MetadataUiSurfaceChromeBuilderResult<Input>;
+function normalizeSurfaceChromeBasicInput<
+  Input extends MetadataUiSurfaceBuilderInput,
+>(input: Input): MetadataUiSurfaceBuilderInput {
+  return {
+    key: input.key.trim(),
+    title: input.title?.trim(),
+    description: input.description?.trim(),
+    sections: input.sections.map((section) => normalizeSurfaceSectionRefInput(section)),
+  };
+}
+
+function normalizeSurfaceChromeInput<
+  Input extends SurfaceChromeBuilderInput,
+>(input: Input): SurfaceChromeBuilderInput {
+  return {
+    ...normalizeSurfaceChromeBasicInput(input),
+    variant: input.variant ?? "module",
+    density: input.density ?? "comfortable",
+  };
+}
+
+function normalizeSurfaceSectionRefInput<
+  Input extends MetadataUiSurfaceSectionRefInput,
+>(input: Input): MetadataUiSurfaceSectionRefInput {
+  return {
+    ...input,
+    sectionKey: input.sectionKey.trim(),
+    region: input.region ?? "primary",
+    order: input.order ?? 0,
+    lazy: input.lazy ?? false,
+  };
+}
+
+function createSurfaceChromeForVariant<
+  const Variant extends MetadataUiSurfaceVariant,
+>(
+  input: MetadataUiSurfaceBuilderInput,
+  variant: Variant,
+): MetadataUiSurfaceChromeBuilderResultFor<Variant> {
+  return createSurfaceChrome({
+    ...input,
+    variant,
+    density: "comfortable",
+  });
+}
+
+export function createSurfaceChrome<const Input extends SurfaceChromeBuilderInput>(
+  input: Input,
+): MetadataUiSurfaceChromeBuilderResult<Input> {
+  return parseMetadataUiSurfaceChrome(normalizeSurfaceChromeInput(input)) as MetadataUiSurfaceChromeBuilderResult<Input>;
+}
+
+export function createWorkspaceSurface<
+  const Input extends MetadataUiSurfaceBuilderInput,
+>(input: Input): MetadataUiSurfaceChromeBuilderResultFor<"workspace"> {
+  return createSurfaceChromeForVariant(input, "workspace");
 }
 
 export function createModuleSurface<
   const Input extends MetadataUiSurfaceBuilderInput,
 >(input: Input): MetadataUiSurfaceChromeBuilderResultFor<"module"> {
-  return createSurfaceChrome({
-    key: input.key,
-    title: input.title,
-    description: input.description,
-    variant: "module",
-    density: "comfortable",
-    sections: input.sections,
-  });
+  return createSurfaceChromeForVariant(input, "module");
 }
 
 export function createRecordSurface<
   const Input extends MetadataUiSurfaceBuilderInput,
 >(input: Input): MetadataUiSurfaceChromeBuilderResultFor<"record"> {
-  return createSurfaceChrome({
-    key: input.key,
-    title: input.title,
-    description: input.description,
-    variant: "record",
-    density: "comfortable",
-    sections: input.sections,
-  });
+  return createSurfaceChromeForVariant(input, "record");
+}
+
+export function createDialogSurface<
+  const Input extends MetadataUiSurfaceBuilderInput,
+>(input: Input): MetadataUiSurfaceChromeBuilderResultFor<"dialog"> {
+  return createSurfaceChromeForVariant(input, "dialog");
+}
+
+export function createEmbeddedSurface<
+  const Input extends MetadataUiSurfaceBuilderInput,
+>(input: Input): MetadataUiSurfaceChromeBuilderResultFor<"embedded"> {
+  return createSurfaceChromeForVariant(input, "embedded");
 }
 
 export function createSurfaceSectionRef<
   const Input extends MetadataUiSurfaceSectionRefInput,
 >(input: Input): MetadataUiSurfaceSectionRefBuilderResult<Input> {
-  return METADATA_UI_SURFACE_SECTION_REF_SCHEMA.parse({
-    sectionKey: input.sectionKey,
-    region: input.region ?? "primary",
-    order: input.order ?? 0,
-    lazy: input.lazy ?? false,
-    permission: input.permission,
-  }) as MetadataUiSurfaceSectionRefBuilderResult<Input>;
+  return METADATA_UI_SURFACE_SECTION_REF_SCHEMA.parse(
+    normalizeSurfaceSectionRefInput(input),
+  ) as MetadataUiSurfaceSectionRefBuilderResult<Input>;
 }
 
 export function withSurfaceSections(
@@ -166,20 +198,18 @@ export function withSurfaceDensity<const Density extends MetadataUiSurfaceDensit
   });
 }
 
+export function withSurfaceVariant<const Variant extends MetadataUiSurfaceVariant>(
+  surface: MetadataUiSurfaceChromeInput,
+  variant: Variant,
+): MetadataUiSurfaceChromeForVariant<Variant> {
+  return createSurfaceChrome({
+    ...surface,
+    variant,
+  });
+}
+
 export function safeCreateSurfaceChrome(
   input: unknown,
 ): MetadataUiSurfaceChromeSafeCreateResult {
-  const result = METADATA_UI_SURFACE_CHROME_SCHEMA.safeParse(input);
-
-  if (!result.success) {
-    return {
-      success: false,
-      error: result.error,
-    };
-  }
-
-  return {
-    success: true,
-    data: parseMetadataUiSurfaceChrome(result.data),
-  };
+  return safeParseMetadataUiSurfaceChrome(input);
 }

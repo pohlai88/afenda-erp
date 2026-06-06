@@ -12,6 +12,7 @@ import {
   METADATA_UI_SCORECARD_FORM_SCHEMA_ID,
   METADATA_UI_STAT_SCHEMA_ID,
   createSurfacePageHeader,
+  resolveMetadataUiSectionInstanceKey,
 } from "@afenda/metadata-ui";
 import {
   createMetadataUiRendererContext,
@@ -63,7 +64,6 @@ import { createMetadataUiPlaygroundAuditPanel } from "./audit-panel.fixture";
 import { createMetadataUiPlaygroundChart } from "./chart.fixture";
 import {
   METADATA_UI_PLAYGROUND_FIXTURE_IDS,
-  METADATA_UI_PLAYGROUND_ROUTE,
 } from "./constants.fixture";
 import { createMetadataUiPlaygroundDetailTabs } from "./detail-tabs.fixture";
 import { createMetadataUiPlaygroundForm } from "./form.fixture";
@@ -73,7 +73,13 @@ import {
   createMetadataUiPlaygroundDenseList,
 } from "./list.fixture";
 import { createMetadataUiPlaygroundMultiStepForm } from "./multi-step-form.fixture";
+import {
+  createMetadataUiPlaygroundPageHeaderShowcase,
+  createMetadataUiPlaygroundWorkspaceHeader,
+  type MetadataUiPlaygroundHeaderView,
+} from "./page-header.fixture";
 import { createMetadataUiPlaygroundScorecardForm } from "./scorecard-form.fixture";
+import { normalizeMetadataUiPlaygroundStackSections } from "./section.fixture";
 import { METADATA_UI_PLAYGROUND_SAMPLE_COPY } from "./sample-vocabulary.fixture";
 import { createMetadataUiPlaygroundStats } from "./stat.fixture";
 import { createMetadataUiPlaygroundTimeline } from "./timeline.fixture";
@@ -105,6 +111,7 @@ const METADATA_UI_PLAYGROUND_SECTION_IDS_BY_PATTERN = {
     METADATA_UI_PLAYGROUND_FIXTURE_IDS.advancedOverviewChartSection,
     METADATA_UI_PLAYGROUND_FIXTURE_IDS.advancedOverviewListSection,
     METADATA_UI_PLAYGROUND_FIXTURE_IDS.rendererGalleryHeaderSection,
+    METADATA_UI_PLAYGROUND_FIXTURE_IDS.pageHeaderShowcaseSection,
     METADATA_UI_PLAYGROUND_FIXTURE_IDS.actionBarSection,
     METADATA_UI_PLAYGROUND_FIXTURE_IDS.statSection,
     METADATA_UI_PLAYGROUND_FIXTURE_IDS.listSection,
@@ -214,45 +221,31 @@ function createMetadataUiPlaygroundScenarioMarker(
   } as const;
 }
 
-export function createMetadataUiPlaygroundStack(): readonly MetadataUiRenderableSectionStackItem[] {
-  const pageHeader = createSurfacePageHeader({
-    key: METADATA_UI_PLAYGROUND_FIXTURE_IDS.pageHeaderMetadata,
-    eyebrow: METADATA_UI_PLAYGROUND_SAMPLE_COPY.appEyebrow,
-    title: METADATA_UI_PLAYGROUND_SAMPLE_COPY.appTitle,
-    description: METADATA_UI_PLAYGROUND_SAMPLE_COPY.appDescription,
-  });
+function createMetadataUiPlaygroundPageHeaderStackItem(
+  headerView: MetadataUiPlaygroundHeaderView = { mode: "atlas" },
+): MetadataUiRenderableSectionStackItem {
+  const headerMetadata = createMetadataUiPlaygroundWorkspaceHeader(headerView);
 
-  return [
-    {
-      order: 10,
-      span: "full",
-      section: {
-        id: METADATA_UI_PLAYGROUND_FIXTURE_IDS.pageHeaderSection,
-        kind: "page-header",
-        title: METADATA_UI_PLAYGROUND_SAMPLE_COPY.appTitle,
-        description: METADATA_UI_PLAYGROUND_SAMPLE_COPY.appDescription,
-        schemaId: METADATA_UI_PAGE_HEADER_SCHEMA_ID,
-        rendererId: "metadata-ui.renderer.page-header",
-        metadata: {
-          ...pageHeader,
-          breadcrumbs: [
-            {
-              key: "metadata-ui.playground.breadcrumb",
-              label: METADATA_UI_PLAYGROUND_SAMPLE_COPY.appTitle,
-              href: METADATA_UI_PLAYGROUND_ROUTE,
-              current: true,
-            },
-          ],
-          badges: [
-            {
-              key: "metadata-ui.playground.badge",
-              label: "Developer only",
-              tone: "info",
-            },
-          ],
-        },
-      },
+  return {
+    order: 10,
+    span: "full",
+    section: {
+      id: METADATA_UI_PLAYGROUND_FIXTURE_IDS.pageHeaderSection,
+      kind: "page-header",
+      title: METADATA_UI_PLAYGROUND_SAMPLE_COPY.appTitle,
+      description: METADATA_UI_PLAYGROUND_SAMPLE_COPY.appDescription,
+      schemaId: METADATA_UI_PAGE_HEADER_SCHEMA_ID,
+      rendererId: "metadata-ui.renderer.page-header",
+      metadata: headerMetadata,
     },
+  };
+}
+
+export function createMetadataUiPlaygroundStack(
+  headerView: MetadataUiPlaygroundHeaderView = { mode: "atlas" },
+): readonly MetadataUiRenderableSectionStackItem[] {
+  return normalizeMetadataUiPlaygroundStackSections([
+    createMetadataUiPlaygroundPageHeaderStackItem(headerView),
     {
       order: 12,
       span: "full",
@@ -609,6 +602,20 @@ export function createMetadataUiPlaygroundStack(): readonly MetadataUiRenderable
       order: 41,
       span: "full",
       section: {
+        id: METADATA_UI_PLAYGROUND_FIXTURE_IDS.pageHeaderShowcaseSection,
+        kind: "page-header",
+        title: "Page header anatomy",
+        description:
+          "Record-level header metadata for shadcn breadcrumb, badge, button, and menu primitives.",
+        schemaId: METADATA_UI_PAGE_HEADER_SCHEMA_ID,
+        rendererId: "metadata-ui.renderer.page-header",
+        metadata: createMetadataUiPlaygroundPageHeaderShowcase(),
+      },
+    },
+    {
+      order: 42,
+      span: "full",
+      section: {
         id: METADATA_UI_PLAYGROUND_FIXTURE_IDS.actionBarSection,
         kind: "action-bar",
         title: "Action bar preview",
@@ -619,7 +626,7 @@ export function createMetadataUiPlaygroundStack(): readonly MetadataUiRenderable
       },
     },
     {
-      order: 42,
+      order: 43,
       span: "full",
       section: {
         id: METADATA_UI_PLAYGROUND_FIXTURE_IDS.statSection,
@@ -632,7 +639,7 @@ export function createMetadataUiPlaygroundStack(): readonly MetadataUiRenderable
       },
     },
     {
-      order: 43,
+      order: 44,
       span: "full",
       section: {
         id: METADATA_UI_PLAYGROUND_FIXTURE_IDS.listSection,
@@ -645,7 +652,7 @@ export function createMetadataUiPlaygroundStack(): readonly MetadataUiRenderable
       },
     },
     {
-      order: 44,
+      order: 45,
       span: "full",
       section: createMetadataUiPlaygroundGroupHeaderSection({
         sectionId: METADATA_UI_PLAYGROUND_FIXTURE_IDS.stateCoverageHeaderSection,
@@ -659,7 +666,7 @@ export function createMetadataUiPlaygroundStack(): readonly MetadataUiRenderable
       }),
     },
     {
-      order: 45,
+      order: 46,
       span: "full",
       section: {
         id: METADATA_UI_PLAYGROUND_FIXTURE_IDS.stateSection,
@@ -673,7 +680,7 @@ export function createMetadataUiPlaygroundStack(): readonly MetadataUiRenderable
       },
     },
     {
-      order: 46,
+      order: 47,
       span: "full",
       section: createMetadataUiPlaygroundGroupHeaderSection({
         sectionId: METADATA_UI_PLAYGROUND_FIXTURE_IDS.inputSurfacesHeaderSection,
@@ -687,7 +694,7 @@ export function createMetadataUiPlaygroundStack(): readonly MetadataUiRenderable
       }),
     },
     {
-      order: 47,
+      order: 48,
       span: "half",
       section: {
         id: METADATA_UI_PLAYGROUND_FIXTURE_IDS.formSection,
@@ -701,7 +708,7 @@ export function createMetadataUiPlaygroundStack(): readonly MetadataUiRenderable
       },
     },
     {
-      order: 48,
+      order: 49,
       span: "half",
       section: {
         id: METADATA_UI_PLAYGROUND_FIXTURE_IDS.scorecardFormSection,
@@ -715,7 +722,7 @@ export function createMetadataUiPlaygroundStack(): readonly MetadataUiRenderable
       },
     },
     {
-      order: 49,
+      order: 50,
       span: "full",
       section: createMetadataUiPlaygroundGroupHeaderSection({
         sectionId:
@@ -730,7 +737,7 @@ export function createMetadataUiPlaygroundStack(): readonly MetadataUiRenderable
       }),
     },
     {
-      order: 50,
+      order: 51,
       span: "full",
       section: {
         id: METADATA_UI_PLAYGROUND_FIXTURE_IDS.chartSection,
@@ -744,7 +751,7 @@ export function createMetadataUiPlaygroundStack(): readonly MetadataUiRenderable
       },
     },
     {
-      order: 51,
+      order: 52,
       span: "half",
       section: {
         id: METADATA_UI_PLAYGROUND_FIXTURE_IDS.timelineSection,
@@ -758,7 +765,7 @@ export function createMetadataUiPlaygroundStack(): readonly MetadataUiRenderable
       },
     },
     {
-      order: 52,
+      order: 53,
       span: "half",
       section: {
         id: METADATA_UI_PLAYGROUND_FIXTURE_IDS.auditPanelSection,
@@ -772,7 +779,7 @@ export function createMetadataUiPlaygroundStack(): readonly MetadataUiRenderable
       },
     },
     {
-      order: 53,
+      order: 54,
       span: "full",
       section: createMetadataUiPlaygroundGroupHeaderSection({
         sectionId: METADATA_UI_PLAYGROUND_FIXTURE_IDS.interactionHeaderSection,
@@ -786,7 +793,7 @@ export function createMetadataUiPlaygroundStack(): readonly MetadataUiRenderable
       }),
     },
     {
-      order: 54,
+      order: 55,
       span: "third",
       section: {
         id: METADATA_UI_PLAYGROUND_FIXTURE_IDS.multiStepFormSection,
@@ -800,7 +807,7 @@ export function createMetadataUiPlaygroundStack(): readonly MetadataUiRenderable
       },
     },
     {
-      order: 55,
+      order: 56,
       span: "two-thirds",
       section: {
         id: METADATA_UI_PLAYGROUND_FIXTURE_IDS.kanbanSection,
@@ -814,7 +821,7 @@ export function createMetadataUiPlaygroundStack(): readonly MetadataUiRenderable
       },
     },
     {
-      order: 56,
+      order: 57,
       span: "full",
       section: {
         id: METADATA_UI_PLAYGROUND_FIXTURE_IDS.detailTabsSection,
@@ -826,7 +833,7 @@ export function createMetadataUiPlaygroundStack(): readonly MetadataUiRenderable
         metadata: createMetadataUiPlaygroundDetailTabs(),
       },
     },
-  ] as const;
+  ]);
 }
 
 function getMetadataUiStackItemSectionId(
@@ -834,8 +841,10 @@ function getMetadataUiStackItemSectionId(
 ): string | undefined {
   const section = item.section;
 
-  if (typeof section === "object" && section && "id" in section) {
-    return String(section.id);
+  if (typeof section === "object" && section && "id" in section && "kind" in section) {
+    return resolveMetadataUiSectionInstanceKey(
+      section as Parameters<typeof resolveMetadataUiSectionInstanceKey>[0],
+    );
   }
 
   return undefined;
@@ -850,11 +859,16 @@ export function isMetadataUiPlaygroundPatternKey(
 export function createMetadataUiPlaygroundStackForPattern(
   pattern: MetadataUiPlaygroundPatternKey,
 ): readonly MetadataUiRenderableSectionStackItem[] {
+  const headerView: MetadataUiPlaygroundHeaderView =
+    pattern === "overview"
+      ? { mode: "atlas" }
+      : { mode: "pattern", pattern };
+
   const patternSectionIds = new Set<string>(
     METADATA_UI_PLAYGROUND_SECTION_IDS_BY_PATTERN[pattern],
   );
 
-  return createMetadataUiPlaygroundStack().filter((item) => {
+  return createMetadataUiPlaygroundStack(headerView).filter((item) => {
     const sectionId = getMetadataUiStackItemSectionId(item);
 
     if (!sectionId) {

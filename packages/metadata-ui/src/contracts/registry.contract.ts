@@ -25,8 +25,14 @@ const METADATA_UI_REGISTRY_LIFECYCLE_VALUES = [
   "deprecated",
 ] as const;
 
+const METADATA_UI_REGISTRY_ID_PREFIX_BY_KIND = {
+  component: "metadata-ui.component.",
+  renderer: "metadata-ui.renderer.",
+} as const satisfies Record<MetadataUiRegistryKind, string>;
+
 export const metadataUiRegistryIdSchema = z
   .string()
+  .trim()
   .min(1)
   .max(160)
   .regex(
@@ -42,6 +48,22 @@ export const metadataUiRegistryLifecycleSchema = z.enum(
   METADATA_UI_REGISTRY_LIFECYCLE_VALUES,
 );
 
+function getMetadataUiRegistryIdPrefix(kind: MetadataUiRegistryKind): string {
+  return METADATA_UI_REGISTRY_ID_PREFIX_BY_KIND[kind];
+}
+
+function assertMetadataUiRegistryIdMatchesKind(
+  id: string,
+  kind: MetadataUiRegistryKind,
+): void {
+  const expectedPrefix = getMetadataUiRegistryIdPrefix(kind);
+  if (!id.startsWith(expectedPrefix)) {
+    throw new Error(
+      `Registry kind "${kind}" must use the ${expectedPrefix} prefix.`,
+    );
+  }
+}
+
 export const metadataUiComponentRegistryContractSchema = z
   .object({
     id: metadataUiRegistryIdSchema,
@@ -54,8 +76,29 @@ export const metadataUiComponentRegistryContractSchema = z
 
     metadata: z.record(z.string(), z.unknown()).default({}),
   })
+  .strict()
   .superRefine((registry, ctx) => {
+    const expectedPrefix = getMetadataUiRegistryIdPrefix(registry.kind);
+    if (!registry.id.startsWith(expectedPrefix)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["id"],
+        message: `Registry kind "${registry.kind}" must use the ${expectedPrefix} prefix.`,
+      });
+    }
+
     const ids = new Set<string>();
+    const sectionKeys = new Map<string, string>();
+    const expectedIdPrefixByKind = {
+      section: "metadata-ui.section.",
+      renderer: "metadata-ui.renderer.",
+      shell: "metadata-ui.shell.",
+      primitive: "metadata-ui.primitive.",
+      "client-island": "metadata-ui.client.",
+    } as const satisfies Record<
+      MetadataUiComponentContract["kind"],
+      string
+    >;
 
     for (const [index, component] of registry.components.entries()) {
       if (ids.has(component.id)) {
@@ -67,6 +110,37 @@ export const metadataUiComponentRegistryContractSchema = z
       }
 
       ids.add(component.id);
+
+      const sectionKind = component.metadata.sectionKind;
+      if (typeof sectionKind !== "string" || !metadataUiSectionKindSchema.safeParse(sectionKind).success) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["components", index, "metadata", "sectionKind"],
+          message: "Component registry entries must declare a valid sectionKind.",
+        });
+        continue;
+      }
+
+      const key = `${component.kind}:${sectionKind}`;
+      const existingComponentId = sectionKeys.get(key);
+      if (existingComponentId) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["components", index, "metadata", "sectionKind"],
+          message: `Component kind "${component.kind}" is already registered for section kind "${sectionKind}" by "${existingComponentId}".`,
+        });
+      }
+
+      sectionKeys.set(key, component.id);
+
+      const expectedPrefix = expectedIdPrefixByKind[component.kind];
+      if (!component.id.startsWith(expectedPrefix)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["components", index, "id"],
+          message: `Component kind "${component.kind}" must use the ${expectedPrefix} prefix.`,
+        });
+      }
     }
   });
 
@@ -82,7 +156,17 @@ export const metadataUiRendererRegistryContractSchema = z
 
     metadata: z.record(z.string(), z.unknown()).default({}),
   })
+  .strict()
   .superRefine((registry, ctx) => {
+    const expectedPrefix = getMetadataUiRegistryIdPrefix(registry.kind);
+    if (!registry.id.startsWith(expectedPrefix)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["id"],
+        message: `Registry kind "${registry.kind}" must use the ${expectedPrefix} prefix.`,
+      });
+    }
+
     const rendererIds = new Set<string>();
     const sectionKinds = new Map<string, string>();
 
@@ -156,6 +240,10 @@ export type MetadataUiBrandedRegistryId = MetadataUiRegistryId & {
   readonly [metadataUiRegistryIdBrand]: true;
 };
 
+export type MetadataUiRegistryIdForKind<
+  Kind extends MetadataUiRegistryKind,
+> = `metadata-ui.${Kind}.${string}` & MetadataUiBrandedRegistryId;
+
 export type MetadataUiRegistryIdFor<
   Kind extends MetadataUiRegistryKind,
   Name extends string,
@@ -196,7 +284,7 @@ export type MetadataUiComponentRegistryContract = Omit<
   MetadataUiComponentRegistryContractSchemaOutput,
   "components" | "id"
 > & {
-  id: MetadataUiBrandedRegistryId;
+  id: MetadataUiRegistryIdForKind<"component">;
   components: MetadataUiUniqueComponentRegistryEntries;
 };
 
@@ -204,7 +292,7 @@ export type MetadataUiRendererRegistryContract = Omit<
   MetadataUiRendererRegistryContractSchemaOutput,
   "id" | "renderers"
 > & {
-  id: MetadataUiBrandedRegistryId;
+  id: MetadataUiRegistryIdForKind<"renderer">;
   renderers: MetadataUiUniqueRendererRegistryEntries;
 };
 
@@ -235,8 +323,21 @@ function assertMetadataUiRegistryContractInvariants(
     throw new Error("Registry id must use lowercase kebab/dot notation.");
   }
 
+  assertMetadataUiRegistryIdMatchesKind(registry.id, registry.kind);
+
   if (registry.kind === "component") {
     const componentIds = new Set<string>();
+    const sectionKeys = new Map<string, string>();
+    const expectedIdPrefixByKind = {
+      section: "metadata-ui.section.",
+      renderer: "metadata-ui.renderer.",
+      shell: "metadata-ui.shell.",
+      primitive: "metadata-ui.primitive.",
+      "client-island": "metadata-ui.client.",
+    } as const satisfies Record<
+      MetadataUiComponentContract["kind"],
+      string
+    >;
 
     for (const component of registry.components) {
       if (componentIds.has(component.id)) {
@@ -244,6 +345,33 @@ function assertMetadataUiRegistryContractInvariants(
       }
 
       componentIds.add(component.id);
+
+      const sectionKind = component.metadata.sectionKind;
+      if (
+        typeof sectionKind !== "string" ||
+        !metadataUiSectionKindSchema.safeParse(sectionKind).success
+      ) {
+        throw new Error(
+          "Component registry entries must declare a valid sectionKind.",
+        );
+      }
+
+      const key = `${component.kind}:${sectionKind}`;
+      const existingComponentId = sectionKeys.get(key);
+      if (existingComponentId) {
+        throw new Error(
+          `Component kind "${component.kind}" is already registered for section kind "${sectionKind}" by "${existingComponentId}".`,
+        );
+      }
+
+      sectionKeys.set(key, component.id);
+
+      const expectedPrefix = expectedIdPrefixByKind[component.kind];
+      if (!component.id.startsWith(expectedPrefix)) {
+        throw new Error(
+          `Component kind "${component.kind}" must use the ${expectedPrefix} prefix.`,
+        );
+      }
     }
   }
 

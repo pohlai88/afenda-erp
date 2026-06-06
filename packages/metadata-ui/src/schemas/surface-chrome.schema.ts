@@ -41,6 +41,7 @@ const METADATA_UI_SURFACE_DENSITY_VALUES = [
 
 export const METADATA_UI_SURFACE_CHROME_KEY_SCHEMA = z
   .string()
+  .trim()
   .min(1)
   .max(160)
   .regex(
@@ -75,8 +76,8 @@ export const METADATA_UI_SURFACE_CHROME_SCHEMA = z.object({
 
   key: METADATA_UI_SURFACE_CHROME_KEY_SCHEMA,
 
-  title: z.string().min(1).max(160).optional(),
-  description: z.string().min(1).max(360).optional(),
+  title: z.string().trim().min(1).max(160).optional(),
+  description: z.string().trim().min(1).max(360).optional(),
 
   variant: z
     .enum(METADATA_UI_SURFACE_VARIANT_VALUES)
@@ -94,12 +95,28 @@ export const METADATA_UI_SURFACE_CHROME_SCHEMA = z.object({
 
   diagnostics: z
     .object({
-      surfaceKey: z.string().min(1).max(160).optional(),
-      rendererKey: z.string().min(1).max(160).optional(),
-      testId: z.string().min(1).max(160).optional(),
+      surfaceKey: z.string().trim().min(1).max(160).optional(),
+      rendererKey: z.string().trim().min(1).max(160).optional(),
+      testId: z.string().trim().min(1).max(160).optional(),
     })
     .optional(),
-});
+})
+  .strict()
+  .superRefine((surfaceChrome, ctx) => {
+    const sectionKeys = new Set<string>();
+
+    surfaceChrome.sections.forEach((section, index) => {
+      if (sectionKeys.has(section.sectionKey)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["sections", index, "sectionKey"],
+          message: "Surface chrome sections must use unique section keys.",
+        });
+      }
+
+      sectionKeys.add(section.sectionKey);
+    });
+  });
 
 type MetadataUiSurfaceChromeSchemaOutput = z.output<
   typeof METADATA_UI_SURFACE_CHROME_SCHEMA
@@ -252,6 +269,11 @@ function assertMetadataUiSurfaceChromeInvariants(
 
   if (surfaceChrome.sections.length < 1 || surfaceChrome.sections.length > 48) {
     throw new Error("Surface chrome must declare between one and forty-eight sections.");
+  }
+
+  const sectionKeys = new Set(surfaceChrome.sections.map((section) => section.sectionKey));
+  if (sectionKeys.size !== surfaceChrome.sections.length) {
+    throw new Error("Surface chrome sections must use unique section keys.");
   }
 }
 

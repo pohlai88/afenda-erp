@@ -7,7 +7,7 @@ vi.mock("@afenda/config/env", () => ({
   getNeonAuthEnv: vi.fn(),
 }));
 
-vi.mock("../../security/jwks.shared.server", () => ({
+vi.mock("../src/aut-jwks-shared-server", () => ({
   getNeonAuthJwkByKid: vi.fn(),
 }));
 

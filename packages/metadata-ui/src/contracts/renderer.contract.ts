@@ -18,8 +18,11 @@ const METADATA_UI_RENDERER_LIFECYCLE_VALUES = [
   "deprecated",
 ] as const;
 
+const METADATA_UI_RENDERER_DEFAULT_EXPORT_NAME = "default" as const;
+
 export const metadataUiRendererIdSchema = z
   .string()
+  .trim()
   .min(1)
   .max(160)
   .regex(
@@ -39,18 +42,24 @@ export const metadataUiRendererContractSchema = z
 
     runtime: metadataUiRuntimeSchema.default("server"),
 
-    schemaId: z.string().min(1).max(160),
+    schemaId: z.string().trim().min(1).max(160),
 
-    modulePath: z.string().min(1).max(240),
+    modulePath: z.string().trim().min(1).max(240),
 
-    exportName: z.string().min(1).max(120).default("default"),
+    exportName: z
+      .string()
+      .trim()
+      .min(1)
+      .max(120)
+      .default(METADATA_UI_RENDERER_DEFAULT_EXPORT_NAME),
 
     lifecycle: metadataUiRendererLifecycleSchema.default("active"),
 
-    description: z.string().min(1).max(240).optional(),
+    description: z.string().trim().min(1).max(240).optional(),
 
     metadata: z.record(z.string(), z.unknown()).default({}),
   })
+  .strict()
   .superRefine((renderer, ctx) => {
     if (renderer.runtime !== "server") {
       ctx.addIssue({
@@ -66,6 +75,41 @@ export const metadataUiRendererContractSchema = z
         path: ["modulePath"],
         message:
           "Renderer modulePath must reference a server renderer without file extension, e.g. sections/list/list-renderer.server.",
+      });
+    }
+
+    if (renderer.exportName !== METADATA_UI_RENDERER_DEFAULT_EXPORT_NAME) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["exportName"],
+        message: `Renderer exportName must be ${METADATA_UI_RENDERER_DEFAULT_EXPORT_NAME}.`,
+      });
+    }
+
+    const expectedRendererId = `metadata-ui.renderer.${renderer.sectionKind}`;
+    if (renderer.id !== expectedRendererId) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["id"],
+        message: `Renderer id must be ${expectedRendererId}.`,
+      });
+    }
+
+    const expectedSchemaId = `metadata-ui.schema.${renderer.sectionKind}`;
+    if (renderer.schemaId !== expectedSchemaId) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["schemaId"],
+        message: `Renderer schemaId must be ${expectedSchemaId}.`,
+      });
+    }
+
+    const expectedModulePath = `sections/${renderer.sectionKind}/${renderer.sectionKind}-renderer.server`;
+    if (renderer.modulePath !== expectedModulePath) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["modulePath"],
+        message: `Renderer modulePath must be ${expectedModulePath}.`,
       });
     }
   });
@@ -101,23 +145,24 @@ export type MetadataUiRendererModulePath = `${string}.server` & {
   readonly [metadataUiRendererModulePathBrand]: true;
 };
 
-export type MetadataUiRendererExportName = string & {
-  readonly [metadataUiRendererExportNameBrand]: true;
-};
+export type MetadataUiRendererExportName =
+  typeof METADATA_UI_RENDERER_DEFAULT_EXPORT_NAME & {
+    readonly [metadataUiRendererExportNameBrand]: true;
+  };
 
 export type MetadataUiRendererIdFor<
   SectionKind extends MetadataUiSectionKind,
   Name extends string = "renderer",
-> = `${SectionKind}.${Lowercase<Name>}` & MetadataUiBrandedRendererId;
+> = `metadata-ui.${Lowercase<Name>}.${SectionKind}` & MetadataUiBrandedRendererId;
 
 export type MetadataUiRendererSchemaIdFor<
   SectionKind extends MetadataUiSectionKind,
-> = `${SectionKind}.schema` & MetadataUiRendererSchemaId;
+> = `metadata-ui.schema.${SectionKind}` & MetadataUiRendererSchemaId;
 
 export type MetadataUiRendererModulePathFor<
   SectionKind extends MetadataUiSectionKind,
   Name extends string = "renderer",
-> = `${string}/${SectionKind}-${Lowercase<Name>}.server` &
+> = `${string}/${SectionKind}/${SectionKind}-${Lowercase<Name>}.server` &
   MetadataUiRendererModulePath;
 
 export type MetadataUiRendererRuntimeState<
@@ -197,6 +242,27 @@ function assertMetadataUiRendererContractInvariants(
     throw new Error(
       "Renderer modulePath must reference a server renderer without file extension, e.g. sections/list/list-renderer.server.",
     );
+  }
+
+  if (renderer.exportName !== METADATA_UI_RENDERER_DEFAULT_EXPORT_NAME) {
+    throw new Error(
+      `Renderer exportName must be ${METADATA_UI_RENDERER_DEFAULT_EXPORT_NAME}.`,
+    );
+  }
+
+  const expectedRendererId = `metadata-ui.renderer.${renderer.sectionKind}`;
+  if (renderer.id !== expectedRendererId) {
+    throw new Error(`Renderer id must be ${expectedRendererId}.`);
+  }
+
+  const expectedSchemaId = `metadata-ui.schema.${renderer.sectionKind}`;
+  if (renderer.schemaId !== expectedSchemaId) {
+    throw new Error(`Renderer schemaId must be ${expectedSchemaId}.`);
+  }
+
+  const expectedModulePath = `sections/${renderer.sectionKind}/${renderer.sectionKind}-renderer.server`;
+  if (renderer.modulePath !== expectedModulePath) {
+    throw new Error(`Renderer modulePath must be ${expectedModulePath}.`);
   }
 }
 

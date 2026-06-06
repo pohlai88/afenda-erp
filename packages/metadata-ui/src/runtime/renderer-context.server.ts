@@ -5,6 +5,7 @@ import type { ReactNode } from "react";
 import type { MetadataUiPermissionContract } from "../contracts/permission.contract";
 import type { MetadataUiPresentationContract } from "../contracts/presentation.contract";
 import type { MetadataUiSectionContract } from "../contracts/section.contract";
+import { resolveMetadataUiSectionInstanceKey } from "../contracts/section.contract";
 import type { MetadataUiDomAttributes } from "../identity/identity.shared";
 import {
   getMetadataUiSectionCapabilities,
@@ -113,7 +114,7 @@ export function resolveMetadataUiSectionRenderContext(
   section: MetadataUiSectionContract,
   context?: MetadataUiRendererContext,
 ): MetadataUiResolvedSectionRenderContext {
-  const sectionKey = section.id;
+  const sectionKey = resolveMetadataUiSectionInstanceKey(section);
 
   return {
     sectionKey,

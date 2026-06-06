@@ -15,7 +15,7 @@ Sources: [Neon Next.js quickstart](https://neon.com/docs/auth/quick-start/nextjs
 | `@afenda/auth/neon-auth/server` | explicit server subpath |
 | `@afenda/auth/neon-auth/client` | explicit client subpath |
 
-ERP wiring (`auth.handler()`, `auth.middleware()`, App Router pages) stays in **apps/erp** until explicitly requested. See [`src/neon-auth/tree.md`](src/neon-auth/tree.md) for the end-to-end checklist.
+ERP wiring (`auth.handler()`, `auth.middleware()`, App Router pages) stays in **apps/erp** until explicitly requested. See [`src/tree.md`](src/tree.md) for the end-to-end checklist.
 
 ## Verify
 

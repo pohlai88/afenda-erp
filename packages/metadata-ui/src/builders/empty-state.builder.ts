@@ -168,30 +168,38 @@ export function createEmptyStateAction<
   ) as MetadataUiEmptyStateActionBuilderResult<Input>;
 }
 
-export function withEmptyStateActions(
-  state: MetadataUiEmptyStateInput,
+export function withEmptyStateActions<
+  const Input extends EmptyStateBuilderInput,
+>(
+  state: Input,
   actions: MetadataUiEmptyStateActionInput[],
-): MetadataUiEmptyState {
+): MetadataUiEmptyStateBuilderResult<Input> {
   return createEmptyState({
     ...state,
     actions,
   });
 }
 
-export function withEmptyStateTone<const Tone extends MetadataUiEmptyStateTone>(
-  state: MetadataUiEmptyStateInput,
+export function withEmptyStateTone<
+  const Input extends EmptyStateBuilderInput,
+  const Tone extends MetadataUiEmptyStateTone,
+>(
+  state: Input,
   tone: Tone,
-): MetadataUiEmptyState & { tone: Tone } {
+): MetadataUiEmptyStateBuilderResult<Input> & { tone: Tone } {
   return createEmptyState({
     ...state,
     tone,
-  }) as MetadataUiEmptyState & { tone: Tone };
+  }) as MetadataUiEmptyStateBuilderResult<Input> & { tone: Tone };
 }
 
-export function withEmptyStateKind<const Kind extends MetadataUiEmptyStateKind>(
-  state: MetadataUiEmptyStateInput,
+export function withEmptyStateKind<
+  const Input extends EmptyStateBuilderInput,
+  const Kind extends MetadataUiEmptyStateKind,
+>(
+  state: Input,
   kind: Kind,
-): MetadataUiEmptyStateForKind<Kind> {
+): MetadataUiEmptyStateBuilderResult<Input> & { kind: Kind } {
   return createEmptyState({
     ...state,
     kind,

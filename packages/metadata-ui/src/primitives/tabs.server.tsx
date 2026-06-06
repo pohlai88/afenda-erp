@@ -1,5 +1,6 @@
 import "server-only";
 
+import type { ReactNode } from "react";
 import {
   Tabs,
   TabsContent,
@@ -14,6 +15,12 @@ import { MetadataUiPrimitiveBadge } from "./badge.server";
 
 export type MetadataUiPrimitiveTabsProps = Readonly<{
   detailTabs: MetadataUiDetailTabs;
+  title?: ReactNode;
+  description?: ReactNode;
+  leading?: ReactNode;
+  trailing?: ReactNode;
+  footer?: ReactNode;
+  shellClassName?: string;
 }>;
 
 function getMetadataUiDefaultTabKey(
@@ -43,8 +50,17 @@ function MetadataUiPrimitiveTabPanel({
 
 export function MetadataUiPrimitiveTabs({
   detailTabs,
+  title,
+  description,
+  leading,
+  trailing,
+  footer,
+  shellClassName,
 }: MetadataUiPrimitiveTabsProps) {
-  return (
+  const hasHeaderContent = Boolean(title || description);
+  const hasShell = Boolean(hasHeaderContent || leading || trailing || footer || shellClassName);
+
+  const tabsNode = (
     <Tabs
       defaultValue={getMetadataUiDefaultTabKey(detailTabs.tabs)}
       className="metadata-ui-detail-tabs"
@@ -72,5 +88,43 @@ export function MetadataUiPrimitiveTabs({
         </TabsContent>
       ))}
     </Tabs>
+  );
+
+  if (!hasShell) {
+    return tabsNode;
+  }
+
+  return (
+    <section className={cn("metadata-ui-detail-tabs-shell grid", ui.surfaceGap.sm, shellClassName)}>
+      {hasHeaderContent ? (
+        <div className="flex flex-wrap items-start justify-between gap-surface-sm">
+          <div className="grid min-w-0 gap-surface-2xs">
+            {title ? (
+              <h2 className={cn(ui.typography.sectionTitle, ui.color.ink.foreground)}>
+                {title}
+              </h2>
+            ) : null}
+            {description ? (
+              <p className={cn(ui.typography.caption, ui.color.ink.muted)}>
+                {description}
+              </p>
+            ) : null}
+          </div>
+          {(leading || trailing) ? (
+            <div className="flex flex-wrap items-center gap-surface-xs">
+              {leading ? <div className="min-w-0">{leading}</div> : null}
+              {trailing ? <div className="min-w-0">{trailing}</div> : null}
+            </div>
+          ) : null}
+        </div>
+      ) : leading || trailing ? (
+        <div className="flex flex-wrap items-center justify-end gap-surface-xs">
+          {leading ? <div className="min-w-0">{leading}</div> : null}
+          {trailing ? <div className="min-w-0">{trailing}</div> : null}
+        </div>
+      ) : null}
+      {tabsNode}
+      {footer ? <div className="flex flex-wrap items-center gap-surface-xs">{footer}</div> : null}
+    </section>
   );
 }

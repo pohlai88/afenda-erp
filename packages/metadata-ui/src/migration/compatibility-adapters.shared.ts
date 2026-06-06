@@ -110,8 +110,18 @@ export function adaptGovernedSurfaceChrome(
   return {
     data: parseMetadataUiPresentationContract({
       chrome: {
-        surface: chrome.material === "plain" ? "plain" : chrome.material === "panel" ? "section" : "card",
-        density: chrome.density === "compact" ? "compact" : "comfortable",
+        surface:
+          chrome.material === "plain"
+            ? "plain"
+            : chrome.material === "panel"
+              ? "section"
+              : "card",
+        density:
+          chrome.density === "compact"
+            ? "compact"
+            : chrome.density === "spacious"
+              ? "spacious"
+              : "comfortable",
         emphasis: chrome.elevation === "raised" ? "high" : "medium",
         tone: "neutral",
       },
@@ -146,7 +156,7 @@ export function createGovernedParityCertificationGate(input: {
   packageTestsPassed: boolean;
   visualCertificationPassed: boolean;
 }) {
-  const base = createMetadataUiMigrationReplacementGate({
+  return createMetadataUiMigrationReplacementGate({
     parityNotes: input.parityNotes,
     guardPassed: input.guardPassed,
     packageBuildPassed: input.packageBuildPassed,
@@ -154,15 +164,4 @@ export function createGovernedParityCertificationGate(input: {
     visualEvidence: input.visualCertificationPassed,
     importAuditPassed: true,
   });
-  const blockers = [
-    ...base.blockers,
-    ...(input.packageBuildPassed ? [] : ["package-build"]),
-    ...(input.packageTestsPassed ? [] : ["package-tests"]),
-  ];
-
-  return {
-    ...base,
-    canReplace: blockers.length === 0,
-    blockers,
-  };
 }

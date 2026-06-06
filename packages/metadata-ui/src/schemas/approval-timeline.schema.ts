@@ -34,6 +34,7 @@ const METADATA_UI_APPROVAL_TIMELINE_ACTOR_TYPE_VALUES = [
 
 export const METADATA_UI_APPROVAL_TIMELINE_KEY_SCHEMA = z
   .string()
+  .trim()
   .min(1)
   .max(160)
   .regex(
@@ -46,22 +47,22 @@ export const METADATA_UI_APPROVAL_TIMELINE_STEP_STATUS_SCHEMA = z.enum(
 );
 
 export const METADATA_UI_APPROVAL_TIMELINE_ACTOR_SCHEMA = z.object({
-  actorId: z.string().min(1).max(160),
+  actorId: z.string().trim().min(1).max(160),
   actorType: z.enum(METADATA_UI_APPROVAL_TIMELINE_ACTOR_TYPE_VALUES),
-  displayName: z.string().min(1).max(160).optional(),
+  displayName: z.string().trim().min(1).max(160).optional(),
 });
 
 export const METADATA_UI_APPROVAL_TIMELINE_STEP_SCHEMA = z
   .object({
     key: METADATA_UI_APPROVAL_TIMELINE_KEY_SCHEMA,
-    label: z.string().min(1).max(160),
-    description: z.string().min(1).max(320).optional(),
+    label: z.string().trim().min(1).max(160),
+    description: z.string().trim().min(1).max(320).optional(),
     status: METADATA_UI_APPROVAL_TIMELINE_STEP_STATUS_SCHEMA,
     actor: METADATA_UI_APPROVAL_TIMELINE_ACTOR_SCHEMA.optional(),
     occurredAt: z.string().datetime().optional(),
     dueAt: z.string().datetime().optional(),
-    comment: z.string().min(1).max(500).optional(),
-    reason: z.string().min(1).max(320).optional(),
+    comment: z.string().trim().min(1).max(500).optional(),
+    reason: z.string().trim().min(1).max(320).optional(),
     order: z.number().int().min(0).max(500),
     metadata: z.record(z.string(), z.unknown()).optional(),
   })
@@ -96,8 +97,8 @@ export const METADATA_UI_APPROVAL_TIMELINE_SCHEMA = z.object({
 
   key: METADATA_UI_APPROVAL_TIMELINE_KEY_SCHEMA,
 
-  title: z.string().min(1).max(120).default("Approval timeline"),
-  description: z.string().min(1).max(320).optional(),
+  title: z.string().trim().min(1).max(120).default("Approval timeline"),
+  description: z.string().trim().min(1).max(320).optional(),
 
   steps: z.array(METADATA_UI_APPROVAL_TIMELINE_STEP_SCHEMA).max(50).default([]),
 
@@ -109,10 +110,10 @@ export const METADATA_UI_APPROVAL_TIMELINE_SCHEMA = z.object({
 
   diagnostics: z
     .object({
-      componentKey: z.string().min(1).max(160).optional(),
-      sectionKey: z.string().min(1).max(160).optional(),
-      rendererKey: z.string().min(1).max(160).optional(),
-      testId: z.string().min(1).max(160).optional(),
+      componentKey: z.string().trim().min(1).max(160).optional(),
+      sectionKey: z.string().trim().min(1).max(160).optional(),
+      rendererKey: z.string().trim().min(1).max(160).optional(),
+      testId: z.string().trim().min(1).max(160).optional(),
     })
     .optional(),
 });
@@ -250,7 +251,9 @@ function assertMetadataUiApprovalTimelineInvariants(
   }
 
   if (timeline.currentStepKey && !knownStepKeys.has(timeline.currentStepKey)) {
-    throw new Error("Approval timeline currentStepKey must reference a declared step.");
+    throw new Error(
+      "Approval timeline currentStepKey must reference a declared step.",
+    );
   }
 }
 

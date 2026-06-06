@@ -76,7 +76,7 @@ export const metadataUiRuntimeBoundarySchema = z.object({
   runtime: metadataUiRuntimeSchema,
   door: metadataUiRuntimeDoorSchema.optional(),
   stability: metadataUiRuntimeStabilitySchema.default("stable"),
-});
+}).strict();
 
 export const metadataUiRuntimeFileSuffixSchema = z.enum(
   METADATA_UI_RUNTIME_FILE_SUFFIX_VALUES,
@@ -86,10 +86,48 @@ export const metadataUiRuntimeDirectiveSchema = z.enum(
   METADATA_UI_RUNTIME_DIRECTIVE_VALUES,
 );
 
+function includesMetadataUiRuntimeValue<Value extends string>(
+  values: readonly Value[],
+  candidate: string,
+): candidate is Value {
+  return values.includes(candidate as Value);
+}
+
+const METADATA_UI_RUNTIME_ALLOWED_FILE_SUFFIXES_BY_RUNTIME = {
+  shared: [
+    ".shared.ts",
+    ".schema.ts",
+    ".contract.ts",
+    ".builder.ts",
+    ".registry.ts",
+  ],
+  server: [".server.ts", ".server.tsx"],
+  client: [".client.ts", ".client.tsx"],
+  action: [".action.ts"],
+} as const satisfies Record<MetadataUiRuntime, readonly MetadataUiRuntimeFileSuffix[]>;
+
+const METADATA_UI_RUNTIME_ALLOWED_DOORS_BY_RUNTIME = {
+  shared: ["index", "client", "server"],
+  server: ["index", "server"],
+  client: ["index", "client"],
+  action: ["index", "server"],
+} as const satisfies Record<MetadataUiRuntime, readonly MetadataUiRuntimeDoor[]>;
+
+const METADATA_UI_RUNTIME_ALLOWED_DIRECTIVES_BY_RUNTIME = {
+  shared: ["none"],
+  server: ["server-only"],
+  client: ["use-client"],
+  action: ["use-server"],
+} as const satisfies Record<
+  MetadataUiRuntime,
+  readonly MetadataUiRuntimeDirective[]
+>;
+
 export const metadataUiRuntimeModuleContractSchema = z
   .object({
     id: z
       .string()
+      .trim()
       .min(1)
       .max(160)
       .regex(
@@ -107,76 +145,51 @@ export const metadataUiRuntimeModuleContractSchema = z
 
     stability: metadataUiRuntimeStabilitySchema.default("stable"),
 
-    description: z.string().min(1).max(240).optional(),
+    description: z.string().trim().min(1).max(240).optional(),
 
     metadata: z.record(z.string(), z.unknown()).default({}),
   })
+  .strict()
   .superRefine((module, ctx) => {
-    if (module.runtime === "client" && module.directive !== "use-client") {
+    const allowedDirectives =
+      METADATA_UI_RUNTIME_ALLOWED_DIRECTIVES_BY_RUNTIME[
+        module.runtime
+      ] as readonly MetadataUiRuntimeDirective[];
+    if (!includesMetadataUiRuntimeValue(allowedDirectives, module.directive)) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: ["directive"],
-        message: "Client runtime modules must declare use-client.",
+        message: `Runtime "${module.runtime}" must use one of: ${allowedDirectives.join(", ")}.`,
       });
     }
 
-    if (module.runtime === "server" && module.directive === "use-client") {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["directive"],
-        message: "Server runtime modules must not declare use-client.",
-      });
-    }
-
-    if (module.runtime === "action" && module.directive !== "use-server") {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["directive"],
-        message: "Action runtime modules must declare use-server.",
-      });
-    }
-
-    if (
-      module.runtime === "shared" &&
-      module.directive !== "none"
-    ) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["directive"],
-        message: "Shared runtime modules must not declare runtime directives.",
-      });
-    }
-
-    if (
-      module.runtime === "client" &&
-      module.allowedDoors.includes("server")
-    ) {
+    const allowedDoors =
+      METADATA_UI_RUNTIME_ALLOWED_DOORS_BY_RUNTIME[
+        module.runtime
+      ] as readonly MetadataUiRuntimeDoor[];
+    const invalidDoors = module.allowedDoors.filter(
+      (door): door is MetadataUiRuntimeDoor =>
+        !includesMetadataUiRuntimeValue(allowedDoors, door),
+    );
+    if (invalidDoors.length > 0) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: ["allowedDoors"],
-        message: "Client modules must not be exported through the server door.",
+        message: `Runtime "${module.runtime}" cannot be exported through ${invalidDoors.join(", ")}.`,
       });
     }
 
+    const allowedFileSuffixes =
+      METADATA_UI_RUNTIME_ALLOWED_FILE_SUFFIXES_BY_RUNTIME[
+        module.runtime
+      ] as readonly MetadataUiRuntimeFileSuffix[];
     if (
-      module.runtime === "server" &&
-      module.allowedDoors.includes("client")
+      !includesMetadataUiRuntimeValue(allowedFileSuffixes, module.fileSuffix)
     ) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        path: ["allowedDoors"],
-        message: "Server modules must not be exported through the client door.",
-      });
-    }
-
-    if (
-      module.runtime === "shared" &&
-      module.allowedDoors.some((door) => !["index", "client", "server"].includes(door))
-    ) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["allowedDoors"],
-        message: "Shared modules may only be exported through known runtime doors.",
+        path: ["fileSuffix"],
+        message: `Runtime "${module.runtime}" requires one of: ${allowedFileSuffixes.join(", ")}.`,
       });
     }
   });
@@ -227,9 +240,9 @@ export type MetadataUiRuntimeModuleIdFor<
 
 export type MetadataUiRuntimeDirectiveByRuntime = {
   shared: "none";
+  server: "server-only";
   client: "use-client";
   action: "use-server";
-  server: Exclude<MetadataUiRuntimeDirective, "use-client">;
 };
 
 export type MetadataUiRuntimeDirectiveForRuntime<
@@ -275,11 +288,12 @@ export type MetadataUiRuntimeModuleContractForRuntime<
   Runtime extends MetadataUiRuntime,
 > = Omit<
   MetadataUiRuntimeModuleContractSchemaOutput,
-  "allowedDoors" | "directive" | "id" | "runtime"
+  "allowedDoors" | "directive" | "fileSuffix" | "id" | "runtime"
 > & {
   id: MetadataUiRuntimeModuleId;
   runtime: Runtime;
   directive: MetadataUiRuntimeDirectiveForRuntime<Runtime>;
+  fileSuffix: MetadataUiRuntimeFileSuffixForRuntime<Runtime>;
   allowedDoors: MetadataUiRuntimeAllowedDoorForRuntime<Runtime>[];
 };
 
@@ -312,16 +326,18 @@ function assertMetadataUiRuntimeModuleContractInvariants(
     throw new Error("Client runtime modules must declare use-client.");
   }
 
-  if (module.runtime === "server" && module.directive === "use-client") {
-    throw new Error("Server runtime modules must not declare use-client.");
-  }
-
   if (module.runtime === "action" && module.directive !== "use-server") {
     throw new Error("Action runtime modules must declare use-server.");
   }
 
+  if (module.runtime === "server" && module.directive !== "server-only") {
+    throw new Error("Server runtime modules must declare server-only.");
+  }
+
   if (module.runtime === "shared" && module.directive !== "none") {
-    throw new Error("Shared runtime modules must not declare runtime directives.");
+    throw new Error(
+      "Shared runtime modules must not declare runtime directives.",
+    );
   }
 
   if (module.runtime === "client" && module.allowedDoors.includes("server")) {
@@ -330,6 +346,30 @@ function assertMetadataUiRuntimeModuleContractInvariants(
 
   if (module.runtime === "server" && module.allowedDoors.includes("client")) {
     throw new Error("Server modules must not be exported through the client door.");
+  }
+
+  const allowedDoors =
+    METADATA_UI_RUNTIME_ALLOWED_DOORS_BY_RUNTIME[
+      module.runtime
+    ] as readonly MetadataUiRuntimeDoor[];
+  const invalidDoors = module.allowedDoors.filter(
+    (door): door is MetadataUiRuntimeDoor =>
+      !includesMetadataUiRuntimeValue(allowedDoors, door),
+  );
+  if (invalidDoors.length > 0) {
+    throw new Error(
+      `Runtime "${module.runtime}" cannot be exported through ${invalidDoors.join(", ")}.`,
+    );
+  }
+
+  const allowedFileSuffixes =
+    METADATA_UI_RUNTIME_ALLOWED_FILE_SUFFIXES_BY_RUNTIME[
+      module.runtime
+    ] as readonly MetadataUiRuntimeFileSuffix[];
+  if (!includesMetadataUiRuntimeValue(allowedFileSuffixes, module.fileSuffix)) {
+    throw new Error(
+      `Runtime "${module.runtime}" requires one of: ${allowedFileSuffixes.join(", ")}.`,
+    );
   }
 }
 

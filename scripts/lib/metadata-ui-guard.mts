@@ -561,6 +561,132 @@ export function scanMetadataUiSpacingContracts(input: {
   }
 }
 
+export function scanMetadataUiShadcnContracts(input: {
+  srcRoot: string;
+  packageRel: string;
+  problems: string[];
+}) {
+  const { srcRoot, packageRel, problems } = input;
+  const requiredAlertRenderers = [
+    {
+      rel: "sections/form/form-renderer.server.tsx",
+      marker: 'data-metadata-ui-form-error-summary="true"',
+      label: "form error summary",
+    },
+    {
+      rel: "sections/multi-step-form/multi-step-form-renderer.server.tsx",
+      marker: 'data-metadata-ui-step-error-summary="true"',
+      label: "multi-step form error summary",
+    },
+    {
+      rel: "sections/scorecard-form/scorecard-form-renderer.server.tsx",
+      marker: 'data-metadata-ui-scorecard-error-summary="true"',
+      label: "scorecard form error summary",
+    },
+  ] as const;
+  const prohibitedRawPalette = /\b(?:border|bg|text)-red-\d{2,3}\b/;
+
+  for (const { rel, marker, label } of requiredAlertRenderers) {
+    const filePath = path.join(srcRoot, rel);
+
+    if (!fs.existsSync(filePath)) {
+      problems.push(
+        `metadata-ui shadcn: missing ${packageRel}/src/${rel} for ${label} primitive contract`,
+      );
+      continue;
+    }
+
+    const source = fs.readFileSync(filePath, "utf8");
+
+    if (prohibitedRawPalette.test(source)) {
+      problems.push(
+        `metadata-ui shadcn: ${packageRel}/src/${rel} must use semantic destructive Alert tokens, not raw red palette utilities`,
+      );
+    }
+
+    if (
+      source.includes(marker) &&
+      (!source.includes("<Alert") ||
+        !source.includes("<AlertTitle") ||
+        !source.includes("<AlertDescription"))
+    ) {
+      problems.push(
+        `metadata-ui shadcn: ${packageRel}/src/${rel} ${label} must render through Alert, AlertTitle, and AlertDescription`,
+      );
+    }
+  }
+
+  const chartBodyPath = path.join(
+    srcRoot,
+    "sections/chart/chart-body.client.tsx",
+  );
+  if (fs.existsSync(chartBodyPath)) {
+    const source = fs.readFileSync(chartBodyPath, "utf8");
+    if (source.includes('className="rounded border px-3 py-2 text-sm"')) {
+      problems.push(
+        `metadata-ui shadcn: ${packageRel}/src/sections/chart/chart-body.client.tsx heatmap cells must use ui radius, typography, and surface spacing tokens`,
+      );
+    }
+  }
+
+  const actionBarBuilderPath = path.join(
+    srcRoot,
+    "builders/action-bar.builder.ts",
+  );
+  if (fs.existsSync(actionBarBuilderPath)) {
+    const source = fs.readFileSync(actionBarBuilderPath, "utf8");
+    for (const token of [
+      "METADATA_UI_ACTION_BAR_LAYOUT_DEFAULTS",
+      "createActionBarForLayout",
+      "createOverflowActionBar",
+      "withActionBarOverflow",
+    ]) {
+      if (!source.includes(token)) {
+        problems.push(
+          `metadata-ui shadcn: ${packageRel}/src/builders/action-bar.builder.ts must expose deterministic action-bar builder contract "${token}"`,
+        );
+      }
+    }
+  }
+
+  const actionBarRendererPath = path.join(
+    srcRoot,
+    "sections/action-bar/action-bar-renderer.server.tsx",
+  );
+  if (fs.existsSync(actionBarRendererPath)) {
+    const source = fs.readFileSync(actionBarRendererPath, "utf8");
+    if (
+      source.includes("<DropdownMenuItem") &&
+      !source.includes("<DropdownMenuGroup")
+    ) {
+      problems.push(
+        `metadata-ui shadcn: ${packageRel}/src/sections/action-bar/action-bar-renderer.server.tsx must group DropdownMenuItem under DropdownMenuGroup`,
+      );
+    }
+  }
+
+  const scorecardPath = path.join(
+    srcRoot,
+    "sections/scorecard-form/scorecard-form-renderer.server.tsx",
+  );
+  if (fs.existsSync(scorecardPath)) {
+    const source = fs.readFileSync(scorecardPath, "utf8");
+    if (/<input\b/.test(source)) {
+      problems.push(
+        `metadata-ui shadcn: ${packageRel}/src/sections/scorecard-form/scorecard-form-renderer.server.tsx must render option controls through RadioGroup primitives, not native input markup`,
+      );
+    }
+    if (
+      source.includes('role="radiogroup"') &&
+      (!source.includes("<RadioGroup") || !source.includes("<RadioGroupItem"))
+    ) {
+      problems.push(
+        `metadata-ui shadcn: ${packageRel}/src/sections/scorecard-form/scorecard-form-renderer.server.tsx radiogroup must use RadioGroup and RadioGroupItem`,
+      );
+    }
+  }
+}
+
 function walkSourceFiles(dir: string): string[] {
   const files: string[] = [];
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
@@ -588,4 +714,5 @@ export function scanMetadataUiEnforcement(input: {
   scanMetadataUiProhibitedDiscovery(input);
   scanMetadataUiSectionContract(input);
   scanMetadataUiSpacingContracts(input);
+  scanMetadataUiShadcnContracts(input);
 }

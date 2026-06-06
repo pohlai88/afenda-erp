@@ -1,31 +1,34 @@
-# `@afenda/auth/neon-auth` tree
+# `@afenda/auth` Neon Auth tree
 
-Neon Auth SDK + **Neon Auth UI** (`@neondatabase/auth-ui`) — default auth surfaces.
-
-```
-neon-auth/
-├── contracts/          # env keys, flows, paths, UI catalog
-├── runtime/            # createNeonAuth, createAuthClient, session, cookies
-├── security/           # JWT + webhook verify
-├── webhooks/           # handler, hooks, policy
-├── plugins/            # Better Auth plugin catalogs + thin clients
-├── ui/                 # NeonAuthUIProvider, layout, component re-exports, styles
-├── pages/              # AuthView / AccountView page scaffolds for ERP wiring
-└── tests/
-```
+Flat `src/` layout with compatibility subpaths for Neon Auth.
 
 ## Public doors
 
 | Import | Purpose |
 | ------ | ------- |
-| `@afenda/auth/neon-auth/server` | Server SDK |
-| `@afenda/auth/neon-auth/client` | Browser client |
-| `@afenda/auth/neon-auth/ui` | `NeonAuthUiProvider`, `NeonAuthUiLayout`, `AuthView`, … |
-| `@afenda/auth/neon-auth/pages` | `NeonAuthSignInPage`, route maps, catch-all helper |
+| `@afenda/auth/neon-auth/server` | Server SDK + route handlers |
+| `@afenda/auth/neon-auth/client` | Browser auth client |
+| `@afenda/auth/neon-auth/ui` | Neon Auth UI provider/layout/components |
+| `@afenda/auth/neon-auth/pages` | Auth and account page scaffolds |
+| `@afenda/auth/neon-auth/paths` | Shared auth routes and redirects |
+| `@afenda/auth/neon-auth/neon-cookies` | Shared session cookie helpers |
+| `@afenda/auth/neon-auth/neon-session` | Session payload helpers |
 
-## ERP wiring (next step)
+## Flat implementation files
 
-1. `(auth)/layout.tsx` → wrap with `NeonAuthUiLayout` from `@afenda/auth/neon-auth/ui`
-2. `globals.css` → `@import '@neondatabase/auth-ui/tailwind';` (Tailwind v4)
-3. Replace `(auth)/*/page.tsx` defaults with exports from `@afenda/auth/neon-auth/pages`
-4. Keep `app/api/auth/[...path]` + `proxy.ts` unchanged (already Neon SDK)
+```txt
+src/
+├── aut-*.ts / aut-*.tsx        # implementation files
+├── client.ts                   # root client door
+├── server.ts                   # root server door
+├── neon-auth-*.ts              # compatibility subpath re-exports
+└── tree.md
+```
+
+## ERP wiring
+
+1. `(auth)/layout.tsx` and `onboarding/layout.tsx` wrap with `NeonAuthUiLayout`
+2. `globals.css` imports `@neondatabase/auth-ui/tailwind`
+3. `(auth)/*/page.tsx` files render from `@afenda/auth/neon-auth/pages`
+4. `app/api/auth/[...path]/route.ts` stays thin and delegates to `@afenda/auth/neon-auth/server`
+5. `proxy.ts` continues to use `auth.middleware()` from `@afenda/auth/neon-auth/server`

@@ -62,15 +62,19 @@ export function adaptLegacyApprovalTimelineToMetadataUi(
   input: LegacyApprovalTimelineInput,
 ): MetadataUiApprovalTimelineMigrationResult {
   const stepKeyById = new Map(
-    input.steps.map((step) => [step.id, approvalTimelineKey(step.id)]),
+    input.steps.map((step) => {
+      const key = approvalTimelineKey(step.id);
+      return [key, key] as const;
+    }),
   );
+  const currentStepKey = input.currentStepId
+    ? approvalTimelineKey(input.currentStepId)
+    : undefined;
   const data = createApprovalFlowTimeline({
     key: input.key ?? approvalTimelineKey(input.title ?? "approval-flow"),
     title: input.title,
     description: input.description,
-    currentStepKey: input.currentStepId
-      ? stepKeyById.get(input.currentStepId)
-      : undefined,
+    currentStepKey: currentStepKey ? stepKeyById.get(currentStepKey) : undefined,
     steps: input.steps.map((step, index) =>
       createApprovalTimelineStep({
         key: approvalTimelineKey(step.id),

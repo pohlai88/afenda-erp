@@ -2,8 +2,8 @@ import { describe, expect, it } from "vitest";
 import { resolveDevSignInRedirectPath } from "@/kitchen-sinks/auth-dev-sign-in.redirect";
 
 describe("developer sign-in redirect", () => {
-  it("falls back to dashboard when no current route is available", () => {
-    expect(resolveDevSignInRedirectPath({})).toBe("/dashboard");
+  it("falls back to onboarding when no current route is available", () => {
+    expect(resolveDevSignInRedirectPath({})).toBe("/onboarding");
   });
 
   it("accepts safe internal form redirect paths", () => {
@@ -16,16 +16,16 @@ describe("developer sign-in redirect", () => {
 
   it("rejects auth, onboarding, api, and external redirects", () => {
     expect(resolveDevSignInRedirectPath({ formValue: "/sign-in" })).toBe(
-      "/dashboard",
+      "/onboarding",
     );
     expect(resolveDevSignInRedirectPath({ formValue: "/onboarding" })).toBe(
-      "/dashboard",
+      "/onboarding",
     );
     expect(
       resolveDevSignInRedirectPath({ formValue: "/api/auth/session" }),
-    ).toBe("/dashboard");
+    ).toBe("/onboarding");
     expect(resolveDevSignInRedirectPath({ formValue: "//example.com" })).toBe(
-      "/dashboard",
+      "/onboarding",
     );
   });
 
@@ -44,6 +44,6 @@ describe("developer sign-in redirect", () => {
         origin: "http://localhost:3100",
         referer: "https://example.com/finance",
       }),
-    ).toBe("/dashboard");
+    ).toBe("/onboarding");
   });
 });

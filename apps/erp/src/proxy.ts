@@ -1,7 +1,6 @@
-import {
-  erpPreLoginAuthPathPrefixes,
-  NEON_AUTH_SESSION_TOKEN_COOKIE,
-} from "@afenda/auth/neon-auth/server";
+import { erpPreLoginAuthPathPrefixes } from "@afenda/auth/neon-auth/paths";
+import { getNeonAuthMiddleware } from "@afenda/auth/neon-auth/middleware";
+import { NEON_AUTH_SESSION_TOKEN_COOKIE } from "@afenda/auth/neon-auth/neon-cookies";
 import { isDevCookieAuthEnabled, isNeonAuthEnabled } from "@afenda/config/env";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
@@ -51,9 +50,11 @@ export async function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
-  neonAuthMiddleware ??= (
-    await import("@afenda/auth/neon-auth/server")
-  ).getNeonAuthServer().middleware({ loginUrl: "/sign-in" });
+  neonAuthMiddleware ??= getNeonAuthMiddleware();
+
+  if (!neonAuthMiddleware) {
+    return NextResponse.next();
+  }
 
   return neonAuthMiddleware(request);
 }

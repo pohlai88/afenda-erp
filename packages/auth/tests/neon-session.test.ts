@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 
 vi.mock("server-only", () => ({}));
-vi.mock("../../runtime/neon-auth.server", () => ({
+vi.mock("../src/aut-neon-auth-server", () => ({
   getNeonAuthServer: vi.fn(),
   isNeonAuthReady: vi.fn(),
 }));

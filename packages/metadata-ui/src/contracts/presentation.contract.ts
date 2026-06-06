@@ -105,25 +105,25 @@ export const metadataUiPresentationChromeSchema = z.object({
   density: metadataUiPresentationDensitySchema.default("comfortable"),
   emphasis: metadataUiPresentationEmphasisSchema.default("medium"),
   tone: metadataUiPresentationToneSchema.default("neutral"),
-});
+}).strict();
 
 export const metadataUiPresentationLayoutContractSchema = z.object({
   layout: metadataUiPresentationLayoutSchema.default("stack"),
   alignment: metadataUiPresentationAlignmentSchema.default("start"),
   width: metadataUiPresentationWidthSchema.default("full"),
-});
+}).strict();
 
 export const metadataUiPresentationVisibilitySchema = z.object({
   showHeader: z.boolean().default(true),
   showDescription: z.boolean().default(true),
   showChrome: z.boolean().default(true),
   showDivider: z.boolean().default(false),
-});
+}).strict();
 
 export const metadataUiPresentationResponsiveSchema = z.object({
   collapseBelow: metadataUiPresentationBreakpointSchema.optional(),
   priority: z.number().int().min(0).max(100).default(50),
-});
+}).strict();
 
 const METADATA_UI_PRESENTATION_DEFAULT_CHROME = {
   surface: "section",
@@ -165,6 +165,7 @@ export const metadataUiPresentationContractSchema = z.object({
 
   profileId: z
     .string()
+    .trim()
     .min(1)
     .max(120)
     .regex(
@@ -174,7 +175,20 @@ export const metadataUiPresentationContractSchema = z.object({
     .optional(),
 
   metadata: z.record(z.string(), z.unknown()).default({}),
-});
+})
+  .strict()
+  .superRefine((presentation, ctx) => {
+    if (
+      presentation.visibility.showChrome === false &&
+      presentation.visibility.showDivider === true
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["visibility", "showDivider"],
+        message: "Hidden chrome cannot request a divider.",
+      });
+    }
+  });
 
 export type MetadataUiPresentationDensity = z.infer<
   typeof metadataUiPresentationDensitySchema
@@ -285,10 +299,15 @@ export type MetadataUiPresentationResponsiveState =
       [Breakpoint in MetadataUiPresentationBreakpoint]: MetadataUiPresentationResponsiveWithCollapse<Breakpoint>;
     }[MetadataUiPresentationBreakpoint];
 
-export type MetadataUiPresentationVisibilityChromeState = {
-  showChrome: boolean;
-  showDivider: boolean;
-};
+export type MetadataUiPresentationVisibilityChromeState =
+  | {
+      showChrome: true;
+      showDivider: boolean;
+    }
+  | {
+      showChrome: false;
+      showDivider: false;
+    };
 
 export type MetadataUiPresentationVisibilityDescriptionState =
   | {
@@ -346,6 +365,13 @@ function assertMetadataUiPresentationContractInvariants(
     throw new Error(
       "Presentation profile id must use lowercase kebab/dot notation.",
     );
+  }
+
+  if (
+    presentation.visibility.showChrome === false &&
+    presentation.visibility.showDivider === true
+  ) {
+    throw new Error("Hidden chrome cannot request a divider.");
   }
 }
 

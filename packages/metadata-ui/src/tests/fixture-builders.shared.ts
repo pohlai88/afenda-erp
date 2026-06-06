@@ -30,7 +30,9 @@ import {
   createListTable,
   createTextColumn,
 } from "../builders/list.builder";
-import { createModulePageHeader } from "../builders/page-header.builder";
+import {
+  createWorkspacePageHeader,
+} from "../builders/page-header.builder";
 import {
   createNumberStatItem,
   createStatGroup,
@@ -323,7 +325,7 @@ export function createMetadataUiDetailTabsFixture(
 export function createMetadataUiPageHeaderFixture(
   input: MetadataUiFixtureOptions<"metadata-ui.fixture.page-header"> = {},
 ): MetadataUiPageHeader {
-  return createModulePageHeader({
+  return createWorkspacePageHeader({
     key: input.key ?? "metadata-ui.fixture.page-header",
     title: input.title ?? "Fixture page",
     description: input.description,

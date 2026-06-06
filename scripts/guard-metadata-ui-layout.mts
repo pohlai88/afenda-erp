@@ -12,7 +12,7 @@ if (problems.length > 0) {
   console.error("[guard:metadata-ui] GUARD 6 FAILED");
   console.error("");
   console.error(
-    "Checks: runtime · naming · doors · dependencies · registry · section contract · spacing contract",
+    "Checks: runtime · naming · doors · dependencies · registry · section contract · spacing contract · shadcn primitive contract",
   );
   console.error("");
   for (const problem of problems) {
@@ -24,5 +24,5 @@ if (problems.length > 0) {
 }
 
 console.log(
-  "[guard:metadata-ui] GUARD 6 passed — runtime · naming · doors · dependencies · registry · section contract · spacing contract",
+  "[guard:metadata-ui] GUARD 6 passed — runtime · naming · doors · dependencies · registry · section contract · spacing contract · shadcn primitive contract",
 );

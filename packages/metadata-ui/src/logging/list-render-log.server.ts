@@ -1,5 +1,3 @@
-import "server-only";
-
 import type { MetadataUiDiagnosticsIdentity } from "../identity/diagnostics.shared";
 import {
   createMetadataUiRenderLogEvent,
@@ -26,26 +24,43 @@ export type MetadataUiListRenderLogInput = Omit<
     metadata?: Readonly<Record<string, unknown>>;
   }>;
 
+function createMetadataUiListRenderLogMetadata(
+  input: MetadataUiListRenderLogInput,
+): Readonly<Record<string, unknown>> {
+  return {
+    ...(input.metadata ?? {}),
+    list: {
+      rowCount: input.window.rowCount,
+      visibleRowCount: input.window.visibleRowCount,
+      pageSize: input.window.pageSize,
+      pageIndex: input.window.pageIndex,
+      totalRowCount: input.window.totalRowCount,
+    },
+  };
+}
+
+function createMetadataUiListRenderLogState(
+  input: MetadataUiListRenderLogInput,
+) {
+  return input.window.rowCount === 0 ? "empty" : "ready";
+}
+
+function createMetadataUiListRenderLogName(
+  input: MetadataUiListRenderLogInput,
+) {
+  return input.window.rowCount === 0
+    ? "metadata-ui.render.empty"
+    : "metadata-ui.render.completed";
+}
+
 export function createMetadataUiListRenderLogEvent(
   input: MetadataUiListRenderLogInput,
 ): MetadataUiRenderLogEvent {
   return createMetadataUiRenderLogEvent({
     ...input,
-    name:
-      input.window.rowCount === 0
-        ? "metadata-ui.render.empty"
-        : "metadata-ui.render.completed",
-    state: input.window.rowCount === 0 ? "empty" : "ready",
-    metadata: {
-      ...(input.metadata ?? {}),
-      list: {
-        rowCount: input.window.rowCount,
-        visibleRowCount: input.window.visibleRowCount,
-        pageSize: input.window.pageSize,
-        pageIndex: input.window.pageIndex,
-        totalRowCount: input.window.totalRowCount,
-      },
-    },
+    name: createMetadataUiListRenderLogName(input),
+    state: createMetadataUiListRenderLogState(input),
+    metadata: createMetadataUiListRenderLogMetadata(input),
   });
 }
 
@@ -55,20 +70,8 @@ export async function emitMetadataUiListRenderLog(
 ): Promise<MetadataUiRenderLogEvent> {
   return logger.emit({
     ...input,
-    name:
-      input.window.rowCount === 0
-        ? "metadata-ui.render.empty"
-        : "metadata-ui.render.completed",
-    state: input.window.rowCount === 0 ? "empty" : "ready",
-    metadata: {
-      ...(input.metadata ?? {}),
-      list: {
-        rowCount: input.window.rowCount,
-        visibleRowCount: input.window.visibleRowCount,
-        pageSize: input.window.pageSize,
-        pageIndex: input.window.pageIndex,
-        totalRowCount: input.window.totalRowCount,
-      },
-    },
+    name: createMetadataUiListRenderLogName(input),
+    state: createMetadataUiListRenderLogState(input),
+    metadata: createMetadataUiListRenderLogMetadata(input),
   });
 }

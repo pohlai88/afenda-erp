@@ -40,16 +40,22 @@ function MetadataUiPermissionFallback({
     return null;
   }
 
+  const title = resolution.failure.title ?? "Access unavailable";
+  const description =
+    resolution.failure.description ??
+    "Access is not available for this metadata surface.";
+
   return (
     <div
       data-metadata-ui-permission-state={resolution.state}
+      data-metadata-ui-permission-visibility={resolution.visibility}
       aria-disabled={resolution.visibility === "disabled" ? true : undefined}
     >
       <MetadataUiPrimitiveEmptyState
         kind="forbidden"
         tone="warning"
-        title="Access unavailable"
-        description="Access is not available for this metadata surface."
+        title={title}
+        description={description}
       />
     </div>
   );

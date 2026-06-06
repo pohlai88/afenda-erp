@@ -37,6 +37,7 @@ export type MetadataUiPermissionResolution = Readonly<{
   state: MetadataUiPermissionResolutionState;
   allowed: boolean;
   visibility: MetadataUiPermissionVisibility;
+  failure: MetadataUiPermissionContract["failure"];
   operator: MetadataUiPermissionContract["operator"];
   requirements: readonly MetadataUiPermissionRequirementResolution[];
   satisfiedRequirements: readonly MetadataUiPermissionRequirementResolution[];
@@ -76,6 +77,9 @@ export function resolveMetadataUiPermission(
       state: "unrestricted",
       allowed: true,
       visibility: "visible",
+      failure: {
+        visibility: "hidden",
+      },
       operator: "all",
       requirements: [],
       satisfiedRequirements: [],
@@ -102,6 +106,7 @@ export function resolveMetadataUiPermission(
     state: allowed ? "allowed" : "denied",
     allowed,
     visibility: allowed ? "visible" : contract.failure.visibility,
+    failure: contract.failure,
     operator: contract.operator,
     requirements,
     satisfiedRequirements,

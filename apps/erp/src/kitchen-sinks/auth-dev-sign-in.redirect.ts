@@ -1,4 +1,4 @@
-const DEFAULT_DEV_SIGN_IN_REDIRECT = "/dashboard";
+const DEFAULT_DEV_SIGN_IN_REDIRECT = "/onboarding";
 const BLOCKED_REDIRECT_PREFIXES = ["/api", "/onboarding", "/sign-in"] as const;
 
 function isSafeInternalRedirectPath(path: string) {

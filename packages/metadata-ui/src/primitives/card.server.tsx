@@ -23,9 +23,11 @@ import { resolveMetadataUiPresentationSurface } from "../presentation/resolve-su
 
 export type MetadataUiPrimitiveCardProps = Readonly<{
   children: ReactNode;
+  eyebrow?: ReactNode;
   title?: ReactNode;
   description?: ReactNode;
   actions?: ReactNode;
+  meta?: ReactNode;
   footer?: ReactNode;
   presentation?: MetadataUiPresentationContract;
   className?: string;
@@ -54,9 +56,11 @@ export function resolveMetadataUiPrimitiveCardSize(
 
 export function MetadataUiPrimitiveCard({
   children,
+  eyebrow,
   title,
   description,
   actions,
+  meta,
   footer,
   presentation,
   className,
@@ -64,7 +68,7 @@ export function MetadataUiPrimitiveCard({
 }: MetadataUiPrimitiveCardProps) {
   const density = resolveMetadataUiPresentationDensity(presentation);
   const surface = resolveMetadataUiPresentationSurface(presentation);
-  const hasHeader = Boolean(title || description || actions);
+  const hasHeader = Boolean(title || description || actions || eyebrow || meta);
 
   return (
     <Card
@@ -73,11 +77,26 @@ export function MetadataUiPrimitiveCard({
     >
       {hasHeader ? (
         <CardHeader>
+          {eyebrow ? (
+            <p className={cn(ui.typography.label, ui.color.ink.muted)}>
+              {eyebrow}
+            </p>
+          ) : null}
           {title ? <CardTitle>{title}</CardTitle> : null}
           {description ? (
             <CardDescription>{description}</CardDescription>
           ) : null}
-          {actions ? <CardAction>{actions}</CardAction> : null}
+          {(actions || meta) ? (
+            <div
+              className={cn(
+                "flex items-center gap-surface-xs",
+                meta ? "justify-between" : "justify-end",
+              )}
+            >
+              {meta ? <div className="min-w-0">{meta}</div> : null}
+              {actions ? <CardAction>{actions}</CardAction> : null}
+            </div>
+          ) : null}
         </CardHeader>
       ) : null}
       <CardContent className={contentClassName}>{children}</CardContent>

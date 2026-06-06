@@ -96,10 +96,7 @@ function createMetadataUiInitialColumnPinning(
     },
     {
       left: [],
-      right: [
-        ...(model.trailingCells.length > 0 ? ["metadata-ui-trailing-cells"] : []),
-        ...(model.rowActions.length > 0 ? ["metadata-ui-row-actions"] : []),
-      ],
+      right: [],
     },
   );
 }
@@ -215,23 +212,32 @@ function MetadataUiSortableHeader({
   const sortState = column.getIsSorted();
   const suffix =
     sortState === "asc" ? " ascending" : sortState === "desc" ? " descending" : "";
+  const sortLabel =
+    sortState === "asc" ? "Asc" : sortState === "desc" ? "Desc" : "Sort";
 
   return (
     <Button
       type="button"
       variant="ghost"
-      size="sm"
-      className="-mx-surface-xs"
+      size="xs"
+      className="-mx-2 h-7 gap-1.5 px-2 text-xs uppercase tracking-label text-muted-foreground hover:bg-accent hover:text-accent-foreground"
       aria-label={`Sort by ${label}${suffix}`}
       onClick={column.getToggleSortingHandler()}
     >
-      {label}
+      <span>{label}</span>
+      <span aria-hidden="true" className="text-[0.65rem] font-medium opacity-60">
+        {sortLabel}
+      </span>
     </Button>
   );
 }
 
 function MetadataUiPlainHeader({ label }: Readonly<{ label: string }>) {
-  return <span>{label}</span>;
+  return (
+    <span className="text-xs uppercase tracking-label text-muted-foreground">
+      {label}
+    </span>
+  );
 }
 
 type MetadataUiRowControlState = "available" | "disabled" | "hidden";
@@ -320,7 +326,7 @@ function MetadataUiListTrailingCell({
   trailingCells: MetadataUiTableClientModel["trailingCells"];
 }>) {
   return (
-    <div className="inline-flex flex-wrap justify-end gap-surface-xs">
+    <div className="inline-flex min-w-0 flex-wrap items-center justify-end gap-surface-xs">
       {trailingCells.map((cell) => {
         const state = getMetadataUiRowControlState(row, cell.stateField);
         const disabledReason = getMetadataUiRowControlDisabledReason(
@@ -359,7 +365,7 @@ function MetadataUiListTrailingCell({
         return (
           <span
             key={cell.key}
-            className="text-muted-foreground"
+            className="max-w-32 truncate text-muted-foreground"
             data-metadata-ui-trailing-cell-kind={cell.kind}
             data-metadata-ui-trailing-cell-state={state}
             title={cell.label}
@@ -414,6 +420,13 @@ function createMetadataUiActionColumn(
     ),
     enableSorting: false,
     enableHiding: false,
+    meta: {
+      align: "end",
+      width: {
+        min: 132,
+        ideal: 160,
+      },
+    },
   };
 }
 
@@ -428,6 +441,13 @@ function createMetadataUiTrailingColumn(
     ),
     enableSorting: false,
     enableHiding: false,
+    meta: {
+      align: "end",
+      width: {
+        min: 176,
+        ideal: 220,
+      },
+    },
   };
 }
 
@@ -478,15 +498,38 @@ function getMetadataUiCellAlignClass(
   );
 }
 
+function getMetadataUiColumnWidthStyle(column: unknown) {
+  const width =
+    typeof column === "object" && column && "width" in column
+      ? column.width
+      : undefined;
+
+  if (!width || typeof width !== "object") {
+    return undefined;
+  }
+
+  const candidate = width as {
+    min?: unknown;
+    ideal?: unknown;
+    max?: unknown;
+  };
+
+  return {
+    minWidth: typeof candidate.min === "number" ? candidate.min : undefined,
+    width: typeof candidate.ideal === "number" ? candidate.ideal : undefined,
+    maxWidth: typeof candidate.max === "number" ? candidate.max : undefined,
+  };
+}
+
 function getMetadataUiPinnedColumnClass(
   pinned: false | "left" | "right",
 ): string {
   if (pinned === "left") {
-    return "sticky left-0 z-10 bg-background";
+    return "sticky left-0 z-10 bg-card shadow-[1px_0_0_var(--color-border)]";
   }
 
   if (pinned === "right") {
-    return "sticky right-0 z-10 bg-background";
+    return "sticky right-0 z-10 bg-card shadow-[-1px_0_0_var(--color-border)]";
   }
 
   return "";
@@ -499,7 +542,7 @@ function getMetadataUiTableDensity(
 }
 
 function getMetadataUiPinnedRowClass(row: Row<MetadataUiTableRowModel>): string {
-  return row.getIsSelected() ? "data-[selected=true]:bg-muted/50" : "";
+  return row.getIsSelected() ? "data-[selected=true]:bg-accent/40" : "";
 }
 
 function MetadataUiListTableHeader({
@@ -516,9 +559,11 @@ function MetadataUiListTableHeader({
               key={header.id}
               className={cn(
                 ui.table.headerCell,
+                "bg-muted/50",
                 getMetadataUiColumnAlignClass(header.column.columnDef.meta),
                 getMetadataUiPinnedColumnClass(header.column.getIsPinned()),
               )}
+              style={getMetadataUiColumnWidthStyle(header.column.columnDef.meta)}
             >
               {header.isPlaceholder
                 ? null
@@ -713,7 +758,10 @@ function MetadataUiInteractiveListTable({
         {toolbar}
         <div
           ref={virtualScrollRef}
-          className={cn(ui.surface.inset, "overflow-y-auto")}
+          className={cn(
+            "overflow-y-auto rounded-section border bg-card",
+            ui.elevation.card,
+          )}
           style={{ maxHeight: model.virtualization.maxHeight }}
         >
           <Table
@@ -722,14 +770,14 @@ function MetadataUiInteractiveListTable({
           >
             <TableCaption>{model.serverWindow.caption}</TableCaption>
             <MetadataUiListTableHeader table={table} />
-          <MetadataUiVirtualListWindow
-            rows={tableRows}
-            columnCount={table.getVisibleLeafColumns().length}
-            virtualization={model.virtualization}
-            scrollElementRef={virtualScrollRef}
-            getCellClassName={getMetadataUiCellAlignClass}
-            getRowClassName={getMetadataUiPinnedRowClass}
-          />
+            <MetadataUiVirtualListWindow
+              rows={tableRows}
+              columnCount={table.getVisibleLeafColumns().length}
+              virtualization={model.virtualization}
+              scrollElementRef={virtualScrollRef}
+              getCellClassName={getMetadataUiCellAlignClass}
+              getRowClassName={getMetadataUiPinnedRowClass}
+            />
           </Table>
         </div>
       </div>
@@ -741,7 +789,7 @@ function MetadataUiInteractiveListTable({
       {toolbar}
       <Table
         density={getMetadataUiTableDensity(density)}
-        containerClassName={ui.surface.inset}
+        containerClassName={cn("rounded-section border bg-card", ui.elevation.card)}
         className="metadata-ui-table metadata-ui-table-tanstack"
         data-metadata-ui-server-window="current"
         data-metadata-ui-server-window-rows={model.serverWindow.rowCount}
@@ -752,7 +800,11 @@ function MetadataUiInteractiveListTable({
           {tableRows.map((row) => (
             <TableRow
               key={row.id}
-              className={cn(ui.table.rowInteractive, getMetadataUiPinnedRowClass(row))}
+              className={cn(
+                "bg-card hover:bg-accent/35",
+                ui.table.rowInteractive,
+                getMetadataUiPinnedRowClass(row),
+              )}
               data-selected={row.getIsSelected() || undefined}
             >
               {row.getVisibleCells().map((cell) => (
@@ -763,6 +815,7 @@ function MetadataUiInteractiveListTable({
                     getMetadataUiColumnAlignClass(cell.column.columnDef.meta),
                     getMetadataUiPinnedColumnClass(cell.column.getIsPinned()),
                   )}
+                  style={getMetadataUiColumnWidthStyle(cell.column.columnDef.meta)}
                 >
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}
                 </TableCell>

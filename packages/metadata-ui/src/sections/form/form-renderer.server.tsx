@@ -1,6 +1,9 @@
 import "server-only";
 
+import { Alert, AlertDescription, AlertTitle } from "@afenda/ui";
+
 import { MetadataUiPrimitiveActionButton } from "../../primitives/action-button.server";
+import { MetadataUiPrimitiveDescriptionList } from "../../primitives/description-list.server";
 import {
   MetadataUiPrimitiveField,
   MetadataUiPrimitiveFieldGroup,
@@ -115,6 +118,7 @@ function resolveMetadataUiFormSectionFields(
 export function MetadataUiFormRenderer({ metadata }: MetadataUiFormRendererProps) {
   const form = parseMetadataUiForm(metadata);
   const actions = groupMetadataUiFormActions(form);
+  const totalActions = actions.primary.length + actions.secondary.length;
 
   return (
     <MetadataUiClientForm
@@ -124,21 +128,60 @@ export function MetadataUiFormRenderer({ metadata }: MetadataUiFormRendererProps
       noValidate
     >
       {form.errorSummary.errors.length > 0 ? (
-        <section
-          className="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-900"
+        <Alert
+          variant="destructive"
           aria-live="polite"
           data-metadata-ui-form-error-summary="true"
         >
-          <h3 className="font-medium">{form.errorSummary.title}</h3>
-          <ul className="mt-2 list-disc pl-5">
-            {form.errorSummary.errors.map((error) => (
-              <li key={`${error.fieldKey}-${error.message}`}>
-                {error.message}
-              </li>
-            ))}
-          </ul>
-        </section>
+          <AlertTitle>{form.errorSummary.title}</AlertTitle>
+          <AlertDescription>
+            <ul className="mt-2 list-disc pl-5">
+              {form.errorSummary.errors.map((error) => (
+                <li key={`${error.fieldKey}-${error.message}`}>
+                  {error.message}
+                </li>
+              ))}
+            </ul>
+          </AlertDescription>
+        </Alert>
       ) : null}
+      <MetadataUiPrimitiveDescriptionList
+        title="Form metadata"
+        description="Governed form state and layout summary."
+        columns={3}
+        items={[
+          {
+            key: "mode",
+            label: "Mode",
+            value: form.mode,
+          },
+          {
+            key: "layout",
+            label: "Layout",
+            value: form.layout,
+          },
+          {
+            key: "state",
+            label: "State",
+            value: form.state,
+          },
+          {
+            key: "sections",
+            label: "Sections",
+            value: form.sections.length,
+          },
+          {
+            key: "actions",
+            label: "Actions",
+            value: totalActions,
+          },
+          {
+            key: "errors",
+            label: "Errors",
+            value: form.errorSummary.errors.length,
+          },
+        ]}
+      />
       {form.sections.map((section) => (
         <MetadataUiPrimitiveFieldGroup key={section.key} section={section}>
           {resolveMetadataUiFormSectionFields(section).map((field) => (

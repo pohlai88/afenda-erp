@@ -3,6 +3,7 @@ import {
   type AppShellChrome,
   type AppShellPrimaryLeftRailNavIconId,
 } from "@afenda/appshell";
+import { readNeonAuthSessionPayload } from "@afenda/auth/neon-auth/server";
 import { getAccessibleModules } from "@afenda/kernel";
 import { getWorkspaceExecutionContext } from "@/routes/execution-context-route.server";
 import { redirect } from "next/navigation";
@@ -188,8 +189,16 @@ export default async function WorkspaceLayout({
 }: {
   children: ReactNode;
 }) {
-  const context = await getWorkspaceExecutionContext();
+  const [context, session] = await Promise.all([
+    getWorkspaceExecutionContext(),
+    readNeonAuthSessionPayload(),
+  ]);
+
   if (!context) {
+    if (session?.session && session?.user) {
+      redirect("/onboarding");
+    }
+
     redirect("/sign-in");
   }
 
