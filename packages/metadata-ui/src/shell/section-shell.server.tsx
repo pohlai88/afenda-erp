@@ -2,6 +2,9 @@ import "server-only";
 
 import type { ReactNode } from "react";
 
+import { ui } from "@afenda/ui/design-system";
+import { cn } from "@afenda/ui/utils";
+
 import type { MetadataUiPresentationContract } from "../contracts/presentation.contract";
 import type { MetadataUiSectionKind } from "../contracts/section.contract";
 import {
@@ -81,7 +84,7 @@ export function MetadataUiSectionShell({
       diagnostics={identity.diagnostics}
       domAttributes={identity.domAttributes}
     >
-      <div className="metadata-ui-section-shell space-y-4">
+      <div className={cn("metadata-ui-section-shell grid", ui.surfaceGap.md)}>
         {showHeader && title ? (
           <MetadataUiHeading
             id={headingId}

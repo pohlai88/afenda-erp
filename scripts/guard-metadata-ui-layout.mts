@@ -11,7 +11,9 @@ const problems = scanMetadataUiFromRoot(packageRoot);
 if (problems.length > 0) {
   console.error("[guard:metadata-ui] GUARD 6 FAILED");
   console.error("");
-  console.error("Checks: runtime · naming · doors · dependencies · registry · section contract");
+  console.error(
+    "Checks: runtime · naming · doors · dependencies · registry · section contract · spacing contract",
+  );
   console.error("");
   for (const problem of problems) {
     console.error(`  - ${problem}`);
@@ -22,5 +24,5 @@ if (problems.length > 0) {
 }
 
 console.log(
-  "[guard:metadata-ui] GUARD 6 passed — runtime · naming · doors · dependencies · registry · section contract",
+  "[guard:metadata-ui] GUARD 6 passed — runtime · naming · doors · dependencies · registry · section contract · spacing contract",
 );

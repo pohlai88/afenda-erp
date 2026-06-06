@@ -920,6 +920,1115 @@ function checkAppRouteFileWhitelist() {
   });
 }
 
+function checkMetadataUiPlaygroundImportBoundaries() {
+  const playgroundRoot = path.join(
+    root,
+    "apps/erp/src/app/playground-metadataui",
+  );
+  if (!fs.existsSync(playgroundRoot)) {
+    return;
+  }
+
+  const allowedPackageSpecifiers = new Set([
+    "@afenda/appshell/server",
+    "@afenda/metadata-ui",
+    "@afenda/metadata-ui/server",
+    "@afenda/ui",
+    "next",
+    "next/navigation",
+    "react",
+    "server-only",
+  ]);
+  const bannedRequestBoundSpecifiers = new Set([
+    "next/cache",
+    "next/headers",
+    "node:crypto",
+    "node:fs",
+    "node:fs/promises",
+    "node:perf_hooks",
+  ]);
+
+  walkSourceFiles(playgroundRoot, (filePath) => {
+    const rel = relativePath(filePath);
+    const content = fs.readFileSync(filePath, "utf8");
+    const importSpecifiers = getImportSpecifiers(content);
+
+    for (const specifier of importSpecifiers) {
+      if (specifier.startsWith(".")) {
+        const resolvedSpecifierPath = path.resolve(
+          path.dirname(filePath),
+          specifier,
+        );
+        if (
+          resolvedSpecifierPath !== playgroundRoot &&
+          !resolvedSpecifierPath.startsWith(`${playgroundRoot}${path.sep}`)
+        ) {
+          problems.push(
+            `${rel} must not import local modules outside apps/erp/src/app/playground-metadataui: ${specifier}`,
+          );
+        }
+        continue;
+      }
+
+      if (!allowedPackageSpecifiers.has(specifier)) {
+        problems.push(
+          `${rel} imports ${specifier}; metadata UI playground imports are allow-listed by architecture.md`,
+        );
+      }
+
+      if (
+        specifier === "@afenda/auth" ||
+        specifier.startsWith("@afenda/auth/")
+      ) {
+        problems.push(
+          `${rel} must not import @afenda/auth; metadata UI playground fixtures do not read sessions or tenant auth`,
+        );
+      }
+
+      if (specifier === "@afenda/db" || specifier.startsWith("@afenda/db/")) {
+        problems.push(
+          `${rel} must not import @afenda/db; metadata UI playground fixtures must stay static and deterministic`,
+        );
+      }
+
+      if (
+        specifier.startsWith("@afenda/feature-") ||
+        specifier.includes("packages/features/")
+      ) {
+        problems.push(
+          `${rel} must not import feature packages; metadata UI playground coverage uses renderer fixtures only: ${specifier}`,
+        );
+      }
+
+      if (
+        specifier.startsWith("@/workspace-routes/") ||
+        /(^|\/)workspace-routes(\/|$)/.test(specifier)
+      ) {
+        problems.push(
+          `${rel} must not import workspace route modules; playground composition is isolated from tenant workspace routes: ${specifier}`,
+        );
+      }
+
+      if (
+        specifier.includes(".actions.server") ||
+        /(^|\/)actions(\/|$)/.test(specifier)
+      ) {
+        problems.push(
+          `${rel} must not import server action modules; playground fixtures must not execute write transports: ${specifier}`,
+        );
+      }
+
+      if (bannedRequestBoundSpecifiers.has(specifier)) {
+        problems.push(
+          `${rel} must not import request-bound or nondeterministic runtime module ${specifier}`,
+        );
+      }
+    }
+  });
+}
+
+function checkMetadataUiPlaygroundCertification() {
+  const playgroundRoot = path.join(
+    root,
+    "apps/erp/src/app/playground-metadataui",
+  );
+  if (!fs.existsSync(playgroundRoot)) {
+    return;
+  }
+
+  const allowedTopLevelFiles = new Set([
+    "architecture.md",
+    "advanced-patterns.md",
+    "README.md",
+    "layout.tsx",
+    "page.tsx",
+  ]);
+  const allowedFixtureFilePattern =
+    /^_fixtures\/(?:[a-z0-9-]+\.)?(?:fixture|server)\.ts$/;
+  const allowedDynamicPatternRouteFiles = new Set(["[pattern]/page.tsx"]);
+
+  const visitPlaygroundShape = (dir: string) => {
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+      const fullPath = path.join(dir, entry.name);
+      const rel = normalize(path.relative(playgroundRoot, fullPath));
+
+      if (entry.isDirectory()) {
+        if (rel !== "_fixtures" && rel !== "[pattern]") {
+          problems.push(
+            `metadata UI playground allows only the _fixtures/ and [pattern]/ directories, found ${relativePath(fullPath)}/`,
+          );
+          continue;
+        }
+        visitPlaygroundShape(fullPath);
+        continue;
+      }
+
+      if (!entry.isFile()) {
+        continue;
+      }
+
+      if (rel.includes("/")) {
+        if (
+          !allowedFixtureFilePattern.test(rel) &&
+          !allowedDynamicPatternRouteFiles.has(rel)
+        ) {
+          problems.push(
+            `metadata UI playground nested files must be fixture files or [pattern]/page.tsx: ${relativePath(fullPath)}`,
+          );
+        }
+        continue;
+      }
+
+      if (!allowedTopLevelFiles.has(rel)) {
+        problems.push(
+          `metadata UI playground top-level file is not allowed by architecture.md: ${relativePath(fullPath)}`,
+        );
+      }
+    }
+  };
+
+  visitPlaygroundShape(playgroundRoot);
+
+  const requiredFiles = [
+    "architecture.md",
+    "advanced-patterns.md",
+    "README.md",
+    "page.tsx",
+    "[pattern]/page.tsx",
+    "layout.tsx",
+    "_fixtures/constants.fixture.ts",
+    "_fixtures/advanced-seed-types.fixture.ts",
+    "_fixtures/advanced-seed.fixture.ts",
+    "_fixtures/advanced-navigation.fixture.ts",
+    "_fixtures/advanced-analytics.fixture.ts",
+    "_fixtures/advanced-overview.fixture.ts",
+    "_fixtures/advanced-operations.fixture.ts",
+    "_fixtures/advanced-record.fixture.ts",
+    "_fixtures/advanced-planning.fixture.ts",
+    "_fixtures/advanced-state.fixture.ts",
+    "_fixtures/advanced-table.fixture.ts",
+    "_fixtures/advanced-workflow.fixture.ts",
+    "_fixtures/stack.fixture.ts",
+    "_fixtures/detail-tabs.fixture.ts",
+    "_fixtures/kanban.fixture.ts",
+    "_fixtures/multi-step-form.fixture.ts",
+  ] as const;
+
+  for (const relativeFile of requiredFiles) {
+    const filePath = path.join(playgroundRoot, relativeFile);
+    if (!fs.existsSync(filePath)) {
+      problems.push(
+        `metadata UI playground certification requires ${normalize(path.join("apps/erp/src/app/playground-metadataui", relativeFile))}`,
+      );
+    }
+  }
+
+  const layoutPath = path.join(playgroundRoot, "layout.tsx");
+  if (fs.existsSync(layoutPath)) {
+    const layoutSource = fs.readFileSync(layoutPath, "utf8");
+    if (
+      !layoutSource.includes("process.env.AFENDA_ENABLE_DEV_PLAYGROUNDS") ||
+      !layoutSource.includes("!== \"1\"") ||
+      !layoutSource.includes("notFound()")
+    ) {
+      problems.push(
+        "metadata UI playground layout must hide the route unless AFENDA_ENABLE_DEV_PLAYGROUNDS=1",
+      );
+    }
+  }
+
+  const proxyPath = path.join(root, "apps/erp/src/proxy.ts");
+  if (fs.existsSync(proxyPath)) {
+    const proxySource = fs.readFileSync(proxyPath, "utf8");
+    if (
+      !proxySource.includes("METADATA_UI_PLAYGROUND_PATH") ||
+      !proxySource.includes("process.env.AFENDA_ENABLE_DEV_PLAYGROUNDS === \"1\"")
+    ) {
+      problems.push(
+        "metadata UI playground proxy bypass must be gated by AFENDA_ENABLE_DEV_PLAYGROUNDS=1",
+      );
+    }
+  }
+
+  const constantsPath = path.join(
+    playgroundRoot,
+    "_fixtures/constants.fixture.ts",
+  );
+  const advancedSeedTypesPath = path.join(
+    playgroundRoot,
+    "_fixtures/advanced-seed-types.fixture.ts",
+  );
+  const advancedSeedPath = path.join(
+    playgroundRoot,
+    "_fixtures/advanced-seed.fixture.ts",
+  );
+  const advancedNavigationPath = path.join(
+    playgroundRoot,
+    "_fixtures/advanced-navigation.fixture.ts",
+  );
+  const advancedAnalyticsPath = path.join(
+    playgroundRoot,
+    "_fixtures/advanced-analytics.fixture.ts",
+  );
+  const advancedOverviewPath = path.join(
+    playgroundRoot,
+    "_fixtures/advanced-overview.fixture.ts",
+  );
+  const advancedOperationsPath = path.join(
+    playgroundRoot,
+    "_fixtures/advanced-operations.fixture.ts",
+  );
+  const advancedRecordPath = path.join(
+    playgroundRoot,
+    "_fixtures/advanced-record.fixture.ts",
+  );
+  const advancedPlanningPath = path.join(
+    playgroundRoot,
+    "_fixtures/advanced-planning.fixture.ts",
+  );
+  const advancedStatePath = path.join(
+    playgroundRoot,
+    "_fixtures/advanced-state.fixture.ts",
+  );
+  const advancedTablePath = path.join(
+    playgroundRoot,
+    "_fixtures/advanced-table.fixture.ts",
+  );
+  const advancedWorkflowPath = path.join(
+    playgroundRoot,
+    "_fixtures/advanced-workflow.fixture.ts",
+  );
+  const advancedPatternsPath = path.join(playgroundRoot, "advanced-patterns.md");
+  const playgroundVisualSpecPath = path.join(
+    root,
+    "apps/erp/tests/e2e/metadata-ui-playground.spec.ts",
+  );
+  const stateFixturePath = path.join(
+    playgroundRoot,
+    "_fixtures/state.fixture.ts",
+  );
+  const constantsSource = fs.existsSync(constantsPath)
+    ? fs.readFileSync(constantsPath, "utf8")
+    : "";
+  const advancedSeedTypesSource = fs.existsSync(advancedSeedTypesPath)
+    ? fs.readFileSync(advancedSeedTypesPath, "utf8")
+    : "";
+  const advancedSeedSource = fs.existsSync(advancedSeedPath)
+    ? fs.readFileSync(advancedSeedPath, "utf8")
+    : "";
+  const advancedNavigationSource = fs.existsSync(advancedNavigationPath)
+    ? fs.readFileSync(advancedNavigationPath, "utf8")
+    : "";
+  const advancedAnalyticsSource = fs.existsSync(advancedAnalyticsPath)
+    ? fs.readFileSync(advancedAnalyticsPath, "utf8")
+    : "";
+  const advancedOverviewSource = fs.existsSync(advancedOverviewPath)
+    ? fs.readFileSync(advancedOverviewPath, "utf8")
+    : "";
+  const advancedOperationsSource = fs.existsSync(advancedOperationsPath)
+    ? fs.readFileSync(advancedOperationsPath, "utf8")
+    : "";
+  const advancedRecordSource = fs.existsSync(advancedRecordPath)
+    ? fs.readFileSync(advancedRecordPath, "utf8")
+    : "";
+  const advancedPlanningSource = fs.existsSync(advancedPlanningPath)
+    ? fs.readFileSync(advancedPlanningPath, "utf8")
+    : "";
+  const advancedStateSource = fs.existsSync(advancedStatePath)
+    ? fs.readFileSync(advancedStatePath, "utf8")
+    : "";
+  const advancedTableSource = fs.existsSync(advancedTablePath)
+    ? fs.readFileSync(advancedTablePath, "utf8")
+    : "";
+  const advancedWorkflowSource = fs.existsSync(advancedWorkflowPath)
+    ? fs.readFileSync(advancedWorkflowPath, "utf8")
+    : "";
+  const advancedPatternsSource = fs.existsSync(advancedPatternsPath)
+    ? fs.readFileSync(advancedPatternsPath, "utf8")
+    : "";
+  const playgroundVisualSpecSource = fs.existsSync(playgroundVisualSpecPath)
+    ? fs.readFileSync(playgroundVisualSpecPath, "utf8")
+    : "";
+  const stackPath = path.join(playgroundRoot, "_fixtures/stack.fixture.ts");
+  const stackSource = fs.existsSync(stackPath)
+    ? fs.readFileSync(stackPath, "utf8")
+    : "";
+  const pagePath = path.join(playgroundRoot, "page.tsx");
+  const pageSource = fs.existsSync(pagePath)
+    ? fs.readFileSync(pagePath, "utf8")
+    : "";
+  const patternPagePath = path.join(playgroundRoot, "[pattern]/page.tsx");
+  const patternPageSource = fs.existsSync(patternPagePath)
+    ? fs.readFileSync(patternPagePath, "utf8")
+    : "";
+  const advancedScenarioKinds = [
+    "overview",
+    "operations-list",
+    "tanstack-table",
+    "record-detail",
+    "workflow-form",
+    "planning-board",
+    "analytics",
+    "state-matrix",
+  ] as const;
+  const advancedVisualSectionContracts = [
+    {
+      sectionId: "metadata-ui.playground.advanced.overview.stats",
+      rendererId: "metadata-ui.renderer.stat",
+    },
+    {
+      sectionId: "metadata-ui.playground.advanced.overview.chart",
+      rendererId: "metadata-ui.renderer.chart",
+    },
+    {
+      sectionId: "metadata-ui.playground.advanced.overview.list",
+      rendererId: "metadata-ui.renderer.list",
+    },
+    {
+      sectionId: "metadata-ui.playground.advanced.operations.action-bar",
+      rendererId: "metadata-ui.renderer.action-bar",
+    },
+    {
+      sectionId: "metadata-ui.playground.advanced.operations.list",
+      rendererId: "metadata-ui.renderer.list",
+    },
+    {
+      sectionId: "metadata-ui.playground.advanced.record.detail-tabs",
+      rendererId: "metadata-ui.renderer.detail-tabs",
+    },
+    {
+      sectionId: "metadata-ui.playground.advanced.record.related-list",
+      rendererId: "metadata-ui.renderer.list",
+    },
+    {
+      sectionId: "metadata-ui.playground.advanced.record.audit-panel",
+      rendererId: "metadata-ui.renderer.audit-panel",
+    },
+    {
+      sectionId: "metadata-ui.playground.advanced.record.timeline",
+      rendererId: "metadata-ui.renderer.approval-timeline",
+    },
+    {
+      sectionId: "metadata-ui.playground.advanced.workflow.multi-step",
+      rendererId: "metadata-ui.renderer.multi-step-form",
+    },
+    {
+      sectionId: "metadata-ui.playground.advanced.workflow.scorecard",
+      rendererId: "metadata-ui.renderer.scorecard-form",
+    },
+    {
+      sectionId: "metadata-ui.playground.advanced.planning.board",
+      rendererId: "metadata-ui.renderer.kanban",
+    },
+    {
+      sectionId: "metadata-ui.playground.advanced.planning.timeline",
+      rendererId: "metadata-ui.renderer.approval-timeline",
+    },
+    {
+      sectionId: "metadata-ui.playground.advanced.analytics.stats",
+      rendererId: "metadata-ui.renderer.stat",
+    },
+    {
+      sectionId: "metadata-ui.playground.advanced.analytics.chart",
+      rendererId: "metadata-ui.renderer.chart",
+    },
+    {
+      sectionId: "metadata-ui.playground.advanced.analytics.list",
+      rendererId: "metadata-ui.renderer.list",
+    },
+    {
+      sectionId: "metadata-ui.playground.advanced.table-lab.list",
+      rendererId: "metadata-ui.renderer.list",
+    },
+    {
+      sectionId: "metadata-ui.playground.state-coverage",
+      rendererId: "metadata-ui.renderer.list",
+    },
+  ] as const;
+
+  for (const stateKey of [
+    "readyState",
+    "loadingState",
+    "emptyState",
+    "forbiddenState",
+    "errorState",
+  ] as const) {
+    if (!constantsSource.includes(`${stateKey}:`)) {
+      problems.push(
+        `metadata UI playground certification missing fixture id ${stateKey}`,
+      );
+    }
+  }
+
+  for (const advancedStateExport of [
+    "createMetadataUiAdvancedStateMatrixList",
+    "METADATA_UI_ADVANCED_STATE_MATRIX_ROWS",
+    "METADATA_UI_ADVANCED_STATE_SEEDS",
+    "createList",
+    "createStatusColumn",
+    "createTextColumn",
+  ] as const) {
+    if (!advancedStateSource.includes(advancedStateExport)) {
+      problems.push(
+        `metadata UI playground advanced state fixture must include ${advancedStateExport}`,
+      );
+    }
+  }
+
+  for (const stateValue of [
+    "ready",
+    "loading",
+    "empty",
+    "forbidden",
+    "error",
+  ] as const) {
+    if (!advancedStateSource.includes(`${stateValue}:`)) {
+      problems.push(
+        `metadata UI playground advanced state fixture must map ${stateValue} state coverage`,
+      );
+    }
+  }
+
+  if (fs.existsSync(stateFixturePath)) {
+    problems.push(
+      "metadata UI playground must not keep _fixtures/state.fixture.ts after metadata-only state matrix conversion",
+    );
+  }
+
+  for (const forbiddenStatePattern of [
+    "createElement",
+    "Skeleton",
+    "MetadataUiPrimitive",
+    "ReactNode",
+  ] as const) {
+    if (advancedStateSource.includes(forbiddenStatePattern)) {
+      problems.push(
+        `metadata UI playground advanced state fixture must not include hand-render pattern ${forbiddenStatePattern}`,
+      );
+    }
+  }
+
+  for (const closedStateGap of [
+    "_fixtures/advanced-state.fixture.ts",
+    "metadata-ui.renderer.list",
+    "rowsBySectionKey",
+    "_fixtures/state.fixture.ts` is removed",
+  ] as const) {
+    if (!advancedPatternsSource.includes(closedStateGap)) {
+      problems.push(
+        `metadata UI playground advanced patterns doc must record closed state matrix gap: ${closedStateGap}`,
+      );
+    }
+  }
+
+  for (const forbiddenStackPattern of [
+    "childrenBySectionKey",
+    "metadata: {}",
+    "createMetadataUiPlaygroundStateCoverageChildren",
+  ] as const) {
+    if (stackSource.includes(forbiddenStackPattern)) {
+      problems.push(
+        `metadata UI playground stack must not include state handroll pattern ${forbiddenStackPattern}`,
+      );
+    }
+  }
+
+  for (const dashboardLayoutToken of [
+    "span: \"third\"",
+    "span: \"two-thirds\"",
+    "span: \"half\"",
+  ] as const) {
+    if (!stackSource.includes(dashboardLayoutToken)) {
+      problems.push(
+        `metadata UI playground stack must keep responsive dashboard span metadata ${dashboardLayoutToken}`,
+      );
+    }
+  }
+
+  if (!pageSource.includes("max-w-[min(1680px,calc(100vw-1.5rem))]")) {
+    problems.push(
+      "metadata UI playground page must keep the wide enterprise dashboard container",
+    );
+  }
+
+  for (const stateStackKey of [
+    "createMetadataUiAdvancedStateMatrixList",
+    "METADATA_UI_ADVANCED_STATE_MATRIX_ROWS",
+    "METADATA_UI_PLAYGROUND_FIXTURE_IDS.stateSection",
+    "metadata-ui.renderer.list",
+  ] as const) {
+    if (!stackSource.includes(stateStackKey)) {
+      problems.push(
+        `metadata UI playground stack must render metadata-only state matrix item ${stateStackKey}`,
+      );
+    }
+  }
+
+  for (const advancedSeedType of [
+    "MetadataUiAdvancedPatternKind",
+    "MetadataUiAdvancedPatternId",
+    "MetadataUiAdvancedScenario",
+    "MetadataUiAdvancedSeedCatalog",
+  ] as const) {
+    if (!advancedSeedTypesSource.includes(advancedSeedType)) {
+      problems.push(
+        `metadata UI playground advanced seed types must define ${advancedSeedType}`,
+      );
+    }
+  }
+
+  for (const advancedSeedExport of [
+    "METADATA_UI_ADVANCED_PATTERN_SCENARIOS",
+    "METADATA_UI_ADVANCED_NAVIGATION_GROUPS",
+    "METADATA_UI_ADVANCED_OPERATIONS_ROWS",
+    "METADATA_UI_ADVANCED_TABLE_LAB_ROWS",
+    "METADATA_UI_ADVANCED_SEED_CATALOG",
+  ] as const) {
+    if (!advancedSeedSource.includes(advancedSeedExport)) {
+      problems.push(
+        `metadata UI playground advanced seed catalog must export ${advancedSeedExport}`,
+      );
+    }
+  }
+
+  if (!advancedSeedSource.includes("as const satisfies")) {
+    problems.push(
+      "metadata UI playground advanced seed catalog must use as const satisfies for compile-time fixture validation",
+    );
+  }
+
+  if (
+    advancedSeedSource.includes("Date.now") ||
+    advancedSeedSource.includes("new Date") ||
+    advancedSeedSource.includes("Math.random")
+  ) {
+    problems.push(
+      "metadata UI playground advanced seed catalog must stay deterministic and avoid runtime generated values",
+    );
+  }
+
+  for (const scenarioKind of advancedScenarioKinds) {
+    if (!advancedSeedTypesSource.includes(`| "${scenarioKind}"`)) {
+      problems.push(
+        `metadata UI playground advanced seed types must include scenario kind ${scenarioKind}`,
+      );
+    }
+    if (!advancedSeedSource.includes(`kind: "${scenarioKind}"`)) {
+      problems.push(
+        `metadata UI playground advanced seed catalog must include seeded scenario kind ${scenarioKind}`,
+      );
+    }
+    if (!advancedNavigationSource.includes(scenarioKind)) {
+      problems.push(
+        `metadata UI playground advanced navigation must include scenario kind ${scenarioKind}`,
+      );
+    }
+  }
+
+  for (const advancedNavigationExport of [
+    "createMetadataUiPlaygroundAdvancedRailSections",
+    "createMetadataUiPlaygroundAdvancedCommandSections",
+    "METADATA_UI_ADVANCED_NAVIGATION_GROUPS",
+    "METADATA_UI_ADVANCED_PATTERN_SCENARIOS",
+  ] as const) {
+    if (!advancedNavigationSource.includes(advancedNavigationExport)) {
+      problems.push(
+        `metadata UI playground advanced navigation fixture must include ${advancedNavigationExport}`,
+      );
+    }
+  }
+
+  if (
+    fs.existsSync(path.join(playgroundRoot, "_fixtures/chrome.server.ts")) &&
+    !fs
+      .readFileSync(path.join(playgroundRoot, "_fixtures/chrome.server.ts"), "utf8")
+      .includes("createMetadataUiPlaygroundAdvancedRailSections")
+  ) {
+    problems.push(
+      "metadata UI playground chrome must include static advanced left navigation sections",
+    );
+  }
+
+  if (
+    !advancedNavigationSource.includes('scenario.kind === "overview"') ||
+    !advancedNavigationSource.includes("METADATA_UI_PLAYGROUND_ROUTE")
+  ) {
+    problems.push(
+      "metadata UI playground advanced navigation must route overview to the playground root",
+    );
+  }
+
+  for (const scenarioKind of advancedScenarioKinds.filter(
+    (kind) => kind !== "overview",
+  )) {
+    if (
+      !advancedNavigationSource.includes(
+        `\${METADATA_UI_PLAYGROUND_ROUTE}/\${scenario.kind}`,
+      )
+    ) {
+      problems.push(
+        `metadata UI playground advanced navigation must use dynamic route hrefs for ${scenarioKind}`,
+      );
+    }
+  }
+
+  for (const dynamicRouteToken of [
+    "generateStaticParams",
+    "METADATA_UI_PLAYGROUND_PATTERN_KEYS",
+    "isMetadataUiPlaygroundPatternKey",
+    "createMetadataUiPlaygroundStackForPattern",
+    "notFound()",
+  ] as const) {
+    if (!patternPageSource.includes(dynamicRouteToken)) {
+      problems.push(
+        `metadata UI playground dynamic pattern route must include ${dynamicRouteToken}`,
+      );
+    }
+  }
+
+  for (const stackPatternToken of [
+    "METADATA_UI_PLAYGROUND_SECTION_IDS_BY_PATTERN",
+    "createMetadataUiPlaygroundStackForPattern",
+    "isMetadataUiPlaygroundPatternKey",
+  ] as const) {
+    if (!stackSource.includes(stackPatternToken)) {
+      problems.push(
+        `metadata UI playground stack fixture must include pattern resolver token ${stackPatternToken}`,
+      );
+    }
+  }
+
+  for (const advancedAnalyticsExport of [
+    "createMetadataUiAdvancedAnalyticsStats",
+    "createMetadataUiAdvancedAnalyticsChart",
+    "createMetadataUiAdvancedAnalyticsList",
+    "METADATA_UI_ADVANCED_ANALYTICS_ROWS",
+    "createStatGroup",
+    "createChart",
+    "createList",
+  ] as const) {
+    if (!advancedAnalyticsSource.includes(advancedAnalyticsExport)) {
+      problems.push(
+        `metadata UI playground advanced analytics fixture must include ${advancedAnalyticsExport}`,
+      );
+    }
+  }
+
+  for (const advancedAnalyticsStackKey of [
+    "advancedAnalyticsStatsSection",
+    "advancedAnalyticsChartSection",
+    "advancedAnalyticsListSection",
+    "createMetadataUiAdvancedAnalyticsStats",
+    "createMetadataUiAdvancedAnalyticsChart",
+    "createMetadataUiAdvancedAnalyticsList",
+    "METADATA_UI_ADVANCED_ANALYTICS_ROWS",
+  ] as const) {
+    if (!stackSource.includes(advancedAnalyticsStackKey)) {
+      problems.push(
+        `metadata UI playground stack must render advanced analytics item ${advancedAnalyticsStackKey}`,
+      );
+    }
+  }
+
+  for (const advancedOverviewExport of [
+    "createMetadataUiAdvancedOverviewStats",
+    "createMetadataUiAdvancedOverviewChart",
+    "createMetadataUiAdvancedOverviewScenarioList",
+    "METADATA_UI_ADVANCED_OVERVIEW_ROWS",
+  ] as const) {
+    if (!advancedOverviewSource.includes(advancedOverviewExport)) {
+      problems.push(
+        `metadata UI playground advanced overview fixture must include ${advancedOverviewExport}`,
+      );
+    }
+  }
+
+  for (const advancedOverviewStackKey of [
+    "advancedOverviewStatsSection",
+    "advancedOverviewChartSection",
+    "advancedOverviewListSection",
+    "createMetadataUiAdvancedOverviewStats",
+    "createMetadataUiAdvancedOverviewChart",
+    "createMetadataUiAdvancedOverviewScenarioList",
+  ] as const) {
+    if (!stackSource.includes(advancedOverviewStackKey)) {
+      problems.push(
+        `metadata UI playground stack must render advanced overview pattern item ${advancedOverviewStackKey}`,
+      );
+    }
+  }
+
+  for (const advancedTableExport of [
+    "createMetadataUiAdvancedTableLabList",
+    "METADATA_UI_ADVANCED_TABLE_LAB_RENDER_ROWS",
+    "METADATA_UI_ADVANCED_TABLE_LAB_ROWS",
+    "createListToolbar",
+    "createListBulkAction",
+    "selectionMode: \"multiple\"",
+    "selectableField",
+    "selectionDisabledReasonField",
+    "stateField",
+    "disabledReasonField",
+    "trailingCells",
+    "virtualization",
+  ] as const) {
+    if (!advancedTableSource.includes(advancedTableExport)) {
+      problems.push(
+        `metadata UI playground advanced table fixture must include ${advancedTableExport}`,
+      );
+    }
+  }
+
+  for (const advancedOperationsExport of [
+    "createMetadataUiAdvancedOperationsActionBar",
+    "createMetadataUiAdvancedOperationsList",
+    "METADATA_UI_ADVANCED_OPERATIONS_RENDER_ROWS",
+    "METADATA_UI_ADVANCED_OPERATIONS_ROWS",
+    "createListRowAction",
+    "trailingCells",
+    "createListBulkAction",
+    "visibility: \"disabled\"",
+  ] as const) {
+    if (!advancedOperationsSource.includes(advancedOperationsExport)) {
+      problems.push(
+        `metadata UI playground advanced operations fixture must include ${advancedOperationsExport}`,
+      );
+    }
+  }
+
+  for (const forbiddenOperationsPattern of [
+    "kind: \"server-action\"",
+    "use server",
+    ".actions.server",
+    "@afenda/feature-",
+  ] as const) {
+    if (advancedOperationsSource.includes(forbiddenOperationsPattern)) {
+      problems.push(
+        `metadata UI playground advanced operations fixture must not include write transport pattern ${forbiddenOperationsPattern}`,
+      );
+    }
+  }
+
+  for (const advancedOperationsStackKey of [
+    "advancedOperationsActionBarSection",
+    "advancedOperationsListSection",
+    "createMetadataUiAdvancedOperationsActionBar",
+    "createMetadataUiAdvancedOperationsList",
+    "METADATA_UI_ADVANCED_OPERATIONS_RENDER_ROWS",
+  ] as const) {
+    if (!stackSource.includes(advancedOperationsStackKey)) {
+      problems.push(
+        `metadata UI playground stack must render advanced operations item ${advancedOperationsStackKey}`,
+      );
+    }
+  }
+
+  for (const advancedRecordExport of [
+    "createMetadataUiAdvancedRecordDetailTabs",
+    "createMetadataUiAdvancedRecordRelatedList",
+    "createMetadataUiAdvancedRecordAuditPanel",
+    "createMetadataUiAdvancedRecordTimeline",
+    "METADATA_UI_ADVANCED_RECORD_RELATED_ROWS",
+    "METADATA_UI_ADVANCED_RECORDS",
+  ] as const) {
+    if (!advancedRecordSource.includes(advancedRecordExport)) {
+      problems.push(
+        `metadata UI playground advanced record fixture must include ${advancedRecordExport}`,
+      );
+    }
+  }
+
+  for (const advancedRecordStackKey of [
+    "advancedRecordDetailTabsSection",
+    "advancedRecordRelatedListSection",
+    "advancedRecordAuditPanelSection",
+    "advancedRecordTimelineSection",
+    "createMetadataUiAdvancedRecordDetailTabs",
+    "createMetadataUiAdvancedRecordRelatedList",
+    "createMetadataUiAdvancedRecordAuditPanel",
+    "createMetadataUiAdvancedRecordTimeline",
+    "METADATA_UI_ADVANCED_RECORD_RELATED_ROWS",
+  ] as const) {
+    if (!stackSource.includes(advancedRecordStackKey)) {
+      problems.push(
+        `metadata UI playground stack must render advanced record item ${advancedRecordStackKey}`,
+      );
+    }
+  }
+
+  for (const advancedWorkflowExport of [
+    "createMetadataUiAdvancedWorkflowMultiStepForm",
+    "createMetadataUiAdvancedWorkflowScorecardForm",
+    "METADATA_UI_ADVANCED_WORKFLOW_STEPS",
+    "createMultiStepForm",
+    "createScorecardForm",
+    "status: \"blocked\"",
+    "readonly: true",
+  ] as const) {
+    if (!advancedWorkflowSource.includes(advancedWorkflowExport)) {
+      problems.push(
+        `metadata UI playground advanced workflow fixture must include ${advancedWorkflowExport}`,
+      );
+    }
+  }
+
+  for (const forbiddenWorkflowPattern of [
+    "kind: \"server-action\"",
+    "use server",
+    ".actions.server",
+    "@afenda/feature-",
+  ] as const) {
+    if (advancedWorkflowSource.includes(forbiddenWorkflowPattern)) {
+      problems.push(
+        `metadata UI playground advanced workflow fixture must not include write transport pattern ${forbiddenWorkflowPattern}`,
+      );
+    }
+  }
+
+  for (const advancedWorkflowStackKey of [
+    "advancedWorkflowMultiStepSection",
+    "advancedWorkflowScorecardSection",
+    "createMetadataUiAdvancedWorkflowMultiStepForm",
+    "createMetadataUiAdvancedWorkflowScorecardForm",
+  ] as const) {
+    if (!stackSource.includes(advancedWorkflowStackKey)) {
+      problems.push(
+        `metadata UI playground stack must render advanced workflow item ${advancedWorkflowStackKey}`,
+      );
+    }
+  }
+
+  for (const advancedPlanningExport of [
+    "createMetadataUiAdvancedPlanningBoard",
+    "createMetadataUiAdvancedPlanningTimeline",
+    "METADATA_UI_ADVANCED_PLANNING_CARDS",
+    "createKanbanBoard",
+    "createApprovalFlowTimeline",
+    "withKanbanMovement",
+    "createKanbanTransition",
+    "status: \"blocked\"",
+  ] as const) {
+    if (!advancedPlanningSource.includes(advancedPlanningExport)) {
+      problems.push(
+        `metadata UI playground advanced planning fixture must include ${advancedPlanningExport}`,
+      );
+    }
+  }
+
+  for (const forbiddenPlanningPattern of [
+    "kind: \"server-action\"",
+    "use server",
+    ".actions.server",
+    "@afenda/feature-",
+    "fetch(",
+  ] as const) {
+    if (advancedPlanningSource.includes(forbiddenPlanningPattern)) {
+      problems.push(
+        `metadata UI playground advanced planning fixture must not include write or data transport pattern ${forbiddenPlanningPattern}`,
+      );
+    }
+  }
+
+  for (const advancedPlanningStackKey of [
+    "advancedPlanningBoardSection",
+    "advancedPlanningTimelineSection",
+    "createMetadataUiAdvancedPlanningBoard",
+    "createMetadataUiAdvancedPlanningTimeline",
+  ] as const) {
+    if (!stackSource.includes(advancedPlanningStackKey)) {
+      problems.push(
+        `metadata UI playground stack must render advanced planning item ${advancedPlanningStackKey}`,
+      );
+    }
+  }
+
+  if (advancedTableSource.includes("@tanstack/")) {
+    problems.push(
+      "metadata UI playground advanced table fixture must not import TanStack directly; use metadata-ui list metadata",
+    );
+  }
+
+  for (const advancedTableStackKey of [
+    "advancedTableLabSection",
+    "createMetadataUiAdvancedTableLabList",
+    "METADATA_UI_ADVANCED_TABLE_LAB_RENDER_ROWS",
+  ] as const) {
+    if (!stackSource.includes(advancedTableStackKey)) {
+      problems.push(
+        `metadata UI playground stack must render advanced table lab item ${advancedTableStackKey}`,
+      );
+    }
+  }
+
+  if (!playgroundVisualSpecSource) {
+    problems.push(
+      "metadata UI playground certification requires apps/erp/tests/e2e/metadata-ui-playground.spec.ts",
+    );
+  }
+
+  for (const visualHarnessToken of [
+    "ADVANCED_NAVIGATION_COPY",
+    "ADVANCED_SECTION_CONTRACTS",
+    "data-metadata-ui-section",
+    "data-metadata-ui-renderer",
+    "expectNoHorizontalOverflow",
+    "expectMetadataUiTableScrollReachability",
+    "metadataUiPlaygroundRouteForScenario",
+    "toHaveScreenshot",
+    "data-metadata-ui-row-action-state",
+    "data-metadata-ui-reduced-motion",
+    "metadata-ui-playground-operations-list-desktop.png",
+    "metadata-ui-playground-table-mobile.png",
+    "metadata-ui-playground-mobile-state-matrix.png",
+  ] as const) {
+    if (!playgroundVisualSpecSource.includes(visualHarnessToken)) {
+      problems.push(
+        `metadata UI playground visual spec must include ${visualHarnessToken}`,
+      );
+    }
+  }
+
+  for (const scenarioKind of advancedScenarioKinds) {
+    if (!playgroundVisualSpecSource.includes(scenarioKind)) {
+      problems.push(
+        `metadata UI playground visual spec must cover advanced scenario kind ${scenarioKind}`,
+      );
+    }
+  }
+
+  for (const { sectionId, rendererId } of advancedVisualSectionContracts) {
+    if (!constantsSource.includes(sectionId)) {
+      problems.push(
+        `metadata UI playground constants must include certified advanced section ${sectionId}`,
+      );
+    }
+    if (!stackSource.includes(`rendererId: "${rendererId}"`)) {
+      problems.push(
+        `metadata UI playground stack must include certified renderer ${rendererId} for advanced sections`,
+      );
+    }
+    if (!playgroundVisualSpecSource.includes(sectionId)) {
+      problems.push(
+        `metadata UI playground visual spec must assert advanced section ${sectionId}`,
+      );
+    }
+    if (!playgroundVisualSpecSource.includes(rendererId)) {
+      problems.push(
+        `metadata UI playground visual spec must assert renderer ${rendererId}`,
+      );
+    }
+  }
+
+  for (const forbiddenVisualSpecPattern of [
+    "storageState",
+    "localStorage",
+    "sessionStorage",
+    "document.cookie",
+    "page.route(",
+    "waitForTimeout",
+  ] as const) {
+    if (playgroundVisualSpecSource.includes(forbiddenVisualSpecPattern)) {
+      problems.push(
+        `metadata UI playground visual spec must stay no-auth and deterministic; found ${forbiddenVisualSpecPattern}`,
+      );
+    }
+  }
+
+  for (const rendererCoverage of [
+    {
+      rendererId: "metadata-ui.renderer.action-bar",
+      fixtureBuilder: "createMetadataUiPlaygroundActionBar",
+    },
+    {
+      rendererId: "metadata-ui.renderer.approval-timeline",
+      fixtureBuilder: "createMetadataUiPlaygroundTimeline",
+    },
+    {
+      rendererId: "metadata-ui.renderer.audit-panel",
+      fixtureBuilder: "createMetadataUiPlaygroundAuditPanel",
+    },
+    {
+      rendererId: "metadata-ui.renderer.chart",
+      fixtureBuilder: "createMetadataUiPlaygroundChart",
+    },
+    {
+      rendererId: "metadata-ui.renderer.detail-tabs",
+      fixtureBuilder: "createMetadataUiPlaygroundDetailTabs",
+    },
+    {
+      rendererId: "metadata-ui.renderer.form",
+      fixtureBuilder: "createMetadataUiPlaygroundForm",
+    },
+    {
+      rendererId: "metadata-ui.renderer.kanban",
+      fixtureBuilder: "createMetadataUiPlaygroundKanban",
+    },
+    {
+      rendererId: "metadata-ui.renderer.list",
+      fixtureBuilder: "createMetadataUiPlaygroundDenseList",
+    },
+    {
+      rendererId: "metadata-ui.renderer.multi-step-form",
+      fixtureBuilder: "createMetadataUiPlaygroundMultiStepForm",
+    },
+    {
+      rendererId: "metadata-ui.renderer.page-header",
+      fixtureBuilder: "createMetadataUiPlaygroundGroupHeaderSection",
+    },
+    {
+      rendererId: "metadata-ui.renderer.scorecard-form",
+      fixtureBuilder: "createMetadataUiPlaygroundScorecardForm",
+    },
+    {
+      rendererId: "metadata-ui.renderer.stat",
+      fixtureBuilder: "createMetadataUiPlaygroundStats",
+    },
+  ] as const) {
+    if (!stackSource.includes(`rendererId: "${rendererCoverage.rendererId}"`)) {
+      problems.push(
+        `metadata UI playground certification missing stack renderer coverage for ${rendererCoverage.rendererId}`,
+      );
+    }
+    if (!stackSource.includes(`${rendererCoverage.fixtureBuilder}(`)) {
+      problems.push(
+        `metadata UI playground certification missing stack fixture builder ${rendererCoverage.fixtureBuilder}()`,
+      );
+    }
+  }
+
+  walkSourceFiles(playgroundRoot, (filePath) => {
+    const rel = relativePath(filePath);
+    const source = fs.readFileSync(filePath, "utf8");
+
+    for (const pattern of [
+      /\bfetch\s*\(/,
+      /\bDate\.now\s*\(/,
+      /\bnew Date\s*\(/,
+      /\bMath\.random\s*\(/,
+      /\bcrypto\.randomUUID\s*\(/,
+      /\bperformance\.now\s*\(/,
+      /\bheaders\s*\(/,
+      /\bcookies\s*\(/,
+      /\bconnection\s*\(/,
+      /\bdraftMode\s*\(/,
+      /\blocalStorage\b/,
+      /\bsessionStorage\b/,
+    ] as const) {
+      if (pattern.test(source)) {
+        problems.push(
+          `${rel} must stay static and deterministic for metadata UI playground certification`,
+        );
+      }
+    }
+
+    if (/\b(?:TODO|TBD|FIXME)\b/i.test(source)) {
+      problems.push(
+        `${rel} must not contain temporary certification markers such as TODO, TBD, or FIXME`,
+      );
+    }
+  });
+}
+
 function readTranspilePackages() {
   const nextConfigPath = path.join(root, "packages/config/src/next.ts");
   if (!fs.existsSync(nextConfigPath)) {
@@ -1471,6 +2580,8 @@ checkImportBoundaries();
 checkFeatureServerBoundaryMarkers();
 checkFeatureSchemaOwnership();
 checkAppRouteFileWhitelist();
+checkMetadataUiPlaygroundImportBoundaries();
+checkMetadataUiPlaygroundCertification();
 
 if (problems.length > 0) {
   console.error("[architecture:check] Directory architecture violations:");

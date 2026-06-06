@@ -1,124 +1,315 @@
-# Public Homepage Architecture
+# Afenda Public Homepage ERP Section Architecture
 
-`@afenda/public-homepage` owns the anonymous Afenda ERP homepage rendered at `/`.
-`apps/erp` only mounts the package from the root React Server Component route, so the app
-boundary stays thin and does not read auth session state, self-fetch `/api`, or place
-homepage logic under `apps/erp/src/lib`.
+## 1. Purpose
 
-This package follows the target architecture in `ARCH-1003` and `ARCH-1004`:
+The ERP section must stop presenting Afenda as a generic ERP module catalog.
 
-- `/` is a public RSC page, not a workspace route.
-- Homepage data is local package content, not tenant data.
-- The package exposes a server entrypoint for `apps/erp/src/app/page.tsx`.
-- There is no homepage HTTP API.
+Its purpose is to communicate Afenda's core differentiation:
 
-## Directory Tree
+> Afenda is not just ERP. It is an ERP where every module can be searched, reasoned over, and operated with evidence.
+
+The section positions modules as **coverage proof**, not the headline.
+
+The primary story is:
 
 ```txt
-packages/public-homepage/
-  docs/
-    public-homepage-architecture.md
-  package.json
-  tsconfig.json
-  tsconfig.build.json
-  types/
-    css-modules.d.ts
-  src/
-    index.ts
-    server.ts
-    pub-homepage-shell-server.tsx
-    pub-homepage-hero-server.tsx
-    pub-site-header-server.tsx
-    pub-homepage-content.ts
-    pub-homepage-schema.ts
-    pub-homepage-seo.ts
-  styles/
-    public-homepage.module.css
+Question → Evidence → Decision → Approval → Audit
 ```
 
-## Package Boundary
+## 2. Section Positioning
 
-`@afenda/public-homepage` has two public doors:
-
-| Export | Use |
-| ------ | --- |
-| `@afenda/public-homepage` | Package-level types or future non-rendering helpers |
-| `@afenda/public-homepage/server` | Root homepage RSC component and `metadata` |
-
-Do not add `./client`, `./api`, or deep component exports until there is a concrete caller.
-`apps/erp` should import only the server door for the root route.
-
-## Render Flow
+### Primary Headline
 
 ```txt
-apps/erp/src/app/page.tsx
-  -> @afenda/public-homepage/server
-  -> homepage-shell.server.tsx
-  -> header, hero
+Every ERP module.
+One evidence engine.
+One decision operator.
 ```
 
-The route remains a React Server Component path. There is no API data fetch and no auth
-redirect. Signed-in and signed-out users see the same page. Sign-in is available from the
-hero CTA.
+### Supporting Copy
 
-## Ownership
-
-- `content/` holds static homepage copy and navigation labels.
-- `schemas/` validates homepage content before rendering or metadata generation.
-- `seo/` owns Next metadata derived from validated content.
-- `components/` contains explicit server components for each section, without boolean mode props or shared mega-components.
-- `styles/` contains the package CSS module for motion, layout, and accessible states.
-
-The package must not import `@afenda/auth`, `@afenda/db`, `@afenda/kernel`, feature packages,
-or workspace governed-surface builders. Those belong to tenant/workspace runtime, not the
-anonymous homepage.
-
-## Server Components
-
-The homepage is server-rendered. Static links, metadata, content composition, and the
-image-led hero all remain in React Server Components. Do not add client islands unless a
-specific interaction requires browser state.
-
-## App Integration
-
-`apps/erp/src/app/page.tsx` re-exports the server entrypoint:
-
-```ts
-export {
-  default,
-  metadata,
-} from "@afenda/public-homepage/server";
+```txt
+Finance, HR, inventory, sales, purchasing, documents, reports, and admin controls are connected to Lynx, so teams can ask what is true, decide what to do, and act with governance.
 ```
 
-`@afenda/erp` depends on `@afenda/public-homepage`. `@afenda/config` must include it in
-`afendaTranspilePackages` so Next.js can compile the workspace package and CSS module during
-the app build.
+### Differentiation Statement
 
-## API And Data Policy
+```txt
+Normal ERP stores records.
+Afenda lets operators prove, decide, and act across them.
+```
 
-The homepage has no route handlers. Do not add `apps/erp/src/app/api/*` endpoints for
-homepage content, forms, navigation, or metadata. If a future public submission is required,
-it must use the `ARCH-1004` public API shape under `apps/erp/src/app/api/public/v1/...` with a
-thin route handler.
+## 3. Visual Architecture
 
-Static copy stays in `content/`. Runtime tenant data, capabilities, and organization-specific
-state are out of scope for this package.
+The section should feel like a **command map**, not a feature grid.
 
-## Guardrails
+```txt
+ERP Modules
+   ↓
+Evidence Sources
+   ↓
+Lynx Truth Retrieval
+   ↓
+Lynx Decision Operator
+   ↓
+Approval / Audit Trail
+```
 
-- Keep the package server-first; client islands are limited to explicit interaction controls such as the public header menu and theme toggle.
-- Keep content schema-validated before it reaches section components.
-- Keep `/` session-agnostic; signed-in and signed-out users see the same public landing page.
-- Do not add business logic under `apps/erp/src/lib`.
-- Do not change `apps/erp/src/app/api` routes for homepage data.
-- Do not add workspace redirects, tenant reads, or capability checks to the root homepage.
-- Do not introduce CMS, registry, or database dependencies without a signed architecture change.
+The center of the visual is **Lynx**, not the modules.
 
-## Validation
+Modules orbit around Lynx as connected evidence sources.
 
-Use the smallest checks for homepage-only changes:
+## 4. Information Architecture
 
-```bash
-pnpm --filter @afenda/public-homepage typecheck
-pnpm architecture:check
+The section contains five layers:
+
+### Layer 1 — Hero Claim
+
+Owns the main positioning:
+
+```txt
+Every ERP module.
+One evidence engine.
+One decision operator.
+```
+
+### Layer 2 — Two Killer Feature Panels
+
+#### Lynx Truth Retrieval
+
+Purpose:
+
+```txt
+Evidence-backed answers across ERP records, documents, policies, workflows, and knowledge sources.
+```
+
+Key bullets:
+
+* Ask across finance, HR, inventory, sales, documents, policies, and knowledge.
+* Answers cite the source.
+* Operators see what evidence was used.
+* No guessing from disconnected dashboards.
+
+#### Lynx Decision Operator
+
+Purpose:
+
+```txt
+AI-assisted operational decisions that can inspect context, propose actions, route approvals, and leave an audit trail.
+```
+
+Key bullets:
+
+* Turns ERP context into reviewed actions.
+* Routes approvals before business writes.
+* Records runs, feedback, and outcomes.
+* Built for governed operations, not chat novelty.
+
+### Layer 3 — Command Map
+
+Visual center:
+
+```txt
+Lynx Truth Engine
+Lynx Decision Operator
+```
+
+Surrounding sources:
+
+```txt
+Finance
+Sales
+CRM
+Purchasing
+Inventory
+HR Suite
+Payroll
+Time Attendance
+Documents
+Knowledge
+Reports
+System Admin
+Audit
+Permissions
+Integrations
+Billing
+```
+
+### Layer 4 — Module Coverage
+
+Modules appear as proof of breadth.
+
+#### Core Operations
+
+* Finance
+* Sales
+* CRM
+* Purchasing
+* Inventory
+
+#### People Operations
+
+* HR Suite
+* Payroll / compensation
+* Time and attendance
+* Talent / training
+* Compliance
+
+#### Knowledge And Documents
+
+* Knowledge
+* Document registry
+* Document activity
+* Source sync
+* Retrieval evaluation
+
+#### Control And Governance
+
+* System Admin
+* Users / roles / permissions
+* Modules / capabilities
+* Audit
+* Billing / entitlements
+* Integrations
+* Data management
+
+#### Intelligence Layer
+
+* Lynx Console
+* Truth Search
+* Decision Operator
+* Run ledger
+* Outcome monitors
+* Reports / analytics
+* Dashboard
+
+### Layer 5 — Closing Proof Line
+
+```txt
+Every record, document, workflow, and approval becomes part of the same operating truth.
+```
+
+## 5. Component Architecture
+
+Recommended package location:
+
+```txt
+packages/public-homepage/src/components/erp-truth-section/
+```
+
+Recommended files:
+
+```txt
+erp-truth-section.server.tsx
+erp-truth-section.module.css
+erp-truth-section.content.ts
+erp-truth-section.schema.ts
+erp-truth-command-map.server.tsx
+erp-truth-feature-panels.server.tsx
+erp-truth-coverage-grid.server.tsx
+erp-truth-evidence-path.server.tsx
+index.ts
+```
+
+## 6. Runtime Rules
+
+This section must remain static, server-rendered, and marketing-safe.
+
+It must not:
+
+* Fetch tenant data.
+* Import workspace auth.
+* Import ERP feature packages.
+* Claim unshipped modules as live product.
+* Use fake dashboard metrics.
+* Present AI as magic.
+* Use generic SaaS phrases.
+
+It may:
+
+* Render static marketing content.
+* Show product positioning.
+* Show module coverage as roadmap-safe coverage.
+* Use visual examples of evidence and decisions.
+* Use CSS-only animation.
+
+## 7. Design Rules
+
+Visual direction:
+
+```txt
+Dark background
+Command center layout
+Lynx in center
+Evidence lines
+Module nodes
+Enterprise-grade restraint
+Scientific / operational tone
+```
+
+Avoid:
+
+```txt
+Generic feature cards
+AI sparkle graphics
+Cartoon SaaS illustrations
+Fake dashboard overload
+Overcrowded module grids
+```
+
+## 8. Accessibility Rules
+
+The command map must remain understandable without animation.
+
+Requirements:
+
+* Use semantic section landmarks.
+* Use real headings.
+* Do not rely on line animation for meaning.
+* Every visual node needs readable text.
+* Motion must be subtle and non-essential.
+* Respect reduced motion.
+* Ensure contrast passes enterprise landing page standards.
+
+## 9. SEO / Copy Rules
+
+The section should naturally include:
+
+* ERP
+* business truth engine
+* evidence-backed decisions
+* enterprise resource planning
+* audit trail
+* operational governance
+* AI-assisted ERP operations
+* finance, HR, inventory, sales, purchasing
+
+Do not keyword-stuff.
+
+## 10. Final Section Structure
+
+```txt
+<section>
+  Eyebrow
+  Headline
+  Subcopy
+
+  Truth Retrieval Panel
+  Decision Operator Panel
+
+  Command Map
+    Lynx center
+    Module source nodes
+    Evidence paths
+    Approval / audit output
+
+  Coverage Grid
+    Core Operations
+    People Operations
+    Knowledge And Documents
+    Control And Governance
+    Intelligence Layer
+
+  Closing Statement
+</section>
 ```

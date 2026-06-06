@@ -15,7 +15,7 @@ The playground may render:
 
 - static AppShell chrome built from local fixtures
 - metadata-ui section stacks
-- representative list, stat, chart, form, action, timeline, and empty states
+- representative list, stat, chart, form, action, timeline, analytics, and state matrix surfaces
 - intentionally seeded sample rows for visual and interaction review
 
 The playground must not become a source of ERP business behavior.
@@ -109,11 +109,17 @@ preferred because this route is development-only and non-canonical.
 ```txt
 apps/erp/src/app/playground-metadataui/
   architecture.md
+  advanced-patterns.md
+  README.md
   layout.tsx
   page.tsx
+  [pattern]/
+    page.tsx
   _fixtures/
     chrome.server.ts
     stack.fixture.ts
+    advanced-analytics.fixture.ts
+    advanced-state.fixture.ts
     list.fixture.ts
     stat.fixture.ts
     chart.fixture.ts
@@ -167,12 +173,27 @@ The page should stay thin:
 
 ```tsx
 import { MetadataUiRenderStack } from "@afenda/metadata-ui/server";
-import { createMetadataUiPlaygroundStack } from "./_fixtures/stack.fixture";
+import { createMetadataUiPlaygroundStackForPattern } from "./_fixtures/stack.fixture";
 
 export default function MetadataUiPlaygroundPage() {
-  return <MetadataUiRenderStack sections={createMetadataUiPlaygroundStack()} />;
+  return (
+    <MetadataUiRenderStack
+      sections={createMetadataUiPlaygroundStackForPattern("overview")}
+    />
+  );
 }
 ```
+
+Advanced patterns live under `/playground-metadataui/[pattern]`. The dynamic
+page must enumerate `generateStaticParams()` from the certified pattern list,
+validate route params with the local pattern-key guard, and render only the
+sections for that pattern through `createMetadataUiPlaygroundStackForPattern()`.
+Invalid pattern params should call `notFound()`.
+
+`createMetadataUiPlaygroundStackForPattern()` may set metadata-ui stack `span` values
+(`full`, `half`, `third`, `two-thirds`, `quarter`) to create enterprise
+dashboard density. Do not replace span metadata with playground-owned JSX
+layout wrappers.
 
 Renderer improvement work belongs in `packages/metadata-ui`. The playground
 should only expose enough fixture variation to verify those improvements.
@@ -195,6 +216,9 @@ Required fixture coverage:
 - chart section
 - form section
 - timeline or audit-like section
+- multi-step form section
+- kanban section
+- detail-tabs section
 
 Coverage may be grouped into tabs or sections as the page grows, but the source
 must remain static fixture metadata.
@@ -393,18 +417,15 @@ Purpose: cover required renderer states.
 Target files:
 
 ```txt
-_fixtures/state.fixture.ts
-_fixtures/empty.fixture.ts
+_fixtures/advanced-state.fixture.ts
 _fixtures/stack.fixture.ts
 ```
 
 Work:
 
-- add ready state fixture
-- add loading state fixture
-- add empty state fixture
-- add forbidden state fixture
-- add error state fixture
+- add metadata-only ready/loading/empty/forbidden/error state rows
+- render state coverage through metadata-ui list metadata
+- avoid custom React state cards or child injection
 
 Acceptance:
 
@@ -555,6 +576,17 @@ Work:
 - verify the route is hidden unless enabled
 - verify all fixtures are static and deterministic
 - remove temporary placeholders
+
+Implementation:
+
+- `scripts/check-directory-architecture.mts` includes
+  `checkMetadataUiPlaygroundCertification()`
+- certification verifies required files, dev-only route gating, proxy gating,
+  state coverage, deterministic fixture sources, and absence of temporary
+  `TODO` / `TBD` / `FIXME` markers
+- certified renderer coverage includes action bar, stat, list, state coverage,
+  form, scorecard form, chart, approval timeline, audit panel, multi-step form,
+  kanban, detail-tabs, advanced analytics, and advanced scenario fixtures
 
 Acceptance:
 

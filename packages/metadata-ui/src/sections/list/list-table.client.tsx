@@ -182,13 +182,27 @@ function MetadataUiListSelectionHeader({
 function MetadataUiListSelectionCell({
   row,
 }: CellContext<MetadataUiTableRowModel, unknown>) {
+  const selectionDisabledReason = row.original.selectionDisabledReason;
+  const selectionDisabledReasonId = selectionDisabledReason
+    ? `${row.id}-selection-disabled-reason`
+    : undefined;
+
   return (
-    <Checkbox
-      aria-label={`Select row ${row.id}`}
-      checked={row.getIsSelected()}
-      disabled={!row.getCanSelect()}
-      onCheckedChange={(value) => row.toggleSelected(Boolean(value))}
-    />
+    <>
+      <Checkbox
+        aria-label={`Select row ${row.id}`}
+        aria-describedby={selectionDisabledReasonId}
+        checked={row.getIsSelected()}
+        disabled={!row.getCanSelect()}
+        title={selectionDisabledReason}
+        onCheckedChange={(value) => row.toggleSelected(Boolean(value))}
+      />
+      {selectionDisabledReason ? (
+        <span id={selectionDisabledReasonId} className="sr-only">
+          {selectionDisabledReason}
+        </span>
+      ) : null}
+    </>
   );
 }
 
@@ -220,25 +234,80 @@ function MetadataUiPlainHeader({ label }: Readonly<{ label: string }>) {
   return <span>{label}</span>;
 }
 
+type MetadataUiRowControlState = "available" | "disabled" | "hidden";
+
+function getMetadataUiRowControlState(
+  row: Row<MetadataUiTableRowModel>,
+  stateField: string | undefined,
+): MetadataUiRowControlState {
+  const value = stateField
+    ? row.original.fieldValues[stateField]?.trim().toLowerCase()
+    : undefined;
+
+  if (value === "hidden") {
+    return "hidden";
+  }
+
+  if (value === "disabled" || value === "blocked" || value === "locked") {
+    return "disabled";
+  }
+
+  return "available";
+}
+
+function getMetadataUiRowControlDisabledReason(
+  row: Row<MetadataUiTableRowModel>,
+  disabledReasonField: string | undefined,
+  fallback: string | undefined,
+): string | undefined {
+  const reason = disabledReasonField
+    ? row.original.fieldValues[disabledReasonField]?.trim()
+    : undefined;
+
+  return reason || fallback;
+}
+
 function MetadataUiListActionCell({
+  row,
   rowActions,
 }: Readonly<{
+  row: Row<MetadataUiTableRowModel>;
   rowActions: MetadataUiTableClientModel["rowActions"];
 }>) {
+  const visibleActions = rowActions
+    .map((action) => ({
+      action,
+      state: getMetadataUiRowControlState(row, action.stateField),
+    }))
+    .filter(({ state }) => state !== "hidden");
+
+  if (visibleActions.length === 0) {
+    return <span className="sr-only">No row actions available</span>;
+  }
+
   return (
     <div className="inline-flex justify-end gap-surface-xs">
-      {rowActions.map((action) => (
-        <Button
-          key={action.id}
-          type="button"
-          variant="ghost"
-          size="sm"
-          disabled
-          title={action.disabledReason}
-        >
-          {action.label}
-        </Button>
-      ))}
+      {visibleActions.map(({ action, state }) => {
+        const disabledReason = getMetadataUiRowControlDisabledReason(
+          row,
+          action.disabledReasonField,
+          action.disabledReason,
+        );
+
+        return (
+          <Button
+            key={action.id}
+            type="button"
+            variant="ghost"
+            size="sm"
+            disabled
+            title={disabledReason}
+            data-metadata-ui-row-action-state={state}
+          >
+            {action.label}
+          </Button>
+        );
+      })}
     </div>
   );
 }
@@ -253,13 +322,23 @@ function MetadataUiListTrailingCell({
   return (
     <div className="inline-flex flex-wrap justify-end gap-surface-xs">
       {trailingCells.map((cell) => {
+        const state = getMetadataUiRowControlState(row, cell.stateField);
+        const disabledReason = getMetadataUiRowControlDisabledReason(
+          row,
+          cell.disabledReasonField,
+          cell.disabledReason,
+        );
         const fieldKey =
           cell.kind === "status"
             ? cell.statusField
             : cell.kind === "document"
               ? cell.documentKeyField
               : cell.field;
-        const value = fieldKey ? row.original.cells[fieldKey] : undefined;
+        const value = fieldKey ? row.original.fieldValues[fieldKey] : undefined;
+
+        if (state === "hidden") {
+          return null;
+        }
 
         if (cell.kind === "action") {
           return (
@@ -269,7 +348,8 @@ function MetadataUiListTrailingCell({
               variant="ghost"
               size="sm"
               disabled
-              title={cell.disabledReason}
+              title={disabledReason}
+              data-metadata-ui-trailing-cell-state={state}
             >
               {cell.actionLabel ?? cell.label}
             </Button>
@@ -281,6 +361,7 @@ function MetadataUiListTrailingCell({
             key={cell.key}
             className="text-muted-foreground"
             data-metadata-ui-trailing-cell-kind={cell.kind}
+            data-metadata-ui-trailing-cell-state={state}
             title={cell.label}
           >
             {value || cell.label}
@@ -328,7 +409,9 @@ function createMetadataUiActionColumn(
   return {
     id: "metadata-ui-row-actions",
     header: () => <span>Actions</span>,
-    cell: () => <MetadataUiListActionCell rowActions={rowActions} />,
+    cell: ({ row }) => (
+      <MetadataUiListActionCell row={row} rowActions={rowActions} />
+    ),
     enableSorting: false,
     enableHiding: false,
   };
@@ -455,6 +538,76 @@ export function MetadataUiClientListTable({
   model,
   className,
 }: MetadataUiClientListTableProps) {
+  const [isHydrated, setIsHydrated] = useState(false);
+
+  useEffect(() => {
+    setIsHydrated(true);
+  }, []);
+
+  if (!isHydrated) {
+    return (
+      <MetadataUiStaticListTableShell model={model} className={className} />
+    );
+  }
+
+  return <MetadataUiInteractiveListTable model={model} className={className} />;
+}
+
+function MetadataUiStaticListTableShell({
+  model,
+  className,
+}: MetadataUiClientListTableProps) {
+  const visibleColumns = model.columns.filter((column) => !column.hidden);
+
+  return (
+    <div
+      className={cn("grid gap-surface-md", className)}
+      data-metadata-ui-server-window="current"
+      data-metadata-ui-list-key={model.listKey}
+    >
+      <Table className={ui.table.shell}>
+        <TableCaption>{model.serverWindow.caption}</TableCaption>
+        <TableHeader>
+          <TableRow className={ui.table.headerRow}>
+            {visibleColumns.map((column) => (
+              <TableHead
+                key={column.key}
+                className={cn(
+                  ui.table.headerCell,
+                  TABLE_ALIGN_CLASS_BY_COLUMN_ALIGN[column.align],
+                )}
+              >
+                {column.label}
+              </TableHead>
+            ))}
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {model.rows.map((row) => (
+            <TableRow key={row.id} className={ui.table.rowInteractive}>
+              {visibleColumns.map((column) => (
+                <TableCell
+                  key={`${row.id}.${column.key}`}
+                  className={cn(
+                    ui.table.cell,
+                    TABLE_ALIGN_CLASS_BY_COLUMN_ALIGN[column.align],
+                  )}
+                >
+                  {row.cells[column.key]}
+                </TableCell>
+              ))}
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </div>
+  );
+}
+
+function MetadataUiInteractiveListTable({
+  model,
+  className,
+}: MetadataUiClientListTableProps) {
   const virtualScrollRef = useRef<HTMLDivElement>(null);
   const columns = useMemo(() => createMetadataUiColumnDefinitions(model), [model]);
   const modelSignature = useMemo(
@@ -498,7 +651,10 @@ export function MetadataUiClientListTable({
       rowSelection,
     },
     enableMultiRowSelection: model.selectionMode === "multiple",
-    enableRowSelection: model.selectionMode !== "none",
+    enableRowSelection:
+      model.selectionMode !== "none"
+        ? (row) => row.original.canSelect
+        : false,
     getRowId: (row) => row.id,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),

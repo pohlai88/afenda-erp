@@ -31,7 +31,10 @@ export type MetadataUiTableColumnModel = Readonly<{
 
 export type MetadataUiTableRowModel = Readonly<{
   id: string;
+  canSelect: boolean;
+  selectionDisabledReason?: string;
   cells: Readonly<Record<string, MetadataUiTableCellValue>>;
+  fieldValues: Readonly<Record<string, MetadataUiTableCellValue>>;
 }>;
 
 export type MetadataUiTableSortingModel = Readonly<{
@@ -43,6 +46,8 @@ export type MetadataUiTableRowActionModel = Readonly<{
   id: string;
   label: string;
   disabledReason: string;
+  stateField?: string;
+  disabledReasonField?: string;
 }>;
 
 export type MetadataUiTableTrailingCellModel = Readonly<{
@@ -52,6 +57,8 @@ export type MetadataUiTableTrailingCellModel = Readonly<{
   field?: string;
   statusField?: string;
   documentKeyField?: string;
+  stateField?: string;
+  disabledReasonField?: string;
   actionId?: string;
   actionLabel?: string;
   hidden: boolean;
@@ -158,6 +165,67 @@ function stringifyMetadataUiTableCellValue(value: unknown): MetadataUiTableCellV
   return "";
 }
 
+function readMetadataUiTableBoolean(value: unknown, fallback: boolean): boolean {
+  if (typeof value === "boolean") {
+    return value;
+  }
+
+  if (typeof value === "number") {
+    return value !== 0;
+  }
+
+  if (typeof value === "string") {
+    const normalizedValue = value.trim().toLowerCase();
+
+    if (["false", "no", "disabled", "hidden", "locked", "0"].includes(normalizedValue)) {
+      return false;
+    }
+
+    if (["true", "yes", "enabled", "available", "1"].includes(normalizedValue)) {
+      return true;
+    }
+  }
+
+  return fallback;
+}
+
+function addMetadataUiTableReferencedField(
+  fields: Set<string>,
+  field: string | undefined,
+) {
+  if (field) {
+    fields.add(field);
+  }
+}
+
+function collectMetadataUiTableReferencedFields(
+  list: MetadataUiList,
+  columns: readonly MetadataUiTableColumnModel[],
+): ReadonlySet<string> {
+  const fields = new Set<string>([
+    list.rowKey,
+    ...columns.map((column) => column.field),
+  ]);
+
+  addMetadataUiTableReferencedField(fields, list.selectableField);
+  addMetadataUiTableReferencedField(fields, list.selectionDisabledReasonField);
+
+  for (const rowAction of list.rowActions) {
+    addMetadataUiTableReferencedField(fields, rowAction.stateField);
+    addMetadataUiTableReferencedField(fields, rowAction.disabledReasonField);
+  }
+
+  for (const trailingCell of list.trailingCells) {
+    addMetadataUiTableReferencedField(fields, trailingCell.field);
+    addMetadataUiTableReferencedField(fields, trailingCell.statusField);
+    addMetadataUiTableReferencedField(fields, trailingCell.documentKeyField);
+    addMetadataUiTableReferencedField(fields, trailingCell.stateField);
+    addMetadataUiTableReferencedField(fields, trailingCell.disabledReasonField);
+  }
+
+  return fields;
+}
+
 function createMetadataUiTableColumnModel(
   column: MetadataUiListColumn,
 ): MetadataUiTableColumnModel {
@@ -193,26 +261,49 @@ function createMetadataUiTableRowModel(
     },
     {},
   );
+  const fieldValues = [...collectMetadataUiTableReferencedFields(list, columns)].reduce<
+    Record<string, MetadataUiTableCellValue>
+  >(
+    (accumulator, column) => {
+      accumulator[column] = stringifyMetadataUiTableCellValue(row[column]);
+      return accumulator;
+    },
+    {},
+  );
+  const canSelect = readMetadataUiTableBoolean(
+    list.selectableField ? row[list.selectableField] : undefined,
+    true,
+  );
+  const selectionDisabledReason = canSelect
+    ? undefined
+    : stringifyMetadataUiTableCellValue(
+        list.selectionDisabledReasonField
+          ? row[list.selectionDisabledReasonField]
+          : undefined,
+      ) || "Row selection is disabled by metadata.";
 
   return {
     id: String(row[list.rowKey]),
+    canSelect,
+    selectionDisabledReason,
     cells,
+    fieldValues,
   };
 }
 
 function createMetadataUiTableDefaultSorting(
   list: MetadataUiList,
 ): readonly MetadataUiTableSortingModel[] {
-  const sortableFields = new Set(
+  const sortableColumnKeyByField = new Map(
     list.columns
       .filter((column) => column.sortable)
-      .map((column) => column.field),
+      .map((column) => [column.field, column.key] as const),
   );
 
   return list.defaultSort
-    .filter((sort) => sortableFields.has(sort.field))
+    .filter((sort) => sortableColumnKeyByField.has(sort.field))
     .map((sort) => ({
-      id: sort.field,
+      id: sortableColumnKeyByField.get(sort.field) ?? sort.field,
       direction: sort.direction,
     }));
 }
@@ -228,6 +319,10 @@ function createMetadataUiTableRowActions(
       disabledReason:
         rowAction.action.disabledReason ??
         "Row action execution must be provided by the host feature.",
+      ...(rowAction.stateField ? { stateField: rowAction.stateField } : {}),
+      ...(rowAction.disabledReasonField
+        ? { disabledReasonField: rowAction.disabledReasonField }
+        : {}),
     }));
 }
 
@@ -243,14 +338,20 @@ function createMetadataUiTableTrailingCells(
       field: cell.field,
       statusField: cell.statusField,
       documentKeyField: cell.documentKeyField,
-      actionId: cell.action?.id,
-      actionLabel: cell.action?.label,
+      ...(cell.stateField ? { stateField: cell.stateField } : {}),
+      ...(cell.disabledReasonField
+        ? { disabledReasonField: cell.disabledReasonField }
+        : {}),
+      ...(cell.action?.id ? { actionId: cell.action.id } : {}),
+      ...(cell.action?.label ? { actionLabel: cell.action.label } : {}),
       hidden: cell.hidden,
-      disabledReason:
-        cell.disabledReason ??
-        (cell.kind === "action"
-          ? "Trailing action execution must be provided by the host feature."
-          : undefined),
+      ...(cell.disabledReason || cell.kind === "action"
+        ? {
+            disabledReason:
+              cell.disabledReason ??
+              "Trailing action execution must be provided by the host feature.",
+          }
+        : {}),
     }));
 }
 
@@ -284,12 +385,12 @@ function createMetadataUiTableToolbar(
       .filter((column) => column.sortable)
       .flatMap((column) => [
         {
-          id: column.field,
+          id: column.key,
           label: `${column.label} ascending`,
           direction: "asc" as const,
         },
         {
-          id: column.field,
+          id: column.key,
           label: `${column.label} descending`,
           direction: "desc" as const,
         },

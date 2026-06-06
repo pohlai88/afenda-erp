@@ -12,6 +12,8 @@ describe("metadata-ui enterprise table state", () => {
       key: "metadata-ui.fixture.enterprise-list",
       rowKey: "id",
       selectionMode: "multiple",
+      selectableField: "canSelect",
+      selectionDisabledReasonField: "selectionDisabledReason",
       density: "compact",
       columns: [
         {
@@ -49,6 +51,8 @@ describe("metadata-ui enterprise table state", () => {
       rowActions: [
         {
           placement: "inline",
+          stateField: "rowActionState",
+          disabledReasonField: "rowActionDisabledReason",
           action: {
             id: "metadata-ui.fixture.view-row",
             label: "View",
@@ -71,6 +75,8 @@ describe("metadata-ui enterprise table state", () => {
           key: "metadata-ui.fixture.trailing-action",
           kind: "action",
           label: "Open",
+          stateField: "trailingActionState",
+          disabledReasonField: "trailingActionDisabledReason",
           action: {
             id: "metadata-ui.fixture.open-trailing",
             label: "Open",
@@ -89,6 +95,12 @@ describe("metadata-ui enterprise table state", () => {
         name: "Quarter close",
         status: "Ready",
         amount: 1250,
+        canSelect: true,
+        selectionDisabledReason: "",
+        rowActionState: "available",
+        rowActionDisabledReason: "",
+        trailingActionState: "available",
+        trailingActionDisabledReason: "",
         ignoredField: "not serialized as a column",
       },
       {
@@ -96,6 +108,12 @@ describe("metadata-ui enterprise table state", () => {
         name: "Audit queue",
         status: "Blocked",
         amount: null,
+        canSelect: false,
+        selectionDisabledReason: "Selection is disabled by host metadata.",
+        rowActionState: "disabled",
+        rowActionDisabledReason: "View is disabled by row metadata.",
+        trailingActionState: "disabled",
+        trailingActionDisabledReason: "Open is disabled by row metadata.",
       },
     ]);
 
@@ -130,13 +148,33 @@ describe("metadata-ui enterprise table state", () => {
       status: "Ready",
       amount: "1250",
     });
+    expect(model.rows[0]?.canSelect).toBe(true);
+    expect(model.rows[0]?.fieldValues).toEqual({
+      id: "row-1",
+      name: "Quarter close",
+      status: "Ready",
+      amount: "1250",
+      canSelect: "Yes",
+      selectionDisabledReason: "",
+      rowActionState: "available",
+      rowActionDisabledReason: "",
+      trailingActionState: "available",
+      trailingActionDisabledReason: "",
+    });
+    expect(model.rows[1]?.canSelect).toBe(false);
+    expect(model.rows[1]?.selectionDisabledReason).toBe(
+      "Selection is disabled by host metadata.",
+    );
     expect(model.rows[1]?.cells.amount).toBe("");
+    expect(model.rows[1]?.fieldValues.amount).toBe("");
     expect(model.rowActions).toEqual([
       {
         id: "metadata-ui.fixture.view-row",
         label: "View",
         disabledReason:
           "Row action execution must be provided by the host feature.",
+        stateField: "rowActionState",
+        disabledReasonField: "rowActionDisabledReason",
       },
     ]);
     expect(model.trailingCells).toEqual([
@@ -153,6 +191,8 @@ describe("metadata-ui enterprise table state", () => {
         label: "Open",
         actionId: "metadata-ui.fixture.open-trailing",
         actionLabel: "Open",
+        stateField: "trailingActionState",
+        disabledReasonField: "trailingActionDisabledReason",
         hidden: false,
         disabledReason:
           "Trailing action execution must be provided by the host feature.",
@@ -321,6 +361,58 @@ describe("metadata-ui enterprise table state", () => {
       },
     ]);
     expect(shouldRenderMetadataUiClientTable(model)).toBe(true);
+  });
+
+  it("uses column keys for TanStack sorting ids when keys and fields differ", () => {
+    const list = createList({
+      key: "metadata-ui.fixture.table-sort-keys",
+      rowKey: "id",
+      columns: [
+        {
+          key: "metadata-ui.fixture.table.column.sort-bucket",
+          field: "sortBucket",
+          label: "Sort bucket",
+          format: "number",
+          sortable: true,
+        },
+      ],
+      defaultSort: [
+        {
+          field: "sortBucket",
+          direction: "asc",
+        },
+      ],
+      toolbar: {
+        enabled: true,
+        showSort: true,
+      },
+    });
+
+    const model = createMetadataUiTableClientModel(list, [
+      {
+        id: "row-1",
+        sortBucket: 10,
+      },
+    ]);
+
+    expect(model.defaultSorting).toEqual([
+      {
+        id: "metadata-ui.fixture.table.column.sort-bucket",
+        direction: "asc",
+      },
+    ]);
+    expect(model.toolbar.sortOptions).toEqual([
+      {
+        id: "metadata-ui.fixture.table.column.sort-bucket",
+        label: "Sort bucket ascending",
+        direction: "asc",
+      },
+      {
+        id: "metadata-ui.fixture.table.column.sort-bucket",
+        label: "Sort bucket descending",
+        direction: "desc",
+      },
+    ]);
   });
 
   it("fails closed when server-window rows omit the configured row key", () => {

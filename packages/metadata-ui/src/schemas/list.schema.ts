@@ -198,6 +198,8 @@ export const METADATA_UI_LIST_SORT_SCHEMA = z.object({
 export const METADATA_UI_LIST_ROW_ACTION_SCHEMA = z.object({
   action: metadataUiActionContractSchema,
   placement: z.enum(METADATA_UI_LIST_ROW_ACTION_PLACEMENT_VALUES).default("overflow"),
+  stateField: z.string().min(1).max(160).optional(),
+  disabledReasonField: z.string().min(1).max(160).optional(),
   permission: metadataUiPermissionContractSchema.optional(),
 });
 
@@ -210,6 +212,8 @@ export const METADATA_UI_LIST_TRAILING_CELL_SCHEMA = z
     action: metadataUiActionContractSchema.optional(),
     statusField: z.string().min(1).max(160).optional(),
     documentKeyField: z.string().min(1).max(160).optional(),
+    stateField: z.string().min(1).max(160).optional(),
+    disabledReasonField: z.string().min(1).max(160).optional(),
     hidden: z.boolean().default(false),
     disabledReason: z.string().min(1).max(240).optional(),
     permission: metadataUiPermissionContractSchema.optional(),
@@ -319,6 +323,10 @@ export const METADATA_UI_LIST_SCHEMA = z.object({
   density: METADATA_UI_LIST_DENSITY_SCHEMA.default("comfortable"),
 
   selectionMode: METADATA_UI_LIST_SELECTION_MODE_SCHEMA.default("none"),
+
+  selectableField: z.string().min(1).max(160).optional(),
+
+  selectionDisabledReasonField: z.string().min(1).max(160).optional(),
 
   columns: z.array(METADATA_UI_LIST_COLUMN_SCHEMA).min(1).max(64),
 
@@ -571,10 +579,12 @@ export type MetadataUiListRowActionForPlacement<
   Placement extends MetadataUiListRowActionPlacement,
 > = Omit<
   MetadataUiListRowActionSchemaOutput,
-  "action" | "permission" | "placement"
+  "action" | "disabledReasonField" | "permission" | "placement" | "stateField"
 > & {
   action: MetadataUiActionContract;
   placement: Placement;
+  stateField?: MetadataUiListFieldKey;
+  disabledReasonField?: MetadataUiListFieldKey;
   permission?: MetadataUiPermissionContract;
 };
 
@@ -587,15 +597,19 @@ export type MetadataUiListTrailingCellForKind<
 > = Omit<
   MetadataUiListTrailingCellSchemaOutput,
   | "action"
+  | "disabledReasonField"
   | "documentKeyField"
   | "field"
   | "key"
   | "kind"
   | "permission"
+  | "stateField"
   | "statusField"
 > & {
   key: MetadataUiListKey;
   kind: Kind;
+  stateField?: MetadataUiListFieldKey;
+  disabledReasonField?: MetadataUiListFieldKey;
   permission?: MetadataUiPermissionContract;
 } & (Kind extends "action"
     ? {
@@ -707,10 +721,14 @@ export type MetadataUiList = Omit<
   | "presentation"
   | "rowActions"
   | "rowKey"
+  | "selectableField"
+  | "selectionDisabledReasonField"
   | "trailingCells"
 > & {
   key: MetadataUiListKey;
   rowKey: MetadataUiListFieldKey;
+  selectableField?: MetadataUiListFieldKey;
+  selectionDisabledReasonField?: MetadataUiListFieldKey;
   columns: MetadataUiListBoundedColumns;
   filters: MetadataUiListBoundedFilters;
   defaultSort: MetadataUiListBoundedSorts;

@@ -28,32 +28,34 @@ export function renderMetadataUiRegisteredSection(
 
   const metadata = state.section.metadata as never;
 
-  switch (state.section.kind) {
-    case "action-bar":
+  switch (state.renderer.id) {
+    case "metadata-ui.renderer.action-bar":
       return <MetadataUiActionBarRenderer metadata={metadata} />;
-    case "approval-timeline":
+    case "metadata-ui.renderer.approval-timeline":
       return <MetadataUiApprovalTimelineRenderer metadata={metadata} />;
-    case "audit-panel":
+    case "metadata-ui.renderer.audit-panel":
       return <MetadataUiAuditPanelRenderer metadata={metadata} />;
-    case "chart":
+    case "metadata-ui.renderer.chart":
       return <MetadataUiChartRenderer metadata={metadata} />;
-    case "detail-tabs":
+    case "metadata-ui.renderer.detail-tabs":
       return <MetadataUiDetailTabsRenderer metadata={metadata} />;
-    case "form":
+    case "metadata-ui.renderer.form":
       return <MetadataUiFormRenderer metadata={metadata} />;
-    case "kanban":
+    case "metadata-ui.renderer.kanban":
       return <MetadataUiKanbanRenderer metadata={metadata} />;
-    case "list":
+    case "metadata-ui.renderer.list":
       return <MetadataUiListRenderer metadata={metadata} rows={state.rows} />;
-    case "multi-step-form":
+    case "metadata-ui.renderer.multi-step-form":
       return <MetadataUiMultiStepFormRenderer metadata={metadata} />;
-    case "page-header":
+    case "metadata-ui.renderer.page-header":
       return <MetadataUiPageHeaderRenderer metadata={metadata} />;
-    case "scorecard-form":
+    case "metadata-ui.renderer.scorecard-form":
       return <MetadataUiScorecardFormRenderer metadata={metadata} />;
-    case "stat":
+    case "metadata-ui.renderer.stat":
       return <MetadataUiStatRenderer metadata={metadata} />;
-    case "custom":
-      return null;
+    default:
+      throw new Error(
+        `Metadata UI renderer "${state.renderer.id}" is registered but has no section dispatcher.`,
+      );
   }
 }

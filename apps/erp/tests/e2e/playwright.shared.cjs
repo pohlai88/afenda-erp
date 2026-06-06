@@ -119,6 +119,7 @@ function createVisualDevServerEnv() {
   return {
     PORT: e2ePort,
     NODE_ENV: "development",
+    AFENDA_ENABLE_DEV_PLAYGROUNDS: "1",
     AFENDA_NEON_AUTH_ENABLED: "0",
     NEXT_PUBLIC_AFENDA_NEON_AUTH_ENABLED: "0",
     AFENDA_E2E_DEV_AUTH: "1",
@@ -308,6 +309,14 @@ function createProductionProjects() {
     }),
     {
       ...chromiumProject(),
+      name: "chromium-metadata-ui-playground",
+      testMatch: /metadata-ui-playground\.spec\.ts/,
+      grep: /@visual/,
+      retries: 0,
+      timeout: TIMEOUTS.visual,
+    },
+    {
+      ...chromiumProject(),
       name: "chromium-visual-public",
       testMatch: /ui-primitives-visual\.spec\.ts/,
       retries: 0,
@@ -327,6 +336,14 @@ function createVisualDevProjects() {
         timeout: TIMEOUTS.visual,
       },
     }),
+    {
+      ...chromiumProject(),
+      name: "chromium-metadata-ui-playground",
+      testMatch: /metadata-ui-playground\.spec\.ts/,
+      grep: /@visual/,
+      retries: 0,
+      timeout: TIMEOUTS.visual,
+    },
     {
       ...chromiumProject(),
       name: "chromium-visual-public",

@@ -41,12 +41,15 @@ export function MetadataUiHeading({
     Boolean(description);
 
   return (
-    <div className={cn("metadata-ui-heading flex min-w-0 items-start justify-between", ui.surfaceGap.md)}>
-      <div className={cn("min-w-0", ui.surfaceGap.xs)}>
+    <div
+      className={cn(
+        "metadata-ui-heading flex min-w-0 items-start justify-between",
+        ui.surfaceGap.md,
+      )}
+    >
+      <div className={cn("grid min-w-0", ui.surfaceGap.xs)}>
         {eyebrow ? (
-          <p className={ui.typography.label}>
-            {eyebrow}
-          </p>
+          <p className={ui.typography.label}>{eyebrow}</p>
         ) : null}
         <HeadingTag id={id} className={HEADING_CLASS_BY_LEVEL[level]}>
           {title}

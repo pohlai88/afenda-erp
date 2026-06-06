@@ -15,6 +15,7 @@ export const afendaTranspilePackages = [
   "@afenda/config",
   "@afenda/db",
   "@afenda/kernel",
+  "@afenda/metadata-ui",
   "@afenda/feature-system-admin",
   "@afenda/feature-crm",
   "@afenda/feature-dashboard",

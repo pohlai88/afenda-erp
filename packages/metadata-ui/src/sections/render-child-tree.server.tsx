@@ -10,11 +10,13 @@ import {
   MetadataUiRenderStack,
   type MetadataUiRenderableSection,
   type MetadataUiRenderableSectionStackItem,
+  type MetadataUiRenderableSectionStackSpan,
 } from "./render-stack.server";
 
 export type MetadataUiRenderableSectionTreeNode = Readonly<{
   section: MetadataUiRenderableSection;
   order?: number;
+  span?: MetadataUiRenderableSectionStackSpan;
   children?: readonly MetadataUiRenderableSectionTreeNode[];
 }>;
 
@@ -65,6 +67,7 @@ function toMetadataUiStackItems(
   return nodes.map((node) => ({
     section: node.section,
     order: node.order,
+    span: node.span,
   }));
 }
 

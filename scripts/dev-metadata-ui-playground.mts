@@ -1,4 +1,4 @@
-import { spawn } from "node:child_process";
+import { spawn, spawnSync } from "node:child_process";
 import { createServer } from "node:net";
 
 const PORT = 4000;
@@ -43,35 +43,66 @@ const env = Object.fromEntries(
     AFENDA_ENABLE_DEV_PLAYGROUNDS: "1",
   }).filter((entry): entry is [string, string] => typeof entry[1] === "string"),
 );
-const command = [
-  "pnpm",
-  "env:sync",
-  "&&",
-  "pnpm",
-  "--filter",
-  "@afenda/erp",
-  "exec",
-  "next",
-  "dev",
-  "--hostname",
-  HOST,
-  "--port",
-  String(PORT),
-].join(" ");
+const pnpmCommand = process.platform === "win32" ? "pnpm.cmd" : "pnpm";
 
-const child = spawn(command, {
+const envSync = spawnSync(pnpmCommand, ["env:sync"], {
   cwd: process.cwd(),
   env,
-  shell: true,
   stdio: "inherit",
 });
 
+if (envSync.error) {
+  console.error(envSync.error.message);
+  process.exit(1);
+}
+
+if (envSync.status !== 0) {
+  process.exit(envSync.status ?? 1);
+}
+
+const child = spawn(
+  pnpmCommand,
+  [
+    "--filter",
+    "@afenda/erp",
+    "exec",
+    "next",
+    "dev",
+    "--hostname",
+    HOST,
+    "--port",
+    String(PORT),
+  ],
+  {
+    cwd: process.cwd(),
+    env,
+    stdio: "inherit",
+    shell: false,
+  },
+);
+
 function forwardSignal(signal: NodeJS.Signals) {
+  if (!child.pid) {
+    return;
+  }
+
+  if (process.platform === "win32") {
+    spawnSync("taskkill", ["/pid", String(child.pid), "/T", "/F"], {
+      stdio: "ignore",
+    });
+    return;
+  }
+
   child.kill(signal);
 }
 
 process.on("SIGINT", forwardSignal);
 process.on("SIGTERM", forwardSignal);
+
+child.on("error", (error) => {
+  console.error(error.message);
+  process.exit(1);
+});
 
 child.on("exit", (code, signal) => {
   if (signal) {

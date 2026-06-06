@@ -31,13 +31,13 @@ function renderMetadataUiStatProgress(item: MetadataUiStatItem) {
   );
 
   return (
-    <div className="space-y-1">
-      <div className="flex items-center justify-between gap-3 text-xs text-zinc-500">
+    <div className="grid gap-surface-2xs">
+      <div className="flex items-center justify-between gap-3 text-xs text-muted-foreground">
         <span>{item.display.progress.label ?? "Progress"}</span>
         <span>{percent}%</span>
       </div>
       <div
-        className="h-2 overflow-hidden rounded-full bg-zinc-100"
+        className="h-2 overflow-hidden rounded-full bg-muted"
         role="progressbar"
         aria-label={item.display.progress.label ?? `${item.label} progress`}
         aria-valuemin={0}
@@ -45,7 +45,7 @@ function renderMetadataUiStatProgress(item: MetadataUiStatItem) {
         aria-valuenow={item.display.progress.value}
       >
         <div
-          className="h-full rounded-full bg-zinc-900"
+          className="h-full rounded-full bg-primary"
           style={{ width: `${percent}%` }}
         />
       </div>
@@ -75,7 +75,7 @@ function renderMetadataUiStatSparkline(item: MetadataUiStatItem) {
         return (
           <span
             key={`${point.value}-${index}`}
-            className="w-1 rounded-t bg-zinc-300"
+            className="w-1 rounded-t bg-muted-foreground/30"
             style={{ height: `${height}%` }}
             title={point.label ?? String(point.value)}
           />
@@ -99,6 +99,7 @@ export function MetadataUiStatRenderer({ metadata }: MetadataUiStatRendererProps
           key={item.key}
           className={cn(
             "min-w-0",
+            "grid",
             ui.surface.inset,
             ui.radius.section,
             ui.padding.card,

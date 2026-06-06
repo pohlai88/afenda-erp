@@ -30,7 +30,7 @@ export function MetadataUiPageHeaderRenderer({
   return (
     <header
       {...identity.domAttributes}
-      className={cn("metadata-ui-page-header", ui.surfaceGap.md)}
+      className={cn("metadata-ui-page-header grid", ui.surfaceGap.md)}
     >
       {header.breadcrumbs.length > 0 ? (
         <nav aria-label="Breadcrumb">

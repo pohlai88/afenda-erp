@@ -198,4 +198,23 @@ describe("metadata-ui visual and accessibility certification", () => {
     expect(kanbanSource).toContain("data-metadata-ui-move-intent");
     expect(statSource).toContain("useCanAnimate");
   });
+
+  it("keeps metadata header spacing tokens attached to real layout containers", () => {
+    const pageHeaderSource = readSource(
+      "sections/page-header/page-header-renderer.server.tsx",
+    );
+    const headingSource = readSource("shell/heading.server.tsx");
+    const sectionShellSource = readSource("shell/section-shell.server.tsx");
+
+    expect(pageHeaderSource).toContain(
+      'className={cn("metadata-ui-page-header grid", ui.surfaceGap.md)}',
+    );
+    expect(headingSource).toContain(
+      '"metadata-ui-heading flex min-w-0 items-start justify-between"',
+    );
+    expect(headingSource).toContain('className={cn("grid min-w-0", ui.surfaceGap.xs)}');
+    expect(sectionShellSource).toContain(
+      'className={cn("metadata-ui-section-shell grid", ui.surfaceGap.md)}',
+    );
+  });
 });

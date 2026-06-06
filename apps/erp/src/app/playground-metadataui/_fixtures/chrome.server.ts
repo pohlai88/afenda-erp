@@ -2,6 +2,10 @@ import "server-only";
 
 import type { AppShellChrome } from "@afenda/appshell/server";
 
+import {
+  createMetadataUiPlaygroundAdvancedCommandSections,
+  createMetadataUiPlaygroundAdvancedRailSections,
+} from "./advanced-navigation.fixture";
 import { METADATA_UI_PLAYGROUND_ROUTE } from "./constants.fixture";
 import { METADATA_UI_PLAYGROUND_SAMPLE_COPY } from "./sample-vocabulary.fixture";
 
@@ -20,18 +24,7 @@ export function createMetadataUiPlaygroundChrome(): AppShellChrome {
         emptyState: "No playground routes match.",
       },
       sections: [
-        {
-          id: "metadata-ui-playground",
-          label: "Playground",
-          items: [
-            {
-              id: "metadata-ui-overview",
-              label: METADATA_UI_PLAYGROUND_SAMPLE_COPY.overviewNavLabel,
-              href: METADATA_UI_PLAYGROUND_ROUTE,
-              icon: "layout-dashboard",
-            },
-          ],
-        },
+        ...createMetadataUiPlaygroundAdvancedRailSections(),
       ],
     },
     utilityBar: {
@@ -69,24 +62,7 @@ export function createMetadataUiPlaygroundChrome(): AppShellChrome {
         email: METADATA_UI_PLAYGROUND_SAMPLE_COPY.operatorEmail,
       },
     },
-    commandSections: [
-      {
-        id: "metadata-ui-playground-navigation",
-        label: "Navigation",
-        items: [
-          {
-            id: "metadata-ui-playground.open-overview",
-            label: METADATA_UI_PLAYGROUND_SAMPLE_COPY.overviewCommandLabel,
-            description:
-              METADATA_UI_PLAYGROUND_SAMPLE_COPY.overviewCommandDescription,
-            href: METADATA_UI_PLAYGROUND_ROUTE,
-            icon: "layout-dashboard",
-            kind: "navigation",
-            keywords: ["metadata", "ui", "playground", "overview"],
-          },
-        ],
-      },
-    ],
+    commandSections: [...createMetadataUiPlaygroundAdvancedCommandSections()],
     contextStack: null,
     preferences: {
       railMode: "expanded",

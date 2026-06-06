@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import { Badge, Button, ScrollArea } from "@afenda/ui";
+import { ui } from "@afenda/ui/design-system";
 import { cn } from "@afenda/ui/utils";
 
 import type {
@@ -122,13 +123,13 @@ export function MetadataUiKanbanDragBoard({
 
   return (
     <div
-      className="metadata-ui-kanban-board grid gap-3 md:grid-cols-3"
+      className={cn("metadata-ui-kanban-board grid md:grid-cols-3", ui.surfaceGap.md)}
       data-metadata-ui-kanban={model.key}
       data-metadata-ui-kanban-mode={model.mode}
       data-metadata-ui-movement-enabled={model.movementEnabled}
     >
       {model.swimlanes.length > 0 ? (
-        <div className="metadata-ui-kanban-swimlanes flex flex-wrap gap-2 md:col-span-3">
+        <div className={cn("metadata-ui-kanban-swimlanes flex flex-wrap md:col-span-3", ui.surfaceGap.xs)}>
           {model.swimlanes.map((swimlane) => (
             <Badge key={swimlane.key} variant="outline">
               {swimlane.label}: {swimlane.cardCount}
@@ -146,7 +147,7 @@ export function MetadataUiKanbanDragBoard({
         return (
           <section
             key={column.key}
-            className="min-w-0 rounded-md border border-zinc-200 bg-zinc-50 p-3"
+            className={cn("min-w-0", ui.radius.section, ui.surface.inset, ui.padding.card)}
             data-metadata-ui-kanban-column={column.key}
             onDragOver={(event) => {
               if (model.movementEnabled && draggingCardKey) {
@@ -163,11 +164,11 @@ export function MetadataUiKanbanDragBoard({
           >
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
-                <h3 className="text-sm font-semibold text-zinc-900">
+                <h3 className="text-sm font-semibold text-foreground">
                   {column.label}
                 </h3>
                 {column.description ? (
-                  <p className="mt-1 text-xs text-zinc-500">
+                  <p className="mt-1 text-xs text-muted-foreground">
                     {column.description}
                   </p>
                 ) : null}
@@ -177,14 +178,14 @@ export function MetadataUiKanbanDragBoard({
               </Badge>
             </div>
             {column.disabledReason ? (
-              <p id={`${column.key}-drop-reason`} className="mt-2 text-xs text-zinc-500">
+              <p id={`${column.key}-drop-reason`} className="mt-2 text-xs text-muted-foreground">
                 {column.disabledReason}
               </p>
             ) : null}
             <ScrollArea className="mt-3 max-h-96 pr-2">
-              <div className="space-y-2">
+              <div className={cn("grid", ui.surfaceGap.xs)}>
                 {cards.length === 0 ? (
-                  <div className="rounded border border-dashed border-zinc-300 bg-white p-3 text-sm text-zinc-500">
+                  <div className={cn("border border-dashed text-sm text-muted-foreground", ui.radius.control, ui.surface.panel, ui.padding.dense)}>
                     No cards
                   </div>
                 ) : null}
@@ -210,7 +211,10 @@ export function MetadataUiKanbanDragBoard({
                       onDragStart={() => setDraggingCardKey(card.key)}
                       onDragEnd={() => setDraggingCardKey(null)}
                       className={cn(
-                        "rounded-md border border-zinc-200 bg-white p-3 shadow-sm",
+                        "border shadow-sm",
+                        ui.radius.control,
+                        ui.surface.panel,
+                        ui.padding.dense,
                         card.disabledReason && "opacity-70",
                       )}
                       data-metadata-ui-kanban-card={card.key}
@@ -219,21 +223,21 @@ export function MetadataUiKanbanDragBoard({
                         columnKey: column.key,
                       })}
                     >
-                      <div className="space-y-1">
-                        <h4 className="text-sm font-medium text-zinc-900">
+                      <div className="grid gap-surface-2xs">
+                        <h4 className="text-sm font-medium text-foreground">
                           {title}
                         </h4>
                         {description ? (
-                          <p className="text-xs text-zinc-500">{description}</p>
+                          <p className="text-xs text-muted-foreground">{description}</p>
                         ) : null}
                         {card.disabledReason ? (
-                          <p className="text-xs text-zinc-500">
+                          <p className="text-xs text-muted-foreground">
                             {card.disabledReason}
                           </p>
                         ) : null}
                       </div>
                       {model.cardTemplate.metadataFields.length > 0 ? (
-                        <dl className="mt-3 grid gap-1 text-xs text-zinc-500">
+                        <dl className="mt-3 grid gap-surface-2xs text-xs text-muted-foreground">
                           {model.cardTemplate.metadataFields.map((field) => (
                             <div key={field} className="flex justify-between gap-3">
                               <dt>{field}</dt>

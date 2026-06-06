@@ -162,11 +162,11 @@ function resolveRelativeImport(
 
 function layerForSrcRelative(relativePath: string): number | null {
   const normalized = relativePath.replace(/\\/g, "/");
-  if (normalized.startsWith("tests/")) return METADATA_UI_LAYER_RANK.tests;
+  if (normalized.startsWith("tests/")) return METADATA_UI_LAYER_RANK.tests ?? null;
 
   const [top] = normalized.split("/");
   if (!top) return null;
-  if (top === "sections") return METADATA_UI_LAYER_RANK.sections;
+  if (top === "sections") return METADATA_UI_LAYER_RANK.sections ?? null;
   return METADATA_UI_LAYER_RANK[top] ?? null;
 }
 
@@ -460,8 +460,7 @@ export function scanMetadataUiRegistry(input: {
   const registryIsPlaceholder = isPlaceholderModule(registrySource);
 
   for (const entry of METADATA_UI_SECTION_CONTRACT) {
-    const rendererArtifact =
-      "renderer" in entry && entry.renderer ? entry.renderer : entry.section;
+    const rendererArtifact = entry.renderer;
     const rendererRel = `sections/${entry.kind}/${rendererArtifact}`;
     const rendererPath = path.join(srcRoot, rendererRel);
     if (!fs.existsSync(rendererPath)) continue;
@@ -483,7 +482,7 @@ export function scanMetadataUiSectionContract(input: {
   packageRel: string;
   problems: string[];
 }) {
-  const { srcRoot, packageRel, problems } = input;
+  const { srcRoot, problems } = input;
 
   for (const entry of METADATA_UI_SECTION_CONTRACT) {
     const schemaPath = path.join(srcRoot, "schemas", entry.schema);
@@ -508,6 +507,56 @@ export function scanMetadataUiSectionContract(input: {
           `metadata-ui section contract: missing ${artifact} for section kind "${entry.kind}"`,
         );
       }
+    }
+  }
+}
+
+export function scanMetadataUiSpacingContracts(input: {
+  srcRoot: string;
+  packageRel: string;
+  problems: string[];
+}) {
+  const { srcRoot, packageRel, problems } = input;
+  const requiredSourceTokens = [
+    {
+      rel: "sections/page-header/page-header-renderer.server.tsx",
+      token: 'className={cn("metadata-ui-page-header grid", ui.surfaceGap.md)}',
+      label:
+        "page-header renderer must attach surface gap tokens to a grid container",
+    },
+    {
+      rel: "shell/heading.server.tsx",
+      token: '"metadata-ui-heading flex min-w-0 items-start justify-between"',
+      label:
+        "heading shell must attach horizontal gap tokens to a flex container",
+    },
+    {
+      rel: "shell/heading.server.tsx",
+      token: 'className={cn("grid min-w-0", ui.surfaceGap.xs)}',
+      label:
+        "heading shell title stack must attach vertical gap tokens to a grid container",
+    },
+    {
+      rel: "shell/section-shell.server.tsx",
+      token: 'className={cn("metadata-ui-section-shell grid", ui.surfaceGap.md)}',
+      label:
+        "section shell must attach surface gap tokens to a grid container",
+    },
+  ] as const;
+
+  for (const { rel, token, label } of requiredSourceTokens) {
+    const filePath = path.join(srcRoot, rel);
+
+    if (!fs.existsSync(filePath)) {
+      problems.push(
+        `metadata-ui spacing: missing ${packageRel}/src/${rel} for spacing contract`,
+      );
+      continue;
+    }
+
+    const source = fs.readFileSync(filePath, "utf8");
+    if (!source.includes(token)) {
+      problems.push(`metadata-ui spacing: ${packageRel}/src/${rel} — ${label}`);
     }
   }
 }
@@ -538,4 +587,5 @@ export function scanMetadataUiEnforcement(input: {
   scanMetadataUiRegistry(input);
   scanMetadataUiProhibitedDiscovery(input);
   scanMetadataUiSectionContract(input);
+  scanMetadataUiSpacingContracts(input);
 }

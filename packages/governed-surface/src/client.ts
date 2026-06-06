@@ -46,6 +46,7 @@ export * from "./gov-list-surface-sparkline-client";
 export * from "./gov-list-surface-table";
 export * from "./gov-list-surface-table-client";
 export * from "./gov-list-surface-toolbar-client";
+export * from "./list-surface-trailing-action.shared";
 export * from "./gov-module-page-header";
 export * from "./gov-multi-step-form-client";
 export * from "./gov-multi-step-form-renderer";
